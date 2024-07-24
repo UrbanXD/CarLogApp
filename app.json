@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "Taxi",
+    "slug": "Taxi",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "taxi",
+    "icon": "./src/assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./src/assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.urbanxd.Taxi"
+    },
+    "web": {
+      "favicon": "./src/assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./src/assets/fonts/Nosifer-Regular.ttf",
+            "./src/assets/fonts/GilroyHeavy.otf"
+          ]
+        }
+      ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "84e8549c-e28c-426d-b5d5-8a1cc83c8da9"
+      }
+    }
+  }
+}
