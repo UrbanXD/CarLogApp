@@ -33,7 +33,7 @@
         {
           "fonts": [
             "./src/assets/fonts/Nosifer-Regular.ttf",
-            "./src/assets/fonts/GilroyHeavy.otf"
+            "./src/assets/fonts/Gilroy-Heavy.otf"
           ]
         }
       ]

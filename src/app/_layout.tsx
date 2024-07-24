@@ -21,7 +21,7 @@ const Layout:React.FC = () => {
     const route: { [key: string]: any } | undefined = routerState.routes[routerState?.index || 0].params
 
     const [loaded, error] = useFonts({
-        // Gilroy: require("../assets/fonts/GilroyHeavy.otf"),
+        // Gilroy: require("../assets/fonts/Gilroy-Heavy.otf"),
         // Nosifer: require("../assets/fonts/Nosifer-Regular.ttf"),
         // DoubleFeature20: require("../assets/fonts/DoubleFeature20.ttf")
     });

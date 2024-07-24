@@ -88,7 +88,7 @@ const HomeScreen: React.FC = () => {
             <Animated.Text
                 entering={ FadeInLeft.springify(1200) }
                 style={{
-                    fontFamily: "GilroyHeavy",
+                    fontFamily: "Gilroy-Heavy",
                     fontSize: 30,
                     color: "whitesmoke",
                     padding: 15,
