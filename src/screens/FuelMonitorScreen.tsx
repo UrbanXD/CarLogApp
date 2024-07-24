@@ -65,7 +65,7 @@ const FuelMonitorScreen: React.FC = () => {
                             fontWeight: 'bold',
                         }}
                     >
-                        Basxic Mask
+                        AsEMMI
                     </Text>
                 </View>
         </View>
