@@ -44,7 +44,7 @@ const FuelMonitorScreen: React.FC = () => {
                     style={{
                         alignSelf: "flex-end",
                         // position: "absolute",
-                        fontFamily: "Nosifer",
+                        fontFamily: "Nosifer-Regular",
                         textAlign: "center",
                         fontSize: 60,
                         fontWeight: "bold"
@@ -65,7 +65,7 @@ const FuelMonitorScreen: React.FC = () => {
                             fontWeight: 'bold',
                         }}
                     >
-                        AsEMMI
+                        AsEMMxdI
                     </Text>
                 </View>
         </View>
