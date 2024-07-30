@@ -7,14 +7,15 @@ import { store } from "../redux/store";
 import { theme } from "../styles/theme";
 import { useFonts } from "expo-font";
 import HomeScreen from "../screens/HomeScreen";
-
+import FirstScreen from "../screens/FirstScreen";
 
 export default function App() {
     return (
         <Provider store={ store }>
             <PaperProvider theme={ theme }>
-                <StatusBar style="light" />
-                <HomeScreen />
+                <StatusBar style="dark" />
+                <FirstScreen />
+                {/*<HomeScreen />*/}
             </PaperProvider>
         </Provider>
     );

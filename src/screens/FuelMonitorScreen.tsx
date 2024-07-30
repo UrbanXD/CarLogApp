@@ -1,56 +1,21 @@
-import React from "react";
-import {Dimensions, Image, ImageBackground, Platform, Text, View} from "react-native";
+import React, {useState} from "react";
+import {Dimensions, Image, SafeAreaView, StyleSheet, Text, View} from "react-native";
 import {theme} from "../styles/theme";
-import Constants from "expo-constants";
-import {white} from "react-native-paper/lib/typescript/styles/themes/v2/colors";
-import MaskedView from "@react-native-masked-view/masked-view";
-import {useFonts} from "expo-font";
-// import {} from "expo-font";
+import {GLOBAL_STYLE} from "../constants/constants";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
+import CompetitionHeader from "../layouts/header/CompetitionHeader";
+// import {countries} from "countries-list";
+import CountryFlag from "react-native-country-flag";
+
 const FuelMonitorScreen: React.FC = () => {
+    const { top } = useSafeAreaInsets();
     return (
-        <View style={{
-            flex:1,
-            flexDirection: "column",
-            // height: "100%", width: "100%",
-            backgroundColor: theme.colors.fuelYellow,
-            paddingLeft: 20, paddingRight: 20,
-            gap: 100,
-            paddingTop: Platform.OS === "android" ? Constants.statusBarHeight * 3 : 0,
-            paddingBottom: 20,
-        }}>
-            <View style={{
-                // left: -80,
-                // bottom: -100,
-                // width: Dimensions.get("window").width,
-                height: "30%",
-                justifyContent: "flex-end",
-                // alignItems: "center",
-            }}>
-                <Image
-                    source={require("../assets/fuel_pump_nozzle.png")}
-                    resizeMode={"cover"}
-                    style={{
-                        position: "absolute",
-                        left: -100,
-                        width: Dimensions.get("window").width,
-                        height: "100%",
-                        resizeMode: "contain",
-                        transform: [{
-                            rotate: "30deg",
-                        }, {scale: 1.5}]
-                    }}
-                />
-                <Text
-                    style={{
-                        alignSelf: "flex-end",
-                        // position: "absolute",
-                        fontFamily: "Nosifer-Regular",
-                        textAlign: "center",
-                        fontSize: 60,
-                        fontWeight: "bold"
-                    }}
-                >Petrolasssaaa</Text>
-            </View>
+        <View style={ GLOBAL_STYLE.pageContainer }>
+            <CompetitionHeader />
+            <View style={ style.contentContainer }>
+                {/*<View style={ style.titleContainer }>*/}
+                {/*</View>*/}
+                <CountryFlag isoCode="HU" size={25} />
                 <View style={{
                     flex: 1,
                     // justifyContent: "center",
@@ -68,8 +33,22 @@ const FuelMonitorScreen: React.FC = () => {
                         AsEMMxdI
                     </Text>
                 </View>
+            </View>
         </View>
     )
 }
+
+const style = StyleSheet.create({
+    contentContainer: {
+        flex: 1,
+        flexDirection: "column",
+        padding: 20,
+        // backgroundColor: theme.colors.fuelYellow
+    },
+    titleContainer: {
+
+    },
+
+})
 
 export default FuelMonitorScreen;

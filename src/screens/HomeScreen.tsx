@@ -1,5 +1,6 @@
 import React from "react";
 import {
+    Dimensions,
     ImageSourcePropType,
     Platform,
     SafeAreaView,
@@ -9,30 +10,13 @@ import {
 } from "react-native";
 import {theme} from "../styles/theme";
 import Constants from "expo-constants";
-import CardButton from "../components/CardButton";
+import CardButton from "../components/Button/CardButton";
 import {router} from "expo-router";
 import Animated, {FadeInLeft} from "react-native-reanimated";
 import {countries} from "countries-list";
 import fuelAPIService from "../services/fuelAPI.service";
-
-
-const style = StyleSheet.create({
-    container: {
-        // flexDirection: "row",
-        width: "100%",
-        height: "100%",
-        backgroundColor: theme.colors.primaryBackground2,
-        paddingTop: Platform.OS === "android" ? Constants.statusBarHeight * 1.5 : 0,
-    },
-    buttonsContainer: {
-        flexDirection: "row",
-        justifyContent: "center",
-        flexWrap: "wrap",
-        gap: 15,
-        marginTop: 15,
-        padding: 15,
-    }
-})
+import HomeHeader from "../layouts/header/HomeHeader";
+import {GLOBAL_STYLE} from "../constants/constants";
 
 interface onButtonPressArgs {
     path: string,
@@ -46,12 +30,6 @@ const onButtonPress = ({ path, params }: onButtonPressArgs) => {
 }
 
 const HomeScreen: React.FC = () => {
-    // console.log("price", fuelAPIService.getGasolinePrice(""))
-    // Object.entries(countries).forEach(([countryCode, country]) => {
-    //     console.log(`Country code: ${countryCode}`);
-    //     console.log(`Country name: ${country.name}`);
-    //     console.log(`Country native: ${country.currency[0]}`);
-    // });
 
     type buttonsProps =
         Array<{
@@ -84,7 +62,8 @@ const HomeScreen: React.FC = () => {
     ];
 
     return (
-        <SafeAreaView style={ style.container }>
+        <View style={ [GLOBAL_STYLE.pageContainer, { backgroundColor: theme.colors.primaryBackground2 }] }>
+            <HomeHeader />
             <Animated.Text
                 entering={ FadeInLeft.springify(1200) }
                 style={{
@@ -109,8 +88,19 @@ const HomeScreen: React.FC = () => {
                     )
                 }
             </View>
-        </SafeAreaView>
+        </View>
     )
 }
+
+const style = StyleSheet.create({
+    buttonsContainer: {
+        flexDirection: "row",
+        justifyContent: "center",
+        flexWrap: "wrap",
+        gap: 15,
+        marginTop: 15,
+        padding: 15,
+    }
+})
 
 export default HomeScreen;

@@ -3,8 +3,8 @@ import Animated, {useAnimatedScrollHandler, useSharedValue} from "react-native-r
 import {ScrollViewProvider, useScrollView} from "../../providers/ScrollViewProvider";
 import React from "react";
 
-const CustomScrollView: React.FC<CustomScrollViewProp> = ({ children }) => {
-    const { lastContentOffset, setLastContentOffset, isScrolling, setIsScrolling} = useScrollView()
+const CustomScrollView: React.FC<CustomScrollViewProp> = ({ children, paddingTop }) => {
+    const { lastContentOffset, isScrolling} = useScrollView()
 
     const scrollHandler = useAnimatedScrollHandler({
         onScroll: (event) => {
@@ -37,6 +37,7 @@ const CustomScrollView: React.FC<CustomScrollViewProp> = ({ children }) => {
     return (
         <Animated.ScrollView
             onScroll={ scrollHandler }
+            style={{ paddingTop: paddingTop }}
             // scrollEventThrottle={ 400 }
         >
             { children }

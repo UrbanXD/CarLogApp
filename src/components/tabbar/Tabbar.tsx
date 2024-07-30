@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Dimensions, View, ViewStyle} from "react-native";
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs'
-import TabbarIcon from "./TabbarIcon";
+import TabBarIcon from "./TabBarIcon";
 import Animated, {interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming} from "react-native-reanimated";
 import {bottomTabStyles} from "../../styles/bottomTabs.style";
 import hexToRgba from "hex-to-rgba";
@@ -100,7 +100,7 @@ const Tabbar: React.FC<BottomTabBarProps & TabBarProps> = ({ state, descriptors,
                     };
 
                     return (
-                        <TabbarIcon
+                        <TabBarIcon
                             key={ index }
                             title={ options.title || route.name }
                             textColor={ color }
@@ -110,7 +110,7 @@ const Tabbar: React.FC<BottomTabBarProps & TabBarProps> = ({ state, descriptors,
                             onPress={ onPress }
                             onLongPress={ onLongPress }
                             width={ TAB_WIDTH }
-                        ></TabbarIcon>
+                        ></TabBarIcon>
                     );
                 })
             }

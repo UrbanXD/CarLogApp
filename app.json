@@ -32,8 +32,11 @@
         "expo-font",
         {
           "fonts": [
-            "./src/assets/fonts/Nosifer-Regular.ttf",
-            "./src/assets/fonts/Gilroy-Heavy.otf"
+            "./src/assets/fonts/Nosifer.otf",
+            "./src/assets/fonts/Gilroy-Heavy.otf",
+            "./src/assets/fonts/Gilroy-Regular.ttf",
+            "./src/assets/fonts/Gilroy-Medium.ttf",
+            "./src/assets/fonts/DoubleFeature20.ttf"
           ]
         }
       ]
