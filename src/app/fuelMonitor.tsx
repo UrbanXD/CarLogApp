@@ -4,10 +4,7 @@ import {StatusBar} from "expo-status-bar";
 
 const Page: React.FC = () => {
     return (
-        <>
-            <StatusBar style="dark" />
-            <FuelMonitorScreen />
-        </>
+        <FuelMonitorScreen />
     )
 }
 

@@ -12,6 +12,8 @@ export const theme = {
         grayMedium: "#8a8a8a",
         greenLight: "#4CBB17",
         greenDark: "#228B22",
+        redLight: "#f9504f",
+        redDark: "#B71C1C",
         primaryBackground1: "#161614",
         primaryBackground2: "#44474b",
         primaryBackground3: "#191919",
@@ -29,3 +31,7 @@ export const theme = {
         xd: "#adb4ba"
     },
 };
+
+   // "@react-native-async-storage/async-storage": "1.23.1",
+//    "expo-crypto": "~13.0.2",
+//    "react-native-url-polyfill": "^2.0.0",

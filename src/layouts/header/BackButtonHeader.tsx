@@ -23,7 +23,7 @@ const BackButtonHeader: React.FC<BackButtonHeaderProps> = ({ backButtonAction, t
 
 const styles = StyleSheet.create({
     headerTitle: {
-        fontSize: hp(6),
+        fontSize: hp(5),
         fontFamily: "Gilroy-Heavy",
         color: theme.colors.white,
     }

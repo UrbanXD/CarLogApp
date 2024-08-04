@@ -1,58 +1,16 @@
 import React, {ReactNode, useState} from "react";
 import {KeyboardAvoidingView, StyleSheet, Text, View} from "react-native";
-import {theme} from "../../styles/theme";
-import ProgressBar from "./ProgressBar";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import {useMultiStepForm} from "../../providers/MultiStepFormProvider";
 
-interface MultiStepFormProps {
-    steps: Array<() => ReactNode>,
-}
-
-const MultiStepForm: React.FC<MultiStepFormProps> = ({ steps }) => {
-    const [currentStep, setCurrentStep] = useState(0);
-    const [isBackActionAvailable, setIsBackActionAvailable] = useState(false);
-    const [isNextActionAvailable, setIsNextActionAvailable] = useState(steps.length > 0);
-
-    const nextStep = () => {
-        if(currentStep + 1 >= steps.length){
-            return;
-        }
-
-        if(currentStep + 1 == 1){
-            setIsBackActionAvailable(true);
-        }
-
-        if(currentStep + 1 == steps.length - 1) {
-            setIsNextActionAvailable(false);
-        }
-
-        setCurrentStep(currentStep + 1);
-        console.log("next", currentStep, currentStep +1)
-    }
-
-    const previousStep = () => {
-        if(currentStep - 1 < 0){
-            return;
-        }
-
-        if(currentStep - 1 == steps.length - 2) {
-            setIsNextActionAvailable(true);
-        }
-
-        if(currentStep - 1 == 0) {
-            setIsBackActionAvailable(false);
-        }
-
-        setCurrentStep(currentStep - 1);
-    }
-
+const MultiStepForm: React.FC = () => {
+    const {steps, currentStep, isFirstStep, isLastStep, next, back, submitHandler} = useMultiStepForm()
     return (
         <KeyboardAvoidingView style={ styles.container }>
-            <ProgressBar currentStep={ currentStep + 1} stepsCount={ steps.length } />
             { steps[currentStep]() }
             <View style={ styles.buttonContainer }>
-                { isNextActionAvailable && <Text onPress={ nextStep } style={{color: "red"}}> next </Text> }
-                { isBackActionAvailable && <Text onPress={ previousStep } style={{color: "red"}}> back </Text> }
+                { !isLastStep && <Text onPress={ next } style={{color: "red"}}> next </Text> }
+                { !isFirstStep && <Text onPress={ back } style={{color: "red"}}> back </Text> }
+                { isLastStep && <Text onPress={ submitHandler } style={{ fontSize: 22, color: "white" }}>Finish</Text> }
             </View>
         </KeyboardAvoidingView>
     );

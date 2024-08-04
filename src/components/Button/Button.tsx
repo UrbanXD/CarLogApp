@@ -8,7 +8,7 @@ import {
     TextStyle,
     StyleSheet,
     Image,
-    ImageSourcePropType
+    ImageSourcePropType, View
 } from "react-native";
 import {theme} from "../../styles/theme";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
@@ -46,11 +46,16 @@ const Button: React.FC<ButtonProps> = ({ onPress, buttonStyle, textStyle, title,
                     ? (
                         <>
                             {
-                                icon && <Image source={ icon } style={ styles.icon }></Image>
+                                icon &&
+                                    <View style={{flex: 0.2}}><Image source={ icon } style={ styles.icon }></Image></View>
                             }
                             <Text style={ [styles.buttonText, textStyle] } >
                                 { title }
                             </Text>
+                            {
+                                icon &&
+                                    <View style={{flex: 0.2}}></View>
+                            }
                         </>
                       )
                     : title
@@ -66,21 +71,23 @@ const useStyles = (primaryColor: ColorValue, secondaryColor: ColorValue) =>
             alignSelf: "center",
             justifyContent: "center",
             alignItems: "center",
-            paddingLeft: hp(3.5),
-            width: wp(85),
+            paddingHorizontal: hp(1),
+            width: "100%",
             height: hp(7),
             backgroundColor: secondaryColor,
             borderRadius: 30
         },
         buttonText: {
+            flex: 1,
+            // alignSelf: "center",
+            textAlign: "center",
             fontSize: hp(3),
             fontFamily: "Gilroy-Heavy",
             color: primaryColor,
             letterSpacing: 30 * 0.075,
         },
         icon: {
-            position: "absolute",
-            left: hp(2),
+            alignSelf: "center",
             width: hp(4),
             height: hp(4)
         }

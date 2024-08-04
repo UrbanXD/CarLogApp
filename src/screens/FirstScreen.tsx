@@ -1,5 +1,5 @@
 import React from "react";
-import {Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Image, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {GLOBAL_STYLE} from "../constants/constants";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-native-responsive-screen";
 import {theme} from "../styles/theme";
@@ -11,9 +11,10 @@ import Button from "../components/Button/Button";
 const FirstScreen: React.FC = () => {
     const openRegister = () => router.push({ pathname: "/(user_entry)/register" });
     const openLogin = () => router.push({ pathname: "/(user_entry)/login" });
-
     return (
         <View style={ [GLOBAL_STYLE.pageContainer, { gap: 0 }] }>
+            {/*<StatusBar translucent={false} backgroundColor='transparent' />*/}
+            {/*<StatusBar barStyle="light-content" translucent={true}  backgroundColor={ theme.colors.primaryBackground3 }  />*/}
             <ImageBackground source={ require("../assets/home2.jpg") } style={ styles.imageContainer } imageStyle={ styles.imageContainer }>
                 <LinearGradient
                     locations={[ 0, 0.35, 0.85 ]}

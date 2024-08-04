@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import {ColorValue, ImageSourcePropType, StyleSheet, View} from "react-native";
+import {ColorValue, ImageSourcePropType, StatusBar, StatusBarStyle, StyleSheet, View} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { SharedValue } from "react-native-reanimated";
 import {CollapsibleHeaderBar, SimpleHeaderBar} from "./HeaderBar";
@@ -7,8 +7,9 @@ import {SIMPLE_HEADER_HEIGHT} from "../../constants/constants";
 
 interface CustomHeaderProp {
     children?: ReactNode | null
-    statusbarColor?: ColorValue,
-    backgroundColor: ColorValue,
+    statusBarStyle?: StatusBarStyle | null | undefined
+    statusbarColor?: ColorValue
+    backgroundColor: ColorValue
     collapsible?: {
         image: ImageSourcePropType,
         imageHeight: SharedValue<number>
@@ -17,11 +18,10 @@ interface CustomHeaderProp {
     height?: SharedValue<number> | number
 }
 
-const Header: React.FC<CustomHeaderProp> = ({ children, backgroundColor, statusbarColor = backgroundColor, height = SIMPLE_HEADER_HEIGHT, collapsible}) => {
-    const { top } = useSafeAreaInsets();
+const Header: React.FC<CustomHeaderProp> = ({ children, statusBarStyle = "light-content", backgroundColor, statusbarColor = backgroundColor, height = SIMPLE_HEADER_HEIGHT, collapsible}) => {
     return (
         <View>
-            <View style={{ height: top, backgroundColor: statusbarColor }} />
+            <StatusBar barStyle={ statusBarStyle } backgroundColor={ statusbarColor } />
             {
                 !!collapsible
                     ? <CollapsibleHeaderBar

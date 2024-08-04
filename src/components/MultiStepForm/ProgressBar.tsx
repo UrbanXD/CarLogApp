@@ -30,12 +30,12 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ currentStep, stepsCount }) =>
 const useStyles = (stepsCount: number, currentStep: number) => {
     return StyleSheet.create({
         progressContainer: {
-            // width: wp(100),
-            flex: 0.25,
+            flex: 0.15,
             flexDirection: 'row',
+            justifyContent: "center",
             alignItems: 'center',
             gap: 0,
-            justifyContent: "center",
+            paddingHorizontal: hp(1.5)
         },
         stepContainer: {
             flex: 1,

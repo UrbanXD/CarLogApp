@@ -1,6 +1,7 @@
 import React from "react";
 import {ColorValue, StyleSheet, View, Text} from "react-native";
 import {theme} from "../../styles/theme";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface TextDividerProps {
     title: string
@@ -26,7 +27,7 @@ const useStyles = (color: ColorValue, height: number, marginVertical: number) =>
         container: {
             flexDirection: "row",
             alignItems: "center",
-            gap: 15,
+            gap: hp(1),
             marginVertical: marginVertical
         },
         line: {
@@ -35,9 +36,9 @@ const useStyles = (color: ColorValue, height: number, marginVertical: number) =>
             backgroundColor: color
         },
         text: {
-            fontSize: 18,
+            fontSize: hp(2.25),
             fontFamily: "Gilroy-Medium",
-            textTransform: "uppercase",
+            // textTransform: "uppercase",
             color: color
         }
     })

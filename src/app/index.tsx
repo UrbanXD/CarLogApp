@@ -1,20 +1,42 @@
-import { StatusBar } from 'expo-status-bar';
-import React, { useEffect } from "react";
-import { PaperProvider } from "react-native-paper";
-import { SplashScreen } from "expo-router";
+import React, {useEffect, useState} from "react";
+import { PaperProvider, Text } from "react-native-paper";
 import { Provider } from "react-redux";
 import { store } from "../redux/store";
 import { theme } from "../styles/theme";
-import { useFonts } from "expo-font";
 import HomeScreen from "../screens/HomeScreen";
 import FirstScreen from "../screens/FirstScreen";
+import {Session} from "@supabase/supabase-js";
+import {supabase} from "../db/supabase";
+import {useDatabase} from "../db/Database";
+import {Alert} from "react-native";
 
 export default function App() {
+    const { supabaseConnector } = useDatabase();
+    const [session, setSession] = useState<Session | null>(null)
+
+    useEffect(() => {
+        supabaseConnector.client.auth.getSession().then(({ data: { session } }) => {
+            setSession(session)
+        })
+
+        supabaseConnector.client.auth.onAuthStateChange((_event, session) => {
+            setSession(session)
+        })
+    }, [])
+
     return (
         <Provider store={ store }>
             <PaperProvider theme={ theme }>
-                <StatusBar style="dark" />
-                <FirstScreen />
+                {
+                    session && session.user ? <Text style={{ paddingTop: 100, color: "black", fontSize: 40}} onPress={ async () => {
+                        try {
+                            await supabaseConnector.client.auth.signOut();
+                        } catch (e: any){
+                            Alert.alert(e.message)
+                        }
+                    } }>Kijelentkezes</Text> : <FirstScreen />
+                }
+                {/*{session && session.user && <Text style={{color: "red", fontSize: 50}}>{session.user.id}</Text>}*/}
                 {/*<HomeScreen />*/}
             </PaperProvider>
         </Provider>
