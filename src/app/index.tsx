@@ -6,7 +6,6 @@ import { theme } from "../styles/theme";
 import HomeScreen from "../screens/HomeScreen";
 import FirstScreen from "../screens/FirstScreen";
 import {Session} from "@supabase/supabase-js";
-import {supabase} from "../db/supabase";
 import {useDatabase} from "../db/Database";
 import {Alert} from "react-native";
 
@@ -36,8 +35,6 @@ export default function App() {
                         }
                     } }>Kijelentkezes</Text> : <FirstScreen />
                 }
-                {/*{session && session.user && <Text style={{color: "red", fontSize: 50}}>{session.user.id}</Text>}*/}
-                {/*<HomeScreen />*/}
             </PaperProvider>
         </Provider>
     );

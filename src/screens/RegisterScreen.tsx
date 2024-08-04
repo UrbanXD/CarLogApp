@@ -18,6 +18,7 @@ import {
 import RegisterStepOne from "../layouts/forms/RegisterForm/StepOne";
 import RegisterStepTwo from "../layouts/forms/RegisterForm/StepTwo";
 import RegisterStepThree from "../layouts/forms/RegisterForm/StepThree";
+import ProgressBar from "../components/MultiStepForm/ProgressBar";
 
 const RegisterScreen: React.FC = () => {
     const { supabaseConnector } = useDatabase();
@@ -41,8 +42,9 @@ const RegisterScreen: React.FC = () => {
     return (
         <KeyboardProvider>
             <MultiStepFormProvider steps={ steps } control={ control } submitHandler={ submitHandler } trigger={ trigger } >
-                <View style={ [GLOBAL_STYLE.pageContainer, { backgroundColor: theme.colors.primaryBackground3, gap: hp(1) }] }>
+                <View style={ [GLOBAL_STYLE.pageContainer, { backgroundColor: theme.colors.primaryBackground3, gap: hp(6.5) }] }>
                     <BackButtonHeader title="Fiók létrehozása" backButtonAction={ () => router.replace({ pathname: "/" }) } />
+                    {/*<BackButtonHeader title={"Bejelentkezés"} backButtonAction={ () => router.replace({ pathname: "/" }) } />*/}
                     <RegisterForm />
                 </View>
             </MultiStepFormProvider>

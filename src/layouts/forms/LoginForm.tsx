@@ -2,20 +2,17 @@ import React, {useState} from "react";
 import {z} from "zod";
 import {SubmitHandler, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import Animated, {SlideInDown} from "react-native-reanimated";
-import {KeyboardAwareScrollView} from "react-native-keyboard-controller";
-import {Alert, StyleSheet, Text, View} from "react-native";
-import {GLOBAL_STYLE, ICON_NAMES} from "../../constants/constants";
+import Animated, { SlideInDown } from "react-native-reanimated";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { StyleSheet, Text, View } from "react-native";
+import { GLOBAL_STYLE, ICON_NAMES } from "../../constants/constants";
 import InputText from "../../components/Form/InputText";
 import Button from "../../components/Button/Button";
 import TextDivider from "../../components/TextDivider/TextDivider";
-import {theme} from "../../styles/theme";
-import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
-import {useDatabase} from "../../db/Database";
-import {getLoginHandleSubmit, LoginFormFieldType, loginUseFormProps} from "../../constants/formSchema/loginForm";
-import {
-    registerUseFormProps
-} from "../../constants/formSchema/registerForm";
+import { theme } from "../../styles/theme";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { useDatabase } from "../../db/Database";
+import { getLoginHandleSubmit, LoginFormFieldType, loginUseFormProps } from "../../constants/formSchema/loginForm";
 
 const LoginForm: React.FC = () => {
     const { control, handleSubmit } =
