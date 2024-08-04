@@ -16,8 +16,8 @@ export const loginFormSchema = z
 
 export const loginUseFormProps = {
     defaultValues: {
-        email: '',
-        password: '',
+        email: "",
+        password: "",
     },
     resolver: zodResolver(loginFormSchema),
 }
