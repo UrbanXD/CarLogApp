@@ -7,6 +7,9 @@
     "scheme": "taxi",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "automatic",
+    "androidStatusBar": {
+      "translucent": true
+    },
     "splash": {
       "image": "./src/assets/splash.png",
       "resizeMode": "contain",
@@ -20,6 +23,7 @@
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "softwareKeyboardLayoutMode": "pan",
       "package": "com.urbanxd.Taxi"
     },
     "web": {

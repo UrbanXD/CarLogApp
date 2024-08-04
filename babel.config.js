@@ -6,6 +6,7 @@ module.exports = function(api) {
       [
         'react-native-paper/babel'
       ],
+      '@babel/plugin-transform-async-generator-functions'
 
       // // NOTE: this is only necessary if you are using reanimated for animations
       // 'react-native-reanimated/plugin',
