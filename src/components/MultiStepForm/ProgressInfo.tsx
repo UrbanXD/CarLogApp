@@ -81,16 +81,14 @@ const ProgressInfo: React.FC<ProgressInfoProps> = ({ radius, strokeWidth, end, f
 const useStyles = (radius: number) =>
     StyleSheet.create({
         container: {
-            flex: 1,
             flexDirection: "row",
             alignItems: "center",
             gap: SEPARATOR_SIZES.lightSmall,
-            padding: SEPARATOR_SIZES.small
+            padding: SEPARATOR_SIZES.small,
         },
         circularProgressBarContainer: {
             width: radius * 2,
             height: radius * 2,
-            alignSelf: "center"
         },
         titleContainer: {
             flex: 1,
@@ -102,7 +100,8 @@ const useStyles = (radius: number) =>
             fontSize: FONT_SIZES.medium,
             fontFamily: "Gilroy-Heavy",
             lineHeight: FONT_SIZES.medium * 1.1,
-            color: theme.colors.white
+            color: theme.colors.white,
+            paddingTop: SEPARATOR_SIZES.small
         },
         subtitle: {
             fontSize: FONT_SIZES.small,

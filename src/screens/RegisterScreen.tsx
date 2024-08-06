@@ -26,7 +26,7 @@ const RegisterScreen: React.FC = () => {
         submitHandler
     } = useMultiStepForm();
 
-    const gap = useSharedValue(SEPARATOR_SIZES.extraMedium);
+    const gap = useSharedValue(SEPARATOR_SIZES.large);
     const end = useSharedValue(0);
 
     useEffect(() => {
@@ -43,7 +43,7 @@ const RegisterScreen: React.FC = () => {
         });
 
         const close = KeyboardEvents.addListener("keyboardWillHide", (e) => {
-            gap.value = withTiming(SEPARATOR_SIZES.extraMedium, { duration: 500 });
+            gap.value = withTiming(SEPARATOR_SIZES.large, { duration: 500 });
             setIsKeyboardOpen(false);
         })
 
@@ -53,7 +53,9 @@ const RegisterScreen: React.FC = () => {
         };
     }, []);
 
-    const font = useFont(require("../assets/fonts/Gilroy-Heavy.otf"), hp(!isKeyboardOpen ? 4 : 2.75));
+    // const font = useFont(require("../assets/fonts/Gilroy-Heavy.otf"), hp(!isKeyboardOpen ? 4 : 2.75));
+    const font = useFont(require("../assets/fonts/Gilroy-Heavy.otf"), hp(3));
+
     if (!font) return <></>
 
     return (
@@ -74,28 +76,30 @@ const RegisterScreen: React.FC = () => {
                 entering={ SlideInDown.duration(750) }
                 style={ styles.container }
             >
-                {
-                    !isFirstStep &&
-                        <View style={ styles.progessBarContainer }>
-                            <ProgressInfo
-                                radius={ hp(!isKeyboardOpen ? 8 : 5) }
-                                strokeWidth={ hp(!isKeyboardOpen ? 2 : 1.25) }
-                                end={ end }
-                                font={ font }
-                                statusText={ `${ stepsCount } / ${ currentStep }` }
-                                stepTitle={ registerStepsTitle[currentStep] }
-                                stepSubtitle={ registerStepsTitle[currentStep + 1] !== undefined ? `Következő: ${ registerStepsTitle[currentStep + 1] }` : undefined }
-                            />
-                        </View>
-                }
-                <View style={ [styles.contentContainer, currentStep === 0 && { justifyContent: "flex-start" }] }>
-                    <KeyboardAwareScrollView
-                        bounces={ false }
-                        keyboardShouldPersistTaps="handled"
-                        showsVerticalScrollIndicator={ false }
-                        contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
-                    >
-                        <View style={ [GLOBAL_STYLE.formContainer, { justifyContent: "flex-start" }] }>
+                <KeyboardAwareScrollView
+                    bounces={ false }
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={ false }
+                    contentContainerStyle={ [GLOBAL_STYLE.scrollViewContentContainer, { gap: SEPARATOR_SIZES.small }] }
+                >
+                    {
+                        !isFirstStep &&
+                            <View style={ styles.progessBarContainer }>
+                                <ProgressInfo
+                                    radius={ hp(6) }
+                                    strokeWidth={ hp(1.25) }
+                                    // radius={ hp(!isKeyboardOpen ? 8 : 5) }
+                                    // strokeWidth={ hp(!isKeyboardOpen ? 2 : 1.25) }
+                                    end={ end }
+                                    font={ font }
+                                    statusText={ `${ stepsCount } / ${ currentStep }` }
+                                    stepTitle={ registerStepsTitle[currentStep] }
+                                    stepSubtitle={ registerStepsTitle[currentStep + 1] !== undefined ? `Következő: ${ registerStepsTitle[currentStep + 1] }` : undefined }
+                                />
+                            </View>
+                    }
+                    <View style={ [styles.contentContainer, currentStep === 0 && { justifyContent: "flex-start" }] }>
+                        <View style={ [GLOBAL_STYLE.formContainer, { justifyContent: "flex-start", paddingBottom: isKeyboardOpen ? hp(10) : 0 }] }>
                             { steps[currentStep]() }
                             {
                                 isFirstStep &&
@@ -107,12 +111,12 @@ const RegisterScreen: React.FC = () => {
                                 </>
                             }
                         </View>
-                    </KeyboardAwareScrollView>
-                </View>
+                    </View>
+                </KeyboardAwareScrollView>
                 {
                     !isFirstStep &&
-                    <KeyboardStickyView offset={{ closed: 0, opened: -hp(0.5) }} style={ styles.buttonContainer }>
-                            <Button title="Következő" onPress={ next } />
+                    <KeyboardStickyView offset={{ closed: 0, opened: -hp(5) }} style={ styles.buttonContainer }>
+                            <Button title={ !isLastStep ? "Következő" : "Fiók létrehozása" } onPress={ next } />
                             {/*    { !isFirstStep && <Text onPress={ back } style={{color: "red"}}> back </Text> }*/}
                             {/*    { !isLastStep && <Text onPress={ next } style={{color: "red"}}> next </Text> }*/}
                             {/*    { isLastStep && <Text onPress={ submitHandler } style={{ fontSize: 22, color: "white" }}>Finish</Text> }*/}
@@ -126,16 +130,13 @@ const RegisterScreen: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        gap: SEPARATOR_SIZES.extraMedium,
         paddingTop: SEPARATOR_SIZES.lightLarge,
-        justifyContent: "space-between",
         borderTopLeftRadius: 125,
         shadowColor: theme.colors.primaryBackground4,
         elevation: 10,
         backgroundColor: theme.colors.primaryBackground4,
     },
     progessBarContainer: {
-        flex: 0.225,
         paddingLeft: SEPARATOR_SIZES.mediumSmall,
     },
     contentContainer: {
@@ -144,7 +145,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: SEPARATOR_SIZES.medium,
     },
     buttonContainer: {
-        flex: 0.2,
+        flex: 0.4,
         flexDirection: "row",
         justifyContent: "center",
         paddingHorizontal: SEPARATOR_SIZES.medium,
