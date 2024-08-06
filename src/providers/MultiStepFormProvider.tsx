@@ -4,6 +4,7 @@ import {registerStepsField} from "../constants/formSchema/registerForm";
 
 interface MultiStepFormProviderValue {
     steps: Array<() => ReactNode | null>
+    stepsCount: number
     control: Control<any>
     submitHandler: SubmitHandler<any>
     trigger: UseFormTrigger<any>
@@ -19,12 +20,13 @@ const MultiStepFormContext = createContext<MultiStepFormProviderValue | null>(nu
 interface MultiStepFormProviderProps {
     children: ReactNode | null
     steps: Array<() => ReactNode | null>
+    isFirstNotCount: boolean
     control: Control<any>
     submitHandler: SubmitHandler<any>
     trigger: UseFormTrigger<any>
 }
 
-export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({ children, steps, control, submitHandler, trigger}) => {
+export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({ children, steps, isFirstNotCount, control, submitHandler, trigger}) => {
     const [currentStep, setCurrentStep] = useState(0);
 
     const next = async () => {
@@ -52,11 +54,12 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({ ch
         <MultiStepFormContext.Provider
             value={{
                 steps,
+                stepsCount: steps.length - (!isFirstNotCount ? 1 : 0),
                 control,
                 submitHandler,
                 trigger,
                 currentStep,
-                isFirstStep: currentStep === 0,
+                isFirstStep: currentStep === (isFirstNotCount ? 1 : 0),
                 isLastStep: currentStep === steps.length - 1,
                 goTo,
                 next,

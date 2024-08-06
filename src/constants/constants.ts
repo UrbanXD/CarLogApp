@@ -13,6 +13,7 @@ export interface GetFormHandleSubmitArgs {
 export const ICON_NAMES = {
     email: "email-outline",
     password: "lock-outline",
+    user: "account-outline",
     checkMark: "check-circle-outline",
     eye: "eye-outline",
     eyeOff: "eye-off-outline",
@@ -22,6 +23,26 @@ export const ICON_COLORS = {
     default: theme.colors.white,
     good: theme.colors.greenLight,
     wrong: "red"
+}
+
+export const FONT_SIZES = {
+    extraSmall: hp(2),
+    small: hp(2.25),
+    normal: hp(2.5),
+    medium: hp(3.5),
+    large: hp(5),
+    extraLarge: hp(11)
+}
+
+export const SEPARATOR_SIZES = {
+    lightSmall: hp(1),
+    small: hp(1.5),
+    mediumSmall: hp(1.75),
+    normal: hp(2.5),
+    medium: hp(3),
+    extraMedium: hp(5),
+    lightLarge: hp(7.5),
+    large: hp(8.5)
 }
 
 export const GLOBAL_STYLE = StyleSheet.create({
@@ -37,11 +58,11 @@ export const GLOBAL_STYLE = StyleSheet.create({
     formContainer: {
         flex: 1,
         justifyContent: "center",
-        gap: hp(1.75)
+        gap: SEPARATOR_SIZES.mediumSmall
     },
     formLinkText: {
-        fontSize: hp(2),
-        paddingLeft: hp(1.5),
+        fontSize: FONT_SIZES.extraSmall,
+        paddingLeft: SEPARATOR_SIZES.small,
         fontFamily: "Gilroy-Medium",
         color: theme.colors.fuelYellow
     },

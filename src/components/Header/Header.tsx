@@ -9,6 +9,7 @@ interface CustomHeaderProp {
     children?: ReactNode | null
     statusBarStyle?: StatusBarStyle | null | undefined
     statusbarColor?: ColorValue
+    statusBarIsTransculent?: boolean
     backgroundColor: ColorValue
     collapsible?: {
         image: ImageSourcePropType,
@@ -18,10 +19,10 @@ interface CustomHeaderProp {
     height?: SharedValue<number> | number
 }
 
-const Header: React.FC<CustomHeaderProp> = ({ children, statusBarStyle = "light-content", backgroundColor, statusbarColor = backgroundColor, height = SIMPLE_HEADER_HEIGHT, collapsible}) => {
+const Header: React.FC<CustomHeaderProp> = ({ children, statusBarStyle = "light-content", statusBarIsTransculent = false, backgroundColor, statusbarColor = backgroundColor, height = SIMPLE_HEADER_HEIGHT, collapsible}) => {
     return (
         <View>
-            <StatusBar barStyle={ statusBarStyle } backgroundColor={ statusbarColor } />
+            <StatusBar translucent={ statusBarIsTransculent } barStyle={ statusBarStyle } backgroundColor={ statusbarColor } />
             {
                 !!collapsible
                     ? <CollapsibleHeaderBar
