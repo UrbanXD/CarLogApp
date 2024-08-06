@@ -7,7 +7,7 @@ import HomeScreen from "../screens/HomeScreen";
 import FirstScreen from "../screens/FirstScreen";
 import {Session} from "@supabase/supabase-js";
 import {useDatabase} from "../db/Database";
-import {Alert, StatusBar} from "react-native";
+import {Alert, SafeAreaView, ScrollView, StatusBar, View} from "react-native";
 
 export default function App() {
     const { supabaseConnector } = useDatabase();
@@ -42,7 +42,9 @@ export default function App() {
                             </Text>
                         :   <>
                                 <StatusBar barStyle={ "dark-content" } />
-                                <FirstScreen />
+                                    {/*<ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>*/}
+                                        <FirstScreen />
+                                    {/*</ScrollView>*/}
                             </>
                 }
             </PaperProvider>

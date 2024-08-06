@@ -31,7 +31,7 @@ export const FONT_SIZES = {
     normal: hp(2.5),
     medium: hp(3.5),
     large: hp(5),
-    extraLarge: hp(11)
+    extraLarge: wp(22)
 }
 
 export const SEPARATOR_SIZES = {
