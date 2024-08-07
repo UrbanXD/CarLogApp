@@ -26,24 +26,11 @@ export default function App() {
     return (
         <Provider store={ store }>
             <PaperProvider theme={ theme }>
+                <StatusBar barStyle={"dark-content"} />
                 {
                     session && session.user
-                        ?   <Text
-                                style={{ paddingTop: 100, color: "black", fontSize: 40}}
-                                onPress={ async () => {
-                                    try {
-                                        await supabaseConnector.client.auth.signOut();
-                                    } catch (e: any){
-                                        Alert.alert(e.message)
-                                    }
-                                }}
-                            >
-                                Kijelentkezes
-                            </Text>
-                        :   <>
-                                <StatusBar barStyle={ "dark-content" } />
-                                <FirstScreen />
-                            </>
+                        ?   <HomeScreen />
+                        :   <FirstScreen />
                 }
             </PaperProvider>
         </Provider>

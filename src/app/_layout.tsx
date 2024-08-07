@@ -21,7 +21,6 @@ const Layout:React.FC = () => {
     }, []);
 
     useEffect(() => {
-        // Listen for changes to authentication state
         const { data } = supabaseConnector.client.auth.onAuthStateChange(async (event, session) => {
             console.log('supabase.auth.onAuthStateChange', event);
             setSession(session);

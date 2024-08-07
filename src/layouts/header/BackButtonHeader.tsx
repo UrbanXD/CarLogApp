@@ -14,7 +14,7 @@ interface BackButtonHeaderProps {
 
 const BackButtonHeader: React.FC<BackButtonHeaderProps> = ({ backButtonAction, title }) => {
     return (
-        <Header statusbarColor={ theme.colors.primaryBackground3 } statusBarIsTransculent={ false } backgroundColor="transparent" statusBarStyle={"dark-content"}>
+        <Header statusbarColor={ theme.colors.primaryBackground3 } statusBarIsTransculent={ false } backgroundColor="transparent" statusBarStyle="light-content">
             <HeaderBackButton backAction={ backButtonAction } />
             { title && <HeaderTitle title={ title } titleStyle={ styles.headerTitle } /> }
         </Header>

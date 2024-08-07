@@ -2,6 +2,7 @@ import React from "react";
 import Header from "../../components/Header/Header";
 import {theme} from "../../styles/theme";
 import HeaderButtonMenu from "../../components/Header/HeaderButtonMenu";
+import {FONT_SIZES} from "../../constants/constants";
 
 const HomeHeader: React.FC = () => {
     return (
@@ -10,11 +11,8 @@ const HomeHeader: React.FC = () => {
                 icons={[
                     {
                         icon: "cog",
-                        size: 28,
+                        size: FONT_SIZES.medium,
                         iconColor: theme.colors.secondaryColor1,
-                        style: {
-                            alignSelf: "flex-end"
-                        },
                         onPress: () => alert("CsaOG")
                     }
                 ]}

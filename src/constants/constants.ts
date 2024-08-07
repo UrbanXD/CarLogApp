@@ -28,7 +28,7 @@ export const ICON_COLORS = {
 export const FONT_SIZES = {
     extraSmall: hp(2),
     small: hp(2.25),
-    normal: hp(2.5),
+    normal: hp(3),//2.5
     medium: hp(3.5),
     large: hp(5),
     extraLarge: wp(22)
@@ -45,12 +45,16 @@ export const SEPARATOR_SIZES = {
     large: hp(8.5)
 }
 
+export const DEFAULT_SEPARATOR = SEPARATOR_SIZES.normal
+
 export const GLOBAL_STYLE = StyleSheet.create({
     pageContainer: {
         flex: 1,
         flexDirection: "column",
-        gap: 10,
+        gap: 0,
         backgroundColor: "whitesmoke",
+        paddingHorizontal: DEFAULT_SEPARATOR,
+        paddingBottom: SEPARATOR_SIZES.small,
     },
     scrollViewContentContainer: {
         flexGrow: 1,
@@ -67,6 +71,10 @@ export const GLOBAL_STYLE = StyleSheet.create({
         color: theme.colors.fuelYellow
     },
 });
+
+export const GET_ICON_BUTTON_RESET_STYLE = (size: number = FONT_SIZES.normal) => {
+    return { width: size, height: size, margin: 0 }
+}
 
 export const COLLAPSIBLE_HEADER_HEIGHT = 180;
 export const COLLAPSIBLE_HEADER_IMAGE = 110;

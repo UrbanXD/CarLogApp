@@ -10,7 +10,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import {FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES} from "../constants/constants";
+import {DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES} from "../constants/constants";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-native-responsive-screen";
 import {theme} from "../styles/theme";
 import {LinearGradient} from "expo-linear-gradient";
@@ -18,13 +18,15 @@ import {Divider} from "react-native-paper";
 import {router} from "expo-router";
 import Button from "../components/Button/Button";
 import {ScreenContainer} from "react-native-screens";
+import {Stack} from "expo-router/stack";
 
 const FirstScreen: React.FC = () => {
     const openRegister = () => router.push({ pathname: "/(user_entry)/register" });
     const openLogin = () => router.push({ pathname: "/(user_entry)/login" });
+
     return (
-        <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, { gap: 0 }]}>
-            <ScrollView contentContainerStyle={styles.scrollContentContainer}>
+        <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, { paddingHorizontal: 0, paddingBottom: 0 }]}>
+            <ScrollView showsVerticalScrollIndicator={ false } contentContainerStyle={GLOBAL_STYLE.scrollViewContentContainer}>
                 <ImageBackground source={ require("../assets/home2.jpg") } style={ styles.imageContainer } imageStyle={ styles.imageContainer }>
                     <LinearGradient
                         locations={[ 0, 0.35, 0.85 ]}
@@ -55,21 +57,18 @@ const FirstScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
     imageContainer: {
-        height: hp(55), // Use height to define the space taken by the image background
+        height: hp(55)
     },
     image: {
         resizeMode: "cover",
-    },
-    scrollContentContainer: {
-        flexGrow: 1,
     },
     contentContainer: {
         flex: 1,
         flexDirection: "column",
         justifyContent: "space-between",
         backgroundColor: theme.colors.primaryBackground3,
-        paddingHorizontal: SEPARATOR_SIZES.normal,
-        paddingBottom: SEPARATOR_SIZES.small,
+        paddingHorizontal: DEFAULT_SEPARATOR,
+        paddingBottom: GLOBAL_STYLE.pageContainer.paddingBottom,
     },
     title: {
         zIndex: 1,

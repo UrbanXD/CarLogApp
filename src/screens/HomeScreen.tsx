@@ -1,9 +1,10 @@
 import React from "react";
 import {
+    Alert,
     Dimensions,
     ImageSourcePropType,
     Platform,
-    SafeAreaView,
+    SafeAreaView, ScrollView,
     StyleSheet,
     Text,
     View
@@ -16,7 +17,10 @@ import Animated, {FadeInLeft} from "react-native-reanimated";
 import {countries} from "countries-list";
 import fuelAPIService from "../services/fuelAPI.service";
 import HomeHeader from "../layouts/header/HomeHeader";
-import {GLOBAL_STYLE} from "../constants/constants";
+import {DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES} from "../constants/constants";
+import {useDatabase} from "../db/Database";
+import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
+import Carousel from "../components/Carousel/Carousel";
 
 interface onButtonPressArgs {
     path: string,
@@ -30,6 +34,7 @@ const onButtonPress = ({ path, params }: onButtonPressArgs) => {
 }
 
 const HomeScreen: React.FC = () => {
+    const { supabaseConnector } = useDatabase();
 
     type buttonsProps =
         Array<{
@@ -62,44 +67,113 @@ const HomeScreen: React.FC = () => {
     ];
 
     return (
-        <View style={ [GLOBAL_STYLE.pageContainer, { backgroundColor: theme.colors.primaryBackground2 }] }>
-            <HomeHeader />
-            <Animated.Text
-                entering={ FadeInLeft.springify(1200) }
-                style={{
-                    fontFamily: "Gilroy-Heavy",
-                    fontSize: 30,
-                    color: "whitesmoke",
-                    padding: 15,
-                    textTransform: "uppercase",
-                }}
-            >
-                Vezzessen számot nálunk az autóiról!
-            </Animated.Text>
-            <View style={ style.buttonsContainer }>
-                {
-                    buttons.map((button, index) =>
-                        <CardButton
-                            key={ index }
-                            onPress={ button.router }
-                            title={ button.title }
-                            image={ button.image }
-                        />
-                    )
-                }
+        <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, { backgroundColor: theme.colors.primaryBackground2, marginBottom: 0, paddingHorizontal: 0 }] }>
+            <View style={{ paddingHorizontal: DEFAULT_SEPARATOR }}>
+                <HomeHeader />
             </View>
-        </View>
+            <ScrollView showsVerticalScrollIndicator={ false } contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }>
+                <Animated.Text
+                    entering={ FadeInLeft.springify(1200) }
+                    style={ styles.titleText }
+                >
+                    Vezzessen számot nálunk az autóiról!
+                </Animated.Text>
+                <View style={ styles.myCarsContainer } >
+                    <Text style={ [styles.containerTitleText, { paddingHorizontal: DEFAULT_SEPARATOR }] }>
+                        Autóim
+                    </Text>
+                    <View style={ styles.carouselContainer }>
+                        <Carousel data={[ <View></View>, <></>, <></>]} />
+                        {/*<View style={ styles.carouselItemContainer }>*/}
+
+                        {/*</View>*/}
+                    </View>
+                </View>
+                <View style={ styles.actionButtonsContainer }>
+                    <Text style={ styles.containerTitleText }>
+                        Szolgáltatások
+                    </Text>
+                    <View style={ styles.buttonsContainer }>
+                        {
+                            buttons.map((button, index) =>
+                                <CardButton
+                                    key={ index }
+                                    onPress={ button.router }
+                                    title={ button.title }
+                                    image={ button.image }
+                                />
+                            )
+                        }
+                    </View>
+                </View>
+            </ScrollView>
+            {/*<Text*/}
+            {/*    style={{ paddingTop: 100, color: "black", fontSize: 40}}*/}
+            {/*    onPress={ async () => {*/}
+            {/*        try {*/}
+            {/*            await supabaseConnector.client.auth.signOut();*/}
+            {/*        } catch (e: any){*/}
+            {/*            Alert.alert(e.message)*/}
+            {/*        }*/}
+            {/*    }}*/}
+            {/*>*/}
+            {/*    Kijelentkezes*/}
+            {/*</Text>*/}
+            {/*<View style={ styles.buttonsContainer }>*/}
+            {/*    {*/}
+            {/*        buttons.map((button, index) =>*/}
+            {/*            <CardButton*/}
+            {/*                key={ index }*/}
+            {/*                onPress={ button.router }*/}
+            {/*                title={ button.title }*/}
+            {/*                image={ button.image }*/}
+            {/*            />*/}
+            {/*        )*/}
+            {/*    }*/}
+            {/*</View>*/}
+        </SafeAreaView>
     )
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
+    titleText: {
+        fontFamily: "Gilroy-Heavy",
+        fontSize: FONT_SIZES.medium,
+        color: theme.colors.white,
+        marginHorizontal: SEPARATOR_SIZES.normal,
+        textTransform: "uppercase"
+    },
+    containerTitleText: {
+        fontFamily: "Gilroy-Heavy",
+        fontSize: FONT_SIZES.normal,
+        color: theme.colors.white
+    },
+    myCarsContainer: {
+        gap: SEPARATOR_SIZES.small,
+        marginTop: SEPARATOR_SIZES.extraMedium,
+    },
+    carouselContainer: {
+        height: hp(25),
+        width: "100%",
+        // alignItems: "center",
+    },
+    carouselItemContainer: {
+        flex: 1,
+        width: "85%",
+        backgroundColor: 'blue'
+    },
+    actionButtonsContainer: {
+        paddingHorizontal: DEFAULT_SEPARATOR,
+        gap: SEPARATOR_SIZES.small,
+        marginTop: SEPARATOR_SIZES.extraMedium
+    },
     buttonsContainer: {
         flexDirection: "row",
         justifyContent: "center",
         flexWrap: "wrap",
         gap: 15,
-        marginTop: 15,
-        padding: 15,
+        // marginTop: 15,
+        // padding: 15,
     }
 })
 
