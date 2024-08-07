@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
         marginTop: SEPARATOR_SIZES.extraMedium,
     },
     carouselContainer: {
-        height: hp(25),
+        height: hp(27.5),
         width: "100%",
         // alignItems: "center",
     },

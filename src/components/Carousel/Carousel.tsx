@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 import hexToRgba from "hex-to-rgba";
 import {theme} from "../../styles/theme";
+import CarouselItem from "./CarouselItem";
 
 interface CarouselProps {
     data: Array<ReactNode>
@@ -17,7 +18,7 @@ interface CarouselProps {
 
 const Carousel: React.FC<CarouselProps> = ({ data }) => {
     const {width} = useWindowDimensions();
-    const ITEM_SIZE = width * 0.75;
+    const ITEM_SIZE = width * 0.8;
     const SPACER = (width - ITEM_SIZE) / 2;
 
     // const ITEM_SIZE = wp(75);
@@ -29,8 +30,9 @@ const Carousel: React.FC<CarouselProps> = ({ data }) => {
     const onScroll = useAnimatedScrollHandler({
         onScroll: event => {
             x.value = event.contentOffset.x;
-            if(focusedIndex != Math.round(x.value / ITEM_SIZE)) {
-                runOnJS(setFoucesdIndex)(Math.round(x.value / ITEM_SIZE))
+            const currentIndex = Math.round(x.value / ITEM_SIZE)
+            if(focusedIndex != currentIndex) {
+                runOnJS(setFoucesdIndex)(currentIndex)
             }
         }
     });
@@ -46,34 +48,18 @@ const Carousel: React.FC<CarouselProps> = ({ data }) => {
             onScroll={ onScroll }
             contentContainerStyle={ styles.scrollViewContainer }>
             {
-                data.map((renderItem, index) => {
-                    const style = useAnimatedStyle(() => {
-                        const scale = interpolate(
-                            x.value,
-                            [ITEM_SIZE * (index - 1), ITEM_SIZE * index , ITEM_SIZE * (index + 1)],
-                            [0.9, 1, 0.9],
-                        );
-
-                        return {
-                            transform: [{scale}]
-                        };
-                    });
-                    return (
-                        <React.Fragment key={index}>
-                            { index === 0 && <View style={{ width: SPACER }} /> }
-                            <View style={{ width: ITEM_SIZE }}>
-                                <Animated.View style={[{ backgroundColor: theme.colors.primaryBackground3, flex: 1, padding:35, borderRadius: 34,
-                                    overflow: 'hidden', position: 'relative' }, style ]}>
-                                    <Text style={{ color: "white" }}> { index } </Text>
-                                    {focusedIndex !== index && (
-                                        <View style={styles.overlay} />
-                                    )}
-                                </Animated.View>
-                            </View>
-                            { index === data.length - 1 && <View style={{ width: SPACER }} /> }
-                        </React.Fragment>
-                    )
-                })
+                data.map((renderItem, index) =>
+                    <React.Fragment key={ index }>
+                        { index === 0 && <View style={{ width: SPACER }} /> }
+                        <CarouselItem
+                            index={ index }
+                            size={ ITEM_SIZE }
+                            x={ x }
+                            isFocused={ focusedIndex === index }
+                        />
+                        { index === data.length - 1 && <View style={{ width: SPACER }} /> }
+                    </React.Fragment>
+                )
             }
         </Animated.ScrollView>
     )
@@ -84,11 +70,6 @@ const styles = StyleSheet.create({
         // gap: SEPARATOR_SIZES.medium,
         justifyContent: "center",
         // backgroundColor: "yellow"
-    },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: hexToRgba(theme.colors.white, 0.025),
-        borderRadius: 34
     }
 });
 
