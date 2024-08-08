@@ -1,26 +1,23 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {
-    Alert,
-    Dimensions,
     ImageSourcePropType,
-    Platform,
     SafeAreaView, ScrollView,
     StyleSheet,
     Text,
     View
 } from "react-native";
 import {theme} from "../styles/theme";
-import Constants from "expo-constants";
 import CardButton from "../components/Button/CardButton";
 import {router} from "expo-router";
 import Animated, {FadeInLeft} from "react-native-reanimated";
-import {countries} from "countries-list";
-import fuelAPIService from "../services/fuelAPI.service";
 import HomeHeader from "../layouts/header/HomeHeader";
 import {DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES} from "../constants/constants";
 import {useDatabase} from "../db/Database";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
-import Carousel from "../components/Carousel/Carousel";
+import Carousel, {CarouselItemType} from "../components/Carousel/Carousel";
+import {CARS_TABLE, USERS_TABLE} from "../db/AppSchema";
+import {getUUID} from "../db/uuid";
+import Button from "../components/Button/Button";
 
 interface onButtonPressArgs {
     path: string,
@@ -34,7 +31,8 @@ const onButtonPress = ({ path, params }: onButtonPressArgs) => {
 }
 
 const HomeScreen: React.FC = () => {
-    const { supabaseConnector } = useDatabase();
+    const { supabaseConnector, db } = useDatabase();
+    const [cars, setCars] = useState<Array<CarouselItemType>>([]);
 
     type buttonsProps =
         Array<{
@@ -66,6 +64,51 @@ const HomeScreen: React.FC = () => {
         }
     ];
 
+    const addCar = async () => {
+        const { userID } = await supabaseConnector.fetchCredentials();
+        const carID = getUUID();
+
+        await db.insertInto(CARS_TABLE).values({
+            id: carID,
+            owner: userID,
+            name: "Azonosito",
+            brand: "Brand",
+            type: "Tipus",
+            image: null,
+            selected: 0
+        }).execute()
+
+        loadCars();
+    }
+
+    const loadCars = async () => {
+        setCars([]);
+
+        const result =
+            await db
+                .selectFrom(CARS_TABLE)
+                .selectAll()
+                .execute();
+
+        if (result && result.length > 0) {
+            result.sort((a, b) => (b.selected || 0) - (a.selected || 0));
+
+            const cars =
+                result.map(car => ({
+                    id: car.name || "",
+                    title: car.brand || "",
+                    subtitle: car.type || "",
+                    selected: !!car.selected,
+                    image: undefined
+                }));
+
+            setCars(cars);
+        }
+    }
+    useEffect(() => {
+        loadCars();
+    }, []);
+
     return (
         <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, { backgroundColor: theme.colors.primaryBackground2, marginBottom: 0, paddingHorizontal: 0 }] }>
             <View style={{ paddingHorizontal: DEFAULT_SEPARATOR }}>
@@ -78,15 +121,18 @@ const HomeScreen: React.FC = () => {
                 >
                     Vezzessen számot nálunk az autóiról!
                 </Animated.Text>
+                <Button onPress={addCar} title={"Add"}></Button>
                 <View style={ styles.myCarsContainer } >
-                    <Text style={ [styles.containerTitleText, { paddingHorizontal: DEFAULT_SEPARATOR }] }>
-                        Autóim
-                    </Text>
+                    <View>
+                        <Text style={ [styles.containerTitleText, { paddingHorizontal: DEFAULT_SEPARATOR }] }>
+                            Autóim
+                        </Text>
+                        <Text style={ [styles.containerSubtitleText, { paddingHorizontal: DEFAULT_SEPARATOR }] }>
+                            Válasszon ki egy autót
+                        </Text>
+                    </View>
                     <View style={ styles.carouselContainer }>
-                        <Carousel data={[ <View></View>, <></>, <></>]} />
-                        {/*<View style={ styles.carouselItemContainer }>*/}
-
-                        {/*</View>*/}
+                        <Carousel data={ cars } />
                     </View>
                 </View>
                 <View style={ styles.actionButtonsContainer }>
@@ -147,6 +193,11 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.normal,
         color: theme.colors.white
+    },
+    containerSubtitleText: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.small,
+        color: theme.colors.grayLight
     },
     myCarsContainer: {
         gap: SEPARATOR_SIZES.small,

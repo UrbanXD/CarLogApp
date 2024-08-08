@@ -13,7 +13,7 @@ export class Database {
         this.powersync = new PowerSyncDatabase({
             schema: AppSchema,
             database: {
-                dbFilename: "app.sqlite"
+                dbFilename: "carlog-app.sqlite"
             }
         })
         this.db = wrapPowerSyncWithKysely(this.powersync);

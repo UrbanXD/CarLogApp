@@ -1,19 +1,21 @@
 import React, {useLayoutEffect, useState} from "react";
-import {ImageBackground, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {ImageBackground, Image, StyleSheet, Text, TouchableOpacity, View, ImageSourcePropType} from "react-native";
 import Animated, {interpolate, SharedValue, useAnimatedStyle} from "react-native-reanimated";
 import {theme} from "../../styles/theme";
 import hexToRgba from "hex-to-rgba";
 import {LinearGradient} from "expo-linear-gradient";
 import {FONT_SIZES, SEPARATOR_SIZES} from "../../constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import {CarouselItemType} from "./Carousel";
 
 interface CarouselItemProps {
-    index: number,
-    size: number,
+    index: number
+    size: number
     x: SharedValue<number>
     isFocused: boolean
+    item: CarouselItemType
 }
-const CarouselItem: React.FC<CarouselItemProps> = ({ index, size, x, isFocused }) => {
+const CarouselItem: React.FC<CarouselItemProps> = ({ index, size, x, isFocused, item }) => {
     const animatedStyle = useAnimatedStyle(() => {
         const scale = interpolate(
             x.value,
@@ -33,7 +35,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({ index, size, x, isFocused }
                     !isFocused && <View style={styles.overlay} />
                 }
                 <ImageBackground
-                    source={ require("../../assets/car2.jpg") }
+                    source={ item.image }
                     style={ styles.itemContentContainer }
                     imageStyle={ styles.itemImage }
                 >
@@ -43,25 +45,27 @@ const CarouselItem: React.FC<CarouselItemProps> = ({ index, size, x, isFocused }
                         style={ styles.imageOverlay }
                     />
                     {
-                        isFocused &&
+                        item.selected &&
                             <View style={ styles.selectedContainer }>
-                                <View style={ styles.selectedPoint }></View>
+                                <View style={ styles.selectedPoint } />
                             </View>
                     }
                     <View style={{ paddingHorizontal: SEPARATOR_SIZES.normal,
                         paddingVertical: hp(0.5), }}>
                         <Text style={{ color: "white", textShadowColor: 'rgba(0, 0, 0, 0.75)',
-                            textShadowOffset: {width: -1, height: 1},
-                            textShadowRadius: 15, fontSize: FONT_SIZES.normal, fontFamily: "Gilroy-Heavy" }}>SA-HK025</Text>
+                            textShadowOffset: {width: 1, height: 1},
+                            textShadowRadius: 10, fontSize: FONT_SIZES.normal, fontFamily: "Gilroy-Heavy" }}>
+                            { item.id }
+                        </Text>
                     </View>
                     <View style={ styles.infoContainer }>
-                        <Text style={{ color: "white", textShadowColor: 'rgba(0, 0, 0, 0.75)',
+                        <Text numberOfLines={ 2 } style={{ color: "white", textShadowColor: 'rgba(0, 0, 0, 0.75)',
                             textShadowOffset: {width: -1, height: 1},
                             textShadowRadius: 15,fontSize: FONT_SIZES.normal, fontFamily: "Gilroy-Heavy" }}>
-                            Mercedes-Benz
+                            { item.title }
                         </Text>
-                        <Text style={{ color: "white", fontSize: FONT_SIZES.small, fontFamily: "Gilroy-Medium" }}>
-                            C osztály
+                        <Text numberOfLines={ 2 } style={{ color: "white", fontSize: FONT_SIZES.small, fontFamily: "Gilroy-Medium" }}>
+                            { item.subtitle }
                         </Text>
                     </View>
                 </ImageBackground>

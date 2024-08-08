@@ -6,8 +6,6 @@ import {ScrollViewProvider} from "../providers/ScrollViewProvider";
 import {DatabaseProvider} from "../providers/DatabaseProvider";
 import {useDatabase} from "../db/Database";
 import { Session } from '@supabase/supabase-js';
-import {StatusBar} from "react-native";
-
 
 const Layout:React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
