@@ -36,17 +36,16 @@ const Carousel: React.FC<CarouselProps> = ({ data, selectedIndex = 0, itemOnPres
     const animatedRef = useAnimatedRef<Animated.ScrollView>();
 
     const x = useSharedValue(0);
-    const [focusedIndex, setFoucesdIndex] = useState(Math.round(x.value / ITEM_SIZE));
+    const [focusedIndex, setFoucesdIndex] = useState(Math.abs(Math.round(x.value / ITEM_SIZE)));
 
     const onScroll = useAnimatedScrollHandler({
         onScroll: event => {
             if(manualScrolling.value) return;
-            x.value = event.contentOffset.x;
-            const currentIndex = Math.round(x.value / ITEM_SIZE)
 
-            if(focusedIndex != currentIndex) {
-                runOnJS(setFoucesdIndex)(currentIndex)
-            }
+            x.value = event.contentOffset.x;
+            const currentIndex = Math.abs(Math.round(x.value / ITEM_SIZE));
+
+            runOnJS(setFoucesdIndex)(currentIndex);
         }
     }, [manualScrolling]);
 
@@ -55,11 +54,9 @@ const Carousel: React.FC<CarouselProps> = ({ data, selectedIndex = 0, itemOnPres
     useEffect(() => {
         if (!hasChanged.current) {
             manualScrolling.value = true;
-            x.value = ITEM_SIZE * selectedIndex;
-
             runOnJS(setFoucesdIndex)(selectedIndex);
 
-            const timeoutId = setTimeout(() => animatedRef?.current?.scrollTo({ x: x.value, y: 0, animated: true }), 0);
+            const timeoutId = setTimeout(() => animatedRef?.current?.scrollTo({ x: ITEM_SIZE * selectedIndex, y: 0, animated: true }), 500);
 
             manualScrolling.value = false;
             return () => clearTimeout(timeoutId);
@@ -67,7 +64,6 @@ const Carousel: React.FC<CarouselProps> = ({ data, selectedIndex = 0, itemOnPres
             hasChanged.current = true;
         }
     }, [data, selectedIndex]);
-
 
     return (
         <Animated.ScrollView

@@ -10,6 +10,8 @@ export const theme = {
         googleRed: "#DB4437",
         grayLight: "#bdbdbd",
         grayMedium: "#8a8a8a",
+        grayDark: "#24252b",
+        blackLight: "#181a20",
         greenLight: "#4CBB17",
         greenDark: "#228B22",
         redLight: "#f9504f",

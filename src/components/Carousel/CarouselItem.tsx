@@ -108,14 +108,15 @@ const styles = StyleSheet.create({
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: hexToRgba(theme.colors.white, 1),
-        borderRadius: 35
+        backgroundColor: hexToRgba(theme.colors.white, 0.075),
+        borderRadius: 35,
+        zIndex: 1
     },
     itemContentContainer: {
         flex: 1,
-        borderWidth: 1.25,
+        borderWidth: 1.5,
         borderRadius: 35,
-        borderColor: theme.colors.white
+        borderColor: theme.colors.grayMedium
     },
     itemImage: {
         width: "100%",

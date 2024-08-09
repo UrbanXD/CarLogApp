@@ -161,12 +161,16 @@ const HomeScreen: React.FC = () => {
                 showsVerticalScrollIndicator={ false }
                 contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
             >
-                <Animated.Text
+                <Animated.View
                     entering={ FadeInLeft.springify(1200) }
-                    style={ styles.titleText }
                 >
-                    Vezzessen számot nálunk az autóiról!
-                </Animated.Text>
+                    <Text style={ styles.titleText }>
+                        Üdv Urbán Ádám!
+                    </Text>
+                    <Text style={ [styles.titleText, {fontSize: FONT_SIZES.normal ,fontFamily: "Gilroy-Medium", textTransform: "none", color: theme.colors.grayLight }] }>
+                        Vezzessen számot nálunk az autóiról!
+                    </Text>
+                </Animated.View>
                 <View style={ styles.myCarsContainer } >
                     <View>
                         <Text style={ [styles.containerTitleText, { paddingHorizontal: DEFAULT_SEPARATOR }] }>

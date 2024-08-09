@@ -1,15 +1,16 @@
 import React from "react";
-import { View } from "react-native";
+import {View, ViewStyle} from "react-native";
 import { IconButton, IconButtonProps } from "react-native-paper";
 import {GET_ICON_BUTTON_RESET_STYLE} from "../../constants/constants";
 
-interface HeaderButtonMenuProp {
+interface HeaderButtonMenuProps {
     icons?: IconButtonProps[]
+    containerStyle?: ViewStyle
 }
 
-const HeaderBackButton: React.FC<HeaderButtonMenuProp> = ({ icons = [] }) => {
+const HeaderBackButton: React.FC<HeaderButtonMenuProps> = ({ icons = [], containerStyle }) => {
     return (
-            <View>
+            <View style={ containerStyle }>
                 {
                     icons.length !== 0
                         ? icons.map(
