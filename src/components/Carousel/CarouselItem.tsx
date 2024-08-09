@@ -1,5 +1,14 @@
 import React, {useLayoutEffect, useState} from "react";
-import {ImageBackground, Image, StyleSheet, Text, TouchableOpacity, View, ImageSourcePropType} from "react-native";
+import {
+    ImageBackground,
+    Image,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    ImageSourcePropType,
+    TouchableHighlight
+} from "react-native";
 import Animated, {interpolate, SharedValue, useAnimatedStyle} from "react-native-reanimated";
 import {theme} from "../../styles/theme";
 import hexToRgba from "hex-to-rgba";
@@ -14,8 +23,9 @@ interface CarouselItemProps {
     x: SharedValue<number>
     isFocused: boolean
     item: CarouselItemType
+    onPress: (index: number) => void
 }
-const CarouselItem: React.FC<CarouselItemProps> = ({ index, size, x, isFocused, item }) => {
+const CarouselItem: React.FC<CarouselItemProps> = ({ index, size, x, isFocused, item, onPress }) => {
     const animatedStyle = useAnimatedStyle(() => {
         const scale = interpolate(
             x.value,
@@ -29,7 +39,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({ index, size, x, isFocused, 
     });
 
     return (
-        <TouchableOpacity style={{ width: size }}>
+        <TouchableOpacity activeOpacity={ 1 } style={{ width: size }} onPress={ () => onPress(index) } disabled={ item.selected }>
             <Animated.View style={ [styles.itemContainer, animatedStyle ] }>
                 {
                     !isFocused && <View style={styles.overlay} />

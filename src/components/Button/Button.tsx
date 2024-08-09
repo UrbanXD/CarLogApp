@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import {theme} from "../../styles/theme";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
+import {FONT_SIZES, SEPARATOR_SIZES} from "../../constants/constants";
 
 interface ButtonCommonProps {
     onPress: () => void
@@ -71,7 +72,7 @@ const useStyles = (primaryColor: ColorValue, secondaryColor: ColorValue) =>
             alignSelf: "center",
             justifyContent: "center",
             alignItems: "center",
-            paddingHorizontal: hp(1),
+            paddingHorizontal: SEPARATOR_SIZES.lightSmall,
             width: "100%",
             height: hp(7),
             backgroundColor: secondaryColor,
@@ -81,10 +82,10 @@ const useStyles = (primaryColor: ColorValue, secondaryColor: ColorValue) =>
             flex: 1,
             // alignSelf: "center",
             textAlign: "center",
-            fontSize: hp(3),
+            fontSize: FONT_SIZES.normal,
             fontFamily: "Gilroy-Heavy",
             color: primaryColor,
-            letterSpacing: 30 * 0.075,
+            letterSpacing: FONT_SIZES.normal * 0.075,
         },
         icon: {
             alignSelf: "center",

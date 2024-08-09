@@ -33,6 +33,8 @@ const onButtonPress = ({ path, params }: onButtonPressArgs) => {
 const HomeScreen: React.FC = () => {
     const { supabaseConnector, db } = useDatabase();
     const [cars, setCars] = useState<Array<CarouselItemType>>([]);
+    const [selectedCarIndex, setSelectedCarIndex] = useState<number>(0);
+    const [carsID, setCarsID] = useState<Array<string>>([]);
 
     type buttonsProps =
         Array<{
@@ -78,12 +80,17 @@ const HomeScreen: React.FC = () => {
             selected: 0
         }).execute()
 
-        loadCars();
+        const newCar: CarouselItemType = {
+            id: "Azonosito",
+            title: "Brand",
+            subtitle: "Tipus",
+            selected: !!0
+        }
+
+        setCars(prevState => [...prevState, newCar])
     }
 
     const loadCars = async () => {
-        setCars([]);
-
         const result =
             await db
                 .selectFrom(CARS_TABLE)
@@ -91,16 +98,21 @@ const HomeScreen: React.FC = () => {
                 .execute();
 
         if (result && result.length > 0) {
-            result.sort((a, b) => (b.selected || 0) - (a.selected || 0));
+            // result.sort((a, b) => (b.selected || 0) - (a.selected || 0));
 
             const cars =
-                result.map(car => ({
-                    id: car.name || "",
-                    title: car.brand || "",
-                    subtitle: car.type || "",
-                    selected: !!car.selected,
-                    image: undefined
-                }));
+                result.map((car, index) => {
+                    setCarsID(prevState => [...prevState, car.id]);
+                    if(!!car.selected) setSelectedCarIndex(index);
+
+                    return ({
+                        id: car.name || "",
+                        title: car.brand || "",
+                        subtitle: car.type || "",
+                        selected: !!car.selected,
+                        image: undefined
+                    })
+                });
 
             setCars(cars);
         }
@@ -109,19 +121,52 @@ const HomeScreen: React.FC = () => {
         loadCars();
     }, []);
 
+    const selectCar = async (index: number) => {
+        await db
+            .updateTable(CARS_TABLE)
+            .set({ selected: 1 })
+            .where("id", "=", carsID[index])
+            .execute();
+
+        setCars(
+            cars.map((car, i) => {
+                if (index === i ) {
+                    return {
+                        ...car,
+                        selected: true
+                    };
+                } else if(i === selectedCarIndex) {
+                    return {
+                        ...car,
+                        selected: false
+                    }
+                } else {
+                    return car;
+                }
+            })
+        );
+    }
+
+    useEffect(() => {
+        const index = cars.findLastIndex(car => car.selected === true);
+        setSelectedCarIndex(index || 0)
+    }, [cars]);
+
     return (
         <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, { backgroundColor: theme.colors.primaryBackground2, marginBottom: 0, paddingHorizontal: 0 }] }>
             <View style={{ paddingHorizontal: DEFAULT_SEPARATOR }}>
                 <HomeHeader />
             </View>
-            <ScrollView showsVerticalScrollIndicator={ false } contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }>
+            <ScrollView
+                showsVerticalScrollIndicator={ false }
+                contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
+            >
                 <Animated.Text
                     entering={ FadeInLeft.springify(1200) }
                     style={ styles.titleText }
                 >
                     Vezzessen számot nálunk az autóiról!
                 </Animated.Text>
-                <Button onPress={addCar} title={"Add"}></Button>
                 <View style={ styles.myCarsContainer } >
                     <View>
                         <Text style={ [styles.containerTitleText, { paddingHorizontal: DEFAULT_SEPARATOR }] }>
@@ -132,8 +177,9 @@ const HomeScreen: React.FC = () => {
                         </Text>
                     </View>
                     <View style={ styles.carouselContainer }>
-                        <Carousel data={ cars } />
+                        <Carousel data={ cars } selectedIndex={ selectedCarIndex } itemOnPress={ selectCar } />
                     </View>
+                    <Button buttonStyle={{ width: wp(75) }} onPress={addCar} title={"Új autó hozzáadása"} />
                 </View>
                 <View style={ styles.actionButtonsContainer }>
                     <Text style={ styles.containerTitleText }>
