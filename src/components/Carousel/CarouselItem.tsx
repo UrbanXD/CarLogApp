@@ -13,9 +13,16 @@ import Animated, {interpolate, SharedValue, useAnimatedStyle} from "react-native
 import {theme} from "../../styles/theme";
 import hexToRgba from "hex-to-rgba";
 import {LinearGradient} from "expo-linear-gradient";
-import {FONT_SIZES, SEPARATOR_SIZES} from "../../constants/constants";
+import {
+    FONT_SIZES,
+    GET_ICON_BUTTON_RESET_STYLE,
+    GLOBAL_STYLE,
+    ICON_NAMES,
+    SEPARATOR_SIZES
+} from "../../constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import {CarouselItemType} from "./Carousel";
+import {Icon, IconButton} from "react-native-paper";
 
 interface CarouselItemProps {
     index: number
@@ -54,29 +61,37 @@ const CarouselItem: React.FC<CarouselItemProps> = ({ index, size, x, isFocused, 
                         colors={ [hexToRgba(theme.colors.primaryBackground3, 0.15), hexToRgba(theme.colors.primaryBackground3, 0.95)] }
                         style={ styles.imageOverlay }
                     />
-                    {
-                        item.selected &&
-                            <View style={ styles.selectedContainer }>
-                                <View style={ styles.selectedPoint } />
-                            </View>
-                    }
-                    <View style={{ paddingHorizontal: SEPARATOR_SIZES.normal,
-                        paddingVertical: hp(0.5), }}>
-                        <Text style={{ color: "white", textShadowColor: 'rgba(0, 0, 0, 0.75)',
-                            textShadowOffset: {width: 1, height: 1},
-                            textShadowRadius: 10, fontSize: FONT_SIZES.normal, fontFamily: "Gilroy-Heavy" }}>
+                    <View style={ styles.topContainer }>
+                        <Text style={ styles.topContainerTitleText }>
                             { item.id }
                         </Text>
+                        <View style={ [styles.topContainerSelectedContainer, { width: styles.selectedContent.width, height: styles.selectedContent.height}] }>
+                            {
+                                item.selected &&
+                                <View style={ styles.selectedContent }>
+                                    <View style={ styles.selectedPoint } />
+                                </View>
+                            }
+                        </View>
                     </View>
-                    <View style={ styles.infoContainer }>
-                        <Text numberOfLines={ 2 } style={{ color: "white", textShadowColor: 'rgba(0, 0, 0, 0.75)',
-                            textShadowOffset: {width: -1, height: 1},
-                            textShadowRadius: 15,fontSize: FONT_SIZES.normal, fontFamily: "Gilroy-Heavy" }}>
-                            { item.title }
-                        </Text>
-                        <Text numberOfLines={ 2 } style={{ color: "white", fontSize: FONT_SIZES.small, fontFamily: "Gilroy-Medium" }}>
-                            { item.subtitle }
-                        </Text>
+                    <View style={ styles.bottomContainer }>
+                        <View style={ styles.infoContainer }>
+                            <Text numberOfLines={ 2 } style={ styles.infoTitleText }>
+                                { item.title }
+                            </Text>
+                            <Text numberOfLines={ 2 } style={ styles.infoSubtitleText }>
+                                { item.subtitle }
+                            </Text>
+                        </View>
+                        <View style={ styles.rightContainer }>
+                            <IconButton
+                                onPress={() => console.log("hllo")}
+                                size={ FONT_SIZES.medium }
+                                icon={ ICON_NAMES.pencil }
+                                iconColor={ theme.colors.white }
+                                style={ GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium * 1.25) }
+                            />
+                        </View>
                     </View>
                 </ImageBackground>
             </Animated.View>
@@ -97,7 +112,10 @@ const styles = StyleSheet.create({
         borderRadius: 35
     },
     itemContentContainer: {
-        flex: 1
+        flex: 1,
+        borderWidth: 1.25,
+        borderRadius: 35,
+        borderColor: theme.colors.white
     },
     itemImage: {
         width: "100%",
@@ -108,7 +126,25 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         borderRadius: 35,
     },
-    selectedContainer: {
+    topContainer: {
+        flexDirection: "row",
+        paddingLeft: SEPARATOR_SIZES.normal,
+        paddingVertical: hp(0.5)
+    },
+    topContainerTitleText: {
+        flex: 1,
+        color: theme.colors.white,
+        fontFamily: "Gilroy-Heavy",
+        fontSize: FONT_SIZES.normal,
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 10
+    },
+    topContainerSelectedContainer: {
+        paddingLeft: SEPARATOR_SIZES.lightLarge,
+        marginTop: -hp(0.5)
+    },
+    selectedContent: {
         position: "absolute",
         right: 0,
         width: hp(5), height: hp(5),
@@ -128,11 +164,37 @@ const styles = StyleSheet.create({
         width: hp(1.25),
         height: hp(1.25)
     },
-    infoContainer: {
+    bottomContainer: {
         position: "absolute",
         bottom: 0,
+        width: "100%",
+        flexDirection: "row",
         paddingHorizontal: SEPARATOR_SIZES.normal,
         paddingVertical: SEPARATOR_SIZES.small,
+    },
+    infoContainer: {
+        width: "80%",
+    },
+    infoTitleText: {
+        color: theme.colors.white,
+        fontSize: FONT_SIZES.normal,
+        fontFamily: "Gilroy-Heavy",
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 10
+    },
+    infoSubtitleText: {
+        color: theme.colors.white,
+        fontSize: FONT_SIZES.small,
+        fontFamily: "Gilroy-Medium",
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 10
+    },
+    rightContainer: {
+        width: "20%",
+        justifyContent: "flex-end",
+        alignItems: "flex-end"
     }
 })
 

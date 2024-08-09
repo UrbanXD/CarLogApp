@@ -17,6 +17,7 @@ export const ICON_NAMES = {
     checkMark: "check-circle-outline",
     eye: "eye-outline",
     eyeOff: "eye-off-outline",
+    pencil: "pencil-outline"
 }
 
 export const ICON_COLORS = {

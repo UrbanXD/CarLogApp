@@ -153,7 +153,7 @@ const HomeScreen: React.FC = () => {
     }, [cars]);
 
     return (
-        <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, { backgroundColor: theme.colors.primaryBackground2, marginBottom: 0, paddingHorizontal: 0 }] }>
+        <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, styles.pageContainer] }>
             <View style={{ paddingHorizontal: DEFAULT_SEPARATOR }}>
                 <HomeHeader />
             </View>
@@ -228,6 +228,11 @@ const HomeScreen: React.FC = () => {
 }
 
 const styles = StyleSheet.create({
+    pageContainer: {
+        backgroundColor: theme.colors.primaryBackground4,
+        marginBottom: 0,
+        paddingHorizontal: 0
+    },
     titleText: {
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.medium,
