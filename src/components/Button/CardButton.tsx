@@ -20,48 +20,6 @@ interface CardButtonProp {
     image?: ImageSourcePropType,
     onPress: () => void
 }
-const style = StyleSheet.create({
-    buttonContainer: {
-        flexDirection:"row",
-        alignItems:'center',
-        justifyContent:'center',
-        width: Dimensions.get("window").width < 500 ? wp(50) - 35 : wp(25) - 35,
-        height: Dimensions.get("window").width < 500 ? wp(50) - 35 : wp(25) - 35,
-        padding: 10,
-        backgroundColor: theme.colors.secondaryColor2,
-        borderColor: theme.colors.secondaryBlue,
-        borderStyle: 'solid',
-        borderWidth: 2,
-        borderRadius: 20,
-        transform: [{
-            rotate: "10deg"
-        }]
-    },
-    buttonContent: {
-        transform: [{
-            rotate: "-10deg"
-        }]
-    },
-    image: {
-        flex: 1,
-        resizeMode: "contain",
-        alignSelf: "center",
-        width: Dimensions.get("window").width < 500 ? wp(35) - 35 : wp(15) - 35,
-        height: Dimensions.get("window").width < 500 ? wp(35) - 35 : wp(15) - 35,
-    },
-    title: {
-        alignSelf: "center",
-        color: "whitesmoke",
-        fontSize: hp(2.75),
-        letterSpacing: hp(2.75) * 0.01,
-        fontFamily: "Gilroy-Heavy",
-        // fontWeight: "bold",
-        textAlign: "center",
-        textShadowColor: 'rgba(0, 0, 0, 0.75)',
-        textShadowOffset: {width: -1, height: 1},
-        textShadowRadius: 15
-    }
-})
 
 const CardButton: React.FC<CardButtonProp> = ({ title, subtitle, image, onPress }) => {
     return (
@@ -85,5 +43,42 @@ const CardButton: React.FC<CardButtonProp> = ({ title, subtitle, image, onPress 
         </TouchableOpacity>
     )
 }
+
+const style = StyleSheet.create({
+    buttonContainer: {
+        flex: 1,
+        width: "100%",
+        flexDirection:"row",
+        alignItems:'center',
+        justifyContent:'center',
+        padding: 10,
+        backgroundColor: theme.colors.primaryBackground6,
+        borderColor: theme.colors.primaryBackground2,
+        borderStyle: 'solid',
+        borderWidth: 2,
+        borderRadius: 20,
+    },
+    buttonContent: {
+    },
+    image: {
+        flex: 1,
+        resizeMode: "contain",
+        alignSelf: "center",
+        width: Dimensions.get("window").width < 500 ? wp(35) - 35 : wp(15) - 35,
+        height: Dimensions.get("window").width < 500 ? wp(35) - 35 : wp(15) - 35,
+    },
+    title: {
+        alignSelf: "center",
+        color: "whitesmoke",
+        fontSize: hp(2.75),
+        letterSpacing: hp(2.75) * 0.01,
+        fontFamily: "Gilroy-Heavy",
+        // fontWeight: "bold",
+        textAlign: "center",
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowOffset: {width: -1, height: 1},
+        textShadowRadius: 15
+    }
+})
 
 export default CardButton;

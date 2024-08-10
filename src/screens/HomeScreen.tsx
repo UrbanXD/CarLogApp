@@ -3,7 +3,7 @@ import {
     ImageSourcePropType,
     SafeAreaView, ScrollView,
     StyleSheet,
-    Text,
+    Text, TouchableHighlight, TouchableOpacity,
     View
 } from "react-native";
 import {theme} from "../styles/theme";
@@ -11,13 +11,16 @@ import CardButton from "../components/Button/CardButton";
 import {router} from "expo-router";
 import Animated, {FadeInLeft} from "react-native-reanimated";
 import HomeHeader from "../layouts/header/HomeHeader";
-import {DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES} from "../constants/constants";
+import {DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../constants/constants";
 import {useDatabase} from "../db/Database";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
 import Carousel, {CarouselItemType} from "../components/Carousel/Carousel";
 import {CARS_TABLE, USERS_TABLE} from "../db/AppSchema";
 import {getUUID} from "../db/uuid";
 import Button from "../components/Button/Button";
+import {Icon} from "react-native-paper";
+import {addLeadingZero, getDate} from "../utils/getDate";
+import {white} from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 
 interface onButtonPressArgs {
     path: string,
@@ -32,9 +35,11 @@ const onButtonPress = ({ path, params }: onButtonPressArgs) => {
 
 const HomeScreen: React.FC = () => {
     const { supabaseConnector, db } = useDatabase();
+
     const [cars, setCars] = useState<Array<CarouselItemType>>([]);
     const [selectedCarIndex, setSelectedCarIndex] = useState<number>(0);
     const [carsID, setCarsID] = useState<Array<string>>([]);
+    const [today] = useState(getDate());
 
     type buttonsProps =
         Array<{
@@ -163,20 +168,21 @@ const HomeScreen: React.FC = () => {
             >
                 <Animated.View
                     entering={ FadeInLeft.springify(1200) }
+                    style={ styles.titleContainer }
                 >
-                    <Text style={ styles.titleText }>
+                    <Text style={ styles.welcomeText }>
                         Üdv Urbán Ádám!
                     </Text>
-                    <Text style={ [styles.titleText, {fontSize: FONT_SIZES.normal ,fontFamily: "Gilroy-Medium", textTransform: "none", color: theme.colors.grayLight }] }>
+                    <Text style={ styles.infoText }>
                         Vezzessen számot nálunk az autóiról!
                     </Text>
                 </Animated.View>
-                <View style={ styles.myCarsContainer } >
-                    <View>
-                        <Text style={ [styles.containerTitleText, { paddingHorizontal: DEFAULT_SEPARATOR }] }>
+                <View style={ [styles.contentContainer, { paddingHorizontal: 0, marginHorizontal: 0, backgroundColor: "transparent"}] } >
+                    <View style={{ paddingHorizontal: DEFAULT_SEPARATOR }}>
+                        <Text style={ styles.containerTitleText }>
                             Autóim
                         </Text>
-                        <Text style={ [styles.containerSubtitleText, { paddingHorizontal: DEFAULT_SEPARATOR }] }>
+                        <Text style={ styles.containerSubtitleText }>
                             Válasszon ki egy autót
                         </Text>
                     </View>
@@ -185,22 +191,50 @@ const HomeScreen: React.FC = () => {
                     </View>
                     <Button buttonStyle={{ width: wp(75) }} onPress={addCar} title={"Új autó hozzáadása"} />
                 </View>
-                <View style={ styles.actionButtonsContainer }>
-                    <Text style={ styles.containerTitleText }>
-                        Szolgáltatások
-                    </Text>
-                    <View style={ styles.buttonsContainer }>
-                        {
-                            buttons.map((button, index) =>
-                                <CardButton
-                                    key={ index }
-                                    onPress={ button.router }
-                                    title={ button.title }
-                                    image={ button.image }
-                                />
-                            )
-                        }
+                <View style={ [styles.contentContainer, { height: hp(30) }] }>
+                    <View>
+                        <Text style={ styles.containerTitleText }>
+                            Mai utak
+                        </Text>
+                        <Text style={ styles.containerSubtitleText }>
+                            { today }
+                        </Text>
                     </View>
+                    <ScrollView horizontal style={ GLOBAL_STYLE.scrollViewContentContainer }>
+                        <View style={ { flexDirection: "row", gap: SEPARATOR_SIZES.lightLarge * 1.75, alignItems: "flex-end" } }>
+                            {
+                                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23].map(data => {
+                                    return <View><Text key={data} style={{ color: "white" }}>{ addLeadingZero(data) }:00</Text></View>
+                                })
+                            }
+                        </View>
+                    </ScrollView>
+                    <TouchableOpacity style={ styles.linkContainer }>
+                        <Text style={ styles.linkText }>
+                            További utak
+                        </Text>
+                        <Icon source={ ICON_NAMES.rightArrowHead } size={ styles.linkText.fontSize * 1.35 } color={ styles.linkText.color } />
+                    </TouchableOpacity>
+                </View>
+                <View style={ styles.contentContainer }>
+                    <Text style={ styles.containerTitleText }>
+                        Legutóbbi kiadások
+                    </Text>
+                    <View style={ styles.smallDataRow }>
+
+                    </View>
+                    <View style={ styles.smallDataRow }>
+
+                    </View>
+                    <View style={ styles.smallDataRow }>
+
+                    </View>
+                    <TouchableOpacity style={ styles.linkContainer }>
+                        <Text style={ styles.linkText }>
+                            További kiadások
+                        </Text>
+                        <Icon source={ ICON_NAMES.rightArrowHead } size={ styles.linkText.fontSize * 1.35 } color={ styles.linkText.color } />
+                    </TouchableOpacity>
                 </View>
             </ScrollView>
             {/*<Text*/}
@@ -215,18 +249,6 @@ const HomeScreen: React.FC = () => {
             {/*>*/}
             {/*    Kijelentkezes*/}
             {/*</Text>*/}
-            {/*<View style={ styles.buttonsContainer }>*/}
-            {/*    {*/}
-            {/*        buttons.map((button, index) =>*/}
-            {/*            <CardButton*/}
-            {/*                key={ index }*/}
-            {/*                onPress={ button.router }*/}
-            {/*                title={ button.title }*/}
-            {/*                image={ button.image }*/}
-            {/*            />*/}
-            {/*        )*/}
-            {/*    }*/}
-            {/*</View>*/}
         </SafeAreaView>
     )
 }
@@ -237,16 +259,36 @@ const styles = StyleSheet.create({
         marginBottom: 0,
         paddingHorizontal: 0
     },
-    titleText: {
+    titleContainer: {
+        paddingHorizontal: SEPARATOR_SIZES.normal
+    },
+    welcomeText: {
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.medium,
+        letterSpacing: FONT_SIZES.medium * 0.045,
         color: theme.colors.white,
-        marginHorizontal: SEPARATOR_SIZES.normal,
         textTransform: "uppercase"
+    },
+    infoText: {
+        fontFamily: "Gilroy-Mediun",
+        fontSize: FONT_SIZES.normal * 0.85,
+        letterSpacing: FONT_SIZES.normal * 0.85 * 0.05,
+        color: theme.colors.grayLight
+    },
+    contentContainer: {
+        gap: SEPARATOR_SIZES.small,
+        flexDirection: "column",
+        marginTop: SEPARATOR_SIZES.extraMedium,
+        paddingHorizontal: DEFAULT_SEPARATOR,
+        marginHorizontal: DEFAULT_SEPARATOR,
+        backgroundColor: theme.colors.primaryBackground7,
+        padding: 20,
+        borderRadius: 35
     },
     containerTitleText: {
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.normal,
+        letterSpacing: FONT_SIZES.normal * 0.05,
         color: theme.colors.white
     },
     containerSubtitleText: {
@@ -254,32 +296,23 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZES.small,
         color: theme.colors.grayLight
     },
-    myCarsContainer: {
-        gap: SEPARATOR_SIZES.small,
-        marginTop: SEPARATOR_SIZES.extraMedium,
-    },
     carouselContainer: {
         height: hp(27.5),
-        width: "100%",
-        // alignItems: "center",
     },
-    carouselItemContainer: {
-        flex: 1,
-        width: "85%",
-        backgroundColor: 'blue'
+    smallDataRow: {
+        height: hp(8.5),
+        backgroundColor: theme.colors.primaryBackground4,
+        borderRadius: 15
     },
-    actionButtonsContainer: {
-        paddingHorizontal: DEFAULT_SEPARATOR,
-        gap: SEPARATOR_SIZES.small,
-        marginTop: SEPARATOR_SIZES.extraMedium
-    },
-    buttonsContainer: {
+    linkContainer: {
         flexDirection: "row",
-        justifyContent: "center",
-        flexWrap: "wrap",
-        gap: 15,
-        // marginTop: 15,
-        // padding: 15,
+        justifyContent: "center"
+    },
+    linkText: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.small * 1.15,
+        textAlign: "center",
+        color: theme.colors.fuelYellow,
     }
 })
 

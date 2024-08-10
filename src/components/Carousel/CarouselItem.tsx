@@ -108,15 +108,15 @@ const styles = StyleSheet.create({
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: hexToRgba(theme.colors.white, 0.075),
+        backgroundColor: hexToRgba(theme.colors.white, 0.035),
         borderRadius: 35,
         zIndex: 1
     },
     itemContentContainer: {
         flex: 1,
-        borderWidth: 1.5,
+        borderWidth: 0.5,
         borderRadius: 35,
-        borderColor: theme.colors.grayMedium
+        borderColor: theme.colors.primaryBackground2
     },
     itemImage: {
         width: "100%",
@@ -130,16 +130,19 @@ const styles = StyleSheet.create({
     topContainer: {
         flexDirection: "row",
         paddingLeft: SEPARATOR_SIZES.normal,
-        paddingVertical: hp(0.5)
+        paddingVertical: hp(0.45)
     },
     topContainerTitleText: {
         flex: 1,
+        paddingVertical: hp(1),
         color: theme.colors.white,
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.normal,
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
-        textShadowOffset: { width: 1, height: 1 },
-        textShadowRadius: 10
+        textShadowOffset: { width: -1, height: 1 },
+        textShadowRadius: 10,
+        letterSpacing: FONT_SIZES.normal * 0.05,
+        lineHeight: FONT_SIZES.normal * 0.85,
     },
     topContainerSelectedContainer: {
         paddingLeft: SEPARATOR_SIZES.lightLarge,
@@ -178,19 +181,21 @@ const styles = StyleSheet.create({
     },
     infoTitleText: {
         color: theme.colors.white,
-        fontSize: FONT_SIZES.normal,
+        fontSize: FONT_SIZES.small,
         fontFamily: "Gilroy-Heavy",
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
         textShadowOffset: { width: 1, height: 1 },
-        textShadowRadius: 10
+        textShadowRadius: 10,
+        letterSpacing: FONT_SIZES.small * 0.05
     },
     infoSubtitleText: {
         color: theme.colors.white,
-        fontSize: FONT_SIZES.small,
+        fontSize: FONT_SIZES.extraSmall,
         fontFamily: "Gilroy-Medium",
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
         textShadowOffset: { width: 1, height: 1 },
-        textShadowRadius: 10
+        textShadowRadius: 10,
+        letterSpacing: FONT_SIZES.extraSmall * 0.05
     },
     rightContainer: {
         width: "20%",

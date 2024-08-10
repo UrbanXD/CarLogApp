@@ -22,6 +22,7 @@ export const theme = {
         primaryBackground4: "#242424",
         primaryBackground5: "#343434",
         primaryBackground6: "#2f2f2f",
+        primaryBackground7: "#303030",
         secondaryBackground: "#6c6f75",
         primaryColor: "#e1e5ea",
         secondaryColor1: "#bec1c6",
