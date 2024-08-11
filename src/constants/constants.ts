@@ -18,7 +18,11 @@ export const ICON_NAMES = {
     eye: "eye-outline",
     eyeOff: "eye-off-outline",
     pencil: "pencil-outline",
-    rightArrowHead: "chevron-right"
+    rightArrowHead: "chevron-right",
+    info: "information-outline",
+    destinationPointMarker: "map-marker-outline",
+    startingPointMarker: "home-map-marker",
+    clock: "clock-time-seven-outline"
 }
 
 export const ICON_COLORS = {

@@ -11,16 +11,25 @@ import CardButton from "../components/Button/CardButton";
 import {router} from "expo-router";
 import Animated, {FadeInLeft} from "react-native-reanimated";
 import HomeHeader from "../layouts/header/HomeHeader";
-import {DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../constants/constants";
+import {
+    DEFAULT_SEPARATOR,
+    FONT_SIZES,
+    GET_ICON_BUTTON_RESET_STYLE,
+    GLOBAL_STYLE,
+    ICON_NAMES,
+    SEPARATOR_SIZES
+} from "../constants/constants";
 import {useDatabase} from "../db/Database";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
 import Carousel, {CarouselItemType} from "../components/Carousel/Carousel";
 import {CARS_TABLE, USERS_TABLE} from "../db/AppSchema";
 import {getUUID} from "../db/uuid";
 import Button from "../components/Button/Button";
-import {Icon} from "react-native-paper";
+import {Icon, IconButton} from "react-native-paper";
 import {addLeadingZero, getDate} from "../utils/getDate";
 import {white} from "react-native-paper/lib/typescript/styles/themes/v2/colors";
+import RideInfo from "../components/RideInfo/RideInfo";
+import UpcomingRides from "../components/RideInfo/UpcomingRides";
 
 interface onButtonPressArgs {
     path: string,
@@ -159,9 +168,7 @@ const HomeScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, styles.pageContainer] }>
-            <View style={{ paddingHorizontal: DEFAULT_SEPARATOR }}>
-                <HomeHeader />
-            </View>
+            <HomeHeader />
             <ScrollView
                 showsVerticalScrollIndicator={ false }
                 contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
@@ -191,23 +198,36 @@ const HomeScreen: React.FC = () => {
                     </View>
                     <Button buttonStyle={{ width: wp(75) }} onPress={addCar} title={"Új autó hozzáadása"} />
                 </View>
-                <View style={ [styles.contentContainer, { height: hp(30) }] }>
+                <View style={ styles.contentContainer }>
                     <View>
                         <Text style={ styles.containerTitleText }>
-                            Mai utak
+                            Legközelebbi utak
                         </Text>
                         <Text style={ styles.containerSubtitleText }>
-                            { today }
+                            { today } (ma)
                         </Text>
                     </View>
-                    <ScrollView horizontal style={ GLOBAL_STYLE.scrollViewContentContainer }>
-                        <View style={ { flexDirection: "row", gap: SEPARATOR_SIZES.lightLarge * 1.75, alignItems: "flex-end" } }>
-                            {
-                                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23].map(data => {
-                                    return <View><Text key={data} style={{ color: "white" }}>{ addLeadingZero(data) }:00</Text></View>
-                                })
-                            }
-                        </View>
+                    <ScrollView style={ GLOBAL_STYLE.scrollViewContentContainer }>
+                        <UpcomingRides
+                            rides={[
+                                {
+                                    dateTitle: "08.25",
+                                    dateSubtitle: "Vasarnap",
+                                    time: "05:00",
+                                    startingPoint: "Zenta",
+                                    destination: "Szeged",
+                                    client: "Urban Adam"
+                                },
+                                {
+                                    dateTitle: "08.25",
+                                    dateSubtitle: "Vasarnap",
+                                    time: "05:00",
+                                    startingPoint: "Zenta",
+                                    destination: "Szeged",
+                                    client: "Urban Adam"
+                                }
+                            ]}
+                        />
                     </ScrollView>
                     <TouchableOpacity style={ styles.linkContainer }>
                         <Text style={ styles.linkText }>
@@ -220,13 +240,13 @@ const HomeScreen: React.FC = () => {
                     <Text style={ styles.containerTitleText }>
                         Legutóbbi kiadások
                     </Text>
-                    <View style={ styles.smallDataRow }>
+                    <View style={ styles.rowContainer }>
 
                     </View>
-                    <View style={ styles.smallDataRow }>
+                    <View style={ styles.rowContainer }>
 
                     </View>
-                    <View style={ styles.smallDataRow }>
+                    <View style={ styles.rowContainer }>
 
                     </View>
                     <TouchableOpacity style={ styles.linkContainer }>
@@ -294,15 +314,11 @@ const styles = StyleSheet.create({
     containerSubtitleText: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.small,
+        letterSpacing: FONT_SIZES.small * 0.035,
         color: theme.colors.grayLight
     },
     carouselContainer: {
         height: hp(27.5),
-    },
-    smallDataRow: {
-        height: hp(8.5),
-        backgroundColor: theme.colors.primaryBackground4,
-        borderRadius: 15
     },
     linkContainer: {
         flexDirection: "row",
@@ -313,7 +329,27 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZES.small * 1.15,
         textAlign: "center",
         color: theme.colors.fuelYellow,
-    }
+    },
+    c: {
+        flexDirection: "row",
+        gap: SEPARATOR_SIZES.lightSmall
+    },
+    rowContainer: {
+        flex: 1,
+        flexDirection: "row",
+        height: hp(8.5),
+        backgroundColor: theme.colors.primaryBackground4,
+        borderRadius: 15,
+        padding: SEPARATOR_SIZES.small
+    },
+    rowContainerExtra: {
+        height: hp(25)
+    },
+    dateContainer: {
+        width: hp(11),
+        justifyContent: "center",
+        alignItems: "center"
+    },
 })
 
 export default HomeScreen;
