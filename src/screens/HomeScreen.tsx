@@ -217,9 +217,8 @@ const HomeScreen: React.FC = () => {
                                     dateSubtitle: "Hétfő",
                                     time: "05:00",
                                     startingCity: "Zenta",
-                                    startingPlace: "Nagy Abonyi Vince 24.",
                                     destinationCity: "Kamenica",
-                                    destinationPlace: "Korház",
+                                    locations: ["Nagy Abonyi Vince 24.", "Korhaz utca 15."],
                                     client: "Kiss Imre",
                                     passengerCount: 2,
                                     comment: ""
@@ -229,9 +228,8 @@ const HomeScreen: React.FC = () => {
                                     dateSubtitle: "Hétfő",
                                     time: "05:00",
                                     startingCity: "Zenta",
-                                    startingPlace: "Nagy Abonyi Vince 24.",
                                     destinationCity: "Kamenica",
-                                    destinationPlace: "Korház",
+                                    locations: ["Nagy Abonyi Vince 24.", "Korhaz utca 15."],
                                     client: "Kiss Imre",
                                     passengerCount: 2,
                                     comment: ""

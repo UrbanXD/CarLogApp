@@ -20,8 +20,8 @@ export const ICON_NAMES = {
     pencil: "pencil-outline",
     rightArrowHead: "chevron-right",
     info: "information-outline",
-    destinationPointMarker: "map-marker-outline",
-    startingPointMarker: "home-map-marker",
+    destinationPointMarker: "map-marker",
+    startingPointMarker: "map-marker-outline",
     clock: "clock-time-seven-outline"
 }
 

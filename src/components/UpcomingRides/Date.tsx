@@ -1,17 +1,18 @@
 import React from "react";
 import {StyleSheet, Text, View} from "react-native";
-import {FONT_SIZES} from "../../constants/constants";
+import {FONT_SIZES, SEPARATOR_SIZES} from "../../constants/constants";
 import {theme} from "../../styles/theme";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
 
 interface DateProps {
     dateTitle: string
     dateSubtitle: string
+    flexDirection?: "row" | "column"
 }
 
-const Date: React.FC<DateProps> = ({ dateTitle, dateSubtitle }) => {
+const Date: React.FC<DateProps> = ({ dateTitle, dateSubtitle, flexDirection = "column" }) => {
     return (
-        <View style={ styles.container }>
+        <View style={ [styles.container, { flexDirection, gap: flexDirection === "row" ? SEPARATOR_SIZES.lightSmall * 0.5 : 0 }] }>
             <Text style={ styles.dateTitleText }>
                 { dateTitle }
             </Text>
@@ -26,7 +27,7 @@ const styles = StyleSheet.create({
     container: {
         width: hp(11),
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
     },
     dateTitleText: {
         fontFamily: "Gilroy-Heavy",

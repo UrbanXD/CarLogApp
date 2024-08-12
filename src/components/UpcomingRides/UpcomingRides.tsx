@@ -9,13 +9,13 @@ import {IconButton, Portal} from "react-native-paper";
 import BottomSheet, {BottomSheetMethods} from "../BottomSheet/BottomSheet";
 
 type RideType = {
+    carID: string
     dateTitle: string
     dateSubtitle: string
     time: string
     startingCity: string
-    startingPlace?: string
     destinationCity: string
-    destinationPlace?: string
+    locations: Array<string>
     client: string,
     passengerCount?: number,
     comment?: string
@@ -38,13 +38,36 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
         <>
             <Portal>
                 <BottomSheet ref={ bottomSheetRef }>
-                    <View>
-                        <Text style={ { color: "white" } }>
-                            { rides[selectedRideIndex].client }
-                        </Text>
-                        <Text style={ { color: "white" } }>
-                            { rides[selectedRideIndex].startingPlace }
-                        </Text>
+                    <View style={ { flex: 1, flexDirection: "column", gap: SEPARATOR_SIZES.medium } }>
+                        <View style={{ flexDirection: "column", alignItems: "center", justifyContent: "center", transform: [{scale: 1.25}] }}>
+                            <Date
+                                dateTitle={ rides[selectedRideIndex].dateTitle }
+                                dateSubtitle={ rides[selectedRideIndex].dateSubtitle }
+                                flexDirection="row"
+                            />
+                            <Text style={{color: "white" }}>{ rides[selectedRideIndex].time }</Text>
+                        </View>
+                        <View style={{ gap: SEPARATOR_SIZES.small }}>
+                            <View style={{ flexDirection: "row" }}>
+                                <View style={{ flex: 1, backgroundColor: "red" }}>
+                                    <Text style={{ color: "white" }}>Kliens</Text>
+                                </View>
+                                <View style={{ flex: 0.6, backgroundColor: "blue" }}>
+                                    <Text style={{ color: "white"}}>Szemelyek szama</Text>
+                                </View>
+                            </View>
+                            <View style={{ flexDirection: "row" }}>
+                                <View style={{ flex: 1, backgroundColor: "red" }}>
+                                    <Text style={{ color: "white" }}>CAr ID</Text>
+                                </View>
+                            </View>
+                            <View style={{ flexDirection: "row" }}>
+                                <View style={{ flex: 1, backgroundColor: "red" }}>
+                                    <Text style={{ color: "white" }}>Comment</Text>
+                                </View>
+                            </View>
+                            <Text style={{ color: "white" }}> Locations pl: Utca 21. (Zenta) </Text>
+                        </View>
                     </View>
                 </BottomSheet>
             </Portal>
