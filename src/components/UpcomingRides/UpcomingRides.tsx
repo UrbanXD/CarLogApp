@@ -1,19 +1,24 @@
-import React from "react";
+import React, {useCallback, useRef, useState} from "react";
 import {StyleSheet, Text, View} from "react-native";
 import {FONT_SIZES, GET_ICON_BUTTON_RESET_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../constants/constants";
 import RideInfo from "./RideInfo";
 import Date from "./Date";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
 import {theme} from "../../styles/theme";
-import {IconButton} from "react-native-paper";
+import {IconButton, Portal} from "react-native-paper";
+import BottomSheet, {BottomSheetMethods} from "../BottomSheet/BottomSheet";
 
 type RideType = {
     dateTitle: string
     dateSubtitle: string
     time: string
-    startingPoint: string
-    destination: string
-    client: string
+    startingCity: string
+    startingPlace?: string
+    destinationCity: string
+    destinationPlace?: string
+    client: string,
+    passengerCount?: number,
+    comment?: string
 }
 
 interface UpcomingRidesProps {
@@ -21,8 +26,29 @@ interface UpcomingRidesProps {
 }
 
 const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
+    const [selectedRideIndex, setSelectedRideIndex] = useState(0);
+    const bottomSheetRef = useRef<BottomSheetMethods>(null);
+
+    const expandHandler = useCallback((index: number) => {
+        setSelectedRideIndex(index);
+        bottomSheetRef.current?.expand();
+    }, []);
+
     return (
-        <View style={ styles.container }>
+        <>
+            <Portal>
+                <BottomSheet ref={ bottomSheetRef }>
+                    <View>
+                        <Text style={ { color: "white" } }>
+                            { rides[selectedRideIndex].client }
+                        </Text>
+                        <Text style={ { color: "white" } }>
+                            { rides[selectedRideIndex].startingPlace }
+                        </Text>
+                    </View>
+                </BottomSheet>
+            </Portal>
+            <View style={ styles.container }>
                 {
                     rides.map((ride, index) =>
                         <View key={ index } style={ styles.contentContainer }>
@@ -34,11 +60,11 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                                 <View style={ styles.rowContentContainer }>
                                     <RideInfo
                                         icon={ ICON_NAMES.startingPointMarker }
-                                        text={ ride.startingPoint }
+                                        text={ ride.startingCity }
                                     />
                                     <RideInfo
                                         icon={ ICON_NAMES.destinationPointMarker }
-                                        text={ ride.destination }
+                                        text={ ride.destinationCity }
                                     />
                                     <RideInfo
                                         icon={ ICON_NAMES.user }
@@ -50,7 +76,7 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                                     />
                                 </View>
                                 <IconButton
-                                    onPress={ () => console.log("xd") }
+                                    onPress={ () => expandHandler(index) }
                                     size={ FONT_SIZES.medium }
                                     icon={ ICON_NAMES.info }
                                     iconColor={"white"}
@@ -60,7 +86,8 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                         </View>
                     )
                 }
-        </View>
+            </View>
+        </>
     )
 }
 

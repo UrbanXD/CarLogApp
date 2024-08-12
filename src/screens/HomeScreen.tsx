@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {
     ImageSourcePropType,
     SafeAreaView, ScrollView,
@@ -30,6 +30,7 @@ import {addLeadingZero, getDate} from "../utils/getDate";
 import {white} from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 import RideInfo from "../components/UpcomingRides/RideInfo";
 import UpcomingRides from "../components/UpcomingRides/UpcomingRides";
+import BottomSheet, {BottomSheetMethods} from "../components/BottomSheet/BottomSheet";
 
 interface onButtonPressArgs {
     path: string,
@@ -166,6 +167,7 @@ const HomeScreen: React.FC = () => {
         setSelectedCarIndex(index || 0)
     }, [cars]);
 
+
     return (
         <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, styles.pageContainer] }>
             <HomeHeader />
@@ -211,20 +213,28 @@ const HomeScreen: React.FC = () => {
                         <UpcomingRides
                             rides={[
                                 {
-                                    dateTitle: "08.25",
-                                    dateSubtitle: "Vasarnap",
+                                    dateTitle: "08.26",
+                                    dateSubtitle: "Hétfő",
                                     time: "05:00",
-                                    startingPoint: "Zenta",
-                                    destination: "Szeged",
-                                    client: "Urban Adam"
+                                    startingCity: "Zenta",
+                                    startingPlace: "Nagy Abonyi Vince 24.",
+                                    destinationCity: "Kamenica",
+                                    destinationPlace: "Korház",
+                                    client: "Kiss Imre",
+                                    passengerCount: 2,
+                                    comment: ""
                                 },
                                 {
-                                    dateTitle: "08.25",
-                                    dateSubtitle: "Vasarnap",
+                                    dateTitle: "08.26",
+                                    dateSubtitle: "Hétfő",
                                     time: "05:00",
-                                    startingPoint: "Zenta",
-                                    destination: "Szeged",
-                                    client: "Urban Adam"
+                                    startingCity: "Zenta",
+                                    startingPlace: "Nagy Abonyi Vince 24.",
+                                    destinationCity: "Kamenica",
+                                    destinationPlace: "Korház",
+                                    client: "Kiss Imre",
+                                    passengerCount: 2,
+                                    comment: ""
                                 }
                             ]}
                         />
