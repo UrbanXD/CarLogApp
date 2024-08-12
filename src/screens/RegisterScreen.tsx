@@ -63,7 +63,7 @@ const RegisterScreen: React.FC = () => {
             style={[
                 GLOBAL_STYLE.pageContainer,
                 {
-                    backgroundColor: theme.colors.primaryBackground3,
+                    backgroundColor: theme.colors.black,
                     gap: gap
                 }
             ]}
@@ -105,7 +105,7 @@ const RegisterScreen: React.FC = () => {
                                 isFirstStep &&
                                 <>
                                     <Button title="Következő" onPress={ next } />
-                                    <TextDivider title="vagy" color={ theme.colors.grayLight } lineHeight={ 1 } marginVertical={ GLOBAL_STYLE.formContainer.gap }/>
+                                    <TextDivider title="vagy" color={ theme.colors.gray1 } lineHeight={ 1 } marginVertical={ GLOBAL_STYLE.formContainer.gap }/>
                                     <Button onPress={ () => 1 } title="Folytatás Google fiókkal" icon={require("../assets/google_logo.png")} inverse={true} backgroundColor={ theme.colors.white } textColor={ theme.colors.googleRed } textStyle={{ fontSize: hp(2) }} />
                                     <Button onPress={ () => 1 } title="Folytatás Facebook fiókkal" icon={require("../assets/facebook_logo.png")} backgroundColor={ theme.colors.facebookBlue } textColor={ theme.colors.white } textStyle={{ fontSize: hp(2) }} />
                                 </>
@@ -132,9 +132,9 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: SEPARATOR_SIZES.lightLarge,
         borderTopLeftRadius: 125,
-        shadowColor: theme.colors.primaryBackground4,
+        shadowColor: theme.colors.black2,
         elevation: 10,
-        backgroundColor: theme.colors.primaryBackground4,
+        backgroundColor: theme.colors.black2,
     },
     progessBarContainer: {
         paddingLeft: SEPARATOR_SIZES.mediumSmall,

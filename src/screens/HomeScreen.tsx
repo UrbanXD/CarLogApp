@@ -28,8 +28,8 @@ import Button from "../components/Button/Button";
 import {Icon, IconButton} from "react-native-paper";
 import {addLeadingZero, getDate} from "../utils/getDate";
 import {white} from "react-native-paper/lib/typescript/styles/themes/v2/colors";
-import RideInfo from "../components/RideInfo/RideInfo";
-import UpcomingRides from "../components/RideInfo/UpcomingRides";
+import RideInfo from "../components/UpcomingRides/RideInfo";
+import UpcomingRides from "../components/UpcomingRides/UpcomingRides";
 
 interface onButtonPressArgs {
     path: string,
@@ -275,7 +275,7 @@ const HomeScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
     pageContainer: {
-        backgroundColor: theme.colors.primaryBackground4,
+        backgroundColor: theme.colors.black2,
         marginBottom: 0,
         paddingHorizontal: 0
     },
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Mediun",
         fontSize: FONT_SIZES.normal * 0.85,
         letterSpacing: FONT_SIZES.normal * 0.85 * 0.05,
-        color: theme.colors.grayLight
+        color: theme.colors.gray1
     },
     contentContainer: {
         gap: SEPARATOR_SIZES.small,
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
         marginTop: SEPARATOR_SIZES.extraMedium,
         paddingHorizontal: DEFAULT_SEPARATOR,
         marginHorizontal: DEFAULT_SEPARATOR,
-        backgroundColor: theme.colors.primaryBackground7,
+        backgroundColor: theme.colors.black4,
         padding: 20,
         borderRadius: 35
     },
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.small,
         letterSpacing: FONT_SIZES.small * 0.035,
-        color: theme.colors.grayLight
+        color: theme.colors.gray1
     },
     carouselContainer: {
         height: hp(27.5),
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "row",
         height: hp(8.5),
-        backgroundColor: theme.colors.primaryBackground4,
+        backgroundColor: theme.colors.black2,
         borderRadius: 15,
         padding: SEPARATOR_SIZES.small
     },

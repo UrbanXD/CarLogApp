@@ -40,7 +40,7 @@ const ProgressInfo: React.FC<ProgressInfoProps> = ({ radius, strokeWidth, end, f
                         strokeJoin="round"
                         strokeCap="round"
                         style="stroke"
-                        color={ theme.colors.primaryBackground2 }
+                        color={ theme.colors.gray3 }
                         start={ 0 }
                         end={ 1 }
                     />

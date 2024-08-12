@@ -38,7 +38,7 @@ type ButtonConditionalProps =
 
 type ButtonProps = ButtonCommonProps & ButtonConditionalProps
 
-const Button: React.FC<ButtonProps> = ({ onPress, buttonStyle, textStyle, title, icon, backgroundColor= theme.colors.primaryBackground3, textColor = theme.colors.fuelYellow, inverse = false}) => {
+const Button: React.FC<ButtonProps> = ({ onPress, buttonStyle, textStyle, title, icon, backgroundColor= theme.colors.black, textColor = theme.colors.fuelYellow, inverse = false}) => {
     const styles = useStyles(!inverse ? backgroundColor : textColor, !inverse ? textColor : backgroundColor);
     return (
         <TouchableOpacity onPress={ onPress } style={ [styles.buttonContainer, buttonStyle] }>

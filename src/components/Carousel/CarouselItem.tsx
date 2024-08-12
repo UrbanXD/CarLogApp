@@ -58,7 +58,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({ index, size, x, isFocused, 
                 >
                     <LinearGradient
                         locations={[ 0, 0.85 ]}
-                        colors={ [hexToRgba(theme.colors.primaryBackground3, 0.15), hexToRgba(theme.colors.primaryBackground3, 0.95)] }
+                        colors={ [hexToRgba(theme.colors.black, 0.15), hexToRgba(theme.colors.black, 0.95)] }
                         style={ styles.imageOverlay }
                     />
                     <View style={ styles.topContainer }>
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     itemContainer: {
         flex: 1,
         position: "relative",
-        backgroundColor: theme.colors.primaryBackground3,
+        backgroundColor: theme.colors.black,
         borderRadius: 35,
     },
     overlay: {
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
         flex: 1,
         borderWidth: 0.5,
         borderRadius: 35,
-        borderColor: theme.colors.primaryBackground2
+        borderColor: theme.colors.gray3
     },
     itemImage: {
         width: "100%",
@@ -157,14 +157,14 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.white,
         borderTopRightRadius: 35,
         borderBottomLeftRadius: 15,
-        borderColor: theme.colors.primaryBackground3,
+        borderColor: theme.colors.black,
         borderBottomWidth: 3,
         borderLeftWidth: 3,
     },
     selectedPoint: {
         borderRadius: 100,
         alignSelf: "center",
-        backgroundColor: theme.colors.primaryBackground3,
+        backgroundColor: theme.colors.black,
         width: hp(1.25),
         height: hp(1.25)
     },

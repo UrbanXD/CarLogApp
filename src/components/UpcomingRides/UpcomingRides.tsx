@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "row",
         height: hp(25),
-        backgroundColor: theme.colors.primaryBackground4,
+        backgroundColor: theme.colors.black2,
         borderRadius: 15,
         padding: SEPARATOR_SIZES.small
     },

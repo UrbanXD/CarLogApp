@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.small,
         letterSpacing: FONT_SIZES.small * 0.035,
-        color: theme.colors.grayLight
+        color: theme.colors.gray1
     }
 })
 

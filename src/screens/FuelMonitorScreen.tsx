@@ -20,7 +20,7 @@ const FuelMonitorScreen: React.FC = () => {
                     flex: 1,
                     // justifyContent: "center",
                     alignItems: "center",
-                    backgroundColor: theme.colors.primaryBackground1,
+                    backgroundColor: theme.colors.black,
                     borderRadius: 25
                 }}>
                     <Text

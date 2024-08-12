@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.small,
-        color: theme.colors.grayLight
+        color: theme.colors.gray1
     }
 })
 

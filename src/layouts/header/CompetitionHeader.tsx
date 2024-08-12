@@ -17,7 +17,7 @@ const containerStyle: StyleProp<any> = {
     alignItems: "center",
     justifyContent: "center",
     gap: 2.5,
-    backgroundColor: theme.colors.primaryBackground2
+    backgroundColor: theme.colors.gray3
 }
 
 const style = StyleSheet.create({

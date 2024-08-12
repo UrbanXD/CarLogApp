@@ -21,7 +21,7 @@ const LoginScreen: React.FC = () => {
     const submitHandler = getLoginHandleSubmit({handleSubmit, supabaseConnector})
 
     return (
-        <View style={ [GLOBAL_STYLE.pageContainer, { backgroundColor: theme.colors.primaryBackground3, gap: hp(6.5) }] }>
+        <View style={ [GLOBAL_STYLE.pageContainer, { backgroundColor: theme.colors.black, gap: hp(6.5) }] }>
             <BackButtonHeader title={"Bejelentkezés"} backButtonAction={ () => router.replace({ pathname: "/" }) } />
             <Animated.View
                 entering={ SlideInDown.duration(750) }
@@ -51,7 +51,7 @@ const LoginScreen: React.FC = () => {
                         />
                         <Text style={ GLOBAL_STYLE.formLinkText }>Elfelejtette jelszavát?</Text>
                         <Button title="Bejelentkezés" onPress={ submitHandler } />
-                        <TextDivider title="vagy" color={ theme.colors.grayLight } lineHeight={ 1 } marginVertical={ GLOBAL_STYLE.formContainer.gap }/>
+                        <TextDivider title="vagy" color={ theme.colors.gray1 } lineHeight={ 1 } marginVertical={ GLOBAL_STYLE.formContainer.gap }/>
                         <Button onPress={ () => 1 } title="Folytatás Google fiókkal" icon={require("../assets/google_logo.png")} inverse={true} backgroundColor={ theme.colors.white } textColor={ theme.colors.googleRed } textStyle={{ fontSize: hp(2) }} />
                         <Button onPress={ () => 1 } title="Folytatás Facebook fiókkal" icon={require("../assets/facebook_logo.png")} backgroundColor={ theme.colors.facebookBlue } textColor={ theme.colors.white } textStyle={{ fontSize: hp(2) }} />
                     </View>
@@ -65,9 +65,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         borderTopLeftRadius: 125,
-        shadowColor: theme.colors.primaryBackground4,
+        shadowColor: theme.colors.black2,
         elevation: 10,
-        backgroundColor: theme.colors.primaryBackground4,
+        backgroundColor: theme.colors.black2,
         paddingVertical: SEPARATOR_SIZES.large,
         paddingHorizontal: SEPARATOR_SIZES.medium
     }

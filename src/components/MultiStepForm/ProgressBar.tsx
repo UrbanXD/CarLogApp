@@ -68,8 +68,8 @@ const useStyles = (stepsCount: number, currentStep: number) => {
             height: hp(5),
             borderRadius: 50,
             borderWidth: 2,
-            borderColor: theme.colors.primaryBackground2,
-            backgroundColor: theme.colors.primaryBackground2,
+            borderColor: theme.colors.gray3,
+            backgroundColor: theme.colors.gray3,
             justifyContent: 'center',
             alignItems: 'center',
         },
@@ -79,21 +79,21 @@ const useStyles = (stepsCount: number, currentStep: number) => {
         },
         activeCircle: {
             // borderColor: theme.colors.white,
-            backgroundColor: theme.colors.primaryBackground2,
+            backgroundColor: theme.colors.gray3,
         },
         stepText: {
             fontFamily: "Gilroy-Heavy",
             fontSize: hp(3),
             textAlign: "center",
             color: theme.colors.white,
-            textShadowColor: theme.colors.primaryBackground3,
+            textShadowColor: theme.colors.black,
             textShadowOffset: {width: -1, height: 1},
             textShadowRadius: 5
         },
         line: {
             flex: 1,
             height: hp(0.5),
-            backgroundColor: theme.colors.primaryBackground2,
+            backgroundColor: theme.colors.gray3,
             // borderRadius: 15
         },
         doneLine: {

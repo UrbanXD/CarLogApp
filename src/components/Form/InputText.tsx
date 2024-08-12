@@ -89,14 +89,14 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: hp(1.5),
-        backgroundColor: theme.colors.primaryBackground5,
+        backgroundColor: theme.colors.gray4,
         paddingHorizontal: hp(1.5),
         borderRadius: 20,
         overflow: "hidden"
     },
     activeFormFieldContainer: {
         borderWidth: 1,
-        borderColor: theme.colors.grayLight
+        borderColor: theme.colors.gray1
     },
     formFieldIconContainer: {
         flex: 0.2,
@@ -104,12 +104,12 @@ const styles = StyleSheet.create({
     },
     textInput: {
         flex: 1,
-        color: theme.colors.grayLight,
+        color: theme.colors.gray1,
         // fontFamily: "Gilroy-Medium",
         fontSize: hp(2.25)
     },
     placeholderText: {
-        color: theme.colors.grayMedium
+        color: theme.colors.gray2
     },
     errorText: {
         paddingLeft: hp(2),

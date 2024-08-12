@@ -13,7 +13,7 @@ export const bottomTabStyles = StyleSheet.create({
     bottomStyle: {
         // position:"relative",
         height: 72,
-        backgroundColor: theme.colors.primaryBackground1,
+        backgroundColor: theme.colors.black,
         borderColor: "whitesmoke",
     },
     style: {
@@ -24,7 +24,7 @@ export const bottomTabStyles = StyleSheet.create({
         alignItems: "center",
         height: 72,
         borderRadius: 50,
-        backgroundColor: theme.colors.primaryBackground1,
+        backgroundColor: theme.colors.black,
         borderColor: theme.colors.secondaryBackground,
         borderWidth: 2.5,
     },

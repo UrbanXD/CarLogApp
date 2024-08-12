@@ -30,7 +30,7 @@ const FirstScreen: React.FC = () => {
                 <ImageBackground source={ require("../assets/home2.jpg") } style={ styles.imageContainer } imageStyle={ styles.imageContainer }>
                     <LinearGradient
                         locations={[ 0, 0.35, 0.85 ]}
-                        colors={ ["transparent", "rgba(0,0,0,0.25)", theme.colors.primaryBackground3] }
+                        colors={ ["transparent", "rgba(0,0,0,0.25)", theme.colors.black] }
                         style={{ ...StyleSheet.absoluteFillObject, top: 20 }}
                     />
                 </ImageBackground>
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "column",
         justifyContent: "space-between",
-        backgroundColor: theme.colors.primaryBackground3,
+        backgroundColor: theme.colors.black,
         paddingHorizontal: DEFAULT_SEPARATOR,
         paddingBottom: GLOBAL_STYLE.pageContainer.paddingBottom,
     },
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     titleEffect: {
         zIndex: 0,
         position: "absolute", top: -hp(2.5),
-        color: theme.colors.primaryBackground3,
+        color: theme.colors.black,
         textShadowOffset: { height: 0, width: 0 },
         textShadowColor: theme.colors.white,
         textShadowRadius: 1,
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         alignSelf: "center",
-        color: theme.colors.secondaryColor2,
+        color: theme.colors.gray2,
         fontSize: FONT_SIZES.normal,
         fontFamily: "Gilroy-Medium",
         textTransform: "uppercase",
