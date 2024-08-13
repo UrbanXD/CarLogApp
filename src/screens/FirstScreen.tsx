@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import {DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES} from "../constants/constants";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {theme} from "../styles/theme";
+import {theme} from "../constants/theme";
 import {LinearGradient} from "expo-linear-gradient";
 import {Divider} from "react-native-paper";
 import {router} from "expo-router";

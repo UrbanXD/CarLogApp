@@ -22,22 +22,26 @@ interface CustomHeaderProp {
 const Header: React.FC<CustomHeaderProp> = ({ children, statusBarStyle = "light-content", statusBarIsTransculent = false, backgroundColor, statusbarColor = backgroundColor, height = SIMPLE_HEADER_HEIGHT, collapsible}) => {
     return (
         <View>
-            <StatusBar translucent={ statusBarIsTransculent } barStyle={ statusBarStyle } backgroundColor={ statusbarColor } />
+            <StatusBar
+                translucent={ statusBarIsTransculent }
+                barStyle={ statusBarStyle }
+                backgroundColor={ statusbarColor }
+            />
             {
                 !!collapsible
-                    ? <CollapsibleHeaderBar
-                          backgroundColor={ backgroundColor }
-                          height={ height }
-                          image={ collapsible.image }
-                          imageHeight={ collapsible.imageHeight }
-                          gradientColors={ collapsible.gradientColors }
-                          children={ children }
-                      />
-                    : <SimpleHeaderBar
-                          backgroundColor={ backgroundColor }
-                          height={ height }
-                          children={ children }
-                      />
+                    ?   <CollapsibleHeaderBar
+                            backgroundColor={ backgroundColor }
+                            height={ height }
+                            image={ collapsible.image }
+                            imageHeight={ collapsible.imageHeight }
+                            gradientColors={ collapsible.gradientColors }
+                            children={ children }
+                        />
+                    :   <SimpleHeaderBar
+                            backgroundColor={ backgroundColor }
+                            height={ height }
+                            children={ children }
+                        />
             }
         </View>
     )

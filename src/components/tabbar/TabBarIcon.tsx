@@ -39,17 +39,6 @@ const TabBarIcon: React.FC<TabBarIconProp> = ({title= "", textColor, focused, fo
         )
     }, [focused, icon]);
 
-    const animatedIconTextStyle = useAnimatedStyle(() => {
-        const opacityValue = interpolate(
-            icon.value,
-            [0, 0.1, 1],
-            [1, 0.05, 0]
-        )
-        return {
-            opacity: opacityValue,
-            color: textColor,
-        }
-    })
 
     const animatedIconSizeStyle = useAnimatedStyle(() => {
         const sizeValue = interpolate(
@@ -61,11 +50,10 @@ const TabBarIcon: React.FC<TabBarIconProp> = ({title= "", textColor, focused, fo
         return {
             transform: [{
                 scale: sizeValue,
-            }, {
-                translateY: focused ? 10 : 0
             }],
             alignItems: "center",
-            alignSelf: "center"
+            alignSelf: "center",
+            justifyContent: "center"
         }
     })
 
@@ -85,7 +73,9 @@ const TabBarIcon: React.FC<TabBarIconProp> = ({title= "", textColor, focused, fo
             <Animated.View style={ animatedIconSizeStyle }>
                 <Icon size={ iconSize } source={ iconName } color={ iconColor } />
                 {
-                    <Animated.Text style={ animatedIconTextStyle }>{ title }</Animated.Text>
+                    <Animated.Text style={{ color: textColor, textAlign: "center", display: focused ? "none" : "flex" }}>
+                        { title }
+                    </Animated.Text>
                 }
             </Animated.View>
         </Pressable>

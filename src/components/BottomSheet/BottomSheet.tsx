@@ -1,6 +1,6 @@
 import React, {forwardRef, useCallback, useImperativeHandle} from "react";
 import {StyleSheet, View, Text} from "react-native";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
 import TextDivider from "../TextDivider/TextDivider";
 import {DEFAULT_SEPARATOR, SEPARATOR_SIZES} from "../../constants/constants";
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     },
     line: {
         alignSelf: "center",
-        margin: SEPARATOR_SIZES.normal,
+        marginTop: SEPARATOR_SIZES.normal,
         width: hp(15),
         height: hp(0.75),
         backgroundColor: theme.colors.white2,

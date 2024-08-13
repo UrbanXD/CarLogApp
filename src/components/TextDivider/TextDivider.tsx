@@ -1,6 +1,6 @@
 import React from "react";
 import {ColorValue, StyleSheet, View, Text} from "react-native";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface TextDividerProps {

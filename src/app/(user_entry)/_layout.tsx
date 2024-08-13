@@ -5,7 +5,7 @@ import {ScrollViewProvider} from "../../providers/ScrollViewProvider";
 import {Provider} from "react-redux";
 import {store} from "../../redux/store";
 import Tabbar from "../../components/tabbar/Tabbar";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 import {PaperProvider} from "react-native-paper";
 
 const TabLayout:React.FC = () => {

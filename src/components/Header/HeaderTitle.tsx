@@ -1,7 +1,7 @@
 import React, {ReactNode} from "react";
 import {Image, ImageSourcePropType, StyleSheet, Text, TextStyle, View} from "react-native";
 import {Divider} from "react-native-paper";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 
 interface HeaderTitleProp {
     title?: string,

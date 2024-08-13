@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../../components/Header/Header";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 import HeaderBackButton from "../../components/Header/HeaderBackButton";
 import HeaderTitle from "../../components/Header/HeaderTitle";
 import {StyleProp, StyleSheet, Text, TouchableOpacity, View} from "react-native";

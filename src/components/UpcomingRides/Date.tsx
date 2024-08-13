@@ -1,7 +1,7 @@
 import React from "react";
 import {StyleSheet, Text, View} from "react-native";
 import {FONT_SIZES, SEPARATOR_SIZES} from "../../constants/constants";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
 
 interface DateProps {

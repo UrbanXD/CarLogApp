@@ -10,7 +10,7 @@ import {
     Image,
     ImageSourcePropType, View
 } from "react-native";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
 import {FONT_SIZES, SEPARATOR_SIZES} from "../../constants/constants";
 

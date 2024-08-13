@@ -1,6 +1,6 @@
 import React from "react";
 import {SharedValue, useAnimatedProps, useDerivedValue} from "react-native-reanimated";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
 import {View, Text as TextRN, StyleSheet} from "react-native";
 import {Canvas, Skia, Path, Text, SkFont} from "@shopify/react-native-skia";

@@ -1,5 +1,10 @@
-export const getDate = () => {
+export const getToday = () => {
     const today = new Date();
+    return today;
+}
+
+export const getDate = () => {
+    const today = getToday();
 
     const month = today.getMonth() + 1;
     const year = today.getFullYear();

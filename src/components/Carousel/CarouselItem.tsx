@@ -10,7 +10,7 @@ import {
     TouchableHighlight
 } from "react-native";
 import Animated, {interpolate, SharedValue, useAnimatedStyle} from "react-native-reanimated";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 import hexToRgba from "hex-to-rgba";
 import {LinearGradient} from "expo-linear-gradient";
 import {

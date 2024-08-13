@@ -4,7 +4,7 @@ import {GetFormHandleSubmitArgs} from "../constants";
 import {Alert} from "react-native";
 
 export interface LoginFormFieldType {
-    email: string,
+    email: string
     password: string
 }
 

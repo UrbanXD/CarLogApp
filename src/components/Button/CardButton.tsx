@@ -10,7 +10,7 @@ import {
     Text,
     StyleSheet, useWindowDimensions
 } from "react-native";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 

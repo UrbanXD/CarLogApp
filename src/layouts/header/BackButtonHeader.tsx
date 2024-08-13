@@ -1,5 +1,5 @@
 import React from "react";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 import Header from "../../components/Header/Header";
 import HeaderBackButton from "../../components/Header/HeaderBackButton";
 import {FONT_SIZES, SIMPLE_HEADER_HEIGHT} from "../../constants/constants";

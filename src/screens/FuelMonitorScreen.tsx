@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {Dimensions, Image, SafeAreaView, StyleSheet, Text, View} from "react-native";
-import {theme} from "../styles/theme";
+import {theme} from "../constants/theme";
 import {GLOBAL_STYLE} from "../constants/constants";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import CompetitionHeader from "../layouts/header/CompetitionHeader";

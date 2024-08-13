@@ -8,6 +8,7 @@ import {useDatabase} from "../db/Database";
 import { Session } from '@supabase/supabase-js';
 import {GestureHandlerRootView} from "react-native-gesture-handler";
 import {SafeAreaProvider} from "react-native-safe-area-context";
+import HomeHeader from "../layouts/header/HomeHeader";
 
 const Layout:React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
@@ -35,9 +36,9 @@ const Layout:React.FC = () => {
         <SafeAreaProvider>
             <GestureHandlerRootView style={{ flex: 1 }}>
                 <ScrollViewProvider>
-                    <Stack screenOptions={{ headerShown: false }}>
+                    <Stack screenOptions={{ header: () => <HomeHeader /> }}>
+                        <Stack.Screen name="(main)" />
                         <Stack.Screen name="fuelMonitor" />
-                        <Stack.Screen name="index" />
                     </Stack>
                 </ScrollViewProvider>
             </GestureHandlerRootView>

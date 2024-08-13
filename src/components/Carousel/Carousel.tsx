@@ -9,7 +9,7 @@ import Animated, {
     useSharedValue
 } from "react-native-reanimated";
 import hexToRgba from "hex-to-rgba";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 import CarouselItem from "./CarouselItem";
 
 export type CarouselItemType = {

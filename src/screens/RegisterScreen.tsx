@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../constants/constants";
-import {theme} from "../styles/theme";
+import {theme} from "../constants/theme";
 import BackButtonHeader from "../layouts/header/BackButtonHeader";
 import {router} from "expo-router";
 import {Alert, ScrollView, StyleSheet, Text, View} from "react-native";

@@ -1,7 +1,7 @@
 import React from "react";
 import {StyleSheet, TouchableWithoutFeedback, View} from "react-native";
 import Animated, {interpolate, SharedValue, useAnimatedStyle} from "react-native-reanimated";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 
 interface BackdropProps {
     top: SharedValue<number>

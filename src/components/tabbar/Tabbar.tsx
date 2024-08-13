@@ -1,68 +1,38 @@
 import React, {useEffect, useState} from "react";
-import {Dimensions, View, ViewStyle} from "react-native";
+import {Dimensions, StyleSheet, View, ViewStyle} from "react-native";
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs'
 import TabBarIcon from "./TabBarIcon";
 import Animated, {interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming} from "react-native-reanimated";
-import {bottomTabStyles} from "../../styles/bottomTabs.style";
 import hexToRgba from "hex-to-rgba";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 import {LinearGradient} from "expo-linear-gradient";
 import createAnimatedComponent = Animated.createAnimatedComponent;
+import {heightPercentageToDP as hp} from "react-native-responsive-screen";
+import {FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT} from "../../constants/constants";
+import {MaterialTopTabBarProps} from "@react-navigation/material-top-tabs";
 
 interface TabBarProps{
-    tabBarStyle: ViewStyle,
-    tabBarActiveTintColor: string,
-    tabBarInactiveTintColor: string,
+    tabBarStyle?: ViewStyle,
+    tabBarActiveTintColor?: string,
+    tabBarInactiveTintColor?: string,
 }
 
-const Tabbar: React.FC<BottomTabBarProps & TabBarProps> = ({ state, descriptors, navigation, tabBarStyle, tabBarActiveTintColor, tabBarInactiveTintColor }) => {
-    const MARGIN = 20
-    const TAB_BAR_WIDTH =  Dimensions.get("screen").width - 2 * MARGIN
+const TabBar: React.FC<MaterialTopTabBarProps & TabBarProps> = ({ state, descriptors, navigation, tabBarStyle = {}, tabBarActiveTintColor = ICON_COLORS.active, tabBarInactiveTintColor = ICON_COLORS.inactive }) => {
+    const TAB_BAR_WIDTH =  Dimensions.get("screen").width
     const TAB_WIDTH = TAB_BAR_WIDTH / state.routes.length;
-
-    const glow = useSharedValue(0);
-    useEffect(() => {
-        glow.value = 0
-        glow.value = withSpring(
-            1,
-            { duration: 5000 }
-        )
-    }, [state.index]);
-
-    const AnimatedLinearGradient = createAnimatedComponent(LinearGradient);
 
     const slideAnimationStyle = useAnimatedStyle(() => {
         return {
-            transform: [{translateX: withTiming(TAB_WIDTH * state.index)}]
+            transform: [{
+                translateX: withTiming(TAB_WIDTH * state.index)
+            }]
         }
     });
 
-    const glowingAnimationStyle = useAnimatedStyle(() => {
-        const opacityValue = interpolate(
-            glow.value,
-            [0, 0.25, 0.5, 0.75, 1],
-            [0.5, 0, 0.75, 0.25, 1]
-        )
-        return {
-            opacity: opacityValue
-        }
-    })
-
     return (
-        <View style={ [tabBarStyle, { width: TAB_BAR_WIDTH, bottom: MARGIN }] }>
-            <Animated.View style={ [bottomTabStyles.slidingElementContainerStyle, { width: TAB_WIDTH }, slideAnimationStyle] }>
-                <View style={ bottomTabStyles.slidingElementStyle }></View>
-                <AnimatedLinearGradient
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 0, y: 1 }}
-                    locations={ [0, 0.75] }
-                    colors={[ hexToRgba(theme.colors.primaryColor, 0.25), "transparent" ]}
-                    style={[{
-                        height: "65%",
-                        borderBottomRightRadius: 50,
-                        borderBottomLeftRadius: 50
-                    }, glowingAnimationStyle]}
-                />
+        <View style={ [styles.container, tabBarStyle] }>
+            <Animated.View style={ [styles.slidingElementContainer, { width: TAB_WIDTH }, slideAnimationStyle] }>
+                <View style={ styles.slidingElement } />
             </Animated.View>
             {
                 state.routes.map((route, index) => {
@@ -76,7 +46,7 @@ const Tabbar: React.FC<BottomTabBarProps & TabBarProps> = ({ state, descriptors,
                             ? options.tabBarIcon({
                                 focused: isFocused,
                                 color: isFocused ? tabBarActiveTintColor : tabBarInactiveTintColor,
-                                size: 25,
+                                // size: 25,
                               }) as string
                             : "home"
 
@@ -110,7 +80,7 @@ const Tabbar: React.FC<BottomTabBarProps & TabBarProps> = ({ state, descriptors,
                             onPress={ onPress }
                             onLongPress={ onLongPress }
                             width={ TAB_WIDTH }
-                        ></TabBarIcon>
+                        />
                     );
                 })
             }
@@ -118,4 +88,30 @@ const Tabbar: React.FC<BottomTabBarProps & TabBarProps> = ({ state, descriptors,
     )
 }
 
-export default Tabbar;
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: "row",
+        alignSelf: "center",
+        justifyContent: "space-between",
+        alignItems: "center",
+        height: SIMPLE_TABBAR_HEIGHT,
+        backgroundColor: theme.colors.black2,
+        borderColor: theme.colors.gray2,
+        borderBottomWidth: 2.5,
+    },
+    titleText: {
+        fontSize: FONT_SIZES.normal,
+        alignItems: "center"
+    },
+    slidingElementContainer: {
+        ...StyleSheet.absoluteFillObject,
+        top: "100%"
+    },
+    slidingElement: {
+        width: "100%",
+        height: 5,
+        backgroundColor: theme.colors.fuelYellow
+    }
+})
+
+export default TabBar;

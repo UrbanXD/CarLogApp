@@ -1,10 +1,10 @@
 import React from "react";
 import {ColorValue, Image, ImageSourcePropType, StyleSheet, View} from "react-native";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
-import {SIMPLE_HEADER_HEIGHT} from "../../constants/constants";
+import {DEFAULT_SEPARATOR, SIMPLE_HEADER_HEIGHT} from "../../constants/constants";
 import Animated, {SharedValue} from "react-native-reanimated";
 import hexToRgba from "hex-to-rgba";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 import {LinearGradient} from "expo-linear-gradient";
 
 interface SimpleHeaderProps {
@@ -61,5 +61,6 @@ const style = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         gap: 20,
+        paddingHorizontal: DEFAULT_SEPARATOR
     }
 })

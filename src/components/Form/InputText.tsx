@@ -4,7 +4,7 @@ import {Control, Controller, FieldError, FieldValues} from "react-hook-form";
 import {GLOBAL_STYLE, ICON_COLORS, ICON_NAMES} from "../../constants/constants";
 import {Divider, Icon, IconButton} from "react-native-paper";
 import {heightPercentageToDP as hp, heightPercentageToDP} from "react-native-responsive-screen";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 
 interface InputTextProps {
     control: Control<any>
@@ -13,11 +13,12 @@ interface InputTextProps {
     icon?: string
     placeholder?: string
     isSecure?: boolean
+    isEditable?: boolean
     style?: StyleProp<ViewStyle>
     textStyle?: StyleProp<TextStyle>
 }
 
-const InputText: React.FC<InputTextProps> = ({ control, fieldName, fieldNameText = fieldName, icon, placeholder = "", isSecure= false, style, textStyle,  }) => {
+const InputText: React.FC<InputTextProps> = ({ control, fieldName, fieldNameText = fieldName, icon, placeholder = "", isSecure= false, isEditable = true, style, textStyle,  }) => {
     const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(isSecure);
 
@@ -34,7 +35,7 @@ const InputText: React.FC<InputTextProps> = ({ control, fieldName, fieldNameText
                 name={ fieldName }
                 render={({ field: { value, onChange }, fieldState: { error }})=>
                     <>
-                        <View style={ [style, styles.formFieldContainer, focused && styles.activeFormFieldContainer] }>
+                        <View style={ [style, isEditable && styles.formFieldContainer, focused && isEditable && styles.activeFormFieldContainer] }>
                             {
                                 icon &&
                                 <View style={ styles.formFieldIconContainer }>
@@ -51,6 +52,7 @@ const InputText: React.FC<InputTextProps> = ({ control, fieldName, fieldNameText
                                 onChangeText={ onChange }
                                 onBlur={ onBlur }
                                 onFocus={ onFocus }
+                                editable={ isEditable }
                             />
                             <View style={ styles.formFieldIconContainer }>
                                 {

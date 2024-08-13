@@ -1,5 +1,5 @@
 import {StyleSheet} from "react-native";
-import {theme} from "../styles/theme";
+import {theme} from "./theme";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
 import {UseFormHandleSubmit} from "react-hook-form";
 import {SupabaseConnector} from "../db/SupabaseConnector";
@@ -22,13 +22,18 @@ export const ICON_NAMES = {
     info: "information-outline",
     destinationPointMarker: "map-marker",
     startingPointMarker: "map-marker-outline",
-    clock: "clock-time-seven-outline"
+    clock: "clock-time-seven-outline",
+    notebook: "notebook-outline",
+    service: "car-wrench",
+    expenses: "currency-usd"
 }
 
 export const ICON_COLORS = {
     default: theme.colors.white,
     good: theme.colors.greenLight,
-    wrong: "red"
+    wrong: "red",
+    active: "white",
+    inactive: theme.colors.gray1
 }
 
 export const FONT_SIZES = {
@@ -60,7 +65,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
         gap: 0,
         backgroundColor: "whitesmoke",
         paddingHorizontal: DEFAULT_SEPARATOR,
-        paddingBottom: SEPARATOR_SIZES.small,
+        paddingVertical: SEPARATOR_SIZES.small,
     },
     scrollViewContentContainer: {
         flexGrow: 1,
@@ -75,7 +80,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
         paddingLeft: SEPARATOR_SIZES.small,
         fontFamily: "Gilroy-Medium",
         color: theme.colors.fuelYellow
-    },
+    }
 });
 
 export const GET_ICON_BUTTON_RESET_STYLE = (size: number = FONT_SIZES.normal) => {
@@ -85,4 +90,5 @@ export const GET_ICON_BUTTON_RESET_STYLE = (size: number = FONT_SIZES.normal) =>
 export const COLLAPSIBLE_HEADER_HEIGHT = 180;
 export const COLLAPSIBLE_HEADER_IMAGE = 110;
 
-export const SIMPLE_HEADER_HEIGHT = 70;
+export const SIMPLE_HEADER_HEIGHT = hp(7.5);
+export const SIMPLE_TABBAR_HEIGHT = hp(7.5);

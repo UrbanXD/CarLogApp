@@ -1,7 +1,7 @@
 import React from "react";
 import {StyleSheet, Text, View} from "react-native";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {theme} from "../../styles/theme";
+import {theme} from "../../constants/theme";
 import {Icon} from "react-native-paper";
 import {ICON_NAMES} from "../../constants/constants";
 import hexToRgba from "hex-to-rgba";

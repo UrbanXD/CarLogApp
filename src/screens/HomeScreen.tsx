@@ -6,7 +6,7 @@ import {
     Text, TouchableHighlight, TouchableOpacity,
     View
 } from "react-native";
-import {theme} from "../styles/theme";
+import {theme} from "../constants/theme";
 import CardButton from "../components/Button/CardButton";
 import {router} from "expo-router";
 import Animated, {FadeInLeft} from "react-native-reanimated";
@@ -170,7 +170,6 @@ const HomeScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, styles.pageContainer] }>
-            <HomeHeader />
             <ScrollView
                 showsVerticalScrollIndicator={ false }
                 contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
@@ -213,23 +212,23 @@ const HomeScreen: React.FC = () => {
                         <UpcomingRides
                             rides={[
                                 {
+                                    carUID: "1",
+                                    carOwnerUID: "1",
                                     dateTitle: "08.26",
                                     dateSubtitle: "Hétfő",
                                     time: "05:00",
-                                    startingCity: "Zenta",
-                                    destinationCity: "Kamenica",
-                                    locations: ["Nagy Abonyi Vince 24.", "Korhaz utca 15."],
+                                    locations: [{city: "Zenta", place: "Nagy Abonyi Vince 24."}, {city: "Kamenica", place: "Korhaz utca 15."}],
                                     client: "Kiss Imre",
                                     passengerCount: 2,
                                     comment: ""
                                 },
                                 {
+                                    carUID: "2",
+                                    carOwnerUID: "2",
                                     dateTitle: "08.26",
                                     dateSubtitle: "Hétfő",
                                     time: "05:00",
-                                    startingCity: "Zenta",
-                                    destinationCity: "Kamenica",
-                                    locations: ["Nagy Abonyi Vince 24.", "Korhaz utca 15."],
+                                    locations: [{city: "Zenta", place: "Nagy Abonyi Vince 24."}, {city: "Kamenica", place: "Korhaz utca 15."}],
                                     client: "Kiss Imre",
                                     passengerCount: 2,
                                     comment: ""
