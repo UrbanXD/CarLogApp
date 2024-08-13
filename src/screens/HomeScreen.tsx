@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import {
+    Alert,
     ImageSourcePropType,
     SafeAreaView, ScrollView,
     StyleSheet,
@@ -14,7 +15,6 @@ import HomeHeader from "../layouts/header/HomeHeader";
 import {
     DEFAULT_SEPARATOR,
     FONT_SIZES,
-    GET_ICON_BUTTON_RESET_STYLE,
     GLOBAL_STYLE,
     ICON_NAMES,
     SEPARATOR_SIZES
@@ -22,15 +22,12 @@ import {
 import {useDatabase} from "../db/Database";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
 import Carousel, {CarouselItemType} from "../components/Carousel/Carousel";
-import {CARS_TABLE, USERS_TABLE} from "../db/AppSchema";
+import {CARS_TABLE} from "../db/AppSchema";
 import {getUUID} from "../db/uuid";
 import Button from "../components/Button/Button";
-import {Icon, IconButton} from "react-native-paper";
-import {addLeadingZero, getDate} from "../utils/getDate";
-import {white} from "react-native-paper/lib/typescript/styles/themes/v2/colors";
-import RideInfo from "../components/UpcomingRides/RideInfo";
+import {Icon} from "react-native-paper";
+import {getDate} from "../utils/getDate";
 import UpcomingRides from "../components/UpcomingRides/UpcomingRides";
-import BottomSheet, {BottomSheetMethods} from "../components/BottomSheet/BottomSheet";
 
 interface onButtonPressArgs {
     path: string,

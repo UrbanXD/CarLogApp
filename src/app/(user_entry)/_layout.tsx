@@ -1,10 +1,7 @@
-import { Stack } from 'expo-router/stack';
-import {Tabs, useRootNavigationState} from 'expo-router';
+import {Tabs} from 'expo-router';
 import React from "react";
-import {ScrollViewProvider} from "../../providers/ScrollViewProvider";
 import {Provider} from "react-redux";
 import {store} from "../../redux/store";
-import Tabbar from "../../components/tabbar/Tabbar";
 import {theme} from "../../constants/theme";
 import {PaperProvider} from "react-native-paper";
 

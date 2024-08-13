@@ -20,8 +20,9 @@ interface CustomHeaderProp {
 }
 
 const Header: React.FC<CustomHeaderProp> = ({ children, statusBarStyle = "light-content", statusBarIsTransculent = false, backgroundColor, statusbarColor = backgroundColor, height = SIMPLE_HEADER_HEIGHT, collapsible}) => {
+    const insets = useSafeAreaInsets()
     return (
-        <View>
+        <View style={{ paddingTop: insets.top }}>
             <StatusBar
                 translucent={ statusBarIsTransculent }
                 barStyle={ statusBarStyle }

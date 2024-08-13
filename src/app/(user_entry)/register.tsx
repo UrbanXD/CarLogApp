@@ -12,7 +12,6 @@ import {
 import RegisterStepOne from "../../layouts/forms/RegisterForm/StepOne";
 import RegisterStepTwo from "../../layouts/forms/RegisterForm/StepTwo";
 import RegisterStepThree from "../../layouts/forms/RegisterForm/StepThree";
-import {StatusBar} from "react-native";
 
 const Page: React.FC = () => {
     const { supabaseConnector } = useDatabase();

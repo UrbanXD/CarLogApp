@@ -9,7 +9,10 @@ import {Avatar} from "react-native-paper";
 
 const HomeHeader: React.FC = () => {
     return (
-            <Header statusbarColor={ theme.colors.black2 } backgroundColor={ theme.colors.black2 }>
+            <Header
+                statusbarColor={ theme.colors.black2 }
+                backgroundColor={ theme.colors.black2 }
+            >
                 <View style={{ flex: 1 }}>
                     <Text style={{ color: "white", fontFamily: "Gilroy-Heavy", fontSize: FONT_SIZES.medium, letterSpacing: FONT_SIZES.medium * 0.1 }}>CARLOG</Text>
                 </View>

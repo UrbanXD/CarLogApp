@@ -3,7 +3,7 @@ import {GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../constants/constants"
 import {theme} from "../constants/theme";
 import BackButtonHeader from "../layouts/header/BackButtonHeader";
 import {router} from "expo-router";
-import {Alert, ScrollView, StyleSheet, Text, View} from "react-native";
+import {StyleSheet, View} from "react-native";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
 import {useMultiStepForm} from "../providers/MultiStepFormProvider";
 import Animated, {SlideInDown, useSharedValue, withTiming} from "react-native-reanimated";

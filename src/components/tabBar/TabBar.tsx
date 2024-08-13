@@ -1,13 +1,8 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Dimensions, StyleSheet, View, ViewStyle} from "react-native";
-import {BottomTabBarProps} from '@react-navigation/bottom-tabs'
 import TabBarIcon from "./TabBarIcon";
-import Animated, {interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming} from "react-native-reanimated";
-import hexToRgba from "hex-to-rgba";
+import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 import {theme} from "../../constants/theme";
-import {LinearGradient} from "expo-linear-gradient";
-import createAnimatedComponent = Animated.createAnimatedComponent;
-import {heightPercentageToDP as hp} from "react-native-responsive-screen";
 import {FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT} from "../../constants/constants";
 import {MaterialTopTabBarProps} from "@react-navigation/material-top-tabs";
 

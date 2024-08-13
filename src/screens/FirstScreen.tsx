@@ -25,39 +25,41 @@ const FirstScreen: React.FC = () => {
     const openLogin = () => router.push({ pathname: "/(user_entry)/login" });
 
     return (
-        <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, { paddingHorizontal: 0, paddingBottom: 0 }]}>
-            <ScrollView showsVerticalScrollIndicator={ false } contentContainerStyle={GLOBAL_STYLE.scrollViewContentContainer}>
-                <ImageBackground source={ require("../assets/home2.jpg") } style={ styles.imageContainer } imageStyle={ styles.imageContainer }>
-                    <LinearGradient
-                        locations={[ 0, 0.35, 0.85 ]}
-                        colors={ ["transparent", "rgba(0,0,0,0.25)", theme.colors.black] }
-                        style={{ ...StyleSheet.absoluteFillObject, top: 20 }}
-                    />
-                </ImageBackground>
-                <View style={ styles.contentContainer }>
-                    <View style={{ top: -SEPARATOR_SIZES.lightLarge, gap: SEPARATOR_SIZES.mediumSmall }}>
-                        <Text style={ styles.title }>Carlog</Text>
-                        <Text style={ [styles.title, styles.titleEffect] }>Carlog</Text>
-                        <Text style={ [styles.title, styles.titleEffect, { top: hp(2.5), zIndex: -1 }] }>Carlog</Text>
-                        <Divider style={ styles.divider } />
-                        <Text style={ styles.subtitle }>Kezelje nálunk autóit</Text>
-                    </View>
-                    <View style={ styles.actionContainer }>
-                        <Button title="Regisztráció" onPress={ openRegister }/>
-                        <Text style={ styles.underButtonText }>
-                            Már rendelkezel felhasználóval ?
-                            <Text style={ styles.linkText } onPress={ openLogin } >Jelentkezz be</Text>
-                        </Text>
-                    </View>
+        <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, { paddingHorizontal: 0, paddingVertical: 0 }]}>
+            <ImageBackground
+                source={ require("../assets/home2.jpg") }
+                style={ styles.imageContainer }
+                imageStyle={ styles.imageContainer }
+            >
+                <LinearGradient
+                    locations={[ 0, 0.35, 0.85 ]}
+                    colors={ ["transparent", "rgba(0,0,0,0.25)", theme.colors.black] }
+                    style={{ ...StyleSheet.absoluteFillObject, top: 20 }}
+                />
+            </ImageBackground>
+            <View style={ styles.contentContainer }>
+                <View style={{ top: -SEPARATOR_SIZES.lightLarge, gap: SEPARATOR_SIZES.mediumSmall }}>
+                    <Text style={ styles.title }>Carlog</Text>
+                    <Text style={ [styles.title, styles.titleEffect] }>Carlog</Text>
+                    <Text style={ [styles.title, styles.titleEffect, { top: hp(2.5), zIndex: -1 }] }>Carlog</Text>
+                    <Divider style={ styles.divider } />
+                    <Text style={ styles.subtitle }>Kezelje nálunk autóit</Text>
                 </View>
-            </ScrollView>
+                <View style={ styles.actionContainer }>
+                    <Button title="Regisztráció" onPress={ openRegister }/>
+                    <Text style={ styles.underButtonText }>
+                        Már rendelkezel felhasználóval ?
+                        <Text style={ styles.linkText } onPress={ openLogin } >Jelentkezz be</Text>
+                    </Text>
+                </View>
+            </View>
         </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
     imageContainer: {
-        height: hp(55)
+        flex: 0.85
     },
     image: {
         resizeMode: "cover",
@@ -68,7 +70,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         backgroundColor: theme.colors.black,
         paddingHorizontal: DEFAULT_SEPARATOR,
-        paddingBottom: GLOBAL_STYLE.pageContainer.paddingBottom,
+        paddingBottom: GLOBAL_STYLE.pageContainer.paddingVertical,
     },
     title: {
         zIndex: 1,
