@@ -6,19 +6,29 @@ import {heightPercentageToDP as hp} from "react-native-responsive-screen";
 
 interface DateProps {
     dateTitle: string
-    dateSubtitle: string
+    dateUpperSubtitle?: string
+    dateUnderSubtitle?: string
     flexDirection?: "row" | "column"
 }
 
-const Date: React.FC<DateProps> = ({ dateTitle, dateSubtitle, flexDirection = "column" }) => {
+const Date: React.FC<DateProps> = ({ dateTitle, dateUnderSubtitle, dateUpperSubtitle, flexDirection = "column" }) => {
     return (
         <View style={ [styles.container, { flexDirection, gap: flexDirection === "row" ? SEPARATOR_SIZES.lightSmall * 0.5 : 0 }] }>
+            {
+                dateUpperSubtitle &&
+                <Text style={ styles.dateSubtitleText }>
+                    { dateUpperSubtitle }
+                </Text>
+            }
             <Text style={ styles.dateTitleText }>
                 { dateTitle }
             </Text>
-            <Text style={ styles.dateSubtitleText }>
-                { dateSubtitle }
-            </Text>
+            {
+                dateUnderSubtitle &&
+                    <Text style={ styles.dateSubtitleText }>
+                        { dateUnderSubtitle }
+                    </Text>
+            }
         </View>
     )
 }

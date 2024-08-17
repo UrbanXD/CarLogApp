@@ -1,17 +1,25 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
-import {StyleSheet, Text, View} from "react-native";
-import {FONT_SIZES, GET_ICON_BUTTON_RESET_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../constants/constants";
+import {ScrollView, StyleSheet, Text, View} from "react-native";
+import {
+    FONT_SIZES,
+    GET_ICON_BUTTON_RESET_STYLE,
+    GLOBAL_STYLE,
+    ICON_NAMES,
+    SEPARATOR_SIZES
+} from "../../constants/constants";
 import RideInfo from "./RideInfo";
 import Date from "./Date";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
 import {theme} from "../../constants/theme";
-import {IconButton, Portal} from "react-native-paper";
+import {Divider, IconButton, Portal} from "react-native-paper";
 import BottomSheet, {BottomSheetMethods} from "../BottomSheet/BottomSheet";
 import InputText from "../Form/InputText";
 import {useForm} from "react-hook-form";
-import {LoginFormFieldType, loginUseFormProps} from "../../constants/formSchema/loginForm";
 import {EditRideFormFieldType, editRideUseFormProps} from "../../constants/formSchema/editRideForm";
 import {getToday} from "../../utils/getDate";
+import Timeline from "../Timeline/Timeline";
+import ProgressBar from "../MultiStepForm/ProgressBar";
+import TextDivider from "../TextDivider/TextDivider";
 
 type RideType = {
     carUID: string
@@ -71,7 +79,7 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                         <View style={ styles.infoTitleContainer }>
                             <Date
                                 dateTitle={ rides[selectedRideIndex].dateTitle }
-                                dateSubtitle={ rides[selectedRideIndex].dateSubtitle }
+                                dateUnderSubtitle={ rides[selectedRideIndex].dateSubtitle }
                                 flexDirection="row"
                             />
                             <Text style={{color: "white" }}>{ rides[selectedRideIndex].time }</Text>
@@ -102,29 +110,23 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                 {
                     rides.map((ride, index) =>
                         <View key={ index } style={ styles.contentContainer }>
-                            <Date
-                                dateTitle={ ride.dateTitle }
-                                dateSubtitle={ ride.dateSubtitle }
-                            />
                             <View style={ styles.rowContainer }>
-                                <View style={ styles.rowContentContainer }>
-                                    <RideInfo
-                                        icon={ ICON_NAMES.startingPointMarker }
-                                        text={ ride.locations[0].city }
-                                    />
-                                    <RideInfo
-                                        icon={ ICON_NAMES.destinationPointMarker }
-                                        text={ ride.locations[ride.locations.length - 1].city }
-                                    />
-                                    <RideInfo
-                                        icon={ ICON_NAMES.user }
-                                        text={ ride.client }
-                                    />
-                                    <RideInfo
-                                        icon={ ICON_NAMES.clock }
-                                        text={ ride.time }
-                                    />
-                                </View>
+                                <Date
+                                    dateTitle={ ride.dateTitle }
+                                    dateUpperSubtitle={ ride.time }
+                                    dateUnderSubtitle={ ride.dateSubtitle }
+                                />
+                                <View style={{ flex: 1, gap: SEPARATOR_SIZES.lightSmall }}>
+                                    <Text numberOfLines={ 2 } style={ [GLOBAL_STYLE.containerText, { color: theme.colors.white }] }>
+                                        { ride.client }
+                                    </Text>
+                                    <ScrollView contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }>
+                                        <ProgressBar isVertical stepsCount={3} titles={["Zenta", "Kamenica"]}/>
+                                    </ScrollView>
+                                    <Text numberOfLines={ 1 } style={ [GLOBAL_STYLE.containerText, { color: theme.colors.white }] }>
+                                        100 km
+                                    </Text>
+                            </View>
                                 <IconButton
                                     onPress={ () => expandHandler(index) }
                                     size={ FONT_SIZES.medium }
@@ -157,6 +159,21 @@ const styles = StyleSheet.create({
     container: {
         gap: SEPARATOR_SIZES.small
     },
+    container2: {
+        // flex: 1,
+        flexDirection: "row",
+        gap: SEPARATOR_SIZES.lightSmall * 0.5,
+        paddingLeft: SEPARATOR_SIZES.lightSmall * 0.75,
+        // justifyContent: "center",
+        alignItems: "center"
+    },
+    text: {
+        // flex: 1,
+        flexWrap: "wrap",
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.small,
+        color: theme.colors.white
+    },
     contentContainer: {
         flexDirection: "row",
         gap: SEPARATOR_SIZES.lightSmall
@@ -164,10 +181,10 @@ const styles = StyleSheet.create({
     rowContainer: {
         flex: 1,
         flexDirection: "row",
-        height: hp(25),
+        height: hp(22.5),
         backgroundColor: theme.colors.black2,
         borderRadius: 15,
-        padding: SEPARATOR_SIZES.small
+        padding: SEPARATOR_SIZES.small,
     },
     rowContentContainer: {
         flex: 1,

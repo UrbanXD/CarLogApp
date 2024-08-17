@@ -28,6 +28,10 @@ import Button from "../components/Button/Button";
 import {Icon} from "react-native-paper";
 import {getDate} from "../utils/getDate";
 import UpcomingRides from "../components/UpcomingRides/UpcomingRides";
+import Link from "../components/Link/Link";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState, store} from "../redux/store";
+import {loadCars, addCar as aC} from "../redux/reducers/cars.slices";
 
 interface onButtonPressArgs {
     path: string,
@@ -42,96 +46,34 @@ const onButtonPress = ({ path, params }: onButtonPressArgs) => {
 
 const HomeScreen: React.FC = () => {
     const { supabaseConnector, db } = useDatabase();
+    const dispatch = useDispatch();
 
-    const [cars, setCars] = useState<Array<CarouselItemType>>([]);
-    const [selectedCarIndex, setSelectedCarIndex] = useState<number>(0);
-    const [carsID, setCarsID] = useState<Array<string>>([]);
+    const cars = useSelector<RootState, CarouselItemType[]>(state => state.cars.cars);
+    const carsID = useSelector<RootState, Array<string>>(state => state.cars.carsID);
+    const selectedCarIndex = useSelector<RootState, number>(state => state.cars.selectedCarIndex);
+    const isLoading = useSelector<RootState>(state => state.cars.loading);
     const [today] = useState(getDate());
 
-    type buttonsProps =
-        Array<{
-            router: () => void,
-            title: string,
-            image: ImageSourcePropType
-        }>
-
-    const buttons: buttonsProps = [
-        {
-            router: () => onButtonPress({ path: "/(competitions)" }),
-            title: "Fuvarok",
-            image: require("../assets/workbook.png")
-        },
-        {
-            router: () => onButtonPress({ path: "/(competitions)" }),
-            title: "Szervíz könyv",
-            image: require("../assets/service-book.png")
-        },
-        {
-            router: () => onButtonPress({ path: "/(competitions)" }),
-            title: "Kiadások",
-            image: require("../assets/expenses.png")
-        },
-        {
-            router: () => onButtonPress({ path: "/fuelMonitor" }),
-            title: "Üzemeanyag Árak",
-            image: require("../assets/gas_pump.png")
-        }
-    ];
+    useEffect(() => {
+        store.dispatch(loadCars(db))
+    }, [dispatch]);
 
     const addCar = async () => {
         const { userID } = await supabaseConnector.fetchCredentials();
         const carID = getUUID();
 
-        await db.insertInto(CARS_TABLE).values({
+        const car = {
             id: carID,
             owner: userID,
-            name: "Azonosito",
-            brand: "Brand",
-            type: "Tipus",
+            name: "AFIHNBGVRN",
+            brand: "LADA",
+            type: "Ori",
             image: null,
             selected: 0
-        }).execute()
-
-        const newCar: CarouselItemType = {
-            id: "Azonosito",
-            title: "Brand",
-            subtitle: "Tipus",
-            selected: !!0
         }
-
-        setCars(prevState => [...prevState, newCar])
+        store.dispatch(aC({ db, car }))
     }
 
-    const loadCars = async () => {
-        const result =
-            await db
-                .selectFrom(CARS_TABLE)
-                .selectAll()
-                .execute();
-
-        if (result && result.length > 0) {
-            // result.sort((a, b) => (b.selected || 0) - (a.selected || 0));
-
-            const cars =
-                result.map((car, index) => {
-                    setCarsID(prevState => [...prevState, car.id]);
-                    if(!!car.selected) setSelectedCarIndex(index);
-
-                    return ({
-                        id: car.name || "",
-                        title: car.brand || "",
-                        subtitle: car.type || "",
-                        selected: !!car.selected,
-                        image: undefined
-                    })
-                });
-
-            setCars(cars);
-        }
-    }
-    useEffect(() => {
-        loadCars();
-    }, []);
 
     const selectCar = async (index: number) => {
         await db
@@ -140,31 +82,24 @@ const HomeScreen: React.FC = () => {
             .where("id", "=", carsID[index])
             .execute();
 
-        setCars(
-            cars.map((car, i) => {
-                if (index === i ) {
-                    return {
-                        ...car,
-                        selected: true
-                    };
-                } else if(i === selectedCarIndex) {
-                    return {
-                        ...car,
-                        selected: false
-                    }
-                } else {
-                    return car;
-                }
-            })
-        );
+        // setCars(
+        //     cars.map((car, i) => {
+        //         if (index === i ) {
+        //             return {
+        //                 ...car,
+        //                 selected: true
+        //             };
+        //         } else if(i === selectedCarIndex) {
+        //             return {
+        //                 ...car,
+        //                 selected: false
+        //             }
+        //         } else {
+        //             return car;
+        //         }
+        //     })
+        // );
     }
-
-    useEffect(() => {
-        const index = cars.findLastIndex(car => car.selected === true);
-        setSelectedCarIndex(index || 0)
-    }, [cars]);
-
-
     return (
         <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, styles.pageContainer] }>
             <ScrollView
@@ -182,12 +117,12 @@ const HomeScreen: React.FC = () => {
                         Vezzessen számot nálunk az autóiról!
                     </Text>
                 </Animated.View>
-                <View style={ [styles.contentContainer, { paddingHorizontal: 0, marginHorizontal: 0, backgroundColor: "transparent"}] } >
+                <View style={ [GLOBAL_STYLE.contentContainer, { paddingHorizontal: 0, marginHorizontal: 0, backgroundColor: "transparent"}] } >
                     <View style={{ paddingHorizontal: DEFAULT_SEPARATOR }}>
-                        <Text style={ styles.containerTitleText }>
+                        <Text style={ GLOBAL_STYLE.containerTitleText }>
                             Autóim
                         </Text>
-                        <Text style={ styles.containerSubtitleText }>
+                        <Text style={ GLOBAL_STYLE.containerText }>
                             Válasszon ki egy autót
                         </Text>
                     </View>
@@ -196,16 +131,16 @@ const HomeScreen: React.FC = () => {
                     </View>
                     <Button buttonStyle={{ width: wp(75) }} onPress={addCar} title={"Új autó hozzáadása"} />
                 </View>
-                <View style={ styles.contentContainer }>
+                <View style={ GLOBAL_STYLE.contentContainer }>
                     <View>
-                        <Text style={ styles.containerTitleText }>
+                        <Text style={ GLOBAL_STYLE.containerTitleText }>
                             Legközelebbi utak
                         </Text>
-                        <Text style={ styles.containerSubtitleText }>
+                        <Text style={ GLOBAL_STYLE.containerText }>
                             { today } (ma)
                         </Text>
                     </View>
-                    <ScrollView style={ GLOBAL_STYLE.scrollViewContentContainer }>
+                    <ScrollView contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }>
                         <UpcomingRides
                             rides={[
                                 {
@@ -226,39 +161,29 @@ const HomeScreen: React.FC = () => {
                                     dateSubtitle: "Hétfő",
                                     time: "05:00",
                                     locations: [{city: "Zenta", place: "Nagy Abonyi Vince 24."}, {city: "Kamenica", place: "Korhaz utca 15."}],
-                                    client: "Kiss Imre",
+                                    client: "Kiss Imre affnenkgrsgk n",
                                     passengerCount: 2,
                                     comment: ""
                                 }
                             ]}
                         />
                     </ScrollView>
-                    <TouchableOpacity style={ styles.linkContainer }>
-                        <Text style={ styles.linkText }>
-                            További utak
-                        </Text>
-                        <Icon source={ ICON_NAMES.rightArrowHead } size={ styles.linkText.fontSize * 1.35 } color={ styles.linkText.color } />
-                    </TouchableOpacity>
+                    <Link text="További utak" icon={ ICON_NAMES.rightArrowHead } />
                 </View>
-                <View style={ styles.contentContainer }>
-                    <Text style={ styles.containerTitleText }>
+                <View style={ GLOBAL_STYLE.contentContainer }>
+                    <Text style={ GLOBAL_STYLE.containerTitleText }>
                         Legutóbbi kiadások
                     </Text>
-                    <View style={ styles.rowContainer }>
+                    <View style={ GLOBAL_STYLE.rowContainer }>
 
                     </View>
-                    <View style={ styles.rowContainer }>
+                    <View style={ GLOBAL_STYLE.rowContainer }>
 
                     </View>
-                    <View style={ styles.rowContainer }>
+                    <View style={ GLOBAL_STYLE.rowContainer }>
 
                     </View>
-                    <TouchableOpacity style={ styles.linkContainer }>
-                        <Text style={ styles.linkText }>
-                            További kiadások
-                        </Text>
-                        <Icon source={ ICON_NAMES.rightArrowHead } size={ styles.linkText.fontSize * 1.35 } color={ styles.linkText.color } />
-                    </TouchableOpacity>
+                    <Link text="További kiadások" icon={ ICON_NAMES.rightArrowHead } />
                 </View>
             </ScrollView>
             {/*<Text*/}
@@ -299,55 +224,12 @@ const styles = StyleSheet.create({
         letterSpacing: FONT_SIZES.normal * 0.85 * 0.05,
         color: theme.colors.gray1
     },
-    contentContainer: {
-        gap: SEPARATOR_SIZES.small,
-        flexDirection: "column",
-        marginTop: SEPARATOR_SIZES.extraMedium,
-        paddingHorizontal: DEFAULT_SEPARATOR,
-        marginHorizontal: DEFAULT_SEPARATOR,
-        backgroundColor: theme.colors.black4,
-        padding: 20,
-        borderRadius: 35
-    },
-    containerTitleText: {
-        fontFamily: "Gilroy-Heavy",
-        fontSize: FONT_SIZES.normal,
-        letterSpacing: FONT_SIZES.normal * 0.05,
-        color: theme.colors.white
-    },
-    containerSubtitleText: {
-        fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.small,
-        letterSpacing: FONT_SIZES.small * 0.035,
-        color: theme.colors.gray1
-    },
     carouselContainer: {
         height: hp(27.5),
-    },
-    linkContainer: {
-        flexDirection: "row",
-        justifyContent: "center"
-    },
-    linkText: {
-        fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.small * 1.15,
-        textAlign: "center",
-        color: theme.colors.fuelYellow,
     },
     c: {
         flexDirection: "row",
         gap: SEPARATOR_SIZES.lightSmall
-    },
-    rowContainer: {
-        flex: 1,
-        flexDirection: "row",
-        height: hp(8.5),
-        backgroundColor: theme.colors.black2,
-        borderRadius: 15,
-        padding: SEPARATOR_SIZES.small
-    },
-    rowContainerExtra: {
-        height: hp(25)
     },
     dateContainer: {
         width: hp(11),

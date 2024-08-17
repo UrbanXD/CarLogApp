@@ -1,4 +1,4 @@
-import { withLayoutContext} from 'expo-router';
+import {Tabs, withLayoutContext} from 'expo-router';
 import React from "react";
 import {Provider} from "react-redux";
 import {store} from "../../redux/store";
@@ -12,6 +12,7 @@ import {
     MaterialTopTabNavigationOptions
 } from "@react-navigation/material-top-tabs";
 import {ParamListBase, TabNavigationState} from "@react-navigation/native";
+import HomeHeader from "../../layouts/header/HomeHeader";
 
 const { Navigator } = createMaterialTopTabNavigator();
 
@@ -27,40 +28,78 @@ const TabLayout:React.FC = () => {
     return (
         <Provider store={ store }>
             <PaperProvider theme={ theme }>
-                <MaterialTop
-                    tabBar={ (props) => <TabBar { ...props }  /> }
+                <Tabs
+                    tabBar={
+                        (props) =>
+                            <TabBar { ...props } />
+                    }
                     screenOptions={{
-                        swipeEnabled: false
+                        header: () => <HomeHeader></HomeHeader>
+                        // headerShown: false,
                     }}
                 >
-                    <MaterialTop.Screen
+                    <Tabs.Screen
                         name="index"
                         options={{
                             title: "Főoldal",
                         }}
                     />
-                    <MaterialTop.Screen
+                    <Tabs.Screen
                         name="workbook"
                         options={{
                             title: "Munkakönyv",
                             tabBarIcon: () => ICON_NAMES.notebook
                         }}
                     />
-                    <MaterialTop.Screen
+                    <Tabs.Screen
                         name="service_log"
                         options={{
                             title: "Szervízkönyv",
                             tabBarIcon: () => ICON_NAMES.service
                         }}
                     />
-                    <MaterialTop.Screen
+                    <Tabs.Screen
                         name="expenses"
                         options={{
                             title: "Pénzügyek",
                             tabBarIcon: () => ICON_NAMES.expenses
                         }}
                     />
-                </MaterialTop>
+                </Tabs>
+                {/*<MaterialTop*/}
+                {/*    tabBar={ (props) => <TabBar { ...props }  /> }*/}
+                {/*    screenOptions={{*/}
+                {/*        swipeEnabled: false*/}
+                {/*    }}*/}
+                {/*>*/}
+                {/*    <MaterialTop.Screen*/}
+                {/*        name="index"*/}
+                {/*        options={{*/}
+                {/*            title: "Főoldal",*/}
+                {/*        }}*/}
+                {/*    />*/}
+                {/*    <MaterialTop.Screen*/}
+                {/*        name="workbook"*/}
+                {/*        options={{*/}
+                {/*            title: "Munkakönyv",*/}
+                {/*            tabBarIcon: () => ICON_NAMES.notebook*/}
+                {/*        }}*/}
+                {/*    />*/}
+                {/*    <MaterialTop.Screen*/}
+                {/*        name="service_log"*/}
+                {/*        options={{*/}
+                {/*            title: "Szervízkönyv",*/}
+                {/*            tabBarIcon: () => ICON_NAMES.service*/}
+                {/*        }}*/}
+                {/*    />*/}
+                {/*    <MaterialTop.Screen*/}
+                {/*        name="expenses"*/}
+                {/*        options={{*/}
+                {/*            title: "Pénzügyek",*/}
+                {/*            tabBarIcon: () => ICON_NAMES.expenses*/}
+                {/*        }}*/}
+                {/*    />*/}
+                {/*</MaterialTop>*/}
             </PaperProvider>
         </Provider>
     );

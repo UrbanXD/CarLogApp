@@ -3,75 +3,104 @@ import {StyleSheet, Text, View} from "react-native";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-native-responsive-screen";
 import {theme} from "../../constants/theme";
 import {Icon} from "react-native-paper";
-import {ICON_NAMES} from "../../constants/constants";
+import {FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES} from "../../constants/constants";
 import hexToRgba from "hex-to-rgba";
 
 interface ProgressBarProps {
-    currentStep: number,
+    isVertical?: boolean
+    currentStep?: number
     stepsCount: number
+    titles?: Array<string>
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ currentStep, stepsCount }) => {
-    const styles = useStyles(stepsCount, currentStep);
+const ProgressBar: React.FC<ProgressBarProps> = ({ isVertical = false, currentStep = -1, stepsCount, titles }) => {
+    const styles= useStyles(stepsCount, currentStep);
     return (
         <View style={ styles.progressContainer }>
-            <View style={ styles.stepContainer }>
+            <View style={ [styles.contentContainer, isVertical && styles.verticalContentContainer]}>
                 {
-                    Array.from({ length: stepsCount }, (_, i) => i + 1).map((step, index) =>
-                        <React.Fragment key={index}>
-                            <View style={[styles.circle, step < currentStep && styles.doneCircle, step === currentStep && styles.activeCircle]}>
-                                {
-                                    currentStep === step &&
-                                        <View style={{ backgroundColor: theme.colors.fuelYellow, width: hp(2), height: hp(2), borderRadius: 50 }}></View>
-                                }
-                            </View>
-                            { index < stepsCount - 1 && <View style={[styles.line, { justifyContent: "center" }, step < currentStep && styles.doneLine] } /> }
-                        </React.Fragment>
-                    )
+                    Array.from({ length: stepsCount }, (_, i) => i + 1)
+                        .map(step => {
+                            const isCurrentStep = step === currentStep;
+                            const isStepDone = step < currentStep;
+                            const isLastStep = step === stepsCount;
+
+                            return (
+                                    <View key={ step } style={ styles.timelineContainer }>
+                                        {
+                                            !isLastStep &&
+                                                <View style={ [styles.line, isVertical && styles.verticalLine] } />
+                                        }
+                                        <View
+                                            style={[
+                                                styles.circle,
+                                            ]} />
+                                    </View>
+                            )
+                        })
                 }
             </View>
-            {/*<View style={ styles.stepContainer }>*/}
-            {/*    <View style={{ flex: 1, justifyContent: "center" }}>*/}
-            {/*        <Text style={[styles.stepText, {  }]}>Helloeascfc</Text>*/}
-            {/*    </View>*/}
-            {/*    { <View style={[styles.line, { justifyContent: "center", backgroundColor: "transparent" }] } /> }*/}
-            {/*    <View style={{ flex: 1, justifyContent: "center" }}>*/}
-            {/*        <Text style={[styles.stepText, {  }]}>Hello</Text>*/}
-            {/*    </View>*/}
-            {/*    { <View style={[styles.line, { justifyContent: "center", backgroundColor: "transparent" }] } /> }*/}
-            {/*    <View style={{ flex: 1, justifyContent: "center" }}>*/}
-            {/*        <Text style={[styles.stepText, { alignSelf: "center" }]}>Hello</Text>*/}
-            {/*    </View>*/}
-            {/*</View>*/}
+            <View style={ [styles.contentContainer, isVertical && styles.verticalContentContainer, { flex: 9 }]}>
+                {
+                    titles?.map((title, index) => {
+                        const isLastStep = index + 1 === stepsCount;
+
+                        return (
+                            <View style={ styles.timelineTextContainer } key={ index }>
+                                <Text numberOfLines={ 2 } key={ index } style={{ color: "white", fontSize: FONT_SIZES.small, lineHeight: FONT_SIZES.small }}>
+                                    { title }
+                                </Text>
+                            </View>
+                        )
+                    })
+                }
+            </View>
         </View>
     );
 }
 const useStyles = (stepsCount: number, currentStep: number) => {
     return StyleSheet.create({
         progressContainer: {
-            // flex: 1,
-            flexDirection: 'column',
-            justifyContent: "center",
-            alignItems: 'center',
-            gap: 0,
-            paddingHorizontal: hp(1.5)
+            flexDirection: "row",
+            paddingLeft: SEPARATOR_SIZES.lightSmall,
+            gap: SEPARATOR_SIZES.lightSmall,
         },
-        stepContainer: {
+        contentContainer: {
             flex: 1,
-            flexDirection: 'row',
-            alignSelf: "center",
-            alignItems: 'center',
-            justifyContent: "space-between",
+            flexDirection: "row",
+            alignSelf: "flex-start",
+        },
+        verticalContentContainer: {
+            flexDirection: "column",
+        },
+        timelineContainer: {
+            height: hp(6),
+            alignItems: "center",
+            justifyContent: "flex-start",
+            alignSelf: "stretch",
+        },
+        timelineTextContainer: {
+            height: hp(6),
+            justifyContent: "flex-start",
+            alignSelf: "stretch"
+        },
+        line: {
+            position: 'absolute',
+            height: hp(0.5),
+            width: "100%",
+            backgroundColor: theme.colors.gray3,
+            zIndex: 0
+        },
+        verticalLine: {
+            height: "100%",
+            width: hp(0.5),
         },
         circle: {
-            width: hp(5),
-            height: hp(5),
+            width: hp(2),
+            height: hp(2),
             borderRadius: 50,
-            borderWidth: 2,
-            borderColor: theme.colors.gray3,
-            backgroundColor: theme.colors.gray3,
-            justifyContent: 'center',
-            alignItems: 'center',
+            backgroundColor: theme.colors.gray2,
+            zIndex: 9,
         },
         doneCircle: {
             borderColor: theme.colors.fuelYellow,
@@ -89,12 +118,6 @@ const useStyles = (stepsCount: number, currentStep: number) => {
             textShadowColor: theme.colors.black,
             textShadowOffset: {width: -1, height: 1},
             textShadowRadius: 5
-        },
-        line: {
-            flex: 1,
-            height: hp(0.5),
-            backgroundColor: theme.colors.gray3,
-            // borderRadius: 15
         },
         doneLine: {
             backgroundColor: theme.colors.fuelYellow

@@ -4,7 +4,9 @@ import TabBarIcon from "./TabBarIcon";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 import {theme} from "../../constants/theme";
 import {FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT} from "../../constants/constants";
+import {BottomTabBarProps} from '@react-navigation/bottom-tabs'
 import {MaterialTopTabBarProps} from "@react-navigation/material-top-tabs";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface TabBarProps{
     tabBarStyle?: ViewStyle,
@@ -12,7 +14,7 @@ interface TabBarProps{
     tabBarInactiveTintColor?: string,
 }
 
-const TabBar: React.FC<MaterialTopTabBarProps & TabBarProps> = ({ state, descriptors, navigation, tabBarStyle = {}, tabBarActiveTintColor = ICON_COLORS.active, tabBarInactiveTintColor = ICON_COLORS.inactive }) => {
+const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({ state, descriptors, navigation, tabBarStyle = {}, tabBarActiveTintColor = ICON_COLORS.active, tabBarInactiveTintColor = ICON_COLORS.inactive }) => {
     const TAB_BAR_WIDTH =  Dimensions.get("screen").width
     const TAB_WIDTH = TAB_BAR_WIDTH / state.routes.length;
 
@@ -41,7 +43,7 @@ const TabBar: React.FC<MaterialTopTabBarProps & TabBarProps> = ({ state, descrip
                             ? options.tabBarIcon({
                                 focused: isFocused,
                                 color: isFocused ? tabBarActiveTintColor : tabBarInactiveTintColor,
-                                // size: 25,
+                                size: 25,
                               }) as string
                             : "home"
 
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
         height: SIMPLE_TABBAR_HEIGHT,
         backgroundColor: theme.colors.black2,
         borderColor: theme.colors.gray2,
-        borderBottomWidth: 2.5,
+        // borderTopWidth: 2.5,
     },
     titleText: {
         fontSize: FONT_SIZES.normal,
@@ -100,11 +102,11 @@ const styles = StyleSheet.create({
     },
     slidingElementContainer: {
         ...StyleSheet.absoluteFillObject,
-        top: "100%"
+        justifyContent: "flex-end",
     },
     slidingElement: {
         width: "100%",
-        height: 5,
+        height: hp(0.4),
         backgroundColor: theme.colors.fuelYellow
     }
 })

@@ -7,6 +7,7 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from "react-native-reanimated";
+import {FONT_SIZES} from "../../constants/constants";
 
 interface TabBarIconProp {
     title?: string
@@ -73,7 +74,7 @@ const TabBarIcon: React.FC<TabBarIconProp> = ({title= "", textColor, focused, fo
             <Animated.View style={ animatedIconSizeStyle }>
                 <Icon size={ iconSize } source={ iconName } color={ iconColor } />
                 {
-                    <Animated.Text style={{ color: textColor, textAlign: "center", display: focused ? "none" : "flex" }}>
+                    <Animated.Text style={{ color: textColor, textAlign: "center", fontFamily:"Gilroy-Medium", fontSize: FONT_SIZES.extraSmall * 0.9 ,display: focused ? "none" : "flex" }}>
                         { title }
                     </Animated.Text>
                 }

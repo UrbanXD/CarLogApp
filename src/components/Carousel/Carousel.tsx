@@ -80,9 +80,10 @@ const Carousel: React.FC<CarouselProps> = ({ data, selectedIndex = 0, itemOnPres
         >
             {
                 data.map((item, index) => {
-                    if(item.image === undefined){
-                        item.image = require("../../assets/car1.jpg");
-                    }
+                    const updatedItem = {
+                        ...item,
+                        image: item.image ?? require("../../assets/car1.jpg"),
+                    };
 
                     return (
                         <React.Fragment key={index}>
@@ -92,7 +93,7 @@ const Carousel: React.FC<CarouselProps> = ({ data, selectedIndex = 0, itemOnPres
                                 size={ ITEM_SIZE }
                                 x={ x }
                                 isFocused={ focusedIndex === index }
-                                item={ item }
+                                item={ updatedItem }
                                 onPress={ itemOnPress }
                             />
                             {index === data.length - 1 && <View style={{width: SPACER}}/>}

@@ -37,8 +37,17 @@ const Layout:React.FC = () => {
         <SafeAreaProvider>
             <GestureHandlerRootView style={{ flex: 1 }}>
                 <ScrollViewProvider>
-                    <Stack screenOptions={{ header: () => <HomeHeader /> }}>
-                        <Stack.Screen name="index" />
+                    <Stack
+                        screenOptions={{
+                            header: () => <HomeHeader />
+                        }}
+                    >
+                        <Stack.Screen
+                            name="index"
+                            options={{
+                                header: () => <></>
+                            }}
+                        />
                         <Stack.Screen name="(main)" />
                         <Stack.Screen name="fuelMonitor" />
                     </Stack>
@@ -51,7 +60,7 @@ const Layout:React.FC = () => {
 const RootLayout: React.FC = () => {
     return (
         <DatabaseProvider>
-            <Layout></Layout>
+            <Layout />
         </DatabaseProvider>
     )
 }

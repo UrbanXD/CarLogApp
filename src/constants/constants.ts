@@ -32,7 +32,7 @@ export const ICON_COLORS = {
     default: theme.colors.white,
     good: theme.colors.greenLight,
     wrong: "red",
-    active: "white",
+    active: theme.colors.white,
     inactive: theme.colors.gray1
 }
 
@@ -80,6 +80,44 @@ export const GLOBAL_STYLE = StyleSheet.create({
         paddingLeft: SEPARATOR_SIZES.small,
         fontFamily: "Gilroy-Medium",
         color: theme.colors.fuelYellow
+    },
+    contentContainer: {
+        gap: SEPARATOR_SIZES.small,
+        flexDirection: "column",
+        marginTop: SEPARATOR_SIZES.extraMedium,
+        paddingHorizontal: DEFAULT_SEPARATOR,
+        marginHorizontal: DEFAULT_SEPARATOR,
+        backgroundColor: theme.colors.black4,
+        padding: 20,
+        borderRadius: 35
+    },
+    containerTitleText: {
+        fontFamily: "Gilroy-Heavy",
+        fontSize: FONT_SIZES.normal,
+        letterSpacing: FONT_SIZES.normal * 0.05,
+        color: theme.colors.white
+    },
+    containerText: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.small,
+        lineHeight: FONT_SIZES.small * 1.2,
+        letterSpacing: FONT_SIZES.small * 0.035,
+        color: theme.colors.gray1,
+    },
+    rowContainer: {
+        flexDirection: "row",
+        // justifyContent: "space-between",
+        alignItems: "center",
+        gap: SEPARATOR_SIZES.lightSmall,
+        height: hp(8.5),
+        backgroundColor: theme.colors.black2,
+        borderRadius: 15,
+        padding: SEPARATOR_SIZES.small
+    },
+    columnContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
     }
 });
 

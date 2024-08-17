@@ -1,8 +1,8 @@
 import {combineReducers} from "@reduxjs/toolkit";
-import competitionReducer from "./competition/competition.slices";
+import carsReducer from "./cars.slices";
 
 const rootReducer = combineReducers({
-    competition: competitionReducer,
+    cars: carsReducer,
 });
 
 export default rootReducer;
