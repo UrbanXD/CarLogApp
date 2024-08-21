@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {ScrollView, StyleSheet, Text, View} from "react-native";
 import {
     FONT_SIZES,
@@ -12,14 +12,15 @@ import Date from "./Date";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
 import {theme} from "../../constants/theme";
 import {Divider, IconButton, Portal} from "react-native-paper";
-import BottomSheet, {BottomSheetMethods} from "../BottomSheet/BottomSheet";
-import InputText from "../Form/InputText";
+import InputText from "../Input/InputText";
 import {useForm} from "react-hook-form";
 import {EditRideFormFieldType, editRideUseFormProps} from "../../constants/formSchema/editRideForm";
 import {getToday} from "../../utils/getDate";
 import Timeline from "../Timeline/Timeline";
 import ProgressBar from "../MultiStepForm/ProgressBar";
 import TextDivider from "../TextDivider/TextDivider";
+import BottomSheet, {BottomSheetBackdrop, BottomSheetModal} from "@gorhom/bottom-sheet";
+import CustomBottomSheet from "../BottomSheet/BottomSheet";
 
 type RideType = {
     carUID: string
@@ -43,7 +44,8 @@ interface UpcomingRidesProps {
 const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
     const [selectedRideIndex, setSelectedRideIndex] = useState(0);
     const [selectedRideValues, setSelectedRideValues] = useState<EditRideFormFieldType>(editRideUseFormProps.defaultValues);
-    const bottomSheetRef = useRef<BottomSheetMethods>(null);
+
+    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
     const { control, handleSubmit } =
         useForm<EditRideFormFieldType>(
@@ -55,7 +57,7 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
 
     const expandHandler = useCallback((index: number) => {
         setSelectedRideIndex(index);
-        bottomSheetRef.current?.expand();
+        bottomSheetModalRef.current?.present();
     }, []);
 
     useEffect(() => {
@@ -74,7 +76,7 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
     return (
         <>
             <Portal>
-                <BottomSheet ref={ bottomSheetRef }>
+                <CustomBottomSheet ref={ bottomSheetModalRef } title={"xd vnrs vnknrdnj njkjngn krkg nkrsn knkrznjgk nzsgrk "} >
                     <View style={ styles.infoContainer }>
                         <View style={ styles.infoTitleContainer }>
                             <Date
@@ -104,7 +106,7 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                             <Text style={{ color: "white" }}> Locations pl: Utca 21. (Zenta) </Text>
                         </View>
                     </View>
-                </BottomSheet>
+                </CustomBottomSheet>
             </Portal>
             <View style={ styles.container }>
                 {

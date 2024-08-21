@@ -3,12 +3,17 @@ import {theme} from "./theme";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
 import {UseFormHandleSubmit} from "react-hook-form";
 import {SupabaseConnector} from "../db/SupabaseConnector";
+import {Kysely} from "@powersync/kysely-driver";
+import {DatabaseType} from "../db/AppSchema";
 
 export interface GetFormHandleSubmitArgs {
-    handleSubmit: UseFormHandleSubmit<any>,
-    supabaseConnector?: SupabaseConnector,
-    onSubmit?: (...args: any[]) => void
+    handleSubmit: UseFormHandleSubmit<any>
+    supabaseConnector?: SupabaseConnector
+    db?: Kysely<DatabaseType>
+    onSubmit?: (isSuccess: boolean) => void
 }
+
+export const CAR_NAME_LENGTH = 10
 
 export const ICON_NAMES = {
     email: "email-outline",
@@ -95,7 +100,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.normal,
         letterSpacing: FONT_SIZES.normal * 0.05,
-        color: theme.colors.white
+        color: theme.colors.white,
     },
     containerText: {
         fontFamily: "Gilroy-Medium",

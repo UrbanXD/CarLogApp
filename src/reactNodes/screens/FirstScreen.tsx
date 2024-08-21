@@ -10,13 +10,13 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import {DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES} from "../constants/constants";
+import {DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES} from "../../constants/constants";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {theme} from "../constants/theme";
+import {theme} from "../../constants/theme";
 import {LinearGradient} from "expo-linear-gradient";
 import {Divider} from "react-native-paper";
 import {router} from "expo-router";
-import Button from "../components/Button/Button";
+import Button from "../../components/Button/Button";
 import {ScreenContainer} from "react-native-screens";
 import {Stack} from "expo-router/stack";
 
@@ -27,7 +27,7 @@ const FirstScreen: React.FC = () => {
     return (
         <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, { paddingHorizontal: 0, paddingVertical: 0 }]}>
             <ImageBackground
-                source={ require("../assets/home2.jpg") }
+                source={ require("../../assets/home2.jpg") }
                 style={ styles.imageContainer }
                 imageStyle={ styles.imageContainer }
             >

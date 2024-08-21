@@ -7,8 +7,8 @@ import {
     Text, TouchableHighlight, TouchableOpacity,
     View
 } from "react-native";
-import {theme} from "../constants/theme";
-import CardButton from "../components/Button/CardButton";
+import {theme} from "../../constants/theme";
+import CardButton from "../../components/Button/CardButton";
 import {router} from "expo-router";
 import Animated, {FadeInLeft} from "react-native-reanimated";
 import HomeHeader from "../layouts/header/HomeHeader";
@@ -18,20 +18,24 @@ import {
     GLOBAL_STYLE,
     ICON_NAMES,
     SEPARATOR_SIZES
-} from "../constants/constants";
-import {useDatabase} from "../db/Database";
+} from "../../constants/constants";
+import {useDatabase} from "../../db/Database";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
-import Carousel, {CarouselItemType} from "../components/Carousel/Carousel";
-import {CARS_TABLE} from "../db/AppSchema";
-import {getUUID} from "../db/uuid";
-import Button from "../components/Button/Button";
+import Carousel, {CarouselItemType} from "../../components/Carousel/Carousel";
+import {CARS_TABLE, CarsType} from "../../db/AppSchema";
+import {getUUID} from "../../db/uuid";
+import Button from "../../components/Button/Button";
 import {Icon} from "react-native-paper";
-import {getDate} from "../utils/getDate";
-import UpcomingRides from "../components/UpcomingRides/UpcomingRides";
-import Link from "../components/Link/Link";
+import {getDate} from "../../utils/getDate";
+import UpcomingRides from "../../components/UpcomingRides/UpcomingRides";
+import Link from "../../components/Link/Link";
 import {useDispatch, useSelector} from "react-redux";
-import {RootState, store} from "../redux/store";
-import {loadCars, addCar as aC} from "../redux/reducers/cars.slices";
+import {RootState, store} from "../../redux/store";
+import {loadCars, addCar as aC} from "../../redux/reducers/cars.slices";
+import CustomBottomSheet from "../../components/BottomSheet/BottomSheet";
+import {BottomSheetModal} from "@gorhom/bottom-sheet";
+import NewCarForm from "../layouts/forms/NewCarForm/NewCarForm";
+import {useGetCarsQuery} from "../../redux/reducers/cars.api.slices";
 
 interface onButtonPressArgs {
     path: string,
@@ -54,24 +58,30 @@ const HomeScreen: React.FC = () => {
     const isLoading = useSelector<RootState>(state => state.cars.loading);
     const [today] = useState(getDate());
 
+    // const {
+    //     data,
+    //     isLoading: asd,
+    //     isSuccess,
+    //     isError,
+    //     error
+    // } = useGetCarsQuery();
+    // useEffect(() => {
+    //     if(data){
+    //         console.log("kocsik", Object.keys(data).length)
+    //         Object.keys(data).map(key => console.log(key))
+    //     }
+    // }, [data]);
+
     useEffect(() => {
         store.dispatch(loadCars(db))
     }, [dispatch]);
 
-    const addCar = async () => {
-        const { userID } = await supabaseConnector.fetchCredentials();
-        const carID = getUUID();
+    useEffect(() => {
+        console.log(isLoading)
+    }, [isLoading]);
 
-        const car = {
-            id: carID,
-            owner: userID,
-            name: "AFIHNBGVRN",
-            brand: "LADA",
-            type: "Ori",
-            image: null,
-            selected: 0
-        }
-        store.dispatch(aC({ db, car }))
+    const addCar = async () => {
+        bottomSheetModalRef.current?.present()
     }
 
 
@@ -100,8 +110,14 @@ const HomeScreen: React.FC = () => {
         //     })
         // );
     }
+
+    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
     return (
         <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, styles.pageContainer] }>
+            <CustomBottomSheet ref={ bottomSheetModalRef } title={"Uj Car Add"}>
+                <NewCarForm />
+            </CustomBottomSheet>
             <ScrollView
                 showsVerticalScrollIndicator={ false }
                 contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }

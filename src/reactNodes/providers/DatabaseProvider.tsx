@@ -1,5 +1,5 @@
 import React, { ReactNode, useMemo } from "react";
-import { useDatabase } from "../db/Database";
+import { useDatabase } from "../../db/Database";
 import { PowerSyncContext } from '@powersync/react-native';
 
 interface PowerSyncProviderProps {

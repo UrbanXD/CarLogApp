@@ -2,14 +2,15 @@ import { Stack } from 'expo-router/stack';
 import {useRootNavigationState} from 'expo-router';
 import React, {useEffect, useState} from "react";
 import '@azure/core-asynciterator-polyfill';
-import {ScrollViewProvider} from "../providers/ScrollViewProvider";
-import {DatabaseProvider} from "../providers/DatabaseProvider";
+import {ScrollViewProvider} from "../reactNodes/providers/ScrollViewProvider";
+import {DatabaseProvider} from "../reactNodes/providers/DatabaseProvider";
 import {useDatabase} from "../db/Database";
 import { Session } from '@supabase/supabase-js';
 import {GestureHandlerRootView} from "react-native-gesture-handler";
 import {SafeAreaProvider} from "react-native-safe-area-context";
-import HomeHeader from "../layouts/header/HomeHeader";
-import BackButtonHeader from "../layouts/header/BackButtonHeader";
+import HomeHeader from "../reactNodes/layouts/header/HomeHeader";
+import BackButtonHeader from "../reactNodes/layouts/header/BackButtonHeader";
+import {BottomSheetModalProvider} from "@gorhom/bottom-sheet";
 
 const Layout:React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
@@ -36,22 +37,24 @@ const Layout:React.FC = () => {
     return (
         <SafeAreaProvider>
             <GestureHandlerRootView style={{ flex: 1 }}>
-                <ScrollViewProvider>
-                    <Stack
-                        screenOptions={{
-                            header: () => <HomeHeader />
-                        }}
-                    >
-                        <Stack.Screen
-                            name="index"
-                            options={{
-                                header: () => <></>
+                <BottomSheetModalProvider>
+                    <ScrollViewProvider>
+                        <Stack
+                            screenOptions={{
+                                header: () => <HomeHeader />
                             }}
-                        />
-                        <Stack.Screen name="(main)" />
-                        <Stack.Screen name="fuelMonitor" />
-                    </Stack>
-                </ScrollViewProvider>
+                        >
+                            <Stack.Screen
+                                name="index"
+                                options={{
+                                    header: () => <></>
+                                }}
+                            />
+                            <Stack.Screen name="(main)" />
+                            <Stack.Screen name="fuelMonitor" />
+                        </Stack>
+                    </ScrollViewProvider>
+                </BottomSheetModalProvider>
             </GestureHandlerRootView>
         </SafeAreaProvider>
     );

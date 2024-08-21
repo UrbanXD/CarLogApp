@@ -1,9 +1,9 @@
 import React from "react";
-import Header from "../../components/Header/Header";
-import {theme} from "../../constants/theme";
-import HeaderButtonMenu from "../../components/Header/HeaderButtonMenu";
-import {DEFAULT_SEPARATOR, FONT_SIZES} from "../../constants/constants";
-import HeaderTitle from "../../components/Header/HeaderTitle";
+import Header from "../../../components/Header/Header";
+import {theme} from "../../../constants/theme";
+import HeaderButtonMenu from "../../../components/Header/HeaderButtonMenu";
+import {DEFAULT_SEPARATOR, FONT_SIZES} from "../../../constants/constants";
+import HeaderTitle from "../../../components/Header/HeaderTitle";
 import {Text, View} from "react-native";
 import {Avatar} from "react-native-paper";
 

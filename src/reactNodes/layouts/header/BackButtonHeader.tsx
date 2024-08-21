@@ -1,9 +1,9 @@
 import React from "react";
-import {theme} from "../../constants/theme";
-import Header from "../../components/Header/Header";
-import HeaderBackButton from "../../components/Header/HeaderBackButton";
-import {FONT_SIZES, SIMPLE_HEADER_HEIGHT} from "../../constants/constants";
-import HeaderTitle from "../../components/Header/HeaderTitle";
+import {theme} from "../../../constants/theme";
+import Header from "../../../components/Header/Header";
+import HeaderBackButton from "../../../components/Header/HeaderBackButton";
+import {FONT_SIZES, SIMPLE_HEADER_HEIGHT} from "../../../constants/constants";
+import HeaderTitle from "../../../components/Header/HeaderTitle";
 import {StyleSheet, Text, View} from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 

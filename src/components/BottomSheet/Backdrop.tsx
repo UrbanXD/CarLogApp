@@ -2,28 +2,18 @@ import React from "react";
 import {StyleSheet, TouchableWithoutFeedback, View} from "react-native";
 import Animated, {interpolate, SharedValue, useAnimatedStyle} from "react-native-reanimated";
 import {theme} from "../../constants/theme";
+import hexToRgba from "hex-to-rgba";
+import {useBottomSheetModal} from "@gorhom/bottom-sheet";
 
 interface BackdropProps {
-    top: SharedValue<number>
-    openHeight: number
-    closeHeight: number
-    close: () => void
 }
 
-const Backdrop: React.FC<BackdropProps> = ({ top, openHeight, closeHeight, close }) => {
-    const animationStyle = useAnimatedStyle(() => {
-        const opacity = interpolate(top.value, [closeHeight, openHeight], [0, 0.5]);
-        const display = opacity === 0 ? "none" : "flex";
-
-        return {
-            opacity,
-            display
-        }
-    })
+const Backdrop: React.FC<BackdropProps> = ({ }) => {
+    const { dismiss } = useBottomSheetModal();
 
     return (
-        <TouchableWithoutFeedback onPress={ () => close() } >
-            <Animated.View style={ [styles.container, animationStyle] } />
+        <TouchableWithoutFeedback onPress={ () => dismiss() } >
+            <View style={ styles.container } />
         </TouchableWithoutFeedback>
     )
 }
@@ -31,9 +21,8 @@ const Backdrop: React.FC<BackdropProps> = ({ top, openHeight, closeHeight, close
 const styles = StyleSheet.create({
     container: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: theme.colors.black,
-        display: "none",
-        zIndex: 98
+        backgroundColor: hexToRgba(theme.colors.black, 0.5),
+        // zIndex: 2
     }
 })
 

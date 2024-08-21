@@ -1,6 +1,6 @@
 import React from "react";
-import InputText from "../../../components/Form/InputText";
-import {ICON_NAMES} from "../../../constants/constants";
+import InputText from "../../../../components/Input/InputText";
+import {ICON_NAMES} from "../../../../constants/constants";
 import {useMultiStepForm} from "../../../providers/MultiStepFormProvider";
 
 const RegisterStepTwo: React.FC = () => {

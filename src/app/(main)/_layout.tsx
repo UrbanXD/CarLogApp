@@ -12,7 +12,7 @@ import {
     MaterialTopTabNavigationOptions
 } from "@react-navigation/material-top-tabs";
 import {ParamListBase, TabNavigationState} from "@react-navigation/native";
-import HomeHeader from "../../layouts/header/HomeHeader";
+import HomeHeader from "../../reactNodes/layouts/header/HomeHeader";
 
 const { Navigator } = createMaterialTopTabNavigator();
 

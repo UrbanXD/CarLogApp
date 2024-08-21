@@ -1,6 +1,6 @@
 import {CustomScrollViewProp} from "./CustomScrollView.prop";
 import Animated, {useAnimatedScrollHandler, useSharedValue} from "react-native-reanimated";
-import {ScrollViewProvider, useScrollView} from "../../providers/ScrollViewProvider";
+import {ScrollViewProvider, useScrollView} from "../../reactNodes/providers/ScrollViewProvider";
 import React from "react";
 
 const CustomScrollView: React.FC<CustomScrollViewProp> = ({ children, paddingTop }) => {

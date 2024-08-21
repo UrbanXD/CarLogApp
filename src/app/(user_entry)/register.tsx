@@ -1,7 +1,7 @@
 import React from "react";
-import RegisterScreen from "../../screens/RegisterScreen";
+import RegisterScreen from "../../reactNodes/screens/RegisterScreen";
 import {KeyboardProvider} from "react-native-keyboard-controller";
-import { MultiStepFormProvider } from "../../providers/MultiStepFormProvider";
+import { MultiStepFormProvider } from "../../reactNodes/providers/MultiStepFormProvider";
 import {useDatabase} from "../../db/Database";
 import {useForm} from "react-hook-form";
 import {
@@ -9,9 +9,9 @@ import {
     RegisterFormFieldType,
     registerUseFormProps
 } from "../../constants/formSchema/registerForm";
-import RegisterStepOne from "../../layouts/forms/RegisterForm/StepOne";
-import RegisterStepTwo from "../../layouts/forms/RegisterForm/StepTwo";
-import RegisterStepThree from "../../layouts/forms/RegisterForm/StepThree";
+import RegisterStepOne from "../../reactNodes/layouts/forms/RegisterForm/StepOne";
+import RegisterStepTwo from "../../reactNodes/layouts/forms/RegisterForm/StepTwo";
+import RegisterStepThree from "../../reactNodes/layouts/forms/RegisterForm/StepThree";
 
 const Page: React.FC = () => {
     const { supabaseConnector } = useDatabase();

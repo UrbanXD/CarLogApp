@@ -1,6 +1,5 @@
-import {Context, createContext, useContext} from "react";
 import {Kysely} from "@powersync/kysely-driver";
-import {CARS_TABLE, CarsType, DatabaseType} from "../AppSchema";
+import {AppSchema, CARS_TABLE, CarsType, DatabaseType} from "../AppSchema";
 
 export class CarDAO {
     db: Kysely<DatabaseType>
@@ -29,3 +28,4 @@ export class CarDAO {
 
     }
 }
+export type CarDAOType = typeof CarDAO["prototype"];

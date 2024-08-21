@@ -1,5 +1,5 @@
 import {CarouselItemType} from "../../components/Carousel/Carousel";
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {Kysely} from "@powersync/kysely-driver";
 import {CarsType, DatabaseType} from "../../db/AppSchema";
 import {CarDAO} from "../../db/dao/CarDAO";
@@ -34,7 +34,7 @@ export const loadCars = createAsyncThunk(
 );
 
 export const addCar = createAsyncThunk(
-    "cars",
+    "addCar",
     async (args: {db: Kysely<DatabaseType>, car: CarsType}, { rejectWithValue, fulfillWithValue }) => {
         try {
             const carDAO = new CarDAO(args.db);
@@ -94,4 +94,4 @@ const carsSlice = createSlice({
     }
 });
 
-export default (carsSlice.reducer);
+export default carsSlice.reducer;

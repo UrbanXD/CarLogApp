@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
-import {GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../constants/constants";
-import {theme} from "../constants/theme";
+import {GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../constants/constants";
+import {theme} from "../../constants/theme";
 import BackButtonHeader from "../layouts/header/BackButtonHeader";
 import {router} from "expo-router";
 import {StyleSheet, View} from "react-native";
@@ -8,11 +8,11 @@ import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-nativ
 import {useMultiStepForm} from "../providers/MultiStepFormProvider";
 import Animated, {SlideInDown, useSharedValue, withTiming} from "react-native-reanimated";
 import {useFont} from "@shopify/react-native-skia";
-import ProgressInfo from "../components/MultiStepForm/ProgressInfo";
+import ProgressInfo from "../../components/MultiStepForm/ProgressInfo";
 import {KeyboardAwareScrollView, KeyboardEvents, KeyboardStickyView} from "react-native-keyboard-controller";
-import Button from "../components/Button/Button";
-import TextDivider from "../components/TextDivider/TextDivider";
-import {registerStepsTitle} from "../constants/formSchema/registerForm";
+import Button from "../../components/Button/Button";
+import TextDivider from "../../components/TextDivider/TextDivider";
+import {registerStepsTitle} from "../../constants/formSchema/registerForm";
 
 const RegisterScreen: React.FC = () => {
     const {
@@ -54,7 +54,7 @@ const RegisterScreen: React.FC = () => {
     }, []);
 
     // const font = useFont(require("../assets/fonts/Gilroy-Heavy.otf"), hp(!isKeyboardOpen ? 4 : 2.75));
-    const font = useFont(require("../assets/fonts/Gilroy-Heavy.otf"), hp(3));
+    const font = useFont(require("../../assets/fonts/Gilroy-Heavy.otf"), hp(3));
 
     if (!font) return <></>
 
@@ -106,8 +106,8 @@ const RegisterScreen: React.FC = () => {
                                 <>
                                     <Button title="Következő" onPress={ next } />
                                     <TextDivider title="vagy" color={ theme.colors.gray1 } lineHeight={ 1 } marginVertical={ GLOBAL_STYLE.formContainer.gap }/>
-                                    <Button onPress={ () => 1 } title="Folytatás Google fiókkal" icon={require("../assets/google_logo.png")} inverse={true} backgroundColor={ theme.colors.white } textColor={ theme.colors.googleRed } textStyle={{ fontSize: hp(2) }} />
-                                    <Button onPress={ () => 1 } title="Folytatás Facebook fiókkal" icon={require("../assets/facebook_logo.png")} backgroundColor={ theme.colors.facebookBlue } textColor={ theme.colors.white } textStyle={{ fontSize: hp(2) }} />
+                                    <Button onPress={ () => 1 } title="Folytatás Google fiókkal" icon={require("../../assets/google_logo.png")} inverse={true} backgroundColor={ theme.colors.white } textColor={ theme.colors.googleRed } textStyle={{ fontSize: hp(2) }} />
+                                    <Button onPress={ () => 1 } title="Folytatás Facebook fiókkal" icon={require("../../assets/facebook_logo.png")} backgroundColor={ theme.colors.facebookBlue } textColor={ theme.colors.white } textStyle={{ fontSize: hp(2) }} />
                                 </>
                             }
                         </View>

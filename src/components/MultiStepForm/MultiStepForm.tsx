@@ -1,6 +1,6 @@
 import React, {ReactNode, useState} from "react";
 import {KeyboardAvoidingView, StyleSheet, Text, View} from "react-native";
-import {useMultiStepForm} from "../../providers/MultiStepFormProvider";
+import {useMultiStepForm} from "../../reactNodes/providers/MultiStepFormProvider";
 
 const MultiStepForm: React.FC = () => {
     const {steps, currentStep, isFirstStep, isLastStep, next, back, submitHandler} = useMultiStepForm()
