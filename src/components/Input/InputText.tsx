@@ -1,10 +1,21 @@
-import React, {useState} from "react";
-import {StyleProp, StyleSheet, TextInput, TextStyle, Text, View, ViewStyle} from "react-native";
+import React, {useCallback, useState} from "react";
+import {
+    StyleProp,
+    StyleSheet,
+    TextInput,
+    TextStyle,
+    Text,
+    View,
+    ViewStyle,
+    NativeSyntheticEvent,
+    TextInputFocusEventData
+} from "react-native";
 import {Control, Controller, FieldError, FieldValues} from "react-hook-form";
 import {GLOBAL_STYLE, ICON_COLORS, ICON_NAMES} from "../../constants/constants";
 import {Divider, Icon, IconButton} from "react-native-paper";
 import {heightPercentageToDP as hp, heightPercentageToDP} from "react-native-responsive-screen";
 import {theme} from "../../constants/theme";
+import {useBottomSheetInternal} from "@gorhom/bottom-sheet";
 
 interface InputTextProps {
     control: Control<any>
@@ -16,9 +27,21 @@ interface InputTextProps {
     isEditable?: boolean
     style?: StyleProp<ViewStyle>
     textStyle?: StyleProp<TextStyle>
+    isInBottomSheet?: boolean
 }
 
-const InputText: React.FC<InputTextProps> = ({ control, fieldName, fieldNameText = fieldName, icon, placeholder = "", isSecure= false, isEditable = true, style, textStyle,  }) => {
+const InputText: React.FC<InputTextProps> = ({
+         control,
+         fieldName,
+         fieldNameText = fieldName,
+         icon,
+         placeholder = "",
+         isSecure= false,
+         isEditable = true,
+         style,
+         textStyle,
+         isInBottomSheet = false
+}) => {
     const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(isSecure);
 
@@ -26,6 +49,29 @@ const InputText: React.FC<InputTextProps> = ({ control, fieldName, fieldNameText
 
     const onFocus = () => setFocused(true);
     const onBlur = () => setFocused(false);
+
+    const handleOnFocus = useCallback(
+        (args: NativeSyntheticEvent<TextInputFocusEventData>) => {
+            if (isInBottomSheet) {
+                const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
+                shouldHandleKeyboardEvents.value = true;
+            }
+            onFocus();
+        },
+        [onFocus, isInBottomSheet]
+    );
+
+    const handleOnBlur = useCallback(
+        (args: NativeSyntheticEvent<TextInputFocusEventData>) => {
+            if (isInBottomSheet) {
+                const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
+                shouldHandleKeyboardEvents.value = false;
+            }
+            onBlur();
+        },
+        [onBlur, isInBottomSheet]
+    );
+
     // console.log(fieldName, control._formValues[fieldName])
     return (
         <View style={ styles.inputContainer }>

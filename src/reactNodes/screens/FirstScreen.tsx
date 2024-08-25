@@ -1,4 +1,4 @@
-import React from "react";
+import React, {ReactElement, useRef, useState} from "react";
 import {
     Image,
     ImageBackground,
@@ -19,13 +19,38 @@ import {router} from "expo-router";
 import Button from "../../components/Button/Button";
 import {ScreenContainer} from "react-native-screens";
 import {Stack} from "expo-router/stack";
+import NewCarForm from "../layouts/forms/NewCarForm/NewCarForm";
+import CustomBottomSheet from "../../components/BottomSheet/BottomSheet";
+import {BottomSheetModal} from "@gorhom/bottom-sheet";
+import RegisterForm from "../layouts/forms/RegisterForm/RegisterForm";
+import LoginForm from "../layouts/forms/LoginForm/LoginForm";
 
 const FirstScreen: React.FC = () => {
-    const openRegister = () => router.push({ pathname: "/(user_entry)/register" });
-    const openLogin = () => router.push({ pathname: "/(user_entry)/login" });
+    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+    const [bottomSheetTitle, setBottomSheetTitle] = useState("");
+    const [bottomSheetContent, setBottomSheetContent] = useState<ReactElement | null>(null);
+
+    const openRegister = () => {
+        setBottomSheetTitle("Felhasználó létrehozás");
+        setBottomSheetContent(<RegisterForm />);
+        bottomSheetModalRef.current?.present();
+        // router.push({ pathname: "/(user_entry)/register" });
+    }
+    const openLogin = () => {
+        setBottomSheetTitle("Bejelentkezés")
+        setBottomSheetContent(<LoginForm />);
+        bottomSheetModalRef.current?.present();
+    };
 
     return (
         <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, { paddingHorizontal: 0, paddingVertical: 0 }]}>
+            <CustomBottomSheet
+                ref={ bottomSheetModalRef }
+                title={ bottomSheetTitle }
+                snapPoints={ ["75%"] }
+            >
+                { bottomSheetContent }
+            </CustomBottomSheet>
             <ImageBackground
                 source={ require("../../assets/home2.jpg") }
                 style={ styles.imageContainer }

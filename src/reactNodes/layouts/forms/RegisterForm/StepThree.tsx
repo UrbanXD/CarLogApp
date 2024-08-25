@@ -16,6 +16,8 @@ const RegisterStepThree: React.FC = () => {
                 icon={ ICON_NAMES.password }
                 placeholder={"*****"}
                 isSecure={ true }
+                isInBottomSheet={true}
+
             />
             <InputText
                 key={ 5 }
@@ -25,6 +27,8 @@ const RegisterStepThree: React.FC = () => {
                 icon={ ICON_NAMES.password }
                 placeholder="*****"
                 isSecure={ true }
+                isInBottomSheet={true}
+
             />
         </>
     )

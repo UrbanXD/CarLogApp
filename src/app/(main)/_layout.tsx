@@ -26,82 +26,44 @@ const MaterialTop =
 
 const TabLayout:React.FC = () => {
     return (
-        <Provider store={ store }>
-            <PaperProvider theme={ theme }>
-                <Tabs
-                    tabBar={
-                        (props) =>
-                            <TabBar { ...props } />
-                    }
-                    screenOptions={{
-                        header: () => <HomeHeader></HomeHeader>
-                        // headerShown: false,
-                    }}
-                >
-                    <Tabs.Screen
-                        name="index"
-                        options={{
-                            title: "Főoldal",
-                        }}
-                    />
-                    <Tabs.Screen
-                        name="workbook"
-                        options={{
-                            title: "Munkakönyv",
-                            tabBarIcon: () => ICON_NAMES.notebook
-                        }}
-                    />
-                    <Tabs.Screen
-                        name="service_log"
-                        options={{
-                            title: "Szervízkönyv",
-                            tabBarIcon: () => ICON_NAMES.service
-                        }}
-                    />
-                    <Tabs.Screen
-                        name="expenses"
-                        options={{
-                            title: "Pénzügyek",
-                            tabBarIcon: () => ICON_NAMES.expenses
-                        }}
-                    />
-                </Tabs>
-                {/*<MaterialTop*/}
-                {/*    tabBar={ (props) => <TabBar { ...props }  /> }*/}
-                {/*    screenOptions={{*/}
-                {/*        swipeEnabled: false*/}
-                {/*    }}*/}
-                {/*>*/}
-                {/*    <MaterialTop.Screen*/}
-                {/*        name="index"*/}
-                {/*        options={{*/}
-                {/*            title: "Főoldal",*/}
-                {/*        }}*/}
-                {/*    />*/}
-                {/*    <MaterialTop.Screen*/}
-                {/*        name="workbook"*/}
-                {/*        options={{*/}
-                {/*            title: "Munkakönyv",*/}
-                {/*            tabBarIcon: () => ICON_NAMES.notebook*/}
-                {/*        }}*/}
-                {/*    />*/}
-                {/*    <MaterialTop.Screen*/}
-                {/*        name="service_log"*/}
-                {/*        options={{*/}
-                {/*            title: "Szervízkönyv",*/}
-                {/*            tabBarIcon: () => ICON_NAMES.service*/}
-                {/*        }}*/}
-                {/*    />*/}
-                {/*    <MaterialTop.Screen*/}
-                {/*        name="expenses"*/}
-                {/*        options={{*/}
-                {/*            title: "Pénzügyek",*/}
-                {/*            tabBarIcon: () => ICON_NAMES.expenses*/}
-                {/*        }}*/}
-                {/*    />*/}
-                {/*</MaterialTop>*/}
-            </PaperProvider>
-        </Provider>
+        <Tabs
+            tabBar={
+                (props) =>
+                    <TabBar { ...props } />
+            }
+            screenOptions={{
+                header: () => <HomeHeader></HomeHeader>
+                // headerShown: false,
+            }}
+        >
+            <Tabs.Screen
+                name="index"
+                options={{
+                    title: "Főoldal",
+                }}
+            />
+            <Tabs.Screen
+                name="workbook"
+                options={{
+                    title: "Munkakönyv",
+                    tabBarIcon: () => ICON_NAMES.notebook
+                }}
+            />
+            <Tabs.Screen
+                name="service_log"
+                options={{
+                    title: "Szervízkönyv",
+                    tabBarIcon: () => ICON_NAMES.service
+                }}
+            />
+            <Tabs.Screen
+                name="expenses"
+                options={{
+                    title: "Pénzügyek",
+                    tabBarIcon: () => ICON_NAMES.expenses
+                }}
+            />
+        </Tabs>
     );
 }
 export default TabLayout;

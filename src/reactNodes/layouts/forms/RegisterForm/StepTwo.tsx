@@ -15,6 +15,7 @@ const RegisterStepTwo: React.FC = () => {
                 fieldNameText="Vezetéknév"
                 icon={ ICON_NAMES.user }
                 placeholder="Kovács"
+                isInBottomSheet={true}
             />
             <InputText
                 key={ 3 }
@@ -23,6 +24,7 @@ const RegisterStepTwo: React.FC = () => {
                 fieldNameText="Keresztnév"
                 icon={ ICON_NAMES.user }
                 placeholder="János"
+                isInBottomSheet={true}
             />
         </>
     )

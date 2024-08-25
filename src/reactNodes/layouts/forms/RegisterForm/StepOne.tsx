@@ -9,6 +9,7 @@ const RegisterStepOne: React.FC = () => {
     return (
         <InputText
             key={ 1 }
+            isInBottomSheet={true}
             control={ control }
             fieldName="email"
             fieldNameText="Email cím"

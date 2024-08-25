@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useState} from "react";
+import React, {useEffect, useLayoutEffect, useState} from "react";
 import {
     ImageBackground,
     Image,
@@ -52,7 +52,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({ index, size, x, isFocused, 
                     !isFocused && <View style={styles.overlay} />
                 }
                 <ImageBackground
-                    source={ item.image }
+                    source={ item.image || require("../../assets/car1.jpg") }
                     style={ styles.itemContentContainer }
                     imageStyle={ styles.itemImage }
                 >

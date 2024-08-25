@@ -6,7 +6,7 @@ type CarModel = {
     endYear: string;
 };
 
-type CarsCollection = {
+export type CarsCollection = {
     [key: string]: CarModel[];
 };
 

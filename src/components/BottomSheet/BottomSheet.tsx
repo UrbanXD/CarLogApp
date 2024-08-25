@@ -2,12 +2,7 @@ import React, {forwardRef, ReactNode, useCallback, useImperativeHandle, useMemo}
 import {StyleSheet, View, Text} from "react-native";
 import {theme} from "../../constants/theme";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import TextDivider from "../TextDivider/TextDivider";
 import {DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES} from "../../constants/constants";
-import Animated, {runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming} from "react-native-reanimated";
-import {Gesture, GestureDetector} from "react-native-gesture-handler";
-import Backdrop from "./Backdrop";
-import {useSafeAreaInsets} from "react-native-safe-area-context";
 import BottomSheet, {
     BottomSheetBackdrop,
     BottomSheetModal,
@@ -18,17 +13,18 @@ import BottomSheet, {
 type BottomSheetProps = {
     title?: string
     children?: ReactNode
+    snapPoints?: Array<string>
+    startSnapIndex?: number
 }
 
-const CustomBottomSheet= forwardRef<BottomSheetModal, BottomSheetProps>(({ title = "Bottom Sheet", children }, ref) => {
-    const bottomSheetSnapPoints = useMemo(() => ["40%", "60%", "80%"], []);
-
+const CustomBottomSheet= forwardRef<BottomSheetModal, BottomSheetProps>(({ title = "Bottom Sheet", snapPoints = ["40%", "60%", "80%"], startSnapIndex = 0, children }, ref) => {
     return (
         <BottomSheetModal
             ref={ ref }
-            index={ 2 }
-            snapPoints={ bottomSheetSnapPoints }
+            index={ startSnapIndex }
+            snapPoints={ snapPoints }
             enablePanDownToClose={ true }
+            // enableDismissOnClose={ false }
             backdropComponent={
                 (props) =>
                     <BottomSheetBackdrop
@@ -41,14 +37,14 @@ const CustomBottomSheet= forwardRef<BottomSheetModal, BottomSheetProps>(({ title
             backgroundStyle={ styles.containerBackground }
             handleIndicatorStyle={ styles.line }
         >
-            <View style={ styles.contentContainer }>
+            <>
                 <Text style={ styles.titleText }>
                     { title }
                 </Text>
-                <BottomSheetScrollView contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }>
+                <BottomSheetView style={{ flex: 1, paddingHorizontal: SEPARATOR_SIZES.medium }}>
                     { children }
-                </BottomSheetScrollView>
-            </View>
+                </BottomSheetView>
+            </>
         </BottomSheetModal>
     )
 })
@@ -63,7 +59,7 @@ const styles = StyleSheet.create({
     contentContainer: {
         flex: 1,
         gap: DEFAULT_SEPARATOR,
-        paddingHorizontal: DEFAULT_SEPARATOR,
+        // paddingHorizontal: DEFAULT_SEPARATOR,
     },
     line: {
         alignSelf: "center",
@@ -79,4 +75,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default CustomBottomSheet;
+export default React.memo(CustomBottomSheet);

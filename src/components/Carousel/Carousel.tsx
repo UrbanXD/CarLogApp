@@ -1,16 +1,7 @@
-import React, {ReactNode, useEffect, useRef, useState} from "react";
-import {ImageSourcePropType, ScrollView, StyleSheet, Text, useWindowDimensions, View} from "react-native";
-import {widthPercentageToDP as wp} from "react-native-responsive-screen";
-import {SEPARATOR_SIZES} from "../../constants/constants";
-import Animated, {
-    interpolate, runOnJS, scrollTo, useAnimatedRef,
-    useAnimatedScrollHandler,
-    useAnimatedStyle, useDerivedValue,
-    useSharedValue
-} from "react-native-reanimated";
-import hexToRgba from "hex-to-rgba";
-import {theme} from "../../constants/theme";
-import CarouselItem from "./CarouselItem";
+import React, {ReactElement, useEffect, useRef, useState} from "react";
+import {ImageSourcePropType, StyleSheet, useWindowDimensions, View} from "react-native";
+import Animated, {runOnJS, runOnUI, SharedValue, useAnimatedScrollHandler, useSharedValue} from "react-native-reanimated";
+import {FlatList} from "react-native-gesture-handler";
 
 export type CarouselItemType = {
     id: string,
@@ -20,88 +11,58 @@ export type CarouselItemType = {
     selected?: boolean
 }
 
-interface CarouselProps {
-    data: Array<CarouselItemType>
-    selectedIndex?: number
-    itemOnPress: (index: number) => void
+export interface CarouselProps {
+    data: Array<any>
+    renderItem: (item: any, index: number, size: number, x: SharedValue<number>) => ReactElement
+    itemSizePercentage?: number
 }
 
-const Carousel: React.FC<CarouselProps> = ({ data, selectedIndex = 0, itemOnPress }) => {
-    const manualScrolling = useSharedValue(false);
+const Carousel: React.FC<CarouselProps> = ({ data, renderItem, itemSizePercentage = 0.8 }) => {
+    const { width } = useWindowDimensions();
+    const ITEM_SIZE = width * itemSizePercentage;
+    const SPACER = (width - ITEM_SIZE) / 2;
 
-    const {width} = useWindowDimensions();
-    const ITEM_SIZE = width * 0.8;
-    const SPACER = (width - ITEM_SIZE) / 2
-
-    const animatedRef = useAnimatedRef<Animated.ScrollView>();
-
-    const x = useSharedValue(0);
-    const [focusedIndex, setFoucesdIndex] = useState(Math.abs(Math.round(x.value / ITEM_SIZE)));
+    const x    = useSharedValue(0);
 
     const onScroll = useAnimatedScrollHandler({
         onScroll: event => {
-            if(manualScrolling.value) return;
-
             x.value = event.contentOffset.x;
-            const currentIndex = Math.abs(Math.round(x.value / ITEM_SIZE));
-
-            runOnJS(setFoucesdIndex)(currentIndex);
+        },
+        onMomentumEnd: event => {
+            // const value = data[Math.abs(Math.round(coordinate.value / ITEM_SIZE))];
         }
-    }, [manualScrolling]);
+    }, []);
 
-    const hasChanged = useRef(false); // Ez a flag nyomon követi, hogy történt-e már változás
-
-    useEffect(() => {
-        if (!hasChanged.current) {
-            manualScrolling.value = true;
-            runOnJS(setFoucesdIndex)(selectedIndex);
-
-            const timeoutId = setTimeout(() => animatedRef?.current?.scrollTo({ x: ITEM_SIZE * selectedIndex, y: 0, animated: true }), 500);
-
-            manualScrolling.value = false;
-            return () => clearTimeout(timeoutId);
-        }else {
-            hasChanged.current = true;
-        }
-    }, [data, selectedIndex]);
+    const AnimatedFlatList = Animated.createAnimatedComponent(FlatList)
 
     return (
-        <Animated.ScrollView
-            ref={ animatedRef }
-            horizontal
-            renderToHardwareTextureAndroid
-            showsHorizontalScrollIndicator={ false }
-            bounces={ false }
-            scrollEventThrottle={ 16 }
-            snapToInterval={ ITEM_SIZE }
-            decelerationRate="fast"
-            onScroll={ onScroll }
-            contentContainerStyle={ styles.scrollViewContainer }
-        >
-            {
-                data.map((item, index) => {
-                    const updatedItem = {
-                        ...item,
-                        image: item.image ?? require("../../assets/car1.jpg"),
-                    };
-
-                    return (
-                        <React.Fragment key={index}>
-                            { index === 0 && <View style={{width: SPACER}}/>}
-                            <CarouselItem
-                                index={ index }
-                                size={ ITEM_SIZE }
-                                x={ x }
-                                isFocused={ focusedIndex === index }
-                                item={ updatedItem }
-                                onPress={ itemOnPress }
-                            />
-                            {index === data.length - 1 && <View style={{width: SPACER}}/>}
-                        </React.Fragment>
-                    )
-                })
+        <AnimatedFlatList
+            data={ data }
+            renderItem={
+                ({ item, index }) =>
+                    <React.Fragment key={ index }>
+                        { index === 0 && <View style={{ width: SPACER }} /> }
+                        { renderItem(item, index, ITEM_SIZE, x) }
+                        { index === data.length - 1 && <View style={{ width: SPACER }} /> }
+                    </React.Fragment>
             }
-        </Animated.ScrollView>
+            keyExtractor={(item, index) => index.toString()}
+            horizontal
+            // scrollEnabled={ horizontal }
+            snapToInterval={ ITEM_SIZE }
+            onScroll={ onScroll }
+            scrollEventThrottle={ 16 }
+            showsHorizontalScrollIndicator={ false }
+            showsVerticalScrollIndicator={ false }
+            decelerationRate="fast"
+            bounces={ false }
+            bouncesZoom={ false }
+            renderToHardwareTextureAndroid
+            contentContainerStyle={{
+                // height: 200, width: "100%",
+                overflow: "hidden"
+            }}
+        />
     )
 };
 
@@ -113,4 +74,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Carousel;
+export default React.memo(Carousel);

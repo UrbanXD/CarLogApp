@@ -5,12 +5,13 @@ import {
     SafeAreaView, ScrollView,
     StyleSheet,
     Text, TouchableHighlight, TouchableOpacity,
-    View
+    View,
+    Image
 } from "react-native";
 import {theme} from "../../constants/theme";
 import CardButton from "../../components/Button/CardButton";
 import {router} from "expo-router";
-import Animated, {FadeInLeft} from "react-native-reanimated";
+import Animated, {FadeInLeft, SharedValue} from "react-native-reanimated";
 import HomeHeader from "../layouts/header/HomeHeader";
 import {
     DEFAULT_SEPARATOR,
@@ -22,10 +23,9 @@ import {
 import {useDatabase} from "../../db/Database";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
 import Carousel, {CarouselItemType} from "../../components/Carousel/Carousel";
-import {CARS_TABLE, CarsType} from "../../db/AppSchema";
+import {CARS_TABLE, CarsType, SERVICE_TABLE, ServiceType} from "../../db/AppSchema";
 import {getUUID} from "../../db/uuid";
 import Button from "../../components/Button/Button";
-import {Icon} from "react-native-paper";
 import {getDate} from "../../utils/getDate";
 import UpcomingRides from "../../components/UpcomingRides/UpcomingRides";
 import Link from "../../components/Link/Link";
@@ -35,8 +35,7 @@ import {loadCars, addCar as aC} from "../../redux/reducers/cars.slices";
 import CustomBottomSheet from "../../components/BottomSheet/BottomSheet";
 import {BottomSheetModal} from "@gorhom/bottom-sheet";
 import NewCarForm from "../layouts/forms/NewCarForm/NewCarForm";
-import {useGetCarsQuery} from "../../redux/reducers/cars.api.slices";
-
+import CarouselItem from "../../components/Carousel/CarouselItem";
 interface onButtonPressArgs {
     path: string,
     params?: { [key: string]: string }
@@ -58,19 +57,23 @@ const HomeScreen: React.FC = () => {
     const isLoading = useSelector<RootState>(state => state.cars.loading);
     const [today] = useState(getDate());
 
-    // const {
-    //     data,
-    //     isLoading: asd,
-    //     isSuccess,
-    //     isError,
-    //     error
-    // } = useGetCarsQuery();
-    // useEffect(() => {
-    //     if(data){
-    //         console.log("kocsik", Object.keys(data).length)
-    //         Object.keys(data).map(key => console.log(key))
-    //     }
-    // }, [data]);
+    const onP = async () => {
+        const service: ServiceType = {
+            id: getUUID(),
+            car: "4222d62c-71a8-4f0a-a64a-c0c2bf00b222",
+            odometer: "400000",
+            price: 50000,
+            date: getDate(),
+            type: "alt",
+            works: JSON.stringify({"xd": "ertek"}),
+            mechanic: "rudi",
+            comment: "comment"
+        }
+        // await db.insertInto(SERVICE_TABLE).values(service).execute();
+        const xd = await db.selectFrom(SERVICE_TABLE).selectAll().execute()
+        xd.map((i, index) => console.log(index))
+        // console.log(xd)
+    }
 
     useEffect(() => {
         store.dispatch(loadCars(db))
@@ -83,7 +86,6 @@ const HomeScreen: React.FC = () => {
     const addCar = async () => {
         bottomSheetModalRef.current?.present()
     }
-
 
     const selectCar = async (index: number) => {
         await db
@@ -115,11 +117,17 @@ const HomeScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, styles.pageContainer] }>
-            <CustomBottomSheet ref={ bottomSheetModalRef } title={"Uj Car Add"}>
-                <NewCarForm />
+            <CustomBottomSheet
+                ref={ bottomSheetModalRef }
+                title={"Új Autó"}
+            >
+                <NewCarForm
+                    close={ bottomSheetModalRef.current?.close }
+                />
             </CustomBottomSheet>
             <ScrollView
                 showsVerticalScrollIndicator={ false }
+                nestedScrollEnabled={ true }
                 contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
             >
                 <Animated.View
@@ -132,6 +140,7 @@ const HomeScreen: React.FC = () => {
                     <Text style={ styles.infoText }>
                         Vezzessen számot nálunk az autóiról!
                     </Text>
+                    <Button title={"service"} onPress={ onP }/>
                 </Animated.View>
                 <View style={ [GLOBAL_STYLE.contentContainer, { paddingHorizontal: 0, marginHorizontal: 0, backgroundColor: "transparent"}] } >
                     <View style={{ paddingHorizontal: DEFAULT_SEPARATOR }}>
@@ -143,7 +152,22 @@ const HomeScreen: React.FC = () => {
                         </Text>
                     </View>
                     <View style={ styles.carouselContainer }>
-                        <Carousel data={ cars } selectedIndex={ selectedCarIndex } itemOnPress={ selectCar } />
+                        <Carousel
+                            data={ cars }
+                            renderItem={
+                                (item: CarouselItemType, index: number, size: number, coordinate: SharedValue<number>) =>
+                                    <CarouselItem
+                                        index={ index }
+                                        size={ size }
+                                        x={ coordinate }
+                                        isFocused={ false }
+                                        item={ item }
+                                        onPress={function (index: number): void {
+                                            console.log("xd")
+                                        }}
+                                    />
+                            }
+                        />
                     </View>
                     <Button buttonStyle={{ width: wp(75) }} onPress={addCar} title={"Új autó hozzáadása"} />
                 </View>

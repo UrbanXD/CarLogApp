@@ -107,7 +107,7 @@ const useStyles = (radius: number) =>
             fontSize: FONT_SIZES.small,
             fontFamily: "Gilroy-Medium",
             lineHeight: FONT_SIZES.small * 1.05,
-            color: theme.colors.secondaryColor1,
+            color: theme.colors.gray1,
         }
     })
 
