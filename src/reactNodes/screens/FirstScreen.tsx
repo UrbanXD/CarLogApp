@@ -1,4 +1,4 @@
-import React, {ReactElement, useRef, useState} from "react";
+import React, {ReactElement, useEffect, useRef, useState} from "react";
 import {
     Image,
     ImageBackground,
@@ -10,11 +10,18 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import {DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES} from "../../constants/constants";
+import {
+    DEFAULT_SEPARATOR,
+    FONT_SIZES,
+    GET_ICON_BUTTON_RESET_STYLE,
+    GLOBAL_STYLE,
+    ICON_NAMES,
+    SEPARATOR_SIZES
+} from "../../constants/constants";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-native-responsive-screen";
 import {theme} from "../../constants/theme";
 import {LinearGradient} from "expo-linear-gradient";
-import {Divider} from "react-native-paper";
+import {Divider, IconButton} from "react-native-paper";
 import {router} from "expo-router";
 import Button from "../../components/Button/Button";
 import {ScreenContainer} from "react-native-screens";
@@ -48,6 +55,15 @@ const FirstScreen: React.FC = () => {
                 ref={ bottomSheetModalRef }
                 title={ bottomSheetTitle }
                 snapPoints={ ["75%"] }
+                isHandlePanningGesture={ false }
+                renderCloseButton={ () =>
+                    <IconButton
+                        icon={ ICON_NAMES.close }
+                        size={ FONT_SIZES.medium }
+                        iconColor={"whitesmoke"}
+                        onPress={ () => bottomSheetModalRef.current?.close() }
+                        style={ [GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium), { alignSelf: "center" }] }
+                    /> }
             >
                 { bottomSheetContent }
             </CustomBottomSheet>

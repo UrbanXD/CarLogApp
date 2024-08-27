@@ -31,6 +31,7 @@ export const getHeaderTitle = (route: string) => {
 export const CAR_NAME_LENGTH = 10
 
 export const ICON_NAMES = {
+    close: "close",
     email: "email-outline",
     password: "lock-outline",
     user: "account-outline",

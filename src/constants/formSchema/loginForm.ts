@@ -30,3 +30,5 @@ export const getLoginHandleSubmit = ({ handleSubmit, supabaseConnector }: GetFor
             Alert.alert(error.message);
         }
     })
+
+export type GetLoginHandleSubmitType = (typeof getLoginHandleSubmit);
