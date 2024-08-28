@@ -10,6 +10,7 @@ import BottomSheet, {
     BottomSheetView
 } from "@gorhom/bottom-sheet";
 import {Divider} from "react-native-paper";
+import {StatusBar} from "expo-status-bar";
 
 type BottomSheetProps = {
     title?: string
@@ -46,30 +47,33 @@ const CustomBottomSheet=
         const styles = getStyles(isHandlePanningGesture);
 
         return (
-            <BottomSheetModal
-                ref={ ref }
-                index={ startSnapIndex }
-                snapPoints={ snapPoints }
-                enablePanDownToClose={ isHandlePanningGesture }
-                enableContentPanningGesture={ isHandlePanningGesture }
-                enableHandlePanningGesture={ isHandlePanningGesture }
-                // enableDismissOnClose={ false }
-                backdropComponent={ renderBackdrop }
-                backgroundStyle={ styles.containerBackground }
-                handleIndicatorStyle={ isHandlePanningGesture ? styles.line : { height: 0 } }
-            >
-                <>
-                    <View style={ !renderCloseButton && { paddingTop: SEPARATOR_SIZES.small }}>
-                        { renderCloseButton && renderCloseButton() }
-                        <Text style={ styles.titleText }>
-                            { title }
-                        </Text>
-                    </View>
-                    <BottomSheetView style={{ flex: 1, paddingHorizontal: SEPARATOR_SIZES.medium }}>
-                        { children }
-                    </BottomSheetView>
-                </>
-            </BottomSheetModal>
+            <>
+                { snapPoints[0] === "100%" && <StatusBar style={"light"}></StatusBar> }
+                <BottomSheetModal
+                    ref={ ref }
+                    index={ startSnapIndex }
+                    snapPoints={ snapPoints }
+                    enablePanDownToClose={ isHandlePanningGesture }
+                    enableContentPanningGesture={ isHandlePanningGesture }
+                    enableHandlePanningGesture={ isHandlePanningGesture }
+                    // enableDismissOnClose={ false }
+                    backdropComponent={ renderBackdrop }
+                    backgroundStyle={ styles.containerBackground }
+                    handleIndicatorStyle={ isHandlePanningGesture ? styles.line : { height: 0 } }
+                >
+                    <>
+                        <View style={ !renderCloseButton && { paddingTop: SEPARATOR_SIZES.small }}>
+                            { renderCloseButton && renderCloseButton() }
+                            <Text style={ styles.titleText }>
+                                { title }
+                            </Text>
+                        </View>
+                        <BottomSheetView style={{ flex: 1, paddingHorizontal: SEPARATOR_SIZES.medium }}>
+                            { children }
+                        </BottomSheetView>
+                    </>
+                </BottomSheetModal>
+            </>
         )
     })
 

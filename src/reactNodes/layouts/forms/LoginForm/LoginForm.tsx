@@ -5,7 +5,7 @@ import {useDatabase} from "../../../../db/Database";
 import {GLOBAL_STYLE, ICON_NAMES} from "../../../../constants/constants";
 import {Text, View} from "react-native";
 import InputText from "../../../../components/Input/InputText";
-import Button from "../../../../components/Button/Button";
+import Button, {FacebookButton, GoogleButton} from "../../../../components/Button/Button";
 import TextDivider from "../../../../components/TextDivider/TextDivider";
 import {theme} from "../../../../constants/theme";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
@@ -43,23 +43,8 @@ const LoginForm: React.FC = () => {
                 <Text style={ GLOBAL_STYLE.formLinkText }>Elfelejtette jelszavát?</Text>
                 <Button title="Bejelentkezés" onPress={ submitHandler } />
                 <TextDivider title="vagy" color={ theme.colors.gray1 } lineHeight={ 1 } marginVertical={ GLOBAL_STYLE.formContainer.gap }/>
-                <Button
-                    onPress={ () => 1 }
-                    title="Folytatás Google fiókkal"
-                    icon={ require("../../../../assets/google_logo.png") }
-                    inverse
-                    backgroundColor={ theme.colors.white }
-                    textColor={ theme.colors.googleRed }
-                    textStyle={{ fontSize: hp(2) }}
-                />
-                <Button
-                    onPress={ () => 1 }
-                    title="Folytatás Facebook fiókkal"
-                    icon={ require("../../../../assets/facebook_logo.png") }
-                    backgroundColor={ theme.colors.facebookBlue }
-                    textColor={ theme.colors.white }
-                    textStyle={{ fontSize: hp(2) }}
-                />
+                <GoogleButton onPress={ () => 1 } />
+                <FacebookButton onPress={ () => 1 } />
             </View>
         </KeyboardAwareScrollView>
     )

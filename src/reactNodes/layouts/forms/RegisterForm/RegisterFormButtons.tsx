@@ -1,24 +1,36 @@
 import React from "react";
 import {KeyboardStickyView} from "react-native-keyboard-controller";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import Button from "../../../../components/Button/Button";
+import Button, {ProgressBackButton, ProgressNextButton} from "../../../../components/Button/Button";
 import {useMultiStepForm} from "../../../providers/MultiStepFormProvider";
-import {StyleSheet} from "react-native";
-import {SEPARATOR_SIZES} from "../../../../constants/constants";
+import {StyleSheet, View} from "react-native";
+import {FONT_SIZES, GET_ICON_BUTTON_RESET_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../../../constants/constants";
 import {theme} from "../../../../constants/theme";
+import {Icon, IconButton} from "react-native-paper";
 
 const RegisterFormButtons: React.FC = () => {
-    const { isFirstStep, isLastStep, next } = useMultiStepForm()
+    const {
+        isFirstStep,
+        isLastStep,
+        next,
+        back
+    } = useMultiStepForm();
 
     return (
-        <>
-            {
-                !isFirstStep &&
-                <KeyboardStickyView offset={{ closed: 0, opened: -hp(5) }} style={ styles.buttonContainer }>
-                    <Button title={ !isLastStep ? "Következő" : "Fiók létrehozása" } onPress={ next } />
-                </KeyboardStickyView>
-            }
-        </>
+        <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: SEPARATOR_SIZES.small }}>
+            {/*<View style={{ flex: 0.2 }}>*/}
+                {
+                    !isFirstStep &&
+                        <ProgressBackButton onPress={ back } />
+                }
+            {/*</View>*/}
+            <View style={{ flex: 0.825 }}>
+                {
+                    !isFirstStep &&
+                        <ProgressNextButton onPress={ next } isLastStep={ isLastStep } />
+                }
+            </View>
+        </View>
     )
 }
 
