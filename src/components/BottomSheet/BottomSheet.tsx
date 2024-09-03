@@ -11,6 +11,8 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import {Divider} from "react-native-paper";
 import {StatusBar} from "expo-status-bar";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
+import Constants from 'expo-constants';
 
 type BottomSheetProps = {
     title?: string
@@ -25,7 +27,7 @@ const CustomBottomSheet=
     forwardRef<BottomSheetModal, BottomSheetProps>((
         {
             title = "Bottom Sheet",
-            snapPoints = ["40%", "60%", "80%"],
+            snapPoints = ["100%"],
             startSnapIndex = 0,
             isHandlePanningGesture = true,
             renderCloseButton,
@@ -48,7 +50,6 @@ const CustomBottomSheet=
 
         return (
             <>
-                { snapPoints[0] === "100%" && <StatusBar style={"light"}></StatusBar> }
                 <BottomSheetModal
                     ref={ ref }
                     index={ startSnapIndex }
@@ -58,6 +59,7 @@ const CustomBottomSheet=
                     enableHandlePanningGesture={ isHandlePanningGesture }
                     // enableDismissOnClose={ false }
                     backdropComponent={ renderBackdrop }
+                    style={{ marginTop: Constants.statusBarHeight * 1.5 }}
                     backgroundStyle={ styles.containerBackground }
                     handleIndicatorStyle={ isHandlePanningGesture ? styles.line : { height: 0 } }
                 >

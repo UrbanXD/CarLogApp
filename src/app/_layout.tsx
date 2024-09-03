@@ -8,7 +8,6 @@ import {useDatabase} from "../db/Database";
 import { Session } from '@supabase/supabase-js';
 import {GestureHandlerRootView} from "react-native-gesture-handler";
 import {SafeAreaProvider} from "react-native-safe-area-context";
-import HomeHeader from "../reactNodes/layouts/header/HomeHeader";
 import BackButtonHeader from "../reactNodes/layouts/header/BackButtonHeader";
 import {BottomSheetModalProvider} from "@gorhom/bottom-sheet";
 import {store} from "../redux/store";
@@ -18,6 +17,7 @@ import {PaperProvider} from "react-native-paper";
 import {KeyboardProvider} from "react-native-keyboard-controller";
 import {getHeaderTitle} from "../constants/constants";
 import {StatusBar} from "expo-status-bar";
+import Header from "../components/Header/Header";
 
 const Layout:React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
@@ -62,7 +62,9 @@ const Layout:React.FC = () => {
                                         />
                                         <Stack.Screen
                                             name="(main)"
-                                            options={{ header: () => <HomeHeader /> }}
+                                            options={{
+                                                headerShown: false
+                                            }}
                                         />
                                         <Stack.Screen name="fuelMonitor" />
                                     </Stack>

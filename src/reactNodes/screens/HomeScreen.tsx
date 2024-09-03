@@ -12,7 +12,6 @@ import {theme} from "../../constants/theme";
 import CardButton from "../../components/Button/CardButton";
 import {router} from "expo-router";
 import Animated, {FadeInLeft, SharedValue} from "react-native-reanimated";
-import HomeHeader from "../layouts/header/HomeHeader";
 import {
     DEFAULT_SEPARATOR,
     FONT_SIZES,
@@ -36,6 +35,8 @@ import CustomBottomSheet from "../../components/BottomSheet/BottomSheet";
 import {BottomSheetModal} from "@gorhom/bottom-sheet";
 import NewCarForm from "../layouts/forms/NewCarForm/NewCarForm";
 import CarouselItem from "../../components/Carousel/CarouselItem";
+import InputPicker from "../../components/Input/InputPicker/InputPicker";
+import {createSelector} from "@reduxjs/toolkit";
 interface onButtonPressArgs {
     path: string,
     params?: { [key: string]: string }
@@ -51,7 +52,21 @@ const HomeScreen: React.FC = () => {
     const { supabaseConnector, db } = useDatabase();
     const dispatch = useDispatch();
 
-    const cars = useSelector<RootState, CarouselItemType[]>(state => state.cars.cars);
+    const selectCarsState = (state: RootState) => state.cars.cars;
+
+    const selectCarsForCarousel = createSelector(
+        [selectCarsState],
+        (cars) => cars.map(car => ({
+            id: car.name,
+            image: undefined,
+            title: car.brand,
+            subtitle: car.model,
+            selected: car.selected,
+        }))
+    );
+
+    const cars = useSelector(selectCarsForCarousel);
+
     const carsID = useSelector<RootState, Array<string>>(state => state.cars.carsID);
     const selectedCarIndex = useSelector<RootState, number>(state => state.cars.selectedCarIndex);
     const isLoading = useSelector<RootState>(state => state.cars.loading);
@@ -78,10 +93,6 @@ const HomeScreen: React.FC = () => {
     useEffect(() => {
         store.dispatch(loadCars(db))
     }, [dispatch]);
-
-    useEffect(() => {
-        console.log(isLoading)
-    }, [isLoading]);
 
     const addCar = async () => {
         bottomSheetModalRef.current?.present()
@@ -142,6 +153,9 @@ const HomeScreen: React.FC = () => {
                     </Text>
                     <Button title={"service"} onPress={ onP }/>
                 </Animated.View>
+
+                {/*<InputPicker />*/}
+
                 <View style={ [GLOBAL_STYLE.contentContainer, { paddingHorizontal: 0, marginHorizontal: 0, backgroundColor: "transparent"}] } >
                     <View style={{ paddingHorizontal: DEFAULT_SEPARATOR }}>
                         <Text style={ GLOBAL_STYLE.containerTitleText }>
@@ -169,7 +183,7 @@ const HomeScreen: React.FC = () => {
                             }
                         />
                     </View>
-                    <Button buttonStyle={{ width: wp(75) }} onPress={addCar} title={"Új autó hozzáadása"} />
+                    <Button width={ wp(75) } onPress={addCar} title={"Autó hozzáadás"} />
                 </View>
                 <View style={ GLOBAL_STYLE.contentContainer }>
                     <View>

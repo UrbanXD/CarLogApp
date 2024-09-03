@@ -43,13 +43,20 @@ export const ICON_NAMES = {
     rightArrow: "arrow-right",
     leftArrowHead: "chevron-left",
     leftArrow: "arrow-left",
+    downArrowHead: "chevron-down",
     info: "information-outline",
     destinationPointMarker: "map-marker",
     startingPointMarker: "map-marker-outline",
     clock: "clock-time-seven-outline",
-    notebook: "notebook-outline",
-    service: "car-wrench",
-    expenses: "currency-usd"
+    homeOutline: "home-outline",
+    home: "home",
+    notebookOutline: "notebook-outline",
+    notebook: "notebook",
+    serviceOutline: "wrench-outline",
+    service: "wrench",
+    expensesOutline: "account-cash-outline",
+    expenses: "account-cash",
+    car: "car-outline",
 }
 
 export const ICON_COLORS = {
@@ -152,5 +159,5 @@ export const GET_ICON_BUTTON_RESET_STYLE = (size: number = FONT_SIZES.normal) =>
 export const COLLAPSIBLE_HEADER_HEIGHT = 180;
 export const COLLAPSIBLE_HEADER_IMAGE = 110;
 
-export const SIMPLE_HEADER_HEIGHT = hp(7.5);
-export const SIMPLE_TABBAR_HEIGHT = hp(7.5);
+export const SIMPLE_HEADER_HEIGHT = hp(6.75);
+export const SIMPLE_TABBAR_HEIGHT = hp(6.75);

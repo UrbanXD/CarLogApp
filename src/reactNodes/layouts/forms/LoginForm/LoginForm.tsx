@@ -2,7 +2,7 @@ import React from "react";
 import {useForm} from "react-hook-form";
 import {getLoginHandleSubmit, LoginFormFieldType, loginUseFormProps} from "../../../../constants/formSchema/loginForm";
 import {useDatabase} from "../../../../db/Database";
-import {GLOBAL_STYLE, ICON_NAMES} from "../../../../constants/constants";
+import {GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../../../constants/constants";
 import {Text, View} from "react-native";
 import InputText from "../../../../components/Input/InputText";
 import Button, {FacebookButton, GoogleButton} from "../../../../components/Button/Button";
@@ -22,9 +22,9 @@ const LoginForm: React.FC = () => {
             bounces={ false }
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={ false }
-            contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
+            contentContainerStyle={ [GLOBAL_STYLE.scrollViewContentContainer, { paddingTop: SEPARATOR_SIZES.extraMedium }] }
         >
-            <View style={ GLOBAL_STYLE.formContainer }>
+            <View style={ [GLOBAL_STYLE.formContainer, { justifyContent: "flex-start" }] }>
                 <InputText
                     control={ control }
                     fieldName="email"

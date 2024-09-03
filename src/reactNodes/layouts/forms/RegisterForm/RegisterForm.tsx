@@ -15,6 +15,7 @@ import {GLOBAL_STYLE, SEPARATOR_SIZES} from "../../../../constants/constants";
 import {KeyboardAwareScrollView} from "react-native-keyboard-controller";
 import RegisterFormContent from "./RegisterFormContent";
 import RegisterFormButtons from "./RegisterFormButtons";
+import {View} from "react-native";
 
 const RegisterForm: React.FC = () => {
     const { supabaseConnector } = useDatabase();

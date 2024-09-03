@@ -20,7 +20,6 @@ const App: React.FC = () => {
     }, []);
 
     return (
-        // <FirstScreen />
         !(session && session.user)
             ?   <FirstScreen />
             :   <Redirect href="/(main)" />

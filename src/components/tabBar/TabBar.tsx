@@ -38,14 +38,18 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({ state, descriptors,
 
                     const color = isFocused ? tabBarActiveTintColor : tabBarInactiveTintColor
 
-                    const icon =
-                        options.tabBarIcon
-                            ? options.tabBarIcon({
-                                focused: isFocused,
-                                color: isFocused ? tabBarActiveTintColor : tabBarInactiveTintColor,
-                                size: 25,
-                              }) as string
-                            : "home"
+                    const icons =
+                        JSON.parse(
+                            options.tabBarIcon
+                                ? options.tabBarIcon({
+                                    focused: isFocused,
+                                    color: isFocused ? tabBarActiveTintColor : "red",
+                                    size: 25,
+                                }) as string
+                                : "help"
+                        )
+
+                    const icon = icons[isFocused ? "active" : "inactive"]
 
                     const onPress = () => {
                         const event = navigation.emit({

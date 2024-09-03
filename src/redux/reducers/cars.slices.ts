@@ -4,9 +4,17 @@ import {Kysely} from "@powersync/kysely-driver";
 import {CarsType, DatabaseType} from "../../db/AppSchema";
 import {CarDAO} from "../../db/dao/CarDAO";
 
+export interface CarType {
+    name: string
+    brand: string
+    model: string
+    image: string | undefined
+    selected: boolean
+}
+
 interface CarsState {
     loading: boolean
-    cars: Array<CarouselItemType>
+    cars: Array<CarType>
     carsID: Array<string>
     selectedCarIndex: number
     loadError: boolean
@@ -70,26 +78,25 @@ const carsSlice = createSlice({
                         state.carsID = [...state.carsID, item.id];
 
                         return {
-                            id: item.name,
+                            name: item.name,
+                            brand: item.brand,
+                            model: item.type,
                             image: undefined,
-                            // image: item.image || undefined,
-                            title: item.brand,
-                            subtitle: item.type,
                             selected: !!item.selected
                         }
-                    }) as Array<CarouselItemType>;
+                    }) as Array<CarType>;
             })
             .addCase(addCar.fulfilled, (state, action) => {
                 state.cars = [
                     ...state.cars,
                     {
-                        id: action.payload.name,
+                        name: action.payload.name,
+                        brand: action.payload.brand,
+                        model: action.payload.type,
                         image: undefined,
-                        title: action.payload.brand,
-                        subtitle: action.payload.type,
                         selected: !!action.payload.selected
                     }
-                ] as Array<CarouselItemType>;
+                ] as Array<CarType>;
             })
     }
 });

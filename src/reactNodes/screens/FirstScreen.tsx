@@ -54,7 +54,7 @@ const FirstScreen: React.FC = () => {
             <CustomBottomSheet
                 ref={ bottomSheetModalRef }
                 title={ bottomSheetTitle }
-                snapPoints={ ["80%"] }
+                snapPoints={ ["100%"] }
                 isHandlePanningGesture={ false }
                 renderCloseButton={ () =>
                     <IconButton
