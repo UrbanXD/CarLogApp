@@ -9,7 +9,7 @@ import {addCar} from "../../redux/reducers/cars.slices";
 export interface NewCarFormFieldType {
     name: string
     brand: string
-    type: string
+    model: string
     // image: string
 }
 
@@ -17,7 +17,7 @@ export const newCarFormSchema = z
     .object({
         name: z.string().min(10, "10 karakter legyen").max(10, "10 karakter legyen"),
         brand: z.string(),
-        type: z.string(),
+        model: z.string(),
         // image: z.string(),
     })
 
@@ -25,7 +25,7 @@ export const newCarUseFormProps = {
     defaultValues: {
         name: "",
         brand: "",
-        type: "",
+        model: "",
         // image: "",
     },
     resolver: zodResolver(newCarFormSchema)
@@ -44,7 +44,6 @@ export const getNewCarHandleSubmit = ({ handleSubmit, supabaseConnector, db, onS
             const car = {
                 id: carID,
                 owner: userID,
-                selected: 0,
                 image: null,
                 ...newCar
             }

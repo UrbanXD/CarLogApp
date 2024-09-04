@@ -1,18 +1,11 @@
-import React, {forwardRef, ReactNode, useCallback, useEffect, useImperativeHandle, useMemo} from "react";
-import {StyleSheet, View, Text} from "react-native";
-import {theme} from "../../constants/theme";
-import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES} from "../../constants/constants";
-import BottomSheet, {
-    BottomSheetBackdrop,
-    BottomSheetModal,
-    BottomSheetScrollView,
-    BottomSheetView
-} from "@gorhom/bottom-sheet";
-import {Divider} from "react-native-paper";
-import {StatusBar} from "expo-status-bar";
-import {useSafeAreaInsets} from "react-native-safe-area-context";
+import React, { forwardRef, ReactNode, useCallback } from "react";
+import { StyleSheet, View, Text } from "react-native";
+import { theme } from "../../constants/theme";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../constants/constants";
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import Constants from 'expo-constants';
+import {snapPoint} from "@gorhom/bottom-sheet/lib/typescript/utilities/snapPoint";
 
 type BottomSheetProps = {
     title?: string
@@ -46,7 +39,7 @@ const CustomBottomSheet=
             ,[]
         )
 
-        const styles = getStyles(isHandlePanningGesture);
+        const styles = getStyles(snapPoints[0] === "100%");
 
         return (
             <>
@@ -57,9 +50,7 @@ const CustomBottomSheet=
                     enablePanDownToClose={ isHandlePanningGesture }
                     enableContentPanningGesture={ isHandlePanningGesture }
                     enableHandlePanningGesture={ isHandlePanningGesture }
-                    // enableDismissOnClose={ false }
                     backdropComponent={ renderBackdrop }
-                    style={{ marginTop: Constants.statusBarHeight * 1.5 }}
                     backgroundStyle={ styles.containerBackground }
                     handleIndicatorStyle={ isHandlePanningGesture ? styles.line : { height: 0 } }
                 >
@@ -79,17 +70,17 @@ const CustomBottomSheet=
         )
     })
 
-const getStyles = (isHandlePanningGesture: boolean) =>
+const getStyles = (isFullScreen: boolean) =>
     StyleSheet.create({
         containerBackground: {
             backgroundColor: theme.colors.black,
-            borderTopLeftRadius: isHandlePanningGesture ? 55 : 35,
-            borderTopRightRadius: isHandlePanningGesture ? 55 : 35,
+            borderTopLeftRadius: !isFullScreen ? 55 : 0,
+            borderTopRightRadius: !isFullScreen ? 55 : 0,
         },
         contentContainer: {
             flex: 1,
             gap: DEFAULT_SEPARATOR,
-            // paddingHorizontal: DEFAULT_SEPARATOR,
+            paddingHorizontal: DEFAULT_SEPARATOR,
         },
         line: {
             alignSelf: "center",

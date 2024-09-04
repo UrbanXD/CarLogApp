@@ -30,6 +30,10 @@ export const getHeaderTitle = (route: string) => {
 
 export const CAR_NAME_LENGTH = 10
 
+export const LOCAL_STORAGE_KEYS = {
+    selectedCarIndex: "selectedCarIndex"
+}
+
 export const ICON_NAMES = {
     close: "close",
     email: "email-outline",
@@ -92,10 +96,7 @@ export const DEFAULT_SEPARATOR = SEPARATOR_SIZES.normal
 export const GLOBAL_STYLE = StyleSheet.create({
     pageContainer: {
         flex: 1,
-        flexDirection: "column",
-        gap: 0,
-        backgroundColor: "whitesmoke",
-        paddingHorizontal: DEFAULT_SEPARATOR,
+        // paddingHorizontal: DEFAULT_SEPARATOR,
         paddingVertical: SEPARATOR_SIZES.small,
     },
     scrollViewContentContainer: {
@@ -115,7 +116,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
     contentContainer: {
         gap: SEPARATOR_SIZES.small,
         flexDirection: "column",
-        marginTop: SEPARATOR_SIZES.extraMedium,
+        marginTop: SEPARATOR_SIZES.mediumSmall,
         paddingHorizontal: DEFAULT_SEPARATOR,
         marginHorizontal: DEFAULT_SEPARATOR,
         backgroundColor: theme.colors.black4,

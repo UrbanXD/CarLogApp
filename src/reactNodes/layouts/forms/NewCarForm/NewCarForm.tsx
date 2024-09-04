@@ -6,7 +6,7 @@ import {
     newCarUseFormProps
 } from "../../../../constants/formSchema/newCarForm";
 import {useDatabase} from "../../../../db/Database";
-import {StyleSheet, Text, View} from "react-native";
+import {StyleSheet, View} from "react-native";
 
 import {GLOBAL_STYLE, ICON_NAMES} from "../../../../constants/constants";
 import InputText from "../../../../components/Input/InputText";
@@ -22,21 +22,20 @@ const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
         useForm<NewCarFormFieldType>(newCarUseFormProps);
 
     const { supabaseConnector, db } = useDatabase();
-    // const { dismiss } = useBottomSheetModal();
 
     const onSubmit = (isSuccess?: boolean) => {
         if(isSuccess){
             reset();
             close();
         } else{
-            console.log("HIBA NEW CAR FORM")
+            console.log("HIBA NEW CAR FORM");
         }
     }
 
     const submitHandler = getNewCarHandleSubmit({ handleSubmit, supabaseConnector, db, onSubmit });
 
     return (
-        <View style={ GLOBAL_STYLE.pageContainer }>
+        <View style={ [GLOBAL_STYLE.pageContainer, { justifyContent: "space-between" } ]}>
             <View style={ [GLOBAL_STYLE.formContainer, { justifyContent: "flex-start" }] }>
                 <InputText
                     control={ control }
@@ -54,13 +53,19 @@ const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
                 />
                 <InputText
                     control={ control }
-                    fieldName="type"
+                    fieldName="model"
                     fieldNameText="Modell"
                     placeholder="G-Class"
                     icon={ ICON_NAMES.user }
                 />
             </View>
-            <Button onPress={ submitHandler } title={"Létrehozás"} buttonStyle={{ width: wp(75) }} />
+            <View style={{ flex: 1, justifyContent: "flex-end" }}>
+                <Button
+                    onPress={ submitHandler }
+                    title="Létrehozás"
+                    width={ wp(75) }
+                />
+            </View>
         </View>
 )
 }
@@ -69,7 +74,7 @@ const styles = StyleSheet.create({
     dropdownButtonStyle: {
         width: 200,
         height: 50,
-        backgroundColor: '#E9ECEF',
+        backgroundColor: 'red',
         borderRadius: 12,
         flexDirection: 'row',
         justifyContent: 'center',

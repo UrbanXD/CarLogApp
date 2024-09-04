@@ -15,9 +15,8 @@ const cars = new TableV2({
     owner: column.text,
     name: column.text,
     brand: column.text,
-    type: column.text,
+    model: column.text,
     image: column.text,
-    selected: column.integer // 1-true : 0-false
 })
 
 const service = new TableV2({

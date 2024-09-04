@@ -1,15 +1,16 @@
 import {CarouselItemType} from "../../components/Carousel/Carousel";
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Kysely} from "@powersync/kysely-driver";
 import {CarsType, DatabaseType} from "../../db/AppSchema";
 import {CarDAO} from "../../db/dao/CarDAO";
+import {LOCAL_STORAGE_KEYS} from "../../constants/constants";
 
 export interface CarType {
     name: string
     brand: string
     model: string
     image: string | undefined
-    selected: boolean
 }
 
 interface CarsState {
@@ -54,6 +55,32 @@ export const addCar = createAsyncThunk(
     }
 )
 
+export const loadSelectedCar = createAsyncThunk(
+    "loadSelectedCarIndex",
+    async (arg: { asd?: number } = {}, { rejectWithValue, fulfillWithValue }) => {
+        try {
+            const index = await AsyncStorage.getItem(LOCAL_STORAGE_KEYS.selectedCarIndex);
+            return index ? Number(index) : 0;
+        } catch (e) {
+            console.log("loadSelectedCar", e);
+            return rejectWithValue(0);
+        }
+    }
+)
+
+export const selectCar = createAsyncThunk(
+    "selectCar",
+    async (index: number, { rejectWithValue, fulfillWithValue })=> {
+        try {
+            await AsyncStorage.setItem(LOCAL_STORAGE_KEYS.selectedCarIndex, index.toString());
+            return index;
+        } catch (e) {
+            console.log(e);
+            return rejectWithValue("");
+        }
+    }
+)
+
 const carsSlice = createSlice({
     name: "cars",
     initialState,
@@ -71,18 +98,12 @@ const carsSlice = createSlice({
                 state.loading = false;
                 state.cars = action.payload
                     .map((item, index) => {
-                        if (!!item.selected) {
-                            state.selectedCarIndex = index;
-                        }
-
                         state.carsID = [...state.carsID, item.id];
-
                         return {
                             name: item.name,
                             brand: item.brand,
-                            model: item.type,
+                            model: item.model,
                             image: undefined,
-                            selected: !!item.selected
                         }
                     }) as Array<CarType>;
             })
@@ -92,11 +113,23 @@ const carsSlice = createSlice({
                     {
                         name: action.payload.name,
                         brand: action.payload.brand,
-                        model: action.payload.type,
+                        model: action.payload.model,
                         image: undefined,
-                        selected: !!action.payload.selected
                     }
                 ] as Array<CarType>;
+            })
+            .addCase(loadSelectedCar.fulfilled, (state, action) => {
+                state.selectedCarIndex = action.payload;
+            })
+            .addCase(loadSelectedCar.rejected, (state, action) => {
+                console.log("roosz load car")
+                state.selectedCarIndex = 0
+            })
+            .addCase(selectCar.fulfilled, (state, action) => {
+                state.selectedCarIndex = action.payload;
+            })
+            .addCase(selectCar.rejected, (state, action) => {
+                console.log("nijncs kivalasztva HIBA")
             })
     }
 });

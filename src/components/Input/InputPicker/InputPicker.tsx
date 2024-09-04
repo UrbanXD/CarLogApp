@@ -1,12 +1,6 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
-import { SharedValue } from "react-native-reanimated";
-import { Control, Controller, UseFormSetValue } from "react-hook-form";
-import Carousel from "../../Carousel/Carousel";
-import {Picker} from "@react-native-picker/picker";
-import {View, Text, ScrollView, StyleSheet, TouchableOpacity} from "react-native";
+import React, {useCallback, useEffect, useRef, useState} from "react";
+import {View, Text, StyleSheet, TouchableOpacity} from "react-native";
 import {Icon, IconButton} from "react-native-paper";
-import CarouselItem from "../../Carousel/CarouselItem";
-import {widthPercentageToDP as wp} from "react-native-responsive-screen";
 import {
     DEFAULT_SEPARATOR, FONT_SIZES,
     GET_ICON_BUTTON_RESET_STYLE,
@@ -16,15 +10,9 @@ import {
 } from "../../../constants/constants";
 import {theme} from "../../../constants/theme";
 import {FlatList} from "react-native-gesture-handler";
-
-// interface InputPickerProps {
-//     data: Array<string>
-//     horizontal?: boolean
-//     itemSizePercentage?: number
-//     control: Control<any>
-//     fieldName: string
-//     setValue: UseFormSetValue<any>
-// }
+import {useDispatch, useSelector} from "react-redux";
+import {RootState, store} from "../../../redux/store";
+import {loadSelectedCar, selectCar} from "../../../redux/reducers/cars.slices";
 
 export interface InputPickerDataType {
     id: number
@@ -40,46 +28,36 @@ interface InputPickerProps {
 const InputPicker: React.FC<InputPickerProps> = ({ data, onDropdownToggle }) => {
     const flatlistRef = useRef<FlatList>(null)
 
-    const [selectedIndex, setSelectedIndex] = useState<number>(0);
+    const selectedIndex = useSelector<RootState, number>(state => state.cars.selectedCarIndex);
     const [isDropdownContentVisible, setIsDropdownContentVisible] = useState(false);
 
     const memoizedSetSelected = useCallback(
-        (value: string, index: number) => {
-            const originalIndex = data.findIndex(item => item.id === index);
-            // setValue(fieldName, value);
-            setSelectedIndex(originalIndex);
+        (index: number) => {
+            store.dispatch(selectCar(index));
             setIsDropdownContentVisible(!isDropdownContentVisible);
 
         },
-        [data, setSelectedIndex, setIsDropdownContentVisible] //setValue, fieldName
+        [data, setIsDropdownContentVisible]
     );
 
     useEffect(() => {
-        if(onDropdownToggle) onDropdownToggle(isDropdownContentVisible);
-    }, [isDropdownContentVisible]);
+        store.dispatch(loadSelectedCar({}));
+    }, []);
 
     useEffect(() => {
-        if(isDropdownContentVisible) flatlistRef?.current?.scrollToIndex({
-            index: selectedIndex,
-            animated: true,
-        })
+        if(onDropdownToggle) onDropdownToggle(isDropdownContentVisible);
+
+        if(isDropdownContentVisible)
+            flatlistRef?.current?.scrollToIndex({
+                index: selectedIndex,
+                animated: true,
+            })
+
     }, [isDropdownContentVisible]);
 
-    // const memoizedRenderItem = useCallback(
-    //     (item: string, index: number, size: number, coordinate: SharedValue<number>) => (
-    //         <InputPickerItem
-    //             title={item}
-    //             index={index}
-    //             size={size}
-    //             coordinate={coordinate}
-    //         />
-    //     ),
-    //     []
-    // );
     return (
         <View style={ styles.container }>
-            <View style={ isDropdownContentVisible && { }}>
-            {/*<View style={ isDropdownContentVisible && { marginRight: DEFAULT_SEPARATOR * -1 }}>*/}
+            <View>
                 {
                     isDropdownContentVisible
                     ?   <View style={{ flexDirection: "row", alignItems: "center", gap: SEPARATOR_SIZES.lightSmall }}>
@@ -101,7 +79,7 @@ const InputPicker: React.FC<InputPickerProps> = ({ data, onDropdownToggle }) => 
                                                 title={ item.title }
                                                 subtitle={ item.subtitle }
                                                 selected={ index === selectedIndex }
-                                                onPress={ () => memoizedSetSelected(item.title, index) }
+                                                onPress={ () => memoizedSetSelected(index) }
                                             />
                                             { index === (data.length - 1) && <View style={{ flex: 1, width: DEFAULT_SEPARATOR }} />}
                                         </View>
@@ -120,12 +98,10 @@ const InputPicker: React.FC<InputPickerProps> = ({ data, onDropdownToggle }) => 
                     :   <TouchableOpacity style={{ alignItems: "center", flexDirection: "row", gap: SEPARATOR_SIZES.lightSmall }} onPress={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }>
                             <Icon source={ ICON_NAMES.car } size={ styles.inputPickerTitleText.fontSize * 2 } color={ theme.colors.white } />
                             <View style={{  }}>
-                                <Text style={ styles.inputPickerTitleText } >
+                                <Text style={ styles.inputPickerTitleText } numberOfLines={ 1 } >
                                     { data[selectedIndex].title }
                                 </Text>
-                                <Text
-                                    style={ styles.inputPickerSubtitleText }
-                                >
+                                <Text style={ styles.inputPickerSubtitleText } numberOfLines={ 1 } >
                                     { data[selectedIndex].subtitle }
                                 </Text>
                             </View>

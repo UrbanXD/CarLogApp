@@ -18,6 +18,7 @@ import {KeyboardProvider} from "react-native-keyboard-controller";
 import {getHeaderTitle} from "../constants/constants";
 import {StatusBar} from "expo-status-bar";
 import Header from "../components/Header/Header";
+import CarHeader from "../reactNodes/layouts/header/CarHeader";
 
 const Layout:React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
@@ -63,7 +64,7 @@ const Layout:React.FC = () => {
                                         <Stack.Screen
                                             name="(main)"
                                             options={{
-                                                headerShown: false
+                                                header: () => <CarHeader />
                                             }}
                                         />
                                         <Stack.Screen name="fuelMonitor" />
