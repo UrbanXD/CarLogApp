@@ -9,6 +9,7 @@ interface MultiStepFormProviderValue {
     submitHandler: SubmitHandler<any>
     trigger: UseFormTrigger<any>
     currentStep: number
+    currentStepText: string
     isFirstStep: boolean
     isLastStep: boolean
     goTo: (index: number) => void
@@ -20,20 +21,31 @@ const MultiStepFormContext = createContext<MultiStepFormProviderValue | null>(nu
 interface MultiStepFormProviderProps {
     children: ReactNode | null
     steps: Array<() => ReactNode | null>
-    isFirstNotCount: boolean
+    fieldsName: Array<Array<string>>
+    isFirstCount?: boolean
     control: Control<any>
-    submitHandler: SubmitHandler<any>
+    submitHandler:  (e?: (React.BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
     trigger: UseFormTrigger<any>
 }
 
-export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({ children, steps, isFirstNotCount, control, submitHandler, trigger}) => {
+export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
+    children,
+    steps,
+    fieldsName,
+    isFirstCount = true,
+    control,
+    submitHandler,
+    trigger
+}) => {
     const [currentStep, setCurrentStep] = useState(0);
 
     const next = async () => {
-        if (currentStep >= steps.length - 1) return
+        if(currentStep >= steps.length - 1) {
+            await submitHandler();
+            return;
+        }
 
-        const isValid = await trigger(registerStepsField[currentStep]);
-        console.log(isValid)
+        const isValid = await trigger(fieldsName[currentStep]);
         if(!isValid) return
 
         setCurrentStep(currentStep + 1);
@@ -54,12 +66,13 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({ ch
         <MultiStepFormContext.Provider
             value={{
                 steps,
-                stepsCount: steps.length - (!isFirstNotCount ? 1 : 0),
+                stepsCount: steps.length - (!isFirstCount ? 1 : 0),
                 control,
                 submitHandler,
                 trigger,
                 currentStep,
-                isFirstStep: currentStep === (isFirstNotCount ? 1 : 0),
+                currentStepText: (currentStep + (isFirstCount ? 1 : 0)).toString(),
+                isFirstStep: currentStep === (!isFirstCount ? 1 : 0),
                 isLastStep: currentStep === steps.length - 1,
                 goTo,
                 next,

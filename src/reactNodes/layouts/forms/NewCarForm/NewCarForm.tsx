@@ -2,23 +2,28 @@ import React, {useEffect} from "react";
 import {useForm} from "react-hook-form";
 import {
     getNewCarHandleSubmit,
-    NewCarFormFieldType,
-    newCarUseFormProps
+    NewCarFormFieldType, newCarFormStepsField,
+    newCarUseFormProps, ODOMETER_MEASUREMENTS
 } from "../../../../constants/formSchema/newCarForm";
 import {useDatabase} from "../../../../db/Database";
-import {StyleSheet, View} from "react-native";
+import {StyleSheet, Text, View} from "react-native";
 
 import {GLOBAL_STYLE, ICON_NAMES} from "../../../../constants/constants";
 import InputText from "../../../../components/Input/InputText";
 import Button from "../../../../components/Button/Button";
 import {widthPercentageToDP as wp} from "react-native-responsive-screen";
+import {MultiStepFormProvider, useMultiStepForm} from "../../../providers/MultiStepFormProvider";
+import {NewCarFormProgressInfo, NewCarFormContent, NewCarFormButtons} from "./NewCarFormProgressInfo";
+// @ts-ignore
+import Picker, { PickerDataType } from "../../../../components/Input/InputPicker/Picker";
+import InputPicker from "../../../../components/Input/InputPicker/InputPicker";
 
 interface NewCarFormProps {
     close?: () => void
 }
 
 const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
-    const { control, handleSubmit, reset, setValue } =
+    const { control, handleSubmit, trigger, reset, setValue } =
         useForm<NewCarFormFieldType>(newCarUseFormProps);
 
     const { supabaseConnector, db } = useDatabase();
@@ -32,42 +37,112 @@ const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
         }
     }
 
-    const submitHandler = getNewCarHandleSubmit({ handleSubmit, supabaseConnector, db, onSubmit });
+    const submitHandler = getNewCarHandleSubmit({
+        handleSubmit,
+        supabaseConnector,
+        db,
+        onSubmit
+    });
+
+    const steps = [
+        () =>
+            <StepOne />,
+        () =>
+            <StepTwo />,
+        () =>
+            <StepThree />
+    ]
 
     return (
-        <View style={ [GLOBAL_STYLE.pageContainer, { justifyContent: "space-between" } ]}>
-            <View style={ [GLOBAL_STYLE.formContainer, { justifyContent: "flex-start" }] }>
-                <InputText
-                    control={ control }
-                    fieldName="name"
-                    fieldNameText="Azonosító"
-                    placeholder="AA-0000-BB"
-                    icon={ ICON_NAMES.user }
-                />
-                <InputText
-                    control={ control }
-                    fieldName="brand"
-                    fieldNameText="Márka"
-                    placeholder="Mercedes"
-                    icon={ ICON_NAMES.user }
-                />
-                <InputText
-                    control={ control }
-                    fieldName="model"
-                    fieldNameText="Modell"
-                    placeholder="G-Class"
-                    icon={ ICON_NAMES.user }
-                />
+        <MultiStepFormProvider
+            steps={ steps }
+            fieldsName={ newCarFormStepsField }
+            control={ control }
+            submitHandler={ submitHandler }
+            trigger={ trigger }
+        >
+            <View style={ [GLOBAL_STYLE.pageContainer, { justifyContent: "space-between" } ]}>
+                <NewCarFormProgressInfo />
+                <NewCarFormContent />
+                <NewCarFormButtons />
             </View>
-            <View style={{ flex: 1, justifyContent: "flex-end" }}>
-                <Button
-                    onPress={ submitHandler }
-                    title="Létrehozás"
-                    width={ wp(75) }
-                />
-            </View>
-        </View>
-)
+        </MultiStepFormProvider>
+    )
+}
+
+const StepOne: React.FC = () => {
+    const { control } = useMultiStepForm();
+
+    return (
+        <InputText
+            control={ control }
+            fieldName="name"
+            fieldNameText="Autó azonosító"
+            fieldInfoText="Az autó elnevezése, azonosítója mely az Ön számára lehet fontos autója azonosításakor."
+            placeholder="AA-0000-BB"
+            icon={ ICON_NAMES.nametag }
+            isInBottomSheet
+        />
+    )
+}
+
+const StepTwo: React.FC = () => {
+    const { control } = useMultiStepForm();
+
+    return (
+        <>
+            {/*<InputText*/}
+            {/*    control={ control }*/}
+            {/*    fieldName="brand"*/}
+            {/*    fieldNameText="Márka"*/}
+            {/*    placeholder="Mercedes"*/}
+            {/*    icon={ ICON_NAMES.car }*/}
+            {/*/>*/}
+            <InputPicker
+                data={ [{title: "Merci"}, {title: "Audi"}, {title: "Opel"}] }
+                control={ control }
+                fieldName={"brand"}
+                fieldNameText="Márka"
+            />
+            <InputPicker
+                data={ [{title: "A4"}, {title: "A5"}, {title: "Zafira"}] }
+                control={ control }
+                fieldName={"model"}
+                fieldNameText="Modell"
+            />
+        </>
+    )
+}
+
+const StepThree: React.FC = () => {
+    const { control } = useMultiStepForm();
+
+    return (
+        <>
+            <InputText
+                control={ control }
+                fieldName="odometer_value"
+                fieldNameText="Kilometerora alass"
+                placeholder="000.000.000"
+                icon={ ICON_NAMES.odometer }
+            />
+            <InputPicker
+                data={ ODOMETER_MEASUREMENTS }
+                control={ control }
+                fieldName={"odometer_measurement"}
+                fieldNameText="Mertekegyseg"
+            />
+        </>
+    )
+}
+
+const StepFour: React.FC = () => {
+    const { control } = useMultiStepForm();
+
+    return (
+        <>
+        </>
+    )
 }
 
 const styles = StyleSheet.create({

@@ -61,6 +61,8 @@ export const ICON_NAMES = {
     expensesOutline: "account-cash-outline",
     expenses: "account-cash",
     car: "car-outline",
+    nametag: "tag-text-outline",
+    odometer: "gauge"
 }
 
 export const ICON_COLORS = {

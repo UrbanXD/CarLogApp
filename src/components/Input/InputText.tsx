@@ -11,18 +11,21 @@ import {
     TextInputFocusEventData
 } from "react-native";
 import {Control, Controller, FieldError, FieldValues} from "react-hook-form";
-import {GLOBAL_STYLE, ICON_COLORS, ICON_NAMES} from "../../constants/constants";
+import {GLOBAL_STYLE, ICON_COLORS, ICON_NAMES, SEPARATOR_SIZES} from "../../constants/constants";
 import {Divider, Icon, IconButton} from "react-native-paper";
 import {heightPercentageToDP as hp, heightPercentageToDP} from "react-native-responsive-screen";
 import {theme} from "../../constants/theme";
 import {useBottomSheetInternal} from "@gorhom/bottom-sheet";
+import InputTitle from "./InputTitle";
 
 interface InputTextProps {
     control: Control<any>
     fieldName: string
     fieldNameText?: string
+    fieldInfoText?: string
     icon?: string
     placeholder?: string
+    numeric?: boolean
     isSecure?: boolean
     isEditable?: boolean
     style?: StyleProp<ViewStyle>
@@ -31,16 +34,18 @@ interface InputTextProps {
 }
 
 const InputText: React.FC<InputTextProps> = ({
-         control,
-         fieldName,
-         fieldNameText = fieldName,
-         icon,
-         placeholder = "",
-         isSecure= false,
-         isEditable = true,
-         style,
-         textStyle,
-         isInBottomSheet = false
+    control,
+    fieldName,
+    fieldNameText,
+    fieldInfoText,
+    icon,
+    placeholder = "",
+    numeric = false,
+    isSecure= false,
+    isEditable = true,
+    style,
+    textStyle,
+    isInBottomSheet = false
 }) => {
     const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(isSecure);
@@ -72,10 +77,15 @@ const InputText: React.FC<InputTextProps> = ({
         [onBlur, isInBottomSheet]
     );
 
-    // console.log(fieldName, control._formValues[fieldName])
     return (
         <View style={ styles.inputContainer }>
-            <Text style={ styles.inputName }>{ fieldNameText }</Text>
+            {
+                fieldNameText &&
+                    <InputTitle
+                        title={ fieldNameText }
+                        subtitle={ fieldInfoText }
+                    />
+            }
             <Controller
                 control={ control }
                 name={ fieldName }
@@ -88,12 +98,12 @@ const InputText: React.FC<InputTextProps> = ({
                                     <Icon source={ icon } size={ heightPercentageToDP(4.5) } color={ styles.textInput.color } />
                                 </View>
                             }
-                            {/*<Divider style={{backgroundColor: "red", width:2}} horizontalInset={true}  />*/}
                             <TextInput
                                 placeholder={ placeholder }
                                 style={ [textStyle, styles.textInput] }
                                 placeholderTextColor={ styles.placeholderText.color }
                                 value={ value }
+                                keyboardType={ numeric ? "numeric" : "default" }
                                 secureTextEntry={ secure }
                                 onChangeText={ onChange }
                                 onBlur={ onBlur }
@@ -112,7 +122,12 @@ const InputText: React.FC<InputTextProps> = ({
                                 }
                             </View>
                         </View>
-                        { error && <Text style={ styles.errorText }>{ error.message }</Text> }
+                        {
+                            error &&
+                            <Text style={ styles.errorText }>
+                                { error.message }
+                            </Text>
+                        }
                     </>
                 }
             />
@@ -123,13 +138,7 @@ const InputText: React.FC<InputTextProps> = ({
 const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: "column",
-        gap: 5
-    },
-    inputName: {
-        paddingLeft: hp(2),
-        fontSize: hp(2.75),
-        fontFamily: "Gilroy-Heavy",
-        color: theme.colors.white
+        gap: SEPARATOR_SIZES.lightSmall
     },
     formFieldContainer: {
         minHeight: hp(6),

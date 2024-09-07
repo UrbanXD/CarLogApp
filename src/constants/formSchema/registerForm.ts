@@ -6,7 +6,6 @@ import {LoginFormFieldType} from "./loginForm";
 import {router} from "expo-router";
 
 export const registerStepsField = [["email"], ["firstname", "lastname"], ["password", "rpassword"]];
-
 export const registerStepsTitle = ["", "Személyes adatok", "Jelszó"];
 
 export interface RegisterFormFieldType {

@@ -6,6 +6,7 @@ import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "..
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import Constants from 'expo-constants';
 import {snapPoint} from "@gorhom/bottom-sheet/lib/typescript/utilities/snapPoint";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
 
 type BottomSheetProps = {
     title?: string
@@ -38,8 +39,9 @@ const CustomBottomSheet=
                         />
             ,[]
         )
-
-        const styles = getStyles(snapPoints[0] === "100%");
+        const isFullScreen = snapPoints[0] === "100%";
+        const styles = getStyles(isFullScreen);
+        const { top } = useSafeAreaInsets();
 
         return (
             <>
@@ -55,7 +57,7 @@ const CustomBottomSheet=
                     handleIndicatorStyle={ isHandlePanningGesture ? styles.line : { height: 0 } }
                 >
                     <>
-                        <View style={ !renderCloseButton && { paddingTop: SEPARATOR_SIZES.small }}>
+                        <View style={{ paddingTop: top / 2 }}>
                             { renderCloseButton && renderCloseButton() }
                             <Text style={ styles.titleText }>
                                 { title }

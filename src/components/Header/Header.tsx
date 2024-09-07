@@ -52,31 +52,6 @@ const Header: CustomHeaderComponents = ({
             { children }
         </View>
     )
-    // return (
-    //     <View style={{ paddingTop: insets.top }}>
-    //         <StatusBar
-    //             translucent={ statusBarIsTransculent }
-    //             barStyle={ statusBarStyle }
-    //             backgroundColor={ statusbarColor }
-    //         />
-    //         {
-    //             !!collapsible
-    //                 ?   <CollapsibleHeaderBar
-    //                         backgroundColor={ backgroundColor }
-    //                         height={ height }
-    //                         image={ collapsible.image }
-    //                         imageHeight={ collapsible.imageHeight }
-    //                         gradientColors={ collapsible.gradientColors }
-    //                         children={ children }
-    //                     />
-    //                 :   <SimpleHeaderBar
-    //                         backgroundColor={ backgroundColor }
-    //                         height={ height }
-    //                         children={ children }
-    //                     />
-    //         }
-    //     </View>
-    // )
 }
 
 interface HeaderStatusBarProps {
@@ -98,12 +73,13 @@ Header.StatusBar = ({ translucent = false, barStyle = "light-content", backgroun
 interface HeaderRowProps {
     children?: ReactNode | null
     backgroundColor?: ColorValue
+    paddingRight?: number
     flex?: number
 }
 
-Header.Row = ({ children, backgroundColor = "transparent", flex = 1 }: HeaderRowProps) => {
+Header.Row = ({ children, backgroundColor = "transparent", flex = 1, paddingRight = DEFAULT_SEPARATOR }: HeaderRowProps) => {
     return (
-        <View style={ [styles.barContainer, { flex, backgroundColor }] }>
+        <View style={ [styles.barContainer, { flex, backgroundColor, paddingRight }] }>
             { children }
         </View>
     )

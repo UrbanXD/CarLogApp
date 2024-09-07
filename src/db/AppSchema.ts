@@ -1,4 +1,5 @@
 import {column, Schema, TableV2} from "@powersync/react-native";
+import {number} from "zod";
 
 export const USERS_TABLE = "users";
 export const CARS_TABLE = "cars";
@@ -16,6 +17,11 @@ const cars = new TableV2({
     name: column.text,
     brand: column.text,
     model: column.text,
+    odometer_measurement: column.text,
+    odometer_value: column.integer,
+    fuel_type: column.text,
+    fuel_measurement: column.text,
+    fuel_tank_size: column.integer,
     image: column.text,
 })
 

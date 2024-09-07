@@ -43,7 +43,7 @@ interface onButtonPressArgs {
 }
 
 const HomeScreen: React.FC = () => {
-    const { db } = useDatabase();
+    const { supabaseConnector, db } = useDatabase();
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const [bottomSheetTitle, setBottomSheetTitle] = useState("");

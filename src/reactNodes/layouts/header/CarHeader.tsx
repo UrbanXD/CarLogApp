@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Text, View} from "react-native";
 import {DEFAULT_SEPARATOR, FONT_SIZES, SIMPLE_HEADER_HEIGHT} from "../../../constants/constants";
-import InputPicker, {InputPickerDataType} from "../../../components/Input/InputPicker/InputPicker";
+import Picker, {InputPickerDataType} from "../../../components/Input/InputPicker/Picker";
 import {SimpleHeaderBar} from "../../../components/Header/HeaderBar";
 import Header from "../../../components/Header/Header";
 import {Avatar} from "react-native-paper";
@@ -10,7 +10,7 @@ import InputPickerItem from "../../../components/Input/InputPicker/InputPickerIt
 import {theme} from "../../../constants/theme";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState, store} from "../../../redux/store";
-import {loadCars} from "../../../redux/reducers/cars.slices";
+import {loadCars, loadSelectedCar, selectCar} from "../../../redux/reducers/cars.slices";
 import {useDatabase} from "../../../db/Database";
 import {createSelector} from "@reduxjs/toolkit";
 
@@ -28,9 +28,16 @@ const CarHeader: React.FC = () => {
     );
 
     const cars = useSelector(selectCarsForCarousel);
-
     const carsIsLoading = useSelector<RootState>(state => state.cars.loading);
-    // console.log(isLoading)
+    const selectedCarIndex = useSelector<RootState, number>(state => state.cars.selectedCarIndex);
+
+    const onCarSelect = (index: number) => {
+        store.dispatch(selectCar(index));
+    }
+
+    useEffect(() => {
+        store.dispatch(loadSelectedCar({}));
+    }, []);
 
     return (
         <Header
@@ -39,13 +46,16 @@ const CarHeader: React.FC = () => {
             <Header.StatusBar
                 backgroundColor={ theme.colors.black2 }
             />
-            <Header.Row>
+            <Header.Row paddingRight={!isDropdownVisible ? undefined : 0}>
                 <View style={{ flex: 1 }}>
                     {
                         !carsIsLoading &&
-                            <InputPicker
-                                onDropdownToggle={ setIsDropdownVisible }
+                            <Picker
                                 data={ cars }
+                                selectedItemIndex={ selectedCarIndex }
+                                isDropdown={ true }
+                                onDropdownToggle={ setIsDropdownVisible }
+                                onSelect={ onCarSelect }
                             />
                     }
                 </View>
