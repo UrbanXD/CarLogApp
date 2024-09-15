@@ -13,7 +13,7 @@ import {KeyboardAwareScrollView} from "react-native-keyboard-controller";
 import RegisterFormContent from "./RegisterFormContent";
 import RegisterFormButtons from "./RegisterFormButtons";
 import {View} from "react-native";
-import InputText from "../../../../components/Input/InputText";
+import InputText from "../../../../components/Input/InputText/InputText";
 
 const RegisterForm: React.FC = () => {
     const { supabaseConnector } = useDatabase();

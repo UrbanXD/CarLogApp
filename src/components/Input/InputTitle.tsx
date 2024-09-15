@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {StyleSheet, Text} from "react-native";
 import {GLOBAL_STYLE, SEPARATOR_SIZES} from "../../constants/constants";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
@@ -10,6 +10,10 @@ interface InputTitleProps {
 }
 
 const InputTitle: React.FC<InputTitleProps> = ({ title, subtitle }) => {
+
+    useEffect(() => {
+        console.log(title, subtitle)
+    }, []);
     return (
         <>
             <Text style={ styles.inputNameText }>

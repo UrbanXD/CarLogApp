@@ -9,7 +9,6 @@ import {useDatabase} from "../../../../db/Database";
 import {StyleSheet, Text, View} from "react-native";
 
 import {GLOBAL_STYLE, ICON_NAMES} from "../../../../constants/constants";
-import InputText from "../../../../components/Input/InputText";
 import Button from "../../../../components/Button/Button";
 import {widthPercentageToDP as wp} from "react-native-responsive-screen";
 import {MultiStepFormProvider, useMultiStepForm} from "../../../providers/MultiStepFormProvider";
@@ -17,6 +16,8 @@ import {NewCarFormProgressInfo, NewCarFormContent, NewCarFormButtons} from "./Ne
 // @ts-ignore
 import Picker, { PickerDataType } from "../../../../components/Input/InputPicker/Picker";
 import InputPicker from "../../../../components/Input/InputPicker/InputPicker";
+import InputText from "../../../../components/Input/InputText/InputText";
+import TextInput from "../../../../components/Input/InputText/TextInput";
 
 interface NewCarFormProps {
     close?: () => void
@@ -50,7 +51,9 @@ const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
         () =>
             <StepTwo />,
         () =>
-            <StepThree />
+            <StepThree />,
+        () =>
+            <StepFour />
     ]
 
     return (
@@ -90,27 +93,13 @@ const StepTwo: React.FC = () => {
     const { control } = useMultiStepForm();
 
     return (
-        <>
-            {/*<InputText*/}
-            {/*    control={ control }*/}
-            {/*    fieldName="brand"*/}
-            {/*    fieldNameText="Márka"*/}
-            {/*    placeholder="Mercedes"*/}
-            {/*    icon={ ICON_NAMES.car }*/}
-            {/*/>*/}
-            <InputPicker
-                data={ [{title: "Merci"}, {title: "Audi"}, {title: "Opel"}] }
-                control={ control }
-                fieldName={"brand"}
-                fieldNameText="Márka"
-            />
-            <InputPicker
-                data={ [{title: "A4"}, {title: "A5"}, {title: "Zafira"}] }
-                control={ control }
-                fieldName={"model"}
-                fieldNameText="Modell"
-            />
-        </>
+        <InputPicker
+            data={ [{title: "Merci"}, {title: "Audi"}, {title: "Audi"}, {title: "Audi"},{title: "Audi"},{title: "Audi"}, {title: "xddi"}, {title: "Audi"}, {title: "Opel"}] }
+            control={ control }
+            fieldName={"brand"}
+            fieldNameText="Márka"
+            // isHorizontal={ false }
+        />
     )
 }
 
@@ -118,29 +107,34 @@ const StepThree: React.FC = () => {
     const { control } = useMultiStepForm();
 
     return (
-        <>
-            <InputText
-                control={ control }
-                fieldName="odometer_value"
-                fieldNameText="Kilometerora alass"
-                placeholder="000.000.000"
-                icon={ ICON_NAMES.odometer }
-            />
-            <InputPicker
-                data={ ODOMETER_MEASUREMENTS }
-                control={ control }
-                fieldName={"odometer_measurement"}
-                fieldNameText="Mertekegyseg"
-            />
-        </>
+        <InputPicker
+            data={ [{title: "A4"}, {title: "A5"}, {title: "Zafira"}] }
+            control={ control }
+            fieldName={"model"}
+            fieldNameText="Modell"
+        />
     )
 }
 
 const StepFour: React.FC = () => {
-    const { control } = useMultiStepForm();
+    const {control} = useMultiStepForm();
 
     return (
         <>
+            <InputText
+                control={control}
+                fieldName="odometer_value"
+                fieldNameText="Kilometerora alass"
+                placeholder="000.000.000"
+                icon={ICON_NAMES.odometer}
+                numeric
+            />
+            <InputPicker
+                data={ODOMETER_MEASUREMENTS}
+                control={control}
+                fieldName={"odometer_measurement"}
+                fieldNameText="Mertekegyseg"
+            />
         </>
     )
 }

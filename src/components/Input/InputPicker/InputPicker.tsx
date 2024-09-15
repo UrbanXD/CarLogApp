@@ -7,6 +7,7 @@ import {SEPARATOR_SIZES} from "../../../constants/constants";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
 import {theme} from "../../../constants/theme";
 import Picker, { PickerDataType } from "./Picker";
+import SearchBar from "../../SearchBar";
 
 export interface InputPickerDataType extends PickerDataType {
     value?: string
@@ -21,6 +22,7 @@ interface InputPickerProps {
     icon?: string
     placeholder?: string
     isInBottomSheet?: boolean
+    isHorizontal?: boolean
 }
 const InputPicker: React.FC<InputPickerProps> = ({
     data,
@@ -30,16 +32,42 @@ const InputPicker: React.FC<InputPickerProps> = ({
     fieldInfoText,
     icon,
     placeholder,
-    isInBottomSheet
+    isInBottomSheet,
+    isHorizontal= true
 }) => {
-    const adjustedData = data.map(item => ({
-        ...item,
-        value: item.value ?? item.title
-    }));
-
+    const [adjustedData, setAdjustedData] = useState<Array<InputPickerDataType>>([] as Array<InputPickerDataType>);
     const [selectedItemIndex, setSelectedItemIndex] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
-    //search bar csak szimpla textInput lesz, legyen just simpe Component search barra
+
+    useEffect(() => {
+        setAdjustedData(
+            data
+            .map(item => ({
+                ...item,
+                value: item.value ?? item.title
+            }))
+        )
+        console.log("xd")
+    }, [data]);
+
+    useEffect(() => {
+        const filteredData =
+            searchTerm.length <= 2
+                ?   data
+                    .map(item => ({
+                        ...item,
+                        value: item.value ?? item.title
+                    }))
+                :   data
+                    .filter(item => item.title.toLowerCase().includes(searchTerm.toLowerCase()))
+                    .map(item => ({
+                        ...item,
+                        value: item.value ?? item.title
+                    }))
+
+        setAdjustedData(filteredData);
+    }, [searchTerm, data]);
+
     return (
         <View style={ styles.inputContainer }>
             {
@@ -55,11 +83,15 @@ const InputPicker: React.FC<InputPickerProps> = ({
                 render={ ({ field: { onChange } }) =>
                     <Picker
                         data={ adjustedData }
+                        setSearchTerm={ (value) => setSearchTerm(value) }
                         selectedItemIndex={ selectedItemIndex }
                         onSelect={ (index: number) => {
                             setSelectedItemIndex(index);
                             onChange(adjustedData[index].value);
                         }}
+                        isDropdown={ !isHorizontal }
+                        isHorizontal={ isHorizontal }
+                        dropDownInfoType={ "input" }
                     />
                 }
             />
@@ -70,7 +102,7 @@ const InputPicker: React.FC<InputPickerProps> = ({
 const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: "column",
-        gap: SEPARATOR_SIZES.lightSmall
+        gap: SEPARATOR_SIZES.lightSmall,
     },
     formFieldContainer: {
         minHeight: hp(6),

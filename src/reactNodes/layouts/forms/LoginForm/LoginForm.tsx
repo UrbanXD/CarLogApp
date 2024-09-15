@@ -4,7 +4,7 @@ import {getLoginHandleSubmit, LoginFormFieldType, loginUseFormProps} from "../..
 import {useDatabase} from "../../../../db/Database";
 import {GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../../../constants/constants";
 import {Text, View} from "react-native";
-import InputText from "../../../../components/Input/InputText";
+import InputText from "../../../../components/Input/InputText/InputText";
 import Button, {FacebookButton, GoogleButton} from "../../../../components/Button/Button";
 import TextDivider from "../../../../components/TextDivider/TextDivider";
 import {theme} from "../../../../constants/theme";

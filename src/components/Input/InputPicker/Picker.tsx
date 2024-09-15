@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {ReactNode, useCallback, useEffect, useRef, useState} from "react";
 import {View, Text, StyleSheet, TouchableOpacity} from "react-native";
 import {Icon, IconButton} from "react-native-paper";
 import {
@@ -11,34 +11,35 @@ import {
 import {theme} from "../../../constants/theme";
 import {FlatList} from "react-native-gesture-handler";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import SearchBar from "../../SearchBar";
+import InputText from "../InputText/InputText";
+import TextInput from "../InputText/TextInput";
 
 export interface PickerDataType {
     title: string
     subtitle?: string
 }
 
-type InputPickerProps = {
+type PickerProps = {
     data: Array<PickerDataType>
     selectedItemIndex: number
     onSelect: (index: number) => void
+    isHorizontal?: boolean
+    setSearchTerm?: (value: string) => void
+    isDropdown?: boolean
+    onDropdownToggle?: (isVisible: boolean) => void
+    dropDownInfoType?: "simple" | "input"
 }
-type InputConditionalProps =
-    |   {
-            isDropdown: true
-            onDropdownToggle?: (isVisible: boolean) => void
-        }
-    |   {
-            isDropdown?: false
-            onDropdownToggle?: never
 
-        }
-
-const Picker: React.FC<InputPickerProps & InputConditionalProps> = ({
+const Picker: React.FC<PickerProps> = ({
     data,
-    isDropdown,
+    isDropdown= false,
     onDropdownToggle,
+    dropDownInfoType= "simple",
+    setSearchTerm,
     onSelect,
     selectedItemIndex,
+    isHorizontal= true
 }) => {
     const flatlistRef = useRef<FlatList>(null)
     const [isDropdownContentVisible, setIsDropdownContentVisible] = useState(!isDropdown);
@@ -47,7 +48,6 @@ const Picker: React.FC<InputPickerProps & InputConditionalProps> = ({
         (index: number) => {
             onSelect(index);
             setIsDropdownContentVisible(!isDropdownContentVisible);
-
         },
         [data, setIsDropdownContentVisible]
     );
@@ -55,7 +55,7 @@ const Picker: React.FC<InputPickerProps & InputConditionalProps> = ({
     useEffect(() => {
         if(onDropdownToggle) onDropdownToggle(isDropdownContentVisible);
 
-        if(isDropdownContentVisible)
+        if(isDropdownContentVisible && data.length >= 1 )
             flatlistRef?.current?.scrollToIndex({
                 index: selectedItemIndex,
                 animated: true,
@@ -63,35 +63,23 @@ const Picker: React.FC<InputPickerProps & InputConditionalProps> = ({
 
     }, [isDropdownContentVisible]);
 
-    const renderDropdownInfo = () =>
-        <TouchableOpacity style={{ alignItems: "center", flexDirection: "row", gap: SEPARATOR_SIZES.lightSmall }} onPress={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }>
-            <Icon source={ ICON_NAMES.car } size={ styles.inputPickerTitleText.fontSize * 2 } color={ theme.colors.white } />
-            <View>
-                <Text style={ styles.inputPickerTitleText } numberOfLines={ 1 } >
-                    { data[selectedItemIndex].title }
-                </Text>
-                <Text style={ styles.inputPickerSubtitleText } numberOfLines={ 1 } >
-                    { data[selectedItemIndex].subtitle }
-                </Text>
-            </View>
-            <IconButton
-                icon={ ICON_NAMES.rightArrowHead }
-                size={ styles.inputPickerTitleText.fontSize * 2 }
-                iconColor={ theme.colors.white }
-                style={ [GET_ICON_BUTTON_RESET_STYLE(styles.inputPickerTitleText.fontSize * 2), { marginLeft: -styles.inputPickerTitleText.fontSize + SEPARATOR_SIZES.lightSmall }] }
-            />
-        </TouchableOpacity>
-
     const renderElements = () =>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: SEPARATOR_SIZES.lightSmall }}>
+        <View style={[styles.elementsContainer, !isHorizontal && { height: styles.inputPickerItemContainer.height * 5 + 5 * SEPARATOR_SIZES.small, flexDirection: "column" }]}>
             {
                 isDropdown &&
                 <IconButton
-                    icon={ICON_NAMES.close}
-                    size={FONT_SIZES.normal}
-                    iconColor={theme.colors.white}
-                    onPress={() => setIsDropdownContentVisible(!isDropdownContentVisible)}
-                    style={GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.normal)}
+                    icon={ ICON_NAMES.close }
+                    size={ FONT_SIZES.normal }
+                    iconColor={ theme.colors.white }
+                    onPress={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
+                    style={ GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.normal) }
+                />
+            }
+            {
+                setSearchTerm &&
+                <SearchBar
+                    onTextChange={ (value) => setSearchTerm(value) }
+                    onClose={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
                 />
             }
             <FlatList
@@ -106,31 +94,121 @@ const Picker: React.FC<InputPickerProps & InputConditionalProps> = ({
                                 selected={ index === selectedItemIndex }
                                 onPress={ () => memoizedSetSelected(index) }
                             />
-                            { index === (data.length - 1) && <View style={{ flex: 1, width: DEFAULT_SEPARATOR }} />}
+                            {
+                                isHorizontal && index === (data.length - 1) &&
+                                <View style={ styles.separator } />
+                            }
                         </View>
                 }
-                keyExtractor={(item, index) => index.toString()}
-                horizontal
+                keyExtractor={(item, index) => item.id || index.toString()}
+                horizontal={ isHorizontal }
                 showsHorizontalScrollIndicator={ false }
-                contentContainerStyle={ [GLOBAL_STYLE.scrollViewContentContainer, {gap: 10}]}
-                onScrollToIndexFailed={(info) => {
-                    setTimeout(() => {
-                        flatlistRef.current?.scrollToIndex({ index: info.index, animated: true });
-                    }, 100);
-                }}
+                contentContainerStyle={ styles.elementsScrollViewContainer }
+                onScrollToIndexFailed={
+                    (info) => {
+                        setTimeout(() => {
+                            flatlistRef.current?.scrollToIndex({ index: info.index, animated: true });
+                        }, 100);
+                    }
+                }
             />
         </View>
 
     return (
         <View style={ styles.container }>
+            <PickerInputDropdownInfo
+                toggleDropdown={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
+                icon={ ICON_NAMES.car }
+                title={ data[selectedItemIndex].title }
+                isHorizontal={ isHorizontal }
+            />
             {
                 isDropdown
                 ?   isDropdownContentVisible
                     ?   renderElements()
-                    :   renderDropdownInfo()
+                    :   dropDownInfoType === "simple"
+                        ?   <PickerSimpleDropdownInfo
+                                toggleDropdown={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
+                                icon={ ICON_NAMES.car }
+                                title={ data[selectedItemIndex].title }
+                                subtitle={ data[selectedItemIndex].subtitle }
+                                isHorizontal={ isHorizontal }
+                            />
+                        :   <PickerInputDropdownInfo
+                                toggleDropdown={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
+                                icon={ ICON_NAMES.car }
+                                title={ data[selectedItemIndex].title }
+                                isHorizontal={ isHorizontal }
+                            />
                 :   renderElements()
             }
         </View>
+    )
+}
+
+interface PickerDropdownInfoProps {
+    toggleDropdown?: () => void
+    icon?: string
+    title: string
+    isHorizontal: boolean
+}
+
+interface PickerSimpleDropdownInfoProps extends PickerDropdownInfoProps{
+    subtitle?: string
+}
+
+const PickerInputDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
+    toggleDropdown,
+    title
+}) => {
+    return (
+        <TouchableOpacity
+    style={{ flex: 1, alignItems: "center", flexDirection: "row", gap: SEPARATOR_SIZES.lightSmall }}
+    onPress={ toggleDropdown }
+        >
+            <TextInput
+                value={ title }
+                isEditable={ false }
+                icon={ ICON_NAMES.car }
+            />
+        </TouchableOpacity>
+    )
+}
+
+const PickerSimpleDropdownInfo: React.FC<PickerSimpleDropdownInfoProps> = ({
+    toggleDropdown,
+    icon,
+    title,
+    subtitle,
+    isHorizontal
+}) => {
+    return (
+        <TouchableOpacity
+            style={{ alignItems: "center", flexDirection: "row", gap: SEPARATOR_SIZES.lightSmall }}
+            onPress={ toggleDropdown }
+        >
+            {
+                icon &&
+                <Icon source={ icon } size={ styles.inputPickerTitleText.fontSize * 2 } color={ theme.colors.white } />
+            }
+            <View>
+                <Text style={ styles.inputPickerTitleText } numberOfLines={ 1 } >
+                    { title }
+                </Text>
+                {
+                    subtitle &&
+                    <Text style={ styles.inputPickerSubtitleText } numberOfLines={ 1 } >
+                        { subtitle }
+                    </Text>
+                }
+            </View>
+            <IconButton
+                icon={ isHorizontal ? ICON_NAMES.rightArrowHead : ICON_NAMES.downArrowHead }
+                size={ styles.inputPickerTitleText.fontSize * 2 }
+                iconColor={ theme.colors.white }
+                style={ [GET_ICON_BUTTON_RESET_STYLE(styles.inputPickerTitleText.fontSize * 2), { marginLeft: -styles.inputPickerTitleText.fontSize + SEPARATOR_SIZES.lightSmall }] }
+            />
+        </TouchableOpacity>
     )
 }
 
@@ -141,7 +219,12 @@ interface PickerItemProps {
     selected: boolean
 }
 
-const PickerItem: React.FC<PickerItemProps> = ({ onPress, title, subtitle, selected }) => {
+const PickerItem: React.FC<PickerItemProps> = ({
+    onPress,
+    title,
+    subtitle,
+    selected
+}) => {
     return (
         <TouchableOpacity onPress={ onPress } style={ [styles.inputPickerItemContainer, selected && styles.inputPickerSelectedItemContainer] }>
             <Text numberOfLines={ 1 } style={ styles.inputPickerTitleText }>
@@ -157,11 +240,26 @@ const PickerItem: React.FC<PickerItemProps> = ({ onPress, title, subtitle, selec
     )
 }
 
-const styles = StyleSheet.create({
+const styles= StyleSheet.create({
     container: {
         flexDirection: "row",
         justifyContent: "flex-start",
         alignItems: "center",
+    },
+    elementsContainer: {
+        flex: 1,
+        flexDirection: "row",
+        // alignItems: "center",
+        gap: SEPARATOR_SIZES.lightSmall,
+        overflow: "hidden"
+    },
+    elementsScrollViewContainer: {
+        ...GLOBAL_STYLE.scrollViewContentContainer,
+        gap: SEPARATOR_SIZES.small
+    },
+    separator: {
+        flex: 1,
+        width: DEFAULT_SEPARATOR
     },
     inputPickerItemContainer: {
         flex: 1,

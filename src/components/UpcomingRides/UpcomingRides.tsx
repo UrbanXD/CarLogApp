@@ -12,7 +12,7 @@ import Date from "./Date";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
 import {theme} from "../../constants/theme";
 import {Divider, IconButton, Portal} from "react-native-paper";
-import InputText from "../Input/InputText";
+import InputText from "../Input/InputText/InputText";
 import {useForm} from "react-hook-form";
 import {EditRideFormFieldType, editRideUseFormProps} from "../../constants/formSchema/editRideForm";
 import {getToday} from "../../utils/getDate";
