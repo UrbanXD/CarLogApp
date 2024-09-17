@@ -16,6 +16,7 @@ import InputText from "../InputText/InputText";
 import TextInput from "../InputText/TextInput";
 
 export interface PickerDataType {
+    id?: number
     title: string
     subtitle?: string
 }
@@ -33,7 +34,7 @@ type PickerProps = {
 
 const Picker: React.FC<PickerProps> = ({
     data,
-    isDropdown= false,
+    isDropdown = false,
     onDropdownToggle,
     dropDownInfoType= "simple",
     setSearchTerm,
@@ -46,6 +47,7 @@ const Picker: React.FC<PickerProps> = ({
 
     const memoizedSetSelected = useCallback(
         (index: number) => {
+            console.log("index: kivalasztva: ", index);
             onSelect(index);
             setIsDropdownContentVisible(!isDropdownContentVisible);
         },
@@ -66,13 +68,13 @@ const Picker: React.FC<PickerProps> = ({
     const renderElements = () =>
         <View style={[styles.elementsContainer, !isHorizontal && { height: styles.inputPickerItemContainer.height * 5 + 5 * SEPARATOR_SIZES.small, flexDirection: "column" }]}>
             {
-                isDropdown &&
+                !setSearchTerm && isDropdown &&
                 <IconButton
                     icon={ ICON_NAMES.close }
                     size={ FONT_SIZES.normal }
                     iconColor={ theme.colors.white }
                     onPress={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
-                    style={ GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.normal) }
+                    style={ [GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.normal), { alignSelf: "center" }] }
                 />
             }
             {
@@ -91,8 +93,8 @@ const Picker: React.FC<PickerProps> = ({
                             <PickerItem
                                 title={ item.title }
                                 subtitle={ item.subtitle }
-                                selected={ index === selectedItemIndex }
-                                onPress={ () => memoizedSetSelected(index) }
+                                selected={ item.id === selectedItemIndex }
+                                onPress={ () => memoizedSetSelected(item.id || index ) }
                             />
                             {
                                 isHorizontal && index === (data.length - 1) &&
@@ -113,15 +115,8 @@ const Picker: React.FC<PickerProps> = ({
                 }
             />
         </View>
-
     return (
         <View style={ styles.container }>
-            <PickerInputDropdownInfo
-                toggleDropdown={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
-                icon={ ICON_NAMES.car }
-                title={ data[selectedItemIndex].title }
-                isHorizontal={ isHorizontal }
-            />
             {
                 isDropdown
                 ?   isDropdownContentVisible
@@ -159,18 +154,24 @@ interface PickerSimpleDropdownInfoProps extends PickerDropdownInfoProps{
 
 const PickerInputDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
     toggleDropdown,
-    title
+    icon,
+    title,
+    isHorizontal
 }) => {
     return (
         <TouchableOpacity
-    style={{ flex: 1, alignItems: "center", flexDirection: "row", gap: SEPARATOR_SIZES.lightSmall }}
+    style={{ alignItems: "center", flexDirection: "row", gap: SEPARATOR_SIZES.lightSmall }}
     onPress={ toggleDropdown }
         >
-            <TextInput
-                value={ title }
-                isEditable={ false }
-                icon={ ICON_NAMES.car }
-            />
+            <View style={ GLOBAL_STYLE.formContainer }>
+                <TextInput
+                    value={ title }
+                    isEditable={ false }
+                    icon={ icon }
+                    actionIcon={ isHorizontal ? ICON_NAMES.rightArrowHead : ICON_NAMES.downArrowHead }
+                    isPickerHeader
+                />
+            </View>
         </TouchableOpacity>
     )
 }

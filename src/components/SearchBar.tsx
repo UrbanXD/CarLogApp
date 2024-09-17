@@ -1,7 +1,6 @@
 import React, {useState} from "react";
-import {TextInput} from "react-native";
-import InputText from "./Input/InputText/InputText";
 import {ICON_NAMES} from "../constants/constants";
+import TextInput from "./Input/InputText/TextInput";
 
 interface SearchBarProps {
     onTextChange: (value: any) => void
@@ -12,14 +11,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ onTextChange, onClose }) => {
     const [value, setValue] = useState("")
 
     return (
-        <InputText
+        <TextInput
             value={ value }
             setValue={(text: string) => {
                 setValue(text)
                 onTextChange(text)
             }}
-            iconButton={ onClose && ICON_NAMES.close }
-            onIconButton={ onClose }
+            actionIcon={ ICON_NAMES.close }
+            onAction={ onClose }
             icon={ ICON_NAMES.search }
         />
     )

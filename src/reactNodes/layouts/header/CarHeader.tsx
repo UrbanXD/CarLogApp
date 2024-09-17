@@ -1,12 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {Text, View} from "react-native";
 import {DEFAULT_SEPARATOR, FONT_SIZES, SIMPLE_HEADER_HEIGHT} from "../../../constants/constants";
-import Picker, {InputPickerDataType} from "../../../components/Input/InputPicker/Picker";
+import Picker from "../../../components/Input/InputPicker/Picker";
 import {SimpleHeaderBar} from "../../../components/Header/HeaderBar";
 import Header from "../../../components/Header/Header";
 import {Avatar} from "react-native-paper";
-import {Input} from "@rneui/themed";
-import InputPickerItem from "../../../components/Input/InputPicker/InputPickerItem";
 import {theme} from "../../../constants/theme";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState, store} from "../../../redux/store";
@@ -50,13 +48,13 @@ const CarHeader: React.FC = () => {
                 <View style={{ flex: 1 }}>
                     {
                         !carsIsLoading &&
-                            <Picker
-                                data={ cars }
-                                selectedItemIndex={ selectedCarIndex }
-                                isDropdown={ true }
-                                onDropdownToggle={ setIsDropdownVisible }
-                                onSelect={ onCarSelect }
-                            />
+                        <Picker
+                            data={ cars }
+                            selectedItemIndex={ selectedCarIndex }
+                            isDropdown={ true }
+                            onDropdownToggle={ setIsDropdownVisible }
+                            onSelect={ onCarSelect }
+                        />
                     }
                 </View>
                 {

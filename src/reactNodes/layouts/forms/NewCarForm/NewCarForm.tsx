@@ -94,11 +94,11 @@ const StepTwo: React.FC = () => {
 
     return (
         <InputPicker
-            data={ [{title: "Merci"}, {title: "Audi"}, {title: "Audi"}, {title: "Audi"},{title: "Audi"},{title: "Audi"}, {title: "xddi"}, {title: "Audi"}, {title: "Opel"}] }
+            data={ [{title: "Merci"}, {title: "Merci"}, {title: "Merci"}, {title: "Merci"}, {title: "Audi"}, {title: "Audi"}, {title: "Audi"},{title: "Audi"},{title: "Audi"}, {title: "xddi"}, {title: "Audi"}, {title: "Opel"}] }
             control={ control }
             fieldName={"brand"}
             fieldNameText="Márka"
-            // isHorizontal={ false }
+            isHorizontal={ false }
         />
     )
 }

@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {StyleSheet, Text, View, TextInput as TextInputRN} from "react-native";
+import {StyleSheet, Text, View, TextInput as TextInputRN, StyleProp, ViewStyle} from "react-native";
 import {Icon, IconButton} from "react-native-paper";
 import {heightPercentageToDP as hp, heightPercentageToDP} from "react-native-responsive-screen";
 import {ICON_COLORS, ICON_NAMES, SEPARATOR_SIZES} from "../../../constants/constants";
@@ -9,22 +9,28 @@ interface TextInputProps {
     value?: string
     setValue?: (text: string) => void
     icon?: string
+    actionIcon?: string
+    onAction?: () => void
     placeholder?: string
     error?: string
     numeric?: boolean
     isSecure?: boolean
     isEditable?: boolean
+    isPickerHeader?: boolean
 }
 
 const TextInput: React.FC<TextInputProps> = ({
     value,
     setValue,
     icon,
+    actionIcon,
+    onAction,
     placeholder,
     error,
     numeric,
     isSecure,
-    isEditable
+    isEditable = true,
+    isPickerHeader
 }) => {
     const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(isSecure);
@@ -35,11 +41,15 @@ const TextInput: React.FC<TextInputProps> = ({
 
     return (
         <>
-            <View style={ [isEditable && styles.formFieldContainer, focused && isEditable && styles.activeFormFieldContainer] }>
+            <View style={ [(isEditable || isPickerHeader) && styles.formFieldContainer, focused && isEditable && styles.activeFormFieldContainer] }>
                 {
                     icon &&
                     <View style={ styles.formFieldIconContainer }>
-                        <Icon source={ icon } size={ heightPercentageToDP(4.5) } color={ styles.textInput.color } />
+                        <Icon
+                            source={ icon }
+                            size={ hp(4.5) }
+                            color={ styles.textInput.color }
+                        />
                     </View>
                 }
                 <TextInputRN
@@ -54,17 +64,29 @@ const TextInput: React.FC<TextInputProps> = ({
                     onFocus={ onFocus }
                     editable={ isEditable }
                 />
-                <View style={ styles.formFieldIconContainer }>
-                    {
-                        isSecure &&
+                {
+                    isSecure &&
+                    <View style={ styles.formFieldIconContainer }>
                         <IconButton
                             icon={ secure ? ICON_NAMES.eyeOff : ICON_NAMES.eye }
                             size={ hp(3.25) }
                             iconColor={ ICON_COLORS.default }
                             onPress={ changeSecure }
                         />
-                    }
-                </View>
+                    </View>
+                }
+                {
+                    actionIcon &&
+                    <View style={ styles.formFieldIconContainer }>
+                        <IconButton
+                            icon={ actionIcon }
+                            size={ hp(4.5) }
+                            iconColor={ ICON_COLORS.default }
+                            style={{ alignSelf: "center" }}
+                            onPress={ onAction }
+                        />
+                    </View>
+                }
             </View>
             {
                 error &&
@@ -93,7 +115,7 @@ const styles = StyleSheet.create({
         borderColor: theme.colors.gray1
     },
     formFieldIconContainer: {
-        flex: 0.2,
+        flex: 0.25,
         alignItems: "center",
     },
     textInput: {

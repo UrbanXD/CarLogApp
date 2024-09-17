@@ -38,29 +38,34 @@ const InputPicker: React.FC<InputPickerProps> = ({
     const [adjustedData, setAdjustedData] = useState<Array<InputPickerDataType>>([] as Array<InputPickerDataType>);
     const [selectedItemIndex, setSelectedItemIndex] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
+    const [isDataAdjusted, setIsDataAdjusted] = useState(false);
 
     useEffect(() => {
         setAdjustedData(
             data
-            .map(item => ({
+            .map((item, index) => ({
                 ...item,
+                id: index,
                 value: item.value ?? item.title
             }))
         )
-        console.log("xd")
     }, [data]);
+
+    useEffect(() => {
+        setIsDataAdjusted(true);
+    }, [adjustedData]);
 
     useEffect(() => {
         const filteredData =
             searchTerm.length <= 2
                 ?   data
-                    .map(item => ({
+                    .map((item, index) => ({
                         ...item,
                         value: item.value ?? item.title
                     }))
                 :   data
                     .filter(item => item.title.toLowerCase().includes(searchTerm.toLowerCase()))
-                    .map(item => ({
+                    .map((item, index) => ({
                         ...item,
                         value: item.value ?? item.title
                     }))
@@ -81,18 +86,20 @@ const InputPicker: React.FC<InputPickerProps> = ({
                 control={ control }
                 name={ fieldName }
                 render={ ({ field: { onChange } }) =>
-                    <Picker
-                        data={ adjustedData }
-                        setSearchTerm={ (value) => setSearchTerm(value) }
-                        selectedItemIndex={ selectedItemIndex }
-                        onSelect={ (index: number) => {
-                            setSelectedItemIndex(index);
-                            onChange(adjustedData[index].value);
-                        }}
-                        isDropdown={ !isHorizontal }
-                        isHorizontal={ isHorizontal }
-                        dropDownInfoType={ "input" }
-                    />
+                    isDataAdjusted
+                    ?   <Picker
+                            data={ adjustedData }
+                            setSearchTerm={ (value) => setSearchTerm(value) }
+                            selectedItemIndex={ selectedItemIndex }
+                            onSelect={ (index: number) => {
+                                setSelectedItemIndex(index);
+                                onChange(adjustedData[index].value);
+                            }}
+                            isDropdown={ !isHorizontal }
+                            isHorizontal={ isHorizontal }
+                            dropDownInfoType={ "input" }
+                        />
+                    :   <></>
                 }
             />
         </View>

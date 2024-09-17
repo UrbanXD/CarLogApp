@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {StyleSheet, Text} from "react-native";
+import {StyleSheet, Text, View} from "react-native";
 import {GLOBAL_STYLE, SEPARATOR_SIZES} from "../../constants/constants";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
 import {theme} from "../../constants/theme";
@@ -10,12 +10,8 @@ interface InputTitleProps {
 }
 
 const InputTitle: React.FC<InputTitleProps> = ({ title, subtitle }) => {
-
-    useEffect(() => {
-        console.log(title, subtitle)
-    }, []);
     return (
-        <>
+        <View>
             <Text style={ styles.inputNameText }>
                 { title }
             </Text>
@@ -25,7 +21,7 @@ const InputTitle: React.FC<InputTitleProps> = ({ title, subtitle }) => {
                     { subtitle }
                 </Text>
             }
-        </>
+        </View>
     )
 }
 

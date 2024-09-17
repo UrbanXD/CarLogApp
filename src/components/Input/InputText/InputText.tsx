@@ -19,11 +19,11 @@ import InputTitle from "../InputTitle";
 import TextInput from "./TextInput";
 
 interface InputTextProps {
+    control: Control<any>
+    fieldName: string
     fieldNameText?: string
     fieldInfoText?: string
     icon?: string
-    iconButton?: string
-    onIconButton?: () => void
     placeholder?: string
     numeric?: boolean
     isSecure?: boolean
@@ -33,30 +33,12 @@ interface InputTextProps {
     isInBottomSheet?: boolean
 }
 
-type ConditionalInputTextProps =
-    |   {
-            control: Control<any>
-            fieldName: string
-            value?: never
-            setValue?: never
-        }
-    |   {
-            control?: never
-            fieldName?: never
-            value: string
-            setValue?: (text: string) => void
-        }
-
-const InputText: React.FC<InputTextProps & ConditionalInputTextProps> = ({
+const InputText: React.FC<InputTextProps> = ({
     control,
     fieldName,
-    value,
-    setValue,
     fieldNameText,
     fieldInfoText,
     icon,
-    iconButton,
-    onIconButton,
     placeholder = "",
     numeric = false,
     isSecure= false,
@@ -96,33 +78,22 @@ const InputText: React.FC<InputTextProps & ConditionalInputTextProps> = ({
                 />
             }
             {
-                control && fieldName
-                ?   <Controller
-                        control={ control }
-                        name={ fieldName }
-                        render={({ field: { value, onChange }, fieldState: { error }})=>
-                            <TextInput
-                                value={ value }
-                                setValue={ onChange }
-                                icon={ icon }
-                                placeholder={ placeholder }
-                                error={ error?.message }
-                                numeric={ numeric }
-                                isSecure={ isSecure }
-                                isEditable={ isEditable }
-                            />
-                        }
-                    />
-                :   <TextInput
-                        value={ value }
-                        setValue={ setValue }
-                        icon={ icon }
-                        placeholder={ placeholder }
-                        numeric={ numeric }
-                        isSecure={ isSecure }
-                        isEditable={ isEditable }
-                    />
-
+                <Controller
+                    control={ control }
+                    name={ fieldName }
+                    render={({ field: { value, onChange }, fieldState: { error }})=>
+                        <TextInput
+                            value={ value }
+                            setValue={ onChange }
+                            icon={ icon }
+                            placeholder={ placeholder }
+                            error={ error?.message }
+                            numeric={ numeric }
+                            isSecure={ isSecure }
+                            isEditable={ isEditable }
+                        />
+                    }
+                />
             }
         </View>
     )
