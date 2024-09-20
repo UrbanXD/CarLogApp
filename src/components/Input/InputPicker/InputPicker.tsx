@@ -23,6 +23,7 @@ interface InputPickerProps {
     placeholder?: string
     isInBottomSheet?: boolean
     isHorizontal?: boolean
+    withSearchbar?: boolean
 }
 const InputPicker: React.FC<InputPickerProps> = ({
     data,
@@ -33,44 +34,38 @@ const InputPicker: React.FC<InputPickerProps> = ({
     icon,
     placeholder,
     isInBottomSheet,
-    isHorizontal= true
+    isHorizontal= false,
+    withSearchbar = false
 }) => {
     const [adjustedData, setAdjustedData] = useState<Array<InputPickerDataType>>([] as Array<InputPickerDataType>);
-    const [selectedItemIndex, setSelectedItemIndex] = useState(0);
+    const [selectedItemID, setSelectedItemID] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [isDataAdjusted, setIsDataAdjusted] = useState(false);
-
-    useEffect(() => {
-        setAdjustedData(
-            data
-            .map((item, index) => ({
-                ...item,
-                id: index,
-                value: item.value ?? item.title
-            }))
-        )
-    }, [data]);
+    const [previousShortTerm, setPreviousShortTerm] = useState(false);
 
     useEffect(() => {
         setIsDataAdjusted(true);
     }, [adjustedData]);
 
     useEffect(() => {
-        const filteredData =
-            searchTerm.length <= 2
-                ?   data
-                    .map((item, index) => ({
-                        ...item,
-                        value: item.value ?? item.title
-                    }))
-                :   data
-                    .filter(item => item.title.toLowerCase().includes(searchTerm.toLowerCase()))
-                    .map((item, index) => ({
-                        ...item,
-                        value: item.value ?? item.title
-                    }))
+        const updatedData = data.map((item, index) => ({
+            ...item,
+            id: item.id ?? index.toString(),
+            value: item.value ?? item.title
+        }));
 
-        setAdjustedData(filteredData);
+        if (searchTerm.length <= 2) {
+            if (!previousShortTerm) {
+                setAdjustedData(updatedData);
+                setPreviousShortTerm(true);
+            }
+        } else {
+            const filteredData =
+                updatedData.filter(item => item.title.toLowerCase().includes(searchTerm.toLowerCase()));
+            setAdjustedData(filteredData);
+
+            if(previousShortTerm) setPreviousShortTerm(false);
+        }
     }, [searchTerm, data]);
 
     return (
@@ -85,16 +80,20 @@ const InputPicker: React.FC<InputPickerProps> = ({
             <Controller
                 control={ control }
                 name={ fieldName }
-                render={ ({ field: { onChange } }) =>
+                render={ ({ field: { onChange }, fieldState: { error } }) =>
                     isDataAdjusted
                     ?   <Picker
                             data={ adjustedData }
-                            setSearchTerm={ (value) => setSearchTerm(value) }
-                            selectedItemIndex={ selectedItemIndex }
-                            onSelect={ (index: number) => {
-                                setSelectedItemIndex(index);
-                                onChange(adjustedData[index].value);
-                            }}
+                            error = { error?.message }
+                            searchTerm={ searchTerm }
+                            setSearchTerm={ withSearchbar ? ((value) => setSearchTerm(value)) : undefined }
+                            selectedItemID={ selectedItemID }
+                            onSelect={
+                                (id: string) => {
+                                    setSelectedItemID(id);
+                                    onChange(adjustedData.find(item => item.id === id)?.value?.toString());
+                                }
+                            }
                             isDropdown={ !isHorizontal }
                             isHorizontal={ isHorizontal }
                             dropDownInfoType={ "input" }

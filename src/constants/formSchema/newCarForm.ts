@@ -8,9 +8,13 @@ import {PickerDataType} from "../../components/Input/InputPicker/Picker";
 import {InputPickerDataType} from "../../components/Input/InputPicker/InputPicker";
 
 export const newCarFormStepsField = [["name"], ["brand"], ["model"], ["odometer_value", "odometer_measurement"], ["fuel_type", "fuel_measurement", "fuel_tank_size"]];
-export const newCarFormStepsTitle = ["Elnevezés", "Gya'rto", "Model", "Autó adatok", "Autó adatok"];
+export const newCarFormStepsTitle = ["Elnevezés", "Gyártó", "Model", "Autó adatok", "Autó adatok"];
 
-export const ODOMETER_MEASUREMENTS: Array<InputPickerDataType> = [{title: "Kilóméter"}, {title: "Mérföld"}];
+export const ODOMETER_MEASUREMENTS: Array<InputPickerDataType> = [
+    { title: "Kilóméter (KM)", value: "km" },
+    { title: "Mérföld (M)", value: "mile" }
+];
+
 export const FUEL_TYPES: Array<InputPickerDataType> = [
     { title: "Dízel" },
     { title: "Benzin" },
@@ -37,11 +41,15 @@ const zNumber = z
         message: "Expected number, received string",
     });
 
+const zPickerRequired = z
+    .string()
+    .min(1, "Válasszon ki egy elemet!")
+
 export const newCarFormSchema = z
     .object({
         name: z.string().min(2, "2 karakter legyen min").max(20, "20 karakter legyen max"),
-        brand: z.string(),
-        model: z.string(),
+        brand: zPickerRequired,
+        model: zPickerRequired,
         odometer_measurement: z.string(),
         odometer_value: zNumber,
         fuel_type: z.string(),

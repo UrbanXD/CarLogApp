@@ -68,7 +68,7 @@ const FirstScreen: React.FC = () => {
                 { bottomSheetContent }
             </CustomBottomSheet>
             <ImageBackground
-                source={ require("../../assets/home2.jpg") }
+                source={ require("../../assets/images/home2.jpg") }
                 style={ styles.imageContainer }
                 imageStyle={ styles.imageContainer }
             >

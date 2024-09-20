@@ -62,7 +62,6 @@ const RegisterStepOne: React.FC = () => {
 
     return (
         <InputText
-            key={ 1 }
             isInBottomSheet={true}
             control={ control }
             fieldName="email"
@@ -79,22 +78,22 @@ const RegisterStepTwo: React.FC = () => {
     return (
         <>
             <InputText
-                key={ 2 }
+                key={ 1 }
                 control={ control }
                 fieldName="lastname"
                 fieldNameText="Vezetéknév"
                 icon={ ICON_NAMES.user }
                 placeholder="Kovács"
-                isInBottomSheet={true}
+                isInBottomSheet
             />
             <InputText
-                key={ 3 }
+                key={ 2 }
                 control={ control }
                 fieldName="firstname"
                 fieldNameText="Keresztnév"
                 icon={ ICON_NAMES.user }
                 placeholder="János"
-                isInBottomSheet={true}
+                isInBottomSheet
             />
         </>
     )
@@ -106,25 +105,23 @@ const RegisterStepThree: React.FC = () => {
     return (
         <>
             <InputText
-                key={ 4 }
                 control={ control }
                 fieldName="password"
                 fieldNameText="Jelszó"
                 icon={ ICON_NAMES.password }
-                placeholder={"*****"}
-                isSecure={ true }
-                isInBottomSheet={true}
+                placeholder="*****"
+                isSecure
+                isInBottomSheet
 
             />
             <InputText
-                key={ 5 }
                 control={ control }
                 fieldName="rpassword"
                 fieldNameText="Jelszó újra"
                 icon={ ICON_NAMES.password }
                 placeholder="*****"
-                isSecure={ true }
-                isInBottomSheet={true}
+                isSecure
+                isInBottomSheet
 
             />
         </>

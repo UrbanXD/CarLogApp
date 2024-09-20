@@ -8,7 +8,7 @@ import {
 import {useDatabase} from "../../../../db/Database";
 import {StyleSheet, Text, View} from "react-native";
 
-import {GLOBAL_STYLE, ICON_NAMES} from "../../../../constants/constants";
+import {GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../../../constants/constants";
 import Button from "../../../../components/Button/Button";
 import {widthPercentageToDP as wp} from "react-native-responsive-screen";
 import {MultiStepFormProvider, useMultiStepForm} from "../../../providers/MultiStepFormProvider";
@@ -96,9 +96,9 @@ const StepTwo: React.FC = () => {
         <InputPicker
             data={ [{title: "Merci"}, {title: "Merci"}, {title: "Merci"}, {title: "Merci"}, {title: "Audi"}, {title: "Audi"}, {title: "Audi"},{title: "Audi"},{title: "Audi"}, {title: "xddi"}, {title: "Audi"}, {title: "Opel"}] }
             control={ control }
-            fieldName={"brand"}
+            fieldName="brand"
             fieldNameText="Márka"
-            isHorizontal={ false }
+            withSearchbar
         />
     )
 }
@@ -112,6 +112,7 @@ const StepThree: React.FC = () => {
             control={ control }
             fieldName={"model"}
             fieldNameText="Modell"
+            isHorizontal
         />
     )
 }
@@ -122,7 +123,7 @@ const StepFour: React.FC = () => {
     return (
         <>
             <InputText
-                control={control}
+                control={ control }
                 fieldName="odometer_value"
                 fieldNameText="Kilometerora alass"
                 placeholder="000.000.000"
@@ -130,10 +131,11 @@ const StepFour: React.FC = () => {
                 numeric
             />
             <InputPicker
-                data={ODOMETER_MEASUREMENTS}
-                control={control}
+                data={ ODOMETER_MEASUREMENTS }
+                control={ control }
                 fieldName={"odometer_measurement"}
                 fieldNameText="Mertekegyseg"
+                isHorizontal
             />
         </>
     )

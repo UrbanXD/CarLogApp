@@ -52,7 +52,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({ index, size, x, isFocused, 
                     !isFocused && <View style={styles.overlay} />
                 }
                 <ImageBackground
-                    source={ item.image || require("../../assets/car1.jpg") }
+                    source={ item.image || require("../../assets/images/car1.jpg") }
                     style={ styles.itemContentContainer }
                     imageStyle={ styles.itemImage }
                 >

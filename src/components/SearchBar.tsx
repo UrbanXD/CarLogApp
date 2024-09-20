@@ -4,11 +4,12 @@ import TextInput from "./Input/InputText/TextInput";
 
 interface SearchBarProps {
     onTextChange: (value: any) => void
+    term?: string
     onClose?: () => void
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onTextChange, onClose }) => {
-    const [value, setValue] = useState("")
+const SearchBar: React.FC<SearchBarProps> = ({ onTextChange, term= "", onClose }) => {
+    const [value, setValue] = useState(term)
 
     return (
         <TextInput

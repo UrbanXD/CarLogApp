@@ -153,7 +153,7 @@ export const GoogleButton: React.FC<CustomButtonProps> = ({ onPress }) => {
         <Button
             onPress={ onPress }
             title="Folytatás Google fiókkal"
-            iconLeft={ require("../../assets/google_logo.png") }
+            iconLeft={ require("../../assets/images/google_logo.png") }
             inverse
             backgroundColor={ theme.colors.white }
             textColor={ theme.colors.googleRed }
@@ -167,7 +167,7 @@ export const FacebookButton: React.FC<CustomButtonProps> = ({ onPress }) => {
         <Button
             onPress={ onPress }
             title="Folytatás Facebook fiókkal"
-            iconLeft={ require("../../assets/facebook_logo.png") }
+            iconLeft={ require("../../assets/images/facebook_logo.png") }
             backgroundColor={ theme.colors.facebookBlue }
             textColor={ theme.colors.white }
             fontSize={ hp(2.35) }

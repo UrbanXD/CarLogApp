@@ -19,7 +19,7 @@ const CarHeader: React.FC = () => {
     const selectCarsForCarousel = createSelector(
         [selectCarsState],
         (cars) => cars.map((car, index) => ({
-            id: index,
+            id: car.id,
             title: car.name,
             subtitle: `${ car.brand }, ${ car.model }`,
         }))
@@ -27,10 +27,10 @@ const CarHeader: React.FC = () => {
 
     const cars = useSelector(selectCarsForCarousel);
     const carsIsLoading = useSelector<RootState>(state => state.cars.loading);
-    const selectedCarIndex = useSelector<RootState, number>(state => state.cars.selectedCarIndex);
+    const selectedCarID = useSelector<RootState, string>(state => state.cars.selectedCarID);
 
-    const onCarSelect = (index: number) => {
-        store.dispatch(selectCar(index));
+    const onCarSelect = (id: string) => {
+        store.dispatch(selectCar(id));
     }
 
     useEffect(() => {
@@ -50,10 +50,11 @@ const CarHeader: React.FC = () => {
                         !carsIsLoading &&
                         <Picker
                             data={ cars }
-                            selectedItemIndex={ selectedCarIndex }
+                            selectedItemID={ selectedCarID }
                             isDropdown={ true }
                             onDropdownToggle={ setIsDropdownVisible }
                             onSelect={ onCarSelect }
+                            placeholder={ "Válasszon autót" }
                         />
                     }
                 </View>
