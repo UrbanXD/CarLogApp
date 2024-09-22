@@ -1,0 +1,5532 @@
+[
+  {
+    "brand": "Abarth",
+    "image": "",
+    "models": [
+      {
+        "name": "500",
+        "startYear": "2008",
+        "endYear": ""
+      },
+      {
+        "name": "595",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "600",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "695",
+        "startYear": "2009",
+        "endYear": ""
+      },
+      {
+        "name": "Fastback",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "Pulse",
+        "startYear": "2022",
+        "endYear": ""
+      },
+      {
+        "name": "1000",
+        "startYear": "1961",
+        "endYear": "1967"
+      },
+      {
+        "name": "103 GT",
+        "startYear": "1953",
+        "endYear": "1953"
+      },
+      {
+        "name": "124 Spider",
+        "startYear": "2016",
+        "endYear": "2020"
+      },
+      {
+        "name": "205",
+        "startYear": "1950",
+        "endYear": "1951"
+      },
+      {
+        "name": "2200",
+        "startYear": "1959",
+        "endYear": "1962"
+      },
+      {
+        "name": "750",
+        "startYear": "1955",
+        "endYear": "1966"
+      },
+      {
+        "name": "850",
+        "startYear": "1958",
+        "endYear": "1960"
+      },
+      {
+        "name": "Nuova 500",
+        "startYear": "1957",
+        "endYear": "1975"
+      },
+      {
+        "name": "Punto",
+        "startYear": "2001",
+        "endYear": "2018"
+      },
+      {
+        "name": "Ritmo",
+        "startYear": "1982",
+        "endYear": "1988"
+      },
+      {
+        "name": "Scorpione",
+        "startYear": "1968",
+        "endYear": "1971"
+      },
+      {
+        "name": "Simca 1300",
+        "startYear": "1961",
+        "endYear": "1965"
+      },
+      {
+        "name": "Simca 2000",
+        "startYear": "1963",
+        "endYear": "1964"
+      }
+    ]
+  },
+  {
+    "brand": "AC Cars",
+    "image": "",
+    "models": [
+      {
+        "name": "Cobra GT",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "2 Litre",
+        "startYear": "1947",
+        "endYear": "1955"
+      },
+      {
+        "name": "3000ME",
+        "startYear": "1973",
+        "endYear": "1985"
+      },
+      {
+        "name": "378 GT Zagato",
+        "startYear": "2012",
+        "endYear": "2014"
+      },
+      {
+        "name": "Ace",
+        "startYear": "1953",
+        "endYear": "2001"
+      },
+      {
+        "name": "Aceca",
+        "startYear": "1954",
+        "endYear": "2001"
+      },
+      {
+        "name": "Cobra",
+        "startYear": "1962",
+        "endYear": "2018"
+      },
+      {
+        "name": "Frua",
+        "startYear": "1967",
+        "endYear": "1973"
+      },
+      {
+        "name": "Greyhound",
+        "startYear": "1959",
+        "endYear": "1963"
+      },
+      {
+        "name": "Petite",
+        "startYear": "1952",
+        "endYear": "1957"
+      },
+      {
+        "name": "Six",
+        "startYear": "1930",
+        "endYear": "1939"
+      }
+    ]
+  },
+  {
+    "brand": "Acura",
+    "image": "",
+    "models": [
+      {
+        "name": "Concept",
+        "startYear": "2009",
+        "endYear": "2024"
+      },
+      {
+        "name": "Integra",
+        "startYear": "1985",
+        "endYear": ""
+      },
+      {
+        "name": "MDX",
+        "startYear": "2001",
+        "endYear": ""
+      },
+      {
+        "name": "RDX",
+        "startYear": "2007",
+        "endYear": ""
+      },
+      {
+        "name": "TLX",
+        "startYear": "2015",
+        "endYear": ""
+      },
+      {
+        "name": "ZDX",
+        "startYear": "2010",
+        "endYear": ""
+      },
+      {
+        "name": "CDX",
+        "startYear": "2016",
+        "endYear": "2022"
+      },
+      {
+        "name": "CL",
+        "startYear": "1997",
+        "endYear": "2003"
+      },
+      {
+        "name": "CSX",
+        "startYear": "2006",
+        "endYear": "2011"
+      },
+      {
+        "name": "EL",
+        "startYear": "1997",
+        "endYear": "2005"
+      },
+      {
+        "name": "ILX",
+        "startYear": "2013",
+        "endYear": "2022"
+      },
+      {
+        "name": "Legend",
+        "startYear": "1986",
+        "endYear": "1955"
+      },
+      {
+        "name": "NSX",
+        "startYear": "1991",
+        "endYear": "2022"
+      },
+      {
+        "name": "RL",
+        "startYear": "1996",
+        "endYear": "2012"
+      },
+      {
+        "name": "RLX",
+        "startYear": "2014",
+        "endYear": "2020"
+      },
+      {
+        "name": "RSX",
+        "startYear": "2002",
+        "endYear": "2006"
+      },
+      {
+        "name": "SLX",
+        "startYear": "1996",
+        "endYear": "1999"
+      },
+      {
+        "name": "TL",
+        "startYear": "1996",
+        "endYear": "2014"
+      },
+      {
+        "name": "TSX",
+        "startYear": "2004",
+        "endYear": "2014"
+      },
+      {
+        "name": "Vigor",
+        "startYear": "1992",
+        "endYear": "1994"
+      },
+      {
+        "name": "",
+        "startYear": "20",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Alfa Romeo",
+    "image": "",
+    "models": [
+      {
+        "name": "33 Stradale",
+        "startYear": "1967",
+        "endYear": ""
+      },
+      {
+        "name": "Giulia",
+        "startYear": "1962",
+        "endYear": ""
+      },
+      {
+        "name": "Giulia (NA)",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "Junior",
+        "startYear": "2014",
+        "endYear": ""
+      },
+      {
+        "name": "Stelvio",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "Stelvio (NA)",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "Tonale",
+        "startYear": "2022",
+        "endYear": ""
+      },
+      {
+        "name": "Tonale (NA)",
+        "startYear": "2023",
+        "endYear": ""
+      },
+      {
+        "name": "145",
+        "startYear": "1994",
+        "endYear": "2001"
+      },
+      {
+        "name": "146",
+        "startYear": "1995",
+        "endYear": "2000"
+      },
+      {
+        "name": "147",
+        "startYear": "2001",
+        "endYear": "2010"
+      },
+      {
+        "name": "155",
+        "startYear": "1998",
+        "endYear": "2007"
+      },
+      {
+        "name": "156",
+        "startYear": "1998",
+        "endYear": "2007"
+      },
+      {
+        "name": "159",
+        "startYear": "2005",
+        "endYear": "2012"
+      },
+      {
+        "name": "164",
+        "startYear": "1987",
+        "endYear": "1998"
+      },
+      {
+        "name": "166",
+        "startYear": "1998",
+        "endYear": "2007"
+      },
+      {
+        "name": "1750-2000",
+        "startYear": "1968",
+        "endYear": "1977"
+      },
+      {
+        "name": "1900",
+        "startYear": "1950",
+        "endYear": "1959"
+      },
+      {
+        "name": "1900 M",
+        "startYear": "1951",
+        "endYear": "1955"
+      },
+      {
+        "name": "2000",
+        "startYear": "1958",
+        "endYear": "1962"
+      },
+      {
+        "name": "2000 Sportiva",
+        "startYear": "1954",
+        "endYear": "1954"
+      },
+      {
+        "name": "2300",
+        "startYear": "1974",
+        "endYear": "1986"
+      },
+      {
+        "name": "2600",
+        "startYear": "1961",
+        "endYear": "1969"
+      },
+      {
+        "name": "33",
+        "startYear": "1983",
+        "endYear": "1995"
+      },
+      {
+        "name": "4C",
+        "startYear": "2013",
+        "endYear": "2020"
+      },
+      {
+        "name": "6C",
+        "startYear": "1925",
+        "endYear": "1954"
+      },
+      {
+        "name": "75",
+        "startYear": "1985",
+        "endYear": "1993"
+      },
+      {
+        "name": "8C",
+        "startYear": "1931",
+        "endYear": "1939"
+      },
+      {
+        "name": "8C Competizione",
+        "startYear": "2007",
+        "endYear": "2010"
+      },
+      {
+        "name": "A 12/F12",
+        "startYear": "1967",
+        "endYear": "1983"
+      },
+      {
+        "name": "Alfa 6",
+        "startYear": "1979",
+        "endYear": "1987"
+      },
+      {
+        "name": "Alfa 90",
+        "startYear": "1984",
+        "endYear": "1987"
+      },
+      {
+        "name": "Alfasud",
+        "startYear": "1972",
+        "endYear": "1984"
+      },
+      {
+        "name": "Alfasud Sprint",
+        "startYear": "1976",
+        "endYear": "1989"
+      },
+      {
+        "name": "75",
+        "startYear": "1985",
+        "endYear": "1993"
+      },
+      {
+        "name": "Alfetta",
+        "startYear": "1972",
+        "endYear": "1984"
+      },
+      {
+        "name": "Alfetta GT",
+        "startYear": "1974",
+        "endYear": "1987"
+      },
+      {
+        "name": "Giulia GT",
+        "startYear": "1964",
+        "endYear": "1977"
+      },
+      {
+        "name": "Giulia Spider",
+        "startYear": "1962",
+        "endYear": "1965"
+      },
+      {
+        "name": "Giulia Sprinter",
+        "startYear": "1962",
+        "endYear": "1965"
+      },
+      {
+        "name": "Giulia SS",
+        "startYear": "1963",
+        "endYear": "1966"
+      },
+      {
+        "name": "Giulia TZ",
+        "startYear": "1963",
+        "endYear": "1965"
+      },
+      {
+        "name": "Giulietta",
+        "startYear": "1954",
+        "endYear": "2021"
+      },
+      {
+        "name": "Giulietta Spider",
+        "startYear": "1955",
+        "endYear": "1962"
+      },
+      {
+        "name": "Giulietta Sprint",
+        "startYear": "1954",
+        "endYear": "1962"
+      },
+      {
+        "name": "Giulietta SS",
+        "startYear": "1959",
+        "endYear": "1962"
+      },
+      {
+        "name": "Giulietta SZ",
+        "startYear": "1959",
+        "endYear": "1961"
+      },
+      {
+        "name": "GTV",
+        "startYear": "1995",
+        "endYear": "2006"
+      },
+      {
+        "name": "Gran Sport Quattroruote",
+        "startYear": "1965",
+        "endYear": "1967"
+      },
+      {
+        "name": "MiTo",
+        "startYear": "2008",
+        "endYear": "2018"
+      },
+      {
+        "name": "Spider",
+        "startYear": "1966",
+        "endYear": "1994"
+      },
+      {
+        "name": "AR 6",
+        "startYear": "1985",
+        "endYear": "1989"
+      },
+      {
+        "name": "AR 8",
+        "startYear": "1978",
+        "endYear": "1989"
+      },
+      {
+        "name": "Arna",
+        "startYear": "1983",
+        "endYear": "1987"
+      },
+      {
+        "name": "Brera",
+        "startYear": "2005",
+        "endYear": "2011"
+      },
+      {
+        "name": "C52 Disco Volante",
+        "startYear": "1952",
+        "endYear": "1953"
+      },
+      {
+        "name": "Concept",
+        "startYear": "1964",
+        "endYear": "2019"
+      },
+      {
+        "name": "Dauphine",
+        "startYear": "1959",
+        "endYear": "1964"
+      },
+      {
+        "name": "Junior Zagato",
+        "startYear": "1969",
+        "endYear": "1975"
+      },
+      {
+        "name": "Milano (NA)",
+        "startYear": "1987",
+        "endYear": "1989"
+      },
+      {
+        "name": "Montreal",
+        "startYear": "1971",
+        "endYear": "1997"
+      },
+      {
+        "name": "RL",
+        "startYear": "1922",
+        "endYear": "1927"
+      },
+      {
+        "name": "Romeo",
+        "startYear": "1954",
+        "endYear": "1967"
+      },
+      {
+        "name": "RZ/SZ",
+        "startYear": "1989",
+        "endYear": "1996"
+      },
+      {
+        "name": "Tipo 33",
+        "startYear": "1966",
+        "endYear": "1977"
+      },
+      {
+        "name": "Tipo B",
+        "startYear": "1932",
+        "endYear": "1935"
+      }
+    ]
+  },
+  {
+    "brand": "Alpine",
+    "image": "",
+    "models": [
+      {
+        "name": "A110",
+        "startYear": "1961",
+        "endYear": ""
+      },
+      {
+        "name": "A290",
+        "startYear": "2025",
+        "endYear": ""
+      },
+      {
+        "name": "A106",
+        "startYear": "1955",
+        "endYear": "1961"
+      },
+      {
+        "name": "A108",
+        "startYear": "1958",
+        "endYear": "1965"
+      },
+      {
+        "name": "A310",
+        "startYear": "1971",
+        "endYear": "1985"
+      },
+      {
+        "name": "A610",
+        "startYear": "1985",
+        "endYear": "1995"
+      },
+      {
+        "name": "Concept",
+        "startYear": "2015",
+        "endYear": "2022"
+      }
+    ]
+  },
+  {
+    "brand": "Aston Martin",
+    "image": "",
+    "models": [
+      {
+        "name": "DB12",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "DBS",
+        "startYear": "1967",
+        "endYear": ""
+      },
+      {
+        "name": "DBX",
+        "startYear": "2021",
+        "endYear": ""
+      },
+      {
+        "name": "Valhalla",
+        "startYear": "2025",
+        "endYear": ""
+      },
+      {
+        "name": "Valiant",
+        "startYear": "2025",
+        "endYear": ""
+      },
+      {
+        "name": "Valkyrie",
+        "startYear": "2022",
+        "endYear": ""
+      },
+      {
+        "name": "Valour",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "Vanquish",
+        "startYear": "2002",
+        "endYear": ""
+      },
+      {
+        "name": "Vantage",
+        "startYear": "1972",
+        "endYear": ""
+      },
+      {
+        "name": "Concept",
+        "startYear": "1949",
+        "endYear": "2022"
+      },
+      {
+        "name": "Cygnet",
+        "startYear": "2011",
+        "endYear": "2013"
+      },
+      {
+        "name": "DB11",
+        "startYear": "2017",
+        "endYear": "2023"
+      },
+      {
+        "name": "DB2",
+        "startYear": "1950",
+        "endYear": "1953"
+      },
+      {
+        "name": "DB2/4",
+        "startYear": "1953",
+        "endYear": "1959"
+      },
+      {
+        "name": "DB3",
+        "startYear": "1951",
+        "endYear": "1955"
+      },
+      {
+        "name": "DB4",
+        "startYear": "1958",
+        "endYear": "1963"
+      },
+      {
+        "name": "DB4 GT",
+        "startYear": "1959",
+        "endYear": "2018"
+      },
+      {
+        "name": "DB5",
+        "startYear": "1963",
+        "endYear": "1965"
+      },
+      {
+        "name": "DB6",
+        "startYear": "1965",
+        "endYear": "1971"
+      },
+      {
+        "name": "DB7",
+        "startYear": "1994",
+        "endYear": "2003"
+      },
+      {
+        "name": "DB7 Zagato",
+        "startYear": "2003",
+        "endYear": "2003"
+      },
+      {
+        "name": "DB9",
+        "startYear": "2004",
+        "endYear": "2017"
+      },
+      {
+        "name": "DBR1",
+        "startYear": "1956",
+        "endYear": "1958"
+      },
+      {
+        "name": "DBR22",
+        "startYear": "2022",
+        "endYear": "2023"
+      },
+      {
+        "name": "Lagonda",
+        "startYear": "1974",
+        "endYear": "1990"
+      },
+      {
+        "name": "One-77",
+        "startYear": "2011",
+        "endYear": "2012"
+      },
+      {
+        "name": "Rapide",
+        "startYear": "2010",
+        "endYear": "2019"
+      },
+      {
+        "name": "V12 Zagato",
+        "startYear": "2011",
+        "endYear": "2013"
+      },
+      {
+        "name": "V8",
+        "startYear": "1972",
+        "endYear": "1999"
+      },
+      {
+        "name": "V8 Zagato",
+        "startYear": "1986",
+        "endYear": "1989"
+      },
+      {
+        "name": "Vanquish Zagato",
+        "startYear": "2018",
+        "endYear": "2019"
+      },
+      {
+        "name": "Vantage Special",
+        "startYear": "1996",
+        "endYear": "1998"
+      },
+      {
+        "name": "Victor",
+        "startYear": "2020",
+        "endYear": "2020"
+      },
+      {
+        "name": "Virage",
+        "startYear": "1989",
+        "endYear": "2012"
+      },
+      {
+        "name": "Virage Lagonda",
+        "startYear": "1994",
+        "endYear": "1994"
+      },
+      {
+        "name": "Vulcan",
+        "startYear": "2015",
+        "endYear": "2016"
+      }
+    ]
+  },
+  {
+    "brand": "Audi",
+    "image": "",
+    "models": [
+      {
+        "name": "A1",
+        "startYear": "2010",
+        "endYear": ""
+      },
+      {
+        "name": "A3",
+        "startYear": "1997",
+        "endYear": ""
+      },
+      {
+        "name": "A4",
+        "startYear": "1995",
+        "endYear": ""
+      },
+      {
+        "name": "A5",
+        "startYear": "2007",
+        "endYear": ""
+      },
+      {
+        "name": "A6",
+        "startYear": "1995",
+        "endYear": ""
+      },
+      {
+        "name": "A6 e-tron",
+        "startYear": "2025",
+        "endYear": ""
+      },
+      {
+        "name": "A7",
+        "startYear": "2011",
+        "endYear": ""
+      },
+      {
+        "name": "A8",
+        "startYear": "1994",
+        "endYear": ""
+      },
+      {
+        "name": "e-tron",
+        "startYear": "2019",
+        "endYear": ""
+      },
+      {
+        "name": "e-tron GT",
+        "startYear": "2021",
+        "endYear": ""
+      },
+      {
+        "name": "Q2",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "Q3",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "Q4 e-tron",
+        "startYear": "2021",
+        "endYear": ""
+      },
+      {
+        "name": "Q5",
+        "startYear": "2009",
+        "endYear": ""
+      },
+      {
+        "name": "Q5 e-tron",
+        "startYear": "2022",
+        "endYear": ""
+      },
+      {
+        "name": "Q6 e-tron",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "Q6 e-trpn (CN)",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "Q7",
+        "startYear": "2006",
+        "endYear": ""
+      },
+      {
+        "name": "Q8",
+        "startYear": "2019",
+        "endYear": ""
+      },
+      {
+        "name": "Q8 e-tron",
+        "startYear": "2023",
+        "endYear": ""
+      },
+      {
+        "name": "R8",
+        "startYear": "2007",
+        "endYear": "2024"
+      },
+      {
+        "name": "100",
+        "startYear": "1968",
+        "endYear": "1994"
+      },
+      {
+        "name": "4000",
+        "startYear": "1980",
+        "endYear": "1987"
+      },
+      {
+        "name": "50",
+        "startYear": "1974",
+        "endYear": "1978"
+      },
+      {
+        "name": "80",
+        "startYear": "1972",
+        "endYear": "1996"
+      },
+      {
+        "name": "90",
+        "startYear": "1984",
+        "endYear": "1992"
+      },
+      {
+        "name": "A2",
+        "startYear": "2000",
+        "endYear": "2005"
+      },
+      {
+        "name": "Cabriolet",
+        "startYear": "1991",
+        "endYear": "2001"
+      },
+      {
+        "name": "Concept",
+        "startYear": "1989",
+        "endYear": "2023"
+      },
+      {
+        "name": "Coupé",
+        "startYear": "1981",
+        "endYear": "1997"
+      },
+      {
+        "name": "F103",
+        "startYear": "1965",
+        "endYear": "1972"
+      },
+      {
+        "name": "Quattro",
+        "startYear": "1980",
+        "endYear": "1991"
+      },
+      {
+        "name": "TT",
+        "startYear": "1999",
+        "endYear": "2023"
+      },
+      {
+        "name": "V8",
+        "startYear": "1989",
+        "endYear": "1994"
+      }
+    ]
+  },
+  {
+    "brand": "Barkas",
+    "image": "",
+    "models": [
+      {
+        "name": "B1000",
+        "startYear": "1961",
+        "endYear": "1991"
+      }
+    ]
+  },
+  {
+    "brand": "Bentley",
+    "image": "",
+    "models": [
+      {
+        "name": "Bacalar",
+        "startYear": "2020",
+        "endYear": ""
+      },
+      {
+        "name": "Bentayga",
+        "startYear": "2016",
+        "endYear": ""
+      },
+      {
+        "name": "Continental Flying Spur",
+        "startYear": "2006",
+        "endYear": ""
+      },
+      {
+        "name": "Continental GT",
+        "startYear": "2003",
+        "endYear": ""
+      },
+      {
+        "name": "Arnage",
+        "startYear": "1989",
+        "endYear": "2009"
+      },
+      {
+        "name": "Azure",
+        "startYear": "1995",
+        "endYear": "2010"
+      },
+      {
+        "name": "Brooklands",
+        "startYear": "1992",
+        "endYear": "2011"
+      },
+      {
+        "name": "Concept",
+        "startYear": "2012",
+        "endYear": "2017"
+      },
+      {
+        "name": "Continental",
+        "startYear": "1971",
+        "endYear": "1995"
+      },
+      {
+        "name": "Continental R",
+        "startYear": "1991",
+        "endYear": "2003"
+      },
+      {
+        "name": "Eight",
+        "startYear": "1984",
+        "endYear": "1992"
+      },
+      {
+        "name": "Mulsanne",
+        "startYear": "1980",
+        "endYear": "2020"
+      },
+      {
+        "name": "T-Series",
+        "startYear": "1965",
+        "endYear": "1980"
+      },
+      {
+        "name": "Turbo R",
+        "startYear": "1985",
+        "endYear": "1998"
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "image": "",
+    "models": [
+      {
+        "name": "1 Series",
+        "startYear": "2004",
+        "endYear": ""
+      },
+      {
+        "name": "2 Series",
+        "startYear": "2014",
+        "endYear": ""
+      },
+      {
+        "name": "2 Series Active / Gran Tourer",
+        "startYear": "2015",
+        "endYear": ""
+      },
+      {
+        "name": "3 Series",
+        "startYear": "1975",
+        "endYear": ""
+      },
+      {
+        "name": "4 Series",
+        "startYear": "2014",
+        "endYear": ""
+      },
+      {
+        "name": "5 Series",
+        "startYear": "1973",
+        "endYear": ""
+      },
+      {
+        "name": "6 Series",
+        "startYear": "1976",
+        "endYear": ""
+      },
+      {
+        "name": "7 Series",
+        "startYear": "1977",
+        "endYear": ""
+      },
+      {
+        "name": "8 Series",
+        "startYear": "1989",
+        "endYear": ""
+      },
+      {
+        "name": "Concept",
+        "startYear": "1969",
+        "endYear": "2024"
+      },
+      {
+        "name": "iX",
+        "startYear": "2022",
+        "endYear": ""
+      },
+      {
+        "name": "X1",
+        "startYear": "2010",
+        "endYear": ""
+      },
+      {
+        "name": "X2",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "X3",
+        "startYear": "2004",
+        "endYear": ""
+      },
+      {
+        "name": "X4",
+        "startYear": "2015",
+        "endYear": ""
+      },
+      {
+        "name": "X5",
+        "startYear": "2000",
+        "endYear": ""
+      },
+      {
+        "name": "X6",
+        "startYear": "2008",
+        "endYear": ""
+      },
+      {
+        "name": "X7",
+        "startYear": "2019",
+        "endYear": ""
+      },
+      {
+        "name": "XM",
+        "startYear": "2023",
+        "endYear": ""
+      },
+      {
+        "name": "Z4",
+        "startYear": "2003",
+        "endYear": ""
+      },
+      {
+        "name": "503",
+        "startYear": "1956",
+        "endYear": "1960"
+      },
+      {
+        "name": "507",
+        "startYear": "1956",
+        "endYear": "1959"
+      },
+      {
+        "name": "600",
+        "startYear": "1957",
+        "endYear": "1959"
+      },
+      {
+        "name": "700",
+        "startYear": "1960",
+        "endYear": "1965"
+      },
+      {
+        "name": "E3/E9",
+        "startYear": "1968",
+        "endYear": "1977"
+      },
+      {
+        "name": "i3",
+        "startYear": "2014",
+        "endYear": "2022"
+      },
+      {
+        "name": "i8",
+        "startYear": "2014",
+        "endYear": "2020"
+      },
+      {
+        "name": "Isetta",
+        "startYear": "1955",
+        "endYear": "1962"
+      },
+      {
+        "name": "M1",
+        "startYear": "1979",
+        "endYear": "1981"
+      },
+      {
+        "name": "New Class",
+        "startYear": "1962",
+        "endYear": "1977"
+      },
+      {
+        "name": "Z1",
+        "startYear": "1989",
+        "endYear": "1992"
+      },
+      {
+        "name": "Z3",
+        "startYear": "1996",
+        "endYear": "2003"
+      },
+      {
+        "name": "Z8",
+        "startYear": "2000",
+        "endYear": "2003"
+      }
+    ]
+  },
+  {
+    "brand": "Brilliance",
+    "image": "",
+    "models": [
+      {
+        "name": "Dolphin",
+        "startYear": "2015",
+        "endYear": ""
+      },
+      {
+        "name": "V5",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "BC3",
+        "startYear": "2007",
+        "endYear": "2011"
+      },
+      {
+        "name": "BS2",
+        "startYear": "2009",
+        "endYear": "2017"
+      },
+      {
+        "name": "BS4",
+        "startYear": "2007",
+        "endYear": "2014"
+      },
+      {
+        "name": "BS6",
+        "startYear": "2004",
+        "endYear": "2010"
+      },
+      {
+        "name": "H230",
+        "startYear": "2013",
+        "endYear": "2020"
+      },
+      {
+        "name": "H3",
+        "startYear": "2017",
+        "endYear": "2019"
+      },
+      {
+        "name": "H320",
+        "startYear": "2012",
+        "endYear": "2020"
+      },
+      {
+        "name": "H530",
+        "startYear": "2011",
+        "endYear": "2020"
+      },
+      {
+        "name": "M3",
+        "startYear": "2007",
+        "endYear": "2009"
+      },
+      {
+        "name": "V3",
+        "startYear": "2015",
+        "endYear": "2020"
+      },
+      {
+        "name": "V6",
+        "startYear": "2017",
+        "endYear": "2020"
+      },
+      {
+        "name": "V7",
+        "startYear": "2018",
+        "endYear": "2020"
+      }
+    ]
+  },
+  {
+    "brand": "Bugatti",
+    "image": "",
+    "models": [
+      {
+        "name": "Chiron",
+        "startYear": "2016",
+        "endYear": "2024"
+      },
+      {
+        "name": "Divo",
+        "startYear": "2019",
+        "endYear": ""
+      },
+      {
+        "name": "La Voiture Noir",
+        "startYear": "2019",
+        "endYear": ""
+      },
+      {
+        "name": "Mistral",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "Tourbillon",
+        "startYear": "2025",
+        "endYear": ""
+      },
+      {
+        "name": "Centodieci",
+        "startYear": "2021",
+        "endYear": "2022"
+      },
+      {
+        "name": "Concept",
+        "startYear": "1999",
+        "endYear": "2015"
+      }
+    ]
+  },
+  {
+    "brand": "Buick",
+    "image": "",
+    "models": [
+      {
+        "name": "Century MPV",
+        "startYear": "2023",
+        "endYear": ""
+      },
+      {
+        "name": "Electra E4",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "Electra E5",
+        "startYear": "2023",
+        "endYear": ""
+      },
+      {
+        "name": "Enclave",
+        "startYear": "2008",
+        "endYear": ""
+      },
+      {
+        "name": "Enclave (CN)",
+        "startYear": "2020",
+        "endYear": ""
+      },
+      {
+        "name": "Encore",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "Encore GX",
+        "startYear": "2020",
+        "endYear": ""
+      },
+      {
+        "name": "Envision",
+        "startYear": "2014",
+        "endYear": ""
+      },
+      {
+        "name": "Envista",
+        "startYear": "2022",
+        "endYear": ""
+      },
+      {
+        "name": "Excelle",
+        "startYear": "2003",
+        "endYear": ""
+      },
+      {
+        "name": "Excelle GT",
+        "startYear": "2010",
+        "endYear": ""
+      },
+      {
+        "name": "GL6",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "GL8",
+        "startYear": "2000",
+        "endYear": ""
+      },
+      {
+        "name": "LaCrosse",
+        "startYear": "2005",
+        "endYear": ""
+      },
+      {
+        "name": "Regal",
+        "startYear": "1975",
+        "endYear": ""
+      },
+      {
+        "name": "Velite 6",
+        "startYear": "2019",
+        "endYear": ""
+      },
+      {
+        "name": "Velite 7",
+        "startYear": "2020",
+        "endYear": ""
+      },
+      {
+        "name": "Verano",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "Allure",
+        "startYear": "2005",
+        "endYear": "2010"
+      },
+      {
+        "name": "Apollo",
+        "startYear": "1973",
+        "endYear": "1975"
+      },
+      {
+        "name": "Cascade",
+        "startYear": "2016",
+        "endYear": "2019"
+      },
+      {
+        "name": "Centurion",
+        "startYear": "1971",
+        "endYear": "1973"
+      },
+      {
+        "name": "Century",
+        "startYear": "1936",
+        "endYear": "2005"
+      },
+      {
+        "name": "Concept",
+        "startYear": "1938",
+        "endYear": "2023"
+      },
+      {
+        "name": "Electra",
+        "startYear": "1959",
+        "endYear": "1990"
+      },
+      {
+        "name": "Electra 225",
+        "startYear": "1959",
+        "endYear": "1976"
+      },
+      {
+        "name": "Estate Wagon",
+        "startYear": "1970",
+        "endYear": "1979"
+      },
+      {
+        "name": "GS",
+        "startYear": "1967",
+        "endYear": "1972"
+      },
+      {
+        "name": "Invicta",
+        "startYear": "1959",
+        "endYear": "1963"
+      },
+      {
+        "name": "LaCrosse (CN)",
+        "startYear": "2006",
+        "endYear": "2008"
+      },
+      {
+        "name": "LeSabre",
+        "startYear": "1959",
+        "endYear": "2005"
+      },
+      {
+        "name": "Lucerne",
+        "startYear": "2006",
+        "endYear": "2011"
+      },
+      {
+        "name": "Park Avenue",
+        "startYear": "1991",
+        "endYear": "2012"
+      },
+      {
+        "name": "Rainier",
+        "startYear": "2004",
+        "endYear": "2007"
+      },
+      {
+        "name": "Reatta",
+        "startYear": "1988",
+        "endYear": "1991"
+      },
+      {
+        "name": "Regal (CN)",
+        "startYear": "1999",
+        "endYear": "2008"
+      },
+      {
+        "name": "Rendezvous",
+        "startYear": "2002",
+        "endYear": "2007"
+      },
+      {
+        "name": "Riviera",
+        "startYear": "1963",
+        "endYear": "1999"
+      },
+      {
+        "name": "Roadmaster",
+        "startYear": "1936",
+        "endYear": "1996"
+      },
+      {
+        "name": "Roadmaster 75",
+        "startYear": "1957",
+        "endYear": "1958"
+      },
+      {
+        "name": "Royaum",
+        "startYear": "2005",
+        "endYear": "2006"
+      },
+      {
+        "name": "Sail",
+        "startYear": "2001",
+        "endYear": "2005"
+      },
+      {
+        "name": "Skyhawk",
+        "startYear": "1975",
+        "endYear": "1989"
+      },
+      {
+        "name": "Skylark",
+        "startYear": "1953",
+        "endYear": "1998"
+      },
+      {
+        "name": "Somerset",
+        "startYear": "1985",
+        "endYear": "1987"
+      },
+      {
+        "name": "Special",
+        "startYear": "1936",
+        "endYear": "1969"
+      },
+      {
+        "name": "Sport Wagon",
+        "startYear": "1964",
+        "endYear": "1980"
+      },
+      {
+        "name": "Super",
+        "startYear": "1940",
+        "endYear": "1958"
+      },
+      {
+        "name": "Terraza",
+        "startYear": "2005",
+        "endYear": "2007"
+      },
+      {
+        "name": "Velite 5",
+        "startYear": "2018",
+        "endYear": "2019"
+      },
+      {
+        "name": "Wildcat",
+        "startYear": "1962",
+        "endYear": "1970"
+      }
+    ]
+  },
+  {
+    "brand": "BYD",
+    "image": "",
+    "models": [
+      {
+        "name": "Atto 3",
+        "startYear": "2022",
+        "endYear": ""
+      },
+      {
+        "name": "D1",
+        "startYear": "2021",
+        "endYear": ""
+      },
+      {
+        "name": "Destroyer 05",
+        "startYear": "2021",
+        "endYear": ""
+      },
+      {
+        "name": "Dolphin",
+        "startYear": "2021",
+        "endYear": ""
+      },
+      {
+        "name": "e2/e3",
+        "startYear": "2019",
+        "endYear": ""
+      },
+      {
+        "name": "e6",
+        "startYear": "2010",
+        "endYear": ""
+      },
+      {
+        "name": "e9",
+        "startYear": "2021",
+        "endYear": ""
+      },
+      {
+        "name": "ETP3",
+        "startYear": "2020",
+        "endYear": ""
+      },
+      {
+        "name": "Frigate 07",
+        "startYear": "2022",
+        "endYear": ""
+      },
+      {
+        "name": "Han",
+        "startYear": "2020",
+        "endYear": ""
+      },
+      {
+        "name": "Qin",
+        "startYear": "2013",
+        "endYear": ""
+      },
+      {
+        "name": "S2",
+        "startYear": "2019",
+        "endYear": ""
+      },
+      {
+        "name": "Seagull",
+        "startYear": "2023",
+        "endYear": ""
+      },
+      {
+        "name": "Seal",
+        "startYear": "2022",
+        "endYear": ""
+      },
+      {
+        "name": "Seal U",
+        "startYear": "2023",
+        "endYear": ""
+      },
+      {
+        "name": "Sealion 6",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "Shark",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "Song",
+        "startYear": "2016",
+        "endYear": ""
+      },
+      {
+        "name": "Song L",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "Song Max",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "Song Plus",
+        "startYear": "2020",
+        "endYear": ""
+      },
+      {
+        "name": "Tang",
+        "startYear": "2015",
+        "endYear": ""
+      },
+      {
+        "name": "Yuan",
+        "startYear": "2016",
+        "endYear": ""
+      },
+      {
+        "name": "Yuan UP",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "e1",
+        "startYear": "2019",
+        "endYear": "2020"
+      },
+      {
+        "name": "e5",
+        "startYear": "2016",
+        "endYear": "2020"
+      },
+      {
+        "name": "FO",
+        "startYear": "2008",
+        "endYear": "2019"
+      },
+      {
+        "name": "F3",
+        "startYear": "2005",
+        "endYear": "2022"
+      },
+      {
+        "name": "F6",
+        "startYear": "2008",
+        "endYear": "2012"
+      },
+      {
+        "name": "Flyer",
+        "startYear": "2005",
+        "endYear": "2008"
+      },
+      {
+        "name": "G3",
+        "startYear": "2010",
+        "endYear": "2014"
+      },
+      {
+        "name": "G5",
+        "startYear": "2014",
+        "endYear": "2017"
+      },
+      {
+        "name": "G6",
+        "startYear": "2011",
+        "endYear": "2018"
+      },
+      {
+        "name": "L3",
+        "startYear": "2010",
+        "endYear": "2015"
+      },
+      {
+        "name": "M6",
+        "startYear": "2010",
+        "endYear": "2017"
+      },
+      {
+        "name": "S6",
+        "startYear": "2011",
+        "endYear": "2016"
+      },
+      {
+        "name": "S7",
+        "startYear": "2014",
+        "endYear": "2018"
+      },
+      {
+        "name": "S8",
+        "startYear": "2009",
+        "endYear": "2010"
+      },
+      {
+        "name": "Sirui",
+        "startYear": "2013",
+        "endYear": "2018"
+      },
+      {
+        "name": "Surui",
+        "startYear": "2012",
+        "endYear": "2018"
+      }
+    ]
+  },
+  {
+    "brand": "Cadillac",
+    "image": "",
+    "models": [
+      {
+        "name": "Celestiq",
+        "startYear": "2023",
+        "endYear": ""
+      },
+      {
+        "name": "Concept",
+        "startYear": "1999",
+        "endYear": "2024"
+      },
+      {
+        "name": "CT4",
+        "startYear": "2020",
+        "endYear": ""
+      },
+      {
+        "name": "CT5",
+        "startYear": "2020",
+        "endYear": ""
+      },
+      {
+        "name": "CT6",
+        "startYear": "2016",
+        "endYear": ""
+      },
+      {
+        "name": "Escalade",
+        "startYear": "1999",
+        "endYear": ""
+      },
+      {
+        "name": "Escalade IQ",
+        "startYear": "2025",
+        "endYear": ""
+      },
+      {
+        "name": "GT4",
+        "startYear": "2023",
+        "endYear": ""
+      },
+      {
+        "name": "Lyriq",
+        "startYear": "2023",
+        "endYear": ""
+      },
+      {
+        "name": "Optiq",
+        "startYear": "2025",
+        "endYear": ""
+      },
+      {
+        "name": "XT4",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "XT5",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "XT6",
+        "startYear": "2020",
+        "endYear": ""
+      },
+      {
+        "name": "Allanté",
+        "startYear": "1987",
+        "endYear": "1993"
+      },
+      {
+        "name": "ATS",
+        "startYear": "2013",
+        "endYear": "2019"
+      },
+      {
+        "name": "BLS",
+        "startYear": "2006",
+        "endYear": "2010"
+      },
+      {
+        "name": "Brougham",
+        "startYear": "1987",
+        "endYear": "1993"
+      },
+      {
+        "name": "Calais",
+        "startYear": "1965",
+        "endYear": "1976"
+      },
+      {
+        "name": "Catera",
+        "startYear": "1997",
+        "endYear": "2001"
+      },
+      {
+        "name": "Cimarron",
+        "startYear": "1982",
+        "endYear": "1988"
+      },
+      {
+        "name": "CTS",
+        "startYear": "2003",
+        "endYear": "2019"
+      },
+      {
+        "name": "Commercial Chassis",
+        "startYear": "1946",
+        "endYear": "1964"
+      },
+      {
+        "name": "De Ville",
+        "startYear": "1959",
+        "endYear": "2005"
+      },
+      {
+        "name": "DTS",
+        "startYear": "2006",
+        "endYear": "2011"
+      },
+      {
+        "name": "Eldorado",
+        "startYear": "1953",
+        "endYear": "2002"
+      },
+      {
+        "name": "Eldorado Brougham",
+        "startYear": "1957",
+        "endYear": "1960"
+      },
+      {
+        "name": "ELR",
+        "startYear": "2014",
+        "endYear": "2016"
+      },
+      {
+        "name": "Fleetwood",
+        "startYear": "1985",
+        "endYear": "1996"
+      },
+      {
+        "name": "Fleetwood Brougham",
+        "startYear": "1975",
+        "endYear": "1986"
+      },
+      {
+        "name": "Fleetwood Limousine",
+        "startYear": "1977",
+        "endYear": "1984"
+      },
+      {
+        "name": "Series Seventy-Five",
+        "startYear": "1940",
+        "endYear": "1987"
+      },
+      {
+        "name": "Series Sixty Special",
+        "startYear": "1938",
+        "endYear": "1993"
+      },
+      {
+        "name": "Series Sixty-Two",
+        "startYear": "1940",
+        "endYear": "1964"
+      },
+      {
+        "name": "Seville",
+        "startYear": "1976",
+        "endYear": "2005"
+      },
+      {
+        "name": "SRX",
+        "startYear": "2004",
+        "endYear": "2016"
+      },
+      {
+        "name": "STS",
+        "startYear": "2005",
+        "endYear": "2011"
+      },
+      {
+        "name": "XLR",
+        "startYear": "2004",
+        "endYear": "2009"
+      },
+      {
+        "name": "XTS",
+        "startYear": "2013",
+        "endYear": "2019"
+      }
+    ]
+  },
+  {
+    "brand": "Casalini",
+    "image": "",
+    "models": [
+      {
+        "name": "Kerry",
+        "startYear": "2010",
+        "endYear": ""
+      },
+      {
+        "name": "M20",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "M10",
+        "startYear": "2009",
+        "endYear": "2012"
+      },
+      {
+        "name": "M12",
+        "startYear": "2012",
+        "endYear": "2015"
+      },
+      {
+        "name": "M14",
+        "startYear": "2014",
+        "endYear": "2018"
+      },
+      {
+        "name": "PickUp",
+        "startYear": "2011",
+        "endYear": "2018"
+      },
+      {
+        "name": "Sulky",
+        "startYear": "1997",
+        "endYear": "2010"
+      },
+      {
+        "name": "Sulkycar",
+        "startYear": "2005",
+        "endYear": "2009"
+      }
+    ]
+  },
+  {
+    "brand": "Changan",
+    "image": "",
+    "models": [
+      {
+        "name": "A800",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "Alsvin V3",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "Alsvin V5",
+        "startYear": "2011",
+        "endYear": ""
+      },
+      {
+        "name": "Alsvin V7",
+        "startYear": "2015",
+        "endYear": ""
+      },
+      {
+        "name": "Benni",
+        "startYear": "2006",
+        "endYear": ""
+      },
+      {
+        "name": "Benni Mini",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "CS15",
+        "startYear": "2016",
+        "endYear": ""
+      },
+      {
+        "name": "CS35",
+        "startYear": "2013",
+        "endYear": ""
+      },
+      {
+        "name": "CS55",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "CS75",
+        "startYear": "2014",
+        "endYear": ""
+      },
+      {
+        "name": "CS75 Plus",
+        "startYear": "2020",
+        "endYear": ""
+      },
+      {
+        "name": "CS85",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "CS95",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "CX20",
+        "startYear": "2011",
+        "endYear": ""
+      },
+      {
+        "name": "CX70",
+        "startYear": "2016",
+        "endYear": ""
+      },
+      {
+        "name": "Eado",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "Eulove",
+        "startYear": "2013",
+        "endYear": ""
+      },
+      {
+        "name": "Honor",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "Lingxuan",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "Oushang",
+        "startYear": "2016",
+        "endYear": ""
+      },
+      {
+        "name": "Raeton",
+        "startYear": "2014",
+        "endYear": ""
+      },
+      {
+        "name": "Raeton CC",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "Star",
+        "startYear": "2013",
+        "endYear": ""
+      },
+      {
+        "name": "Star 3",
+        "startYear": "2015",
+        "endYear": ""
+      },
+      {
+        "name": "Star 7",
+        "startYear": "2014",
+        "endYear": ""
+      },
+      {
+        "name": "Star 9",
+        "startYear": "2015",
+        "endYear": ""
+      },
+      {
+        "name": "Uni-T",
+        "startYear": "2020",
+        "endYear": ""
+      },
+      {
+        "name": "X70A",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "Alsvin",
+        "startYear": "2009",
+        "endYear": "2012"
+      },
+      {
+        "name": "Benni Love",
+        "startYear": "2010",
+        "endYear": "2010"
+      },
+      {
+        "name": "CX30",
+        "startYear": "2010",
+        "endYear": "2012"
+      },
+      {
+        "name": "Star 2",
+        "startYear": "2007",
+        "endYear": "2015"
+      },
+      {
+        "name": "Z-Shine",
+        "startYear": "2008",
+        "endYear": "2015"
+      }
+    ]
+  },
+  {
+    "brand": "Chatenet",
+    "image": "",
+    "models": [
+      {
+        "name": "CH40",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "Barooder",
+        "startYear": "2003",
+        "endYear": "2008"
+      },
+      {
+        "name": "CH26",
+        "startYear": "2009",
+        "endYear": "2018"
+      },
+      {
+        "name": "Media",
+        "startYear": "2000",
+        "endYear": "2004"
+      },
+      {
+        "name": "Stella",
+        "startYear": "1998",
+        "endYear": "2001"
+      },
+      {
+        "name": "Yack",
+        "startYear": "1997",
+        "endYear": "2004"
+      }
+    ]
+  },
+  {
+    "brand": "Chery",
+    "image": "",
+    "models": [
+      {
+        "name": "A13",
+        "startYear": "2009",
+        "endYear": ""
+      },
+      {
+        "name": "A3",
+        "startYear": "2008",
+        "endYear": ""
+      },
+      {
+        "name": "Arrizo 5",
+        "startYear": "2016",
+        "endYear": ""
+      },
+      {
+        "name": "Arrizo 8",
+        "startYear": "2022",
+        "endYear": ""
+      },
+      {
+        "name": "Arrizo M7",
+        "startYear": "2015",
+        "endYear": ""
+      },
+      {
+        "name": "E3",
+        "startYear": "2014",
+        "endYear": ""
+      },
+      {
+        "name": "E5",
+        "startYear": "2011",
+        "endYear": ""
+      },
+      {
+        "name": "eQ1",
+        "startYear": "2016",
+        "endYear": ""
+      },
+      {
+        "name": "Exeed TX",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "QQ",
+        "startYear": "2013",
+        "endYear": ""
+      },
+      {
+        "name": "QQ6",
+        "startYear": "2006",
+        "endYear": ""
+      },
+      {
+        "name": "Tiggo",
+        "startYear": "2005",
+        "endYear": ""
+      },
+      {
+        "name": "Tiggo 3",
+        "startYear": "2014",
+        "endYear": ""
+      },
+      {
+        "name": "Tiggo 5",
+        "startYear": "2014",
+        "endYear": ""
+      },
+      {
+        "name": "Tiggo 7",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "Tiggo 8",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "Tiggo 9",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "A1",
+        "startYear": "2007",
+        "endYear": "2015"
+      },
+      {
+        "name": "A11",
+        "startYear": "1999",
+        "endYear": "2006"
+      },
+      {
+        "name": "A15",
+        "startYear": "2003",
+        "endYear": "2013"
+      },
+      {
+        "name": "A5",
+        "startYear": "2006",
+        "endYear": "2012"
+      },
+      {
+        "name": "Amulet",
+        "startYear": "2003",
+        "endYear": "2014"
+      },
+      {
+        "name": "Arrizo 3",
+        "startYear": "2015",
+        "endYear": "2020"
+      },
+      {
+        "name": "Arrizo 7",
+        "startYear": "2013",
+        "endYear": "2020"
+      },
+      {
+        "name": "Concept",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "E8",
+        "startYear": "2012",
+        "endYear": "2016"
+      },
+      {
+        "name": "Eastar",
+        "startYear": "2003",
+        "endYear": "2016"
+      },
+      {
+        "name": "QQ3",
+        "startYear": "2003",
+        "endYear": "2022"
+      },
+      {
+        "name": "V5",
+        "startYear": "2006",
+        "endYear": "2015"
+      }
+    ]
+  },
+  {
+    "brand": "Chevrolet",
+    "image": "",
+    "models": [
+      {
+        "name": "Aveo",
+        "startYear": "2004",
+        "endYear": ""
+      },
+      {
+        "name": "Aveo (LADM)",
+        "startYear": "2009",
+        "endYear": ""
+      },
+      {
+        "name": "Blazer",
+        "startYear": "2019",
+        "endYear": ""
+      },
+      {
+        "name": "Blazer EV",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "Bolt EUV",
+        "startYear": "2022",
+        "endYear": ""
+      },
+      {
+        "name": "Bolt EV",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "Camaro",
+        "startYear": "1967",
+        "endYear": "2024"
+      },
+      {
+        "name": "Captiva",
+        "startYear": "2007",
+        "endYear": ""
+      },
+      {
+        "name": "Cavalier",
+        "startYear": "1982",
+        "endYear": ""
+      },
+      {
+        "name": "Cheyenne",
+        "startYear": "2007",
+        "endYear": ""
+      },
+      {
+        "name": "Cobalt",
+        "startYear": "2005",
+        "endYear": ""
+      },
+      {
+        "name": "Colorado",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "Colorado (NA)",
+        "startYear": "2004",
+        "endYear": ""
+      },
+      {
+        "name": "Corvette",
+        "startYear": "1953",
+        "endYear": ""
+      },
+      {
+        "name": "Cruze",
+        "startYear": "2009",
+        "endYear": ""
+      },
+      {
+        "name": "D-Max",
+        "startYear": "2005",
+        "endYear": ""
+      },
+      {
+        "name": "Equinox",
+        "startYear": "2005",
+        "endYear": ""
+      },
+      {
+        "name": "Equinox EV",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "Express",
+        "startYear": "1996",
+        "endYear": ""
+      },
+      {
+        "name": "Malibu",
+        "startYear": "1978",
+        "endYear": ""
+      },
+      {
+        "name": "Menlo",
+        "startYear": "2020",
+        "endYear": ""
+      },
+      {
+        "name": "Montana",
+        "startYear": "2003",
+        "endYear": ""
+      },
+      {
+        "name": "Monza",
+        "startYear": "1975",
+        "endYear": ""
+      },
+      {
+        "name": "N300",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "Nexia",
+        "startYear": "2008",
+        "endYear": ""
+      },
+      {
+        "name": "Onix",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "Optra",
+        "startYear": "2003",
+        "endYear": ""
+      },
+      {
+        "name": "Orlando",
+        "startYear": "2011",
+        "endYear": ""
+      },
+      {
+        "name": "S-10 (LADM)",
+        "startYear": "1995",
+        "endYear": ""
+      },
+      {
+        "name": "Sail",
+        "startYear": "2005",
+        "endYear": ""
+      },
+      {
+        "name": "Seeker",
+        "startYear": "2023",
+        "endYear": ""
+      },
+      {
+        "name": "Silverado",
+        "startYear": "1999",
+        "endYear": ""
+      },
+      {
+        "name": "Silverado EV",
+        "startYear": "2024",
+        "endYear": ""
+      },
+      {
+        "name": "Silverado HD",
+        "startYear": "2001",
+        "endYear": ""
+      },
+      {
+        "name": "Silverado MD",
+        "startYear": "2019",
+        "endYear": ""
+      },
+      {
+        "name": "Spin",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "Suburban",
+        "startYear": "1960",
+        "endYear": ""
+      },
+      {
+        "name": "Tahoe",
+        "startYear": "1995",
+        "endYear": ""
+      },
+      {
+        "name": "Tracker",
+        "startYear": "1989",
+        "endYear": ""
+      },
+      {
+        "name": "TrailBlazer",
+        "startYear": "2002",
+        "endYear": ""
+      },
+      {
+        "name": "Traverse",
+        "startYear": "2009",
+        "endYear": ""
+      },
+      {
+        "name": "Trax",
+        "startYear": "2013",
+        "endYear": ""
+      },
+      {
+        "name": "Advance Design",
+        "startYear": "1947",
+        "endYear": "1955"
+      },
+      {
+        "name": "Agile",
+        "startYear": "2009",
+        "endYear": "2016"
+      },
+      {
+        "name": "Alero",
+        "startYear": "1999",
+        "endYear": "2002"
+      },
+      {
+        "name": "Art Deco HD",
+        "startYear": "1941",
+        "endYear": "1946"
+      },
+      {
+        "name": "Art Deco",
+        "startYear": "1941",
+        "endYear": "1946"
+      },
+      {
+        "name": "Art Deco MD",
+        "startYear": "1941",
+        "endYear": "1946"
+      },
+      {
+        "name": "Astra",
+        "startYear": "1995",
+        "endYear": "2011"
+      },
+      {
+        "name": "Astro",
+        "startYear": "1985",
+        "endYear": "2004"
+      },
+      {
+        "name": "Avalanche",
+        "startYear": "2002",
+        "endYear": "2013"
+      },
+      {
+        "name": "Beat",
+        "startYear": "2010",
+        "endYear": "2022"
+      },
+      {
+        "name": "Bel Air",
+        "startYear": "1953",
+        "endYear": "1981"
+      },
+      {
+        "name": "Beretta",
+        "startYear": "1988",
+        "endYear": "1996"
+      },
+      {
+        "name": "Biscayne",
+        "startYear": "1958",
+        "endYear": "1975"
+      },
+      {
+        "name": "Blazer (LADM)",
+        "startYear": "1995",
+        "endYear": "2011"
+      },
+      {
+        "name": "C/K-Series",
+        "startYear": "1960",
+        "endYear": "2000"
+      },
+      {
+        "name": "Caprice",
+        "startYear": "1966",
+        "endYear": "2017"
+      },
+      {
+        "name": "Captiva Sport",
+        "startYear": "2008",
+        "endYear": "2016"
+      },
+      {
+        "name": "Celebrity",
+        "startYear": "1982",
+        "endYear": "1990"
+      },
+      {
+        "name": "Celta",
+        "startYear": "2000",
+        "endYear": "2015"
+      },
+      {
+        "name": "Chevelle",
+        "startYear": "1964",
+        "endYear": "1977"
+      },
+      {
+        "name": "Chevette",
+        "startYear": "1976",
+        "endYear": "1986"
+      },
+      {
+        "name": "Chevy",
+        "startYear": "1995",
+        "endYear": "2012"
+      },
+      {
+        "name": "Chevy II",
+        "startYear": "1962",
+        "endYear": "1967"
+      },
+      {
+        "name": "Citation",
+        "startYear": "1980",
+        "endYear": "1985"
+      },
+      {
+        "name": "City Express",
+        "startYear": "2015",
+        "endYear": "2018"
+      },
+      {
+        "name": "Classic",
+        "startYear": "2010",
+        "endYear": "2016"
+      },
+      {
+        "name": "Combo",
+        "startYear": "2001",
+        "endYear": "2010"
+      },
+      {
+        "name": "Concept",
+        "startYear": "1959",
+        "endYear": "2017"
+      },
+      {
+        "name": "Concours",
+        "startYear": "1976",
+        "endYear": "1977"
+      },
+      {
+        "name": "Corsa",
+        "startYear": "1994",
+        "endYear": "2013"
+      },
+      {
+        "name": "Corvair",
+        "startYear": "1960",
+        "endYear": "1969"
+      },
+      {
+        "name": "Corsica",
+        "startYear": "1988",
+        "endYear": "1996"
+      },
+      {
+        "name": "Corvair 95",
+        "startYear": "1961",
+        "endYear": "1965"
+      },
+      {
+        "name": "Damas",
+        "startYear": "2011",
+        "endYear": "2020"
+      },
+      {
+        "name": "Delray",
+        "startYear": "1958",
+        "endYear": "1958"
+      },
+      {
+        "name": "Deluxe",
+        "startYear": "1949",
+        "endYear": "1952"
+      },
+      {
+        "name": "El Camino",
+        "startYear": "1959",
+        "endYear": "1987"
+      },
+      {
+        "name": "Enjoy",
+        "startYear": "2013",
+        "endYear": "2018"
+      },
+      {
+        "name": "Epica",
+        "startYear": "2004",
+        "endYear": "2013"
+      },
+      {
+        "name": "Evanda",
+        "startYear": "2002",
+        "endYear": "2006"
+      },
+      {
+        "name": "Fleetmaster",
+        "startYear": "1946",
+        "endYear": "1948"
+      },
+      {
+        "name": "Forester",
+        "startYear": "2004",
+        "endYear": "2007"
+      },
+      {
+        "name": "G-Series",
+        "startYear": "1964",
+        "endYear": "1996"
+      },
+      {
+        "name": "G506",
+        "startYear": "1941",
+        "endYear": "1945"
+      },
+      {
+        "name": "HHR",
+        "startYear": "2006",
+        "endYear": "2011"
+      },
+      {
+        "name": "Impala",
+        "startYear": "1958",
+        "endYear": "2020"
+      },
+      {
+        "name": "K5 Blazer",
+        "startYear": "1969",
+        "endYear": "1994"
+      },
+      {
+        "name": "Kalos",
+        "startYear": "2003",
+        "endYear": "2008"
+      },
+      {
+        "name": "Kodiak",
+        "startYear": "2003",
+        "endYear": "2009"
+      },
+      {
+        "name": "Labo",
+        "startYear": "2011",
+        "endYear": "2020"
+      },
+      {
+        "name": "Lacetti",
+        "startYear": "2004",
+        "endYear": "2013"
+      },
+      {
+        "name": "Lanos",
+        "startYear": "2005",
+        "endYear": "2020"
+      },
+      {
+        "name": "Lova",
+        "startYear": "2006",
+        "endYear": "2011"
+      },
+      {
+        "name": "Lova RV",
+        "startYear": "2016",
+        "endYear": "2019"
+      },
+      {
+        "name": "Lumina",
+        "startYear": "1990",
+        "endYear": "2013"
+      },
+      {
+        "name": "Lumina APV",
+        "startYear": "1990",
+        "endYear": "1996"
+      },
+      {
+        "name": "LUV",
+        "startYear": "1972",
+        "endYear": "1982"
+      },
+      {
+        "name": "Matiz",
+        "startYear": "2004",
+        "endYear": "2010"
+      },
+      {
+        "name": "Meriva",
+        "startYear": "2002",
+        "endYear": "2012"
+      },
+      {
+        "name": "Metro",
+        "startYear": "1998",
+        "endYear": "2001"
+      },
+      {
+        "name": "Monte Carlo",
+        "startYear": "1970",
+        "endYear": "2007"
+      },
+      {
+        "name": "MW",
+        "startYear": "2000",
+        "endYear": "2010"
+      },
+      {
+        "name": "N200",
+        "startYear": "2008",
+        "endYear": "2012"
+      },
+      {
+        "name": "Niva",
+        "startYear": "2003",
+        "endYear": "2020"
+      },
+      {
+        "name": "Nova",
+        "startYear": "1962",
+        "endYear": "1988"
+      },
+      {
+        "name": "Nubira",
+        "startYear": "2003",
+        "endYear": "2011"
+      },
+      {
+        "name": "Omega",
+        "startYear": "1992",
+        "endYear": "2011"
+      },
+      {
+        "name": "One-Fifty",
+        "startYear": "1953",
+        "endYear": "1957"
+      },
+      {
+        "name": "Opala",
+        "startYear": "1987",
+        "endYear": "1992"
+      },
+      {
+        "name": "P-Series",
+        "startYear": "1960",
+        "endYear": "2005"
+      },
+      {
+        "name": "Prizm",
+        "startYear": "1998",
+        "endYear": "2002"
+      },
+      {
+        "name": "Rezzo",
+        "startYear": "2004",
+        "endYear": "2008"
+      },
+      {
+        "name": "S-10",
+        "startYear": "1982",
+        "endYear": "2004"
+      },
+      {
+        "name": "S-Blazer",
+        "startYear": "1983",
+        "endYear": "2005"
+      },
+      {
+        "name": "Sonic",
+        "startYear": "2012",
+        "endYear": "2020"
+      },
+      {
+        "name": "Sonora",
+        "startYear": "2000",
+        "endYear": "2006"
+      },
+      {
+        "name": "Spark",
+        "startYear": "2000",
+        "endYear": "2022"
+      },
+      {
+        "name": "Spectrum",
+        "startYear": "1985",
+        "endYear": "1988"
+      },
+      {
+        "name": "Special",
+        "startYear": "1949",
+        "endYear": "1952"
+      },
+      {
+        "name": "Special Deluxe",
+        "startYear": "1940",
+        "endYear": "1942"
+      },
+      {
+        "name": "Sprint",
+        "startYear": "1985",
+        "endYear": "2004"
+      },
+      {
+        "name": "SS",
+        "startYear": "2014",
+        "endYear": "2017"
+      },
+      {
+        "name": "SSR",
+        "startYear": "2003",
+        "endYear": "2006"
+      },
+      {
+        "name": "Stylemaster",
+        "startYear": "1946",
+        "endYear": "1948"
+      },
+      {
+        "name": "Tacuma",
+        "startYear": "2003",
+        "endYear": "2008"
+      },
+      {
+        "name": "Task Force",
+        "startYear": "1955",
+        "endYear": "1959"
+      },
+      {
+        "name": "Tavera",
+        "startYear": "2002",
+        "endYear": "2018"
+      },
+      {
+        "name": "Trans Sport",
+        "startYear": "1997",
+        "endYear": "2005"
+      },
+      {
+        "name": "Two-Ten",
+        "startYear": "1953",
+        "endYear": "1957"
+      },
+      {
+        "name": "Uplander",
+        "startYear": "2005",
+        "endYear": "2009"
+      },
+      {
+        "name": "Vectra",
+        "startYear": "1996",
+        "endYear": "2008"
+      },
+      {
+        "name": "Vectra GT",
+        "startYear": "2005",
+        "endYear": "2011"
+      },
+      {
+        "name": "Vega",
+        "startYear": "1971",
+        "endYear": "1977"
+      },
+      {
+        "name": "Venture",
+        "startYear": "1997",
+        "endYear": "2005"
+      },
+      {
+        "name": "Viva",
+        "startYear": "2004",
+        "endYear": "2008"
+      },
+      {
+        "name": "Volt",
+        "startYear": "2011",
+        "endYear": "2019"
+      },
+      {
+        "name": "Zafira",
+        "startYear": "2001",
+        "endYear": "2012"
+      }
+    ]
+  },
+  {
+    "brand": "Chrysler",
+    "image": "",
+    "models": [
+      {
+        "name": "Concept",
+        "startYear": "1956",
+        "endYear": "2024"
+      },
+      {
+        "name": "Pacifica",
+        "startYear": "2004",
+        "endYear": ""
+      },
+      {
+        "name": "Voyager",
+        "startYear": "1987",
+        "endYear": ""
+      },
+      {
+        "name": "180",
+        "startYear": "1970",
+        "endYear": "1979"
+      },
+      {
+        "name": "200",
+        "startYear": "2011",
+        "endYear": "2017"
+      },
+      {
+        "name": "300 Letter Series",
+        "startYear": "1955",
+        "endYear": "2004"
+      },
+      {
+        "name": "300 Non-letter Series",
+        "startYear": "1962",
+        "endYear": "1971"
+      },
+      {
+        "name": "300C",
+        "startYear": "2005",
+        "endYear": "2023"
+      },
+      {
+        "name": "Alpine",
+        "startYear": "1975",
+        "endYear": "1979"
+      },
+      {
+        "name": "Aspen",
+        "startYear": "2007",
+        "endYear": "2009"
+      },
+      {
+        "name": "Avenger",
+        "startYear": "1976",
+        "endYear": "1978"
+      },
+      {
+        "name": "by Chrysler",
+        "startYear": "1971",
+        "endYear": "1976"
+      },
+      {
+        "name": "Centura",
+        "startYear": "1975",
+        "endYear": "1978"
+      },
+      {
+        "name": "Charger",
+        "startYear": "1975",
+        "endYear": "1978"
+      },
+      {
+        "name": "Cirrus",
+        "startYear": "1995",
+        "endYear": "2000"
+      },
+      {
+        "name": "Concorde",
+        "startYear": "1993",
+        "endYear": "2004"
+      },
+      {
+        "name": "Conquest",
+        "startYear": "1988",
+        "endYear": "1989"
+      },
+      {
+        "name": "Cordoba",
+        "startYear": "1975",
+        "endYear": "1983"
+      },
+      {
+        "name": "Crossfire",
+        "startYear": "2004",
+        "endYear": "2008"
+      },
+      {
+        "name": "Daytona",
+        "startYear": "1987",
+        "endYear": "1993"
+      },
+      {
+        "name": "Delta",
+        "startYear": "2011",
+        "endYear": "2015"
+      },
+      {
+        "name": "Dynasty",
+        "startYear": "1988",
+        "endYear": "1993"
+      },
+      {
+        "name": "E Class",
+        "startYear": "1983",
+        "endYear": "1984"
+      },
+      {
+        "name": "ES",
+        "startYear": "1986",
+        "endYear": "1990"
+      },
+      {
+        "name": "Executive",
+        "startYear": "1983",
+        "endYear": "1986"
+      },
+      {
+        "name": "Fifth Avenue",
+        "startYear": "1984",
+        "endYear": "1989"
+      },
+      {
+        "name": "Galant",
+        "startYear": "1971",
+        "endYear": "1977"
+      },
+      {
+        "name": "GTS",
+        "startYear": "1988",
+        "endYear": "1989"
+      },
+      {
+        "name": "Horizon",
+        "startYear": "1978",
+        "endYear": "1979"
+      },
+      {
+        "name": "Hunter",
+        "startYear": "1977",
+        "endYear": "1979"
+      },
+      {
+        "name": "Intrepid",
+        "startYear": "1993",
+        "endYear": "2004"
+      },
+      {
+        "name": "Lancer",
+        "startYear": "1975",
+        "endYear": "1981"
+      },
+      {
+        "name": "Laser",
+        "startYear": "1984",
+        "endYear": "1986"
+      },
+      {
+        "name": "LeBaron",
+        "startYear": "1977",
+        "endYear": "1994"
+      },
+      {
+        "name": "LeBaron (j-Body)",
+        "startYear": "1987",
+        "endYear": "1995"
+      },
+      {
+        "name": "LeBaron GTS",
+        "startYear": "1985",
+        "endYear": "1989"
+      },
+      {
+        "name": "LHS",
+        "startYear": "1993",
+        "endYear": "2001"
+      },
+      {
+        "name": "Neon",
+        "startYear": "1994",
+        "endYear": "2005"
+      },
+      {
+        "name": "New Yorker",
+        "startYear": "1939",
+        "endYear": "1997"
+      },
+      {
+        "name": "New Yorker Brougham",
+        "startYear": "1972",
+        "endYear": "1978"
+      },
+      {
+        "name": "Newport",
+        "startYear": "1961",
+        "endYear": "1981"
+      },
+      {
+        "name": "Newport Custom",
+        "startYear": "1967",
+        "endYear": "1976"
+      },
+      {
+        "name": "Prowler",
+        "startYear": "2001",
+        "endYear": "2002"
+      },
+      {
+        "name": "Plainsman",
+        "startYear": "1958",
+        "endYear": "1959"
+      },
+      {
+        "name": "PT Cruiser",
+        "startYear": "2000",
+        "endYear": "2010"
+      },
+      {
+        "name": "Royal",
+        "startYear": "1933",
+        "endYear": "1964"
+      },
+      {
+        "name": "Saratoga",
+        "startYear": "1939",
+        "endYear": "1995"
+      },
+      {
+        "name": "Scorpion",
+        "startYear": "1978",
+        "endYear": "1980"
+      },
+      {
+        "name": "Sebring",
+        "startYear": "1995",
+        "endYear": "2010"
+      },
+      {
+        "name": "Sigma",
+        "startYear": "1977",
+        "endYear": "1980"
+      },
+      {
+        "name": "Stratus",
+        "startYear": "1995",
+        "endYear": "2000"
+      },
+      {
+        "name": "Sunbeam",
+        "startYear": "1977",
+        "endYear": "1979"
+      },
+      {
+        "name": "TC by Maserati",
+        "startYear": "1989",
+        "endYear": "1991"
+      },
+      {
+        "name": "Town & Country",
+        "startYear": "1946",
+        "endYear": "1977"
+      },
+      {
+        "name": "Town & Country MPV",
+        "startYear": "1990",
+        "endYear": "2016"
+      },
+      {
+        "name": "Turbine Car",
+        "startYear": "1963",
+        "endYear": "1963"
+      },
+      {
+        "name": "Valiant",
+        "startYear": "1963",
+        "endYear": "1964"
+      },
+      {
+        "name": "Valiant (AUS)",
+        "startYear": "1962",
+        "endYear": "1981"
+      },
+      {
+        "name": "Viper",
+        "startYear": "1993",
+        "endYear": "1999"
+      },
+      {
+        "name": "Vision",
+        "startYear": "1993",
+        "endYear": "1998"
+      },
+      {
+        "name": "Wayfarer",
+        "startYear": "1958",
+        "endYear": "1961"
+      },
+      {
+        "name": "Windsor",
+        "startYear": "1940",
+        "endYear": "1961"
+      }
+    ,
+      {
+        "name": "Ypsilon",
+        "startYear": "2011",
+        "endYear": "2015"
+      }
+    ]
+  },
+  {
+    "brand": "Citroën",
+    "image": "",
+    "models": [
+      {
+        "name": "Ami Micro",
+        "startYear": "2020",
+        "endYear": ""
+      }
+    ,
+      {
+        "name": "Basalt",
+        "startYear": "2025",
+        "endYear": ""
+      },
+      {
+        "name": "Berlingo",
+        "startYear": "1996",
+        "endYear": ""
+      },
+      {
+        "name": "C-Triomphe",
+        "startYear": "2006",
+        "endYear": ""
+      },
+      {
+        "name": "C-Zero",
+        "startYear": "2010",
+        "endYear": ""
+      },
+      {
+        "name": "C1",
+        "startYear": "2005",
+        "endYear": ""
+      },
+      {
+        "name": "C3",
+        "startYear": "2002",
+        "endYear": ""
+      },
+      {
+        "name": "C3 Aircross",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "C3 Aircross (Asia)",
+        "startYear": "2023",
+        "endYear": ""
+      },
+      {
+        "name": "C3-XR",
+        "startYear": "2014",
+        "endYear": ""
+      },
+      {
+        "name": "C4",
+        "startYear": "2004",
+        "endYear": ""
+      },
+      {
+        "name": "C4 Aircross",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "C4 Cactus",
+        "startYear": "2014",
+        "endYear": ""
+      }
+    ,
+      {
+        "name": "C4 L",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "C4 Picasso",
+        "startYear": "2006",
+        "endYear": ""
+      },
+      {
+        "name": "C4 Shijia",
+        "startYear": "2016",
+        "endYear": ""
+      },
+      {
+        "name": "C5",
+        "startYear": "2001",
+        "endYear": ""
+      },
+      {
+        "name": "C5 Aircross",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "C6",
+        "startYear": "2006",
+        "endYear": ""
+      },
+      {
+        "name": "e-Méhari",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "Elysée",
+        "startYear": "2002",
+        "endYear": ""
+      },
+      {
+        "name": "Jumper",
+        "startYear": "1994",
+        "endYear": ""
+      },
+      {
+        "name": "Jumper Conversions",
+        "startYear": "1994",
+        "endYear": "2024"
+      },
+      {
+        "name": "Jumpy",
+        "startYear": "1995",
+        "endYear": ""
+      },
+      {
+        "name": "Spacetourer",
+        "startYear": "2016",
+        "endYear": ""
+      },
+      {
+        "name": "2CV",
+        "startYear": "1948",
+        "endYear": "1990"
+      },
+      {
+        "name": "Acadiane",
+        "startYear": "1978",
+        "endYear": "1987"
+      },
+      {
+        "name": "Ami",
+        "startYear": "1961",
+        "endYear": "1978"
+      },
+      {
+        "name": "AX",
+        "startYear": "1987",
+        "endYear": "1998"
+      },
+      {
+        "name": "Axel",
+        "startYear": "1984",
+        "endYear": "1990"
+      },
+      {
+        "name": "BX",
+        "startYear": "1982",
+        "endYear": "1994"
+      },
+      {
+        "name": "C-Crosser",
+        "startYear": "2008",
+        "endYear": "2013"
+      },
+      {
+        "name": "C15",
+        "startYear": "1984",
+        "endYear": "2005"
+      },
+      {
+        "name": "C2",
+        "startYear": "2004",
+        "endYear": "2010"
+      },
+      {
+        "name": "C25",
+        "startYear": "1982",
+        "endYear": "1994"
+      },
+      {
+        "name": "C3 Picasso",
+        "startYear": "2009",
+        "endYear": "2017"
+      },
+      {
+        "name": "C8",
+        "startYear": "2003",
+        "endYear": "2014"
+      }
+    ,
+      {
+        "name": "Concept",
+        "startYear": "1958",
+        "endYear": "2023"
+      },
+      {
+        "name": "CX",
+        "startYear": "1975",
+        "endYear": "1991"
+      },
+      {
+        "name": "DS",
+        "startYear": "1955",
+        "endYear": "1975"
+      },
+      {
+        "name": "DS3",
+        "startYear": "2010",
+        "endYear": "20161"
+      },
+      {
+        "name": "DS4",
+        "startYear": "2011",
+        "endYear": "2015"
+      },
+      {
+        "name": "DS5",
+        "startYear": "2011",
+        "endYear": "2015"
+      },
+      {
+        "name": "Dyane",
+        "startYear": "1967",
+        "endYear": "1983"
+      },
+      {
+        "name": "Evasion",
+        "startYear": "1994",
+        "endYear": "2002"
+      },
+      {
+        "name": "FAF",
+        "startYear": "1978",
+        "endYear": "1985"
+      },
+      {
+        "name": "Fukang",
+        "startYear": "1994",
+        "endYear": "2009"
+      },
+      {
+        "name": "GS",
+        "startYear": "1970",
+        "endYear": "1986"
+      },
+      {
+        "name": "H Van",
+        "startYear": "1947",
+        "endYear": "1981"
+      }
+    ,
+      {
+        "name": "LN",
+        "startYear": "1976",
+        "endYear": "1986"
+      },
+      {
+        "name": "M35",
+        "startYear": "1970",
+        "endYear": "1971"
+      },
+      {
+        "name": "Méhari",
+        "startYear": "1968",
+        "endYear": "1987"
+      },
+      {
+        "name": "Nemo",
+        "startYear": "2007",
+        "endYear": "2014"
+      },
+      {
+        "name": "Saxo",
+        "startYear": "1996",
+        "endYear": "2004"
+      },
+      {
+        "name": "SM",
+        "startYear": "1970",
+        "endYear": "1975"
+      },
+      {
+        "name": "Visa",
+        "startYear": "1978",
+        "endYear": "1988"
+      },
+      {
+        "name": "XM",
+        "startYear": "1989",
+        "endYear": "2001"
+      },
+      {
+        "name": "Xsara",
+        "startYear": "1998",
+        "endYear": "2006"
+      },
+      {
+        "name": "Xsara Picasso",
+        "startYear": "2000",
+        "endYear": "2010"
+      },
+      {
+        "name": "ZX",
+        "startYear": "1991",
+        "endYear": "1998"
+      }
+    ]
+  },
+  {
+    "brand": "Dacia",
+    "image": "",
+    "models": [
+      {
+        "name": "Dokker",
+        "startYear": "2013",
+        "endYear": ""
+      },
+      {
+        "name": "Duster",
+        "startYear": "2010",
+        "endYear": ""
+      },
+      {
+        "name": "Jogger",
+        "startYear": "2022",
+        "endYear": ""
+      },
+      {
+        "name": "Lodgy",
+        "startYear": "2012",
+        "endYear": ""
+      },
+      {
+        "name": "Logan",
+        "startYear": "2005",
+        "endYear": ""
+      },
+      {
+        "name": "Sandero",
+        "startYear": "2008",
+        "endYear": ""
+      },
+      {
+        "name": "Spring",
+        "startYear": "2021",
+        "endYear": ""
+      },
+      {
+        "name": "1100",
+        "startYear": "1968",
+        "endYear": "1972"
+      },
+      {
+        "name": "1300",
+        "startYear": "1969",
+        "endYear": "2004"
+      },
+      {
+        "name": "500 Lastun",
+        "startYear": "1988",
+        "endYear": "1991"
+      },
+      {
+        "name": "Concept",
+        "startYear": "2020",
+        "endYear": "2022"
+      },
+      {
+        "name": "Nova",
+        "startYear": "1995",
+        "endYear": "2000"
+      },
+      {
+        "name": "Pick-Up",
+        "startYear": "1975",
+        "endYear": "2006"
+      },
+      {
+        "name": "Solenza",
+        "startYear": "2003",
+        "endYear": "2005"
+      },
+      {
+        "name": "SupeRNova",
+        "startYear": "2000",
+        "endYear": "2003"
+      }
+    ]
+  },
+  {
+    "brand": "Daewoo",
+    "image": "",
+    "models": [
+      {
+        "name": "Arcadia",
+        "startYear": "1994",
+        "endYear": "1998"
+      },
+      {
+        "name": "Damas",
+        "startYear": "1991",
+        "endYear": "2011"
+      },
+      {
+        "name": "Espero",
+        "startYear": "1990",
+        "endYear": "1997"
+      },
+      {
+        "name": "Evanda",
+        "startYear": "2002",
+        "endYear": "2004"
+      },
+      {
+        "name": "Gentra",
+        "startYear": "2005",
+        "endYear": "2016"
+      },
+      {
+        "name": "Imperial",
+        "startYear": "1989",
+        "endYear": "1993"
+      },
+      {
+        "name": "Kalos",
+        "startYear": "2002",
+        "endYear": "2007"
+      },
+      {
+        "name": "Labo",
+        "startYear": "1991",
+        "endYear": "2013"
+      },
+      {
+        "name": "Lacetti",
+        "startYear": "2002",
+        "endYear": "2011"
+      },
+      {
+        "name": "Lanos",
+        "startYear": "1997",
+        "endYear": "2017"
+      },
+      {
+        "name": "Leganza",
+        "startYear": "1997",
+        "endYear": "2003"
+      },
+      {
+        "name": "LeMans",
+        "startYear": "1986",
+        "endYear": "1997"
+      },
+      {
+        "name": "Lublin",
+        "startYear": "1995",
+        "endYear": "2003"
+      },
+      {
+        "name": "Maepsy",
+        "startYear": "1982",
+        "endYear": "1985"
+      },
+      {
+        "name": "Magnus",
+        "startYear": "1999",
+        "endYear": "2006"
+      },
+      {
+        "name": "Matiz",
+        "startYear": "1998",
+        "endYear": "2015"
+      },
+      {
+        "name": "Musso",
+        "startYear": "1993",
+        "endYear": "2005"
+      },
+      {
+        "name": "Nexia",
+        "startYear": "1994",
+        "endYear": "1997"
+      },
+      {
+        "name": "Nubira",
+        "startYear": "1997",
+        "endYear": "2005"
+      },
+      {
+        "name": "Prince",
+        "startYear": "1991",
+        "endYear": "1997"
+      },
+      {
+        "name": "Rezzp",
+        "startYear": "2000",
+        "endYear": "2007"
+      },
+      {
+        "name": "Royale",
+        "startYear": "1980",
+        "endYear": "1991"
+      },
+      {
+        "name": "Statesman",
+        "startYear": "2005",
+        "endYear": "2007"
+      },
+      {
+        "name": "Tacuma",
+        "startYear": "2000",
+        "endYear": "2008"
+      },
+      {
+        "name": "Tico",
+        "startYear": "1991",
+        "endYear": "2001"
+      },
+      {
+        "name": "Tosca",
+        "startYear": "2006",
+        "endYear": "2011"
+      },
+      {
+        "name": "Veritas",
+        "startYear": "2008",
+        "endYear": "2010"
+      },
+      {
+        "name": "Winstorm",
+        "startYear": "2007",
+        "endYear": "2011"
+      },
+      {
+        "name": "Winstorm MaXX",
+        "startYear": "2008",
+        "endYear": "2011"
+      }
+    ]
+  },
+  {
+    "brand": "Daihatsu",
+    "image": "",
+    "models": [
+      {
+        "name": "Altis",
+        "startYear": "2000",
+        "endYear": ""
+      },
+      {
+        "name": "Atrai",
+        "startYear": "1981",
+        "endYear": ""
+      },
+      {
+        "name": "Ayla",
+        "startYear": "2013",
+        "endYear": ""
+      },
+      {
+        "name": "Boon",
+        "startYear": "2004",
+        "endYear": ""
+      },
+      {
+        "name": "Cast",
+        "startYear": "2015",
+        "endYear": ""
+      },
+      {
+        "name": "Copen",
+        "startYear": "2002",
+        "endYear": ""
+      },
+      {
+        "name": "Gran Max",
+        "startYear": "2007",
+        "endYear": ""
+      },
+      {
+        "name": "Hijet",
+        "startYear": "1960",
+        "endYear": ""
+      },
+      {
+        "name": "Mebius",
+        "startYear": "2013",
+        "endYear": ""
+      },
+      {
+        "name": "Mira e:S",
+        "startYear": "2011",
+        "endYear": ""
+      },{
+        "name": "Move",
+        "startYear": "1995",
+        "endYear": ""
+      },
+      {
+        "name": "Rocky",
+        "startYear": "1984",
+        "endYear": ""
+      },
+      {
+        "name": "Sigra",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "Taft",
+        "startYear": "1974",
+        "endYear": ""
+      },
+      {
+        "name": "Tanto",
+        "startYear": "2003",
+        "endYear": ""
+      },
+      {
+        "name": "Terios",
+        "startYear": "1997",
+        "endYear": ""
+      },
+      {
+        "name": "Thor",
+        "startYear": "2016",
+        "endYear": ""
+      },
+      {
+        "name": "Wake",
+        "startYear": "2014",
+        "endYear": ""
+      },
+      {
+        "name": "Applause",
+        "startYear": "1989",
+        "endYear": "2000"
+      },
+      {
+        "name": "Be-Go",
+        "startYear": "2006",
+        "endYear": "2016"
+      },
+      {
+        "name": "Boon Luminas",
+        "startYear": "2008",
+        "endYear": "2012"
+      },
+      {
+        "name": "Charade",
+        "startYear": "1977",
+        "endYear": "2013"
+      },
+      {
+        "name": "Charmant",
+        "startYear": "1975",
+        "endYear": "1988"
+      },
+      {
+        "name": "Concept",
+        "startYear": "2016",
+        "endYear": ""
+      },
+      {
+        "name": "Coo",
+        "startYear": "2006",
+        "endYear": "2013"
+      },
+      {
+        "name": "Esse",
+        "startYear": "2005",
+        "endYear": "2011"
+      },
+      {
+        "name": "Feroza",
+        "startYear": "1989",
+        "endYear": "1999"
+      },
+      {
+        "name": "Gran Move",
+        "startYear": "1996",
+        "endYear": "2002"
+      },
+      {
+        "name": "Leeza",
+        "startYear": "1986",
+        "endYear": "1993"
+      },
+      {
+        "name": "Luxio",
+        "startYear": "2009",
+        "endYear": "2016"
+      },
+      {
+        "name": "Materia",
+        "startYear": "2006",
+        "endYear": "2010"
+      },
+      {
+        "name": "Max",
+        "startYear": "2001",
+        "endYear": "2006"
+      },
+      {
+        "name": "Midget",
+        "startYear": "1996",
+        "endYear": "2001"
+      },
+      {
+        "name": "Mira",
+        "startYear": "1980",
+        "endYear": "2017"
+      },
+      {
+        "name": "Move Conte",
+        "startYear": "2008",
+        "endYear": "2017"
+      },
+      {
+        "name": "Naked",
+        "startYear": "2000",
+        "endYear": "2004"
+      },
+      {
+        "name": "Opti",
+        "startYear": "1992",
+        "endYear": "2002"
+      },
+      {
+        "name": "Pyzar",
+        "startYear": "1996",
+        "endYear": "2002"
+      },
+      {
+        "name": "Rugger",
+        "startYear": "1984",
+        "endYear": "2002"
+      },
+      {
+        "name": "Sirion",
+        "startYear": "1998",
+        "endYear": "2010"
+      },
+      {
+        "name": "Sonica",
+        "startYear": "2006",
+        "endYear": "2009"
+      },
+      {
+        "name": "Storia",
+        "startYear": "1998",
+        "endYear": "2004"
+      },
+      {
+        "name": "Terios Kid",
+        "startYear": "1998",
+        "endYear": "2012"
+      },
+      {
+        "name": "Terios Lucia",
+        "startYear": "2002",
+        "endYear": "2003"
+      },
+      {
+        "name": "Trevis",
+        "startYear": "2006",
+        "endYear": "2011"
+      },
+      {
+        "name": "Xenia",
+        "startYear": "2003",
+        "endYear": "2011"
+      },
+      {
+        "name": "YRV",
+        "startYear": "2000",
+        "endYear": "2005"
+      }
+    ]
+  },
+  {
+    "brand": "Datsun",
+    "image": "",
+    "models": [
+      {
+        "name": "Go",
+        "startYear": "2014",
+        "endYear": ""
+      }
+    ,
+      {
+        "name": "mi-Do",
+        "startYear": "2015",
+        "endYear": ""
+      },
+      {
+        "name": "on-Do",
+        "startYear": "2014",
+        "endYear": ""
+      },
+      {
+        "name": "redi-Go",
+        "startYear": "2016",
+        "endYear": ""
+      },
+      {
+        "name": "210",
+        "startYear": "1979",
+        "endYear": "1982"
+      },
+      {
+        "name": "280C",
+        "startYear": "1979",
+        "endYear": "1984"
+      },
+      {
+        "name": "510",
+        "startYear": "1968",
+        "endYear": "1973"
+      },
+      {
+        "name": "Bluebird",
+        "startYear": "1959",
+        "endYear": "1993"
+      },
+      {
+        "name": "Cherry",
+        "startYear": "1971",
+        "endYear": "1982"
+      },
+      {
+        "name": "Concept",
+        "startYear": "2015",
+        "endYear": "2015"
+      },
+      {
+        "name": "Laurel",
+        "startYear": "1968",
+        "endYear": "1986"
+      },
+      {
+        "name": "Patrol",
+        "startYear": "1951",
+        "endYear": "1989"
+      },
+      {
+        "name": "Sports",
+        "startYear": "1952",
+        "endYear": "1970"
+      }
+    ,
+      {
+        "name": "Stanza",
+        "startYear": "1973",
+        "endYear": "1992"
+      },
+      {
+        "name": "Sunny",
+        "startYear": "1966",
+        "endYear": "1985"
+      },
+      {
+        "name": "Truck",
+        "startYear": "1972",
+        "endYear": "1986"
+      },
+      {
+        "name": "Violet",
+        "startYear": "1973",
+        "endYear": "1981"
+      },
+      {
+        "name": "Z-car",
+        "startYear": "1970",
+        "endYear": "1983"
+      }
+    ]
+  },
+  {
+    "brand": "DeLorean",
+    "image": "",
+    "models": [
+      {
+        "name": "DMC-12",
+        "startYear": "1981",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Dodge",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Dongfeng",
+    "image": "",
+    "models": [
+      {
+        "name": "AX4",
+        "startYear": "2017",
+        "endYear": ""
+      },
+      {
+        "name": "AX7",
+        "startYear": "2014",
+        "endYear": ""
+      },
+      {
+        "name": "ix5",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "Nammi Box",
+        "startYear": "2025",
+        "endYear": ""
+      },
+      {
+        "name": "P16",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "Ruijing 6",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "S16",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "S560",
+        "startYear": "2018",
+        "endYear": ""
+      },
+      {
+        "name": "T5",
+        "startYear": "2018",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Edsel",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "FAW",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Ferrari",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Fiat",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Fisker",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Ford",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Foton",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "GAC",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "GAZ",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Geely",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Genesis",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "GMC",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Goupil",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Great Wall",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Grecav",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "GSC",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Haval",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Hawtai",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Holden",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Honda",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Hummer",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Hyosung",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Hyundai",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Infiniti",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Isuzu",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Iveco",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "JAC",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Jaecoo",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Jaguar",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Jeep",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "KGM",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Kia",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Koenigsegg",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "KTM",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Lada",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Lamborghini",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Lancia",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Land Rover",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "LEVC",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Lexus",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Lifan",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Lightyear",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Ligier",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Lincoln",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Lotus",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Mahindra",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "MAN",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Maserati",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Maxus",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Maybach",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Mazda",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "McLaren",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Mercedes-Benz",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Mercury",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "MG",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Mini",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Mitsubishi",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Morgan",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Morris",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Moskvich",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Nissan",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Oldsmobile",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Omoda",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Opel",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Peugeot",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Plymouth",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Polaris",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Pontiac",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Porsche",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "RAM",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Renault",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Rolls-Royce",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Rover",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Saab",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Saturn",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Scion",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "SEAT",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Shelby",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Ski-Doo",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Skoda",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Smart",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "SsangYong",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Subaru",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Suzuki",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Tesla",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Toyota",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Trabant",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "UAZ",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Vauxhall",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "VAZ",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Volkswagen",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Volvo",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Wartburg",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Xiaomi",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "XPENG",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Yangwang",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Yugo",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Zastava",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Zeekr",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  },
+  {
+    "brand": "Zhongyu",
+    "image": "",
+    "models": [
+      {
+        "name": "",
+        "startYear": "",
+        "endYear": ""
+      }
+    ]
+  }
+]
