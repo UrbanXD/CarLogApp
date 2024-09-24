@@ -5,6 +5,8 @@ import {UseFormHandleSubmit} from "react-hook-form";
 import {SupabaseConnector} from "../db/SupabaseConnector";
 import {Kysely} from "@powersync/kysely-driver";
 import {DatabaseType} from "../db/AppSchema";
+import {exp} from "@gorhom/bottom-sheet/lib/typescript/utilities/easingExp";
+import {InputPickerDataType} from "../components/Input/InputPicker/InputPicker";
 
 export interface GetFormHandleSubmitArgs {
     handleSubmit: UseFormHandleSubmit<any>
@@ -165,3 +167,18 @@ export const COLLAPSIBLE_HEADER_IMAGE = 110;
 
 export const SIMPLE_HEADER_HEIGHT = hp(6.75);
 export const SIMPLE_TABBAR_HEIGHT = hp(6.75);
+
+export const CARS_DATA = require("../assets/cars.json");
+
+export const GET_CAR_BRANDS = () => {
+    const brands = [] as Array<InputPickerDataType>;
+
+    CARS_DATA.forEach((item: any) => {
+        brands.push({
+            title: item.brand,
+            icon: require("../assets/images/carBrands/audi.png")
+            // icon: `../../../assets/images/carBrands/${ item.brand.toLowerCase().replace(/ /g, '-') }.png`
+        });
+    })
+    return brands;
+}

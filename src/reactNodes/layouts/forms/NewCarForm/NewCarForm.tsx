@@ -8,7 +8,7 @@ import {
 import {useDatabase} from "../../../../db/Database";
 import {StyleSheet, Text, View} from "react-native";
 
-import {GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../../../constants/constants";
+import {GET_CAR_BRANDS, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../../../constants/constants";
 import Button from "../../../../components/Button/Button";
 import {widthPercentageToDP as wp} from "react-native-responsive-screen";
 import {MultiStepFormProvider, useMultiStepForm} from "../../../providers/MultiStepFormProvider";
@@ -91,10 +91,11 @@ const StepOne: React.FC = () => {
 
 const StepTwo: React.FC = () => {
     const { control } = useMultiStepForm();
+    const brands = GET_CAR_BRANDS();
 
     return (
         <InputPicker
-            data={ [{title: "Merci"}, {title: "Merci"}, {title: "Merci"}, {title: "Merci"}, {title: "Audi"}, {title: "Audi"}, {title: "Audi"},{title: "Audi"},{title: "Audi"}, {title: "xddi"}, {title: "Audi"}, {title: "Opel"}] }
+            data={ brands }
             control={ control }
             fieldName="brand"
             fieldNameText="Márka"

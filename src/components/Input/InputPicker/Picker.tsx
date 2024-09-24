@@ -1,5 +1,5 @@
 import React, {ReactNode, useCallback, useEffect, useRef, useState} from "react";
-import {View, Text, StyleSheet, TouchableOpacity} from "react-native";
+import {View, Text, StyleSheet, TouchableOpacity, Image, ImageSourcePropType} from "react-native";
 import {Icon, IconButton} from "react-native-paper";
 import {
     DEFAULT_SEPARATOR, FONT_SIZES,
@@ -20,6 +20,7 @@ export interface PickerDataType {
     id?: string
     title: string
     subtitle?: string
+    icon?: ImageSourcePropType
 }
 
 type PickerProps = {
@@ -79,10 +80,10 @@ const Picker: React.FC<PickerProps> = ({
         if(isDropdownContentVisible && data.length >= 1) {
             const selectedItemIndex = data.map(item => item.id).indexOf(selectedItemID);
             if(selectedItemIndex !== -1) {
-                flatlistRef?.current?.scrollToIndex({
-                    index: selectedItemIndex,
-                    animated: true
-                })
+                // flatlistRef?.current?.scrollToIndex({
+                //     index: selectedItemIndex,
+                //     animated: true
+                // })
             } else {
                 flatlistRef?.current?.scrollToIndex({
                     index: 0,
@@ -93,7 +94,7 @@ const Picker: React.FC<PickerProps> = ({
     }, [data]);
 
     const renderElements = () =>
-        <View style={[styles.elementsContainer, !isHorizontal && { height: styles.inputPickerItemContainer.height * 5 + 5 * SEPARATOR_SIZES.small, flexDirection: "column" }]}>
+        <View style={[styles.elementsContainer, !isHorizontal && { height: styles.inputPickerItemContainer.minHeight * 5 + 5 * SEPARATOR_SIZES.small, flexDirection: "column" }]}>
             {
                 !setSearchTerm && isDropdown &&
                 <IconButton
@@ -121,6 +122,7 @@ const Picker: React.FC<PickerProps> = ({
                             <PickerItem
                                 title={ item.title }
                                 subtitle={ item.subtitle }
+                                icon={ item.icon }
                                 selected={ item.id === selectedItemID }
                                 onPress={ () => memoizedSetSelected(item.id || index.toString() ) }
                             />
@@ -256,7 +258,7 @@ interface PickerItemProps {
     onPress: () => void
     title: string
     subtitle?: string
-    error?: string
+    icon?: ImageSourcePropType
     selected: boolean
 }
 
@@ -264,19 +266,34 @@ const PickerItem: React.FC<PickerItemProps> = ({
     onPress,
     title,
     subtitle,
-    error,
+    icon,
     selected
 }) => {
     return (
         <TouchableOpacity onPress={ onPress } style={ [styles.inputPickerItemContainer, selected && styles.inputPickerSelectedItemContainer] }>
-            <Text numberOfLines={ 1 } style={ styles.inputPickerTitleText }>
-                { title }
-            </Text>
             {
-                subtitle &&
-                    <Text numberOfLines={ 1 } style={ styles.inputPickerSubtitleText }>
+                icon &&
+                <View style={ styles.inputPickerItemIconContainer }>
+                    <Image
+                        source={ icon }
+                        style={{ alignSelf: "center", width: FONT_SIZES.large, height: FONT_SIZES.large }}
+                    />
+                </View>
+            }
+            <View style={{ flex: 1, alignItems: "center" }}>
+                <Text style={ styles.inputPickerTitleText }>
+                    { title }
+                </Text>
+                {
+                    subtitle &&
+                    <Text style={ styles.inputPickerSubtitleText }>
                         { subtitle }
                     </Text>
+                }
+            </View>
+            {
+                icon &&
+                <View style={ styles.inputPickerItemIconContainer } />
             }
         </TouchableOpacity>
     )
@@ -305,27 +322,33 @@ const styles= StyleSheet.create({
     },
     inputPickerItemContainer: {
         flex: 1,
-        justifyContent: "center",
+        flexDirection: "row",
+        // justifyContent: "center",
         alignItems: "center",
         backgroundColor: theme.colors.gray3,
-        height: hp(6),
-        // width: wp(35),
+        minHeight: hp(6),
         borderRadius: 15,
-        paddingHorizontal: SEPARATOR_SIZES.normal
+        paddingHorizontal: SEPARATOR_SIZES.lightSmall
     },
     inputPickerSelectedItemContainer: {
         borderWidth: 1.5,
         borderColor: theme.colors.gray1
     },
+    inputPickerItemIconContainer: {
+        flex: 0.25,
+        alignItems: "center",
+    },
     inputPickerTitleText: {
         ...GLOBAL_STYLE.containerTitleText,
         fontSize: GLOBAL_STYLE.containerTitleText.fontSize * 0.7,
-        letterSpacing: GLOBAL_STYLE.containerTitleText.letterSpacing * 0.7
+        letterSpacing: GLOBAL_STYLE.containerTitleText.letterSpacing * 0.7,
+        textAlign: "center"
     },
     inputPickerSubtitleText: {
         ...GLOBAL_STYLE.containerText,
         fontSize: GLOBAL_STYLE.containerText.fontSize * 0.8,
-        letterSpacing: GLOBAL_STYLE.containerText.letterSpacing * 0.8
+        letterSpacing: GLOBAL_STYLE.containerText.letterSpacing * 0.8,
+        textAlign: "center"
     }
 })
 
