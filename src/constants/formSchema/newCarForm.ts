@@ -7,8 +7,8 @@ import {addCar} from "../../redux/reducers/cars.slices";
 import {PickerDataType} from "../../components/Input/InputPicker/Picker";
 import {InputPickerDataType} from "../../components/Input/InputPicker/InputPicker";
 
-export const newCarFormStepsField = [["name"], ["brand"], ["model"], ["odometer_value", "odometer_measurement"], ["fuel_type", "fuel_measurement", "fuel_tank_size"]];
-export const newCarFormStepsTitle = ["Elnevezés", "Gyártó", "Model", "Autó adatok", "Autó adatok"];
+export const newCarFormStepsField = [["name"], ["brand", "model"], ["odometer_value", "odometer_measurement"], ["fuel_type", "fuel_measurement", "fuel_tank_size"]];
+export const newCarFormStepsTitle = ["Elnevezés", "Gyártó", "Autó adatok", "Autó adatok"];
 
 export const ODOMETER_MEASUREMENTS: Array<InputPickerDataType> = [
     { title: "Kilóméter (KM)", value: "km" },

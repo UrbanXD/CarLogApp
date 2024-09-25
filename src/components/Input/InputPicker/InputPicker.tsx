@@ -24,6 +24,7 @@ interface InputPickerProps {
     isInBottomSheet?: boolean
     isHorizontal?: boolean
     withSearchbar?: boolean
+    disabled?: boolean
 }
 const InputPicker: React.FC<InputPickerProps> = ({
     data,
@@ -34,8 +35,9 @@ const InputPicker: React.FC<InputPickerProps> = ({
     icon,
     placeholder,
     isInBottomSheet,
-    isHorizontal= false,
-    withSearchbar = false
+    isHorizontal = false,
+    withSearchbar = false,
+    disabled = false
 }) => {
     const [adjustedData, setAdjustedData] = useState<Array<InputPickerDataType>>([] as Array<InputPickerDataType>);
     const [selectedItemID, setSelectedItemID] = useState("");
@@ -97,6 +99,7 @@ const InputPicker: React.FC<InputPickerProps> = ({
                             isDropdown={ !isHorizontal }
                             isHorizontal={ isHorizontal }
                             dropDownInfoType={ "input" }
+                            disabled={ disabled }
                         />
                     :   <></>
                 }

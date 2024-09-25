@@ -35,6 +35,7 @@ type PickerProps = {
     dropDownInfoType?: "simple" | "input"
     placeholder?: string
     error?: string
+    disabled?: boolean
 }
 
 const Picker: React.FC<PickerProps> = ({
@@ -48,7 +49,8 @@ const Picker: React.FC<PickerProps> = ({
     setSearchTerm,
     onSelect,
     selectedItemID,
-    isHorizontal= true
+    isHorizontal = true,
+    disabled = false
 }) => {
     const flatlistRef = useRef<FlatList>(null)
     const [isDropdownContentVisible, setIsDropdownContentVisible] = useState(!isDropdown);
@@ -160,6 +162,7 @@ const Picker: React.FC<PickerProps> = ({
                                 placeholder={ placeholder }
                                 error={ error }
                                 isHorizontal={ isHorizontal }
+                                disabled={ disabled }
                             />
                         :   <PickerInputDropdownInfo
                                 toggleDropdown={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
@@ -168,6 +171,7 @@ const Picker: React.FC<PickerProps> = ({
                                 error={ error }
                                 placeholder={ placeholder }
                                 isHorizontal={ isHorizontal }
+                                disabled={ disabled }
                             />
                 :   renderElements()
             }
@@ -182,6 +186,7 @@ interface PickerDropdownInfoProps {
     placeholder?: string
     error?: string
     isHorizontal: boolean
+    disabled: boolean
 }
 
 interface PickerSimpleDropdownInfoProps extends PickerDropdownInfoProps{
@@ -194,12 +199,20 @@ const PickerInputDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
     title,
     placeholder,
     error,
-    isHorizontal
+    isHorizontal,
+    disabled
 }) => {
+
+    const [pickerError, setPickerError] = useState<string | undefined>();
+
+    useEffect(() => {
+        if(!disabled) setPickerError(undefined)
+    }, [disabled]);
+
     return (
         <TouchableOpacity
     style={{ alignItems: "center", flexDirection: "row", gap: SEPARATOR_SIZES.lightSmall }}
-    onPress={ toggleDropdown }
+    onPress={ !disabled ? toggleDropdown : () => { setPickerError("xd") } }
         >
             <View style={ GLOBAL_STYLE.formContainer }>
                 <TextInput
@@ -208,7 +221,7 @@ const PickerInputDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
                     icon={ icon }
                     actionIcon={ isHorizontal ? ICON_NAMES.rightArrowHead : ICON_NAMES.downArrowHead }
                     placeholder={ placeholder }
-                    error={ error }
+                    error={ error || pickerError }
                     isPickerHeader
                 />
             </View>
@@ -222,12 +235,13 @@ const PickerSimpleDropdownInfo: React.FC<PickerSimpleDropdownInfoProps> = ({
     title,
     subtitle,
     placeholder,
-    isHorizontal
+    isHorizontal,
+    disabled
 }) => {
     return (
         <TouchableOpacity
             style={{ alignItems: "center", flexDirection: "row", gap: SEPARATOR_SIZES.lightSmall }}
-            onPress={ toggleDropdown }
+            onPress={ !disabled ? toggleDropdown : () => {} }
         >
             {
                 icon &&

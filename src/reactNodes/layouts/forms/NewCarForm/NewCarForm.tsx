@@ -1,5 +1,5 @@
-import React, {useEffect} from "react";
-import {useForm} from "react-hook-form";
+import React, {useEffect, useState} from "react";
+import {useForm, useWatch} from "react-hook-form";
 import {
     getNewCarHandleSubmit,
     NewCarFormFieldType, newCarFormStepsField,
@@ -8,14 +8,20 @@ import {
 import {useDatabase} from "../../../../db/Database";
 import {StyleSheet, Text, View} from "react-native";
 
-import {GET_CAR_BRANDS, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../../../constants/constants";
+import {
+    DATA_TRANSFORM_TO_PICKER_DATA,
+    GET_CARS_DATA,
+    GLOBAL_STYLE,
+    ICON_NAMES,
+    SEPARATOR_SIZES
+} from "../../../../constants/constants";
 import Button from "../../../../components/Button/Button";
 import {widthPercentageToDP as wp} from "react-native-responsive-screen";
 import {MultiStepFormProvider, useMultiStepForm} from "../../../providers/MultiStepFormProvider";
 import {NewCarFormProgressInfo, NewCarFormContent, NewCarFormButtons} from "./NewCarFormProgressInfo";
 // @ts-ignore
 import Picker, { PickerDataType } from "../../../../components/Input/InputPicker/Picker";
-import InputPicker from "../../../../components/Input/InputPicker/InputPicker";
+import InputPicker, {InputPickerDataType} from "../../../../components/Input/InputPicker/InputPicker";
 import InputText from "../../../../components/Input/InputText/InputText";
 import TextInput from "../../../../components/Input/InputText/TextInput";
 
@@ -24,7 +30,7 @@ interface NewCarFormProps {
 }
 
 const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
-    const { control, handleSubmit, trigger, reset, setValue } =
+    const { control, handleSubmit, trigger, reset } =
         useForm<NewCarFormFieldType>(newCarUseFormProps);
 
     const { supabaseConnector, db } = useDatabase();
@@ -50,8 +56,6 @@ const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
             <StepOne />,
         () =>
             <StepTwo />,
-        () =>
-            <StepThree />,
         () =>
             <StepFour />
     ]
@@ -91,30 +95,36 @@ const StepOne: React.FC = () => {
 
 const StepTwo: React.FC = () => {
     const { control } = useMultiStepForm();
-    const brands = GET_CAR_BRANDS();
+    const cars_data = GET_CARS_DATA();
+    const selectedBrandName = useWatch({
+        control,
+        name: "brand"
+    });
+
+    const brands = DATA_TRANSFORM_TO_PICKER_DATA(Object.keys(cars_data));
+    const models = DATA_TRANSFORM_TO_PICKER_DATA(cars_data[selectedBrandName] || [], "name");
+
+    const isBrandSelected = selectedBrandName !== "";
 
     return (
-        <InputPicker
-            data={ brands }
-            control={ control }
-            fieldName="brand"
-            fieldNameText="Márka"
-            withSearchbar
-        />
-    )
-}
-
-const StepThree: React.FC = () => {
-    const { control } = useMultiStepForm();
-
-    return (
-        <InputPicker
-            data={ [{title: "A4"}, {title: "A5"}, {title: "Zafira"}] }
-            control={ control }
-            fieldName={"model"}
-            fieldNameText="Modell"
-            isHorizontal
-        />
+        <>
+            <InputPicker
+                data={ brands }
+                control={ control }
+                fieldName="brand"
+                fieldNameText="Márka"
+                withSearchbar
+            />
+            <InputPicker
+                key={ JSON.stringify(models) }
+                data={ models }
+                control={ control }
+                fieldName={"model"}
+                fieldNameText="Modell"
+                withSearchbar
+                disabled={ !isBrandSelected }
+            />
+        </>
     )
 }
 

@@ -4,7 +4,7 @@ import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-nativ
 import {UseFormHandleSubmit} from "react-hook-form";
 import {SupabaseConnector} from "../db/SupabaseConnector";
 import {Kysely} from "@powersync/kysely-driver";
-import {DatabaseType} from "../db/AppSchema";
+import {CarsType, DatabaseType} from "../db/AppSchema";
 import {exp} from "@gorhom/bottom-sheet/lib/typescript/utilities/easingExp";
 import {InputPickerDataType} from "../components/Input/InputPicker/InputPicker";
 
@@ -168,17 +168,50 @@ export const COLLAPSIBLE_HEADER_IMAGE = 110;
 export const SIMPLE_HEADER_HEIGHT = hp(6.75);
 export const SIMPLE_TABBAR_HEIGHT = hp(6.75);
 
+export interface CarBrandsType {
+    [key: string]: Array<CarModelsType>;
+}
+
+export interface CarModelsType {
+    name: string,
+    startYear: number,
+    endYear: number,
+}
+
 export const CARS_DATA = require("../assets/cars.json");
 
-export const GET_CAR_BRANDS = () => {
-    const brands = [] as Array<InputPickerDataType>;
+export const GET_CARS_DATA = () => {
+    const cars_data = { } as CarBrandsType;
 
     CARS_DATA.forEach((item: any) => {
-        brands.push({
-            title: item.brand,
-            icon: require("../assets/images/carBrands/audi.png")
-            // icon: `../../../assets/images/carBrands/${ item.brand.toLowerCase().replace(/ /g, '-') }.png`
-        });
+        const models = [] as Array<CarModelsType>;
+
+        item
+            .models
+            .map((item: any) => {
+                models.push({
+                    name: item.name,
+                    startYear: Number(item.years.startYear),
+                    endYear: Number(item.years.endYear)
+                })
+            })
+
+        cars_data[item.brand] = models;
     })
-    return brands;
+
+    return cars_data;
+}
+
+export const DATA_TRANSFORM_TO_PICKER_DATA = (data: any, titleSelector?: string, subtitleSelector?: string, valueSelector?: string) => {
+    const picker_data = [] as Array<InputPickerDataType>;
+
+    data
+        .map((item: any) => {
+            picker_data.push({
+                title: titleSelector ? item[titleSelector] : item,
+                subtitle: subtitleSelector && item[subtitleSelector],
+                value: valueSelector && item[valueSelector]
+            })
+        })
+    return picker_data;
 }

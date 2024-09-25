@@ -1,5 +1,5 @@
 import React, {Context, createContext, ReactNode, useContext, useEffect, useState} from "react";
-import {Control, SubmitHandler, UseFormHandleSubmit, UseFormTrigger} from "react-hook-form";
+import {Control, SubmitHandler, UseFormHandleSubmit, UseFormTrigger, UseFormWatch} from "react-hook-form";
 import {registerStepsField} from "../../constants/formSchema/registerForm";
 
 interface MultiStepFormProviderValue {
@@ -8,6 +8,7 @@ interface MultiStepFormProviderValue {
     control: Control<any>
     submitHandler: SubmitHandler<any>
     trigger: UseFormTrigger<any>
+    watch?: UseFormWatch<any>
     currentStep: number
     currentStepText: string
     isFirstStep: boolean
@@ -35,7 +36,7 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
     isFirstCount = true,
     control,
     submitHandler,
-    trigger
+    trigger,
 }) => {
     const [currentStep, setCurrentStep] = useState(0);
 
