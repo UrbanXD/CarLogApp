@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {useForm, useWatch} from "react-hook-form";
+import {useController, useForm, useWatch} from "react-hook-form";
 import {
     getNewCarHandleSubmit,
     NewCarFormFieldType, newCarFormStepsField,
@@ -30,7 +30,7 @@ interface NewCarFormProps {
 }
 
 const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
-    const { control, handleSubmit, trigger, reset } =
+    const { control, handleSubmit, trigger, reset, resetField } =
         useForm<NewCarFormFieldType>(newCarUseFormProps);
 
     const { supabaseConnector, db } = useDatabase();
@@ -67,6 +67,7 @@ const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
             control={ control }
             submitHandler={ submitHandler }
             trigger={ trigger }
+            resetField={ resetField }
         >
             <View style={ [GLOBAL_STYLE.pageContainer, { justifyContent: "space-between" } ]}>
                 <NewCarFormProgressInfo />
@@ -94,7 +95,7 @@ const StepOne: React.FC = () => {
 }
 
 const StepTwo: React.FC = () => {
-    const { control } = useMultiStepForm();
+    const { control, resetField } = useMultiStepForm();
     const cars_data = GET_CARS_DATA();
     const selectedBrandName = useWatch({
         control,
@@ -119,10 +120,11 @@ const StepTwo: React.FC = () => {
                 key={ JSON.stringify(models) }
                 data={ models }
                 control={ control }
-                fieldName={"model"}
+                fieldName="model"
                 fieldNameText="Modell"
                 withSearchbar
                 disabled={ !isBrandSelected }
+                resetField={ resetField }
             />
         </>
     )

@@ -1,5 +1,12 @@
 import React, {Context, createContext, ReactNode, useContext, useEffect, useState} from "react";
-import {Control, SubmitHandler, UseFormHandleSubmit, UseFormTrigger, UseFormWatch} from "react-hook-form";
+import {
+    Control,
+    SubmitHandler,
+    UseFormHandleSubmit,
+    UseFormResetField,
+    UseFormTrigger,
+    UseFormWatch
+} from "react-hook-form";
 import {registerStepsField} from "../../constants/formSchema/registerForm";
 
 interface MultiStepFormProviderValue {
@@ -8,7 +15,7 @@ interface MultiStepFormProviderValue {
     control: Control<any>
     submitHandler: SubmitHandler<any>
     trigger: UseFormTrigger<any>
-    watch?: UseFormWatch<any>
+    resetField?: UseFormResetField<any>
     currentStep: number
     currentStepText: string
     isFirstStep: boolean
@@ -27,6 +34,7 @@ interface MultiStepFormProviderProps {
     control: Control<any>
     submitHandler:  (e?: (React.BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
     trigger: UseFormTrigger<any>
+    resetField?: UseFormResetField<any>
 }
 
 export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
@@ -37,6 +45,7 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
     control,
     submitHandler,
     trigger,
+    resetField
 }) => {
     const [currentStep, setCurrentStep] = useState(0);
 
@@ -71,6 +80,7 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
                 control,
                 submitHandler,
                 trigger,
+                resetField,
                 currentStep,
                 currentStepText: (currentStep + (isFirstCount ? 1 : 0)).toString(),
                 isFirstStep: currentStep === (!isFirstCount ? 1 : 0),
