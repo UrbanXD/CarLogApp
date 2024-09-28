@@ -180,7 +180,7 @@ export interface CarModelsType {
 
 export const CARS_DATA = require("../assets/cars.json");
 
-export const GET_CARS_DATA = () => {
+export const GET_CARS = () => {
     const cars_data = { } as CarBrandsType;
 
     CARS_DATA.forEach((item: any) => {
@@ -201,6 +201,8 @@ export const GET_CARS_DATA = () => {
 
     return cars_data;
 }
+
+export const CARS = GET_CARS();
 
 export const DATA_TRANSFORM_TO_PICKER_DATA = (data: any, titleSelector?: string, subtitleSelector?: string, valueSelector?: string) => {
     const picker_data = [] as Array<InputPickerDataType>;

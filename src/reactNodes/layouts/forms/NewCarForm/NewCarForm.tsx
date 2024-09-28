@@ -9,8 +9,8 @@ import {useDatabase} from "../../../../db/Database";
 import {StyleSheet, Text, View} from "react-native";
 
 import {
-    DATA_TRANSFORM_TO_PICKER_DATA,
-    GET_CARS_DATA,
+    CARS,
+    DATA_TRANSFORM_TO_PICKER_DATA, GET_CARS,
     GLOBAL_STYLE,
     ICON_NAMES,
     SEPARATOR_SIZES
@@ -96,16 +96,25 @@ const StepOne: React.FC = () => {
 
 const StepTwo: React.FC = () => {
     const { control, resetField } = useMultiStepForm();
-    const cars_data = GET_CARS_DATA();
+
+    const [isBrandSelected, setIsBrandSelected] = useState(false);
+    const [brands] = useState(DATA_TRANSFORM_TO_PICKER_DATA(Object.keys(CARS)));
+    const [models, setModels] = useState<Array<InputPickerDataType>>([]);
+
     const selectedBrandName = useWatch({
         control,
         name: "brand"
     });
 
-    const brands = DATA_TRANSFORM_TO_PICKER_DATA(Object.keys(cars_data));
-    const models = DATA_TRANSFORM_TO_PICKER_DATA(cars_data[selectedBrandName] || [], "name");
+    useEffect(() => {
+        if (resetField){
+            console.log("reset")
+            resetField("model", { keepError: true });
+        }
 
-    const isBrandSelected = selectedBrandName !== "";
+        setIsBrandSelected(selectedBrandName !== "");
+        setModels(DATA_TRANSFORM_TO_PICKER_DATA(CARS[selectedBrandName] || [], "name"));
+    }, [selectedBrandName]);
 
     return (
         <>
@@ -124,7 +133,6 @@ const StepTwo: React.FC = () => {
                 fieldNameText="Modell"
                 withSearchbar
                 disabled={ !isBrandSelected }
-                resetField={ resetField }
             />
         </>
     )

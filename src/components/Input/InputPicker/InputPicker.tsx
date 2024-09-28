@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {any} from "zod";
 import {Control, Controller, UseFormResetField} from "react-hook-form";
 import {StyleSheet, Text, View} from "react-native";
@@ -19,7 +19,6 @@ interface InputPickerProps {
     fieldName: string
     fieldNameText?: string
     fieldInfoText?: string
-    resetField?: UseFormResetField<any>
     icon?: string
     placeholder?: string
     isInBottomSheet?: boolean
@@ -33,7 +32,6 @@ const InputPicker: React.FC<InputPickerProps> = ({
     fieldName,
     fieldNameText,
     fieldInfoText,
-    resetField,
     icon,
     placeholder,
     isInBottomSheet,
@@ -46,7 +44,6 @@ const InputPicker: React.FC<InputPickerProps> = ({
     const [searchTerm, setSearchTerm] = useState("");
     const [isDataAdjusted, setIsDataAdjusted] = useState(false);
     const [previousShortTerm, setPreviousShortTerm] = useState(false);
-    const [isSelected, setIsSelected] = useState(false);
 
     useEffect(() => {
         setIsDataAdjusted(true);
@@ -73,14 +70,6 @@ const InputPicker: React.FC<InputPickerProps> = ({
         }
     }, [searchTerm, data]);
 
-    useEffect(() => {
-        if (resetField && isSelected) {
-            resetField(fieldName);
-            setIsSelected(false)
-            console.log("resetr")
-        }
-    }, [data]);
-
     return (
         <View style={ styles.inputContainer }>
             {
@@ -104,7 +93,6 @@ const InputPicker: React.FC<InputPickerProps> = ({
                             onSelect={
                                 (id: string) => {
                                     setSelectedItemID(id);
-                                    setIsSelected(true);
                                     onChange(adjustedData.find(item => item.id === id)?.value?.toString());
                                 }
                             }
