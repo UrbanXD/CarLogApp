@@ -9,7 +9,6 @@ import {
     Image
 } from "react-native";
 import {theme} from "../../constants/theme";
-import CardButton from "../../components/Button/CardButton";
 import {router} from "expo-router";
 import Animated, {FadeInLeft, SharedValue} from "react-native-reanimated";
 import {

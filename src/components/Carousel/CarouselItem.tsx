@@ -1,28 +1,24 @@
-import React, {useEffect, useLayoutEffect, useState} from "react";
+import React from "react";
 import {
     ImageBackground,
-    Image,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
-    ImageSourcePropType,
-    TouchableHighlight
 } from "react-native";
-import Animated, {interpolate, SharedValue, useAnimatedStyle} from "react-native-reanimated";
-import {theme} from "../../constants/theme";
+import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
+import { theme } from "../../constants/theme";
 import hexToRgba from "hex-to-rgba";
-import {LinearGradient} from "expo-linear-gradient";
+import { LinearGradient } from "expo-linear-gradient";
 import {
     FONT_SIZES,
     GET_ICON_BUTTON_RESET_STYLE,
-    GLOBAL_STYLE,
     ICON_NAMES,
     SEPARATOR_SIZES
 } from "../../constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import {CarouselItemType} from "./Carousel";
-import {Icon, IconButton} from "react-native-paper";
+import { CarouselItemType } from "./Carousel";
+import { IconButton } from "react-native-paper";
 
 interface CarouselItemProps {
     index: number
@@ -32,7 +28,14 @@ interface CarouselItemProps {
     item: CarouselItemType
     onPress: (index: number) => void
 }
-const CarouselItem: React.FC<CarouselItemProps> = ({ index, size, x, isFocused, item, onPress }) => {
+const CarouselItem: React.FC<CarouselItemProps> = ({
+    index,
+    size,
+    x,
+    isFocused,
+    item,
+    onPress
+}) => {
     const animatedStyle = useAnimatedStyle(() => {
         const scale = interpolate(
             x.value,
@@ -46,7 +49,12 @@ const CarouselItem: React.FC<CarouselItemProps> = ({ index, size, x, isFocused, 
     });
 
     return (
-        <TouchableOpacity activeOpacity={ 1 } style={{ width: size }} onPress={ () => onPress(index) } disabled={ item.selected }>
+        <TouchableOpacity
+            activeOpacity={ 1 }
+            style={{ width: size }}
+            onPress={ () => onPress(index) }
+            disabled={ item.selected }
+        >
             <Animated.View style={ [styles.itemContainer, animatedStyle ] }>
                 {
                     !isFocused && <View style={styles.overlay} />
@@ -204,4 +212,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default CarouselItem
+export default CarouselItem;

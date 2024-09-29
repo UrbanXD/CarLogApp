@@ -4,11 +4,9 @@ import { theme } from "../../constants/theme";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../constants/constants";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
-import Constants from 'expo-constants';
-import {snapPoint} from "@gorhom/bottom-sheet/lib/typescript/utilities/snapPoint";
-import {useSafeAreaInsets} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-type BottomSheetProps = {
+interface BottomSheetProps {
     title?: string
     children?: ReactNode
     snapPoints?: Array<string>
@@ -29,7 +27,8 @@ const CustomBottomSheet=
         },
         ref
     ) => {
-        const renderBackdrop = useCallback(
+        const renderBackdrop =
+            useCallback(
             (props: any) =>
                         <BottomSheetBackdrop
                             appearsOnIndex={ 0 }
@@ -38,7 +37,7 @@ const CustomBottomSheet=
                             { ...props }
                         />
             ,[]
-        )
+            );
         const isFullScreen = snapPoints[0] === "100%";
         const styles = getStyles(isFullScreen);
         const { top } = useSafeAreaInsets();

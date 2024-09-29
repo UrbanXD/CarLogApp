@@ -1,11 +1,9 @@
-import React, {ReactElement, useEffect, useRef, useState} from "react";
-import {ImageSourcePropType, StyleSheet, useWindowDimensions, View} from "react-native";
-import Animated, {runOnJS, runOnUI, SharedValue, useAnimatedScrollHandler, useSharedValue} from "react-native-reanimated";
+import React, { ReactElement } from "react";
+import { ImageSourcePropType, useWindowDimensions, View } from "react-native";
+import Animated, { SharedValue, useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import {FlatList} from "react-native-gesture-handler";
-import {widthPercentageToDP as wp} from "react-native-responsive-screen";
-import {SEPARATOR_SIZES} from "../../constants/constants";
 
-export type CarouselItemType = {
+export interface CarouselItemType {
     id: string,
     image?: ImageSourcePropType
     title: string,
@@ -57,7 +55,6 @@ const Carousel: React.FC<CarouselProps> = ({ data, renderItem, itemSizePercentag
             }
             keyExtractor={(item, index) => index.toString()}
             horizontal
-            // scrollEnabled={ horizontal }
             snapToInterval={ ITEM_SIZE }
             onScroll={ onScroll }
             scrollEventThrottle={ 16 }

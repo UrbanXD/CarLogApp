@@ -1,5 +1,4 @@
 import { Stack } from 'expo-router/stack';
-import {router, useRootNavigationState} from 'expo-router';
 import React, {useEffect, useState} from "react";
 import '@azure/core-asynciterator-polyfill';
 import {ScrollViewProvider} from "../reactNodes/providers/ScrollViewProvider";
@@ -8,16 +7,13 @@ import {useDatabase} from "../db/Database";
 import { Session } from '@supabase/supabase-js';
 import {GestureHandlerRootView} from "react-native-gesture-handler";
 import {SafeAreaProvider} from "react-native-safe-area-context";
-import BackButtonHeader from "../reactNodes/layouts/header/BackButtonHeader";
 import {BottomSheetModalProvider} from "@gorhom/bottom-sheet";
 import {store} from "../redux/store";
 import {theme} from "../constants/theme";
 import {Provider} from "react-redux";
 import {PaperProvider} from "react-native-paper";
 import {KeyboardProvider} from "react-native-keyboard-controller";
-import {getHeaderTitle} from "../constants/constants";
 import {StatusBar} from "expo-status-bar";
-import Header from "../components/Header/Header";
 import CarHeader from "../reactNodes/layouts/header/CarHeader";
 
 const Layout:React.FC = () => {
@@ -32,11 +28,16 @@ const Layout:React.FC = () => {
     }, []);
 
     useEffect(() => {
-        const { data } = supabaseConnector.client.auth.onAuthStateChange(async (event, session) => {
-            console.log('supabase.auth.onAuthStateChange', event);
-            setSession(session);
-            setInitialized(true);
-        });
+        const { data } =
+            supabaseConnector
+                .client
+                .auth
+                .onAuthStateChange(async (event, session) => {
+                    // console.log('supabase.auth.onAuthStateChange', event);
+                    setSession(session);
+                    setInitialized(true);
+                });
+
         return () => {
             data.subscription.unsubscribe();
         };
@@ -50,11 +51,7 @@ const Layout:React.FC = () => {
                         <GestureHandlerRootView style={{ flex: 1 }}>
                             <BottomSheetModalProvider>
                                 <ScrollViewProvider>
-                                    <Stack
-                                        screenOptions={{
-                                            header: () => <></>
-                                        }}
-                                    >
+                                    <Stack screenOptions={{ header: () => <></>}} >
                                         <Stack.Screen
                                             name="index"
                                             options={{

@@ -1,19 +1,16 @@
-import React, {ReactNode} from "react";
+import React from "react";
 import {
     TouchableOpacity,
     Text,
     ColorValue,
-    ViewStyle,
-    StyleProp,
-    TextStyle,
     StyleSheet,
     Image,
     ImageSourcePropType, View
 } from "react-native";
-import {theme} from "../../constants/theme";
-import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
-import {FONT_SIZES, GET_ICON_BUTTON_RESET_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../constants/constants";
-import {Icon, IconButton} from "react-native-paper";
+import { theme } from "../../constants/theme";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/constants";
+import { Icon } from "react-native-paper";
 
 interface ButtonCommonProps {
     onPress: () => void
@@ -44,9 +41,7 @@ type ButtonOptionalProps =
             iconSize?: number
         }
 
-type ButtonProps = ButtonCommonProps & ButtonOptionalProps
-
-const Button: React.FC<ButtonProps> = ({
+const Button: React.FC<ButtonCommonProps & ButtonOptionalProps> = ({
     onPress,
     title,
     icon,
@@ -205,4 +200,4 @@ export const ProgressNextButton: React.FC<CustomButtonProps & ProgressNextButton
     )
 }
 
-export default Button
+export default Button;
