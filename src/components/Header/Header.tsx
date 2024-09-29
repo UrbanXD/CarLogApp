@@ -1,25 +1,8 @@
 import React, { ReactNode } from "react";
-import {ColorValue, ImageSourcePropType, StatusBar, StatusBarStyle, StyleSheet, Text, View} from "react-native";
+import { ColorValue,  StatusBar, StatusBarStyle, StyleSheet, View} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { SharedValue } from "react-native-reanimated";
-import {CollapsibleHeaderBar, SimpleHeaderBar} from "./HeaderBar";
-import {DEFAULT_SEPARATOR, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT} from "../../constants/constants";
-import {theme} from "../../constants/theme";
-import {Avatar} from "react-native-paper";
-
-// interface CustomHeaderProp {
-//     children?: ReactNode | null
-//     statusBarStyle?: StatusBarStyle | null | undefined
-//     statusbarColor?: ColorValue
-//     statusBarIsTransculent?: boolean
-//     backgroundColor: ColorValue
-//     collapsible?: {
-//         image: ImageSourcePropType,
-//         imageHeight: SharedValue<number>
-//         gradientColors?: Array<string>
-//     }
-//     height?: SharedValue<number> | number
-// }
+import { DEFAULT_SEPARATOR, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT} from "../../constants/constants";
+import { theme } from "../../constants/theme";
 
 interface CustomHeaderProps {
     children?: ReactNode | null,
@@ -37,18 +20,11 @@ const Header: CustomHeaderComponents = ({
     height = SIMPLE_HEADER_HEIGHT,
     backgroundColor = theme.colors.black2,
     ...props
-    // statusBarStyle = "light-content",
-    // statusBarIsTransculent = false,
-    // backgroundColor,
-    // statusbarColor = backgroundColor,
-    // height = SIMPLE_HEADER_HEIGHT,
-    // collapsible,
-    // ...props
 }) => {
     const insets = useSafeAreaInsets();
 
     return (
-        <View style={{ height, backgroundColor, paddingTop: insets.top }} {...props}>
+        <View style={{ height, backgroundColor, paddingTop: insets.top }} { ...props } >
             { children }
         </View>
     )
@@ -60,7 +36,11 @@ interface HeaderStatusBarProps {
     backgroundColor?: ColorValue
 }
 
-Header.StatusBar = ({ translucent = false, barStyle = "light-content", backgroundColor = theme.colors.black2}: HeaderStatusBarProps) => {
+Header.StatusBar = ({
+    translucent = false,
+    barStyle = "light-content",
+    backgroundColor = theme.colors.black2
+}: HeaderStatusBarProps) => {
     return (
         <StatusBar
             translucent={ translucent }
@@ -77,7 +57,12 @@ interface HeaderRowProps {
     flex?: number
 }
 
-Header.Row = ({ children, backgroundColor = "transparent", flex = 1, paddingRight = DEFAULT_SEPARATOR }: HeaderRowProps) => {
+Header.Row = ({
+    children,
+    backgroundColor = "transparent",
+    flex = 1,
+    paddingRight = DEFAULT_SEPARATOR
+}: HeaderRowProps) => {
     return (
         <View style={ [styles.barContainer, { flex, backgroundColor, paddingRight }] }>
             { children }

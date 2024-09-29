@@ -1,7 +1,6 @@
-import React, {ReactNode} from "react";
-import {Image, ImageSourcePropType, StyleSheet, Text, TextStyle, View} from "react-native";
-import {Divider} from "react-native-paper";
-import {theme} from "../../constants/theme";
+import React, { ReactNode } from "react";
+import { Image, ImageSourcePropType, StyleSheet, Text, TextStyle, View } from "react-native";
+
 
 interface HeaderTitleProp {
     title?: string,
@@ -11,23 +10,27 @@ interface HeaderTitleProp {
     image?: ImageSourcePropType
 }
 
-const HeaderTitle: React.FC<HeaderTitleProp> = ({ title, subAction, titleStyle= {}, isTitleCenter, image }) => {
+const HeaderTitle: React.FC<HeaderTitleProp> = ({
+    title,
+    subAction,
+    titleStyle= {},
+    isTitleCenter,
+    image
+}) => {
     return (
         <View style={ [style.titleContainer, { justifyContent: isTitleCenter ? "center" : "flex-start" }] }>
             {
-                image
-                ? <Image
-                        source={ image }
-                        resizeMode="contain"
-                        style={ style.titleLogo }
-                 />
-                : <></>
+                image &&
+                <Image
+                    source={ image }
+                    resizeMode="contain"
+                    style={ style.titleLogo }
+                />
             }
             <View>
                 {
-                    title
-                        ? <Text style={ titleStyle }>{ title }</Text>
-                        : <></>
+                    title &&
+                    <Text style={ titleStyle }>{ title }</Text>
                 }
                 { subAction }
             </View>

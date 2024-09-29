@@ -1,15 +1,18 @@
-import React, {useEffect} from "react";
-import {StyleSheet, Text, View} from "react-native";
-import {GLOBAL_STYLE, SEPARATOR_SIZES} from "../../constants/constants";
-import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {theme} from "../../constants/theme";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { GLOBAL_STYLE, SEPARATOR_SIZES } from "../../constants/constants";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { theme } from "../../constants/theme";
 
 interface InputTitleProps {
     title: string,
     subtitle?: string
 }
 
-const InputTitle: React.FC<InputTitleProps> = ({ title, subtitle }) => {
+const InputTitle: React.FC<InputTitleProps> = ({
+    title,
+    subtitle
+}) => {
     return (
         <View>
             <Text style={ styles.inputNameText }>
@@ -38,4 +41,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default InputTitle
+export default InputTitle;

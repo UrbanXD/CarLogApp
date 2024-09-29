@@ -1,13 +1,11 @@
-import React, {useEffect, useRef, useState} from "react";
-import {any} from "zod";
-import {Control, Controller, UseFormResetField} from "react-hook-form";
-import {StyleSheet, Text, View} from "react-native";
+import React, { useEffect, useState } from "react";
+import { Control, Controller } from "react-hook-form";
+import {StyleSheet, View} from "react-native";
 import InputTitle from "../InputTitle";
-import {SEPARATOR_SIZES} from "../../../constants/constants";
-import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {theme} from "../../../constants/theme";
+import { SEPARATOR_SIZES } from "../../../constants/constants";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { theme } from "../../../constants/theme";
 import Picker, { PickerDataType } from "./Picker";
-import SearchBar from "../../SearchBar";
 
 export interface InputPickerDataType extends PickerDataType {
     value?: string
@@ -27,6 +25,7 @@ interface InputPickerProps {
     withSearchbar?: boolean
     disabled?: boolean
 }
+
 const InputPicker: React.FC<InputPickerProps> = ({
     data,
     control,

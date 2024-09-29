@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import {ICON_NAMES} from "../constants/constants";
+import React, { useState } from "react";
+import { ICON_NAMES } from "../constants/constants";
 import TextInput from "./Input/InputText/TextInput";
 
 interface SearchBarProps {
@@ -8,7 +8,11 @@ interface SearchBarProps {
     onClose?: () => void
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onTextChange, term= "", onClose }) => {
+const SearchBar: React.FC<SearchBarProps> = ({
+    onTextChange,
+    term= "",
+    onClose
+}) => {
     const [value, setValue] = useState(term)
 
     return (

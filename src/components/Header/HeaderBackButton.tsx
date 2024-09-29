@@ -1,5 +1,5 @@
 import React from "react";
-import {IconButton} from "react-native-paper";
+import { IconButton } from "react-native-paper";
 import { router } from "expo-router";
 
 interface HeaderBackButtonProps {
@@ -7,7 +7,10 @@ interface HeaderBackButtonProps {
     isAbsolute?: boolean
 }
 
-const HeaderBackButton: React.FC<HeaderBackButtonProps> = ({ backAction, isAbsolute }) => {
+const HeaderBackButton: React.FC<HeaderBackButtonProps> = ({
+    backAction,
+    isAbsolute
+}) => {
     return (
         <IconButton
             style={{ margin: 0, position: isAbsolute ? "absolute" : "relative"}}

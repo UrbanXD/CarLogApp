@@ -1,6 +1,6 @@
-import React, {ReactNode, useCallback, useEffect, useRef, useState} from "react";
-import {View, Text, StyleSheet, TouchableOpacity, Image, ImageSourcePropType} from "react-native";
-import {Icon, IconButton} from "react-native-paper";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Image, ImageSourcePropType } from "react-native";
+import { Icon, IconButton } from "react-native-paper";
 import {
     DEFAULT_SEPARATOR, FONT_SIZES,
     GET_ICON_BUTTON_RESET_STYLE,
@@ -8,13 +8,11 @@ import {
     ICON_NAMES,
     SEPARATOR_SIZES
 } from "../../../constants/constants";
-import {theme} from "../../../constants/theme";
-import {FlatList} from "react-native-gesture-handler";
+import { theme } from "../../../constants/theme";
+import { FlatList } from "react-native-gesture-handler";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import SearchBar from "../../SearchBar";
-import InputText from "../InputText/InputText";
 import TextInput from "../InputText/TextInput";
-import {err} from "react-native-svg";
 
 export interface PickerDataType {
     id?: string
@@ -23,7 +21,7 @@ export interface PickerDataType {
     icon?: ImageSourcePropType
 }
 
-type PickerProps = {
+interface PickerProps {
     data: Array<PickerDataType>
     selectedItemID: string
     onSelect: (id: string) => void

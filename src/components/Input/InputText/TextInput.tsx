@@ -1,9 +1,9 @@
-import React, {useState} from "react";
-import {StyleSheet, Text, View, TextInput as TextInputRN, StyleProp, ViewStyle} from "react-native";
-import {Icon, IconButton} from "react-native-paper";
-import {heightPercentageToDP as hp, heightPercentageToDP} from "react-native-responsive-screen";
-import {ICON_COLORS, ICON_NAMES, SEPARATOR_SIZES} from "../../../constants/constants";
-import {theme} from "../../../constants/theme";
+import React, { useState } from "react";
+import { StyleSheet, Text, View, TextInput as TextInputRN } from "react-native";
+import { Icon, IconButton } from "react-native-paper";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { ICON_COLORS, ICON_NAMES } from "../../../constants/constants";
+import { theme } from "../../../constants/theme";
 
 interface TextInputProps {
     value?: string
@@ -121,7 +121,6 @@ const styles = StyleSheet.create({
     textInput: {
         flex: 1,
         color: theme.colors.gray1,
-        // fontFamily: "Gilroy-Medium",
         fontSize: hp(2.25)
     },
     placeholderText: {
