@@ -108,7 +108,6 @@ const StepTwo: React.FC = () => {
 
     useEffect(() => {
         if (resetField){
-            console.log("reset")
             resetField("model", { keepError: true });
         }
 
@@ -157,6 +156,7 @@ const StepFour: React.FC = () => {
                 fieldName={"odometer_measurement"}
                 fieldNameText="Mertekegyseg"
                 isHorizontal
+                isCarousel={ false }
             />
         </>
     )

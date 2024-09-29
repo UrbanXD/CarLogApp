@@ -28,6 +28,7 @@ type PickerProps = {
     selectedItemID: string
     onSelect: (id: string) => void
     isHorizontal?: boolean
+    isCarousel?: boolean
     searchTerm?: string
     setSearchTerm?: (value: string) => void
     isDropdown?: boolean
@@ -50,6 +51,7 @@ const Picker: React.FC<PickerProps> = ({
     onSelect,
     selectedItemID,
     isHorizontal = true,
+    isCarousel = true,
     disabled = false
 }) => {
     const flatlistRef = useRef<FlatList>(null)
@@ -95,6 +97,21 @@ const Picker: React.FC<PickerProps> = ({
         }
     }, [data]);
 
+    const renderItem = (arg: { item: any, index: number }) =>
+        <View key={ arg.index } style={{ flexDirection: "row" }}>
+            <PickerItem
+                title={ arg.item.title }
+                subtitle={ arg.item.subtitle }
+                icon={ arg.item.icon }
+                selected={ arg.item.id === selectedItemID }
+                onPress={ () => memoizedSetSelected(arg.item.id || arg.index.toString() ) }
+            />
+            {
+                isHorizontal && isCarousel && arg.index === (data.length - 1) &&
+                <View style={ styles.separator } />
+            }
+        </View>
+
     const renderElements = () =>
         <View style={[styles.elementsContainer, !isHorizontal && { height: styles.inputPickerItemContainer.minHeight * 5 + 5 * SEPARATOR_SIZES.small, flexDirection: "column" }]}>
             {
@@ -115,37 +132,32 @@ const Picker: React.FC<PickerProps> = ({
                     onClose={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
                 />
             }
-            <FlatList
-                ref={ flatlistRef }
-                data={ data }
-                renderItem={
-                    ({ item, index }) =>
-                        <View key={ index } style={{ flexDirection: "row" }}>
-                            <PickerItem
-                                title={ item.title }
-                                subtitle={ item.subtitle }
-                                icon={ item.icon }
-                                selected={ item.id === selectedItemID }
-                                onPress={ () => memoizedSetSelected(item.id || index.toString() ) }
-                            />
+            {
+                isCarousel
+                    ?   <FlatList
+                            ref={ flatlistRef }
+                            data={ data }
+                            renderItem={ renderItem }
+                            keyExtractor={(item, index) => item.id || index.toString()}
+                            horizontal={ isHorizontal }
+                            showsHorizontalScrollIndicator={ false }
+                            contentContainerStyle={ styles.elementsScrollViewContainer }
+                            onScrollToIndexFailed={
+                                (info) => {
+                                    setTimeout(() => {
+                                        flatlistRef.current?.scrollToIndex({ index: info.index, animated: true });
+                                    }, 100);
+                                }
+                            }
+                        />
+                    :   <View style={{ flex: 1, backgroundColor: "red" }}>
                             {
-                                isHorizontal && index === (data.length - 1) &&
-                                <View style={ styles.separator } />
+                               data.map((item, index) => {
+                                   return renderItem({ item, index });
+                               })
                             }
                         </View>
-                }
-                keyExtractor={(item, index) => item.id || index.toString()}
-                horizontal={ isHorizontal }
-                showsHorizontalScrollIndicator={ false }
-                contentContainerStyle={ styles.elementsScrollViewContainer }
-                onScrollToIndexFailed={
-                    (info) => {
-                        setTimeout(() => {
-                            flatlistRef.current?.scrollToIndex({ index: info.index, animated: true });
-                        }, 100);
-                    }
-                }
-            />
+            }
         </View>
     return (
         <View style={ styles.container }>

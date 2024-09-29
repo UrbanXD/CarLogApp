@@ -23,6 +23,7 @@ interface InputPickerProps {
     placeholder?: string
     isInBottomSheet?: boolean
     isHorizontal?: boolean
+    isCarousel?: boolean
     withSearchbar?: boolean
     disabled?: boolean
 }
@@ -36,6 +37,7 @@ const InputPicker: React.FC<InputPickerProps> = ({
     placeholder,
     isInBottomSheet,
     isHorizontal = false,
+    isCarousel = true,
     withSearchbar = false,
     disabled = false
 }) => {
@@ -98,6 +100,7 @@ const InputPicker: React.FC<InputPickerProps> = ({
                             }
                             isDropdown={ !isHorizontal }
                             isHorizontal={ isHorizontal }
+                            isCarousel={ isCarousel }
                             dropDownInfoType={ "input" }
                             disabled={ disabled }
                         />
