@@ -1,5 +1,5 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {ScrollView, StyleSheet, Text, View} from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import {
     FONT_SIZES,
     GET_ICON_BUTTON_RESET_STYLE,
@@ -7,19 +7,16 @@ import {
     ICON_NAMES,
     SEPARATOR_SIZES
 } from "../../constants/constants";
-import RideInfo from "./RideInfo";
 import Date from "./Date";
-import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {theme} from "../../constants/theme";
-import {Divider, IconButton, Portal} from "react-native-paper";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { theme } from "../../constants/theme";
+import { IconButton, Portal } from "react-native-paper";
 import InputText from "../Input/InputText/InputText";
-import {useForm} from "react-hook-form";
-import {EditRideFormFieldType, editRideUseFormProps} from "../../constants/formSchema/editRideForm";
-import {getToday} from "../../utils/getDate";
-import Timeline from "../Timeline/Timeline";
+import { useForm } from "react-hook-form";
+import { EditRideFormFieldType, editRideUseFormProps } from "../../constants/formSchema/editRideForm";
+import { getToday } from "../../utils/getDate";
 import ProgressBar from "../MultiStepForm/ProgressBar";
-import TextDivider from "../TextDivider/TextDivider";
-import BottomSheet, {BottomSheetBackdrop, BottomSheetModal} from "@gorhom/bottom-sheet";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import CustomBottomSheet from "../BottomSheet/BottomSheet";
 
 type RideType = {
@@ -47,7 +44,7 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-    const { control, handleSubmit } =
+    const { control } =
         useForm<EditRideFormFieldType>(
             {
                     ...editRideUseFormProps,
@@ -76,7 +73,10 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
     return (
         <>
             <Portal>
-                <CustomBottomSheet ref={ bottomSheetModalRef } title={"xd vnrs vnknrdnj njkjngn krkg nkrsn knkrznjgk nzsgrk "} >
+                <CustomBottomSheet
+                    ref={ bottomSheetModalRef }
+                    title={"xd vnrs vnknrdnj njkjngn krkg nkrsn knkrznjgk nzsgrk "}
+                >
                     <View style={ styles.infoContainer }>
                         <View style={ styles.infoTitleContainer }>
                             <Date
@@ -84,11 +84,17 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                                 dateUnderSubtitle={ rides[selectedRideIndex].dateSubtitle }
                                 flexDirection="row"
                             />
-                            <Text style={{color: "white" }}>{ rides[selectedRideIndex].time }</Text>
+                            <Text style={{color: "white" }}>
+                                { rides[selectedRideIndex].time }
+                            </Text>
                         </View>
                         <View style={ styles.infoContentContainer }>
                             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                <InputText control={control} fieldName={"carUID"} isEditable={ true }  />
+                                <InputText
+                                    control={control}
+                                    fieldName={"carUID"}
+                                    isEditable={ true }
+                                />
                                 <View style={{ backgroundColor: "blue" }}>
                                     <Text style={{ color: "white"}}>Szemelyek szama</Text>
                                 </View>
@@ -123,7 +129,11 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                                         { ride.client }
                                     </Text>
                                     <ScrollView contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }>
-                                        <ProgressBar isVertical stepsCount={3} titles={["Zenta", "Kamenica"]}/>
+                                        <ProgressBar
+                                            isVertical
+                                            stepsCount={3}
+                                            titles={["Zenta", "Kamenica"]}
+                                        />
                                     </ScrollView>
                                     <Text numberOfLines={ 1 } style={ [GLOBAL_STYLE.containerText, { color: theme.colors.white }] }>
                                         100 km
@@ -162,15 +172,12 @@ const styles = StyleSheet.create({
         gap: SEPARATOR_SIZES.small
     },
     container2: {
-        // flex: 1,
         flexDirection: "row",
         gap: SEPARATOR_SIZES.lightSmall * 0.5,
         paddingLeft: SEPARATOR_SIZES.lightSmall * 0.75,
-        // justifyContent: "center",
         alignItems: "center"
     },
     text: {
-        // flex: 1,
         flexWrap: "wrap",
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.small,

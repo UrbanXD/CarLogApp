@@ -1,11 +1,10 @@
 import { z } from "zod";
-import {getUUID} from "../../db/uuid";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {GetFormHandleSubmitArgs} from "../constants";
-import {store} from "../../redux/store";
-import {addCar} from "../../redux/reducers/cars.slices";
-import {PickerDataType} from "../../components/Input/InputPicker/Picker";
-import {InputPickerDataType} from "../../components/Input/InputPicker/InputPicker";
+import { getUUID } from "../../db/uuid";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { GetFormHandleSubmitArgs } from "../constants";
+import { store } from "../../redux/store";
+import { addCar } from "../../redux/reducers/cars.slices";
+import { InputPickerDataType } from "../../components/Input/InputPicker/InputPicker";
 
 export const newCarFormStepsField = [["name"], ["brand", "model"], ["odometer_value", "odometer_measurement"], ["fuel_type", "fuel_measurement", "fuel_tank_size"]];
 export const newCarFormStepsTitle = ["Elnevezés", "Gyártó", "Autó adatok", "Autó adatok"];

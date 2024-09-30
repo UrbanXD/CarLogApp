@@ -1,4 +1,4 @@
-import {ReactNode, useState} from "react";
+import { ReactNode, useState } from "react";
 
 interface useMultiStepFormArgs {
     steps: Array<() => ReactNode | null>

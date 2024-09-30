@@ -1,7 +1,7 @@
-import {z} from "zod";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {GetFormHandleSubmitArgs} from "../constants";
-import {Alert} from "react-native";
+import { z} from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { GetFormHandleSubmitArgs } from "../constants";
+import { Alert } from "react-native";
 
 export interface LoginFormFieldType {
     email: string

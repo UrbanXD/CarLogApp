@@ -1,5 +1,5 @@
-import {Kysely} from "@powersync/kysely-driver";
-import {AppSchema, CARS_TABLE, CarsType, DatabaseType} from "../AppSchema";
+import { Kysely } from "@powersync/kysely-driver";
+import { CARS_TABLE, CarsType, DatabaseType } from "../AppSchema";
 
 export class CarDAO {
     db: Kysely<DatabaseType>

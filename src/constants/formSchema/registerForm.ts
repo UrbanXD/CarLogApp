@@ -1,9 +1,8 @@
-import {z} from "zod";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {Alert} from "react-native";
-import {GetFormHandleSubmitArgs} from "../constants";
-import {LoginFormFieldType} from "./loginForm";
-import {router} from "expo-router";
+import { z} from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Alert } from "react-native";
+import { GetFormHandleSubmitArgs } from "../constants";
+import { router } from "expo-router";
 
 export const registerStepsField = [["email"], ["firstname", "lastname"], ["password", "rpassword"]];
 export const registerStepsTitle = ["", "Személyes adatok", "Jelszó"];
@@ -70,96 +69,3 @@ export const getRegisterHandleSubmit = ({ handleSubmit, supabaseConnector }: Get
             Alert.alert(error.message);
         }
     })
-
-
-
-
-
-
-
-
-
-
-//
-//
-// export interface RegisterStepOneFormFieldType {
-//     email: string
-// }
-//
-// export interface RegisterStepTwoFormFieldType {
-//     firstname: string,
-//     lastname: string
-// } //isDriver
-//
-// export interface RegisterStepThreeFormFieldType {
-//     password: string,
-//     rpassword: string,
-// }
-//
-// export const registerFormSchemas = {
-//     stepOne: z.object({ email: z.string().email("Nem megfelelő email cím formátum") }),
-//     stepTwo: z.object({
-//         firstname: z.string(),
-//         lastname: z.string()
-//     }),
-//     stepThree: z
-//         .object({
-//             password: z.string().min(5, "rovid").max(8),
-//             rpassword: z.string(),
-//         })
-//         .refine(data => data.password === data.rpassword, {
-//             message: "Nem azonos jelszok",
-//             path: ["rpassword"]
-//         })
-// }
-//
-// export const registerUseFormProps = {
-//     stepOne: {
-//         defaultValues: { email: "" },
-//         resolver: zodResolver(registerFormSchemas.stepOne),
-//     },
-//     stepTwo: {
-//         defaultValues: {
-//             firstname: "",
-//             lastname: ""
-//         },
-//         resolver: zodResolver(registerFormSchemas.stepTwo),
-//     },
-//     stepThree: {
-//         defaultValues: {
-//             password: "",
-//             rpassword: "",
-//         },
-//         resolver: zodResolver(registerFormSchemas.stepThree),
-//     }
-// }
-//
-// export const registerFormHandleSubmits = {
-//     stepOne: ({ handleSubmit, onSubmit = () => {} }: GetFormHandleSubmitArgs) => (
-//         handleSubmit(async ({ email }: RegisterStepOneFormFieldType) => {
-//             try {
-//                 onSubmit({ email });
-//             } catch (error: any) {
-//                 Alert.alert(error.message);
-//             }
-//         })
-//     ),
-//     stepTwo: ({ handleSubmit, onSubmit = () => {} }: GetFormHandleSubmitArgs) => (
-//         handleSubmit(async ({ firstname, lastname }: RegisterStepTwoFormFieldType) => {
-//             try {
-//                 onSubmit(firstname, lastname);
-//             } catch (error: any) {
-//                 Alert.alert(error.message);
-//             }
-//         })
-//     ),
-//     stepThree: ({ handleSubmit, onSubmit = () => {} }: GetFormHandleSubmitArgs) => (
-//         handleSubmit(async ({ password }: RegisterStepThreeFormFieldType) => {
-//             try {
-//                 onSubmit(password);
-//             } catch (error: any) {
-//                 Alert.alert(error.message);
-//             }
-//         })
-//     )
-// }

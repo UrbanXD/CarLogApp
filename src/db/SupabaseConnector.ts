@@ -7,7 +7,7 @@ import {
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import 'react-native-url-polyfill/auto';
-import {BaseConfig} from "./BaseConfig";
+import { BaseConfig } from "./BaseConfig";
 
 /// Postgres Response codes that we cannot recover from by retrying.
 const FATAL_RESPONSE_CODES = [

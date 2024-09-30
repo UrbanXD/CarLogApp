@@ -1,7 +1,6 @@
-import {string, z} from "zod";
-import Date from "../../components/UpcomingRides/Date";
-import {getToday} from "../../utils/getDate";
-import {zodResolver} from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { getToday } from "../../utils/getDate";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export interface EditRideFormFieldType {
     carUID: string //hidden

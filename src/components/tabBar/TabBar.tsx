@@ -1,11 +1,10 @@
 import React from "react";
-import {Dimensions, StyleSheet, View, ViewStyle} from "react-native";
+import { Dimensions, StyleSheet, View, ViewStyle } from "react-native";
 import TabBarIcon from "./TabBarIcon";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
-import {theme} from "../../constants/theme";
-import {FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT} from "../../constants/constants";
-import {BottomTabBarProps} from '@react-navigation/bottom-tabs'
-import {MaterialTopTabBarProps} from "@react-navigation/material-top-tabs";
+import { theme } from "../../constants/theme";
+import { FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT } from "../../constants/constants";
+import { BottomTabBarProps } from '@react-navigation/bottom-tabs'
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface TabBarProps{
@@ -14,7 +13,14 @@ interface TabBarProps{
     tabBarInactiveTintColor?: string,
 }
 
-const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({ state, descriptors, navigation, tabBarStyle = {}, tabBarActiveTintColor = ICON_COLORS.active, tabBarInactiveTintColor = ICON_COLORS.inactive }) => {
+const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
+    state,
+    descriptors,
+    navigation,
+    tabBarStyle = {},
+    tabBarActiveTintColor = ICON_COLORS.active,
+    tabBarInactiveTintColor = ICON_COLORS.inactive
+}) => {
     const TAB_BAR_WIDTH =  Dimensions.get("screen").width
     const TAB_WIDTH = TAB_BAR_WIDTH / state.routes.length;
 
@@ -98,7 +104,6 @@ const styles = StyleSheet.create({
         height: SIMPLE_TABBAR_HEIGHT,
         backgroundColor: theme.colors.black2,
         borderColor: theme.colors.gray2,
-        // borderTopWidth: 2.5,
     },
     titleText: {
         fontSize: FONT_SIZES.normal,

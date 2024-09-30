@@ -1,10 +1,9 @@
 import React from "react";
-import {SharedValue, useAnimatedProps, useDerivedValue} from "react-native-reanimated";
-import {theme} from "../../constants/theme";
-import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {View, Text as TextRN, StyleSheet} from "react-native";
-import {Canvas, Skia, Path, Text, SkFont} from "@shopify/react-native-skia";
-import {FONT_SIZES, SEPARATOR_SIZES} from "../../constants/constants";
+import { SharedValue } from "react-native-reanimated";
+import { theme} from "../../constants/theme";
+import { View, Text as TextRN, StyleSheet } from "react-native";
+import { Canvas, Skia, Path, Text, SkFont } from "@shopify/react-native-skia";
+import { FONT_SIZES, SEPARATOR_SIZES } from "../../constants/constants";
 
 interface ProgressInfoProps {
     radius: number

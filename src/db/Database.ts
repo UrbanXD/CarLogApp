@@ -1,8 +1,8 @@
-import {AbstractPowerSyncDatabase, PowerSyncDatabase} from "@powersync/react-native";
-import {AppSchema, DatabaseType} from "./AppSchema";
-import {SupabaseConnector} from "./SupabaseConnector";
-import {Kysely, wrapPowerSyncWithKysely} from "@powersync/kysely-driver";
-import {Context, createContext, useContext} from "react";
+import { AbstractPowerSyncDatabase, PowerSyncDatabase } from "@powersync/react-native";
+import { AppSchema, DatabaseType } from "./AppSchema";
+import { SupabaseConnector } from "./SupabaseConnector";
+import { Kysely, wrapPowerSyncWithKysely } from "@powersync/kysely-driver";
+import { Context, createContext, useContext } from "react";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;

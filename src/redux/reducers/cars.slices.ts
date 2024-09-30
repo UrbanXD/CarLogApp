@@ -1,10 +1,9 @@
-import {CarouselItemType} from "../../components/Carousel/Carousel";
-import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Kysely} from "@powersync/kysely-driver";
-import {CarsType, DatabaseType} from "../../db/AppSchema";
-import {CarDAO} from "../../db/dao/CarDAO";
-import {LOCAL_STORAGE_KEYS} from "../../constants/constants";
+import { Kysely } from "@powersync/kysely-driver";
+import { CarsType, DatabaseType } from "../../db/AppSchema";
+import { CarDAO } from "../../db/dao/CarDAO";
+import { LOCAL_STORAGE_KEYS } from "../../constants/constants";
 
 export interface CarType {
     id: string
@@ -32,7 +31,7 @@ const initialState: CarsState = {
 
 export const loadCars = createAsyncThunk(
     "cars",
-    async (db: Kysely<DatabaseType>, { rejectWithValue, fulfillWithValue }) => {
+    async (db: Kysely<DatabaseType>, { rejectWithValue }) => {
         try {
             const carDAO = new CarDAO(db);
             return await carDAO.getCars();
@@ -45,7 +44,7 @@ export const loadCars = createAsyncThunk(
 
 export const addCar = createAsyncThunk(
     "addCar",
-    async (args: {db: Kysely<DatabaseType>, car: CarsType}, { rejectWithValue, fulfillWithValue }) => {
+    async (args: {db: Kysely<DatabaseType>, car: CarsType}, { rejectWithValue }) => {
         try {
             const carDAO = new CarDAO(args.db);
             return await carDAO.addCar(args.car);
@@ -58,7 +57,7 @@ export const addCar = createAsyncThunk(
 
 export const loadSelectedCar = createAsyncThunk(
     "loadSelectedCarIndex",
-    async (arg: { asd?: string } = {}, { rejectWithValue, fulfillWithValue }) => {
+    async (arg: { asd?: string } = {}, { rejectWithValue }) => {
         try {
             const id = await AsyncStorage.getItem(LOCAL_STORAGE_KEYS.selectedCarIndex);
             console.log("loadSelectedsCar ", id)
@@ -72,7 +71,7 @@ export const loadSelectedCar = createAsyncThunk(
 
 export const selectCar = createAsyncThunk(
     "selectCar",
-    async (id: string, { rejectWithValue, fulfillWithValue })=> {
+    async (id: string, { rejectWithValue })=> {
         try {
             await AsyncStorage.setItem(LOCAL_STORAGE_KEYS.selectedCarIndex, id.toString());
             return id;
@@ -89,17 +88,17 @@ const carsSlice = createSlice({
     reducers: {},
     extraReducers: builder => {
         builder
-            .addCase(loadCars.pending, (state, action) => {
+            .addCase(loadCars.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(loadCars.rejected, (state, action) => {
+            .addCase(loadCars.rejected, (state) => {
                 state.loading = false;
                 state.loadError = true;
             })
             .addCase(loadCars.fulfilled, (state, action) => {
                 state.loading = false;
                 state.cars = action.payload
-                    .map((item, index) => {
+                    .map(item => {
                         state.carsID = [...state.carsID, item.id];
                         return {
                             id: item.id,
@@ -125,7 +124,7 @@ const carsSlice = createSlice({
             .addCase(loadSelectedCar.fulfilled, (state, action) => {
                 state.selectedCarID = action.payload;
             })
-            .addCase(loadSelectedCar.rejected, (state, action) => {
+            .addCase(loadSelectedCar.rejected, state => {
                 console.log("roosz load car")
                 state.selectedCarID = "";
             })
@@ -133,7 +132,7 @@ const carsSlice = createSlice({
                 state.selectedCarID = action.payload;
                 console.log("kivalasztas, selectCar: ", action.payload)
             })
-            .addCase(selectCar.rejected, (state, action) => {
+            .addCase(selectCar.rejected, () => {
                 console.log("nijncs kivalasztva HIBA")
             })
     }

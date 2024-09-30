@@ -1,5 +1,5 @@
-import {Kysely} from "@powersync/kysely-driver";
-import {DatabaseType, SERVICE_TABLE, ServiceType} from "../AppSchema";
+import { Kysely } from "@powersync/kysely-driver";
+import { DatabaseType, SERVICE_TABLE, ServiceType } from "../AppSchema";
 
 export class ServiceDAO {
     db: Kysely<DatabaseType>

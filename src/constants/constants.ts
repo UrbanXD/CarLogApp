@@ -1,12 +1,11 @@
-import {StyleSheet} from "react-native";
-import {theme} from "./theme";
-import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
-import {UseFormHandleSubmit} from "react-hook-form";
-import {SupabaseConnector} from "../db/SupabaseConnector";
-import {Kysely} from "@powersync/kysely-driver";
-import {CarsType, DatabaseType} from "../db/AppSchema";
-import {exp} from "@gorhom/bottom-sheet/lib/typescript/utilities/easingExp";
-import {InputPickerDataType} from "../components/Input/InputPicker/InputPicker";
+import { StyleSheet } from "react-native";
+import { theme } from "./theme";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { UseFormHandleSubmit } from "react-hook-form";
+import { SupabaseConnector } from "../db/SupabaseConnector";
+import { Kysely } from "@powersync/kysely-driver";
+import { DatabaseType } from "../db/AppSchema";
+import { InputPickerDataType } from "../components/Input/InputPicker/InputPicker";
 
 export interface GetFormHandleSubmitArgs {
     handleSubmit: UseFormHandleSubmit<any>

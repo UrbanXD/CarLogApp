@@ -1,10 +1,8 @@
 import React from "react";
-import {StyleSheet, Text, View} from "react-native";
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {theme} from "../../constants/theme";
-import {Icon} from "react-native-paper";
-import {FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES} from "../../constants/constants";
-import hexToRgba from "hex-to-rgba";
+import { StyleSheet, Text, View } from "react-native";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { theme } from "../../constants/theme";
+import { FONT_SIZES, SEPARATOR_SIZES } from "../../constants/constants";
 
 interface ProgressBarProps {
     isVertical?: boolean
@@ -13,16 +11,18 @@ interface ProgressBarProps {
     titles?: Array<string>
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ isVertical = false, currentStep = -1, stepsCount, titles }) => {
-    const styles= useStyles(stepsCount, currentStep);
+const ProgressBar: React.FC<ProgressBarProps> = ({
+    isVertical = false,
+    stepsCount,
+    titles
+}) => {
+
     return (
         <View style={ styles.progressContainer }>
             <View style={ [styles.contentContainer, isVertical && styles.verticalContentContainer]}>
                 {
                     Array.from({ length: stepsCount }, (_, i) => i + 1)
                         .map(step => {
-                            const isCurrentStep = step === currentStep;
-                            const isStepDone = step < currentStep;
                             const isLastStep = step === stepsCount;
 
                             return (
@@ -42,24 +42,19 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ isVertical = false, currentSt
             </View>
             <View style={ [styles.contentContainer, isVertical && styles.verticalContentContainer, { flex: 9 }]}>
                 {
-                    titles?.map((title, index) => {
-                        const isLastStep = index + 1 === stepsCount;
-
-                        return (
-                            <View style={ styles.timelineTextContainer } key={ index }>
-                                <Text numberOfLines={ 2 } key={ index } style={{ color: "white", fontSize: FONT_SIZES.small, lineHeight: FONT_SIZES.small }}>
-                                    { title }
-                                </Text>
-                            </View>
-                        )
-                    })
+                    titles?.map((title, index) =>
+                        <View style={ styles.timelineTextContainer } key={ index }>
+                            <Text numberOfLines={ 2 } key={ index } style={{ color: "white", fontSize: FONT_SIZES.small, lineHeight: FONT_SIZES.small }}>
+                                { title }
+                            </Text>
+                        </View>
+                    )
                 }
             </View>
         </View>
     );
 }
-const useStyles = (stepsCount: number, currentStep: number) => {
-    return StyleSheet.create({
+const styles = StyleSheet.create({
         progressContainer: {
             flexDirection: "row",
             paddingLeft: SEPARATOR_SIZES.lightSmall,
@@ -122,7 +117,6 @@ const useStyles = (stepsCount: number, currentStep: number) => {
         doneLine: {
             backgroundColor: theme.colors.fuelYellow
         }
-    })
-}
+    });
 
 export default ProgressBar;

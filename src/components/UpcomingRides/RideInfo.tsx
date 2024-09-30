@@ -1,16 +1,19 @@
 import React from "react";
-import {FONT_SIZES, GET_ICON_BUTTON_RESET_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../constants/constants";
-import {IconButton} from "react-native-paper";
-import {theme} from "../../constants/theme";
-import {StyleSheet, Text, View} from "react-native";
-import {IconSource} from "react-native-paper/lib/typescript/components/Icon";
+import { FONT_SIZES, GET_ICON_BUTTON_RESET_STYLE, SEPARATOR_SIZES } from "../../constants/constants";
+import { IconButton } from "react-native-paper";
+import { theme } from "../../constants/theme";
+import { StyleSheet, Text, View } from "react-native";
+import { IconSource } from "react-native-paper/lib/typescript/components/Icon";
 
 interface RideInfoProps {
     text: string,
     icon: IconSource
 }
 
-const RideInfo: React.FC<RideInfoProps> = ({ text, icon }) => {
+const RideInfo: React.FC<RideInfoProps> = ({
+    text,
+    icon
+}) => {
     return (
         <View style={ styles.container }>
             <IconButton

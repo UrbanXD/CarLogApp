@@ -1,6 +1,5 @@
 export const getToday = () => {
-    const today = new Date();
-    return today;
+    return new Date();
 }
 
 export const getDate = () => {
@@ -8,7 +7,6 @@ export const getDate = () => {
 
     const month = today.getMonth() + 1;
     const year = today.getFullYear();
-    // const day = today.getDay();
     const day = today.getDate();
 
     return `${ year }.${ addLeadingZero(month) }.${ addLeadingZero(day) }`;

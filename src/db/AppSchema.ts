@@ -1,5 +1,4 @@
-import {column, Schema, TableV2} from "@powersync/react-native";
-import {number} from "zod";
+import { column, Schema, TableV2 } from "@powersync/react-native";
 
 export const USERS_TABLE = "users";
 export const CARS_TABLE = "cars";

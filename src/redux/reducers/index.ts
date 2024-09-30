@@ -1,4 +1,4 @@
-import {combineReducers} from "@reduxjs/toolkit";
+import { combineReducers } from "@reduxjs/toolkit";
 import carsReducer from "./cars.slices";
 import carsApiSlices from "./cars.api.slices";
 
