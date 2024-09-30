@@ -6,7 +6,7 @@ export const store = configureStore({
     reducer: rootReducer,
     middleware: getDefaultMiddleware =>
         getDefaultMiddleware({ })
-            .concat(carsApiSlices.middleware)
+            .concat(carsApiSlices.middleware);
 })
 
 export type RootState = ReturnType<typeof store.getState>;
