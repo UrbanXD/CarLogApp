@@ -1,15 +1,12 @@
-import React, {ReactElement, useCallback, useEffect, useRef, useState} from "react";
+import React, { ReactElement, useEffect, useRef, useState } from "react";
 import {
-    Alert,
-    ImageSourcePropType,
-    SafeAreaView, ScrollView,
+    SafeAreaView,
+    ScrollView,
     StyleSheet,
-    Text, TouchableHighlight, TouchableOpacity,
+    Text,
     View,
-    Image
 } from "react-native";
-import {theme} from "../../constants/theme";
-import {router} from "expo-router";
+import { theme } from "../../constants/theme";
 import Animated, {FadeInLeft, SharedValue} from "react-native-reanimated";
 import {
     DEFAULT_SEPARATOR,
@@ -18,31 +15,24 @@ import {
     ICON_NAMES,
     SEPARATOR_SIZES
 } from "../../constants/constants";
-import {useDatabase} from "../../db/Database";
-import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
-import Carousel, {CarouselItemType} from "../../components/Carousel/Carousel";
+import { useDatabase } from "../../db/Database";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
+import Carousel, { CarouselItemType } from "../../components/Carousel/Carousel";
 import Button from "../../components/Button/Button";
-import {getDate} from "../../utils/getDate";
+import { getDate } from "../../utils/getDate";
 import UpcomingRides from "../../components/UpcomingRides/UpcomingRides";
 import Link from "../../components/Link/Link";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState, store} from "../../redux/store";
-import {loadCars, addCar as aC} from "../../redux/reducers/cars.slices";
+import { useSelector } from "react-redux";
+import { RootState, store } from "../../redux/store";
+import { loadCars } from "../../redux/reducers/cars.slices";
 import CustomBottomSheet from "../../components/BottomSheet/BottomSheet";
-import {BottomSheetModal} from "@gorhom/bottom-sheet";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import NewCarForm from "../layouts/forms/NewCarForm/NewCarForm";
 import CarouselItem from "../../components/Carousel/CarouselItem";
-import {createSelector} from "@reduxjs/toolkit";
-import RegisterForm from "../layouts/forms/RegisterForm/RegisterForm";
-import LoginForm from "../layouts/forms/LoginForm/LoginForm";
-
-interface onButtonPressArgs {
-    path: string,
-    params?: { [key: string]: string }
-}
+import { createSelector } from "@reduxjs/toolkit";
 
 const HomeScreen: React.FC = () => {
-    const { supabaseConnector, db } = useDatabase();
+    const { db } = useDatabase();
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const [bottomSheetTitle, setBottomSheetTitle] = useState("");
@@ -168,7 +158,7 @@ const CarsBlock: React.FC<CarsBlockProps> = ({ openNewCarBottomSheet }) => {
                                 x={ coordinate }
                                 isFocused={ false }
                                 item={ item }
-                                onPress={function (index: number): void {
+                                onPress={function (): void {
                                     console.log("xd")
                                 }}
                             />

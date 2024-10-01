@@ -1,16 +1,14 @@
-import React, {useEffect, useState} from "react";
-import {Text, View} from "react-native";
-import {DEFAULT_SEPARATOR, FONT_SIZES, SIMPLE_HEADER_HEIGHT} from "../../../constants/constants";
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
+import { FONT_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/constants";
 import Picker from "../../../components/Input/InputPicker/Picker";
-import {SimpleHeaderBar} from "../../../components/Header/HeaderBar";
 import Header from "../../../components/Header/Header";
-import {Avatar} from "react-native-paper";
-import {theme} from "../../../constants/theme";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState, store} from "../../../redux/store";
-import {loadCars, loadSelectedCar, selectCar} from "../../../redux/reducers/cars.slices";
-import {useDatabase} from "../../../db/Database";
-import {createSelector} from "@reduxjs/toolkit";
+import { Avatar } from "react-native-paper";
+import { theme } from "../../../constants/theme";
+import { useSelector } from "react-redux";
+import { RootState, store } from "../../../redux/store";
+import { loadSelectedCar, selectCar } from "../../../redux/reducers/cars.slices";
+import { createSelector } from "@reduxjs/toolkit";
 
 const CarHeader: React.FC = () => {
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -60,9 +58,9 @@ const CarHeader: React.FC = () => {
                 </View>
                 {
                     !isDropdownVisible &&
-                        <View style={{ flex: 1, alignItems: "flex-end" }}>
-                            <Avatar.Text label={"UA"} size={FONT_SIZES.large * 1.25} />
-                        </View>
+                    <View style={{ flex: 1, alignItems: "flex-end" }}>
+                        <Avatar.Text label={"UA"} size={FONT_SIZES.large * 1.25} />
+                    </View>
                 }
             </Header.Row>
         </Header>

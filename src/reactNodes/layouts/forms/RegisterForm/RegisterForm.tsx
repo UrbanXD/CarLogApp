@@ -1,18 +1,17 @@
 import React from "react";
-import {useDatabase} from "../../../../db/Database";
-import {useForm} from "react-hook-form";
+import { useDatabase } from "../../../../db/Database";
+import { useForm } from "react-hook-form";
 import {
     getRegisterHandleSubmit,
     RegisterFormFieldType, registerStepsField,
     registerUseFormProps
 } from "../../../../constants/formSchema/registerForm";
-import {MultiStepFormProvider, useMultiStepForm} from "../../../providers/MultiStepFormProvider";
+import { MultiStepFormProvider, useMultiStepForm } from "../../../providers/MultiStepFormProvider";
 import RegisterProgressInfo from "./RegisterProgressInfo";
-import {GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../../../constants/constants";
-import {KeyboardAwareScrollView} from "react-native-keyboard-controller";
+import { GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/constants";
+import { KeyboardAwareScrollView} from "react-native-keyboard-controller";
 import RegisterFormContent from "./RegisterFormContent";
 import RegisterFormButtons from "./RegisterFormButtons";
-import {View} from "react-native";
 import InputText from "../../../../components/Input/InputText/InputText";
 
 const RegisterForm: React.FC = () => {

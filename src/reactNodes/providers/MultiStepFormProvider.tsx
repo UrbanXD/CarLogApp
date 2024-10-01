@@ -1,13 +1,10 @@
-import React, {Context, createContext, ReactNode, useContext, useEffect, useState} from "react";
+import React, { Context, createContext, ReactNode, useContext, useState } from "react";
 import {
     Control,
     SubmitHandler,
-    UseFormHandleSubmit,
     UseFormResetField,
     UseFormTrigger,
-    UseFormWatch
 } from "react-hook-form";
-import {registerStepsField} from "../../constants/formSchema/registerForm";
 
 interface MultiStepFormProviderValue {
     steps: Array<() => ReactNode | null>

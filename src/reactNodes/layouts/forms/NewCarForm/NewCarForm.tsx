@@ -1,29 +1,26 @@
-import React, {useEffect, useState} from "react";
-import {useController, useForm, useWatch} from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import {
     getNewCarHandleSubmit,
-    NewCarFormFieldType, newCarFormStepsField,
-    newCarUseFormProps, ODOMETER_MEASUREMENTS
+    NewCarFormFieldType,
+    newCarFormStepsField,
+    newCarUseFormProps,
+    ODOMETER_MEASUREMENTS
 } from "../../../../constants/formSchema/newCarForm";
-import {useDatabase} from "../../../../db/Database";
-import {StyleSheet, Text, View} from "react-native";
-
+import { useDatabase } from "../../../../db/Database";
+import { View } from "react-native";
 import {
     CARS,
-    DATA_TRANSFORM_TO_PICKER_DATA, GET_CARS,
+    DATA_TRANSFORM_TO_PICKER_DATA,
     GLOBAL_STYLE,
     ICON_NAMES,
-    SEPARATOR_SIZES
 } from "../../../../constants/constants";
-import Button from "../../../../components/Button/Button";
-import {widthPercentageToDP as wp} from "react-native-responsive-screen";
-import {MultiStepFormProvider, useMultiStepForm} from "../../../providers/MultiStepFormProvider";
-import {NewCarFormProgressInfo, NewCarFormContent, NewCarFormButtons} from "./NewCarFormProgressInfo";
-// @ts-ignore
-import Picker, { PickerDataType } from "../../../../components/Input/InputPicker/Picker";
-import InputPicker, {InputPickerDataType} from "../../../../components/Input/InputPicker/InputPicker";
+import { MultiStepFormProvider, useMultiStepForm } from "../../../providers/MultiStepFormProvider";
+import NewCarFormProgressInfo from "./NewCarFormProgressInfo";
+import InputPicker, { InputPickerDataType } from "../../../../components/Input/InputPicker/InputPicker";
 import InputText from "../../../../components/Input/InputText/InputText";
-import TextInput from "../../../../components/Input/InputText/TextInput";
+import NewCarFormContent from "./NewCarFormContent";
+import NewCarFormButtons from "./NewCarFormButtons";
 
 interface NewCarFormProps {
     close?: () => void
@@ -161,53 +158,5 @@ const StepFour: React.FC = () => {
         </>
     )
 }
-
-const styles = StyleSheet.create({
-    dropdownButtonStyle: {
-        width: 200,
-        height: 50,
-        backgroundColor: 'red',
-        borderRadius: 12,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 12,
-    },
-    dropdownButtonTxtStyle: {
-        flex: 1,
-        fontSize: 18,
-        fontWeight: '500',
-        color: '#151E26',
-    },
-    dropdownButtonArrowStyle: {
-        fontSize: 28,
-    },
-    dropdownButtonIconStyle: {
-        fontSize: 28,
-        marginRight: 8,
-    },
-    dropdownMenuStyle: {
-        backgroundColor: '#E9ECEF',
-        borderRadius: 8,
-    },
-    dropdownItemStyle: {
-        width: '100%',
-        flexDirection: 'row',
-        paddingHorizontal: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingVertical: 8,
-    },
-    dropdownItemTxtStyle: {
-        flex: 1,
-        fontSize: 18,
-        fontWeight: '500',
-        color: '#151E26',
-    },
-    dropdownItemIconStyle: {
-        fontSize: 28,
-        marginRight: 8,
-    },
-});
 
 export default NewCarForm;

@@ -1,10 +1,10 @@
 import React from "react";
-import { ProgressBackButton, ProgressNextButton } from "../../../../components/Button/Button";
 import { useMultiStepForm } from "../../../providers/MultiStepFormProvider";
 import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../../constants/constants";
+import { ProgressBackButton, ProgressNextButton } from "../../../../components/Button/Button";
 
-const RegisterFormButtons: React.FC = () => {
+const NewCarFormButtons: React.FC = () => {
     const {
         isFirstStep,
         isLastStep,
@@ -14,15 +14,14 @@ const RegisterFormButtons: React.FC = () => {
 
     return (
         <View style={ styles.buttonsContainer }>
-            {
-                !isFirstStep &&
-                    <ProgressBackButton onPress={ back } />
-            }
-            <View style={{ flex: 0.825 }}>
+            <View>
                 {
                     !isFirstStep &&
-                        <ProgressNextButton onPress={ next } isLastStep={ isLastStep } />
+                    <ProgressBackButton onPress={ back } />
                 }
+            </View>
+            <View>
+                <ProgressNextButton onPress={ next } isLastStep={ isLastStep } />
             </View>
         </View>
     )
@@ -33,9 +32,9 @@ const styles = StyleSheet.create({
         width: "100%",
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingVertical: SEPARATOR_SIZES.small,
         alignItems: "center",
+        paddingVertical: SEPARATOR_SIZES.small
     }
-});
+})
 
-export default RegisterFormButtons;
+export default NewCarFormButtons;

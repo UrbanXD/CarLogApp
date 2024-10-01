@@ -1,13 +1,9 @@
-import React, {ReactElement, useEffect, useRef, useState} from "react";
+import React, { ReactElement, useRef, useState } from "react";
 import {
-    Image,
     ImageBackground,
     SafeAreaView,
-    ScrollView,
-    StatusBar,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View
 } from "react-native";
 import {
@@ -18,17 +14,13 @@ import {
     ICON_NAMES,
     SEPARATOR_SIZES
 } from "../../constants/constants";
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {theme} from "../../constants/theme";
-import {LinearGradient} from "expo-linear-gradient";
-import {Divider, IconButton} from "react-native-paper";
-import {router} from "expo-router";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { theme } from "../../constants/theme";
+import { LinearGradient } from "expo-linear-gradient";
+import { Divider, IconButton } from "react-native-paper";
 import Button from "../../components/Button/Button";
-import {ScreenContainer} from "react-native-screens";
-import {Stack} from "expo-router/stack";
-import NewCarForm from "../layouts/forms/NewCarForm/NewCarForm";
 import CustomBottomSheet from "../../components/BottomSheet/BottomSheet";
-import {BottomSheetModal} from "@gorhom/bottom-sheet";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import RegisterForm from "../layouts/forms/RegisterForm/RegisterForm";
 import LoginForm from "../layouts/forms/LoginForm/LoginForm";
 
@@ -41,7 +33,6 @@ const FirstScreen: React.FC = () => {
         setBottomSheetTitle("Felhasználó létrehozás");
         setBottomSheetContent(<RegisterForm />);
         bottomSheetModalRef.current?.present();
-        // router.push({ pathname: "/(user_entry)/register" });
     }
     const openLogin = () => {
         setBottomSheetTitle("Bejelentkezés")

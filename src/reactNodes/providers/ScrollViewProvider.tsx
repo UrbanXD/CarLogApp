@@ -1,5 +1,5 @@
-import React, {Context, createContext, ReactNode, useContext, useEffect, useState} from "react";
-import {SharedValue, useAnimatedReaction, useSharedValue} from "react-native-reanimated";
+import React, { Context, createContext, ReactNode, useContext } from "react";
+import { SharedValue, useSharedValue } from "react-native-reanimated";
 
 interface ScrollViewProviderValue {
     lastContentOffset: SharedValue<number>,

@@ -1,13 +1,10 @@
 import React from "react";
-import {FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../constants/constants";
-import {Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {theme} from "../../constants/theme";
-import {DataTable, Divider, Icon} from "react-native-paper";
-import Link from "../../components/Link/Link";
-import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import Date from "../../components/UpcomingRides/Date";
-import Button from "../../components/Button/Button";
-import {formatNumber} from "../../utils/formatNumber";
+import { FONT_SIZES, GLOBAL_STYLE } from "../../constants/constants";
+import { Platform, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { theme } from "../../constants/theme";
+import { Divider } from "react-native-paper";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { formatNumber } from "../../utils/formatNumber";
 
 const ServiceLogScreen: React.FC = () => {
     const logs = [

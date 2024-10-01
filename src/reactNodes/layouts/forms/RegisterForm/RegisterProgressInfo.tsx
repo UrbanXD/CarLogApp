@@ -1,12 +1,10 @@
-import React, {useEffect} from "react";
-import {View} from "react-native";
+import React, { useEffect } from "react";
 import ProgressInfo from "../../../../components/MultiStepForm/ProgressInfo";
-import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {registerStepsTitle} from "../../../../constants/formSchema/registerForm";
-import {useMultiStepForm} from "../../../providers/MultiStepFormProvider";
-import {SEPARATOR_SIZES} from "../../../../constants/constants";
-import {useFont} from "@shopify/react-native-skia";
-import {useSharedValue, withTiming} from "react-native-reanimated";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { registerStepsTitle } from "../../../../constants/formSchema/registerForm";
+import { useMultiStepForm } from "../../../providers/MultiStepFormProvider";
+import { useFont } from "@shopify/react-native-skia";
+import { useSharedValue, withTiming } from "react-native-reanimated";
 
 const RegisterProgressInfo: React.FC = () => {
     const {
@@ -31,8 +29,6 @@ const RegisterProgressInfo: React.FC = () => {
                     <ProgressInfo
                         radius={ hp(6) }
                         strokeWidth={ hp(1.25) }
-                        // radius={ hp(!isKeyboardOpen ? 8 : 5) }
-                        // strokeWidth={ hp(!isKeyboardOpen ? 2 : 1.25) }
                         end={ end }
                         font={ font }
                         statusText={ `${ stepsCount } / ${ currentStep }` }

@@ -1,15 +1,14 @@
 import React from "react";
-import {useForm} from "react-hook-form";
-import {getLoginHandleSubmit, LoginFormFieldType, loginUseFormProps} from "../../../../constants/formSchema/loginForm";
-import {useDatabase} from "../../../../db/Database";
-import {GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../../../constants/constants";
-import {Text, View} from "react-native";
+import { useForm } from "react-hook-form";
+import { getLoginHandleSubmit, LoginFormFieldType, loginUseFormProps } from "../../../../constants/formSchema/loginForm";
+import { useDatabase } from "../../../../db/Database";
+import { GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/constants";
+import { Text, View } from "react-native";
 import InputText from "../../../../components/Input/InputText/InputText";
-import Button, {FacebookButton, GoogleButton} from "../../../../components/Button/Button";
+import Button, { FacebookButton, GoogleButton } from "../../../../components/Button/Button";
 import TextDivider from "../../../../components/TextDivider/TextDivider";
-import {theme} from "../../../../constants/theme";
-import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {KeyboardAwareScrollView} from "react-native-keyboard-controller";
+import { theme } from "../../../../constants/theme";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 const LoginForm: React.FC = () => {
     const { control, handleSubmit } =

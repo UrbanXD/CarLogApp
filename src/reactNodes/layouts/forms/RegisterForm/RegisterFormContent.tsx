@@ -1,11 +1,10 @@
 import React from "react";
-import {StyleSheet, View} from "react-native";
-import {GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../../../constants/constants";
-import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import Button, {FacebookButton, GoogleButton} from "../../../../components/Button/Button";
+import { View } from "react-native";
+import { GLOBAL_STYLE, ICON_NAMES } from "../../../../constants/constants";
+import Button, { FacebookButton, GoogleButton } from "../../../../components/Button/Button";
 import TextDivider from "../../../../components/TextDivider/TextDivider";
-import {theme} from "../../../../constants/theme";
-import {useMultiStepForm} from "../../../providers/MultiStepFormProvider";
+import { theme } from "../../../../constants/theme";
+import { useMultiStepForm } from "../../../providers/MultiStepFormProvider";
 
 const RegisterFormContent: React.FC = () => {
     const {
@@ -13,7 +12,6 @@ const RegisterFormContent: React.FC = () => {
         currentStep,
         isFirstStep,
         next,
-        back
     } = useMultiStepForm();
 
     return (
@@ -35,12 +33,5 @@ const RegisterFormContent: React.FC = () => {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    contentContainer: {
-        flex: 1,
-        justifyContent: "center",
-    },
-});
 
 export default RegisterFormContent;
