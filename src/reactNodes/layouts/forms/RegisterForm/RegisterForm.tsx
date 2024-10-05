@@ -3,16 +3,18 @@ import { useDatabase } from "../../../../db/Database";
 import { useForm } from "react-hook-form";
 import {
     getRegisterHandleSubmit,
-    RegisterFormFieldType, registerStepsField,
+    RegisterFormFieldType,
+    registerStepsField,
+    registerStepsTitle,
     registerUseFormProps
 } from "../../../../constants/formSchema/registerForm";
-import { MultiStepFormProvider, useMultiStepForm } from "../../../providers/MultiStepFormProvider";
-import RegisterProgressInfo from "./RegisterProgressInfo";
-import { GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/constants";
-import { KeyboardAwareScrollView} from "react-native-keyboard-controller";
-import RegisterFormContent from "./RegisterFormContent";
-import RegisterFormButtons from "./RegisterFormButtons";
+import { useMultiStepForm } from "../../../providers/MultiStepFormProvider";
+import { GLOBAL_STYLE, ICON_NAMES } from "../../../../constants/constants";
 import InputText from "../../../../components/Input/InputText/InputText";
+import { MultiStepForm } from "../../../../components/Form/Form";
+import Button, {FacebookButton, GoogleButton} from "../../../../components/Button/Button";
+import TextDivider from "../../../../components/TextDivider/TextDivider";
+import { theme } from "../../../../constants/theme";
 
 const RegisterForm: React.FC = () => {
     const { supabaseConnector } = useDatabase();
@@ -34,40 +36,45 @@ const RegisterForm: React.FC = () => {
     ];
 
     return (
-        <MultiStepFormProvider
+        <MultiStepForm
             steps={ steps }
+            stepsTitle={ registerStepsTitle }
             fieldsName={ registerStepsField }
             isFirstCount={ false }
             control={ control }
             submitHandler={ submitHandler }
             trigger={ trigger }
-        >
-            <KeyboardAwareScrollView
-                bounces={ false }
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={ false }
-                contentContainerStyle={ [GLOBAL_STYLE.scrollViewContentContainer, { paddingTop: SEPARATOR_SIZES.extraMedium }] }
-            >
-                <RegisterProgressInfo />
-                <RegisterFormContent />
-            </KeyboardAwareScrollView>
-            <RegisterFormButtons />
-        </MultiStepFormProvider>
+        />
     )
 }
 
 const RegisterStepOne: React.FC = () => {
-    const { control } = useMultiStepForm();
+    const { control, next } = useMultiStepForm();
 
     return (
-        <InputText
-            isInBottomSheet={true}
-            control={ control }
-            fieldName="email"
-            fieldNameText="Email cím"
-            icon={ ICON_NAMES.email }
-            placeholder="carlog@gmail.com"
-        />
+        <>
+            <InputText
+                isInBottomSheet
+                control={ control }
+                fieldName="email"
+                fieldNameText="Email cím"
+                icon={ ICON_NAMES.email }
+                placeholder="carlog@gmail.com"
+            />
+            <Button
+                title="Következő"
+                iconRight={ ICON_NAMES.rightArrowHead }
+                onPress={ next }
+            />
+            <TextDivider
+                title="vagy"
+                color={ theme.colors.gray1 }
+                lineHeight={ 1 }
+                marginVertical={ GLOBAL_STYLE.formContainer.gap }
+            />
+            <GoogleButton onPress={ () => 1 } />
+            <FacebookButton onPress={ () => 1 } />
+        </>
     )
 }
 
@@ -77,7 +84,6 @@ const RegisterStepTwo: React.FC = () => {
     return (
         <>
             <InputText
-                key={ 1 }
                 control={ control }
                 fieldName="lastname"
                 fieldNameText="Vezetéknév"
@@ -86,7 +92,6 @@ const RegisterStepTwo: React.FC = () => {
                 isInBottomSheet
             />
             <InputText
-                key={ 2 }
                 control={ control }
                 fieldName="firstname"
                 fieldNameText="Keresztnév"
@@ -121,7 +126,6 @@ const RegisterStepThree: React.FC = () => {
                 placeholder="*****"
                 isSecure
                 isInBottomSheet
-
             />
         </>
     )

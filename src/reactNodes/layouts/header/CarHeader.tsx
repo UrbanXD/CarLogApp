@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import {Alert, TouchableOpacity, View} from "react-native";
 import { FONT_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/constants";
 import Picker from "../../../components/Input/InputPicker/Picker";
 import Header from "../../../components/Header/Header";
@@ -9,8 +9,11 @@ import { useSelector } from "react-redux";
 import { RootState, store } from "../../../redux/store";
 import { loadSelectedCar, selectCar } from "../../../redux/reducers/cars.slices";
 import { createSelector } from "@reduxjs/toolkit";
+import { useDatabase } from "../../../db/Database";
 
 const CarHeader: React.FC = () => {
+    const { supabaseConnector } = useDatabase();
+
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const selectCarsState = (state: RootState) => state.cars.cars;
 
@@ -58,9 +61,19 @@ const CarHeader: React.FC = () => {
                 </View>
                 {
                     !isDropdownVisible &&
-                    <View style={{ flex: 1, alignItems: "flex-end" }}>
+                    <TouchableOpacity
+                        style={{ flex: 1, alignItems: "flex-end" }}
+                        onPress={ async () => {
+                            try {
+                                await supabaseConnector.client.auth.signOut();
+                                console.log("logout")
+                            } catch (e: any){
+                                Alert.alert(e.message)
+                            }
+                        }}
+                    >
                         <Avatar.Text label={"UA"} size={FONT_SIZES.large * 1.25} />
-                    </View>
+                    </TouchableOpacity>
                 }
             </Header.Row>
         </Header>

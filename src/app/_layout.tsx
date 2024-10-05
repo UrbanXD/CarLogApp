@@ -64,7 +64,6 @@ const Layout:React.FC = () => {
                                                 header: () => <CarHeader />
                                             }}
                                         />
-                                        <Stack.Screen name="fuelMonitor" />
                                     </Stack>
                                 </ScrollViewProvider>
                             </BottomSheetModalProvider>

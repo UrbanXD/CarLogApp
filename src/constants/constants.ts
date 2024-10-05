@@ -14,20 +14,6 @@ export interface GetFormHandleSubmitArgs {
     onSubmit?: (isSuccess: boolean) => void
 }
 
-export interface FormProps {
-    bottomSheet?: boolean
-}
-
-export const getHeaderTitle = (route: string) => {
-    switch (route) {
-        case "register": {
-            return "Regisztráció";
-        }
-        default: {
-            return "Carlog"
-        }
-    }
-}
 
 export const CAR_NAME_LENGTH = 10
 

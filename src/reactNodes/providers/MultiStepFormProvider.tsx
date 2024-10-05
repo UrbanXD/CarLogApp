@@ -1,4 +1,4 @@
-import React, { Context, createContext, ReactNode, useContext, useState } from "react";
+import React, {Context, createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {
     Control,
     SubmitHandler,
@@ -80,7 +80,7 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
                 resetField,
                 currentStep,
                 currentStepText: (currentStep + (isFirstCount ? 1 : 0)).toString(),
-                isFirstStep: currentStep === (!isFirstCount ? 1 : 0),
+                isFirstStep: currentStep === 0,
                 isLastStep: currentStep === steps.length - 1,
                 goTo,
                 next,
