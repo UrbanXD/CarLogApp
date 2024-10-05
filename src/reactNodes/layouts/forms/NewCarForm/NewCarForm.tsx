@@ -104,7 +104,7 @@ const StepTwo: React.FC = () => {
 
         setIsBrandSelected(selectedBrandNameValue !== "");
         setModels(DATA_TRANSFORM_TO_PICKER_DATA(CARS[selectedBrandNameValue] || [], "name"));
-    }, [selectedBrandNameValue]);
+    }, [selectedBrandNameValue, resetField]);
 
     return (
         <>

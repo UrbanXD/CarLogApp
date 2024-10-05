@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from "react";
+import React, {ReactElement, ReactNode, useEffect} from "react";
 import { GLOBAL_STYLE, SEPARATOR_SIZES } from "../../constants/constants";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { MultiStepFormProvider, useMultiStepForm } from "../../reactNodes/providers/MultiStepFormProvider";
@@ -9,6 +9,7 @@ import { useSharedValue, withTiming } from "react-native-reanimated";
 import { useFont } from "@shopify/react-native-skia";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import ProgressInfo from "../MultiStepForm/ProgressInfo";
+import { FlatList } from "react-native-gesture-handler";
 
 interface FormProps {
     children: ReactNode | null
@@ -16,16 +17,21 @@ interface FormProps {
 
 export const Form: React.FC<FormProps> = ({ children }) => {
     return (
-        <KeyboardAwareScrollView
-            bounces={ false }
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={ false }
-            contentContainerStyle={ [GLOBAL_STYLE.scrollViewContentContainer, { paddingTop: SEPARATOR_SIZES.extraMedium }] }
-        >
-            <View style={ [GLOBAL_STYLE.formContainer, { justifyContent: "flex-start" }] }>
-                { children }
-            </View>
-        </KeyboardAwareScrollView>
+        <FlatList
+            data={ React.Children.toArray(children) }
+            renderItem={ ({ item }) => item as ReactElement }
+            keyExtractor={ (_, index) => index.toString() }
+            contentContainerStyle={ [GLOBAL_STYLE.scrollViewContentContainer, { justifyContent: "flex-start", gap: SEPARATOR_SIZES.mediumSmall }] }
+            renderScrollComponent={
+                (props) =>
+                    <KeyboardAwareScrollView
+                        { ...props }
+                        bounces={ false }
+                        keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={ false }
+                    />
+            }
+        />
     )
 }
 
@@ -61,18 +67,11 @@ export const MultiStepForm: React.FC<MultiStepFormProps> = ({
             trigger={ trigger }
             resetField={ resetField }
         >
-            <KeyboardAwareScrollView
-                bounces={ false }
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={ false }
-                contentContainerStyle={ [GLOBAL_STYLE.scrollViewContentContainer, { paddingTop: SEPARATOR_SIZES.extraMedium }] }
-            >
-                <MultiStepFormProgressInfo
-                    isFirstCount={ isFirstCount }
-                    stepsTitle={ stepsTitle }
-                />
-                <MultiStepFormContent />
-            </KeyboardAwareScrollView>
+            <MultiStepFormProgressInfo
+                isFirstCount={ isFirstCount }
+                stepsTitle={ stepsTitle }
+            />
+            <MultiStepFormContent />
             <MultiStepFormButtons isFirstCount={ isFirstCount } />
         </MultiStepFormProvider>
     )
@@ -160,11 +159,16 @@ const MultiStepFormContent: React.FC = () => {
         currentStep,
     } = useMultiStepForm();
 
-    const memoizedSteps = React.useMemo(() => steps.map(step => step), [steps]);
-
     return (
         <Form>
-            { steps[currentStep]() }
+            {
+                steps.map(
+                    (step, index) =>
+                        <View key={index} style={{ display: currentStep === index ? 'flex' : 'none' }}>
+                            { step() }
+                        </View>
+                )
+            }
         </Form>
     )
 }
