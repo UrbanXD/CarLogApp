@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useRef, useState } from "react";
+import React, {ReactElement, useCallback, useEffect, useRef, useState} from "react";
 import {
     SafeAreaView,
     ScrollView,
@@ -30,24 +30,16 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import NewCarForm from "../layouts/forms/NewCarForm/NewCarForm";
 import CarouselItem from "../../components/Carousel/CarouselItem";
 import { createSelector } from "@reduxjs/toolkit";
+import {useBottomSheet} from "../providers/BottomSheetProvider";
 
 const HomeScreen: React.FC = () => {
     const { db } = useDatabase();
-
-    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-    const [bottomSheetTitle, setBottomSheetTitle] = useState("");
-    const [bottomSheetContent, setBottomSheetContent] = useState<ReactElement | null>(null);
-
-    const openBottomSheet = (title: string, content: ReactElement) => {
-        setBottomSheetTitle(title);
-        setBottomSheetContent(content);
-        bottomSheetModalRef.current?.present();
-    }
+    const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
     useEffect(() => {
         store.dispatch(loadCars(db))
     }, []);
-
+    console.log("homescren rerender")
     // const onP = async () => {
     //     const service: ServiceType = {
     //         id: getUUID(),
@@ -68,13 +60,13 @@ const HomeScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, styles.pageContainer] }>
-            <CustomBottomSheet
-                ref={ bottomSheetModalRef }
-                title={ bottomSheetTitle }
-                snapPoints={ ["85%"] }
-            >
-                { bottomSheetContent }
-            </CustomBottomSheet>
+            {/*<CustomBottomSheet*/}
+            {/*    ref={ bottomSheetModalRef }*/}
+            {/*    title={ bottomSheetTitle }*/}
+            {/*    snapPoints={ ["85%"] }*/}
+            {/*>*/}
+            {/*    { bottomSheetContent }*/}
+            {/*</CustomBottomSheet>*/}
             <ScrollView
                 showsVerticalScrollIndicator={ false }
                 nestedScrollEnabled={ true }
@@ -83,7 +75,12 @@ const HomeScreen: React.FC = () => {
                 <WelcomeBlock />
                 <CarsBlock
                     openNewCarBottomSheet={
-                        () => openBottomSheet("Új Autó", <NewCarForm close={ bottomSheetModalRef.current?.close } />)
+                        () =>
+                            openBottomSheet({
+                                title: "Új Autó",
+                                content: <NewCarForm close={ closeBottomSheet } />,
+                                snapPoints: ["85%"]
+                            })
                     }
                 />
                 <UpcomingRidesBlock />
@@ -116,12 +113,13 @@ const CarsBlock: React.FC<CarsBlockProps> = ({ openNewCarBottomSheet }) => {
     const selectCarsState = (state: RootState) => state.cars.cars;
     const selectCarsForCarousel = createSelector(
         [selectCarsState],
-        (cars) => cars.map(car => ({
-            id: car.name,
-            image: undefined,
-            title: car.brand,
-            subtitle: car.model,
-        }))
+        (cars) =>
+            cars.map(car => ({
+                id: car.name,
+                image: undefined,
+                title: car.brand,
+                subtitle: car.model,
+            }))
     );
     const cars = useSelector(selectCarsForCarousel);
 

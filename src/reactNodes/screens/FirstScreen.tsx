@@ -1,4 +1,4 @@
-import React, { ReactElement, useRef, useState } from "react";
+import React, {ReactElement, ReactNode, useRef, useState} from "react";
 import {
     ImageBackground,
     SafeAreaView,
@@ -20,44 +20,44 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Divider, IconButton } from "react-native-paper";
 import Button from "../../components/Button/Button";
 import CustomBottomSheet from "../../components/BottomSheet/BottomSheet";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import {BottomSheetModal} from "@gorhom/bottom-sheet";
 import RegisterForm from "../layouts/forms/RegisterForm/RegisterForm";
 import LoginForm from "../layouts/forms/LoginForm/LoginForm";
+import {useBottomSheet} from "../providers/BottomSheetProvider";
 
 const FirstScreen: React.FC = () => {
-    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-    const [bottomSheetTitle, setBottomSheetTitle] = useState("");
-    const [bottomSheetContent, setBottomSheetContent] = useState<ReactElement | null>(null);
+    const { openBottomSheet, closeBottomSheet  } = useBottomSheet();
 
+    const bottomSheetArgs = {
+        snapPoints: ["100%"],
+        isHandlePanningGesture: false,
+        renderCloseButton:
+            () =>
+                <IconButton
+                    icon={ ICON_NAMES.close }
+                    size={ FONT_SIZES.medium }
+                    iconColor={"whitesmoke"}
+                    onPress={ closeBottomSheet }
+                    style={ [GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium), { alignSelf: "center" }] }
+                /> as ReactNode
+    }
     const openRegister = () => {
-        setBottomSheetTitle("Felhasználó létrehozás");
-        setBottomSheetContent(<RegisterForm />);
-        bottomSheetModalRef.current?.present();
+        openBottomSheet({
+            ...bottomSheetArgs,
+            title: "Felhasználó létrehozás",
+            content: <RegisterForm />
+        });
     }
     const openLogin = () => {
-        setBottomSheetTitle("Bejelentkezés")
-        setBottomSheetContent(<LoginForm />);
-        bottomSheetModalRef.current?.present();
+        openBottomSheet({
+            ...bottomSheetArgs,
+            title: "Bejelentkezés",
+            content: <LoginForm />
+        });
     };
 
     return (
         <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, { paddingHorizontal: 0, paddingVertical: 0 }]}>
-            <CustomBottomSheet
-                ref={ bottomSheetModalRef }
-                title={ bottomSheetTitle }
-                snapPoints={ ["100%"] }
-                isHandlePanningGesture={ false }
-                renderCloseButton={ () =>
-                    <IconButton
-                        icon={ ICON_NAMES.close }
-                        size={ FONT_SIZES.medium }
-                        iconColor={"whitesmoke"}
-                        onPress={ () => bottomSheetModalRef.current?.close() }
-                        style={ [GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium), { alignSelf: "center" }] }
-                    /> }
-            >
-                { bottomSheetContent }
-            </CustomBottomSheet>
             <ImageBackground
                 source={ require("../../assets/images/home2.jpg") }
                 style={ styles.imageContainer }

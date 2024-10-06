@@ -15,6 +15,7 @@ import {PaperProvider} from "react-native-paper";
 import {KeyboardProvider} from "react-native-keyboard-controller";
 import {StatusBar} from "expo-status-bar";
 import CarHeader from "../reactNodes/layouts/header/CarHeader";
+import {BottomSheetProvider} from "../reactNodes/providers/BottomSheetProvider";
 
 const Layout:React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
@@ -51,20 +52,22 @@ const Layout:React.FC = () => {
                         <GestureHandlerRootView style={{ flex: 1 }}>
                             <BottomSheetModalProvider>
                                 <ScrollViewProvider>
-                                    <Stack screenOptions={{ header: () => <></>}} >
-                                        <Stack.Screen
-                                            name="index"
-                                            options={{
-                                                header: () => <StatusBar translucent={ true } />
-                                            }}
-                                        />
-                                        <Stack.Screen
-                                            name="(main)"
-                                            options={{
-                                                header: () => <CarHeader />
-                                            }}
-                                        />
-                                    </Stack>
+                                    <BottomSheetProvider>
+                                        <Stack screenOptions={{ header: () => <></>}} >
+                                            <Stack.Screen
+                                                name="index"
+                                                options={{
+                                                    header: () => <StatusBar translucent={ true } />
+                                                }}
+                                            />
+                                            <Stack.Screen
+                                                name="(main)"
+                                                options={{
+                                                    header: () => <CarHeader />
+                                                }}
+                                            />
+                                        </Stack>
+                                    </BottomSheetProvider>
                                 </ScrollViewProvider>
                             </BottomSheetModalProvider>
                         </GestureHandlerRootView>

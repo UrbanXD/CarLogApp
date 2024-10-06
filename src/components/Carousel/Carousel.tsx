@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React, {ReactElement, useEffect, useRef} from "react";
 import { ImageSourcePropType, useWindowDimensions, View } from "react-native";
 import Animated, { SharedValue, useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import {FlatList} from "react-native-gesture-handler";
@@ -35,9 +35,13 @@ const Carousel: React.FC<CarouselProps> = ({ data, renderItem, itemSizePercentag
     }, []);
 
     const AnimatedFlatList = Animated.createAnimatedComponent(FlatList)
+    const flatlistRef = useRef<FlatList>(null);
+
+    // flatlistRef?.current?.scrollToOffset({ offset: x.value, animated: false });
 
     return (
         <AnimatedFlatList
+            ref={ flatlistRef }
             data={ data }
             renderItem={
                 ({ item, index }) =>
@@ -53,7 +57,7 @@ const Carousel: React.FC<CarouselProps> = ({ data, renderItem, itemSizePercentag
                         }
                     </React.Fragment>
             }
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={ (_, index) => index.toString() }
             horizontal
             snapToInterval={ ITEM_SIZE }
             onScroll={ onScroll }
