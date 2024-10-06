@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import {
     FONT_SIZES,
@@ -10,14 +10,13 @@ import {
 import Date from "./Date";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { theme } from "../../constants/theme";
-import { IconButton, Portal } from "react-native-paper";
+import { IconButton } from "react-native-paper";
 import InputText from "../Input/InputText/InputText";
 import { useForm } from "react-hook-form";
 import { EditRideFormFieldType, editRideUseFormProps } from "../../constants/formSchema/editRideForm";
 import { getToday } from "../../utils/getDate";
 import ProgressBar from "../MultiStepForm/ProgressBar";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import CustomBottomSheet from "../BottomSheet/BottomSheet";
+import { useBottomSheet } from "../../reactNodes/providers/BottomSheetProvider";
 
 type RideType = {
     carUID: string
@@ -39,121 +38,117 @@ interface UpcomingRidesProps {
 }
 
 const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
-    const [selectedRideIndex, setSelectedRideIndex] = useState(0);
-    const [selectedRideValues, setSelectedRideValues] = useState<EditRideFormFieldType>(editRideUseFormProps.defaultValues);
-
-    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-
-    const { control } =
-        useForm<EditRideFormFieldType>(
-            {
-                    ...editRideUseFormProps,
-                    values: selectedRideValues
-                  }
-        )
-
-    const expandHandler = useCallback((index: number) => {
-        setSelectedRideIndex(index);
-        bottomSheetModalRef.current?.present();
-    }, []);
-
-    useEffect(() => {
-        setSelectedRideValues({
-            carUID: rides[selectedRideIndex].carUID,
-            carOwnerUID: rides[selectedRideIndex].carOwnerUID,
-            date: getToday(),
-            time: rides[selectedRideIndex].time,
-            client: rides[selectedRideIndex].client,
-            passengerCount: rides[selectedRideIndex].passengerCount || 1,
-            comment: rides[selectedRideIndex].comment || "",
-            locations: rides[selectedRideIndex].locations
-        });
-    }, [selectedRideIndex]);
+    const { openBottomSheet } = useBottomSheet();
 
     return (
-        <>
-            <Portal>
-                <CustomBottomSheet
-                    ref={ bottomSheetModalRef }
-                    title={"xd vnrs vnknrdnj njkjngn krkg nkrsn knkrznjgk nzsgrk "}
-                >
-                    <View style={ styles.infoContainer }>
-                        <View style={ styles.infoTitleContainer }>
+        <View style={ styles.container }>
+            {
+                rides.map((ride, index) =>
+                    <View key={ index } style={ styles.contentContainer }>
+                        <View style={ styles.rowContainer }>
                             <Date
-                                dateTitle={ rides[selectedRideIndex].dateTitle }
-                                dateUnderSubtitle={ rides[selectedRideIndex].dateSubtitle }
-                                flexDirection="row"
+                                dateTitle={ ride.dateTitle }
+                                dateUpperSubtitle={ ride.time }
+                                dateUnderSubtitle={ ride.dateSubtitle }
                             />
-                            <Text style={{color: "white" }}>
-                                { rides[selectedRideIndex].time }
-                            </Text>
+                            <View style={{ flex: 1, gap: SEPARATOR_SIZES.lightSmall }}>
+                                <Text numberOfLines={ 2 } style={ [GLOBAL_STYLE.containerText, { color: theme.colors.white }] }>
+                                    { ride.client }
+                                </Text>
+                                <ScrollView contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }>
+                                    <ProgressBar
+                                        isVertical
+                                        stepsCount={3}
+                                        titles={["Zenta", "Kamenica"]}
+                                    />
+                                </ScrollView>
+                                <Text numberOfLines={ 1 } style={ [GLOBAL_STYLE.containerText, { color: theme.colors.white }] }>
+                                    100 km
+                                </Text>
                         </View>
-                        <View style={ styles.infoContentContainer }>
-                            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                <InputText
-                                    control={control}
-                                    fieldName={"carUID"}
-                                    isEditable={ true }
-                                />
-                                <View style={{ backgroundColor: "blue" }}>
-                                    <Text style={{ color: "white"}}>Szemelyek szama</Text>
-                                </View>
-                            </View>
-                            <View style={{ flexDirection: "row" }}>
-                                <View style={{ flex: 1, backgroundColor: "red" }}>
-                                    <Text style={{ color: "white" }}>CAr ID</Text>
-                                </View>
-                            </View>
-                            <View style={{ flexDirection: "row" }}>
-                                <View style={{ flex: 1, backgroundColor: "red" }}>
-                                    <Text style={{ color: "white" }}>Comment</Text>
-                                </View>
-                            </View>
-                            <Text style={{ color: "white" }}> Locations pl: Utca 21. (Zenta) </Text>
+                            <IconButton
+                                onPress={
+                                    () =>{
+                                        console.log("xdd")
+                                        openBottomSheet({
+                                            title: "Edit Ride",
+                                            content: <EditRideForm ride={ ride } />,
+                                            snapPoints: ["85%"]
+                                        })
+                                        }
+                                }
+                                size={ FONT_SIZES.medium }
+                                icon={ ICON_NAMES.info }
+                                iconColor={"white"}
+                                style={ GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium) }
+                            />
                         </View>
                     </View>
-                </CustomBottomSheet>
-            </Portal>
-            <View style={ styles.container }>
-                {
-                    rides.map((ride, index) =>
-                        <View key={ index } style={ styles.contentContainer }>
-                            <View style={ styles.rowContainer }>
-                                <Date
-                                    dateTitle={ ride.dateTitle }
-                                    dateUpperSubtitle={ ride.time }
-                                    dateUnderSubtitle={ ride.dateSubtitle }
-                                />
-                                <View style={{ flex: 1, gap: SEPARATOR_SIZES.lightSmall }}>
-                                    <Text numberOfLines={ 2 } style={ [GLOBAL_STYLE.containerText, { color: theme.colors.white }] }>
-                                        { ride.client }
-                                    </Text>
-                                    <ScrollView contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }>
-                                        <ProgressBar
-                                            isVertical
-                                            stepsCount={3}
-                                            titles={["Zenta", "Kamenica"]}
-                                        />
-                                    </ScrollView>
-                                    <Text numberOfLines={ 1 } style={ [GLOBAL_STYLE.containerText, { color: theme.colors.white }] }>
-                                        100 km
-                                    </Text>
-                            </View>
-                                <IconButton
-                                    onPress={ () => expandHandler(index) }
-                                    size={ FONT_SIZES.medium }
-                                    icon={ ICON_NAMES.info }
-                                    iconColor={"white"}
-                                    style={ GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium) }
-                                />
-                            </View>
-                        </View>
-                    )
-                }
-            </View>
-        </>
+                )
+            }
+        </View>
     )
 }
+
+interface EditRideFormProps {
+    ride: RideType
+}
+
+const EditRideForm: React.FC<EditRideFormProps> = React.memo(({ ride }) => {
+    const rideValue = useMemo(() => ({
+        ...ride,
+        passengerCount: ride.passengerCount || 1,
+        comment: ride.comment || "",
+        date: getToday()
+    }), [ride]);
+
+    const { control, setValue } =
+        useForm<EditRideFormFieldType>(
+            {
+                ...editRideUseFormProps,
+                values: rideValue
+            }
+        )
+
+
+    return (
+        <View style={ styles.infoContainer }>
+            <View style={ styles.infoTitleContainer }>
+                <Date
+                    dateTitle={ ride.dateTitle }
+                    dateUnderSubtitle={ ride.dateSubtitle }
+                    flexDirection="row"
+                />
+                <Text style={{color: "white" }}>
+                    { ride.time }
+                </Text>
+            </View>
+            <View style={ styles.infoContentContainer }>
+                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                    <InputText
+                        control={control}
+                        fieldName={"carUID"}
+                        isEditable={ true }
+                    />
+                    <View style={{ backgroundColor: "blue" }}>
+                        <Text style={{ color: "white"}}>Szemelyek szama { ride.client }</Text>
+                    </View>
+                </View>
+                <View style={{ flexDirection: "row" }}>
+                    <View style={{ flex: 1, backgroundColor: "red" }}>
+                        <Text style={{ color: "white" }}>CAr ID</Text>
+                    </View>
+                </View>
+                <View style={{ flexDirection: "row" }}>
+                    <View style={{ flex: 1, backgroundColor: "red" }}>
+                        <Text style={{ color: "white" }}>Comment</Text>
+                    </View>
+                </View>
+                <Text style={{ color: "white" }}> Locations pl: Utca 21. (Zenta) </Text>
+            </View>
+        </View>
+    )
+})
 
 const styles = StyleSheet.create({
     infoContainer: {
