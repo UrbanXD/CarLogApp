@@ -11,7 +11,7 @@ export const newCarFormStepsTitle = ["Elnevezés", "Gyártó", "Autó adatok", "
 
 export const ODOMETER_MEASUREMENTS: Array<InputPickerDataType> = [
     { title: "Kilóméter (km)", value: "km" },
-    { title: "ascdvsvrzsvr bdr trbd drzbt", value: "a" },
+    { title: "ascdvsvxfbvbbr", value: "a" },
     { title: "Mérföld (m)", value: "mile" }
 ];
 

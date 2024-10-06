@@ -144,7 +144,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
     }
 
     const renderItem = (arg: { item: any, index: number }) =>
-        <View key={ arg.index } style={{ flexDirection: "row" }}>
+        <React.Fragment key={ arg.index }>
             <PickerItem
                 title={ arg.item.title }
                 subtitle={ arg.item.subtitle }
@@ -156,7 +156,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
                 isHorizontal && isCarousel && arg.index === (data.length - 1) &&
                 <View style={ styles.separator } />
             }
-        </View>
+        </React.Fragment>
 
     useEffect(() => {
         if(isDropdownContentVisible && data.length >= 1) {
@@ -226,7 +226,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
                             }
                         }
                     />
-                    :   <View style={{ flex: 1, backgroundColor: "red" }}>
+                    :   <View style={{ flexDirection: "row", flexWrap: "wrap", gap: SEPARATOR_SIZES.small }}>
                             {
                                 data.map((item, index) => {
                                     return renderItem({ item, index });

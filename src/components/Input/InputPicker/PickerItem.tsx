@@ -31,7 +31,7 @@ const PickerItem: React.FC<PickerItemProps> = ({
                     />
                 </View>
             }
-            <View style={{ flex: 1, alignItems: "center" }}>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
                 <Text style={ styles.inputPickerTitleText }>
                     { title }
                 </Text>
@@ -52,14 +52,12 @@ const PickerItem: React.FC<PickerItemProps> = ({
 
 const styles= StyleSheet.create({
     inputPickerItemContainer: {
-        flex: 1,
-        flexDirection: "row",
-        // justifyContent: "center",
+        justifyContent: "center",
         alignItems: "center",
         backgroundColor: theme.colors.gray3,
         minHeight: hp(6),
         borderRadius: 15,
-        paddingHorizontal: SEPARATOR_SIZES.lightSmall
+        paddingHorizontal: SEPARATOR_SIZES.small
     },
     inputPickerSelectedItemContainer: {
         borderWidth: 1.5,
@@ -73,13 +71,13 @@ const styles= StyleSheet.create({
         ...GLOBAL_STYLE.containerTitleText,
         fontSize: GLOBAL_STYLE.containerTitleText.fontSize * 0.7,
         letterSpacing: GLOBAL_STYLE.containerTitleText.letterSpacing * 0.7,
-        textAlign: "center"
+        textAlign: "center",
     },
     inputPickerSubtitleText: {
         ...GLOBAL_STYLE.containerText,
         fontSize: GLOBAL_STYLE.containerText.fontSize * 0.8,
         letterSpacing: GLOBAL_STYLE.containerText.letterSpacing * 0.8,
-        textAlign: "center"
+        textAlign: "center",
     }
 })
 
