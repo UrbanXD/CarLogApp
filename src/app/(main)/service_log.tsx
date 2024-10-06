@@ -1,9 +1,9 @@
 import React from "react";
-import { store } from "../../redux/store";
+import { store } from "../../features/core/redux/store";
 import { PaperProvider } from "react-native-paper";
-import { theme } from "../../constants/theme";
+import { theme } from "../../features/core/constants/theme";
 import { Provider } from "react-redux";
-import ServiceLogScreen from "../../reactNodes/screens/ServiceLogScreen";
+import ServiceLogScreen from "../../features/core/screens/ServiceLogScreen";
 
 const Page: React.FC = () => {
     return (

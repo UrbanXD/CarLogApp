@@ -1,21 +1,21 @@
 import { Stack } from 'expo-router/stack';
 import React, {useEffect, useState} from "react";
 import '@azure/core-asynciterator-polyfill';
-import {ScrollViewProvider} from "../reactNodes/providers/ScrollViewProvider";
-import {DatabaseProvider} from "../reactNodes/providers/DatabaseProvider";
-import {useDatabase} from "../db/Database";
+import {ScrollViewProvider} from "../features/core/context/ScrollViewProvider";
+import {DatabaseProvider} from "../features/core/context/DatabaseProvider";
+import {useDatabase} from "../features/core/utils/database/Database";
 import { Session } from '@supabase/supabase-js';
 import {GestureHandlerRootView} from "react-native-gesture-handler";
 import {SafeAreaProvider} from "react-native-safe-area-context";
 import {BottomSheetModalProvider} from "@gorhom/bottom-sheet";
-import {store} from "../redux/store";
-import {theme} from "../constants/theme";
+import {store} from "../features/core/redux/store";
+import {theme} from "../features/core/constants/theme";
 import {Provider} from "react-redux";
 import {PaperProvider} from "react-native-paper";
 import {KeyboardProvider} from "react-native-keyboard-controller";
 import {StatusBar} from "expo-status-bar";
-import CarHeader from "../reactNodes/layouts/header/CarHeader";
-import {BottomSheetProvider} from "../reactNodes/providers/BottomSheetProvider";
+import CarHeader from "../features/header/layouts/CarHeader";
+import {BottomSheetProvider} from "../features/core/context/BottomSheetProvider";
 
 const Layout:React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);

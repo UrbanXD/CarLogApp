@@ -1,6 +1,6 @@
 import React from "react";
 import { Text, View } from "react-native";
-import { theme } from "../../constants/theme";
+import { theme } from "../../features/core/constants/theme";
 
 const Page: React.FC = () => {
     return (

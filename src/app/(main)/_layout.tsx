@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import React from "react";
-import { ICON_NAMES } from "../../constants/constants";
-import TabBar from "../../components/tabBar/TabBar";
+import { ICON_NAMES } from "../../features/core/constants/constants";
+import TabBar from "../../features/tabBar/components/TabBar";
 
 const TabLayout:React.FC = () => {
     return (

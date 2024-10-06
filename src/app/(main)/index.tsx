@@ -1,9 +1,9 @@
 import React from "react";
 import { PaperProvider } from "react-native-paper";
 import { Provider } from "react-redux";
-import { store } from "../../redux/store";
-import { theme } from "../../constants/theme";
-import HomeScreen from "../../reactNodes/screens/HomeScreen";
+import { store } from "../../features/core/redux/store";
+import { theme } from "../../features/core/constants/theme";
+import HomeScreen from "../../features/core/screens/HomeScreen";
 
 const Page: React.FC = () => {
     return (
