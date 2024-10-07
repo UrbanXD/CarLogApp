@@ -1,6 +1,8 @@
 import React, {useEffect, useRef, useState} from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
+    FUEL_MEASUREMENTS,
+    FUEL_TYPES,
     getNewCarHandleSubmit,
     NewCarFormFieldType,
     newCarFormStepsField, newCarFormStepsTitle,
@@ -50,7 +52,9 @@ const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
         () =>
             <StepTwo />,
         () =>
-            <StepFour />
+            <StepThree />,
+        () =>
+            <StepFour />,
     ]
 
     return (
@@ -128,7 +132,7 @@ const StepTwo: React.FC = () => {
     )
 }
 
-const StepFour: React.FC = () => {
+const StepThree: React.FC = () => {
     const { control} = useMultiStepForm();
 
     return (
@@ -138,16 +142,49 @@ const StepFour: React.FC = () => {
                 fieldName="odometer_value"
                 fieldNameText="Kilometerora alass"
                 placeholder="000.000.000"
-                icon={ICON_NAMES.odometer}
+                icon={ ICON_NAMES.odometer }
                 numeric
             />
             <InputPicker
                 data={ ODOMETER_MEASUREMENTS }
                 control={ control }
-                fieldName={"odometer_measurement"}
+                fieldName="odometer_measurement"
                 fieldNameText="Mertekegyseg"
                 isHorizontal
                 isCarousel={ false }
+            />
+        </>
+    )
+}
+
+const StepFour: React.FC = () => {
+    const { control } = useMultiStepForm();
+
+    return (
+        <>
+            <InputPicker
+                data={ FUEL_TYPES }
+                control={ control }
+                fieldName="fuel_type"
+                fieldNameText="Uzemanyag tipus"
+                isHorizontal
+                isCarousel={ false }
+            />
+            <InputPicker
+                data={ FUEL_MEASUREMENTS }
+                control={ control }
+                fieldName="fuel_measurement"
+                fieldNameText="Uzemanyag mertekegyseg"
+                isHorizontal
+                isCarousel={ false }
+            />
+            <InputText
+                control={ control }
+                fieldName="fuel_tank_size"
+                fieldNameText="Uzemanyag tartaly merete"
+                placeholder="000.000.000"
+                icon={ ICON_NAMES.odometer }
+                numeric
             />
         </>
     )

@@ -20,7 +20,12 @@ export const FUEL_TYPES: Array<InputPickerDataType> = [
     { title: "Benzin" },
     { title: "Elektromos" },
     { title: "LPG" },
-]
+];
+
+export const FUEL_MEASUREMENTS: Array<InputPickerDataType> = [
+    { title: "Liter", value: "l" },
+    { title: "Gallon", value: "gal" }
+];
 
 export interface NewCarFormFieldType {
     name: string
@@ -36,9 +41,10 @@ export interface NewCarFormFieldType {
 
 const zNumber = z
     .string()
+    .min(1, "Adjon meg számot")
     .transform((value) => (value === "" ? "" : Number(value)))
     .refine((value) => !isNaN(Number(value)), {
-        message: "Expected number, received string",
+        message: "Kérem számot adjon",
     });
 
 const zPickerRequired = z
@@ -50,11 +56,11 @@ export const newCarFormSchema = z
         name: z.string().min(2, "2 karakter legyen min").max(20, "20 karakter legyen max"),
         brand: zPickerRequired,
         model: zPickerRequired,
-        odometer_measurement: z.string(),
+        odometer_measurement: zPickerRequired,
         odometer_value: zNumber,
-        fuel_type: z.string(),
-        fuel_measurement: z.string(),
-        fuel_tank_size: z.number().min(0),
+        fuel_type: zPickerRequired,
+        fuel_measurement: zPickerRequired,
+        fuel_tank_size: zNumber,
         // image: z.string(),
     })
 
