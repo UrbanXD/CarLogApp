@@ -1,8 +1,17 @@
-import React, {Context, createContext, ReactElement, ReactNode, useCallback, useContext, useRef, useState} from "react";
-import {BottomSheetModal} from "@gorhom/bottom-sheet";
+import React, {
+    Context,
+    createContext,
+    ReactElement,
+    ReactNode,
+    useCallback,
+    useContext,
+    useRef,
+    useState
+} from "react";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import CustomBottomSheet from "../components/shared/BottomSheet";
 
-interface OpenBottomSheetArgs {
+export interface OpenBottomSheetArgs {
     title: string,
     content: ReactElement,
     snapPoints?: Array<string>,
@@ -30,7 +39,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
     const [snapPoints, setSnapPoints] = useState<Array<string> | undefined>();
     const [startSnapIndex, setStartSnapIndex] = useState<number | undefined>();
     const [isHandlePanningGesture, setIsHandlePanningGesture] = useState<boolean | undefined>();
-    const [renderCloseButton, setRenderCloseButton] = useState<(() => ReactNode) | undefined>();
+    const [renderCloseButton, setRenderCloseButton] = useState<(() => ReactNode) | undefined>(undefined);
 
     const openBottomSheet = useCallback((args: OpenBottomSheetArgs) => {
         setBottomSheetTitle(args.title);
@@ -38,7 +47,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
         setSnapPoints(args.snapPoints);
         setStartSnapIndex(args.startSnapIndex);
         setIsHandlePanningGesture(args.isHandlePanningGesture);
-        setRenderCloseButton(args.renderCloseButton);
+        setRenderCloseButton(() => args.renderCloseButton);
 
         bottomSheetModalRef.current?.present();
     }, []);

@@ -1,4 +1,4 @@
-import React, {ReactElement, ReactNode, useRef, useState} from "react";
+import React from "react";
 import {
     ImageBackground,
     SafeAreaView,
@@ -19,16 +19,14 @@ import { theme } from "../constants/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import { Divider, IconButton } from "react-native-paper";
 import Button from "../components/shared/Button";
-import CustomBottomSheet from "../components/shared/BottomSheet";
-import {BottomSheetModal} from "@gorhom/bottom-sheet";
 import RegisterForm from "../../register/components/RegisterForm";
 import LoginForm from "../../login/components/LoginForm";
-import {useBottomSheet} from "../context/BottomSheetProvider";
+import { useBottomSheet } from "../context/BottomSheetProvider";
 
 const FirstScreen: React.FC = () => {
     const { openBottomSheet, closeBottomSheet  } = useBottomSheet();
 
-    const bottomSheetArgs = {
+    const bottomSheetArgs= {
         snapPoints: ["100%"],
         isHandlePanningGesture: false,
         renderCloseButton:
@@ -39,7 +37,7 @@ const FirstScreen: React.FC = () => {
                     iconColor={"whitesmoke"}
                     onPress={ closeBottomSheet }
                     style={ [GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium), { alignSelf: "center" }] }
-                /> as ReactNode
+                />
     }
     const openRegister = () => {
         openBottomSheet({

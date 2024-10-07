@@ -228,9 +228,11 @@ const PickerElements: React.FC<PickerElementsProps> = ({
                     />
                     :   <View style={{ flexDirection: "row", flexWrap: "wrap", gap: SEPARATOR_SIZES.small }}>
                             {
-                                data.map((item, index) => {
-                                    return renderItem({ item, index });
-                                })
+                                data.length >= 1
+                                ?   data.map((item, index) => {
+                                        return renderItem({ item, index });
+                                    })
+                                :   <Text style={{color: "white"}}>Nincs elem</Text>
                             }
                         </View>
             }
