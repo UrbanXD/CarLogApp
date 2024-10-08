@@ -2,7 +2,7 @@ import { Stack } from 'expo-router/stack';
 import React, {useEffect, useState} from "react";
 import '@azure/core-asynciterator-polyfill';
 import {ScrollViewProvider} from "../features/core/context/ScrollViewProvider";
-import {DatabaseProvider} from "../features/core/context/DatabaseProvider";
+import {DatabaseProvider} from "../features/form/context/DatabaseProvider";
 import {useDatabase} from "../features/core/utils/database/Database";
 import { Session } from '@supabase/supabase-js';
 import {GestureHandlerRootView} from "react-native-gesture-handler";

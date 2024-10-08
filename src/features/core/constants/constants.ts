@@ -5,7 +5,7 @@ import { UseFormHandleSubmit } from "react-hook-form";
 import { SupabaseConnector } from "../utils/database/SupabaseConnector";
 import { Kysely } from "@powersync/kysely-driver";
 import { DatabaseType } from "../utils/database/AppSchema";
-import { InputPickerDataType } from "../components/input/InputPicker/InputPicker";
+import { InputPickerDataType } from "../../form/components/InputPicker/InputPicker";
 
 export interface GetFormHandleSubmitArgs {
     handleSubmit: UseFormHandleSubmit<any>

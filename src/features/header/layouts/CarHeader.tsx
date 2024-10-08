@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import {Alert, TouchableOpacity, View} from "react-native";
 import { FONT_SIZES, SIMPLE_HEADER_HEIGHT } from "../../core/constants/constants";
-import Picker from "../../core/components/input/InputPicker/Picker";
+import Picker from "../../form/components/InputPicker/Picker";
 import Header from "../components/Header";
 import { Avatar } from "react-native-paper";
 import { theme } from "../../core/constants/theme";
 import { useSelector } from "react-redux";
 import { RootState, store } from "../../core/redux/store";
-import { loadSelectedCar, selectCar } from "../../core/redux/reducers/cars.slices";
+import { loadSelectedCar, selectCar } from "../../form/redux/cars/cars.slices";
 import { createSelector } from "@reduxjs/toolkit";
 import { useDatabase } from "../../core/utils/database/Database";
 

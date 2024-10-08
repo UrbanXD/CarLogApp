@@ -19,8 +19,8 @@ import { theme } from "../constants/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import { Divider, IconButton } from "react-native-paper";
 import Button from "../components/shared/Button";
-import RegisterForm from "../../register/components/RegisterForm";
-import LoginForm from "../../login/components/LoginForm";
+import RegisterForm from "../../form/layouts/register/components/RegisterForm";
+import LoginForm from "../../form/layouts/login/components/LoginForm";
 import { useBottomSheet } from "../context/BottomSheetProvider";
 
 const FirstScreen: React.FC = () => {

@@ -11,11 +11,11 @@ import Date from "../core/components/shared/Date";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { theme } from "../core/constants/theme";
 import { IconButton } from "react-native-paper";
-import InputText from "../core/components/input/InputText/InputText";
+import InputText from "../form/components/InputText/InputText";
 import { useForm } from "react-hook-form";
 import { EditRideFormFieldType, editRideUseFormProps } from "../editRideForm/constants/editRideFormSchema";
 import { getToday } from "../core/utils/getDate";
-import ProgressBar from "../core/components/form/ProgressBar";
+import ProgressBar from "../form/components/ProgressBar";
 import { useBottomSheet } from "../core/context/BottomSheetProvider";
 
 type RideType = {
