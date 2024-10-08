@@ -40,6 +40,7 @@ const InputPicker: React.FC<InputPickerProps> = ({
     withSearchbar = false,
     disabled = false
 }) => {
+    const [allData, setAllData] = useState<Array<PickerDataType>>([] as Array<PickerDataType>);
     const [adjustedData, setAdjustedData] = useState<Array<InputPickerDataType>>([] as Array<InputPickerDataType>);
     const [selectedItemID, setSelectedItemID] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
@@ -57,19 +58,29 @@ const InputPicker: React.FC<InputPickerProps> = ({
             value: item.value ?? item.title
         }));
 
+        setAllData(updatedData);
+    }, [data]);
+
+    useEffect(() => {
+        if(allData.length <= 0) return;
+
         if (searchTerm.length <= 2) {
             if (!previousShortTerm) {
-                setAdjustedData(updatedData);
+                setAdjustedData(allData);
                 setPreviousShortTerm(true);
             }
         } else {
-            const filteredData =
-                updatedData.filter(item => item.title.toLowerCase().includes(searchTerm.toLowerCase()));
+            const filteredData = allData.filter(
+                item => item
+                        .title
+                        .toLowerCase()
+                        .includes(searchTerm.toLowerCase())
+            );
             setAdjustedData(filteredData);
 
             if(previousShortTerm) setPreviousShortTerm(false);
         }
-    }, [searchTerm, data]);
+    }, [searchTerm, allData]);
 
     return (
         <View style={ styles.inputContainer }>
@@ -90,7 +101,7 @@ const InputPicker: React.FC<InputPickerProps> = ({
                             error = { error?.message }
                             searchTerm={ searchTerm }
                             setSearchTerm={ withSearchbar ? ((value) => setSearchTerm(value)) : undefined }
-                            selectedItemID={ selectedItemID }
+                            selectedItem={ allData.find(item => item.id === selectedItemID) || { id: "" } as PickerDataType}
                             onSelect={
                                 (id: string) => {
                                     setSelectedItemID(id);
@@ -100,7 +111,7 @@ const InputPicker: React.FC<InputPickerProps> = ({
                             isDropdown={ !isHorizontal }
                             isHorizontal={ isHorizontal }
                             isCarousel={ isCarousel }
-                            dropDownInfoType={ "input" }
+                            dropDownInfoType="input"
                             disabled={ disabled }
                         />
                     :   <></>

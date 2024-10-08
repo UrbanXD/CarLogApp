@@ -28,7 +28,7 @@ export interface PickerDataType {
 
 interface PickerProps {
     data: Array<PickerDataType>
-    selectedItemID: string
+    selectedItem: PickerDataType
     onSelect: (id: string) => void
     isHorizontal?: boolean
     isCarousel?: boolean
@@ -55,13 +55,12 @@ const Picker: React.FC<PickerProps> = (initialProps) => {
     };
 
     const {
-        data,
+        selectedItem,
         onDropdownToggle,
         isDropdown,
         dropDownInfoType,
         placeholder,
         error,
-        selectedItemID,
         isHorizontal,
         disabled,
     } = props;
@@ -86,8 +85,8 @@ const Picker: React.FC<PickerProps> = (initialProps) => {
                         ?   <PickerDropdownInfo
                                 toggleDropdown={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
                                 icon={ ICON_NAMES.car }
-                                title={ data.find(item => item.id === selectedItemID)?.title }
-                                subtitle={ data.find(item => item.id === selectedItemID)?.subtitle }
+                                title={ selectedItem?.title }
+                                subtitle={ selectedItem?.subtitle }
                                 placeholder={ placeholder }
                                 error={ error }
                                 isHorizontal={ isHorizontal }
@@ -96,7 +95,7 @@ const Picker: React.FC<PickerProps> = (initialProps) => {
                         :   <InputPickerDropdownInfo
                                 toggleDropdown={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
                                 icon={ ICON_NAMES.car }
-                                title={ data.find(item => item.id === selectedItemID)?.title }
+                                title={ selectedItem?.title }
                                 error={ error }
                                 placeholder={ placeholder }
                                 isHorizontal={ isHorizontal }

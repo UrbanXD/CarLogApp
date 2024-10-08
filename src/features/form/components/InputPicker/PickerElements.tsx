@@ -17,7 +17,7 @@ import SearchBar from "../../../core/components/shared/SearchBar";
 
 interface PickerElementsProps {
     data: Array<PickerDataType>
-    selectedItemID: string
+    selectedItem: PickerDataType
     onSelect: (id: string) => void
     isHorizontal?: boolean
     isCarousel?: boolean
@@ -31,7 +31,7 @@ interface PickerElementsProps {
 const PickerElements: React.FC<PickerElementsProps> = ({
     data,
     onSelect,
-    selectedItemID,
+    selectedItem,
     searchTerm,
     setSearchTerm,
     isDropdown,
@@ -53,7 +53,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
                 title={ arg.item.title }
                 subtitle={ arg.item.subtitle }
                 icon={ arg.item.icon }
-                selected={ arg.item.id === selectedItemID }
+                selected={ arg.item.id === selectedItem.id }
                 onPress={ () => select(arg.item.id || arg.index.toString() ) }
             />
             {
@@ -64,7 +64,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
 
     useEffect(() => {
         if(isDropdownContentVisible && data.length >= 1) {
-            const selectedItemIndex = data.map(item => item.id).indexOf(selectedItemID);
+            const selectedItemIndex = data.map(item => item.id).indexOf(selectedItem.id);
 
             if(selectedItemIndex !== -1) {
                 flatListRef?.current?.scrollToIndex({
@@ -78,7 +78,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
 
     useEffect(() => {
         if(isDropdownContentVisible && data.length >= 1) {
-            const selectedItemIndex = data.map(item => item.id).indexOf(selectedItemID);
+            const selectedItemIndex = data.map(item => item.id).indexOf(selectedItem.id);
             if(selectedItemIndex !== -1) {
                 // flatlistRef?.current?.scrollToIndex({
                 //     index: selectedItemIndex,
