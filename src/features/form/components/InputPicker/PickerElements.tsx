@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, {useCallback, useEffect, useRef} from "react";
 import { PickerDataType } from "./Picker";
 import { FlatList } from "react-native-gesture-handler";
 import PickerItem from "./PickerItem";
@@ -47,7 +47,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
         setIsDropdownContentVisible(false);
     }
 
-    const renderItem = (arg: { item: any, index: number }) =>
+    const renderItem = useCallback((arg: { item: any, index: number }) =>
         <React.Fragment key={ arg.index }>
             <PickerItem
                 title={ arg.item.title }
@@ -60,7 +60,15 @@ const PickerElements: React.FC<PickerElementsProps> = ({
                 isHorizontal && isCarousel && arg.index === (data.length - 1) &&
                 <View style={ styles.separator } />
             }
-        </React.Fragment>
+        </React.Fragment>, [])
+
+    const keyExtractor = (item: any, index: number) => item.id || index.toString()
+
+    const onScrollToIndexFailed = (info: any) => {
+        setTimeout(() => {
+            flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
+        }, 100);
+    }
 
     useEffect(() => {
         if(isDropdownContentVisible && data.length >= 1) {
@@ -71,19 +79,6 @@ const PickerElements: React.FC<PickerElementsProps> = ({
                     index: selectedItemIndex,
                     animated: true
                 })
-            }
-        }
-
-    }, [isDropdownContentVisible]);
-
-    useEffect(() => {
-        if(isDropdownContentVisible && data.length >= 1) {
-            const selectedItemIndex = data.map(item => item.id).indexOf(selectedItem.id);
-            if(selectedItemIndex !== -1) {
-                // flatlistRef?.current?.scrollToIndex({
-                //     index: selectedItemIndex,
-                //     animated: true
-                // })
             } else {
                 flatListRef?.current?.scrollToIndex({
                     index: 0,
@@ -91,7 +86,8 @@ const PickerElements: React.FC<PickerElementsProps> = ({
                 })
             }
         }
-    }, [data]);
+
+    }, [isDropdownContentVisible, data]);
 
     return (
         <View style={[styles.elementsContainer, !isHorizontal && { maxHeight: 30 * 5 + 5 * SEPARATOR_SIZES.small, flexDirection: "column" }]}>
@@ -117,21 +113,16 @@ const PickerElements: React.FC<PickerElementsProps> = ({
                 isCarousel
                     ?   data.length >= 1
                         ?   <FlatList
-                            ref={ flatListRef }
-                            data={ data }
-                            renderItem={ renderItem }
-                            keyExtractor={ (item, index) => item.id || index.toString() }
-                            horizontal={ isHorizontal }
-                            showsHorizontalScrollIndicator={ false }
-                            contentContainerStyle={ styles.elementsScrollViewContainer }
-                            onScrollToIndexFailed={
-                                (info) => {
-                                    setTimeout(() => {
-                                        flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
-                                    }, 100);
-                                }
-                            }
-                        />
+                                ref={ flatListRef }
+                                data={ data }
+                                renderItem={ renderItem }
+                                keyExtractor={ keyExtractor }
+                                horizontal={ isHorizontal }
+                                showsHorizontalScrollIndicator={ false }
+                                contentContainerStyle={ styles.elementsScrollViewContainer }
+                                onScrollToIndexFailed={ onScrollToIndexFailed }
+                                removeClippedSubviews
+                            />
                         :   <View style={ styles.notFoundContainer }>
                                 <Text style={ styles.notFoundText }>Nem található</Text>
                             </View>

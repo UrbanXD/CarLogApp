@@ -90,4 +90,4 @@ const styles= StyleSheet.create({
     }
 })
 
-export default PickerItem;
+export default React.memo(PickerItem);
