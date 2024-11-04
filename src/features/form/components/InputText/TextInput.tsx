@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, Text, View, TextInput as TextInputRN } from "react-native";
 import { Icon, IconButton } from "react-native-paper";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { ICON_COLORS, ICON_NAMES } from "../../../core/constants/constants";
+import {ICON_COLORS, ICON_NAMES, SEPARATOR_SIZES} from "../../../core/constants/constants";
 import { theme } from "../../../core/constants/theme";
 
 interface TextInputProps {
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
         borderColor: theme.colors.gray1
     },
     formFieldIconContainer: {
-        flex: 0.25,
+        flex: 0.15,
         alignItems: "center",
     },
     textInput: {

@@ -164,7 +164,7 @@ const MultiStepFormContent: React.FC = () => {
             {
                 steps.map(
                     (step, index) =>
-                        <View key={index} style={{ display: currentStep === index ? 'flex' : 'none' }}>
+                        <View key={ index } style={{ display: currentStep === index ? 'flex' : 'none' }}>
                             { step() }
                         </View>
                 )

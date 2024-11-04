@@ -28,7 +28,7 @@ export interface PickerDataType {
 
 interface PickerProps {
     data: Array<PickerDataType>
-    selectedItem: PickerDataType
+    selectedItem?: PickerDataType
     onSelect: (id: string) => void
     isHorizontal?: boolean
     isCarousel?: boolean

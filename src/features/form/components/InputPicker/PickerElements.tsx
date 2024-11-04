@@ -17,7 +17,7 @@ import SearchBar from "../../../core/components/shared/SearchBar";
 
 interface PickerElementsProps {
     data: Array<PickerDataType>
-    selectedItem: PickerDataType
+    selectedItem?: PickerDataType
     onSelect: (id: string) => void
     isHorizontal?: boolean
     isCarousel?: boolean
@@ -53,7 +53,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
                 title={ arg.item.title }
                 subtitle={ arg.item.subtitle }
                 icon={ arg.item.icon }
-                selected={ arg.item.id === selectedItem.id }
+                selected={ arg.item.id === selectedItem?.id }
                 onPress={ () => select(arg.item.id || arg.index.toString() ) }
             />
             {
@@ -72,7 +72,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
 
     useEffect(() => {
         if(isDropdownContentVisible && data.length >= 1) {
-            const selectedItemIndex = data.map(item => item.id).indexOf(selectedItem.id);
+            const selectedItemIndex = data.map(item => item.id).indexOf(selectedItem?.id);
 
             if(selectedItemIndex !== -1) {
                 flatListRef?.current?.scrollToIndex({
@@ -154,7 +154,9 @@ const styles= StyleSheet.create({
         width: DEFAULT_SEPARATOR
     },
     notFoundContainer: {
-        flexGrow: 1,
+        flexGrow: 0.8,
+        // marginRight: FONT_SIZES.normal,
+        // backgroundColor: "red",
         justifyContent: "center"
     },
     notFoundText: {
