@@ -82,6 +82,10 @@ const InputPicker: React.FC<InputPickerProps> = ({
         }
     }, [searchTerm, allData]);
 
+    useEffect(() => {
+        console.log(selectedItemID, " kivalasyztva")
+    }, [selectedItemID]);
+
     return (
         <View style={ styles.inputContainer }>
             {
@@ -101,7 +105,7 @@ const InputPicker: React.FC<InputPickerProps> = ({
                             error = { error?.message }
                             searchTerm={ searchTerm }
                             setSearchTerm={ withSearchbar ? ((value) => setSearchTerm(value)) : undefined }
-                            selectedItem={ allData.find(item => item.id === selectedItemID) || { id: "" } as PickerDataType}
+                            selectedItem={ allData.find((item, index) => item.id === selectedItemID) }
                             onSelect={
                                 (id: string) => {
                                     setSelectedItemID(id);
