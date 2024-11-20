@@ -17,7 +17,7 @@ import SearchBar from "../../../core/components/shared/SearchBar";
 
 interface PickerElementsProps {
     data: Array<PickerDataType>
-    selectedItem?: PickerDataType
+    selectedItemID?: string
     onSelect: (id: string) => void
     isHorizontal?: boolean
     isCarousel?: boolean
@@ -31,7 +31,7 @@ interface PickerElementsProps {
 const PickerElements: React.FC<PickerElementsProps> = ({
     data,
     onSelect,
-    selectedItem,
+    selectedItemID,
     searchTerm,
     setSearchTerm,
     isDropdown,
@@ -42,25 +42,30 @@ const PickerElements: React.FC<PickerElementsProps> = ({
 }) => {
     const flatListRef = useRef<FlatList>(null)
 
+    useEffect(() => {
+        console.log("xd")
+    }, [selectedItemID]);
+
     const select = (id: string) => {
         onSelect(id);
         setIsDropdownContentVisible(false);
+        console.log("picker elements selecr")
     }
 
-    const renderItem = useCallback((arg: { item: any, index: number }) =>
+    const renderItem = (arg: { item: any, index: number }) =>
         <React.Fragment key={ arg.index }>
             <PickerItem
                 title={ arg.item.title }
                 subtitle={ arg.item.subtitle }
                 icon={ arg.item.icon }
-                selected={ arg.item.id === selectedItem?.id }
+                selected={ arg.item.id === selectedItemID }
                 onPress={ () => select(arg.item.id || arg.index.toString() ) }
             />
             {
                 isHorizontal && isCarousel && arg.index === (data.length - 1) &&
                 <View style={ styles.separator } />
             }
-        </React.Fragment>, [])
+        </React.Fragment>
 
     const keyExtractor = (item: any, index: number) => item.id || index.toString()
 
@@ -72,7 +77,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
 
     useEffect(() => {
         if(isDropdownContentVisible && data.length >= 1) {
-            const selectedItemIndex = data.map(item => item.id).indexOf(selectedItem?.id);
+            const selectedItemIndex = data.map(item => item.id).indexOf(selectedItemID);
 
             if(selectedItemIndex !== -1) {
                 flatListRef?.current?.scrollToIndex({
