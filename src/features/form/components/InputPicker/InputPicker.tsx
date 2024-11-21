@@ -105,10 +105,11 @@ const InputPicker: React.FC<InputPickerProps> = ({
                             error = { error?.message }
                             searchTerm={ searchTerm }
                             setSearchTerm={ withSearchbar ? ((value) => setSearchTerm(value)) : undefined }
-                            selectedItem={ allData.find((item, index) => item.id === selectedItemID) }
+                            selectedItemID={ selectedItemID }
                             onSelect={
                                 (id: string) => {
                                     setSelectedItemID(id);
+                                    console.log("OnSelected", id)
                                     onChange(adjustedData.find(item => item.id === id)?.value?.toString());
                                 }
                             }
