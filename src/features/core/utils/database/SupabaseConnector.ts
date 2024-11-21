@@ -8,6 +8,7 @@ import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import 'react-native-url-polyfill/auto';
 import { BaseConfig } from "./BaseConfig";
+import {GoogleSignin, statusCodes} from "@react-native-google-signin/google-signin";
 
 /// Postgres Response codes that we cannot recover from by retrying.
 const FATAL_RESPONSE_CODES = [
@@ -20,6 +21,10 @@ const FATAL_RESPONSE_CODES = [
     // INSUFFICIENT PRIVILEGE - typically a row-level security violation
     new RegExp('^42501$'),
 ];
+
+GoogleSignin.configure({
+    webClientId: "251073631752-b8bsmbe8uum81epqj2pa0d3n8act4mi1.apps.googleusercontent.com",
+});
 
 export class SupabaseConnector implements PowerSyncBackendConnector {
     client: SupabaseClient;
@@ -40,6 +45,34 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
 
         if (error) {
             throw error;
+        }
+    }
+
+    async googleLogin() {
+        try {
+            await GoogleSignin.hasPlayServices();
+            const userInfo = await GoogleSignin.signIn();
+            if (userInfo.data?.idToken) {
+                const { data, error } = await this.client.auth.signInWithIdToken({
+                    provider: 'google',
+                    token: userInfo.data.idToken,
+                })
+                console.log(error, data)
+                console.log("xdd")
+            } else {
+                throw new Error('no ID token present!')
+            }
+        } catch (error: any) {
+            console.log(error.code, error.message)
+            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+                // user cancelled the login flow
+            } else if (error.code === statusCodes.IN_PROGRESS) {
+                // operation (e.g. sign in) is in progress already
+            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+                // play services not available or outdated
+            } else {
+                // some other error happened
+            }
         }
     }
 

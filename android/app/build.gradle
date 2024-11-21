@@ -83,9 +83,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.urbanxd.Taxi'
+    namespace 'com.urbanxd.Carlog'
     defaultConfig {
-        applicationId 'com.urbanxd.Taxi'
+        applicationId 'com.urbanxd.Carlog'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { getLoginHandleSubmit, LoginFormFieldType, loginUseFormProps } from "../constants/loginFormSchema";
 import { useDatabase } from "../../../../core/utils/database/Database";
 import { GLOBAL_STYLE, ICON_NAMES } from "../../../../core/constants/constants";
-import { Text } from "react-native";
+import {Alert, Text} from "react-native";
 import InputText from "../../../components/InputText/InputText";
 import Button, { FacebookButton, GoogleButton } from "../../../../core/components/shared/Button";
 import TextDivider from "../../../../core/components/shared/TextDivider";
@@ -15,6 +15,14 @@ const LoginForm: React.FC = () => {
         useForm<LoginFormFieldType>(loginUseFormProps)
     const { supabaseConnector } = useDatabase();
     const submitHandler = getLoginHandleSubmit({handleSubmit, supabaseConnector})
+
+    const googleAuth = async () => {
+        try {
+            await supabaseConnector.googleLogin();
+        } catch (error: any) {
+            Alert.alert(error.message);
+        }
+    }
 
     return (
         <Form>
@@ -44,7 +52,7 @@ const LoginForm: React.FC = () => {
                 marginVertical={ GLOBAL_STYLE.formContainer.gap }
 
             />
-            <GoogleButton onPress={ () => 1 } />
+            <GoogleButton onPress={ googleAuth } />
             <FacebookButton onPress={ () => 1 } />
         </Form>
     )

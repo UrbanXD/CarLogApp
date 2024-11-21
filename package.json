@@ -17,6 +17,7 @@
     "@powersync/react-native": "^1.9.0",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/blur": "^4.4.0",
+    "@react-native-google-signin/google-signin": "^13.1.0",
     "@react-native-menu/menu": "^1.1.2",
     "@react-native-picker/picker": "^2.7.7",
     "@react-navigation/material-top-tabs": "^6.6.14",

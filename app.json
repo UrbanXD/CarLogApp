@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Taxi",
-    "slug": "Taxi",
+    "name": "Carlog",
+    "slug": "Carlog",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "taxi",
+    "scheme": "carlog",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "automatic",
     "androidStatusBar": {
@@ -24,7 +24,7 @@
         "backgroundColor": "#ffffff"
       },
       "softwareKeyboardLayoutMode": "pan",
-      "package": "com.urbanxd.Taxi"
+      "package": "com.urbanxd.Carlog"
     },
     "web": {
       "favicon": "./src/assets/favicon.png",

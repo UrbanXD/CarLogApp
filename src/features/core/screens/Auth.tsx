@@ -1,5 +1,6 @@
 import React from "react";
 import {
+    Alert,
     ImageBackground,
     SafeAreaView,
     StyleSheet,
@@ -23,7 +24,7 @@ import RegisterForm from "../../form/layouts/register/components/RegisterForm";
 import LoginForm from "../../form/layouts/login/components/LoginForm";
 import { useBottomSheet } from "../context/BottomSheetProvider";
 
-const FirstScreen: React.FC = () => {
+const Auth: React.FC = () => {
     const { openBottomSheet, closeBottomSheet  } = useBottomSheet();
 
     const bottomSheetArgs= {
@@ -156,4 +157,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default FirstScreen;
+export default Auth;

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Redirect} from "expo-router";
 import {useDatabase} from "../features/core/utils/database/Database";
 import {Session} from "@supabase/supabase-js";
-import FirstScreen from "../features/core/screens/FirstScreen";
+import Auth from "../features/core/screens/Auth";
 
 const App: React.FC = () => {
     const { supabaseConnector } = useDatabase();
@@ -21,7 +21,7 @@ const App: React.FC = () => {
 
     return (
         !(session && session.user)
-            ?   <FirstScreen />
+            ?   <Auth />
             :   <Redirect href="/(main)" />
     )
 }
