@@ -43,6 +43,9 @@
             "./src/assets/fonts/DoubleFeature20.ttf"
           ]
         }
+      ],
+      [
+        "@react-native-google-signin/google-signin"
       ]
     ],
     "extra": {
