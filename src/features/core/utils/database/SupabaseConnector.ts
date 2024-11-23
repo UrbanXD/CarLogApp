@@ -23,6 +23,7 @@ const FATAL_RESPONSE_CODES = [
 ];
 
 GoogleSignin.configure({
+    scopes: ['https://www.googleapis.com/auth/drive.readonly'],
     webClientId: "251073631752-b8bsmbe8uum81epqj2pa0d3n8act4mi1.apps.googleusercontent.com",
 });
 
@@ -52,13 +53,12 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
         try {
             await GoogleSignin.hasPlayServices();
             const userInfo = await GoogleSignin.signIn();
+            console.log(userInfo.data)
             if (userInfo.data?.idToken) {
                 const { data, error } = await this.client.auth.signInWithIdToken({
                     provider: 'google',
                     token: userInfo.data.idToken,
                 })
-                console.log(error, data)
-                console.log("xdd")
             } else {
                 throw new Error('no ID token present!')
             }
