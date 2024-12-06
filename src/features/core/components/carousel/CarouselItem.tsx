@@ -10,15 +10,9 @@ import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-nati
 import { theme } from "../../constants/theme";
 import hexToRgba from "hex-to-rgba";
 import { LinearGradient } from "expo-linear-gradient";
-import {
-    FONT_SIZES,
-    GET_ICON_BUTTON_RESET_STYLE,
-    ICON_NAMES,
-    SEPARATOR_SIZES
-} from "../../constants/constants";
+import { FONT_SIZES, SEPARATOR_SIZES } from "../../constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { CarouselItemType } from "./Carousel";
-import { IconButton } from "react-native-paper";
 
 interface CarouselItemProps {
     index: number
@@ -83,23 +77,12 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                         </View>
                     </View>
                     <View style={ styles.bottomContainer }>
-                        <View style={ styles.infoContainer }>
-                            <Text numberOfLines={ 2 } style={ styles.infoTitleText }>
-                                { item.title }
-                            </Text>
-                            <Text numberOfLines={ 2 } style={ styles.infoSubtitleText }>
-                                { item.subtitle }
-                            </Text>
-                        </View>
-                        <View style={ styles.rightContainer }>
-                            <IconButton
-                                onPress={() => console.log("hllo")}
-                                size={ FONT_SIZES.medium }
-                                icon={ ICON_NAMES.pencil }
-                                iconColor={ theme.colors.white }
-                                style={ GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium * 1.25) }
-                            />
-                        </View>
+                        <Text numberOfLines={ 2 } style={ styles.infoTitleText }>
+                            { item.title }
+                        </Text>
+                        <Text numberOfLines={ 2 } style={ styles.infoSubtitleText }>
+                            { item.subtitle }
+                        </Text>
                     </View>
                 </ImageBackground>
             </Animated.View>
@@ -180,12 +163,8 @@ const styles = StyleSheet.create({
         position: "absolute",
         bottom: 0,
         width: "100%",
-        flexDirection: "row",
         paddingHorizontal: SEPARATOR_SIZES.normal,
         paddingVertical: SEPARATOR_SIZES.small,
-    },
-    infoContainer: {
-        width: "80%",
     },
     infoTitleText: {
         color: theme.colors.white,
@@ -204,11 +183,6 @@ const styles = StyleSheet.create({
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 10,
         letterSpacing: FONT_SIZES.extraSmall * 0.05
-    },
-    rightContainer: {
-        width: "20%",
-        justifyContent: "flex-end",
-        alignItems: "flex-end"
     }
 })
 

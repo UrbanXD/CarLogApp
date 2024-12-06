@@ -8,7 +8,8 @@ export interface CarouselItemType {
     image?: ImageSourcePropType
     title: string,
     subtitle: string,
-    selected?: boolean
+    selected?: boolean,
+    value?: any
 }
 
 export interface CarouselProps {

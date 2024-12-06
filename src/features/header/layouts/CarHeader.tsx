@@ -51,7 +51,7 @@ const CarHeader: React.FC = () => {
                         !carsIsLoading &&
                         <Picker
                             data={ cars }
-                            selectedItem={ cars.find(car => car.id === selectedCarID) }
+                            selectedItemID={ selectedCarID }
                             isDropdown={ true }
                             onDropdownToggle={ setIsDropdownVisible }
                             onSelect={ onCarSelect }

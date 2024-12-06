@@ -50,7 +50,8 @@ export const ICON_NAMES = {
     car: "car-outline",
     nametag: "tag-text-outline",
     odometer: "gauge",
-    search: "magnify"
+    search: "magnify",
+    trashCan: "delete-outline",
 }
 
 export const ICON_COLORS = {

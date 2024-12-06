@@ -74,16 +74,7 @@ const HomeScreen: React.FC = () => {
                 contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
             >
                 <WelcomeBlock />
-                <CarsBlock
-                    openNewCarBottomSheet={
-                        () =>
-                            openBottomSheet({
-                                title: "Új Autó",
-                                content: <NewCarForm close={ closeBottomSheet } />,
-                                snapPoints: ["85%"]
-                            })
-                    }
-                />
+                <CarsBlock />
                 <UpcomingRidesBlock />
                 <LatestExpensesBlock />
             </ScrollView>
@@ -103,15 +94,14 @@ const WelcomeBlock: React.FC = () => {
             <Text style={ styles.infoText }>
                 Vezzessen számot nálunk az autóiról!
             </Text>
-            <InputSlider min={ 1970 } max={ 1974 } step={ 1 } />
+            {/*<InputSlider min={ 1970 } max={ 1974 } step={ 1 } />*/}
         </Animated.View>
     )
 }
 
-interface CarsBlockProps {
-    openNewCarBottomSheet: () => void
-}
-const CarsBlock: React.FC<CarsBlockProps> = ({ openNewCarBottomSheet }) => {
+const CarsBlock: React.FC = () => {
+    const { openBottomSheet, closeBottomSheet } = useBottomSheet();
+
     const selectCarsState = (state: RootState) => state.cars.cars;
     const selectCarsForCarousel = createSelector(
         [selectCarsState],
@@ -121,6 +111,7 @@ const CarsBlock: React.FC<CarsBlockProps> = ({ openNewCarBottomSheet }) => {
                 image: undefined,
                 title: car.brand,
                 subtitle: car.model,
+                value: car.id
             }))
     );
     const cars = useSelector(selectCarsForCarousel);
@@ -129,7 +120,7 @@ const CarsBlock: React.FC<CarsBlockProps> = ({ openNewCarBottomSheet }) => {
         <View style={ [GLOBAL_STYLE.contentContainer, { paddingHorizontal: 0, marginHorizontal: 0, backgroundColor: "transparent"}] } >
             <View style={{ paddingHorizontal: DEFAULT_SEPARATOR }}>
                 <Text style={ GLOBAL_STYLE.containerTitleText }>
-                    Autóim
+                    Garázs
                 </Text>
                 <Text style={ GLOBAL_STYLE.containerText }>
                     Válasszon ki egy autót
@@ -146,8 +137,13 @@ const CarsBlock: React.FC<CarsBlockProps> = ({ openNewCarBottomSheet }) => {
                                 x={ coordinate }
                                 isFocused={ false }
                                 item={ item }
-                                onPress={function (): void {
-                                    console.log("xd")
+                                onPress={function (index: number): void {
+                                    openBottomSheet({
+                                        title: "hello",
+                                        content: <></>,
+                                        snapPoints: ["85%"]
+                                    })
+                                    console.log("HomeSCREEN", index, cars[index].value);
                                 }}
                             />
                     }
@@ -155,7 +151,11 @@ const CarsBlock: React.FC<CarsBlockProps> = ({ openNewCarBottomSheet }) => {
             </View>
             <Button
                 width={ wp(75) }
-                onPress={ openNewCarBottomSheet }
+                onPress={ () => openBottomSheet({
+                    title: "Új Autó",
+                    content: <NewCarForm close={ closeBottomSheet } />,
+                    snapPoints: ["85%"]
+                }) }
                 title={"Autó hozzáadás"}
             />
         </View>
