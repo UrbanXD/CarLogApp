@@ -64,8 +64,8 @@ const Button: React.FC<ButtonCommonProps & ButtonOptionalProps> = ({
 
     const styles =
         useStyles(
-            !inverse ? backgroundColor : textColor,
             !inverse ? textColor : backgroundColor,
+            !inverse ? backgroundColor : textColor,
             rectangular,
             width,
             height,
@@ -149,7 +149,6 @@ export const GoogleButton: React.FC<CustomButtonProps> = ({ onPress }) => {
             onPress={ onPress }
             title="Folytatás Google fiókkal"
             iconLeft={ require("../../../../assets/images/google_logo.png") }
-            inverse
             backgroundColor={ theme.colors.white }
             textColor={ theme.colors.googleRed }
             fontSize={ hp(2.35) }
@@ -163,8 +162,8 @@ export const FacebookButton: React.FC<CustomButtonProps> = ({ onPress }) => {
             onPress={ onPress }
             title="Folytatás Facebook fiókkal"
             iconLeft={ require("../../../../assets/images/facebook_logo.png") }
-            backgroundColor={ theme.colors.facebookBlue }
-            textColor={ theme.colors.white }
+            textColor={ theme.colors.facebookBlue }
+            backgroundColor={ theme.colors.white }
             fontSize={ hp(2.35) }
         />
     )
@@ -179,7 +178,7 @@ export const ProgressBackButton: React.FC<CustomButtonProps> = ({ onPress }) => 
             width={ hp(7) }
             height={ hp(7) }
             disabled={ false }
-
+            inverse
         />
     )
 }
@@ -195,6 +194,7 @@ export const ProgressNextButton: React.FC<CustomButtonProps & ProgressNextButton
             title={ !isLastStep ? "Következő" : "Befejezés" }
             fontSize={ FONT_SIZES.normal * 0.85 }
             iconRight={ !isLastStep ? ICON_NAMES.rightArrowHead : undefined }
+            inverse
             // iconSize={ FONT_SIZES.normal }
         />
     )

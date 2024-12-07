@@ -11,10 +11,11 @@ import {
 import { useMultiStepForm } from "../../../context/MultiStepFormProvider";
 import { GLOBAL_STYLE, ICON_NAMES } from "../../../../core/constants/constants";
 import InputText from "../../../components/InputText/InputText";
-import { MultiStepForm } from "../../../components/Form";
+import {Form, MultiStepForm } from "../../../components/Form";
 import Button, {FacebookButton, GoogleButton} from "../../../../core/components/shared/Button";
 import TextDivider from "../../../../core/components/shared/TextDivider";
 import { theme } from "../../../../core/constants/theme";
+import { View } from "react-native";
 
 const RegisterForm: React.FC = () => {
     const { supabaseConnector } = useDatabase();
@@ -52,7 +53,7 @@ const RegisterStepOne: React.FC = () => {
     const { control, next } = useMultiStepForm();
 
     return (
-        <>
+        <Form>
             <InputText
                 isInBottomSheet
                 control={ control }
@@ -65,6 +66,7 @@ const RegisterStepOne: React.FC = () => {
                 title="Következő"
                 iconRight={ ICON_NAMES.rightArrowHead }
                 onPress={ next }
+                inverse
             />
             <TextDivider
                 title="vagy"
@@ -74,7 +76,7 @@ const RegisterStepOne: React.FC = () => {
             />
             <GoogleButton onPress={ () => 1 } />
             <FacebookButton onPress={ () => 1 } />
-        </>
+        </Form>
     )
 }
 

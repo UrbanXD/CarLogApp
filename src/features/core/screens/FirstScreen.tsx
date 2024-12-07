@@ -34,7 +34,7 @@ const FirstScreen: React.FC = () => {
                 <IconButton
                     icon={ ICON_NAMES.close }
                     size={ FONT_SIZES.medium }
-                    iconColor={"whitesmoke"}
+                    iconColor="whitesmoke"
                     onPress={ closeBottomSheet }
                     style={ [GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium), { alignSelf: "center" }] }
                 />
@@ -76,7 +76,11 @@ const FirstScreen: React.FC = () => {
                     <Text style={ styles.subtitle }>Kezelje nálunk autóit</Text>
                 </View>
                 <View style={ styles.actionContainer }>
-                    <Button title="Regisztráció" onPress={ openRegister }/>
+                    <Button
+                        title="Regisztráció"
+                        onPress={ openRegister }
+                        inverse={ true }
+                    />
                     <Text style={ styles.underButtonText }>
                         Már rendelkezel felhasználóval ?
                         <Text style={ styles.linkText } onPress={ openLogin } >Jelentkezz be</Text>

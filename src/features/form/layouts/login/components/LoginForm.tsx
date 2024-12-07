@@ -31,12 +31,16 @@ const LoginForm: React.FC = () => {
                 fieldNameText="Jelszó"
                 icon={ ICON_NAMES.password }
                 placeholder="Jelszó"
-                isSecure={ true }
+                isSecure
             />
             <Text style={ GLOBAL_STYLE.formLinkText }>
                 Elfelejtette jelszavát?
             </Text>
-            <Button title="Bejelentkezés" onPress={ submitHandler } />
+            <Button
+                title="Bejelentkezés"
+                onPress={ submitHandler }
+                inverse
+            />
             <TextDivider
                 title="vagy"
                 color={ theme.colors.gray1 }

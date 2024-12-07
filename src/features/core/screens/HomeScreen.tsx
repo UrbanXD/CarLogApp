@@ -24,7 +24,7 @@ import UpcomingRides from "../../upcomingRides/UpcomingRides";
 import Link from "../components/shared/Link";
 import { useSelector } from "react-redux";
 import { RootState, store } from "../redux/store";
-import { loadCars } from "../../form/redux/cars/cars.slices";
+import {CarType, loadCars } from "../../form/redux/cars/cars.slices";
 import CustomBottomSheet from "../components/shared/BottomSheet";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import NewCarForm from "../../form/layouts/newCarForm/components/NewCarForm";
@@ -32,6 +32,7 @@ import CarouselItem from "../components/carousel/CarouselItem";
 import { createSelector } from "@reduxjs/toolkit";
 import {useBottomSheet} from "../context/BottomSheetProvider";
 import InputSlider from "../../form/components/InputSlider";
+import CarInfo from "../../carInfo/CarInfo";
 
 const HomeScreen: React.FC = () => {
     const { db } = useDatabase();
@@ -114,7 +115,8 @@ const CarsBlock: React.FC = () => {
                 value: car.id
             }))
     );
-    const cars = useSelector(selectCarsForCarousel);
+    const carsForCarousel = useSelector(selectCarsForCarousel);
+    const cars = useSelector(selectCarsState);
 
     return (
         <View style={ [GLOBAL_STYLE.contentContainer, { paddingHorizontal: 0, marginHorizontal: 0, backgroundColor: "transparent"}] } >
@@ -128,7 +130,7 @@ const CarsBlock: React.FC = () => {
             </View>
             <View style={ styles.carouselContainer }>
                 <Carousel
-                    data={ cars }
+                    data={ carsForCarousel }
                     renderItem={
                         (item: CarouselItemType, index: number, size: number, coordinate: SharedValue<number>) =>
                             <CarouselItem
@@ -139,11 +141,10 @@ const CarsBlock: React.FC = () => {
                                 item={ item }
                                 onPress={function (index: number): void {
                                     openBottomSheet({
-                                        title: "hello",
-                                        content: <></>,
+                                        title: carsForCarousel[index].id,
+                                        content: <CarInfo car={ cars.find(car => car.id === carsForCarousel[index].value) }></CarInfo>,
                                         snapPoints: ["85%"]
                                     })
-                                    console.log("HomeSCREEN", index, cars[index].value);
                                 }}
                             />
                     }
@@ -156,7 +157,8 @@ const CarsBlock: React.FC = () => {
                     content: <NewCarForm close={ closeBottomSheet } />,
                     snapPoints: ["85%"]
                 }) }
-                title={"Autó hozzáadás"}
+                title="Autó hozzáadás"
+                inverse
             />
         </View>
     )
