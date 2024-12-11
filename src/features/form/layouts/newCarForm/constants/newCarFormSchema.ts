@@ -81,7 +81,6 @@ export const newCarUseFormProps = {
 
 export const getNewCarHandleSubmit = ({ handleSubmit, supabaseConnector, db, onSubmit }: GetFormHandleSubmitArgs) =>
     handleSubmit(async (newCar: NewCarFormFieldType) => {
-        console.log("handel submit new cda")
         try {
             if(!supabaseConnector || !db){
                 throw Error("Hiba, supabase connector vagy DB");
@@ -96,7 +95,7 @@ export const getNewCarHandleSubmit = ({ handleSubmit, supabaseConnector, db, onS
                 image: null,
                 ...newCar
             }
-            console.log("xd")
+
             store.dispatch(addCar({ db, car }));
 
             if (onSubmit) {
