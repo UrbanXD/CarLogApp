@@ -1,11 +1,14 @@
 import { Kysely } from "@powersync/kysely-driver";
 import { CARS_TABLE, CarsType, DatabaseType } from "../../core/utils/database/AppSchema";
+import { PhotoAttachmentQueue } from "../../core/utils/database/PhotoAttachmentQueue";
 
 export class CarDAO {
     db: Kysely<DatabaseType>
+    attachmentQueue?: PhotoAttachmentQueue
 
-    constructor(db: Kysely<DatabaseType>) {
+    constructor(db: Kysely<DatabaseType>, attachmentQueue?: PhotoAttachmentQueue) {
         this.db = db;
+        this.attachmentQueue = attachmentQueue;
     }
 
     async getCars() {
@@ -20,6 +23,10 @@ export class CarDAO {
             .insertInto(CARS_TABLE)
             .values(car)
             .execute()
+
+        if(this.attachmentQueue) {
+            // await this.attachmentQueue.savePhoto();
+        }
 
         return car;
     }

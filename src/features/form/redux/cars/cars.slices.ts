@@ -4,13 +4,14 @@ import { Kysely } from "@powersync/kysely-driver";
 import { CarsType, DatabaseType } from "../../../core/utils/database/AppSchema";
 import { CarDAO } from "../../utils/CarDAO";
 import { LOCAL_STORAGE_KEYS } from "../../../core/constants/constants";
+import { PhotoAttachmentQueue } from "../../../core/utils/database/PhotoAttachmentQueue";
 
 export interface CarType {
     id: string
     name: string
     brand: string
     model: string
-    image: string | undefined
+    image_id: string | undefined
 }
 
 interface CarsState {
@@ -44,9 +45,9 @@ export const loadCars = createAsyncThunk(
 
 export const addCar = createAsyncThunk(
     "addCar",
-    async (args: {db: Kysely<DatabaseType>, car: CarsType}, { rejectWithValue }) => {
+    async (args: {db: Kysely<DatabaseType>, car: CarsType, attachmentQueue?: PhotoAttachmentQueue}, { rejectWithValue }) => {
         try {
-            const carDAO = new CarDAO(args.db);
+            const carDAO = new CarDAO(args.db, args.attachmentQueue);
             return await carDAO.addCar(args.car);
         } catch (e) {
             console.log(e)
@@ -99,13 +100,13 @@ const carsSlice = createSlice({
                 state.loading = false;
                 state.cars = action.payload
                     .map(item => {
-                        state.carsID = [...state.carsID, item.id];
+                        state.carsID = [...state.carsID, item.id as string];
                         return {
                             id: item.id,
                             name: item.name,
                             brand: item.brand,
                             model: item.model,
-                            image: undefined,
+                            image_id: item.image_id,
                         }
                     }) as Array<CarType>;
             })
@@ -117,7 +118,7 @@ const carsSlice = createSlice({
                         name: action.payload.name,
                         brand: action.payload.brand,
                         model: action.payload.model,
-                        image: undefined,
+                        image_id: action.payload.image_id,
                     }
                 ] as Array<CarType>;
             })

@@ -36,7 +36,7 @@ export interface NewCarFormFieldType {
     fuel_type: string
     fuel_measurement: string
     fuel_tank_size: number
-    // image: string
+    image_json: string
 }
 
 const zNumber = z
@@ -61,7 +61,7 @@ export const newCarFormSchema = z
         fuel_type: zPickerRequired,
         fuel_measurement: zPickerRequired,
         fuel_tank_size: zNumber,
-        // image: z.string(),
+        image_id: z.string(),
     })
 
 export const newCarUseFormProps = {
@@ -73,31 +73,30 @@ export const newCarUseFormProps = {
         odometer_value: 0,
         fuel_type: "",
         fuel_measurement: "",
-        fuel_tank_size: 0
-        // image: "",
+        fuel_tank_size: 0,
+        image_id: "",
     },
     resolver: zodResolver(newCarFormSchema)
 }
 
-export const getNewCarHandleSubmit = ({ handleSubmit, supabaseConnector, db, onSubmit }: GetFormHandleSubmitArgs) =>
+export const getNewCarHandleSubmit = ({ handleSubmit, database, onSubmit }: GetFormHandleSubmitArgs) =>
     handleSubmit(async (newCar: NewCarFormFieldType) => {
         console.log("handel submit new cda")
         try {
-            if(!supabaseConnector || !db){
+            if(!database){
                 throw Error("Hiba, supabase connector vagy DB");
             }
 
-            const { userID } = await supabaseConnector.fetchCredentials();
+            const { userID } = await database.supabaseConnector.fetchCredentials();
             const carID = getUUID();
 
             const car = {
                 id: carID,
                 owner: userID,
-                image: null,
                 ...newCar
             }
-            console.log("xd")
-            store.dispatch(addCar({ db, car }));
+
+            store.dispatch(addCar({ db: database.db, car }));
 
             if (onSubmit) {
                 onSubmit(true);

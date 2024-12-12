@@ -6,14 +6,13 @@ import { SupabaseConnector } from "../utils/database/SupabaseConnector";
 import { Kysely } from "@powersync/kysely-driver";
 import { DatabaseType } from "../utils/database/AppSchema";
 import { InputPickerDataType } from "../../form/components/InputPicker/InputPicker";
+import { Database } from "../utils/database/Database";
 
 export interface GetFormHandleSubmitArgs {
     handleSubmit: UseFormHandleSubmit<any>
-    supabaseConnector?: SupabaseConnector
-    db?: Kysely<DatabaseType>
+    database?: Database
     onSubmit?: (isSuccess: boolean) => void
 }
-
 
 export const CAR_NAME_LENGTH = 10
 

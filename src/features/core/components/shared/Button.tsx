@@ -75,7 +75,12 @@ const Button: React.FC<ButtonCommonProps & ButtonOptionalProps> = ({
 
     return (
         <TouchableOpacity
-            onPress={ onPress }
+            onPress={
+                (event) => {
+                    event.persist();
+                    onPress()
+                }
+            }
             disabled={ disabled }
             style={ styles.buttonContainer }
         >

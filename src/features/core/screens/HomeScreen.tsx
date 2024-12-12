@@ -32,13 +32,15 @@ import CarouselItem from "../components/carousel/CarouselItem";
 import { createSelector } from "@reduxjs/toolkit";
 import {useBottomSheet} from "../context/BottomSheetProvider";
 import InputSlider from "../../form/components/InputSlider";
+import { pickImage } from "../utils/handleImagePicker";
+import { Session } from "@supabase/supabase-js";
 
 const HomeScreen: React.FC = () => {
-    const { db } = useDatabase();
+    const { db, supabaseConnector, attachmentQueue } = useDatabase();
     const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
     useEffect(() => {
-        store.dispatch(loadCars(db))
+        store.dispatch(loadCars(db));
     }, []);
     console.log("homescren rerender")
     // const onP = async () => {
@@ -74,6 +76,7 @@ const HomeScreen: React.FC = () => {
                 contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
             >
                 <WelcomeBlock />
+                <Button title={"Image upload"} onPress={ () => pickImage(supabaseConnector, attachmentQueue) } />
                 <CarsBlock
                     openNewCarBottomSheet={
                         () =>

@@ -19,6 +19,8 @@ import { useMultiStepForm } from "../../../context/MultiStepFormProvider";
 import InputPicker, { InputPickerDataType } from "../../../components/InputPicker/InputPicker";
 import InputText from "../../../components/InputText/InputText";
 import { MultiStepForm } from "../../../components/Form";
+import Button from "../../../../core/components/shared/Button";
+import { pickImage } from "../../../../core/utils/handleImagePicker";
 
 interface NewCarFormProps {
     close?: () => void
@@ -28,7 +30,7 @@ const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
     const { control, handleSubmit, trigger, reset, resetField } =
         useForm<NewCarFormFieldType>(newCarUseFormProps);
 
-    const { supabaseConnector, db } = useDatabase();
+    const database = useDatabase();
 
     const onSubmit = (isSuccess?: boolean) => {
         if(isSuccess){
@@ -41,8 +43,7 @@ const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
 
     const submitHandler = getNewCarHandleSubmit({
         handleSubmit,
-        supabaseConnector,
-        db,
+        database,
         onSubmit
     });
 
