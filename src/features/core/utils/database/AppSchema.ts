@@ -1,40 +1,50 @@
-import { column, Schema, TableV2 } from "@powersync/react-native";
+import {Column, column, ColumnType, Schema, Table, TableV2 } from "@powersync/react-native";
 
 export const USERS_TABLE = "users";
 export const CARS_TABLE = "cars";
 export const SERVICE_TABLE = "service";
 
-const users = new TableV2({
-    id: column.text,
-    firstname: column.text,
-    lastname: column.text
+const users = new Table({
+    name: USERS_TABLE,
+    columns: [
+        new Column({name: "id", type: ColumnType.TEXT}),
+        new Column({name: "firstname", type: ColumnType.TEXT}),
+        new Column({name: "lastname", type: ColumnType.TEXT})
+    ],
 });
 
-const cars = new TableV2({
-    id: column.text,
-    owner: column.text,
-    name: column.text,
-    brand: column.text,
-    model: column.text,
-    odometer_measurement: column.text,
-    odometer_value: column.integer,
-    fuel_type: column.text,
-    fuel_measurement: column.text,
-    fuel_tank_size: column.integer,
-    image: column.text,
+const cars = new Table({
+    name: CARS_TABLE,
+    columns: [
+        new Column({name: "id", type: ColumnType.TEXT}),
+        new Column({name: "owner", type: ColumnType.TEXT}),
+        new Column({name: "name", type: ColumnType.TEXT}),
+        new Column({name: "brand", type: ColumnType.TEXT}),
+        new Column({name: "model", type: ColumnType.TEXT}),
+        new Column({name: "odometer_measurement", type: ColumnType.TEXT}),
+        new Column({name: "odometer_value", type: ColumnType.INTEGER}),
+        new Column({name: "fuel_type", type: ColumnType.TEXT}),
+        new Column({name: "fuel_measurement", type: ColumnType.TEXT}),
+        new Column({name: "fuel_tank_size", type: ColumnType.INTEGER}),
+        new Column({name: "image_id", type: ColumnType.TEXT}),
+    ]
 })
 
-const service = new TableV2({
-    id: column.text,
-    car: column.text,
-    date: column.text,
-    odometer: column.text,
-    price: column.integer,
-    type: column.text,
-    works: column.text,
-    mechanic: column.text,
-    comment: column.text
+const service = new Table({
+    name: SERVICE_TABLE,
+    columns: [
+        new Column({name: "id", type: ColumnType.TEXT}),
+        new Column({name: "car", type: ColumnType.TEXT}),
+        new Column({name: "date", type: ColumnType.TEXT}),
+        new Column({name: "odometer", type: ColumnType.TEXT}),
+        new Column({name: "price", type: ColumnType.INTEGER}),
+        new Column({name: "type", type: ColumnType.TEXT}),
+        new Column({name: "works", type: ColumnType.TEXT}),
+        new Column({name: "mechanic", type: ColumnType.TEXT}),
+        new Column({name: "comment", type: ColumnType.TEXT}),
+    ]
 })
+
 
 export const AppSchema = new Schema({
     cars,

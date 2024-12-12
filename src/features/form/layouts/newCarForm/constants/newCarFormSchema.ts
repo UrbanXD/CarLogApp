@@ -93,10 +93,10 @@ export const getNewCarHandleSubmit = ({ handleSubmit, supabaseConnector, db, onS
             const car = {
                 id: carID,
                 owner: userID,
-                image: null,
+                image_id: null,
                 ...newCar
             }
-            console.log("xd")
+
             store.dispatch(addCar({ db, car }));
 
             if (onSubmit) {

@@ -10,7 +10,7 @@ export interface CarType {
     name: string
     brand: string
     model: string
-    image: string | undefined
+    image_id: string | undefined
 }
 
 interface CarsState {
@@ -105,7 +105,7 @@ const carsSlice = createSlice({
                             name: item.name,
                             brand: item.brand,
                             model: item.model,
-                            image: undefined,
+                            image_id: undefined,
                         }
                     }) as Array<CarType>;
             })
@@ -117,7 +117,7 @@ const carsSlice = createSlice({
                         name: action.payload.name,
                         brand: action.payload.brand,
                         model: action.payload.model,
-                        image: undefined,
+                        image_id: undefined,
                     }
                 ] as Array<CarType>;
             })
