@@ -1,4 +1,5 @@
-import {Column, column, ColumnType, Schema, Table, TableV2 } from "@powersync/react-native";
+import { AttachmentTable } from "@powersync/attachments";
+import {Column, ColumnType, Schema, Table } from "@powersync/react-native";
 
 export const USERS_TABLE = "users";
 export const CARS_TABLE = "cars";
@@ -21,12 +22,12 @@ const cars = new Table({
         new Column({name: "name", type: ColumnType.TEXT}),
         new Column({name: "brand", type: ColumnType.TEXT}),
         new Column({name: "model", type: ColumnType.TEXT}),
-        new Column({name: "odometer_measurement", type: ColumnType.TEXT}),
-        new Column({name: "odometer_value", type: ColumnType.INTEGER}),
-        new Column({name: "fuel_type", type: ColumnType.TEXT}),
-        new Column({name: "fuel_measurement", type: ColumnType.TEXT}),
-        new Column({name: "fuel_tank_size", type: ColumnType.INTEGER}),
-        new Column({name: "image_id", type: ColumnType.TEXT}),
+        new Column({name: "odometerMeasurement", type: ColumnType.TEXT}),
+        new Column({name: "odometerValue", type: ColumnType.INTEGER}),
+        new Column({name: "fuelType", type: ColumnType.TEXT}),
+        new Column({name: "fuelMeasurement", type: ColumnType.TEXT}),
+        new Column({name: "fuelTankSize", type: ColumnType.INTEGER}),
+        new Column({name: "image", type: ColumnType.TEXT}),
     ]
 })
 
@@ -45,12 +46,12 @@ const service = new Table({
     ]
 })
 
-
-export const AppSchema = new Schema({
+export const AppSchema = new Schema([
     cars,
     users,
-    service
-});
+    service,
+    new AttachmentTable()
+]);
 
 export type DatabaseType = (typeof AppSchema)["types"];
 export type UsersType = DatabaseType["users"];

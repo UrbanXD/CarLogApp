@@ -2,13 +2,14 @@ import { askMediaLibraryPermission } from "./getPermissions"
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import { decode } from "base64-arraybuffer";
+import { getFileExtension } from "./getFileExtension";
+import { getUUID } from "./uuid";
 
-const getFileExtension = (uri: string) => {
-    const match = /\.([a-zA-Z]+)$/.exec(uri);
-    if (match) {
-        return match[1];
-    }
-    return "";
+export interface ImageType {
+    id: string
+    buffer: ArrayBuffer
+    fileExtension: string
+    mediaType: string
 }
 
 export const pickImage = async (options?: ImagePicker.ImagePickerOptions) => {
@@ -22,9 +23,15 @@ export const pickImage = async (options?: ImagePicker.ImagePickerOptions) => {
 
     if(!pickerResult.canceled) {
         const img = pickerResult.assets[0];
-        const base64 = await FileSystem.readAsStringAsync(img.uri, { encoding: "base64" });
+        const base64 = await FileSystem.readAsStringAsync(img.uri, {encoding: "base64"});
+        const fileExtension = getFileExtension(img.uri);
 
-        return decode(base64);
+        return {
+            id: getUUID(),
+            buffer: decode(base64),
+            fileExtension,
+            mediaType: img.mimeType ?? "image/jpeg"
+        }
     }
 
     return null

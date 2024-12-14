@@ -103,7 +103,6 @@ const WelcomeBlock: React.FC = () => {
             <Text style={ styles.infoText }>
                 Vezzessen számot nálunk az autóiról!
             </Text>
-            <InputImagePicker />
         </Animated.View>
     )
 }

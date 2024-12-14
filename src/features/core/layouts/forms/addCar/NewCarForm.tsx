@@ -19,6 +19,7 @@ import { useMultiStepForm } from "../../../context/MultiStepFormProvider";
 import { MultiStepForm } from "../../../components/form/Form";
 import InputText from "../../../components/form/InputText/InputText";
 import InputPicker, { InputPickerDataType } from "../../../components/form/InputPicker/InputPicker";
+import InputImagePicker from "../../../components/form/InputImagePicker";
 
 interface NewCarFormProps {
     close?: () => void
@@ -28,7 +29,7 @@ const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
     const { control, handleSubmit, trigger, reset, resetField } =
         useForm<NewCarFormFieldType>(newCarUseFormProps);
 
-    const { supabaseConnector, db } = useDatabase();
+    const database = useDatabase();
 
     const onSubmit = (isSuccess?: boolean) => {
         if(isSuccess){
@@ -41,8 +42,7 @@ const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
 
     const submitHandler = getNewCarHandleSubmit({
         handleSubmit,
-        supabaseConnector,
-        db,
+        database,
         onSubmit
     });
 
@@ -74,15 +74,22 @@ const StepOne: React.FC = () => {
     const { control } = useMultiStepForm();
 
     return (
-        <InputText
-            control={ control }
-            fieldName="name"
-            fieldNameText="Autó azonosító"
-            fieldInfoText="Az autó elnevezése, azonosítója mely az Ön számára lehet fontos autója azonosításakor."
-            placeholder="AA-0000-BB"
-            icon={ ICON_NAMES.nametag }
-            isInBottomSheet
-        />
+        <>
+            <InputText
+                control={ control }
+                fieldName="name"
+                fieldNameText="Autó azonosító"
+                fieldInfoText="Az autó elnevezése, azonosítója mely az Ön számára lehet fontos autója azonosításakor."
+                placeholder="AA-0000-BB"
+                icon={ ICON_NAMES.nametag }
+                isInBottomSheet
+            />
+            <InputImagePicker
+                control={ control }
+                fieldName="image"
+                fieldNameText={"Adj kepekt"}
+            />
+        </>
     )
 }
 
@@ -139,7 +146,7 @@ const StepThree: React.FC = () => {
         <>
             <InputText
                 control={ control }
-                fieldName="odometer_value"
+                fieldName="odometerValue"
                 fieldNameText="Kilometerora alass"
                 placeholder="000.000.000"
                 icon={ ICON_NAMES.odometer }
@@ -148,7 +155,7 @@ const StepThree: React.FC = () => {
             <InputPicker
                 data={ ODOMETER_MEASUREMENTS }
                 control={ control }
-                fieldName="odometer_measurement"
+                fieldName="odometerMeasurement"
                 fieldNameText="Mertekegyseg"
                 isHorizontal
                 isCarousel={ false }
@@ -165,7 +172,7 @@ const StepFour: React.FC = () => {
             <InputPicker
                 data={ FUEL_TYPES }
                 control={ control }
-                fieldName="fuel_type"
+                fieldName="fuelType"
                 fieldNameText="Uzemanyag tipus"
                 isHorizontal
                 isCarousel={ false }
@@ -173,14 +180,14 @@ const StepFour: React.FC = () => {
             <InputPicker
                 data={ FUEL_MEASUREMENTS }
                 control={ control }
-                fieldName="fuel_measurement"
+                fieldName="fuelMeasurement"
                 fieldNameText="Uzemanyag mertekegyseg"
                 isHorizontal
                 isCarousel={ false }
             />
             <InputText
                 control={ control }
-                fieldName="fuel_tank_size"
+                fieldName="fuelTankSize"
                 fieldNameText="Uzemanyag tartaly merete"
                 placeholder="000.000.000"
                 icon={ ICON_NAMES.odometer }

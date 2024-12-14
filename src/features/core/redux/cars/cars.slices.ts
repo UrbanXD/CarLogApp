@@ -1,16 +1,24 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Kysely } from "@powersync/kysely-driver";
-import { CarsType, DatabaseType } from "../../utils/database/AppSchema";
+import { CarsType, DatabaseType } from "../../utils/database/powersync/AppSchema";
 import { CarDAO } from "../../utils/DAOs/CarDAO";
 import { LOCAL_STORAGE_KEYS } from "../../constants/constants";
+import { Database } from "../../utils/database/Database";
+import { ImageType } from "../../utils/pickImage";
 
 export interface CarType {
     id: string
+    owner: string
     name: string
     brand: string
     model: string
-    image_id: string | undefined
+    odometerMeasurement: string
+    odometerValue: number
+    fuelType: string
+    fuelMeasurement: string
+    fuelTankSize: number
+    image: ImageType | null
 }
 
 interface CarsState {
@@ -44,10 +52,20 @@ export const loadCars = createAsyncThunk(
 
 export const addCar = createAsyncThunk(
     "addCar",
-    async (args: {db: Kysely<DatabaseType>, car: CarsType}, { rejectWithValue }) => {
+    async (args: {database: Database, car: CarType}, { rejectWithValue }) => {
         try {
-            const carDAO = new CarDAO(args.db);
-            return await carDAO.addCar(args.car);
+            let image = null;
+            if(args.database?.attachmentQueue && args.car.image){
+                image = await args.database.attachmentQueue.saveFile(args.car.image, `${args.car.owner}/custom`)
+            }
+
+            const car: CarsType = {
+                ...args.car,
+                image: image ? image.filename : null,
+            }
+
+            const carDAO = new CarDAO(args.database.db);
+            return await carDAO.addCar(car);
         } catch (e) {
             console.log(e)
             return rejectWithValue("")
@@ -99,13 +117,13 @@ const carsSlice = createSlice({
                 state.loading = false;
                 state.cars = action.payload
                     .map(item => {
-                        state.carsID = [...state.carsID, item.id];
+                        state.carsID = [...state.carsID, item.id as string];
                         return {
                             id: item.id,
                             name: item.name,
                             brand: item.brand,
                             model: item.model,
-                            image_id: undefined,
+                            image: item.image,
                         }
                     }) as Array<CarType>;
             })
@@ -117,7 +135,7 @@ const carsSlice = createSlice({
                         name: action.payload.name,
                         brand: action.payload.brand,
                         model: action.payload.model,
-                        image_id: undefined,
+                        image: action.payload.image,
                     }
                 ] as Array<CarType>;
             })

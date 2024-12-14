@@ -2,15 +2,12 @@ import { StyleSheet } from "react-native";
 import { theme } from "./theme";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { UseFormHandleSubmit } from "react-hook-form";
-import { SupabaseConnector } from "../utils/database/SupabaseConnector";
-import { Kysely } from "@powersync/kysely-driver";
-import { DatabaseType } from "../utils/database/AppSchema";
-import { InputPickerDataType } from "../../form/components/InputPicker/InputPicker";
+import { Database } from "../utils/database/Database";
+import { InputPickerDataType } from "../components/form/InputPicker/InputPicker";
 
 export interface GetFormHandleSubmitArgs {
     handleSubmit: UseFormHandleSubmit<any>
-    supabaseConnector?: SupabaseConnector
-    db?: Kysely<DatabaseType>
+    database: Database
     onSubmit?: (isSuccess: boolean) => void
 }
 
