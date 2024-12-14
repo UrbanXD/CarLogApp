@@ -1,6 +1,6 @@
 import rootReducer from "./index";
 import { configureStore } from '@reduxjs/toolkit'
-import carsApiSlices from "../../form/redux/cars/cars.api.slices";
+import carsApiSlices from "../redux/cars/cars.api.slices";
 
 export const store = configureStore({
     reducer: rootReducer,

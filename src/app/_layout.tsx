@@ -2,7 +2,6 @@ import { Stack } from 'expo-router/stack';
 import React, {useEffect, useState} from "react";
 import '@azure/core-asynciterator-polyfill';
 import {ScrollViewProvider} from "../features/core/context/ScrollViewProvider";
-import {DatabaseProvider} from "../features/form/context/DatabaseProvider";
 import {useDatabase} from "../features/core/utils/database/Database";
 import { Session } from '@supabase/supabase-js';
 import {GestureHandlerRootView} from "react-native-gesture-handler";
@@ -16,6 +15,7 @@ import {KeyboardProvider} from "react-native-keyboard-controller";
 import {StatusBar} from "expo-status-bar";
 import CarHeader from "../features/header/layouts/CarHeader";
 import {BottomSheetProvider} from "../features/core/context/BottomSheetProvider";
+import { DatabaseProvider } from '../features/core/context/DatabaseProvider';
 
 const Layout:React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);

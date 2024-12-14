@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {Alert, TouchableOpacity, View} from "react-native";
 import { FONT_SIZES, SIMPLE_HEADER_HEIGHT } from "../../core/constants/constants";
-import Picker from "../../form/components/InputPicker/Picker";
+import Picker from "../../core/components/form/InputPicker/Picker";
 import Header from "../components/Header";
 import { Avatar } from "react-native-paper";
 import { theme } from "../../core/constants/theme";
 import { useSelector } from "react-redux";
 import { RootState, store } from "../../core/redux/store";
-import { loadSelectedCar, selectCar } from "../../form/redux/cars/cars.slices";
 import { createSelector } from "@reduxjs/toolkit";
 import { useDatabase } from "../../core/utils/database/Database";
+import {loadSelectedCar, selectCar } from "../../core/redux/cars/cars.slices";
 
 const CarHeader: React.FC = () => {
     const { supabaseConnector } = useDatabase();
@@ -51,7 +51,7 @@ const CarHeader: React.FC = () => {
                         !carsIsLoading &&
                         <Picker
                             data={ cars }
-                            selectedItem={ cars.find(car => car.id === selectedCarID) }
+                            selectedItemID={ selectedCarID }
                             isDropdown={ true }
                             onDropdownToggle={ setIsDropdownVisible }
                             onSelect={ onCarSelect }
