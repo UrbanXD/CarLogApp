@@ -32,6 +32,7 @@ import CarouselItem from "../components/carousel/CarouselItem";
 import { createSelector } from "@reduxjs/toolkit";
 import {useBottomSheet} from "../context/BottomSheetProvider";
 import InputSlider from "../../form/components/InputSlider";
+import InputImagePicker from "../../form/components/InputImagePicker";
 
 const HomeScreen: React.FC = () => {
     const { db } = useDatabase();
@@ -103,7 +104,7 @@ const WelcomeBlock: React.FC = () => {
             <Text style={ styles.infoText }>
                 Vezzessen számot nálunk az autóiról!
             </Text>
-            <InputSlider min={ 1970 } max={ 1974 } step={ 1 } />
+            <InputImagePicker />
         </Animated.View>
     )
 }
