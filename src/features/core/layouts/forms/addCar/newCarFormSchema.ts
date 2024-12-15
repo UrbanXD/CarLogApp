@@ -2,11 +2,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GetFormHandleSubmitArgs } from "../../../constants/constants";
 import { store } from "../../../redux/store";
-import {CarType, addCar } from "../../../redux/cars/cars.slices";
+import { addCar } from "../../../redux/cars/cars.slices";
 import { InputPickerDataType } from "../../../components/form/InputPicker/InputPicker";
 import { getUUID } from "../../../utils/uuid";
 import { ImageType } from "../../../utils/pickImage";
-import { CarsType } from "../../../utils/database/powersync/AppSchema";
+import { CarTableType } from "../../../utils/database/powersync/AppSchema";
 
 export const newCarFormStepsField = [["name", "image"], ["brand", "model"], ["odometerValue", "odometerMeasurement"], ["fuelType", "fuelMeasurement", "fuelTankSize"]];
 export const newCarFormStepsTitle = ["Elnevezés", "Gyártó", "Autó adatok", "Autó adatok"];
@@ -38,7 +38,7 @@ export interface NewCarFormFieldType {
     fuelType: string
     fuelMeasurement: string
     fuelTankSize: number
-    image: ImageType | null
+    image?: ImageType
 }
 
 const zNumber = z
@@ -87,19 +87,23 @@ export const newCarUseFormProps = {
 
 export const getNewCarHandleSubmit = ({ handleSubmit, database, onSubmit }: GetFormHandleSubmitArgs) =>
     handleSubmit(async (newCar: NewCarFormFieldType) => {
-        console.log("handel submit new cda")
         try {
             if(!database || !database.supabaseConnector || !database.db) {
                 throw Error("Hiba, supabase connector vagy DB");
             }
 
             const { userID } = await database.supabaseConnector.fetchCredentials();
+            let image = null;
+            if(database.attachmentQueue && newCar.image) {
+                image = await database.attachmentQueue.saveFile(newCar.image, userID);
+            }
 
             const car = {
+                ...newCar,
                 id: getUUID(),
                 owner: userID,
-                ...newCar
-            } as CarType
+                image: image?.filename ? image.filename : null,
+            } as CarTableType
 
             store.dispatch(addCar({ database, car }));
 

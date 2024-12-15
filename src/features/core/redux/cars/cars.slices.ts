@@ -1,29 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Kysely } from "@powersync/kysely-driver";
-import { CarsType, DatabaseType } from "../../utils/database/powersync/AppSchema";
+import { CarTableType, DatabaseType } from "../../utils/database/powersync/AppSchema";
 import { CarDAO } from "../../utils/DAOs/CarDAO";
 import { LOCAL_STORAGE_KEYS } from "../../constants/constants";
 import { Database } from "../../utils/database/Database";
-import { ImageType } from "../../utils/pickImage";
-
-export interface CarType {
-    id: string
-    owner: string
-    name: string
-    brand: string
-    model: string
-    odometerMeasurement: string
-    odometerValue: number
-    fuelType: string
-    fuelMeasurement: string
-    fuelTankSize: number
-    image: ImageType | null
-}
 
 interface CarsState {
     loading: boolean
-    cars: Array<CarType>
+    cars: Array<CarTableType>
     carsID: Array<string>
     selectedCarID: string
     loadError: boolean
@@ -44,28 +29,18 @@ export const loadCars = createAsyncThunk(
             const carDAO = new CarDAO(db);
             return await carDAO.getCars();
         } catch (e) {
-            console.log(e)
-            return rejectWithValue("")
+            console.log(e);
+            return rejectWithValue("");
         }
     }
 );
 
 export const addCar = createAsyncThunk(
     "addCar",
-    async (args: {database: Database, car: CarType}, { rejectWithValue }) => {
+    async (args: {database: Database, car: CarTableType}, { rejectWithValue }) => {
         try {
-            let image = null;
-            if(args.database?.attachmentQueue && args.car.image){
-                image = await args.database.attachmentQueue.saveFile(args.car.image, `${args.car.owner}/custom`)
-            }
-
-            const car: CarsType = {
-                ...args.car,
-                image: image ? image.filename : null,
-            }
-
             const carDAO = new CarDAO(args.database.db);
-            return await carDAO.addCar(car);
+            return await carDAO.addCar(args.car);
         } catch (e) {
             console.log(e)
             return rejectWithValue("")
@@ -78,7 +53,6 @@ export const loadSelectedCar = createAsyncThunk(
     async (arg: { asd?: string } = {}, { rejectWithValue }) => {
         try {
             const id = await AsyncStorage.getItem(LOCAL_STORAGE_KEYS.selectedCarIndex);
-            console.log("loadSelectedsCar ", id)
             return id ? id : "";
         } catch (e) {
             console.log("loadSelectedCar", e);
@@ -118,6 +92,7 @@ const carsSlice = createSlice({
                 state.cars = action.payload
                     .map(item => {
                         state.carsID = [...state.carsID, item.id as string];
+
                         return {
                             id: item.id,
                             name: item.name,
@@ -125,9 +100,10 @@ const carsSlice = createSlice({
                             model: item.model,
                             image: item.image,
                         }
-                    }) as Array<CarType>;
+                    }) as Array<CarTableType>;
             })
             .addCase(addCar.fulfilled, (state, action) => {
+
                 state.cars = [
                     ...state.cars,
                     {
@@ -137,7 +113,7 @@ const carsSlice = createSlice({
                         model: action.payload.model,
                         image: action.payload.image,
                     }
-                ] as Array<CarType>;
+                ] as Array<CarTableType>;
             })
             .addCase(loadSelectedCar.fulfilled, (state, action) => {
                 state.selectedCarID = action.payload;
@@ -148,7 +124,6 @@ const carsSlice = createSlice({
             })
             .addCase(selectCar.fulfilled, (state, action) => {
                 state.selectedCarID = action.payload;
-                console.log("kivalasztas, selectCar: ", action.payload)
             })
             .addCase(selectCar.rejected, () => {
                 console.log("nijncs kivalasztva HIBA")

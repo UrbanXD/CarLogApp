@@ -1,12 +1,11 @@
-import { useEffect, useState } from "react";
 import Button from "../shared/Button"
-import {ImageType, pickImage } from "../../utils/pickImage";
+import { pickImage } from "../../utils/pickImage";
 import {
     Image,
     Text
 } from "react-native";
 import { encode } from "base64-arraybuffer";
-import {Control, Controller } from "react-hook-form";
+import { Control, Controller } from "react-hook-form";
 
 interface InputImagePickerProps {
     control: Control<any>
@@ -46,24 +45,5 @@ const InputImagePicker:React.FC<InputImagePickerProps> = ({
         />
     )
 }
-
-// <Controller
-//     control={ control }
-//     name={ fieldName }
-//     render={ ({ field: { onChange }, fieldState: { error } }) =>
-//         isDataAdjusted
-//             ?   <Picker
-//                 data={ adjustedData }
-//                 error = { error?.message }
-//                 searchTerm={ searchTerm }
-//                 setSearchTerm={ withSearchbar ? ((value) => setSearchTerm(value)) : undefined }
-//                 selectedItemID={ selectedItemID }
-//                 onSelect={
-//                     (id: string) => {
-//                         setSelectedItemID(id);
-//                         console.log("OnSelected", id)
-//                         onChange(adjustedData.find(item => item.id === id)?.value?.toString());
-//                     }
-//                 }
 
 export default InputImagePicker;

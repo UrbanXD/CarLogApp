@@ -1,5 +1,6 @@
 import { Kysely } from "@powersync/kysely-driver";
-import { CARS_TABLE, CarsType, DatabaseType } from "../database/powersync/AppSchema";
+import { CAR_TABLE, CarTableType, DatabaseType } from "../database/powersync/AppSchema";
+import { convertTableTypeToRowType } from "../convertTableTypeToRowType";
 
 export class CarDAO {
     db: Kysely<DatabaseType>
@@ -10,15 +11,15 @@ export class CarDAO {
 
     async getCars() {
         return await this.db
-            .selectFrom(CARS_TABLE)
+            .selectFrom(CAR_TABLE)
             .selectAll()
             .execute()
     }
 
-    async addCar(car: CarsType) {
+    async addCar(car: CarTableType) {
         await this.db
-            .insertInto(CARS_TABLE)
-            .values(car)
+            .insertInto(CAR_TABLE)
+            .values(convertTableTypeToRowType(car))
             .execute()
 
         return car;

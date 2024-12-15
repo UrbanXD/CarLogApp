@@ -24,14 +24,11 @@ import UpcomingRides from "../../../upcomingRides/UpcomingRides";
 import Link from "../../components/shared/Link";
 import { useSelector } from "react-redux";
 import { RootState, store } from "../../redux/store";
-import {CarType, loadCars } from "../../redux/cars/cars.slices";
-import CustomBottomSheet from "../../components/shared/BottomSheet";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import {loadCars } from "../../redux/cars/cars.slices";
 import CarouselItem from "../../components/carousel/CarouselItem";
-import { createSelector } from "@reduxjs/toolkit";
 import {useBottomSheet} from "../../context/BottomSheetProvider";
 import NewCarForm from "../forms/addCar/NewCarForm";
-import InputImagePicker from "../../components/form/InputImagePicker";
+import { encode } from "base64-arraybuffer";
 
 const HomeScreen: React.FC = () => {
     const { db } = useDatabase();
@@ -111,18 +108,38 @@ interface CarsBlockProps {
     openNewCarBottomSheet: () => void
 }
 const CarsBlock: React.FC<CarsBlockProps> = ({ openNewCarBottomSheet }) => {
+    const { attachmentQueue } = useDatabase();
+
     const selectCarsState = (state: RootState) => state.cars.cars;
-    const selectCarsForCarousel = createSelector(
-        [selectCarsState],
-        (cars) =>
-            cars.map(car => ({
-                id: car.name,
-                image: undefined,
-                title: car.brand,
-                subtitle: car.model,
-            }))
-    );
-    const cars = useSelector(selectCarsForCarousel);
+
+    const cars = useSelector(selectCarsState);
+    const [carouselData, setCarouselData] = useState<CarouselItemType[]>([]);
+
+
+    useEffect(() => {
+        const fetchImages = async () => {
+            const mappedCars = await Promise.all(
+                cars.map(async (car) => {
+                    let img = undefined;
+                    if(car.image && attachmentQueue){
+                        const file = await attachmentQueue.getFile(car.image);
+                        img = file ? { uri: `data:image/jpeg;base64,${encode(file)}` } : null;
+                    }
+
+                    return {
+                        id: car.name,
+                        image: img,
+                        title: car.brand,
+                        subtitle: car.model,
+                    } as CarouselItemType;
+                })
+            );
+
+            setCarouselData(mappedCars);
+        }
+
+        fetchImages();
+    }, [cars, attachmentQueue]);
 
     return (
         <View style={ [GLOBAL_STYLE.contentContainer, { paddingHorizontal: 0, marginHorizontal: 0, backgroundColor: "transparent"}] } >
@@ -136,7 +153,7 @@ const CarsBlock: React.FC<CarsBlockProps> = ({ openNewCarBottomSheet }) => {
             </View>
             <View style={ styles.carouselContainer }>
                 <Carousel
-                    data={ cars }
+                    data={ carouselData }
                     renderItem={
                         (item: CarouselItemType, index: number, size: number, coordinate: SharedValue<number>) =>
                             <CarouselItem

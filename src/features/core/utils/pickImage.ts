@@ -4,6 +4,7 @@ import * as FileSystem from "expo-file-system";
 import { decode } from "base64-arraybuffer";
 import { getFileExtension } from "./getFileExtension";
 import { getUUID } from "./uuid";
+import { AttachmentRecord } from "@powersync/attachments";
 
 export interface ImageType {
     id: string
@@ -29,7 +30,7 @@ export const pickImage = async (options?: ImagePicker.ImagePickerOptions) => {
         return {
             id: getUUID(),
             buffer: decode(base64),
-            fileExtension,
+            fileExtension: fileExtension === "jpeg" ? "jpg" : fileExtension,
             mediaType: img.mimeType ?? "image/jpeg"
         }
     }

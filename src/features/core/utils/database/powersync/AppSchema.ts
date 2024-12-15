@@ -1,12 +1,17 @@
 import { AttachmentTable } from "@powersync/attachments";
-import {Column, ColumnType, Schema, Table } from "@powersync/react-native";
+import { Column, ColumnType, Schema, Table } from "@powersync/react-native";
 
-export const USERS_TABLE = "users";
-export const CARS_TABLE = "cars";
+export const USER_TABLE = "user";
+export const CAR_TABLE = "car";
 export const SERVICE_TABLE = "service";
 
-const users = new Table({
-    name: USERS_TABLE,
+export interface UserTableType {
+    id: string
+    firstName: string
+    lastName: string
+}
+const user = new Table({
+    name: USER_TABLE,
     columns: [
         new Column({name: "id", type: ColumnType.TEXT}),
         new Column({name: "firstname", type: ColumnType.TEXT}),
@@ -14,8 +19,21 @@ const users = new Table({
     ],
 });
 
-const cars = new Table({
-    name: CARS_TABLE,
+export interface CarTableType {
+    id: string
+    owner: string
+    name: string
+    brand: string
+    model: string
+    odometerMeasurement: string
+    odometerValue: number
+    fuelType: string
+    fuelMeasurement: string
+    fuelTankSize: number
+    image?: string
+}
+const car = new Table({
+    name: CAR_TABLE,
     columns: [
         new Column({name: "id", type: ColumnType.TEXT}),
         new Column({name: "owner", type: ColumnType.TEXT}),
@@ -47,13 +65,11 @@ const service = new Table({
 })
 
 export const AppSchema = new Schema([
-    cars,
-    users,
+    car,
+    user,
     service,
     new AttachmentTable()
 ]);
 
 export type DatabaseType = (typeof AppSchema)["types"];
-export type UsersType = DatabaseType["users"];
-export type CarsType = DatabaseType["cars"];
-export type ServiceType = DatabaseType["service"];
+export type RowTableType = DatabaseType[""];
