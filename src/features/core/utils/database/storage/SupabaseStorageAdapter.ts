@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { decode as decodeBase64 } from 'base64-arraybuffer';
+import { decode } from 'base64-arraybuffer';
 import * as FileSystem from 'expo-file-system';
 import { BaseConfig } from '../BaseConfig';
 import { StorageAdapter } from '@powersync/attachments';
@@ -60,10 +60,10 @@ export class SupabaseStorageAdapter implements StorageAdapter {
     ): Promise<void> {
         const { encoding = FileSystem.EncodingType.UTF8 } = options ?? {};
 
-        const directoryPath = fileURI.substring(0, fileURI.lastIndexOf('/') + 1);
-        if(!await this.fileExists(directoryPath)){
-            await this.makeDir(directoryPath);
-        }
+        // const directoryPath = fileURI.substring(0, fileURI.lastIndexOf('/') + 1);
+        // if(!await this.fileExists(directoryPath)){
+        //     await this.makeDir(directoryPath);
+        // }
 
         await FileSystem.writeAsStringAsync(fileURI, base64Data, { encoding });
     }
@@ -113,12 +113,14 @@ export class SupabaseStorageAdapter implements StorageAdapter {
 
     async fileExists(fileURI: string): Promise<boolean> {
         const { exists } = await FileSystem.getInfoAsync(fileURI);
+
         return exists;
     }
 
     async makeDir(uri: string): Promise<void> {
         console.log(uri, "makedir")
         const { exists } = await FileSystem.getInfoAsync(uri);
+
         if (!exists) {
             await FileSystem.makeDirectoryAsync(uri, { intermediates: true });
         }
@@ -141,6 +143,6 @@ export class SupabaseStorageAdapter implements StorageAdapter {
      * Converts a base64 string to an ArrayBuffer
      */
     async base64ToArrayBuffer(base64: string): Promise<ArrayBuffer> {
-        return decodeBase64(base64);
+        return decode(base64);
     }
 }

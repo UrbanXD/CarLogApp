@@ -8,6 +8,7 @@ import { encode } from 'base64-arraybuffer';
 import { getFileExtension } from '../../getFileExtension';
 
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
+
     async init() {
         if (!BaseConfig.SUPABASE_BUCKET) {
             console.debug('No Supabase bucket configured, skip setting up PhotoAttachmentQueue watches');
@@ -15,15 +16,27 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
             this.options.syncInterval = 0;
             return;
         }
-        this.options.syncInterval = 30000; //30mp = 30000
-
+        // this.options.syncInterval = 300; //30mp = 30000
         await super.init();
     }
 
+    // async downloadRecord(record: AttachmentRecord) {
+    //     console.log('ads')
+    //     this.downloadRecord(record)
+    //     return true;
+    // }
+
     onAttachmentIdsChange(onUpdate: (ids: string[]) => void): void {
+        console.log(this.table, "taxxx")
         const imgSQL =
                 `SELECT image as image FROM ${CAR_TABLE} WHERE image IS NOT NULL`;
         // UNION-nal lehet meg tobb tablat hozza irni es onnan is kiszedni ha lesz
+
+        // this.powersync.watch("SELECT * FROM attachments", [], {
+        //     onResult: async (result) => {
+        //         console.log(result.rows?._array, "kutya");
+        //     }
+        // })
 
         this.powersync.watch(imgSQL, [], {
             onResult:
@@ -31,10 +44,12 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
                     return onUpdate(
                     result.rows?._array.map(
                             (r) => {
-                                const file = r.image.substring(r.image.lastIndexOf('/') + 1, r.image.length);
-                                const extension = getFileExtension(r.image);
-
-                                return file.substring(0, file.length - 1 - extension.length);
+                                // const file = r.image.substring(r.image.lastIndexOf('/') + 1, r.image.length);
+                                // const extension = getFileExtension(r.image);
+                                //
+                                // const id = file.substring(0, file.length - 1 - extension.length)
+                                // console.log("cica ", id)
+                                return r.image;
                             }
                         )
                         ?? []
@@ -42,16 +57,16 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
         });
     }
 
-
     async newAttachmentRecord(record?: Partial<AttachmentRecord>): Promise<AttachmentRecord> {
-        const fileID = record?.id ?? getUUID();
+        const fileID = getUUID();
 
         return {
-            id: fileID,
-            filename: record?.filename ?? `${fileID}.jpg`,
-            media_type: record?.media_type ?? "image/jpeg",
-            state: AttachmentState.QUEUED_UPLOAD,
-            ...record
+            id: record?.id || `${fileID}.jpg`,
+            filename: record?.id || `${fileID}.jpg`,
+            media_type: "image/jpeg",
+            state: AttachmentState.QUEUED_SYNC,
+            ...record,
+            local_uri: this.getLocalFilePathSuffix(record?.id || `${fileID}.jpg`),
         };
     }
 
@@ -64,15 +79,13 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
                 : "";
         const filename = `${storagePath}${image.id}.${image.fileExtension}`;
 
-        const attachmentRecord: AttachmentRecord = {
-            id: image.id,
-            filename: filename,
+        const attachmentRecord = await this.newAttachmentRecord({
+            id: filename,
             media_type: image.mediaType,
-            state: AttachmentState.QUEUED_UPLOAD
-        };
+            state: AttachmentState.QUEUED_UPLOAD,
+        });
 
-        attachmentRecord.local_uri = this.getLocalFilePathSuffix(attachmentRecord.filename);
-        const localURI = `${this.storageDirectory}/${filename}`;
+        const localURI = this.getLocalUri(attachmentRecord.local_uri || this.getLocalFilePathSuffix(filename));
         await this.storage.writeFile(localURI, encode(image.buffer), { encoding: FileSystem.EncodingType.Base64 });
 
         const fileInfo = await FileSystem.getInfoAsync(localURI);
@@ -85,9 +98,24 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
 
     async getFile(filename: string): Promise<ArrayBuffer | null> {
         const localURI = `${this.storageDirectory}/${filename}`;
-        const { exists } = await FileSystem.getInfoAsync(localURI);
 
+        let attachmentRecord = await this.record(filename);
+        if (!attachmentRecord) {
+            attachmentRecord = await this.newAttachmentRecord({
+                id: filename,
+                state: AttachmentState.QUEUED_DOWNLOAD,
+            })
+
+            await this.saveToQueue(attachmentRecord);
+        }
+
+        const { exists } = await FileSystem.getInfoAsync(localURI);
         if(!exists) {
+            const directoryPath = localURI.substring(0, localURI.lastIndexOf('/') + 1);
+            if(!await this.storage.fileExists(directoryPath)){
+                await this.storage.makeDir(directoryPath);
+            }
+
             return null;
         }
 
