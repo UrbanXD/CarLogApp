@@ -160,7 +160,7 @@ const CarsBlock: React.FC<CarsBlockProps> = ({ openNewCarBottomSheet }) => {
                                 index={ index }
                                 size={ size }
                                 x={ coordinate }
-                                isFocused={ false }
+                                overlay
                                 item={ item }
                                 onPress={function (): void {
                                     console.log("xd")

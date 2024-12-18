@@ -4,10 +4,10 @@ import Animated, { SharedValue, useAnimatedScrollHandler, useSharedValue } from 
 import {FlatList} from "react-native-gesture-handler";
 
 export interface CarouselItemType {
-    id: string,
-    image?: ImageSourcePropType
-    title: string,
-    subtitle: string,
+    id?: string,
+    image?: ImageSourcePropType | string
+    title?: string,
+    subtitle?: string,
     selected?: boolean
 }
 

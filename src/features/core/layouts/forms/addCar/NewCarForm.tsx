@@ -88,6 +88,8 @@ const StepOne: React.FC = () => {
                 control={ control }
                 fieldName="image"
                 fieldNameText={"Adj kepekt"}
+                defaultImages={[require("../../../../../assets/images/car2.jpg")]}
+                multipleSelection
             />
         </>
     )

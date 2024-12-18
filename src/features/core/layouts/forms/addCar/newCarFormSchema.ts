@@ -80,7 +80,7 @@ export const newCarUseFormProps = {
         fuelType: "",
         fuelMeasurement: "",
         fuelTankSize: 0,
-        image: null,
+        image: {},//nulL
     },
     resolver: zodResolver(newCarFormSchema)
 }

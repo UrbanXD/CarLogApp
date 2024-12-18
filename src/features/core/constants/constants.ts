@@ -47,7 +47,8 @@ export const ICON_NAMES = {
     car: "car-outline",
     nametag: "tag-text-outline",
     odometer: "gauge",
-    search: "magnify"
+    search: "magnify",
+    addImage: "image-plus"
 }
 
 export const ICON_COLORS = {

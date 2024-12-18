@@ -19,12 +19,13 @@ import {
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { CarouselItemType } from "./Carousel";
 import { IconButton } from "react-native-paper";
+import { encode } from "base64-arraybuffer";
 
 interface CarouselItemProps {
     index: number
     size: number
     x: SharedValue<number>
-    isFocused: boolean
+    overlay?: boolean
     item: CarouselItemType
     onPress: (index: number) => void
 }
@@ -32,7 +33,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
     index,
     size,
     x,
-    isFocused,
+    overlay = false,
     item,
     onPress
 }) => {
@@ -57,22 +58,27 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
         >
             <Animated.View style={ [styles.itemContainer, animatedStyle ] }>
                 {
-                    !isFocused && <View style={styles.overlay} />
+                    overlay && <View style={ styles.overlay } />
                 }
                 <ImageBackground
                     source={
                         !item.image
                             ? require("../../../../assets/images/car1.jpg")
-                            : item.image
+                            : typeof item.image === "string"
+                                ? { uri: `data:image/jpeg;base64,${item.image}` }
+                                : item.image
                     }
                     style={ styles.itemContentContainer }
                     imageStyle={ styles.itemImage }
                 >
-                    <LinearGradient
-                        locations={[ 0, 0.85 ]}
-                        colors={ [hexToRgba(theme.colors.black, 0.15), hexToRgba(theme.colors.black, 0.95)] }
-                        style={ styles.imageOverlay }
-                    />
+                    {
+                        overlay &&
+                        <LinearGradient
+                            locations={[ 0, 0.85 ]}
+                            colors={ [hexToRgba(theme.colors.black, 0.15), hexToRgba(theme.colors.black, 0.95)] }
+                            style={ styles.imageOverlay }
+                        />
+                    }
                     <View style={ styles.topContainer }>
                         <Text style={ styles.topContainerTitleText }>
                             { item.id }
@@ -94,15 +100,6 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                             <Text numberOfLines={ 2 } style={ styles.infoSubtitleText }>
                                 { item.subtitle }
                             </Text>
-                        </View>
-                        <View style={ styles.rightContainer }>
-                            <IconButton
-                                onPress={() => console.log("hllo")}
-                                size={ FONT_SIZES.medium }
-                                icon={ ICON_NAMES.pencil }
-                                iconColor={ theme.colors.white }
-                                style={ GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium * 1.25) }
-                            />
                         </View>
                     </View>
                 </ImageBackground>
@@ -127,7 +124,7 @@ const styles = StyleSheet.create({
     itemContentContainer: {
         flex: 1,
         borderWidth: 0.5,
-        borderRadius: 35,
+        borderRadius: 38,
         borderColor: theme.colors.gray3
     },
     itemImage: {
@@ -208,11 +205,6 @@ const styles = StyleSheet.create({
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 10,
         letterSpacing: FONT_SIZES.extraSmall * 0.05
-    },
-    rightContainer: {
-        width: "20%",
-        justifyContent: "flex-end",
-        alignItems: "flex-end"
     }
 })
 
