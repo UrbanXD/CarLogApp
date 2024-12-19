@@ -38,21 +38,21 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
     onPress
 }) => {
     const animatedStyle = useAnimatedStyle(() => {
-        const scale = interpolate(
+        const scaleY = interpolate(
             x.value,
             [size * (index - 1), size * index , size * (index + 1)],
-            [0.9, 1, 0.9],
+            [0.85, 1, 0.85],
         );
 
         return {
-            transform: [{scale}]
+            transform: [{ scaleY }]
         };
     });
 
     return (
         <TouchableOpacity
             activeOpacity={ 1 }
-            style={{ width: size }}
+            style={{ width: size, paddingHorizontal: 10 }}
             onPress={ () => onPress(index) }
             disabled={ item.selected }
         >
@@ -101,6 +101,16 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                                 { item.subtitle }
                             </Text>
                         </View>
+                        <View style={ styles.rightContainer }>
+                            <IconButton
+                                onPress={() => console.log("hllo")}
+                                size={ FONT_SIZES.medium }
+                                icon={ ICON_NAMES.close }
+                                iconColor={ theme.colors.redLight }
+                                containerColor={ hexToRgba(theme.colors.black, 0.75) }
+                                style={ [GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium * 1.35), { borderColor: theme.colors.redLight, borderWidth: 2 }] }
+                            />
+                        </View>
                     </View>
                 </ImageBackground>
             </Animated.View>
@@ -129,7 +139,7 @@ const styles = StyleSheet.create({
     },
     itemImage: {
         width: "100%",
-        resizeMode: "cover",
+        resizeMode: "stretch",
         borderRadius: 35,
     },
     imageOverlay: {
@@ -182,7 +192,8 @@ const styles = StyleSheet.create({
         bottom: 0,
         width: "100%",
         flexDirection: "row",
-        paddingHorizontal: SEPARATOR_SIZES.normal,
+        paddingLeft: SEPARATOR_SIZES.normal,
+        paddingRight: SEPARATOR_SIZES.lightSmall,
         paddingVertical: SEPARATOR_SIZES.small,
     },
     infoContainer: {
@@ -205,6 +216,11 @@ const styles = StyleSheet.create({
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 10,
         letterSpacing: FONT_SIZES.extraSmall * 0.05
+    },
+    rightContainer: {
+        width: "20%",
+        justifyContent: "flex-end",
+        alignItems: "flex-end"
     }
 })
 

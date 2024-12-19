@@ -75,21 +75,22 @@ const StepOne: React.FC = () => {
 
     return (
         <>
-            <InputText
-                control={ control }
-                fieldName="name"
-                fieldNameText="Autó azonosító"
-                fieldInfoText="Az autó elnevezése, azonosítója mely az Ön számára lehet fontos autója azonosításakor."
-                placeholder="AA-0000-BB"
-                icon={ ICON_NAMES.nametag }
-                isInBottomSheet
-            />
+            {/*<InputText*/}
+            {/*    control={ control }*/}
+            {/*    fieldName="name"*/}
+            {/*    fieldNameText="Autó azonosító"*/}
+            {/*    // fieldInfoText="Az autó elnevezése, azonosítója mely az Ön számára lehet fontos autója azonosításakor."*/}
+            {/*    placeholder="AA-0000-BB"*/}
+            {/*    icon={ ICON_NAMES.nametag }*/}
+            {/*    isInBottomSheet*/}
+            {/*/>*/}
             <InputImagePicker
                 control={ control }
                 fieldName="image"
-                fieldNameText={"Adj kepekt"}
-                defaultImages={[require("../../../../../assets/images/car2.jpg")]}
-                multipleSelection
+                fieldNameText="Autó képek"
+                fieldInfoText="Az autójáról tölthet fel maxiumu 6 darab képet. Ezen feltöltött képeket csak Ön fogja látni."
+                // defaultImages={[require("../../../../../assets/images/car2.jpg")]}
+                multipleSelection={false}
             />
         </>
     )

@@ -16,14 +16,17 @@ import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../carousel/CarouselItem";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { formatImageSource } from "../../utils/formatImageSource";
-import { Icon } from "react-native-paper";
-import { ICON_NAMES } from "../../constants/constants";
+import { Icon, IconButton } from "react-native-paper";
+import {FONT_SIZES, GET_ICON_BUTTON_RESET_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/constants";
 import { theme } from "../../constants/theme";
+import InputTitle from "./InputTitle";
+import hexToRgba from "hex-to-rgba";
 
 interface InputImagePickerProps {
     control: Control<any>
     fieldName: string
     fieldNameText?: string
+    fieldInfoText?: string
     defaultImages?: Array<ImageSourcePropType | string>
     limitOfImages?: number
     multipleSelection?: boolean
@@ -33,12 +36,33 @@ const InputImagePicker:React.FC<InputImagePickerProps> = ({
     control,
     fieldName,
     fieldNameText,
+    fieldInfoText,
     defaultImages = [],
     limitOfImages = 5,
     multipleSelection = false,
 }) => {
     const [selectedImage, setSelectedImage] = useState<ImageSourcePropType | string | undefined>(defaultImages.length === 0 || multipleSelection ? undefined : defaultImages[0]);
     const [history, setHistory] = useState(defaultImages);
+
+    const addImagesToHistory = (newImages: Array<ImageSourcePropType | string>) => {
+        setHistory(prevHistory => {
+            const newHistoryLength = history.length + newImages.length;
+            const limit = limitOfImages + defaultImages.length;
+
+            if(newHistoryLength > limit) {
+                const removeStartIndex = defaultImages.length;
+                const removeEndIndex = newHistoryLength - limit;
+
+                if(removeEndIndex >= limit){
+                    return [...newImages.slice(0, limit)];
+                }
+
+                return [...prevHistory.slice(0, removeStartIndex), ...prevHistory.slice(removeEndIndex + 1), ...newImages];
+            }
+            console.log(newHistoryLength, [...prevHistory, ...newImages].length)
+            return [...prevHistory, ...newImages];
+        })
+    }
 
     const selectImage = (newImage: ImageSourcePropType | string) => {
         if(multipleSelection) return;
@@ -77,89 +101,104 @@ const InputImagePicker:React.FC<InputImagePickerProps> = ({
         });
     }
 
+    const [size, setSize] = useState({ width: 0, height: 0 });
+
+    const handleLayout = (event: any) => {
+        const { width, height } = event.nativeEvent.layout;
+        setSize({ width, height });
+    };
+
     return (
         <Controller
             control={ control }
             name={ fieldName }
             render={
-                ({ field: { value, onChange }, fieldState: {error} }) =>
-                    <View style={{ height: hp(27.5) }}>
+                ({ field: { onChange }, fieldState: {error} }) =>
+                    <View style={ styles.inputContainer }>
                         {
-                            !multipleSelection &&
-                            <Image
-                                source={
-                                    history.length === 0
-                                        ? require("../../../../assets/images/car1.jpg")
-                                        : formatImageSource(selectedImage || require("../../../../assets/images/car2.jpg"))
-                                }
-                                style={{
-                                    width: 150,
-                                    height: 100
-                                }}
+                            fieldNameText &&
+                            <InputTitle
+                                title={ fieldNameText }
+                                subtitle={ fieldInfoText }
                             />
                         }
-                        <Carousel
-                            data={ history }
-                            itemSizePercentage={ 0.55 }
-                            spacer={ 0 }
-                            renderItem={
-                                (item: ImageSourcePropType, index: number, size: number, coordinate: SharedValue<number> ) => {
-                                    const itemCarousel: CarouselItemType = {
-                                        image: item
-                                    }
-                                    return (
-                                        <>
-                                            {
-                                                index === 0
-                                                ?   <TouchableOpacity
-                                                        style={{ width: size }}
-                                                        activeOpacity={ 1 }
-                                                        onPress={
-                                                            async () => {
-                                                                const images = await pickImage({
-                                                                    allowsMultipleSelection: multipleSelection,
-                                                                    selectionLimit: limitOfImages
-                                                                });
-
-                                                                if(!images){
-                                                                    return;
-                                                                }
-                                                                
-                                                                onChange(images[0]);
-                                                                selectImage(encode(images[0].buffer));
-                                                            }
-                                                        }
-                                                    >
-                                                        <View style={styles.container}>
-                                                            <Icon
-                                                                source={ ICON_NAMES.addImage }
-                                                                size={ size / 2.5 }
-                                                                color={ theme.colors.white }
-                                                            />
-                                                            <View style={[styles.corner, styles.topLeft]} />
-                                                            <View style={[styles.corner, styles.topRight]} />
-                                                            <View style={[styles.corner, styles.bottomLeft]} />
-                                                            <View style={[styles.corner, styles.bottomRight]} />
-                                                        </View>
-                                                </TouchableOpacity>
-                                                :   <></>
-                                            }
-                                            <></>
-                                            <CarouselItem
-                                                index={ index }
-                                                size={ size }
-                                                x={ coordinate }
-                                                item={ itemCarousel }
-                                                onPress={ () => selectImage(item) }
-                                            />
-                                        </>
-                                    )
-                                }
-                            }
-                        />
                         {
-                            error ? <Text style={{ color: "green" }}>{error.message}</Text> : <></>
+                            !multipleSelection &&
+                            <>
+                                <Image
+                                    source={
+                                        history.length === 0
+                                            ? require("../../../../assets/images/car1.jpg")
+                                            : formatImageSource(selectedImage || require("../../../../assets/images/car2.jpg"))
+                                    }
+                                    style={ [styles.chosenImage, { height: size.height * 1.25 }] }
+                                />
+                                <InputTitle title="Kiválasztható képek" />
+                            </>
                         }
+                        <View style={ styles.secondRowContainer }>
+                            <View style={ styles.uploadButtonContainer }>
+                                <Button
+                                    icon={ ICON_NAMES.upArrowHead }
+                                    onPress={
+                                        async () => {
+                                            const images = await pickImage({
+                                                allowsMultipleSelection: multipleSelection,
+                                                selectionLimit: limitOfImages
+                                            });
+
+                                            if(!images){
+                                                return;
+                                            }
+
+                                            if(!multipleSelection) {
+                                                selectImage(encode(images[0].buffer));
+                                            } else {
+                                                addImagesToHistory(images.map(img => encode(img.buffer)));
+                                            }
+
+                                            onChange(images[0]);
+                                        }
+                                    }
+                                />
+                            </View>
+                            <View style={ styles.imagesContainer } onLayout={ handleLayout }>
+                                <Carousel
+                                    data={ history }
+                                    contentWidth={ size.width }
+                                    renderItem={
+                                        (item: ImageSourcePropType, index: number, size: number, coordinate: SharedValue<number> ) => {
+                                            const itemCarousel: CarouselItemType = {
+                                                image: item
+                                            }
+                                            return (
+                                                <CarouselItem
+                                                    index={ index }
+                                                    size={ size }
+                                                    x={ coordinate }
+                                                    item={ itemCarousel }
+                                                    onPress={ () => selectImage(item) }
+                                                />
+                                            )
+                                        }
+                                    }
+                                    renderDefaultItem={
+                                        () =>
+                                            <View style={ styles.defaultItemContainer }>
+                                                <IconButton
+                                                    icon={ ICON_NAMES.image }
+                                                    size={ FONT_SIZES.extraLarge }
+                                                    iconColor={ theme.colors.gray3 }
+                                                    style={ GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.extraLarge) }
+                                                />
+                                            </View>
+                                    }
+                                />
+                            </View>
+                            {
+                                error ? <Text style={{ color: "green" }}>{error.message}</Text> : <></>
+                            }
+                        </View>
                     </View>
             }
         />
@@ -167,52 +206,44 @@ const InputImagePicker:React.FC<InputImagePickerProps> = ({
 }
 
 const styles = StyleSheet.create({
-    container: {
+    inputContainer: {
+        flexDirection: "column",
+        gap: SEPARATOR_SIZES.lightSmall,
+    },
+    chosenImage: {
         width: "100%",
-        height: "100%",
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'relative',
-        marginRight: 50,
+        resizeMode: "stretch",
+        borderRadius: 35,
     },
-    corner: {
-        position: 'absolute',
-        width: 50,
-        height: 50,
-        borderColor: theme.colors.gray2,
-        borderRadius: 5
+    secondRowContainer: {
+        flexDirection: "row",
+        gap: SEPARATOR_SIZES.lightSmall,
+        // height: 150,
     },
-    topLeft: {
-        top: 0,
-        left: 0,
-        borderTopWidth: 6,
-        borderLeftWidth: 6,
-        borderRightWidth: 0,
-        borderBottomWidth: 0,
+    uploadButtonContainer: {
+        flex: 0.25,
+        justifyContent: "center",
+        alignItems: "center",
     },
-    topRight: {
-        top: 0,
-        right: 0,
-        borderTopWidth: 6,
-        borderRightWidth: 6,
-        borderLeftWidth: 0,
-        borderBottomWidth: 0,
+    imagesContainer: {
+        flex: 1,
+        height: hp(17.5),
     },
-    bottomLeft: {
-        bottom: 0,
-        left: 0,
-        borderBottomWidth: 6,
-        borderLeftWidth: 6,
-        borderTopWidth: 0,
-        borderRightWidth: 0,
+    defaultItemContainer: {
+        flex: 1,
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: hexToRgba(theme.colors.gray4, 0.65),
+        borderWidth: 0.5,
+        borderRadius: 38,
+        borderColor: theme.colors.gray3
     },
-    bottomRight: {
-        bottom: 0,
-        right: 0,
-        borderBottomWidth: 6,
-        borderRightWidth: 6,
-        borderTopWidth: 0,
-        borderLeftWidth: 0,
+    defaultItemImage: {
+        width: "100%",
+        height: hp(17.5),
+        resizeMode: "stretch",
+        borderRadius: 35,
     },
 });
 

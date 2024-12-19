@@ -30,14 +30,12 @@ const InputTitle: React.FC<InputTitleProps> = ({
 
 const styles = StyleSheet.create({
     inputNameText: {
-        paddingLeft: SEPARATOR_SIZES.lightSmall,
         fontSize: hp(2.75),
         fontFamily: "Gilroy-Heavy",
         color: theme.colors.white
     },
     inputInfoText: {
         ...GLOBAL_STYLE.containerText,
-        paddingLeft: SEPARATOR_SIZES.lightSmall
     }
 })
 

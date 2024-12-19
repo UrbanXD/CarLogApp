@@ -32,6 +32,7 @@ export const ICON_NAMES = {
     leftArrowHead: "chevron-left",
     leftArrow: "arrow-left",
     downArrowHead: "chevron-down",
+    upArrowHead: "upload",
     info: "information-outline",
     destinationPointMarker: "map-marker",
     startingPointMarker: "map-marker-outline",
@@ -48,7 +49,8 @@ export const ICON_NAMES = {
     nametag: "tag-text-outline",
     odometer: "gauge",
     search: "magnify",
-    addImage: "image-plus"
+    addImage: "image-plus",
+    image: "image-outline"
 }
 
 export const ICON_COLORS = {
