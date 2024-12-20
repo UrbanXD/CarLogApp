@@ -26,9 +26,7 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
 
     const slideAnimationStyle = useAnimatedStyle(() => {
         return {
-            transform: [{
-                translateX: withTiming(TAB_WIDTH * state.index)
-            }]
+            transform: [{ translateX: withTiming(TAB_WIDTH * state.index) }]
         }
     });
 
@@ -47,12 +45,12 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
                     const icons =
                         JSON.parse(
                             options.tabBarIcon
-                                ? options.tabBarIcon({
-                                    focused: isFocused,
-                                    color: isFocused ? tabBarActiveTintColor : "red",
-                                    size: 25,
-                                }) as string
-                                : "help"
+                                ?   options.tabBarIcon({
+                                        focused: isFocused,
+                                        color: isFocused ? tabBarActiveTintColor : "red",
+                                        size: 500,
+                                    }) as string
+                                :   "help"
                         )
 
                     const icon = icons[isFocused ? "active" : "inactive"]
@@ -79,14 +77,13 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
                     return (
                         <TabBarIcon
                             key={ index }
-                            title={ options.title || route.name }
-                            textColor={ color }
-                            focused={ isFocused }
-                            focusedColor={ color }
                             iconName={ icon }
+                            iconSize={ FONT_SIZES.medium }
+                            iconColor={ theme.colors.black }
+                            focused={ isFocused }
+                            width={ TAB_WIDTH }
                             onPress={ onPress }
                             onLongPress={ onLongPress }
-                            width={ TAB_WIDTH }
                         />
                     );
                 })
@@ -97,13 +94,19 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
 
 const styles = StyleSheet.create({
     container: {
+        position: "absolute",
+        bottom: 0,
         flexDirection: "row",
         alignSelf: "center",
         justifyContent: "space-between",
         alignItems: "center",
         height: SIMPLE_TABBAR_HEIGHT,
-        backgroundColor: theme.colors.black2,
-        borderColor: theme.colors.gray2,
+        backgroundColor: theme.colors.fuelYellow,
+        borderWidth: 3.5,
+        borderBottomWidth: 0,
+        borderColor: theme.colors.black5,
+        borderTopRightRadius: 45,
+        borderTopLeftRadius: 45,
     },
     titleText: {
         fontSize: FONT_SIZES.normal,
@@ -115,8 +118,8 @@ const styles = StyleSheet.create({
     },
     slidingElement: {
         width: "100%",
-        height: hp(0.4),
-        backgroundColor: theme.colors.fuelYellow
+        height: hp(0.5),
+        backgroundColor: theme.colors.black5
     }
 })
 

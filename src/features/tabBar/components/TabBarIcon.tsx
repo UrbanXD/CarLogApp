@@ -1,19 +1,16 @@
 import React, { useEffect } from "react";
 import { Pressable, StyleSheet } from "react-native";
-import { Icon } from "react-native-paper";
 import Animated, {
     interpolate,
     useAnimatedStyle,
     useSharedValue,
     withSpring,
 } from "react-native-reanimated";
-import { FONT_SIZES } from "../../core/constants/constants";
+import Icon from "../../core/components/shared/Icon";
+import { theme } from "../../core/constants/theme";
 
 interface TabBarIconProp {
-    title?: string
-    textColor: string
     focused: boolean
-    focusedColor?: string
     iconName?: string
     iconColor?: string,
     iconSize?: number,
@@ -23,13 +20,10 @@ interface TabBarIconProp {
 }
 
 const TabBarIcon: React.FC<TabBarIconProp> = ({
-    title = "",
-    textColor,
     focused,
-    focusedColor = "#00000",
     iconName = "home",
-    iconColor = textColor,
-    iconSize = 28,
+    iconColor = theme.colors.white,
+    iconSize,
     onPress,
     onLongPress,
     width
@@ -69,7 +63,7 @@ const TabBarIcon: React.FC<TabBarIconProp> = ({
         }
     })
 
-    const styles = useStyles(focused, width, textColor);
+    const styles = useStyles(width);
 
     return (
         <Pressable
@@ -78,12 +72,11 @@ const TabBarIcon: React.FC<TabBarIconProp> = ({
             style={ styles.iconContainer }
         >
             <Animated.View style={ animatedIconSizeStyle }>
-                <Icon size={ iconSize } source={ iconName } color={ iconColor } />
-                {
-                    <Animated.Text style={ styles.iconText }>
-                        { title }
-                    </Animated.Text>
-                }
+                <Icon
+                    icon={ iconName }
+                    size={ iconSize }
+                    color={ iconColor }
+                />
             </Animated.View>
         </Pressable>
     )
@@ -91,7 +84,7 @@ const TabBarIcon: React.FC<TabBarIconProp> = ({
 
 export default TabBarIcon;
 
-const useStyles = (focused: boolean, iconWidth: number, textColor: string,) =>
+const useStyles = (iconWidth: number) =>
     StyleSheet.create({
         iconContainer: {
             alignSelf: "center",
@@ -99,12 +92,5 @@ const useStyles = (focused: boolean, iconWidth: number, textColor: string,) =>
             alignItems: "center",
             height: "100%",
             width: iconWidth
-        },
-        iconText: {
-            color: textColor,
-            textAlign: "center",
-            fontFamily:"Gilroy-Medium",
-            fontSize: FONT_SIZES.extraSmall * 0.9,
-            display: focused ? "none" : "flex"
         }
     })

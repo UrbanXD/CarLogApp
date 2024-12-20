@@ -6,13 +6,8 @@ import TabBar from "../../features/tabBar/components/TabBar";
 const TabLayout:React.FC = () => {
     return (
         <Tabs
-            tabBar={
-                (props) =>
-                    <TabBar { ...props } />
-            }
-            screenOptions={{
-                headerShown: false,
-            }}
+            tabBar={ (props) => <TabBar { ...props } /> }
+            screenOptions={{ headerShown: false }}
         >
             <Tabs.Screen
                 name="index"

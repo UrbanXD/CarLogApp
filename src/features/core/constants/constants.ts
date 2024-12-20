@@ -12,7 +12,9 @@ export interface GetFormHandleSubmitArgs {
 }
 
 
-export const CAR_NAME_LENGTH = 10
+export const CAR_NAME_LENGTH = 10;
+export const SIMPLE_HEADER_HEIGHT = hp(6.75);
+export const SIMPLE_TABBAR_HEIGHT = hp(7.5);
 
 export const LOCAL_STORAGE_KEYS = {
     selectedCarIndex: "selectedCarIndex"
@@ -88,6 +90,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
         flex: 1,
         // paddingHorizontal: DEFAULT_SEPARATOR,
         paddingVertical: SEPARATOR_SIZES.small,
+        paddingBottom: SIMPLE_TABBAR_HEIGHT * 1.25
     },
     scrollViewContentContainer: {
         flexGrow: 1,
@@ -149,9 +152,6 @@ export const GET_ICON_BUTTON_RESET_STYLE = (size: number = FONT_SIZES.normal) =>
 
 export const COLLAPSIBLE_HEADER_HEIGHT = 180;
 export const COLLAPSIBLE_HEADER_IMAGE = 110;
-
-export const SIMPLE_HEADER_HEIGHT = hp(6.75);
-export const SIMPLE_TABBAR_HEIGHT = hp(6.75);
 
 export interface CarBrandsType {
     [key: string]: Array<CarModelsType>;
