@@ -19,7 +19,6 @@ import { useMultiStepForm } from "../../../context/MultiStepFormProvider";
 import { MultiStepForm } from "../../../components/form/Form";
 import InputText from "../../../components/form/InputText/InputText";
 import InputPicker, { InputPickerDataType } from "../../../components/form/InputPicker/InputPicker";
-import InputImagePicker from "../../../components/form/InputImagePicker";
 
 interface NewCarFormProps {
     close?: () => void
@@ -74,25 +73,15 @@ const StepOne: React.FC = () => {
     const { control } = useMultiStepForm();
 
     return (
-        <>
-            {/*<InputText*/}
-            {/*    control={ control }*/}
-            {/*    fieldName="name"*/}
-            {/*    fieldNameText="Autó azonosító"*/}
-            {/*    // fieldInfoText="Az autó elnevezése, azonosítója mely az Ön számára lehet fontos autója azonosításakor."*/}
-            {/*    placeholder="AA-0000-BB"*/}
-            {/*    icon={ ICON_NAMES.nametag }*/}
-            {/*    isInBottomSheet*/}
-            {/*/>*/}
-            <InputImagePicker
-                control={ control }
-                fieldName="image"
-                fieldNameText="Autó képek"
-                fieldInfoText="Az autójáról tölthet fel maxiumu 6 darab képet. Ezen feltöltött képeket csak Ön fogja látni."
-                // defaultImages={[require("../../../../../assets/images/car2.jpg")]}
-                multipleSelection={false}
-            />
-        </>
+        <InputText
+            control={ control }
+            fieldName="name"
+            fieldNameText="Autó azonosító"
+            fieldInfoText="Az autó elnevezése, azonosítója mely az Ön számára lehet fontos autója azonosításakor."
+            placeholder="AA-0000-BB"
+            icon={ ICON_NAMES.nametag }
+            isInBottomSheet
+        />
     )
 }
 

@@ -8,7 +8,7 @@ import { getUUID } from "../../../utils/uuid";
 import { ImageType } from "../../../utils/pickImage";
 import { CarTableType } from "../../../utils/database/powersync/AppSchema";
 
-export const newCarFormStepsField = [["name", "image"], ["brand", "model"], ["odometerValue", "odometerMeasurement"], ["fuelType", "fuelMeasurement", "fuelTankSize"]];
+export const newCarFormStepsField = [["name"], ["brand", "model"], ["odometerValue", "odometerMeasurement"], ["fuelType", "fuelMeasurement", "fuelTankSize"]];
 export const newCarFormStepsTitle = ["Elnevezés", "Gyártó", "Autó adatok", "Autó adatok"];
 
 export const ODOMETER_MEASUREMENTS: Array<InputPickerDataType> = [
@@ -38,7 +38,7 @@ export interface NewCarFormFieldType {
     fuelType: string
     fuelMeasurement: string
     fuelTankSize: number
-    image?: ImageType
+    image?: ImageType | null
 }
 
 const zNumber = z
@@ -80,7 +80,7 @@ export const newCarUseFormProps = {
         fuelType: "",
         fuelMeasurement: "",
         fuelTankSize: 0,
-        image: {},//nulL
+        image: null,
     },
     resolver: zodResolver(newCarFormSchema)
 }

@@ -38,33 +38,9 @@ const HomeScreen: React.FC = () => {
         store.dispatch(loadCars(db))
     }, []);
     console.log("homescren rerender")
-    // const onP = async () => {
-    //     const service: ServiceType = {
-    //         id: getUUID(),
-    //         car: "4222d62c-71a8-4f0a-a64a-c0c2bf00b222",
-    //         odometer: "400000",
-    //         price: 50000,
-    //         date: getDate(),
-    //         type: "alt",
-    //         works: JSON.stringify({"xd": "ertek"}),
-    //         mechanic: "rudi",
-    //         comment: "comment"
-    //     }
-    //     // await db.insertInto(SERVICE_TABLE).values(service).execute();
-    //     const xd = await db.selectFrom(SERVICE_TABLE).selectAll().execute()
-    //     xd.map((i, index) => console.log(index))
-    //     // console.log(xd)
-    // }
 
     return (
         <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, styles.pageContainer] }>
-            {/*<CustomBottomSheet*/}
-            {/*    ref={ bottomSheetModalRef }*/}
-            {/*    title={ bottomSheetTitle }*/}
-            {/*    snapPoints={ ["85%"] }*/}
-            {/*>*/}
-            {/*    { bottomSheetContent }*/}
-            {/*</CustomBottomSheet>*/}
             <ScrollView
                 showsVerticalScrollIndicator={ false }
                 nestedScrollEnabled={ true }
@@ -162,9 +138,6 @@ const CarsBlock: React.FC<CarsBlockProps> = ({ openNewCarBottomSheet }) => {
                                 x={ coordinate }
                                 overlay
                                 item={ item }
-                                onPress={function (): void {
-                                    console.log("xd")
-                                }}
                             />
                     }
                 />

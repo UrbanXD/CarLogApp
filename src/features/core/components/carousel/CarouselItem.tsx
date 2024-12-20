@@ -19,7 +19,6 @@ import {
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { CarouselItemType } from "./Carousel";
 import { IconButton } from "react-native-paper";
-import { encode } from "base64-arraybuffer";
 
 interface CarouselItemProps {
     index: number
@@ -27,15 +26,18 @@ interface CarouselItemProps {
     x: SharedValue<number>
     overlay?: boolean
     item: CarouselItemType
-    onPress: (index: number) => void
+    cardAction?: () => void
+    bottomAction?: () => void
 }
+
 const CarouselItem: React.FC<CarouselItemProps> = ({
     index,
     size,
     x,
     overlay = false,
     item,
-    onPress
+    cardAction,
+    bottomAction,
 }) => {
     const animatedStyle = useAnimatedStyle(() => {
         const scaleY = interpolate(
@@ -53,8 +55,8 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
         <TouchableOpacity
             activeOpacity={ 1 }
             style={{ width: size, paddingHorizontal: 10 }}
-            onPress={ () => onPress(index) }
-            disabled={ item.selected }
+            onPress={ cardAction }
+            disabled={ !cardAction }
         >
             <Animated.View style={ [styles.itemContainer, animatedStyle ] }>
                 {
@@ -101,16 +103,19 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                                 { item.subtitle }
                             </Text>
                         </View>
-                        <View style={ styles.rightContainer }>
-                            <IconButton
-                                onPress={() => console.log("hllo")}
-                                size={ FONT_SIZES.medium }
-                                icon={ ICON_NAMES.close }
-                                iconColor={ theme.colors.redLight }
-                                containerColor={ hexToRgba(theme.colors.black, 0.75) }
-                                style={ [GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium * 1.35), { borderColor: theme.colors.redLight, borderWidth: 2 }] }
-                            />
-                        </View>
+                        {
+                            bottomAction &&
+                            <View style={ styles.rightContainer }>
+                                <IconButton
+                                    onPress={ bottomAction }
+                                    size={ FONT_SIZES.medium }
+                                    icon={ ICON_NAMES.close }
+                                    iconColor={ theme.colors.redLight }
+                                    containerColor={ hexToRgba(theme.colors.black, 0.75) }
+                                    style={ [GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium * 1.35), { borderColor: theme.colors.redLight, borderWidth: 2 }] }
+                                />
+                            </View>
+                        }
                     </View>
                 </ImageBackground>
             </Animated.View>
