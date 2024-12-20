@@ -2,15 +2,12 @@ import { StyleSheet } from "react-native";
 import { theme } from "./theme";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { UseFormHandleSubmit } from "react-hook-form";
-import { SupabaseConnector } from "../utils/database/SupabaseConnector";
-import { Kysely } from "@powersync/kysely-driver";
-import { DatabaseType } from "../utils/database/AppSchema";
-import { InputPickerDataType } from "../../form/components/InputPicker/InputPicker";
+import { Database } from "../utils/database/Database";
+import { InputPickerDataType } from "../components/form/InputPicker/InputPicker";
 
 export interface GetFormHandleSubmitArgs {
     handleSubmit: UseFormHandleSubmit<any>
-    supabaseConnector?: SupabaseConnector
-    db?: Kysely<DatabaseType>
+    database: Database
     onSubmit?: (isSuccess: boolean) => void
 }
 
@@ -35,6 +32,7 @@ export const ICON_NAMES = {
     leftArrowHead: "chevron-left",
     leftArrow: "arrow-left",
     downArrowHead: "chevron-down",
+    upArrowHead: "upload",
     info: "information-outline",
     destinationPointMarker: "map-marker",
     startingPointMarker: "map-marker-outline",
@@ -50,7 +48,9 @@ export const ICON_NAMES = {
     car: "car-outline",
     nametag: "tag-text-outline",
     odometer: "gauge",
-    search: "magnify"
+    search: "magnify",
+    addImage: "image-plus",
+    image: "image-outline"
 }
 
 export const ICON_COLORS = {

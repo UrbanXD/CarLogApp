@@ -4,22 +4,31 @@ import Animated, { SharedValue, useAnimatedScrollHandler, useSharedValue } from 
 import {FlatList} from "react-native-gesture-handler";
 
 export interface CarouselItemType {
-    id: string,
-    image?: ImageSourcePropType
-    title: string,
-    subtitle: string,
+    id?: string,
+    image?: ImageSourcePropType | string
+    title?: string,
+    subtitle?: string,
     selected?: boolean
 }
 
 export interface CarouselProps {
     data: Array<any>
     renderItem: (item: any, index: number, size: number, x: SharedValue<number>) => ReactElement
+    renderDefaultItem?: () => ReactElement
+    contentWidth?: number
     itemSizePercentage?: number
     spacer?: number
 }
 
-const Carousel: React.FC<CarouselProps> = ({ data, renderItem, itemSizePercentage = 0.8, spacer }) => {
-    const { width } = useWindowDimensions();
+const Carousel: React.FC<CarouselProps> = ({
+    data,
+    renderItem,
+    renderDefaultItem,
+    contentWidth,
+    itemSizePercentage = 0.8,
+    spacer
+}) => {
+    const width =  contentWidth ?? useWindowDimensions().width;
     const ITEM_SIZE = width * itemSizePercentage;
     const SPACER = spacer ?? (width - ITEM_SIZE) / 2;
 
@@ -57,6 +66,7 @@ const Carousel: React.FC<CarouselProps> = ({ data, renderItem, itemSizePercentag
                         }
                     </React.Fragment>
             }
+            ListEmptyComponent={ renderDefaultItem ? renderDefaultItem() : <></> }
             keyExtractor={ (_, index) => index.toString() }
             horizontal
             snapToInterval={ ITEM_SIZE }
@@ -69,7 +79,8 @@ const Carousel: React.FC<CarouselProps> = ({ data, renderItem, itemSizePercentag
             bouncesZoom={ false }
             renderToHardwareTextureAndroid
             contentContainerStyle={{
-                overflow: "hidden"
+                overflow: "hidden",
+                flexGrow: 1
             }}
         />
     )

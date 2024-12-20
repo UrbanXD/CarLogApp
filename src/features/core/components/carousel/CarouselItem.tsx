@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
     ImageBackground,
     StyleSheet,
@@ -24,51 +24,63 @@ interface CarouselItemProps {
     index: number
     size: number
     x: SharedValue<number>
-    isFocused: boolean
+    overlay?: boolean
     item: CarouselItemType
-    onPress: (index: number) => void
+    cardAction?: () => void
+    bottomAction?: () => void
 }
+
 const CarouselItem: React.FC<CarouselItemProps> = ({
     index,
     size,
     x,
-    isFocused,
+    overlay = false,
     item,
-    onPress
+    cardAction,
+    bottomAction,
 }) => {
     const animatedStyle = useAnimatedStyle(() => {
-        const scale = interpolate(
+        const scaleY = interpolate(
             x.value,
             [size * (index - 1), size * index , size * (index + 1)],
-            [0.9, 1, 0.9],
+            [0.85, 1, 0.85],
         );
 
         return {
-            transform: [{scale}]
+            transform: [{ scaleY }]
         };
     });
 
     return (
         <TouchableOpacity
             activeOpacity={ 1 }
-            style={{ width: size }}
-            onPress={ () => onPress(index) }
-            disabled={ item.selected }
+            style={{ width: size, paddingHorizontal: 10 }}
+            onPress={ cardAction }
+            disabled={ !cardAction }
         >
             <Animated.View style={ [styles.itemContainer, animatedStyle ] }>
                 {
-                    !isFocused && <View style={styles.overlay} />
+                    overlay && <View style={ styles.overlay } />
                 }
                 <ImageBackground
-                    source={ item.image || require("../../../../assets/images/car1.jpg") }
+                    source={
+                        !item.image
+                            ? require("../../../../assets/images/car1.jpg")
+                            : typeof item.image === "string"
+                                ? { uri: `data:image/jpeg;base64,${item.image}` }
+                                : item.image
+                    }
                     style={ styles.itemContentContainer }
                     imageStyle={ styles.itemImage }
                 >
-                    <LinearGradient
-                        locations={[ 0, 0.85 ]}
-                        colors={ [hexToRgba(theme.colors.black, 0.15), hexToRgba(theme.colors.black, 0.95)] }
-                        style={ styles.imageOverlay }
-                    />
+                    {
+                        overlay &&
+                        <LinearGradient
+                            locations={[ 0, 0.85 ]}
+                            colors={ [hexToRgba(theme.colors.black, 0.15), hexToRgba(theme.colors.black, 0.95)] }
+                            style={ styles.imageOverlay }
+                        />
+                    }
                     <View style={ styles.topContainer }>
                         <Text style={ styles.topContainerTitleText }>
                             { item.id }
@@ -91,15 +103,19 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                                 { item.subtitle }
                             </Text>
                         </View>
-                        <View style={ styles.rightContainer }>
-                            <IconButton
-                                onPress={() => console.log("hllo")}
-                                size={ FONT_SIZES.medium }
-                                icon={ ICON_NAMES.pencil }
-                                iconColor={ theme.colors.white }
-                                style={ GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium * 1.25) }
-                            />
-                        </View>
+                        {
+                            bottomAction &&
+                            <View style={ styles.rightContainer }>
+                                <IconButton
+                                    onPress={ bottomAction }
+                                    size={ FONT_SIZES.medium }
+                                    icon={ ICON_NAMES.close }
+                                    iconColor={ theme.colors.redLight }
+                                    containerColor={ hexToRgba(theme.colors.black, 0.75) }
+                                    style={ [GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium * 1.35), { borderColor: theme.colors.redLight, borderWidth: 2 }] }
+                                />
+                            </View>
+                        }
                     </View>
                 </ImageBackground>
             </Animated.View>
@@ -123,12 +139,12 @@ const styles = StyleSheet.create({
     itemContentContainer: {
         flex: 1,
         borderWidth: 0.5,
-        borderRadius: 35,
+        borderRadius: 38,
         borderColor: theme.colors.gray3
     },
     itemImage: {
         width: "100%",
-        resizeMode: "cover",
+        resizeMode: "stretch",
         borderRadius: 35,
     },
     imageOverlay: {
@@ -181,7 +197,8 @@ const styles = StyleSheet.create({
         bottom: 0,
         width: "100%",
         flexDirection: "row",
-        paddingHorizontal: SEPARATOR_SIZES.normal,
+        paddingLeft: SEPARATOR_SIZES.normal,
+        paddingRight: SEPARATOR_SIZES.lightSmall,
         paddingVertical: SEPARATOR_SIZES.small,
     },
     infoContainer: {

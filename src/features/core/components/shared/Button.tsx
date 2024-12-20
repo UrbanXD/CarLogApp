@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import { theme } from "../../constants/theme";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/constants";
-import { Icon } from "react-native-paper";
+import { FONT_SIZES, GET_ICON_BUTTON_RESET_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/constants";
+import { Icon, IconButton } from "react-native-paper";
 
 interface ButtonCommonProps {
     onPress: () => void
@@ -59,7 +59,12 @@ const Button: React.FC<ButtonCommonProps & ButtonOptionalProps> = ({
 }) => {
     const renderIcon = (icon: ImageSourcePropType | string) =>
         (typeof icon === "string")
-            ? <Icon source={ icon } size={ styles.icon.width * 1.5 } />
+            ?   <IconButton
+                    icon={ icon }
+                    iconColor={ styles.icon.color as string}
+                    size={ styles.icon.width * 1.5 }
+                    style={ [styles.icon, GET_ICON_BUTTON_RESET_STYLE(iconSize * 1.5)] }
+                />
             : <Image source={ icon } style={ styles.icon } />
 
     const styles =
@@ -82,7 +87,7 @@ const Button: React.FC<ButtonCommonProps & ButtonOptionalProps> = ({
             {
                 title
                     ?   <>
-                            <View style={ styles.sideSpacerContainer }>
+                            <View style={ [styles.sideSpacerContainer, { paddingLeft: SEPARATOR_SIZES.lightSmall }] }>
                                 {
                                     iconLeft &&
                                     renderIcon(iconLeft)
@@ -91,7 +96,7 @@ const Button: React.FC<ButtonCommonProps & ButtonOptionalProps> = ({
                             <Text numberOfLines={ 2 } style={ styles.buttonText } >
                                 { title }
                             </Text>
-                            <View style={ styles.sideSpacerContainer }>
+                            <View style={ [styles.sideSpacerContainer, { paddingRight: SEPARATOR_SIZES.lightSmall }] }>
                                 {
                                     iconRight && renderIcon(iconRight)
                                 }
@@ -135,7 +140,8 @@ const useStyles = (primaryColor: ColorValue, secondaryColor: ColorValue, isRecta
         icon: {
             alignSelf: "center",
             width: iconSize,
-            height: iconSize
+            height: iconSize,
+            color: primaryColor,
         }
     })
 
