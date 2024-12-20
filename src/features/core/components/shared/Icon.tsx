@@ -44,7 +44,7 @@ const useStyles = (size: number, backgroundColor: ColorValue | string) =>
             justifyContent: "center",
             alignItems: "center",
             backgroundColor,
-            // padding: backgroundColor === "transparent" ? 0 : SEPARATOR_SIZES.lightSmall
+            borderRadius: 50,
         }
     })
 
