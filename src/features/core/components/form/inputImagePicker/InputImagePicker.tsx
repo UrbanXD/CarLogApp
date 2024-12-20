@@ -16,9 +16,12 @@ import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../../carousel/CarouselItem";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { formatImageSource } from "../../../utils/formatImageSource";
-import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/constants";
+import {FONT_SIZES, GET_ICON_BUTTON_RESET_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/constants";
 import InputTitle from "../InputTitle";
 import DefaultImage from "./DefaultImage";
+import { IconButton } from "react-native-paper";
+import { theme } from "../../../constants/theme";
+import hexToRgba from "hex-to-rgba";
 
 interface InputImagePickerProps {
     control: Control<any>
@@ -179,7 +182,17 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                                                     x={ coordinate }
                                                     item={ itemCarousel }
                                                     cardAction={ () => selectImage(item) }
-                                                    bottomAction={ () => removeImageFromHistory(index) }
+                                                    renderBottomActionButton={
+                                                        () =>
+                                                            <IconButton
+                                                                onPress={ () => removeImageFromHistory(index) }
+                                                                size={ FONT_SIZES.medium }
+                                                                icon={ ICON_NAMES.close }
+                                                                iconColor={ theme.colors.redLight }
+                                                                containerColor={ hexToRgba(theme.colors.black, 0.75) }
+                                                                style={ [GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium * 1.35), { borderColor: theme.colors.redLight, borderWidth: 2 }] }
+                                                            />
+                                                    }
                                                 />
                                             )
                                         }

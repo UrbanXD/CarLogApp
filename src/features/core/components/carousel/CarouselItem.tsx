@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, {ReactElement, useEffect } from "react";
 import {
     ImageBackground,
     StyleSheet,
@@ -27,7 +27,8 @@ interface CarouselItemProps {
     overlay?: boolean
     item: CarouselItemType
     cardAction?: () => void
-    bottomAction?: () => void
+    renderBottomActionButton?: () => ReactElement
+    renderTopActionButton?: () => ReactElement
 }
 
 const CarouselItem: React.FC<CarouselItemProps> = ({
@@ -37,7 +38,8 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
     overlay = false,
     item,
     cardAction,
-    bottomAction,
+    renderBottomActionButton,
+    renderTopActionButton
 }) => {
     const animatedStyle = useAnimatedStyle(() => {
         const scaleY = interpolate(
@@ -85,14 +87,12 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                         <Text style={ styles.topContainerTitleText }>
                             { item.id }
                         </Text>
-                        <View style={ [styles.topContainerSelectedContainer, { width: styles.selectedContent.width, height: styles.selectedContent.height}] }>
-                            {
-                                item.selected &&
-                                <View style={ styles.selectedContent }>
-                                    <View style={ styles.selectedPoint } />
-                                </View>
-                            }
-                        </View>
+                        {
+                            renderTopActionButton &&
+                            <View style={ styles.actionContainer }>
+                                { renderTopActionButton() }
+                            </View>
+                        }
                     </View>
                     <View style={ styles.bottomContainer }>
                         <View style={ styles.infoContainer }>
@@ -104,16 +104,9 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                             </Text>
                         </View>
                         {
-                            bottomAction &&
-                            <View style={ styles.rightContainer }>
-                                <IconButton
-                                    onPress={ bottomAction }
-                                    size={ FONT_SIZES.medium }
-                                    icon={ ICON_NAMES.close }
-                                    iconColor={ theme.colors.redLight }
-                                    containerColor={ hexToRgba(theme.colors.black, 0.75) }
-                                    style={ [GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium * 1.35), { borderColor: theme.colors.redLight, borderWidth: 2 }] }
-                                />
+                            renderBottomActionButton &&
+                            <View style={ styles.actionContainer }>
+                                { renderBottomActionButton() }
                             </View>
                         }
                     </View>
@@ -153,8 +146,16 @@ const styles = StyleSheet.create({
     },
     topContainer: {
         flexDirection: "row",
+        padding: SEPARATOR_SIZES.lightSmall,
         paddingLeft: SEPARATOR_SIZES.normal,
-        paddingVertical: hp(0.45)
+    },
+    bottomContainer: {
+        position: "absolute",
+        bottom: 0,
+        width: "100%",
+        flexDirection: "row",
+        padding: SEPARATOR_SIZES.lightSmall,
+        paddingLeft: SEPARATOR_SIZES.normal,
     },
     topContainerTitleText: {
         flex: 1,
@@ -168,41 +169,8 @@ const styles = StyleSheet.create({
         letterSpacing: FONT_SIZES.normal * 0.05,
         lineHeight: FONT_SIZES.normal * 0.85,
     },
-    topContainerSelectedContainer: {
-        paddingLeft: SEPARATOR_SIZES.lightLarge,
-        marginTop: -hp(0.5)
-    },
-    selectedContent: {
-        position: "absolute",
-        right: 0,
-        width: hp(5), height: hp(5),
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: theme.colors.white,
-        borderTopRightRadius: 35,
-        borderBottomLeftRadius: 15,
-        borderColor: theme.colors.black,
-        borderBottomWidth: 3,
-        borderLeftWidth: 3,
-    },
-    selectedPoint: {
-        borderRadius: 100,
-        alignSelf: "center",
-        backgroundColor: theme.colors.black,
-        width: hp(1.25),
-        height: hp(1.25)
-    },
-    bottomContainer: {
-        position: "absolute",
-        bottom: 0,
-        width: "100%",
-        flexDirection: "row",
-        paddingLeft: SEPARATOR_SIZES.normal,
-        paddingRight: SEPARATOR_SIZES.lightSmall,
-        paddingVertical: SEPARATOR_SIZES.small,
-    },
     infoContainer: {
-        width: "80%",
+        flex: 1,
     },
     infoTitleText: {
         color: theme.colors.white,
@@ -222,7 +190,7 @@ const styles = StyleSheet.create({
         textShadowRadius: 10,
         letterSpacing: FONT_SIZES.extraSmall * 0.05
     },
-    rightContainer: {
+    actionContainer: {
         width: "20%",
         justifyContent: "flex-end",
         alignItems: "flex-end"
