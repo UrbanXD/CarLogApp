@@ -20,7 +20,9 @@ const Divider: React.FC<DividerProps> = ({
     const styles = useStyles(size, thickness, color, margin);
 
     return (
-        <View style={ isVertical ? styles.verticalLine : styles.horizontalLine } />
+        <View style={{ overflow: "hidden" }}>
+            <View style={ isVertical ? styles.verticalLine : styles.horizontalLine } />
+        </View>
     )
 }
 
