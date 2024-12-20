@@ -1,6 +1,6 @@
 import { z} from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { GetFormHandleSubmitArgs } from "../../../constants/constants";
+import { GetFormHandleSubmitArgs } from "../../../core/constants/constants";
 import { Alert } from "react-native";
 
 export interface LoginFormFieldType {
@@ -22,10 +22,10 @@ export const loginUseFormProps = {
     resolver: zodResolver(loginFormSchema),
 }
 
-export const getLoginHandleSubmit = ({ handleSubmit, supabaseConnector }: GetFormHandleSubmitArgs) =>
+export const getLoginHandleSubmit = ({ handleSubmit, database }: GetFormHandleSubmitArgs) =>
     handleSubmit(async ({ email, password }: LoginFormFieldType) => {
         try {
-            await supabaseConnector?.login(email, password);
+            await database.supabaseConnector?.login(email, password);
         } catch (error: any) {
             Alert.alert(error.message);
         }

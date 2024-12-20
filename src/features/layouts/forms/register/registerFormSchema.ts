@@ -1,7 +1,7 @@
 import { z} from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert } from "react-native";
-import { GetFormHandleSubmitArgs } from "../../../constants/constants";
+import { GetFormHandleSubmitArgs } from "../../../core/constants/constants";
 import { router } from "expo-router";
 
 export const registerStepsField = [["email"], ["firstname", "lastname"], ["password", "rpassword"]];
@@ -39,11 +39,11 @@ export const registerUseFormProps = {
     resolver: zodResolver(registerFormSchema),
 }
 
-export const getRegisterHandleSubmit = ({ handleSubmit, supabaseConnector }: GetFormHandleSubmitArgs) =>
+export const getRegisterHandleSubmit = ({ handleSubmit, database }: GetFormHandleSubmitArgs) =>
     handleSubmit(async ({ email, password, firstname, lastname }: RegisterFormFieldType) => {
         try {
             console.log(email, password, firstname, lastname)
-            const response = await supabaseConnector?.client.auth.signUp({
+            const response = await database.supabaseConnector?.client.auth.signUp({
                 email,
                 password,
                 options: {

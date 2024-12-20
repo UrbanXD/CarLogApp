@@ -6,7 +6,7 @@ import {
     Text,
     View,
 } from "react-native";
-import { theme } from "../../constants/theme";
+import { theme } from "../../core/constants/theme";
 import Animated, { FadeInLeft, SharedValue } from "react-native-reanimated";
 import {
     DEFAULT_SEPARATOR,
@@ -14,20 +14,20 @@ import {
     GLOBAL_STYLE,
     ICON_NAMES,
     SEPARATOR_SIZES
-} from "../../constants/constants";
-import { useDatabase } from "../../utils/database/Database";
+} from "../../core/constants/constants";
+import { useDatabase } from "../../core/utils/database/Database";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import Carousel, { CarouselItemType } from "../../components/carousel/Carousel";
-import Button from "../../components/shared/Button";
-import { getDate } from "../../utils/getDate";
-import UpcomingRides from "../../../upcomingRides/UpcomingRides";
-import Link from "../../components/shared/Link";
+import Carousel, { CarouselItemType } from "../../core/components/carousel/Carousel";
+import Button from "../../core/components/shared/Button";
+import { getDate } from "../../core/utils/getDate";
+import UpcomingRides from "../../upcomingRides/UpcomingRides";
+import Link from "../../core/components/shared/Link";
 import { useSelector } from "react-redux";
-import { RootState, store } from "../../redux/store";
-import {loadCars } from "../../redux/cars/cars.slices";
-import CarouselItem from "../../components/carousel/CarouselItem";
-import {useBottomSheet} from "../../context/BottomSheetProvider";
-import NewCarForm from "../forms/addCar/NewCarForm";
+import { RootState, store } from "../../core/redux/store";
+import {loadCars } from "../../core/redux/cars/cars.slices";
+import CarouselItem from "../../core/components/carousel/CarouselItem";
+import {useBottomSheet} from "../../core/context/BottomSheetProvider";
+import NewCarForm from "../../layouts/forms/addCar/NewCarForm";
 import { encode } from "base64-arraybuffer";
 
 const HomeScreen: React.FC = () => {

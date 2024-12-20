@@ -2,8 +2,8 @@ import React from "react";
 import { Dimensions, StyleSheet, View, ViewStyle } from "react-native";
 import TabBarIcon from "./TabBarIcon";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
-import { theme } from "../../core/constants/theme";
-import { FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT } from "../../core/constants/constants";
+import { theme } from "../../constants/theme";
+import { FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT } from "../../constants/constants";
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs'
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 

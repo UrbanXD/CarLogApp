@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
-import {Alert, TouchableOpacity, View} from "react-native";
-import { FONT_SIZES, SIMPLE_HEADER_HEIGHT } from "../../core/constants/constants";
-import Picker from "../../core/components/form/InputPicker/Picker";
-import Header from "../components/Header";
+import { Alert, StatusBar, TouchableOpacity, View, StyleSheet } from "react-native";
+import {DEFAULT_SEPARATOR, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../constants/constants";
+import Picker from "../form/InputPicker/Picker";
 import { Avatar } from "react-native-paper";
-import { theme } from "../../core/constants/theme";
+import { theme } from "../../constants/theme";
 import { useSelector } from "react-redux";
-import { RootState, store } from "../../core/redux/store";
+import { RootState, store } from "../../redux/store";
 import { createSelector } from "@reduxjs/toolkit";
-import { useDatabase } from "../../core/utils/database/Database";
-import {loadSelectedCar, selectCar } from "../../core/redux/cars/cars.slices";
+import { useDatabase } from "../../utils/database/Database";
+import { loadSelectedCar, selectCar } from "../../redux/cars/cars.slices";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const CarHeader: React.FC = () => {
+const Header: React.FC = () => {
     const { supabaseConnector } = useDatabase();
+    const insets = useSafeAreaInsets();
 
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const selectCarsState = (state: RootState) => state.cars.cars;
@@ -39,13 +40,12 @@ const CarHeader: React.FC = () => {
     }, []);
 
     return (
-        <Header
-            height={ SIMPLE_HEADER_HEIGHT }
-        >
-            <Header.StatusBar
+        <View style={{ paddingTop: insets.top }}>
+            <StatusBar
+                barStyle={ "light-content" }
                 backgroundColor={ theme.colors.black2 }
             />
-            <Header.Row paddingRight={!isDropdownVisible ? undefined : 0}>
+            <View style={ styles.barContainer }>
                 <View style={{ flex: 1 }}>
                     {
                         !carsIsLoading &&
@@ -75,9 +75,24 @@ const CarHeader: React.FC = () => {
                         <Avatar.Text label={"UA"} size={FONT_SIZES.large * 1.25} />
                     </TouchableOpacity>
                 }
-            </Header.Row>
-        </Header>
+            </View>
+            {/*//paddingRight={!isDropdownVisible ? undefined : 0}*/}
+        </View>
     )
 }
 
-export default CarHeader;
+const styles = StyleSheet.create({
+    barContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: SEPARATOR_SIZES.lightSmall,
+        height: SIMPLE_HEADER_HEIGHT,
+        backgroundColor: theme.colors.black2,
+        paddingTop: SEPARATOR_SIZES.lightSmall * 0.5,
+        paddingHorizontal: DEFAULT_SEPARATOR,
+        overflow: "hidden"
+    }
+})
+
+export default Header;

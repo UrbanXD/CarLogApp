@@ -1,10 +1,10 @@
 import React from "react";
-import { FONT_SIZES, GLOBAL_STYLE } from "../../constants/constants";
+import { FONT_SIZES, GLOBAL_STYLE } from "../../core/constants/constants";
 import { Platform, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
-import { theme } from "../../constants/theme";
+import { theme } from "../../core/constants/theme";
 import { Divider } from "react-native-paper";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { formatNumber } from "../../utils/formatNumber";
+import { formatNumber } from "../../core/utils/formatNumber";
 
 const ServiceLogScreen: React.FC = () => {
     const logs = [

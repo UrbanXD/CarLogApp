@@ -6,8 +6,8 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from "react-native-reanimated";
-import Icon from "../../core/components/shared/Icon";
-import { theme } from "../../core/constants/theme";
+import Icon from "../shared/Icon";
+import { theme } from "../../constants/theme";
 
 interface TabBarIconProp {
     focused: boolean

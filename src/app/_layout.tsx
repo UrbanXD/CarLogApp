@@ -13,7 +13,7 @@ import {Provider} from "react-redux";
 import {PaperProvider} from "react-native-paper";
 import {KeyboardProvider} from "react-native-keyboard-controller";
 import {StatusBar} from "expo-status-bar";
-import CarHeader from "../features/header/layouts/CarHeader";
+import Header from "../features/core/components/header/Header";
 import {BottomSheetProvider} from "../features/core/context/BottomSheetProvider";
 import { DatabaseProvider } from '../features/core/context/DatabaseProvider';
 
@@ -63,7 +63,7 @@ const Layout:React.FC = () => {
                                             <Stack.Screen
                                                 name="(main)"
                                                 options={{
-                                                    header: () => <CarHeader />
+                                                    header: () => <Header />
                                                 }}
                                             />
                                         </Stack>
