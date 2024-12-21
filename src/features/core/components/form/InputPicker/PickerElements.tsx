@@ -96,8 +96,8 @@ const PickerElements: React.FC<PickerElementsProps> = ({
                     icon={ ICON_NAMES.close }
                     size={ FONT_SIZES.normal }
                     color={ theme.colors.white }
+                    style={{ alignSelf: "center" }}
                     onPress={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
-                    // style={ { alignSelf: "center" } }
                 />
             }
             {
