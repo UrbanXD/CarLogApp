@@ -18,7 +18,6 @@ import { formatImageSource } from "../../../utils/formatImageSource";
 import {ControllerRenderArgs, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/constants";
 import InputTitle from "../InputTitle";
 import DefaultImage from "./DefaultImage";
-import { IconButton } from "react-native-paper";
 import { theme } from "../../../constants/theme";
 import hexToRgba from "hex-to-rgba";
 import Icon from "../../shared/Icon";
