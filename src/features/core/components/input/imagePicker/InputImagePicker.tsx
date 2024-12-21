@@ -1,4 +1,4 @@
-import Button from "../../shared/Button"
+import Button from "../../shared/button/Button"
 import { pickImage } from "../../../utils/pickImage";
 import {
     Image,
@@ -9,15 +9,15 @@ import {
 } from "react-native";
 import { encode } from "base64-arraybuffer";
 import { Control, Controller } from "react-hook-form";
-import { useState } from "react";
-import Carousel, { CarouselItemType } from "../../carousel/Carousel";
+import React, { useState } from "react";
+import Carousel, { CarouselItemType } from "../../shared/carousel/Carousel";
 import { SharedValue } from "react-native-reanimated";
-import CarouselItem from "../../carousel/CarouselItem";
+import CarouselItem from "../../shared/carousel/CarouselItem";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { formatImageSource } from "../../../utils/formatImageSource";
 import {ControllerRenderArgs, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/constants";
 import InputTitle from "../InputTitle";
-import DefaultImage from "./DefaultImage";
+import DefaultImage from "../../shared/DefaultImage";
 import { theme } from "../../../constants/theme";
 import Icon from "../../shared/Icon";
 import { hexToRgba } from "../../../utils/colors/hexToRgba";

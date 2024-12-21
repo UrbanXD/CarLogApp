@@ -3,7 +3,7 @@ import { theme } from "./theme";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { ControllerFieldState, ControllerRenderProps, UseFormHandleSubmit, UseFormStateReturn } from "react-hook-form";
 import { Database } from "../utils/database/Database";
-import { InputPickerDataType } from "../components/form/InputPicker/InputPicker";
+import { InputPickerDataType } from "../components/input/picker/InputPicker";
 
 export interface GetFormHandleSubmitArgs {
     handleSubmit: UseFormHandleSubmit<any>
@@ -20,6 +20,7 @@ export interface ControllerRenderArgs {
 export const CAR_NAME_LENGTH = 10;
 export const SIMPLE_HEADER_HEIGHT = hp(6.75);
 export const SIMPLE_TABBAR_HEIGHT = hp(7.5);
+export const ICON_FONT_SIZE_SCALE = 1.75;
 
 export const LOCAL_STORAGE_KEYS = {
     selectedCarIndex: "selectedCarIndex"

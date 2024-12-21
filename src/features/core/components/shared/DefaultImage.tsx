@@ -2,10 +2,11 @@ import {
     StyleSheet,
     View
 } from "react-native";
-import { theme } from "../../../constants/theme";
-import { FONT_SIZES, ICON_NAMES } from "../../../constants/constants";
-import Icon from "../../shared/Icon";
-import { hexToRgba } from "../../../utils/colors/hexToRgba";
+import { theme } from "../../constants/theme";
+import { FONT_SIZES, ICON_NAMES } from "../../constants/constants";
+import Icon from "./Icon";
+import { hexToRgba } from "../../utils/colors/hexToRgba";
+import React from "react";
 
 const DefaultImage: React.FC = () => {
     return (

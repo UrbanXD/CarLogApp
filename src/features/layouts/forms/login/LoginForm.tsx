@@ -4,11 +4,11 @@ import { getLoginHandleSubmit, LoginFormFieldType, loginUseFormProps } from "./l
 import { useDatabase } from "../../../core/utils/database/Database";
 import { GLOBAL_STYLE, ICON_NAMES } from "../../../core/constants/constants";
 import { Text } from "react-native";
-import Button, { FacebookButton, GoogleButton } from "../../../core/components/shared/Button";
+import Button from "../../../core/components/shared/button/Button";
 import TextDivider from "../../../core/components/shared/TextDivider";
 import { theme } from "../../../core/constants/theme";
-import InputText from "../../../core/components/form/InputText/InputText";
-import { Form } from "../../../core/components/form/Form";
+import Form from "../../../core/components/form/Form";
+import Input from "../../../core/components/input/Input";
 
 const LoginForm: React.FC = () => {
     const { control, handleSubmit } =
@@ -18,14 +18,14 @@ const LoginForm: React.FC = () => {
 
     return (
         <Form>
-            <InputText
+            <Input.Text
                 control={ control }
                 fieldName="email"
                 fieldNameText="Email cím"
                 icon={ ICON_NAMES.email }
                 placeholder="Email"
             />
-            <InputText
+            <Input.Text
                 control={ control }
                 fieldName="password"
                 fieldNameText="Jelszó"
@@ -36,7 +36,10 @@ const LoginForm: React.FC = () => {
             <Text style={ GLOBAL_STYLE.formLinkText }>
                 Elfelejtette jelszavát?
             </Text>
-            <Button title="Bejelentkezés" onPress={ submitHandler } />
+            <Button.Text
+                text="Bejelentkezés"
+                onPress={ submitHandler }
+            />
             <TextDivider
                 title="vagy"
                 color={ theme.colors.gray1 }
@@ -44,8 +47,7 @@ const LoginForm: React.FC = () => {
                 marginVertical={ GLOBAL_STYLE.formContainer.gap }
 
             />
-            <GoogleButton onPress={ () => 1 } />
-            <FacebookButton onPress={ () => 1 } />
+            <Button.Google onPress={ () => 1 } />
         </Form>
     )
 }

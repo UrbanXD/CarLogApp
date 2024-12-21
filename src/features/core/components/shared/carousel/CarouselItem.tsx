@@ -7,15 +7,15 @@ import {
     View,
 } from "react-native";
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
-import { theme } from "../../constants/theme";
+import { theme } from "../../../constants/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import {
     FONT_SIZES,
     SEPARATOR_SIZES
-} from "../../constants/constants";
+} from "../../../constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { CarouselItemType } from "./Carousel";
-import { hexToRgba } from "../../utils/colors/hexToRgba";
+import { hexToRgba } from "../../../utils/colors/hexToRgba";
 
 interface CarouselItemProps {
     index: number
@@ -64,7 +64,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                 <ImageBackground
                     source={
                         !item.image
-                            ? require("../../../../assets/images/car1.jpg")
+                            ? require("../../../../../assets/images/car1.jpg")
                             : typeof item.image === "string"
                                 ? { uri: `data:image/jpeg;base64,${item.image}` }
                                 : item.image

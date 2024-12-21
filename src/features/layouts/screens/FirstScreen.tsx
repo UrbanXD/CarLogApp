@@ -16,7 +16,7 @@ import {
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { theme } from "../../core/constants/theme";
 import { LinearGradient } from "expo-linear-gradient";
-import Button from "../../core/components/shared/Button";
+import Button from "../../core/components/shared/button/Button";
 import { useBottomSheet } from "../../core/context/BottomSheetProvider";
 import RegisterForm from "../../layouts/forms/register/RegisterForm";
 import LoginForm from "../../layouts/forms/login/LoginForm";
@@ -85,8 +85,8 @@ const FirstScreen: React.FC = () => {
                     <Text style={ styles.subtitle }>Kezelje nálunk autóit</Text>
                 </View>
                 <View style={ styles.actionContainer }>
-                    <Button
-                        title="Regisztráció"
+                    <Button.Text
+                        text="Regisztráció"
                         onPress={ openRegister }
                     />
                     <Text style={ styles.underButtonText }>

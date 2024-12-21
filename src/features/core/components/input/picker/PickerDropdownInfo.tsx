@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/constants";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import TextInput from "../InputText/TextInput";
+import TextInput from "../text/TextInput";
 import { theme } from "../../../constants/theme";
 import Icon from "../../shared/Icon";
 

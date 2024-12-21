@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Alert, StatusBar, TouchableOpacity, View, StyleSheet } from "react-native";
 import {DEFAULT_SEPARATOR, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../constants/constants";
-import Picker from "../form/InputPicker/Picker";
+import Picker from "../input/picker/Picker";
 import { theme } from "../../constants/theme";
 import { useSelector } from "react-redux";
 import { RootState, store } from "../../redux/store";
@@ -9,7 +9,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { useDatabase } from "../../utils/database/Database";
 import { loadSelectedCar, selectCar } from "../../redux/cars/cars.slices";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import * as Avatar from "../shared/avatar/Avatar";
+import Avatar from "../shared/avatar/Avatar";
 
 const Header: React.FC = () => {
     const { supabaseConnector } = useDatabase();

@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { GetFormHandleSubmitArgs } from "../../../core/constants/constants";
 import { store } from "../../../core/redux/store";
 import { addCar } from "../../../core/redux/cars/cars.slices";
-import { InputPickerDataType } from "../../../core/components/form/InputPicker/InputPicker";
+import { InputPickerDataType } from "../../../core/components/input/picker/InputPicker";
 import { getUUID } from "../../../core/utils/uuid";
 import { ImageType } from "../../../core/utils/pickImage";
 import { CarTableType } from "../../../core/utils/database/powersync/AppSchema";
