@@ -1,15 +1,13 @@
 import { ColorValue } from "react-native";
-import hexToRGBA from "./hexToRGBA";
+import { hexToRgba, rgbaToArray } from "./hexToRgba";
 
 //https://24ways.org/2010/calculating-color-contrast
 const getContrastingColor = (inputColor: ColorValue, light: ColorValue, dark: ColorValue) => {
-    const RGBA = hexToRGBA(inputColor as string, 1, true);
+    const rgba = hexToRgba(inputColor as string, 1);
 
-    if(typeof RGBA === "string"){
-        return light;
-    }
+    const arrayRgba = rgbaToArray(rgba);
 
-    const yiq = (RGBA[0] * 2126 + RGBA[1] * 7152 + RGBA[2] * 722) / 10000;
+    const yiq = (arrayRgba[0] * 2126 + arrayRgba[1] * 7152 + arrayRgba[2] * 722) / 10000;
     if(yiq >= 128) {
         return dark;
     }

@@ -15,7 +15,7 @@ const getAlphafloat = (alpha: number, a?: number) => {
     return alpha;
 }
 
-const hexToRGBA = (hex: string, alpha: number = 1, asArray: boolean = false) => {
+export const hexToRgba = (hex: string, alpha: number = 1) => {
     if (!isValidHex(hex)) {
         throw new Error("Invalid HEX");
     }
@@ -27,11 +27,9 @@ const hexToRGBA = (hex: string, alpha: number = 1, asArray: boolean = false) => 
     }
     const [r, g, b, a] = hexArray.map(convertHexUnitTo256);
 
-    if(asArray){
-        return [ r, g, b, a ];
-    }
-
     return `rgba(${r}, ${g}, ${b}, ${getAlphafloat(alpha, a)})`;
 }
 
-export default hexToRGBA;
+export const rgbaToArray = (rgba: string) => {
+    return rgba.slice(rgba.indexOf("(") + 1, rgba.indexOf(")")).split(", ").map(value => parseInt(value));
+}
