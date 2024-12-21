@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { theme } from "../../constants/theme";
-import hexToRgba from "hex-to-rgba";
 import { LinearGradient } from "expo-linear-gradient";
 import {
     FONT_SIZES,
@@ -16,6 +15,7 @@ import {
 } from "../../constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { CarouselItemType } from "./Carousel";
+import { hexToRgba } from "../../utils/colors/hexToRgba";
 
 interface CarouselItemProps {
     index: number

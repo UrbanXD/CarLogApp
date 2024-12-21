@@ -1,4 +1,3 @@
-import hexToRgba from "hex-to-rgba";
 import {
     StyleSheet,
     View
@@ -6,6 +5,7 @@ import {
 import { theme } from "../../../constants/theme";
 import { FONT_SIZES, ICON_NAMES } from "../../../constants/constants";
 import Icon from "../../shared/Icon";
+import { hexToRgba } from "../../../utils/colors/hexToRgba";
 
 const DefaultImage: React.FC = () => {
     return (

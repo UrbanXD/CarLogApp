@@ -19,8 +19,8 @@ import {ControllerRenderArgs, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "..
 import InputTitle from "../InputTitle";
 import DefaultImage from "./DefaultImage";
 import { theme } from "../../../constants/theme";
-import hexToRgba from "hex-to-rgba";
 import Icon from "../../shared/Icon";
+import { hexToRgba } from "../../../utils/colors/hexToRgba";
 
 interface InputImagePickerProps {
     control: Control<any>
@@ -185,8 +185,8 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                                                         size={ FONT_SIZES.medium }
                                                         color={ theme.colors.redLight }
                                                         backgroundColor={ hexToRgba(theme.colors.black, 0.75) }
-                                                          onPress={ () => removeImageFromHistory(index) }
-                                                        // style={ { borderColor: theme.colors.redLight, borderWidth: 2 } }
+                                                        onPress={ () => removeImageFromHistory(index) }
+                                                        style={ { borderColor: theme.colors.redLight, borderWidth: 2 } }
                                                     />
                                             }
                                         />
