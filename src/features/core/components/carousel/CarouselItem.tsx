@@ -1,4 +1,4 @@
-import React, {ReactElement, useEffect } from "react";
+import React, {ReactElement } from "react";
 import {
     ImageBackground,
     StyleSheet,
@@ -8,17 +8,14 @@ import {
 } from "react-native";
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { theme } from "../../constants/theme";
-import hexToRgba from "hex-to-rgba";
 import { LinearGradient } from "expo-linear-gradient";
 import {
     FONT_SIZES,
-    GET_ICON_BUTTON_RESET_STYLE,
-    ICON_NAMES,
     SEPARATOR_SIZES
 } from "../../constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { CarouselItemType } from "./Carousel";
-import { IconButton } from "react-native-paper";
+import { hexToRgba } from "../../utils/colors/hexToRgba";
 
 interface CarouselItemProps {
     index: number

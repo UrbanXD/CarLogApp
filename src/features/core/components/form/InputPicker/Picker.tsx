@@ -1,22 +1,9 @@
-import React, {forwardRef, useCallback, useEffect, useRef, useState} from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, ImageSourcePropType } from "react-native";
-import { Icon, IconButton } from "react-native-paper";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, ImageSourcePropType } from "react-native";
 import {
-    DEFAULT_SEPARATOR, FONT_SIZES,
-    GET_ICON_BUTTON_RESET_STYLE,
-    GLOBAL_STYLE,
     ICON_NAMES,
-    SEPARATOR_SIZES
 } from "../../../constants/constants";
-import { theme } from "../../../constants/theme";
-import { FlatList } from "react-native-gesture-handler";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import SearchBar from "../../shared/SearchBar";
-import TextInput from "../InputText/TextInput";
-import PickerItem from "./PickerItem";
-import {InputPickerDropdownInfo, PickerDropdownInfo} from "./PickerDropdownInfo";
-import InputPicker from "./InputPicker";
-import {Callback} from "@react-native-async-storage/async-storage/lib/typescript/types";
+import { InputPickerDropdownInfo, PickerDropdownInfo } from "./PickerDropdownInfo";
 import PickerElements from "./PickerElements";
 
 export interface PickerDataType {

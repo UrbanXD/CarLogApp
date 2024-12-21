@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { GLOBAL_STYLE, SEPARATOR_SIZES } from "../../constants/constants";
+import { GLOBAL_STYLE } from "../../constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { theme } from "../../constants/theme";
 

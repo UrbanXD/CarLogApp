@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { theme } from "./theme";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { UseFormHandleSubmit } from "react-hook-form";
+import { ControllerFieldState, ControllerRenderProps, UseFormHandleSubmit, UseFormStateReturn } from "react-hook-form";
 import { Database } from "../utils/database/Database";
 import { InputPickerDataType } from "../components/form/InputPicker/InputPicker";
 
@@ -11,8 +11,15 @@ export interface GetFormHandleSubmitArgs {
     onSubmit?: (isSuccess: boolean) => void
 }
 
+export interface ControllerRenderArgs {
+    field: ControllerRenderProps<any, string>
+    fieldState: ControllerFieldState
+    formState: UseFormStateReturn<any>
+}
 
-export const CAR_NAME_LENGTH = 10
+export const CAR_NAME_LENGTH = 10;
+export const SIMPLE_HEADER_HEIGHT = hp(6.75);
+export const SIMPLE_TABBAR_HEIGHT = hp(7.5);
 
 export const LOCAL_STORAGE_KEYS = {
     selectedCarIndex: "selectedCarIndex"
@@ -88,6 +95,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
         flex: 1,
         // paddingHorizontal: DEFAULT_SEPARATOR,
         paddingVertical: SEPARATOR_SIZES.small,
+        paddingBottom: SIMPLE_TABBAR_HEIGHT * 1.25
     },
     scrollViewContentContainer: {
         flexGrow: 1,
@@ -143,15 +151,8 @@ export const GLOBAL_STYLE = StyleSheet.create({
     }
 });
 
-export const GET_ICON_BUTTON_RESET_STYLE = (size: number = FONT_SIZES.normal) => {
-    return { width: size, height: size, margin: 0 }
-}
-
 export const COLLAPSIBLE_HEADER_HEIGHT = 180;
 export const COLLAPSIBLE_HEADER_IMAGE = 110;
-
-export const SIMPLE_HEADER_HEIGHT = hp(6.75);
-export const SIMPLE_TABBAR_HEIGHT = hp(6.75);
 
 export interface CarBrandsType {
     [key: string]: Array<CarModelsType>;

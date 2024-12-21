@@ -9,16 +9,16 @@ import {
     newCarUseFormProps,
     ODOMETER_MEASUREMENTS
 } from "./newCarFormSchema";
-import { useDatabase } from "../../../utils/database/Database";
+import { useDatabase } from "../../../core/utils/database/Database";
 import {
     CARS,
     DATA_TRANSFORM_TO_PICKER_DATA,
     ICON_NAMES,
-} from "../../../constants/constants";
-import { useMultiStepForm } from "../../../context/MultiStepFormProvider";
-import { MultiStepForm } from "../../../components/form/Form";
-import InputText from "../../../components/form/InputText/InputText";
-import InputPicker, { InputPickerDataType } from "../../../components/form/InputPicker/InputPicker";
+} from "../../../core/constants/constants";
+import { useMultiStepForm } from "../../../core/context/MultiStepFormProvider";
+import { MultiStepForm } from "../../../core/components/form/Form";
+import InputText from "../../../core/components/form/InputText/InputText";
+import InputPicker, { InputPickerDataType } from "../../../core/components/form/InputPicker/InputPicker";
 
 interface NewCarFormProps {
     close?: () => void

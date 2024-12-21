@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Control, Controller } from "react-hook-form";
-import {StyleSheet, View} from "react-native";
+import { StyleSheet, View } from "react-native";
 import InputTitle from "../InputTitle";
-import { SEPARATOR_SIZES } from "../../../constants/constants";
+import { ControllerRenderArgs, SEPARATOR_SIZES } from "../../../constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { theme } from "../../../constants/theme";
 import Picker, { PickerDataType } from "./Picker";
@@ -82,9 +82,33 @@ const InputPicker: React.FC<InputPickerProps> = ({
         }
     }, [searchTerm, allData]);
 
-    useEffect(() => {
-        console.log(selectedItemID, " kivalasyztva")
-    }, [selectedItemID]);
+
+    const render = (args: ControllerRenderArgs) => {
+        const { field: { onChange }, fieldState: { error } } = args;
+
+        return (
+            isDataAdjusted
+                ?   <Picker
+                        data={ adjustedData }
+                        error = { error?.message }
+                        searchTerm={ searchTerm }
+                        setSearchTerm={ withSearchbar ? ((value) => setSearchTerm(value)) : undefined }
+                        selectedItemID={ selectedItemID }
+                        onSelect={
+                            (id: string) => {
+                                setSelectedItemID(id);
+                                onChange(adjustedData.find(item => item.id === id)?.value?.toString());
+                            }
+                        }
+                        isDropdown={ !isHorizontal }
+                        isHorizontal={ isHorizontal }
+                        isCarousel={ isCarousel }
+                        dropDownInfoType="input"
+                        disabled={ disabled }
+                    />
+                :   <></>
+        )
+    }
 
     return (
         <View style={ styles.inputContainer }>
@@ -98,29 +122,7 @@ const InputPicker: React.FC<InputPickerProps> = ({
             <Controller
                 control={ control }
                 name={ fieldName }
-                render={ ({ field: { onChange }, fieldState: { error } }) =>
-                    isDataAdjusted
-                    ?   <Picker
-                            data={ adjustedData }
-                            error = { error?.message }
-                            searchTerm={ searchTerm }
-                            setSearchTerm={ withSearchbar ? ((value) => setSearchTerm(value)) : undefined }
-                            selectedItemID={ selectedItemID }
-                            onSelect={
-                                (id: string) => {
-                                    setSelectedItemID(id);
-                                    console.log("OnSelected", id)
-                                    onChange(adjustedData.find(item => item.id === id)?.value?.toString());
-                                }
-                            }
-                            isDropdown={ !isHorizontal }
-                            isHorizontal={ isHorizontal }
-                            isCarousel={ isCarousel }
-                            dropDownInfoType="input"
-                            disabled={ disabled }
-                        />
-                    :   <></>
-                }
+                render={ render }
             />
         </View>
     )

@@ -4,24 +4,23 @@ import {
     Image,
     ImageSourcePropType,
     Text,
-    TouchableOpacity,
     View,
     StyleSheet
 } from "react-native";
 import { encode } from "base64-arraybuffer";
 import { Control, Controller } from "react-hook-form";
-import {useEffect, useState } from "react";
+import { useState } from "react";
 import Carousel, { CarouselItemType } from "../../carousel/Carousel";
 import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../../carousel/CarouselItem";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { formatImageSource } from "../../../utils/formatImageSource";
-import {FONT_SIZES, GET_ICON_BUTTON_RESET_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/constants";
+import {ControllerRenderArgs, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/constants";
 import InputTitle from "../InputTitle";
 import DefaultImage from "./DefaultImage";
-import { IconButton } from "react-native-paper";
 import { theme } from "../../../constants/theme";
-import hexToRgba from "hex-to-rgba";
+import Icon from "../../shared/Icon";
+import { hexToRgba } from "../../../utils/colors/hexToRgba";
 
 interface InputImagePickerProps {
     control: Control<any>
@@ -135,77 +134,81 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
         });
     }
 
+    const render = (args: ControllerRenderArgs) => {
+        const { field: { onChange }, fieldState: { error } } = args;
+
+        return (
+            <View style={ styles.inputContainer }>
+                {
+                    fieldNameText &&
+                    <InputTitle
+                        title={ fieldNameText }
+                        subtitle={ fieldInfoText }
+                    />
+                }
+                {
+                    !multipleSelection &&
+                    <>
+                        <Image
+                            source={ formatImageSource(selectedImage || require("../../../../../assets/images/car2.jpg")) }
+                            style={ [styles.chosenImage, { height: size.height * 1.25 }] }
+                        />
+                        <InputTitle title="Kiválasztható képek" />
+                    </>
+                }
+                <View style={ styles.secondRowContainer }>
+                    <View style={ styles.uploadButtonContainer }>
+                        <Button
+                            icon={ ICON_NAMES.upArrowHead }
+                            onPress={ () => getImages(onChange) }
+                        />
+                    </View>
+                    <View style={ styles.imagesContainer } onLayout={ handleLayout }>
+                        <Carousel
+                            data={ history }
+                            contentWidth={ size.width }
+                            renderItem={
+                                (item: ImageSourcePropType, index: number, size: number, coordinate: SharedValue<number> ) => {
+                                    const itemCarousel: CarouselItemType = {
+                                        image: item
+                                    }
+                                    return (
+                                        <CarouselItem
+                                            index={ index }
+                                            size={ size }
+                                            x={ coordinate }
+                                            item={ itemCarousel }
+                                            cardAction={ () => selectImage(item) }
+                                            renderBottomActionButton={
+                                                () =>
+                                                    <Icon icon={ ICON_NAMES.close }
+                                                        size={ FONT_SIZES.medium }
+                                                        color={ theme.colors.redLight }
+                                                        backgroundColor={ hexToRgba(theme.colors.black, 0.75) }
+                                                        onPress={ () => removeImageFromHistory(index) }
+                                                        style={ { borderColor: theme.colors.redLight, borderWidth: 2 } }
+                                                    />
+                                            }
+                                        />
+                                    )
+                                }
+                            }
+                            renderDefaultItem={ () => <DefaultImage /> }
+                        />
+                    </View>
+                    {
+                        error ? <Text style={{ color: "green" }}>{error.message}</Text> : <></>
+                    }
+                </View>
+            </View>
+        )
+    }
+
     return (
         <Controller
             control={ control }
             name={ fieldName }
-            render={
-                ({ field: { onChange }, fieldState: {error} }) =>
-                    <View style={ styles.inputContainer }>
-                        {
-                            fieldNameText &&
-                            <InputTitle
-                                title={ fieldNameText }
-                                subtitle={ fieldInfoText }
-                            />
-                        }
-                        {
-                            !multipleSelection &&
-                            <>
-                                <Image
-                                    source={ formatImageSource(selectedImage || require("../../../../../assets/images/car2.jpg")) }
-                                    style={ [styles.chosenImage, { height: size.height * 1.25 }] }
-                                />
-                                <InputTitle title="Kiválasztható képek" />
-                            </>
-                        }
-                        <View style={ styles.secondRowContainer }>
-                            <View style={ styles.uploadButtonContainer }>
-                                <Button
-                                    icon={ ICON_NAMES.upArrowHead }
-                                    onPress={ () => getImages(onChange) }
-                                />
-                            </View>
-                            <View style={ styles.imagesContainer } onLayout={ handleLayout }>
-                                <Carousel
-                                    data={ history }
-                                    contentWidth={ size.width }
-                                    renderItem={
-                                        (item: ImageSourcePropType, index: number, size: number, coordinate: SharedValue<number> ) => {
-                                            const itemCarousel: CarouselItemType = {
-                                                image: item
-                                            }
-                                            return (
-                                                <CarouselItem
-                                                    index={ index }
-                                                    size={ size }
-                                                    x={ coordinate }
-                                                    item={ itemCarousel }
-                                                    cardAction={ () => selectImage(item) }
-                                                    renderBottomActionButton={
-                                                        () =>
-                                                            <IconButton
-                                                                onPress={ () => removeImageFromHistory(index) }
-                                                                size={ FONT_SIZES.medium }
-                                                                icon={ ICON_NAMES.close }
-                                                                iconColor={ theme.colors.redLight }
-                                                                containerColor={ hexToRgba(theme.colors.black, 0.75) }
-                                                                style={ [GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium * 1.35), { borderColor: theme.colors.redLight, borderWidth: 2 }] }
-                                                            />
-                                                    }
-                                                />
-                                            )
-                                        }
-                                    }
-                                    renderDefaultItem={ () => <DefaultImage /> }
-                                />
-                            </View>
-                            {
-                                error ? <Text style={{ color: "green" }}>{error.message}</Text> : <></>
-                            }
-                        </View>
-                    </View>
-            }
+            render={ render }
         />
     )
 }

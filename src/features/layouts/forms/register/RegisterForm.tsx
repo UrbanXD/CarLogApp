@@ -1,5 +1,5 @@
 import React from "react";
-import { useDatabase } from "../../../utils/database/Database";
+import { useDatabase } from "../../../core/utils/database/Database";
 import { useForm } from "react-hook-form";
 import {
     getRegisterHandleSubmit,
@@ -8,22 +8,22 @@ import {
     registerStepsTitle,
     registerUseFormProps
 } from "./registerFormSchema";
-import { useMultiStepForm } from "../../../context/MultiStepFormProvider";
-import { GLOBAL_STYLE, ICON_NAMES } from "../../../constants/constants";
-import Button, {FacebookButton, GoogleButton} from "../../../components/shared/Button";
-import TextDivider from "../../../components/shared/TextDivider";
-import { theme } from "../../../constants/theme";
-import InputText from "../../../components/form/InputText/InputText";
-import { MultiStepForm } from "../../../components/form/Form";
+import { useMultiStepForm } from "../../../core/context/MultiStepFormProvider";
+import { GLOBAL_STYLE, ICON_NAMES } from "../../../core/constants/constants";
+import Button, {FacebookButton, GoogleButton} from "../../../core/components/shared/Button";
+import TextDivider from "../../../core/components/shared/TextDivider";
+import { theme } from "../../../core/constants/theme";
+import InputText from "../../../core/components/form/InputText/InputText";
+import { MultiStepForm } from "../../../core/components/form/Form";
 
 const RegisterForm: React.FC = () => {
-    const { supabaseConnector } = useDatabase();
+    const database = useDatabase();
     const { control, handleSubmit, trigger } =
         useForm<RegisterFormFieldType>(registerUseFormProps);
 
     const submitHandler = getRegisterHandleSubmit({
         handleSubmit,
-        supabaseConnector
+        database
     });
 
     const steps = [

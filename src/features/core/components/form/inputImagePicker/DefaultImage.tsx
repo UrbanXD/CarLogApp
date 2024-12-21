@@ -1,22 +1,22 @@
-import hexToRgba from "hex-to-rgba";
 import {
     StyleSheet,
     View
 } from "react-native";
 import { theme } from "../../../constants/theme";
-import { IconButton } from "react-native-paper";
-import {FONT_SIZES, GET_ICON_BUTTON_RESET_STYLE, ICON_NAMES } from "../../../constants/constants";
+import { FONT_SIZES, ICON_NAMES } from "../../../constants/constants";
+import Icon from "../../shared/Icon";
+import { hexToRgba } from "../../../utils/colors/hexToRgba";
 
 const DefaultImage: React.FC = () => {
     return (
         <View style={ styles.container }>
-            <IconButton
+            <Icon
                 icon={ ICON_NAMES.image }
                 size={ FONT_SIZES.extraLarge }
-                iconColor={ theme.colors.gray3 }
-                style={ GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.extraLarge) }
+                color={ theme.colors.gray3 }
             />
-        </View>    )
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({

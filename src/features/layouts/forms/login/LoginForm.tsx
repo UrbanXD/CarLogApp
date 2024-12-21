@@ -1,20 +1,20 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { getLoginHandleSubmit, LoginFormFieldType, loginUseFormProps } from "./loginFormSchema";
-import { useDatabase } from "../../../utils/database/Database";
-import { GLOBAL_STYLE, ICON_NAMES } from "../../../constants/constants";
+import { useDatabase } from "../../../core/utils/database/Database";
+import { GLOBAL_STYLE, ICON_NAMES } from "../../../core/constants/constants";
 import { Text } from "react-native";
-import Button, { FacebookButton, GoogleButton } from "../../../components/shared/Button";
-import TextDivider from "../../../components/shared/TextDivider";
-import { theme } from "../../../constants/theme";
-import InputText from "../../../components/form/InputText/InputText";
-import { Form } from "../../../components/form/Form";
+import Button, { FacebookButton, GoogleButton } from "../../../core/components/shared/Button";
+import TextDivider from "../../../core/components/shared/TextDivider";
+import { theme } from "../../../core/constants/theme";
+import InputText from "../../../core/components/form/InputText/InputText";
+import { Form } from "../../../core/components/form/Form";
 
 const LoginForm: React.FC = () => {
     const { control, handleSubmit } =
         useForm<LoginFormFieldType>(loginUseFormProps)
-    const { supabaseConnector } = useDatabase();
-    const submitHandler = getLoginHandleSubmit({handleSubmit, supabaseConnector})
+    const database = useDatabase();
+    const submitHandler = getLoginHandleSubmit({handleSubmit, database})
 
     return (
         <Form>

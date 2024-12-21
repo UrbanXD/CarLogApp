@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { GetFormHandleSubmitArgs } from "../../../constants/constants";
-import { store } from "../../../redux/store";
-import { addCar } from "../../../redux/cars/cars.slices";
-import { InputPickerDataType } from "../../../components/form/InputPicker/InputPicker";
-import { getUUID } from "../../../utils/uuid";
-import { ImageType } from "../../../utils/pickImage";
-import { CarTableType } from "../../../utils/database/powersync/AppSchema";
+import { GetFormHandleSubmitArgs } from "../../../core/constants/constants";
+import { store } from "../../../core/redux/store";
+import { addCar } from "../../../core/redux/cars/cars.slices";
+import { InputPickerDataType } from "../../../core/components/form/InputPicker/InputPicker";
+import { getUUID } from "../../../core/utils/uuid";
+import { ImageType } from "../../../core/utils/pickImage";
+import { CarTableType } from "../../../core/utils/database/powersync/AppSchema";
 
 export const newCarFormStepsField = [["name"], ["brand", "model"], ["odometerValue", "odometerMeasurement"], ["fuelType", "fuelMeasurement", "fuelTankSize"]];
 export const newCarFormStepsTitle = ["Elnevezés", "Gyártó", "Autó adatok", "Autó adatok"];

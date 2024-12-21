@@ -1,6 +1,6 @@
 import React from "react";
 import { SharedValue } from "react-native-reanimated";
-import { theme} from "../../constants/theme";
+import { theme } from "../../constants/theme";
 import { View, Text as TextRN, StyleSheet } from "react-native";
 import { Canvas, Skia, Path, Text, SkFont } from "@shopify/react-native-skia";
 import { FONT_SIZES, SEPARATOR_SIZES } from "../../constants/constants";

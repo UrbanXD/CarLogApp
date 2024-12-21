@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef} from "react";
+import React, { useEffect, useRef } from "react";
 import { PickerDataType } from "./Picker";
 import { FlatList } from "react-native-gesture-handler";
 import PickerItem from "./PickerItem";
@@ -6,14 +6,13 @@ import { StyleSheet, Text, View } from "react-native";
 import {
     DEFAULT_SEPARATOR,
     FONT_SIZES,
-    GET_ICON_BUTTON_RESET_STYLE,
     GLOBAL_STYLE,
     ICON_NAMES,
     SEPARATOR_SIZES
 } from "../../../constants/constants";
-import { IconButton } from "react-native-paper";
 import { theme } from "../../../constants/theme";
 import SearchBar from "../../shared/SearchBar";
+import Icon from "../../shared/Icon";
 
 interface PickerElementsProps {
     data: Array<PickerDataType>
@@ -40,16 +39,11 @@ const PickerElements: React.FC<PickerElementsProps> = ({
     isDropdownContentVisible,
     setIsDropdownContentVisible
 }) => {
-    const flatListRef = useRef<FlatList>(null)
-
-    useEffect(() => {
-        console.log("xd")
-    }, [selectedItemID]);
+    const flatListRef = useRef<FlatList>(null);
 
     const select = (id: string) => {
         onSelect(id);
         setIsDropdownContentVisible(false);
-        console.log("picker elements selecr")
     }
 
     const renderItem = (arg: { item: any, index: number }) =>
@@ -67,7 +61,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
             }
         </React.Fragment>
 
-    const keyExtractor = (item: any, index: number) => item.id || index.toString()
+    const keyExtractor = (item: any, index: number) => item.id || index.toString();
 
     const onScrollToIndexFailed = (info: any) => {
         setTimeout(() => {
@@ -98,12 +92,12 @@ const PickerElements: React.FC<PickerElementsProps> = ({
         <View style={[styles.elementsContainer, !isHorizontal && { maxHeight: 30 * 5 + 5 * SEPARATOR_SIZES.small, flexDirection: "column" }]}>
             {
                 !setSearchTerm && isDropdown &&
-                <IconButton
+                <Icon
                     icon={ ICON_NAMES.close }
                     size={ FONT_SIZES.normal }
-                    iconColor={ theme.colors.white }
+                    color={ theme.colors.white }
+                    style={{ alignSelf: "center" }}
                     onPress={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
-                    style={ [GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.normal), { alignSelf: "center" }] }
                 />
             }
             {
@@ -132,12 +126,12 @@ const PickerElements: React.FC<PickerElementsProps> = ({
                                 <Text style={ styles.notFoundText }>Nem található</Text>
                             </View>
                     :   <View style={ styles.notCarouselElementsContainer }>
-                        {
-                            data.map((item, index) => {
-                                return renderItem({ item, index });
-                            })
-                        }
-                    </View>
+                            {
+                                data.map((item, index) => {
+                                    return renderItem({ item, index });
+                                })
+                            }
+                        </View>
             }
         </View>
     )
@@ -160,8 +154,6 @@ const styles= StyleSheet.create({
     },
     notFoundContainer: {
         flexGrow: 0.8,
-        // marginRight: FONT_SIZES.normal,
-        // backgroundColor: "red",
         justifyContent: "center"
     },
     notFoundText: {
