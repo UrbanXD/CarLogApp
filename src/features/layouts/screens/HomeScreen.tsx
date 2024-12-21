@@ -17,15 +17,15 @@ import {
 } from "../../core/constants/constants";
 import { useDatabase } from "../../core/utils/database/Database";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import Carousel, { CarouselItemType } from "../../core/components/carousel/Carousel";
-import Button from "../../core/components/shared/Button";
+import Button from "../../core/components/shared/button/Button";
+import Carousel, { CarouselItemType } from "../../core/components/shared/carousel/Carousel";
 import { getDate } from "../../core/utils/getDate";
 import UpcomingRides from "../../upcomingRides/UpcomingRides";
 import Link from "../../core/components/shared/Link";
 import { useSelector } from "react-redux";
 import { RootState, store } from "../../core/redux/store";
 import {loadCars } from "../../core/redux/cars/cars.slices";
-import CarouselItem from "../../core/components/carousel/CarouselItem";
+import CarouselItem from "../../core/components/shared/carousel/CarouselItem";
 import {useBottomSheet} from "../../core/context/BottomSheetProvider";
 import NewCarForm from "../../layouts/forms/addCar/NewCarForm";
 import { encode } from "base64-arraybuffer";
@@ -142,10 +142,10 @@ const CarsBlock: React.FC<CarsBlockProps> = ({ openNewCarBottomSheet }) => {
                     }
                 />
             </View>
-            <Button
+            <Button.Text
+                text="Autó hozzáadás"
                 width={ wp(75) }
                 onPress={ openNewCarBottomSheet }
-                title={"Autó hozzáadás"}
             />
         </View>
     )

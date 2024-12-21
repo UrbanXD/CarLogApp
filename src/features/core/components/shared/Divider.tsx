@@ -1,6 +1,7 @@
 import { View, StyleSheet, ColorValue } from "react-native";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { theme } from "../../constants/theme";
+import React from "react";
 
 interface DividerProps {
     size?: number

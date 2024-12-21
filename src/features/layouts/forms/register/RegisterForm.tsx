@@ -10,11 +10,11 @@ import {
 } from "./registerFormSchema";
 import { useMultiStepForm } from "../../../core/context/MultiStepFormProvider";
 import { GLOBAL_STYLE, ICON_NAMES } from "../../../core/constants/constants";
-import Button, {FacebookButton, GoogleButton} from "../../../core/components/shared/Button";
+import Button from "../../../core/components/shared/button/Button";
 import TextDivider from "../../../core/components/shared/TextDivider";
 import { theme } from "../../../core/constants/theme";
-import InputText from "../../../core/components/form/InputText/InputText";
-import { MultiStepForm } from "../../../core/components/form/Form";
+import MultiStepForm from "../../../core/components/multiStepForm/MultiStepForm";
+import Input from "../../../core/components/input/Input";
 
 const RegisterForm: React.FC = () => {
     const database = useDatabase();
@@ -28,11 +28,11 @@ const RegisterForm: React.FC = () => {
 
     const steps = [
         () =>
-            <RegisterStepOne />,
+            <StepOne />,
         () =>
-            <RegisterStepTwo />,
+            <StepTwo />,
         () =>
-            <RegisterStepThree />
+            <StepThree />
     ];
 
     return (
@@ -48,12 +48,12 @@ const RegisterForm: React.FC = () => {
     )
 }
 
-const RegisterStepOne: React.FC = () => {
+const StepOne: React.FC = () => {
     const { control, next } = useMultiStepForm();
 
     return (
         <>
-            <InputText
+            <Input.Text
                 isInBottomSheet
                 control={ control }
                 fieldName="email"
@@ -61,8 +61,8 @@ const RegisterStepOne: React.FC = () => {
                 icon={ ICON_NAMES.email }
                 placeholder="carlog@gmail.com"
             />
-            <Button
-                title="Következő"
+            <Button.Text
+                text="Következő"
                 iconRight={ ICON_NAMES.rightArrowHead }
                 onPress={ next }
             />
@@ -72,18 +72,19 @@ const RegisterStepOne: React.FC = () => {
                 lineHeight={ 1 }
                 marginVertical={ GLOBAL_STYLE.formContainer.gap }
             />
-            <GoogleButton onPress={ () => 1 } />
-            <FacebookButton onPress={ () => 1 } />
+            <Button.Google
+                onPress={ () => 1 }
+            />
         </>
     )
 }
 
-const RegisterStepTwo: React.FC = () => {
+const StepTwo: React.FC = () => {
     const { control } = useMultiStepForm()
 
     return (
         <>
-            <InputText
+            <Input.Text
                 control={ control }
                 fieldName="lastname"
                 fieldNameText="Vezetéknév"
@@ -91,7 +92,7 @@ const RegisterStepTwo: React.FC = () => {
                 placeholder="Kovács"
                 isInBottomSheet
             />
-            <InputText
+            <Input.Text
                 control={ control }
                 fieldName="firstname"
                 fieldNameText="Keresztnév"
@@ -103,12 +104,12 @@ const RegisterStepTwo: React.FC = () => {
     )
 }
 
-const RegisterStepThree: React.FC = () => {
+const StepThree: React.FC = () => {
     const { control } = useMultiStepForm()
 
     return (
         <>
-            <InputText
+            <Input.Text
                 control={ control }
                 fieldName="password"
                 fieldNameText="Jelszó"
@@ -118,7 +119,7 @@ const RegisterStepThree: React.FC = () => {
                 isInBottomSheet
 
             />
-            <InputText
+            <Input.Text
                 control={ control }
                 fieldName="rpassword"
                 fieldNameText="Jelszó újra"

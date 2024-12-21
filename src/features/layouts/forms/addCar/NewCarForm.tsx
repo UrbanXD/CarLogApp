@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
     FUEL_MEASUREMENTS,
@@ -16,9 +16,9 @@ import {
     ICON_NAMES,
 } from "../../../core/constants/constants";
 import { useMultiStepForm } from "../../../core/context/MultiStepFormProvider";
-import { MultiStepForm } from "../../../core/components/form/Form";
-import InputText from "../../../core/components/form/InputText/InputText";
-import InputPicker, { InputPickerDataType } from "../../../core/components/form/InputPicker/InputPicker";
+import MultiStepForm from "../../../core/components/multiStepForm/MultiStepForm";
+import Input from "../../../core/components/input/Input";
+import { InputPickerDataType } from "../../../core/components/input/picker/InputPicker";
 
 interface NewCarFormProps {
     close?: () => void
@@ -73,7 +73,7 @@ const StepOne: React.FC = () => {
     const { control } = useMultiStepForm();
 
     return (
-        <InputText
+        <Input.Text
             control={ control }
             fieldName="name"
             fieldNameText="Autó azonosító"
@@ -111,14 +111,14 @@ const StepTwo: React.FC = () => {
 
     return (
         <>
-            <InputPicker
+            <Input.Picker
                 data={ brands }
                 control={ control }
                 fieldName="brand"
                 fieldNameText="Márka"
                 withSearchbar
             />
-            <InputPicker
+            <Input.Picker
                 key={ JSON.stringify(models) }
                 data={ models }
                 control={ control }
@@ -136,7 +136,7 @@ const StepThree: React.FC = () => {
 
     return (
         <>
-            <InputText
+            <Input.Text
                 control={ control }
                 fieldName="odometerValue"
                 fieldNameText="Kilometerora alass"
@@ -144,7 +144,7 @@ const StepThree: React.FC = () => {
                 icon={ ICON_NAMES.odometer }
                 numeric
             />
-            <InputPicker
+            <Input.Picker
                 data={ ODOMETER_MEASUREMENTS }
                 control={ control }
                 fieldName="odometerMeasurement"
@@ -161,7 +161,7 @@ const StepFour: React.FC = () => {
 
     return (
         <>
-            <InputPicker
+            <Input.Picker
                 data={ FUEL_TYPES }
                 control={ control }
                 fieldName="fuelType"
@@ -169,7 +169,7 @@ const StepFour: React.FC = () => {
                 isHorizontal
                 isCarousel={ false }
             />
-            <InputPicker
+            <Input.Picker
                 data={ FUEL_MEASUREMENTS }
                 control={ control }
                 fieldName="fuelMeasurement"
@@ -177,7 +177,7 @@ const StepFour: React.FC = () => {
                 isHorizontal
                 isCarousel={ false }
             />
-            <InputText
+            <Input.Text
                 control={ control }
                 fieldName="fuelTankSize"
                 fieldNameText="Uzemanyag tartaly merete"

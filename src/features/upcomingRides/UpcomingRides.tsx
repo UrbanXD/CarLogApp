@@ -13,8 +13,8 @@ import { useForm } from "react-hook-form";
 import { getToday } from "../core/utils/getDate";
 import { useBottomSheet } from "../core/context/BottomSheetProvider";
 import { EditRideFormFieldType, editRideUseFormProps } from "../layouts/forms/editRide/editRideFormSchema";
-import InputText from "../core/components/form/InputText/InputText";
-import ProgressBar from "../core/components/form/ProgressBar";
+import InputText from "../core/components/input/text/InputText";
+import ProgressBar from "../core/components/shared/ProgressBar";
 import Icon from "../core/components/shared/Icon";
 
 type RideType = {

@@ -1,9 +1,10 @@
-import { ColorValue, StyleProp, StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
+import {ColorValue, Image, ImageSourcePropType, StyleProp, StyleSheet, TouchableOpacity, ViewStyle} from "react-native";
 import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import React from "react";
 
 interface IconProps {
-    icon: string
+    icon: ImageSourcePropType | string
     size?: number
     color?: ColorValue | string,
     backgroundColor?: ColorValue | string,
@@ -27,12 +28,18 @@ const Icon: React.FC<IconProps> = ({
             onPress={ onPress }
             disabled={ !onPress }
         >
-            <MaterialIcon
-                name={ icon }
-                size={ size }
-                color={ color }
-                style={{ }}
-            />
+            {
+                typeof icon === "string"
+                    ?   <MaterialIcon
+                            name={ icon }
+                            size={ size }
+                            color={ color }
+                        />
+                    :   <Image
+                            source={ icon }
+                            style={ styles.imageIcon }
+                        />
+            }
         </TouchableOpacity>
     )
 }
@@ -46,6 +53,12 @@ const useStyles = (size: number, backgroundColor: ColorValue | string) =>
             alignItems: "center",
             backgroundColor,
             borderRadius: 50,
+        },
+        imageIcon: {
+            alignSelf: "center",
+            width: size,
+            height: size,
+            backgroundColor
         }
     })
 
