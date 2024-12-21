@@ -5,7 +5,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface TextDividerProps {
     title: string
-    color?: ColorValue
+    color?: ColorValue | string
     lineHeight?: number
     marginVertical?: number
 }

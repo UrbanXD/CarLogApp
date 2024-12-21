@@ -1,18 +1,13 @@
 import { Tabs } from 'expo-router';
 import React from "react";
 import { ICON_NAMES } from "../../features/core/constants/constants";
-import TabBar from "../../features/tabBar/components/TabBar";
+import TabBar from "../../features/core/components/tabBar/TabBar";
 
 const TabLayout:React.FC = () => {
     return (
         <Tabs
-            tabBar={
-                (props) =>
-                    <TabBar { ...props } />
-            }
-            screenOptions={{
-                headerShown: false,
-            }}
+            tabBar={ (props) => <TabBar { ...props } /> }
+            screenOptions={{ headerShown: false }}
         >
             <Tabs.Screen
                 name="index"

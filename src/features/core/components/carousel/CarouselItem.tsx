@@ -1,4 +1,4 @@
-import React from "react";
+import React, {ReactElement } from "react";
 import {
     ImageBackground,
     StyleSheet,
@@ -8,79 +8,88 @@ import {
 } from "react-native";
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { theme } from "../../constants/theme";
-import hexToRgba from "hex-to-rgba";
 import { LinearGradient } from "expo-linear-gradient";
 import {
     FONT_SIZES,
-    GET_ICON_BUTTON_RESET_STYLE,
-    ICON_NAMES,
     SEPARATOR_SIZES
 } from "../../constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { CarouselItemType } from "./Carousel";
-import { IconButton } from "react-native-paper";
+import { hexToRgba } from "../../utils/colors/hexToRgba";
 
 interface CarouselItemProps {
     index: number
     size: number
     x: SharedValue<number>
-    isFocused: boolean
+    overlay?: boolean
     item: CarouselItemType
-    onPress: (index: number) => void
+    cardAction?: () => void
+    renderBottomActionButton?: () => ReactElement
+    renderTopActionButton?: () => ReactElement
 }
+
 const CarouselItem: React.FC<CarouselItemProps> = ({
     index,
     size,
     x,
-    isFocused,
+    overlay = false,
     item,
-    onPress
+    cardAction,
+    renderBottomActionButton,
+    renderTopActionButton
 }) => {
     const animatedStyle = useAnimatedStyle(() => {
-        const scale = interpolate(
+        const scaleY = interpolate(
             x.value,
             [size * (index - 1), size * index , size * (index + 1)],
-            [0.9, 1, 0.9],
+            [0.85, 1, 0.85],
         );
 
         return {
-            transform: [{scale}]
+            transform: [{ scaleY }]
         };
     });
 
     return (
         <TouchableOpacity
             activeOpacity={ 1 }
-            style={{ width: size }}
-            onPress={ () => onPress(index) }
-            disabled={ item.selected }
+            style={{ width: size, paddingHorizontal: 10 }}
+            onPress={ cardAction }
+            disabled={ !cardAction }
         >
             <Animated.View style={ [styles.itemContainer, animatedStyle ] }>
                 {
-                    !isFocused && <View style={styles.overlay} />
+                    overlay && <View style={ styles.overlay } />
                 }
                 <ImageBackground
-                    source={ item.image || require("../../../../assets/images/car1.jpg") }
+                    source={
+                        !item.image
+                            ? require("../../../../assets/images/car1.jpg")
+                            : typeof item.image === "string"
+                                ? { uri: `data:image/jpeg;base64,${item.image}` }
+                                : item.image
+                    }
                     style={ styles.itemContentContainer }
                     imageStyle={ styles.itemImage }
                 >
-                    <LinearGradient
-                        locations={[ 0, 0.85 ]}
-                        colors={ [hexToRgba(theme.colors.black, 0.15), hexToRgba(theme.colors.black, 0.95)] }
-                        style={ styles.imageOverlay }
-                    />
+                    {
+                        overlay &&
+                        <LinearGradient
+                            locations={[ 0, 0.85 ]}
+                            colors={ [hexToRgba(theme.colors.black, 0.15), hexToRgba(theme.colors.black, 0.95)] }
+                            style={ styles.imageOverlay }
+                        />
+                    }
                     <View style={ styles.topContainer }>
                         <Text style={ styles.topContainerTitleText }>
                             { item.id }
                         </Text>
-                        <View style={ [styles.topContainerSelectedContainer, { width: styles.selectedContent.width, height: styles.selectedContent.height}] }>
-                            {
-                                item.selected &&
-                                <View style={ styles.selectedContent }>
-                                    <View style={ styles.selectedPoint } />
-                                </View>
-                            }
-                        </View>
+                        {
+                            renderTopActionButton &&
+                            <View style={ styles.actionContainer }>
+                                { renderTopActionButton() }
+                            </View>
+                        }
                     </View>
                     <View style={ styles.bottomContainer }>
                         <View style={ styles.infoContainer }>
@@ -91,15 +100,12 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                                 { item.subtitle }
                             </Text>
                         </View>
-                        <View style={ styles.rightContainer }>
-                            <IconButton
-                                onPress={() => console.log("hllo")}
-                                size={ FONT_SIZES.medium }
-                                icon={ ICON_NAMES.pencil }
-                                iconColor={ theme.colors.white }
-                                style={ GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium * 1.25) }
-                            />
-                        </View>
+                        {
+                            renderBottomActionButton &&
+                            <View style={ styles.actionContainer }>
+                                { renderBottomActionButton() }
+                            </View>
+                        }
                     </View>
                 </ImageBackground>
             </Animated.View>
@@ -123,12 +129,12 @@ const styles = StyleSheet.create({
     itemContentContainer: {
         flex: 1,
         borderWidth: 0.5,
-        borderRadius: 35,
+        borderRadius: 38,
         borderColor: theme.colors.gray3
     },
     itemImage: {
         width: "100%",
-        resizeMode: "cover",
+        resizeMode: "stretch",
         borderRadius: 35,
     },
     imageOverlay: {
@@ -137,8 +143,16 @@ const styles = StyleSheet.create({
     },
     topContainer: {
         flexDirection: "row",
+        padding: SEPARATOR_SIZES.lightSmall,
         paddingLeft: SEPARATOR_SIZES.normal,
-        paddingVertical: hp(0.45)
+    },
+    bottomContainer: {
+        position: "absolute",
+        bottom: 0,
+        width: "100%",
+        flexDirection: "row",
+        padding: SEPARATOR_SIZES.lightSmall,
+        paddingLeft: SEPARATOR_SIZES.normal,
     },
     topContainerTitleText: {
         flex: 1,
@@ -152,40 +166,8 @@ const styles = StyleSheet.create({
         letterSpacing: FONT_SIZES.normal * 0.05,
         lineHeight: FONT_SIZES.normal * 0.85,
     },
-    topContainerSelectedContainer: {
-        paddingLeft: SEPARATOR_SIZES.lightLarge,
-        marginTop: -hp(0.5)
-    },
-    selectedContent: {
-        position: "absolute",
-        right: 0,
-        width: hp(5), height: hp(5),
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: theme.colors.white,
-        borderTopRightRadius: 35,
-        borderBottomLeftRadius: 15,
-        borderColor: theme.colors.black,
-        borderBottomWidth: 3,
-        borderLeftWidth: 3,
-    },
-    selectedPoint: {
-        borderRadius: 100,
-        alignSelf: "center",
-        backgroundColor: theme.colors.black,
-        width: hp(1.25),
-        height: hp(1.25)
-    },
-    bottomContainer: {
-        position: "absolute",
-        bottom: 0,
-        width: "100%",
-        flexDirection: "row",
-        paddingHorizontal: SEPARATOR_SIZES.normal,
-        paddingVertical: SEPARATOR_SIZES.small,
-    },
     infoContainer: {
-        width: "80%",
+        flex: 1,
     },
     infoTitleText: {
         color: theme.colors.white,
@@ -205,7 +187,7 @@ const styles = StyleSheet.create({
         textShadowRadius: 10,
         letterSpacing: FONT_SIZES.extraSmall * 0.05
     },
-    rightContainer: {
+    actionContainer: {
         width: "20%",
         justifyContent: "flex-end",
         alignItems: "flex-end"
