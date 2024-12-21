@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from "react";
-import {GET_ICON_BUTTON_RESET_STYLE, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../../constants/constants";
-import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import React, { useEffect, useState } from "react";
+import { GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/constants";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import TextInput from "../InputText/TextInput";
-import {Icon, IconButton} from "react-native-paper";
-import {theme} from "../../../constants/theme";
+import { theme } from "../../../constants/theme";
+import Icon from "../../shared/Icon";
 
 interface PickerDropdownInfoProps {
     toggleDropdown?: () => void
@@ -32,7 +32,11 @@ export const PickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
         >
             {
                 icon &&
-                <Icon source={ icon } size={ styles.titleText.fontSize * 2 } color={ theme.colors.white } />
+                <Icon
+                    icon={ icon }
+                    size={ styles.titleText.fontSize * 2 }
+                    color={ theme.colors.white }
+                />
             }
             <View>
                 <Text style={ styles.titleText } numberOfLines={ 1 } >
@@ -45,11 +49,11 @@ export const PickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
                     </Text>
                 }
             </View>
-            <IconButton
+            <Icon
                 icon={ isHorizontal ? ICON_NAMES.rightArrowHead : ICON_NAMES.downArrowHead }
                 size={ styles.titleText.fontSize * 2 }
-                iconColor={ theme.colors.white }
-                style={ [GET_ICON_BUTTON_RESET_STYLE(styles.titleText.fontSize * 2), { marginLeft: -styles.titleText.fontSize + SEPARATOR_SIZES.lightSmall }] }
+                color={ theme.colors.white }
+                // style={ { marginLeft: -styles.titleText.fontSize + SEPARATOR_SIZES.lightSmall } }
             />
         </TouchableOpacity>
     )

@@ -1,7 +1,6 @@
 import { ColorValue, StyleSheet, TouchableOpacity } from "react-native";
 import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { SEPARATOR_SIZES } from "../../constants/constants";
 
 interface IconProps {
     icon: string

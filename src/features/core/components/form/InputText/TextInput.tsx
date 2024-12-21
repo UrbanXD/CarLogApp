@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, TextInput as TextInputRN } from "react-native";
-import { Icon, IconButton } from "react-native-paper";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import {ICON_COLORS, ICON_NAMES, SEPARATOR_SIZES} from "../../../constants/constants";
+import { ICON_COLORS, ICON_NAMES } from "../../../constants/constants";
 import { theme } from "../../../constants/theme";
+import Icon from "../../shared/Icon";
 
 interface TextInputProps {
     value?: string
@@ -46,7 +46,7 @@ const TextInput: React.FC<TextInputProps> = ({
                     icon &&
                     <View style={ styles.formFieldIconContainer }>
                         <Icon
-                            source={ icon }
+                            icon={ icon }
                             size={ hp(4.5) }
                             color={ styles.textInput.color }
                         />
@@ -67,10 +67,10 @@ const TextInput: React.FC<TextInputProps> = ({
                 {
                     isSecure &&
                     <View style={ styles.formFieldIconContainer }>
-                        <IconButton
+                        <Icon
                             icon={ secure ? ICON_NAMES.eyeOff : ICON_NAMES.eye }
                             size={ hp(3.25) }
-                            iconColor={ ICON_COLORS.default }
+                            color={ ICON_COLORS.default }
                             onPress={ changeSecure }
                         />
                     </View>
@@ -78,11 +78,11 @@ const TextInput: React.FC<TextInputProps> = ({
                 {
                     actionIcon &&
                     <View style={ styles.formFieldIconContainer }>
-                        <IconButton
+                        <Icon
                             icon={ actionIcon }
                             size={ hp(4.5) }
-                            iconColor={ ICON_COLORS.default }
-                            style={{ alignSelf: "center" }}
+                            color={ ICON_COLORS.default }
+                            // style={{ alignSelf: "center" }}
                             onPress={ onAction }
                         />
                     </View>

@@ -10,7 +10,6 @@ import {BottomSheetModalProvider} from "@gorhom/bottom-sheet";
 import {store} from "../features/core/redux/store";
 import {theme} from "../features/core/constants/theme";
 import {Provider} from "react-redux";
-import {PaperProvider} from "react-native-paper";
 import {KeyboardProvider} from "react-native-keyboard-controller";
 import {StatusBar} from "expo-status-bar";
 import Header from "../features/core/components/header/Header";
@@ -46,34 +45,32 @@ const Layout:React.FC = () => {
 
     return (
         <Provider store={ store }>
-            <PaperProvider theme={ theme }>
-                <SafeAreaProvider>
-                    <KeyboardProvider>
-                        <GestureHandlerRootView style={{ flex: 1 }}>
-                            <BottomSheetModalProvider>
-                                <ScrollViewProvider>
-                                    <BottomSheetProvider>
-                                        <Stack screenOptions={{ header: () => <></>}} >
-                                            <Stack.Screen
-                                                name="index"
-                                                options={{
-                                                    header: () => <StatusBar translucent={ true } />
-                                                }}
-                                            />
-                                            <Stack.Screen
-                                                name="(main)"
-                                                options={{
-                                                    header: () => <Header />
-                                                }}
-                                            />
-                                        </Stack>
-                                    </BottomSheetProvider>
-                                </ScrollViewProvider>
-                            </BottomSheetModalProvider>
-                        </GestureHandlerRootView>
-                    </KeyboardProvider>
-                </SafeAreaProvider>
-            </PaperProvider>
+            <SafeAreaProvider>
+                <KeyboardProvider>
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                        <BottomSheetModalProvider>
+                            <ScrollViewProvider>
+                                <BottomSheetProvider>
+                                    <Stack screenOptions={{ header: () => <></>}} >
+                                        <Stack.Screen
+                                            name="index"
+                                            options={{
+                                                header: () => <StatusBar translucent={ true } />
+                                            }}
+                                        />
+                                        <Stack.Screen
+                                            name="(main)"
+                                            options={{
+                                                header: () => <Header />
+                                            }}
+                                        />
+                                    </Stack>
+                                </BottomSheetProvider>
+                            </ScrollViewProvider>
+                        </BottomSheetModalProvider>
+                    </GestureHandlerRootView>
+                </KeyboardProvider>
+            </SafeAreaProvider>
         </Provider>
     );
 }
