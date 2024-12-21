@@ -1,17 +1,21 @@
 import React from "react";
-import { Image, TouchableOpacity, StyleSheet } from "react-native";
+import { Image, TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface AvatarImageProps {
     avatarSize?: number
+    style?: StyleProp<ViewStyle>
 }
 
-const AvatarImage: React.FC<AvatarImageProps> = ({ avatarSize = hp(5) }) => {
+const AvatarImage: React.FC<AvatarImageProps> = ({
+    avatarSize = hp(5),
+    style
+}) => {
     const styles = useStyles(avatarSize);
 
     return (
         <TouchableOpacity
-            style={ styles.container }
+            style={ [styles.container, style] }
         >
             <Image
                 source={ require("../../../../../assets/images/google_logo.png") }

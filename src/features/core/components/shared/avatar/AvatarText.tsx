@@ -1,5 +1,5 @@
 import React from "react";
-import { ColorValue, View, Text, StyleSheet, useWindowDimensions, TouchableOpacity } from "react-native";
+import { ColorValue, View, Text, StyleSheet, useWindowDimensions, TouchableOpacity, ViewStyle, StyleProp } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { theme } from "../../../constants/theme";
 import getContrastingColor from "../../../utils/colors/getContrastingColor";
@@ -9,6 +9,7 @@ interface AvatarTextProps {
     avatarSize?: number
     color?: ColorValue
     backgroundColor?: ColorValue | string
+    style?: StyleProp<ViewStyle>
     onPress?: () => void
 }
 
@@ -17,6 +18,7 @@ const AvatarText: React.FC<AvatarTextProps> = ({
     avatarSize = hp(5),
     backgroundColor = theme.colors.fuelYellow,
     color = getContrastingColor(backgroundColor, theme.colors.white, theme.colors.black),
+    style,
     onPress,
 }) => {
     const { fontScale } = useWindowDimensions();
@@ -25,7 +27,7 @@ const AvatarText: React.FC<AvatarTextProps> = ({
 
     return (
         <TouchableOpacity
-            style={ styles.container }
+            style={ [styles.container, style] }
             onPress={ onPress }
             disabled={ !onPress }
         >
