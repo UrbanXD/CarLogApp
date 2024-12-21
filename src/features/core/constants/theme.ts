@@ -1,9 +1,5 @@
-import { DefaultTheme } from "react-native-paper";
-
 export const theme = {
-    ...DefaultTheme,
     colors: {
-        ...DefaultTheme.colors,
         homePageBackground: "red",
         white: "#fdfdfd",
         white2: "#E1E5EA",
@@ -25,7 +21,3 @@ export const theme = {
         fuelYellow: "#FFDF00",
     },
 };
-
-   // "@react-native-async-storage/async-storage": "1.23.1",
-//    "expo-crypto": "~13.0.2",
-//    "react-native-url-polyfill": "^2.0.0",

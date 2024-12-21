@@ -1,13 +1,15 @@
 import React from "react";
-import { CarType } from "../form/redux/cars/cars.slices";
 import { Image, StyleSheet, View, Text } from "react-native";
 import { theme } from "../core/constants/theme";
 import { FONT_SIZES, ICON_COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../core/constants/constants";
-import { Divider, IconButton } from "react-native-paper";
-import Button from "../core/components/shared/Button";
+import {CarTableType} from "../core/utils/database/powersync/AppSchema";
+import Icon from "../core/components/shared/Icon";
+import Divider from "../core/components/shared/Divider";
+import IconButton from "../core/components/shared/button/IconButton";
+import Button from "../core/components/shared/button/Button";
 
 interface CarInfoProps {
-    car?: CarType
+    car?: CarTableType
 }
 
 const CarInfo: React.FC<CarInfoProps> = ({ car }) => {
@@ -26,17 +28,17 @@ const CarInfo: React.FC<CarInfoProps> = ({ car }) => {
                         2018
                     </Text>
                     <View style={{ position: "absolute", alignItems: "flex-end", width:"100%" }}>
-                        <IconButton icon={ ICON_NAMES.pencil } iconColor={"white"} />
+                        <Icon icon={ ICON_NAMES.pencil } color={ theme.colors.white } />
                     </View>
                 </View>
                 <Divider />
                 <View>
-                    <IconButton icon={ ICON_NAMES.pencil } iconColor={"white"}></IconButton>
+                    <Icon icon={ ICON_NAMES.pencil } color={ theme.colors.white } />
                 </View>
             </View>
-            <Button
+            <Button.Text
                 onPress={() => {}}
-                title="Törlés"
+                text="Törlés"
                 backgroundColor={ theme.colors.googleRed }
                 textColor={ theme.colors.black2 }
             />

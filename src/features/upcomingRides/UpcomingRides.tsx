@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import {
     FONT_SIZES,
-    GET_ICON_BUTTON_RESET_STYLE,
     GLOBAL_STYLE,
     ICON_NAMES,
     SEPARATOR_SIZES
@@ -10,13 +9,13 @@ import {
 import Date from "../core/components/shared/Date";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { theme } from "../core/constants/theme";
-import { IconButton } from "react-native-paper";
-import InputText from "../form/components/InputText/InputText";
 import { useForm } from "react-hook-form";
-import { EditRideFormFieldType, editRideUseFormProps } from "../editRideForm/constants/editRideFormSchema";
 import { getToday } from "../core/utils/getDate";
-import ProgressBar from "../form/components/ProgressBar";
 import { useBottomSheet } from "../core/context/BottomSheetProvider";
+import { EditRideFormFieldType, editRideUseFormProps } from "../layouts/forms/editRide/editRideFormSchema";
+import InputText from "../core/components/input/text/InputText";
+import ProgressBar from "../core/components/shared/ProgressBar";
+import Icon from "../core/components/shared/Icon";
 
 type RideType = {
     carUID: string
@@ -66,7 +65,10 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                                     100 km
                                 </Text>
                         </View>
-                            <IconButton
+                            <Icon
+                                icon={ ICON_NAMES.info }
+                                size={ FONT_SIZES.medium }
+                                color={ theme.colors.white }
                                 onPress={
                                     () =>{
                                         console.log("xdd")
@@ -77,10 +79,6 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                                         })
                                         }
                                 }
-                                size={ FONT_SIZES.medium }
-                                icon={ ICON_NAMES.info }
-                                iconColor={"white"}
-                                style={ GET_ICON_BUTTON_RESET_STYLE(FONT_SIZES.medium) }
                             />
                         </View>
                     </View>

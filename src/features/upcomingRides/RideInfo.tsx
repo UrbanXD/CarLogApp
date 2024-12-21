@@ -1,13 +1,12 @@
 import React from "react";
-import { FONT_SIZES, GET_ICON_BUTTON_RESET_STYLE, SEPARATOR_SIZES } from "../core/constants/constants";
-import { IconButton } from "react-native-paper";
+import { FONT_SIZES, SEPARATOR_SIZES } from "../core/constants/constants";
 import { theme } from "../core/constants/theme";
 import { StyleSheet, Text, View } from "react-native";
-import { IconSource } from "react-native-paper/lib/typescript/components/Icon";
+import Icon from "../core/components/shared/Icon";
 
 interface RideInfoProps {
     text: string,
-    icon: IconSource
+    icon: string
 }
 
 const RideInfo: React.FC<RideInfoProps> = ({
@@ -16,11 +15,10 @@ const RideInfo: React.FC<RideInfoProps> = ({
 }) => {
     return (
         <View style={ styles.container }>
-            <IconButton
+            <Icon
                 icon={ icon }
-                iconColor={ theme.colors.white }
                 size={ styles.text.fontSize * 1.2 }
-                style={ GET_ICON_BUTTON_RESET_STYLE(styles.text.fontSize * 1.2) }
+                color={ theme.colors.white }
             />
             <Text numberOfLines={ 2 } style={ styles.text }>
                 { text }

@@ -1,13 +1,12 @@
 import React from "react";
-import { IconSource } from "react-native-paper/lib/typescript/components/Icon";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import { Icon } from "react-native-paper";
 import { FONT_SIZES } from "../../constants/constants";
 import { theme } from "../../constants/theme";
+import Icon from "./Icon";
 
 interface LinkProps {
     text?: string,
-    icon?: IconSource
+    icon?: string
 }
 
 const Link: React.FC<LinkProps> = ({
@@ -25,7 +24,7 @@ const Link: React.FC<LinkProps> = ({
             {
                 icon &&
                 <Icon
-                    source={ icon }
+                    icon={ icon }
                     size={ styles.linkText.fontSize * 1.35 }
                     color={ styles.linkText.color }
                 />

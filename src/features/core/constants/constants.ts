@@ -1,21 +1,26 @@
 import { StyleSheet } from "react-native";
 import { theme } from "./theme";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { UseFormHandleSubmit } from "react-hook-form";
-import { SupabaseConnector } from "../utils/database/SupabaseConnector";
-import { Kysely } from "@powersync/kysely-driver";
-import { DatabaseType } from "../utils/database/AppSchema";
-import { InputPickerDataType } from "../../form/components/InputPicker/InputPicker";
+import { ControllerFieldState, ControllerRenderProps, UseFormHandleSubmit, UseFormStateReturn } from "react-hook-form";
+import { Database } from "../utils/database/Database";
+import { InputPickerDataType } from "../components/input/picker/InputPicker";
 
 export interface GetFormHandleSubmitArgs {
     handleSubmit: UseFormHandleSubmit<any>
-    supabaseConnector?: SupabaseConnector
-    db?: Kysely<DatabaseType>
+    database: Database
     onSubmit?: (isSuccess: boolean) => void
 }
 
+export interface ControllerRenderArgs {
+    field: ControllerRenderProps<any, string>
+    fieldState: ControllerFieldState
+    formState: UseFormStateReturn<any>
+}
 
-export const CAR_NAME_LENGTH = 10
+export const CAR_NAME_LENGTH = 10;
+export const SIMPLE_HEADER_HEIGHT = hp(6.75);
+export const SIMPLE_TABBAR_HEIGHT = hp(7.5);
+export const ICON_FONT_SIZE_SCALE = 1.75;
 
 export const LOCAL_STORAGE_KEYS = {
     selectedCarIndex: "selectedCarIndex"
@@ -35,6 +40,7 @@ export const ICON_NAMES = {
     leftArrowHead: "chevron-left",
     leftArrow: "arrow-left",
     downArrowHead: "chevron-down",
+    upArrowHead: "chevron-up",
     info: "information-outline",
     destinationPointMarker: "map-marker",
     startingPointMarker: "map-marker-outline",
@@ -51,6 +57,8 @@ export const ICON_NAMES = {
     nametag: "tag-text-outline",
     odometer: "gauge",
     search: "magnify",
+    addImage: "image-plus",
+    image: "image-outline",
     trashCan: "delete-outline",
 }
 
@@ -89,6 +97,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
         flex: 1,
         // paddingHorizontal: DEFAULT_SEPARATOR,
         paddingVertical: SEPARATOR_SIZES.small,
+        paddingBottom: SIMPLE_TABBAR_HEIGHT * 1.25
     },
     scrollViewContentContainer: {
         flexGrow: 1,
@@ -144,15 +153,8 @@ export const GLOBAL_STYLE = StyleSheet.create({
     }
 });
 
-export const GET_ICON_BUTTON_RESET_STYLE = (size: number = FONT_SIZES.normal) => {
-    return { width: size, height: size, margin: 0 }
-}
-
 export const COLLAPSIBLE_HEADER_HEIGHT = 180;
 export const COLLAPSIBLE_HEADER_IMAGE = 110;
-
-export const SIMPLE_HEADER_HEIGHT = hp(6.75);
-export const SIMPLE_TABBAR_HEIGHT = hp(6.75);
 
 export interface CarBrandsType {
     [key: string]: Array<CarModelsType>;

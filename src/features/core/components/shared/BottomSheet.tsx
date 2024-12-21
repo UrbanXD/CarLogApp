@@ -39,7 +39,7 @@ const CustomBottomSheet=
             ,[]
             );
         const isFullScreen = snapPoints[0] === "100%";
-        const styles = getStyles(isFullScreen);
+        const styles = useStyles(isFullScreen);
         const { top } = useSafeAreaInsets();
 
         return (
@@ -71,7 +71,7 @@ const CustomBottomSheet=
         )
     })
 
-const getStyles = (isFullScreen: boolean) =>
+const useStyles = (isFullScreen: boolean) =>
     StyleSheet.create({
         containerBackground: {
             backgroundColor: theme.colors.black,
