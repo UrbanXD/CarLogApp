@@ -42,7 +42,7 @@ const Header: React.FC = () => {
     return (
         <View style={{ paddingTop: insets.top }}>
             <StatusBar
-                barStyle={ "light-content" }
+                barStyle="light-content"
                 backgroundColor={ theme.colors.black2 }
             />
             <View style={ styles.barContainer }>
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
         gap: SEPARATOR_SIZES.lightSmall,
         height: SIMPLE_HEADER_HEIGHT,
         backgroundColor: theme.colors.black2,
-        paddingVertical: SEPARATOR_SIZES.lightSmall * 0.5,
+        paddingTop: SEPARATOR_SIZES.lightSmall * 0.5,
         paddingHorizontal: DEFAULT_SEPARATOR,
         overflow: "hidden"
     }
