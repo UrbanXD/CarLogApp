@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Alert, StatusBar, TouchableOpacity, View, StyleSheet } from "react-native";
 import {DEFAULT_SEPARATOR, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../constants/constants";
 import Picker from "../form/InputPicker/Picker";
-import { Avatar } from "react-native-paper";
 import { theme } from "../../constants/theme";
 import { useSelector } from "react-redux";
 import { RootState, store } from "../../redux/store";
@@ -10,6 +9,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { useDatabase } from "../../utils/database/Database";
 import { loadSelectedCar, selectCar } from "../../redux/cars/cars.slices";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as Avatar from "../shared/avatar/Avatar";
 
 const Header: React.FC = () => {
     const { supabaseConnector } = useDatabase();
@@ -61,22 +61,22 @@ const Header: React.FC = () => {
                 </View>
                 {
                     !isDropdownVisible &&
-                    <TouchableOpacity
-                        style={{ flex: 1, alignItems: "flex-end" }}
-                        onPress={ async () => {
-                            try {
-                                await supabaseConnector.client.auth.signOut();
-                                console.log("logout")
-                            } catch (e: any){
-                                Alert.alert(e.message)
+                    <Avatar.Text
+                        label={ "Ka" }
+                        avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
+                        onPress={
+                            async () => {
+                                try {
+                                    await supabaseConnector.client.auth.signOut();
+                                    console.log("logout")
+                                } catch (e: any){
+                                    Alert.alert(e.message)
+                                }
                             }
-                        }}
-                    >
-                        <Avatar.Text label={"UA"} size={FONT_SIZES.large * 1.25} />
-                    </TouchableOpacity>
+                        }
+                    />
                 }
             </View>
-            {/*//paddingRight={!isDropdownVisible ? undefined : 0}*/}
         </View>
     )
 }
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
         gap: SEPARATOR_SIZES.lightSmall,
         height: SIMPLE_HEADER_HEIGHT,
         backgroundColor: theme.colors.black2,
-        paddingTop: SEPARATOR_SIZES.lightSmall * 0.5,
+        paddingVertical: SEPARATOR_SIZES.lightSmall * 0.5,
         paddingHorizontal: DEFAULT_SEPARATOR,
         overflow: "hidden"
     }
