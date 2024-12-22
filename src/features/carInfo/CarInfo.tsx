@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {Image, StyleSheet, View, Text, ImageBackground} from "react-native";
 import { theme } from "../core/constants/theme";
 import { FONT_SIZES, ICON_COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../core/constants/constants";
@@ -9,6 +9,9 @@ import IconButton from "../core/components/shared/button/IconButton";
 import Button from "../core/components/shared/button/Button";
 import {formatImageSource} from "../core/utils/formatImageSource";
 import DefaultImage from "../core/components/shared/DefaultImage";
+import {useBottomSheet} from "../core/context/BottomSheetProvider";
+import NewCarForm from "../layouts/forms/addCar/NewCarForm";
+import TextInput from "../core/components/input/text/TextInput";
 
 interface CarInfoProps {
     car?: CarTableType
@@ -20,21 +23,22 @@ const CarInfo: React.FC<CarInfoProps> = ({ car }) => {
             <View style={ styles.content }>
                 {
                     car?.image
-                        ?   <ImageBackground
+                        ?   <Image
                                 source={ formatImageSource(car?.image) }
-                                style={ styles.itemContentContainer }
-                                imageStyle={ styles.itemImage }
+                                style={ styles.image }
                             />
-                        :   <DefaultImage />
+                        :   <DefaultImage style={ styles.image }/>
                 }
-                <View>
-                    <Text style={ styles.carInfoText } numberOfLines={ 3 }>
-                        { car?.brand } { car?.model }
-                    </Text>
-                    <Text style={ styles.carDateText } numberOfLines={ 3 }>
-                        2018
-                    </Text>
-                    <View style={{ position: "absolute", alignItems: "flex-end", justifyContent:"center", width:"100%" }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                    <View style={{ flex: 1, flexDirection: "column" }}>
+                        <Text style={ styles.carInfoText } numberOfLines={ 3 }>
+                            { car?.brand } { car?.model }
+                        </Text>
+                        <Text style={ styles.carDateText } numberOfLines={ 3 }>
+                            2018
+                        </Text>
+                    </View>
+                    <View style={{ alignItems: "flex-end", justifyContent:"center" }}>
                         <Icon icon={ ICON_NAMES.pencil } color={ theme.colors.white } />
                     </View>
                 </View>
@@ -43,12 +47,19 @@ const CarInfo: React.FC<CarInfoProps> = ({ car }) => {
                     <Icon icon={ ICON_NAMES.pencil } color={ theme.colors.white } />
                 </View>
             </View>
-            <Button.Text
-                onPress={() => {}}
-                text="Törlés"
-                backgroundColor={ theme.colors.googleRed }
-                textColor={ theme.colors.black }
-            />
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <Button.Icon
+                    icon={ ICON_NAMES.trashCan }
+                    backgroundColor={ theme.colors.googleRed }
+                    iconColor={ theme.colors.black }
+                    onPress={ () => {} }
+                />
+                <Button.Text
+                    onPress={() => {}}
+                    text="Módosítás"
+                    style={{ flex: 0.9 }}
+                />
+            </View>
         </View>
     )
 }
@@ -65,9 +76,10 @@ const styles = StyleSheet.create({
         gap: SEPARATOR_SIZES.small,
     },
     image: {
+        flex: 0,
         height: "30%",
         width: "100%",
-        resizeMode: "cover",
+        resizeMode: "stretch",
         borderRadius: 10,
         borderWidth: 1,
         borderColor: theme.colors.gray3
