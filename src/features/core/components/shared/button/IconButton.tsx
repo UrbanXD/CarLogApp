@@ -67,8 +67,8 @@ export const useButtonStyles = (
             paddingHorizontal: width ? 0 : SEPARATOR_SIZES.small,
             width: width ?? "100%",
             height: height,
-            backgroundColor: secondaryColor,
-            color: primaryColor,
+            backgroundColor: primaryColor,
+            color: secondaryColor,
             borderRadius: 30
         }
     })

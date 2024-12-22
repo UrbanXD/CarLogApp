@@ -7,9 +7,10 @@ import { useSelector } from "react-redux";
 import { RootState, store } from "../../redux/store";
 import { createSelector } from "@reduxjs/toolkit";
 import { useDatabase } from "../../utils/database/Database";
-import { loadSelectedCar, selectCar } from "../../redux/cars/cars.slices";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Avatar from "../shared/avatar/Avatar";
+import {selectCar} from "../../redux/cars/functions/selectCar";
+import {loadSelectedCar} from "../../redux/cars/functions/loadSelectedCar";
 
 const Header: React.FC = () => {
     const { supabaseConnector } = useDatabase();

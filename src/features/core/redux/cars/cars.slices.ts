@@ -1,10 +1,9 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Kysely } from "@powersync/kysely-driver";
-import { CarTableType, DatabaseType } from "../../utils/database/powersync/AppSchema";
-import { CarDAO } from "../../utils/DAOs/CarDAO";
-import { LOCAL_STORAGE_KEYS } from "../../constants/constants";
-import { Database } from "../../utils/database/Database";
+import { createSlice } from "@reduxjs/toolkit";
+import { CarTableType } from "../../utils/database/powersync/AppSchema";
+import { loadCars } from "./functions/loadCars";
+import {addCar} from "./functions/addCar";
+import {loadSelectedCar} from "./functions/loadSelectedCar";
+import {selectCar} from "./functions/selectCar";
 
 interface CarsState {
     loading: boolean
@@ -21,58 +20,6 @@ const initialState: CarsState = {
     selectedCarID: "",
     loadError: false
 }
-
-export const loadCars = createAsyncThunk(
-    "cars",
-    async (db: Kysely<DatabaseType>, { rejectWithValue }) => {
-        try {
-            const carDAO = new CarDAO(db);
-            return await carDAO.getCars();
-        } catch (e) {
-            console.log(e);
-            return rejectWithValue("");
-        }
-    }
-);
-
-export const addCar = createAsyncThunk(
-    "addCar",
-    async (args: {database: Database, car: CarTableType}, { rejectWithValue }) => {
-        try {
-            const carDAO = new CarDAO(args.database.db);
-            return await carDAO.addCar(args.car);
-        } catch (e) {
-            console.log(e)
-            return rejectWithValue("")
-        }
-    }
-)
-
-export const loadSelectedCar = createAsyncThunk(
-    "loadSelectedCarIndex",
-    async (arg: { asd?: string } = {}, { rejectWithValue }) => {
-        try {
-            const id = await AsyncStorage.getItem(LOCAL_STORAGE_KEYS.selectedCarIndex);
-            return id ? id : "";
-        } catch (e) {
-            console.log("loadSelectedCar", e);
-            return rejectWithValue(0);
-        }
-    }
-)
-
-export const selectCar = createAsyncThunk(
-    "selectCar",
-    async (id: string, { rejectWithValue })=> {
-        try {
-            await AsyncStorage.setItem(LOCAL_STORAGE_KEYS.selectedCarIndex, id.toString());
-            return id;
-        } catch (e) {
-            console.log(e);
-            return rejectWithValue(-1);
-        }
-    }
-)
 
 const carsSlice = createSlice({
     name: "cars",
@@ -103,7 +50,6 @@ const carsSlice = createSlice({
                     }) as Array<CarTableType>;
             })
             .addCase(addCar.fulfilled, (state, action) => {
-
                 state.cars = [
                     ...state.cars,
                     {

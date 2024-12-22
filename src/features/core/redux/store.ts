@@ -1,12 +1,10 @@
 import rootReducer from "./index";
 import { configureStore } from '@reduxjs/toolkit'
-import carsApiSlices from "../redux/cars/cars.api.slices";
 
 export const store = configureStore({
     reducer: rootReducer,
     middleware: getDefaultMiddleware =>
-        getDefaultMiddleware({ })
-            .concat(carsApiSlices.middleware)
+        getDefaultMiddleware({})
 })
 
 export type RootState = ReturnType<typeof store.getState>;

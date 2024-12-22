@@ -158,7 +158,7 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                 }
                 <View style={ styles.secondRowContainer }>
                     <View style={ styles.uploadButtonContainer }>
-                        <Button
+                        <Button.Icon
                             icon={ ICON_NAMES.upArrowHead }
                             onPress={ () => getImages(onChange) }
                         />

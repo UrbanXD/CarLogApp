@@ -13,7 +13,7 @@ export class CarDAO {
         return await this.db
             .selectFrom(CAR_TABLE)
             .selectAll()
-            .execute()
+            .execute() as unknown as Array<CarTableType>;
     }
 
     async addCar(car: CarTableType) {

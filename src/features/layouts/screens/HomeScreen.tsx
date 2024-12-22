@@ -24,18 +24,18 @@ import UpcomingRides from "../../upcomingRides/UpcomingRides";
 import Link from "../../core/components/shared/Link";
 import { useSelector } from "react-redux";
 import { RootState, store } from "../../core/redux/store";
-import { loadCars } from "../../core/redux/cars/cars.slices";
 import CarouselItem from "../../core/components/shared/carousel/CarouselItem";
 import { useBottomSheet} from "../../core/context/BottomSheetProvider";
 import NewCarForm from "../../layouts/forms/addCar/NewCarForm";
 import { encode } from "base64-arraybuffer";
 import CarInfo from "../../carInfo/CarInfo";
+import {loadCars} from "../../core/redux/cars/functions/loadCars";
 
 const HomeScreen: React.FC = () => {
-    const { db } = useDatabase();
+    const database = useDatabase();
 
     useEffect(() => {
-        store.dispatch(loadCars(db))
+        store.dispatch(loadCars(database))
     }, []);
     console.log("homescren rerender")
 
@@ -96,29 +96,17 @@ const CarsBlock: React.FC = () => {
         })
 
     useEffect(() => {
-        const fetchImages = async () => {
-            const mappedCars = await Promise.all(
-                cars.map(async (car) => {
-                    let img = undefined;
-                    if(car.image && attachmentQueue){
-                        const file = await attachmentQueue.getFile(car.image);
-                        img = file ? { uri: `data:image/jpeg;base64,${encode(file)}` } : null;
-                    }
+        const mappedCars = cars.map(car => {
+            return {
+                id: car.name,
+                image: car.image,
+                title: car.brand,
+                subtitle: car.model,
+            } as CarouselItemType;
+        })
 
-                    return {
-                        id: car.name,
-                        image: img,
-                        title: car.brand,
-                        subtitle: car.model,
-                    } as CarouselItemType;
-                })
-            );
-
-            setCarouselData(mappedCars);
-        }
-
-        fetchImages();
-    }, [cars, attachmentQueue]);
+        setCarouselData(mappedCars);
+    }, [cars]);
 
     return (
         <View style={ [GLOBAL_STYLE.contentContainer, { paddingHorizontal: 0, marginHorizontal: 0, backgroundColor: "transparent"}] } >

@@ -13,6 +13,7 @@ import { FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { CarouselItemType } from "./Carousel";
 import { hexToRgba } from "../../../utils/colors/hexToRgba";
+import {formatImageSource} from "../../../utils/formatImageSource";
 
 interface CarouselItemProps {
     index: number
@@ -62,9 +63,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                     source={
                         !item.image
                             ? require("../../../../../assets/images/car1.jpg")
-                            : typeof item.image === "string"
-                                ? { uri: `data:image/jpeg;base64,${item.image}` }
-                                : item.image
+                            : formatImageSource(item.image)
                     }
                     style={ styles.itemContentContainer }
                     imageStyle={ styles.itemImage }
