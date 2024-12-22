@@ -36,30 +36,13 @@ const carsSlice = createSlice({
             })
             .addCase(loadCars.fulfilled, (state, action) => {
                 state.loading = false;
-                state.cars = action.payload
-                    .map(item => {
-                        state.carsID = [...state.carsID, item.id as string];
-
-                        return {
-                            id: item.id,
-                            name: item.name,
-                            brand: item.brand,
-                            model: item.model,
-                            image: item.image,
-                        }
-                    }) as Array<CarTableType>;
+                state.cars = action.payload;
             })
             .addCase(addCar.fulfilled, (state, action) => {
                 state.cars = [
                     ...state.cars,
-                    {
-                        id: action.payload.id,
-                        name: action.payload.name,
-                        brand: action.payload.brand,
-                        model: action.payload.model,
-                        image: action.payload.image,
-                    }
-                ] as Array<CarTableType>;
+                    action.payload
+                ];
             })
             .addCase(loadSelectedCar.fulfilled, (state, action) => {
                 state.selectedCarID = action.payload;

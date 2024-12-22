@@ -27,9 +27,8 @@ import { RootState, store } from "../../core/redux/store";
 import CarouselItem from "../../core/components/shared/carousel/CarouselItem";
 import { useBottomSheet} from "../../core/context/BottomSheetProvider";
 import NewCarForm from "../../layouts/forms/addCar/NewCarForm";
-import { encode } from "base64-arraybuffer";
 import CarInfo from "../../carInfo/CarInfo";
-import {loadCars} from "../../core/redux/cars/functions/loadCars";
+import { loadCars } from "../../core/redux/cars/functions/loadCars";
 
 const HomeScreen: React.FC = () => {
     const database = useDatabase();
@@ -73,8 +72,6 @@ const WelcomeBlock: React.FC = () => {
 
 const CarsBlock: React.FC = () => {
     const { openBottomSheet, closeBottomSheet } = useBottomSheet();
-
-    const { attachmentQueue } = useDatabase();
 
     const selectCarsState = (state: RootState) => state.cars.cars;
 

@@ -2,11 +2,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GetFormHandleSubmitArgs } from "../../../core/constants/constants";
 import { store } from "../../../core/redux/store";
-import { addCar } from "../../../core/redux/cars/cars.slices";
 import { InputPickerDataType } from "../../../core/components/input/picker/InputPicker";
 import { getUUID } from "../../../core/utils/uuid";
 import { ImageType } from "../../../core/utils/pickImage";
 import { CarTableType } from "../../../core/utils/database/powersync/AppSchema";
+import {addCar} from "../../../core/redux/cars/functions/addCar";
 
 export const newCarFormStepsField = [["name"], ["brand", "model"], ["odometerValue", "odometerMeasurement"], ["fuelType", "fuelMeasurement", "fuelTankSize"]];
 export const newCarFormStepsTitle = ["Elnevezés", "Gyártó", "Autó adatok", "Autó adatok"];
@@ -102,7 +102,7 @@ export const getNewCarHandleSubmit = ({ handleSubmit, database, onSubmit }: GetF
                 ...newCar,
                 id: getUUID(),
                 owner: userID,
-                image: image?.filename ? image.filename : null,
+                image: image?.filename ? image?.filename : undefined,
             } as CarTableType
 
             store.dispatch(addCar({ database, car }));
