@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+    Alert,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -85,12 +86,17 @@ const CarsBlock: React.FC = () => {
             snapPoints: ["85%"]
         })
 
-    const openCarInfoBottomSheet = (index: number) =>
+    const openCarInfoBottomSheet = (index: number) => {
+        const car = cars.find(car => car .id === cars[index].id);
+
+        if(!car) return Alert.alert('Nincs auto');
+
         openBottomSheet({
             title: carouselData[index].id || index.toString(),
-            content: <CarInfo car={ cars.find(car => car.id === cars[index].id) } />,
+            content: <CarInfo car={ car } />,
             snapPoints: ["85%"]
         })
+    }
 
     useEffect(() => {
         const mappedCars = cars.map(car => {
@@ -100,7 +106,7 @@ const CarsBlock: React.FC = () => {
                 title: car.brand,
                 subtitle: car.model,
             } as CarouselItemType;
-        })
+        });
 
         setCarouselData(mappedCars);
     }, [cars]);

@@ -51,6 +51,10 @@ const CustomBottomSheet=
                     enablePanDownToClose={ isHandlePanningGesture }
                     enableContentPanningGesture={ isHandlePanningGesture }
                     enableHandlePanningGesture={ isHandlePanningGesture }
+                    enableOverDrag={ false }
+                    enableDismissOnClose={ false }
+                    onDismiss={ () => console.log("dissmiss") }
+                    onChange={ (index) => console.log("oNchnagem,m ", index) }
                     backdropComponent={ renderBackdrop }
                     backgroundStyle={ styles.containerBackground }
                     handleIndicatorStyle={ isHandlePanningGesture ? styles.line : { height: 0 } }
