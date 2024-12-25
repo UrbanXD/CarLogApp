@@ -29,24 +29,20 @@ export class SupabaseStorageAdapter implements StorageAdapter {
                 .from(BaseConfig.SUPABASE_BUCKET)
                 .upload(filename, data, { contentType: mediaType });
 
-        if (res.error) {
-            throw res.error;
-        }
+        if (res.error) throw res.error;
     }
 
     async downloadFile(filePath: string) {
         if (!BaseConfig.SUPABASE_BUCKET) {
             throw new Error('Supabase bucket not configured in AppConfig.ts');
         }
-        console.log("downloadFile ", filePath);
+
         const { data, error } =
             await this.options.client.storage
                 .from(BaseConfig.SUPABASE_BUCKET)
                 .download(filePath);
 
-        if (error) {
-            throw error;
-        }
+        if (error) throw error;
 
         return data as Blob;
     }
@@ -60,10 +56,10 @@ export class SupabaseStorageAdapter implements StorageAdapter {
     ): Promise<void> {
         const { encoding = FileSystem.EncodingType.UTF8 } = options ?? {};
 
-        // const directoryPath = fileURI.substring(0, fileURI.lastIndexOf('/') + 1);
-        // if(!await this.fileExists(directoryPath)){
-        //     await this.makeDir(directoryPath);
-        // }
+        const directoryPath = fileURI.substring(0, fileURI.lastIndexOf('/') + 1);
+        if(!await this.fileExists(directoryPath)){
+            await this.makeDir(directoryPath);
+        }
 
         await FileSystem.writeAsStringAsync(fileURI, base64Data, { encoding });
     }
@@ -94,21 +90,14 @@ export class SupabaseStorageAdapter implements StorageAdapter {
         }
 
         const { filename } = options ?? {};
-        if (!filename) {
-            return;
-        }
+        if (!filename) return;
 
         if (!BaseConfig.SUPABASE_BUCKET) {
             throw new Error('Supabase bucket not configured in AppConfig.ts');
         }
 
         const { data, error } = await this.options.client.storage.from(BaseConfig.SUPABASE_BUCKET).remove([filename]);
-        if (error) {
-            console.debug('Failed to delete file from Cloud Storage', error);
-            throw error;
-        }
-
-        console.debug('Deleted file from storage', data);
+        if (error) throw error;
     }
 
     async fileExists(fileURI: string): Promise<boolean> {
@@ -118,7 +107,6 @@ export class SupabaseStorageAdapter implements StorageAdapter {
     }
 
     async makeDir(uri: string): Promise<void> {
-        console.log(uri, "makedir")
         const { exists } = await FileSystem.getInfoAsync(uri);
 
         if (!exists) {

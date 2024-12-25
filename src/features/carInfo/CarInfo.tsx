@@ -12,12 +12,18 @@ import DefaultImage from "../core/components/shared/DefaultImage";
 import {useBottomSheet} from "../core/context/BottomSheetProvider";
 import NewCarForm from "../layouts/forms/addCar/NewCarForm";
 import TextInput from "../core/components/input/text/TextInput";
+import {deleteCar} from "../core/redux/cars/functions/deleteCar";
+import {useDatabase} from "../core/utils/database/Database";
+import {store} from "../core/redux/store";
+import {addCar} from "../core/redux/cars/functions/addCar";
 
 interface CarInfoProps {
-    car?: CarTableType
+    car: CarTableType
 }
 
 const CarInfo: React.FC<CarInfoProps> = ({ car }) => {
+    const database = useDatabase();
+
     return (
         <View style={ styles.container }>
             <View style={ styles.content }>
@@ -52,7 +58,7 @@ const CarInfo: React.FC<CarInfoProps> = ({ car }) => {
                     icon={ ICON_NAMES.trashCan }
                     backgroundColor={ theme.colors.googleRed }
                     iconColor={ theme.colors.black }
-                    onPress={ () => {} }
+                    onPress={ () => store.dispatch(deleteCar({database, carID: car.id})) }
                 />
                 <Button.Text
                     onPress={() => {}}
