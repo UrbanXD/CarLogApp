@@ -29,6 +29,7 @@ import CarouselItem from "../../core/components/shared/carousel/CarouselItem";
 import {useBottomSheet} from "../../core/context/BottomSheetProvider";
 import NewCarForm from "../../layouts/forms/addCar/NewCarForm";
 import { encode } from "base64-arraybuffer";
+import AlertToast from "../../core/components/shared/alert/AlertToast";
 
 const HomeScreen: React.FC = () => {
     const { db } = useDatabase();
@@ -65,6 +66,7 @@ const HomeScreen: React.FC = () => {
 }
 
 const WelcomeBlock: React.FC = () => {
+    const [a, seA] = useState(false);
     return (
         <Animated.View
             entering={ FadeInLeft.springify(1200) }
@@ -76,6 +78,12 @@ const WelcomeBlock: React.FC = () => {
             <Text style={ styles.infoText }>
                 Vezzessen számot nálunk az autóiról!
             </Text>
+            <Button.Text text={"a"} onPress={() => seA(!a)}></Button.Text>
+            <AlertToast type={"warning"} body={"Ezt meg ezt csinald ocskosvlnkvlklvbkdklvnllkvsllsmklmvkllmcmklvlmlkmblkdkbmkl hxmxk tl mklmk mtt nm"} />
+            {
+                a &&
+                <AlertToast type={"success"} body={"Ezt meg ezt csinald ocskosvlnkvlklvbkdklvnllkvsllsmklmvkllmcmklvlmlkmblkdkbmkl hxmxk tl mklmk mtt nm"} />
+            }
         </Animated.View>
     )
 }
@@ -235,8 +243,8 @@ const styles = StyleSheet.create({
     },
     infoText: {
         fontFamily: "Gilroy-Mediun",
-        fontSize: FONT_SIZES.normal * 0.85,
-        letterSpacing: FONT_SIZES.normal * 0.85 * 0.05,
+        fontSize: FONT_SIZES.intermediate,
+        letterSpacing: FONT_SIZES.intermediate * 0.05,
         color: theme.colors.gray1
     },
     carouselContainer: {

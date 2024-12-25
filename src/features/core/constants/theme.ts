@@ -1,6 +1,5 @@
 export const theme = {
     colors: {
-        homePageBackground: "red",
         white: "#fdfdfd",
         white2: "#E1E5EA",
         facebookBlue: "#044ead",
@@ -16,6 +15,7 @@ export const theme = {
         black5: "#2f2f2f",
         greenLight: "#4CBB17",
         greenDark: "#228B22",
+        blueLight: "#82c8e5",
         redLight: "#f9504f",
         redDark: "#B71C1C",
         fuelYellow: "#FFDF00",

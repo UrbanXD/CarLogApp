@@ -70,9 +70,10 @@ export const ICON_COLORS = {
 }
 
 export const FONT_SIZES = {
-    extraSmall: hp(2),
+    tiny: hp(2),
     small: hp(2.25),
-    normal: hp(3),//2.5
+    intermediate: hp(2.5),
+    normal: hp(3),
     medium: hp(3.5),
     large: hp(5),
     extraLarge: wp(22)
@@ -107,7 +108,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
         gap: SEPARATOR_SIZES.mediumSmall
     },
     formLinkText: {
-        fontSize: FONT_SIZES.extraSmall,
+        fontSize: FONT_SIZES.tiny,
         paddingLeft: SEPARATOR_SIZES.small,
         fontFamily: "Gilroy-Medium",
         color: theme.colors.fuelYellow
