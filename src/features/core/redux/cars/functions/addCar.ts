@@ -8,10 +8,17 @@ export const addCar = createAsyncThunk(
     async (args: {database: Database, car: CarTableType}, { rejectWithValue }) => {
         try {
             const carDAO = new CarDAO(args.database.db);
-            return await carDAO.addCar(args.car);
+
+            const result = await carDAO.addCar(args.car);
+
+            if(result === null) {
+                return rejectWithValue("");
+            }
+
+            return result;
         } catch (e) {
             console.log(e)
-            return rejectWithValue("")
+            return rejectWithValue("");
         }
     }
 )
