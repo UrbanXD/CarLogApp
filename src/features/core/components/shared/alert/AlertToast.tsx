@@ -35,7 +35,7 @@ const AlertToast: React.FC<AlertToastProps> = React.memo(({
 
     const opacity = useSharedValue(0.5);
     const x = useSharedValue(-width / 2);
-    const height = !body ? hp(8) : hp(9.5);
+    const height = !body ? hp(8) : hp(10);
     const [removable, setRemovable] = useState(false);
 
     const intervalRef = useRef<NodeJS.Timeout>();
@@ -162,7 +162,6 @@ const useStyles = (type: AlertType, height: number) =>
         titleText: {
             fontFamily: "Gilroy-Heavy",
             fontSize: FONT_SIZES.intermediate,
-            lineHeight: FONT_SIZES.intermediate ,
             letterSpacing: FONT_SIZES.intermediate * 0.05,
             color: theme.colors.white,
         },

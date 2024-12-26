@@ -77,7 +77,7 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({
 const styles = StyleSheet.create({
     container: {
         position: "absolute",
-        top: SIMPLE_HEADER_HEIGHT * 1.5,
+        top: SIMPLE_HEADER_HEIGHT * 2,
         width: "100%",
         gap: SEPARATOR_SIZES.lightSmall,
         zIndex: 1,
