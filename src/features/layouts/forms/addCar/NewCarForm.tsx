@@ -134,6 +134,7 @@ const StepTwo: React.FC = () => {
                 fieldNameText="Modell"
                 withSearchbar
                 disabled={ !isBrandSelected }
+                disabledText={ "Először válassza ki az autó márkáját!" }
             />
         </>
     )

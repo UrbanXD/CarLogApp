@@ -4,6 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import TextInput from "../text/TextInput";
 import { theme } from "../../../constants/theme";
 import Icon from "../../shared/Icon";
+import {useAlert} from "../../../context/AlertProvider";
 
 interface PickerDropdownInfoProps {
     toggleDropdown?: () => void
@@ -13,7 +14,8 @@ interface PickerDropdownInfoProps {
     placeholder?: string
     error?: string
     isHorizontal: boolean
-    disabled: boolean
+    disabled: boolean,
+    disabledText?: string
 }
 
 export const PickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
@@ -23,12 +25,21 @@ export const PickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
     subtitle,
     placeholder,
     isHorizontal,
-    disabled
+    disabled,
+    disabledText,
 }) => {
+    const { addToast } = useAlert();
+
+    const openWarning = () =>
+        addToast({
+            type: "warning",
+            body: disabledText
+        });
+
     return (
         <TouchableOpacity
             style={ styles.container }
-            onPress={ !disabled ? toggleDropdown : () => {} }
+            onPress={ !disabled ? toggleDropdown : openWarning }
         >
             {
                 icon &&
@@ -66,18 +77,22 @@ export const InputPickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
     placeholder,
     error,
     isHorizontal,
-    disabled
+    disabled,
+    disabledText
 }) => {
-    const [pickerError, setPickerError] = useState<string | undefined>();
-
-    useEffect(() => {
-        if(!disabled) setPickerError(undefined)
-    }, [disabled]);
+    const { addToast } = useAlert();
+    console.log(disabledText)
+    const openWarning = () =>
+        addToast({
+            type: "warning",
+            body: disabledText,
+            duration: 200
+        });
 
     return (
         <TouchableOpacity
             style={ styles.container }
-            onPress={ !disabled ? toggleDropdown : () => { setPickerError("xd") } }
+            onPress={ !disabled ? toggleDropdown : openWarning }
         >
             <View style={ GLOBAL_STYLE.formContainer }>
                 <TextInput
@@ -86,7 +101,7 @@ export const InputPickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
                     icon={ icon }
                     actionIcon={ isHorizontal ? ICON_NAMES.rightArrowHead : ICON_NAMES.downArrowHead }
                     placeholder={ placeholder }
-                    error={ error || pickerError }
+                    error={ error }
                     isPickerHeader
                 />
             </View>

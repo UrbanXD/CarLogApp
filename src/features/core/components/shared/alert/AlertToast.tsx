@@ -30,8 +30,6 @@ const AlertToast: React.FC<AlertToastProps> = React.memo(({
     body,
     duration = 4000
 }) => {
-    console.log(`Rendering Toast: ${id}`);
-
     const { width } = useWindowDimensions();
     const { removeToast } = useAlert();
 
