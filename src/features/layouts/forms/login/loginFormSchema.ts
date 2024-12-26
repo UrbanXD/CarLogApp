@@ -22,12 +22,18 @@ export const loginUseFormProps = {
     resolver: zodResolver(loginFormSchema),
 }
 
-export const getLoginHandleSubmit = ({ handleSubmit, database }: GetFormHandleSubmitArgs) =>
+export const getLoginHandleSubmit = ({ handleSubmit, database, onSubmit }: GetFormHandleSubmitArgs) =>
     handleSubmit(async ({ email, password }: LoginFormFieldType) => {
         try {
             await database.supabaseConnector?.login(email, password);
+
+            if(onSubmit) {
+                onSubmit(true);
+            }
         } catch (error: any) {
-            Alert.alert(error.message);
+            if(onSubmit) {
+                onSubmit(false);
+            }
         }
     })
 

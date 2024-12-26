@@ -15,15 +15,42 @@ import TextDivider from "../../../core/components/shared/TextDivider";
 import { theme } from "../../../core/constants/theme";
 import MultiStepForm from "../../../core/components/multiStepForm/MultiStepForm";
 import Input from "../../../core/components/input/Input";
+import {router} from "expo-router";
+import {useAlert} from "../../../core/context/AlertProvider";
 
-const RegisterForm: React.FC = () => {
+interface RegisterFormProps {
+    close: () => void
+}
+
+const RegisterForm: React.FC<RegisterFormProps> = ({
+    close
+}) => {
     const database = useDatabase();
+    const { addToast } = useAlert();
+
     const { control, handleSubmit, trigger } =
         useForm<RegisterFormFieldType>(registerUseFormProps);
 
+    const onSubmit = (isSuccess?: boolean) => {
+        if(isSuccess){
+            close();
+            router.replace("/(main)");
+            addToast({
+                type: "success",
+                title: "Sikeres regisztráció!",
+            });
+        } else{
+            addToast({
+                type: "error",
+                body: "Váratlan hiba lépett fel a regisztráció során!"
+            });
+        }
+    }
+
     const submitHandler = getRegisterHandleSubmit({
         handleSubmit,
-        database
+        database,
+        onSubmit
     });
 
     const steps = [

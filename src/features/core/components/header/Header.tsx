@@ -10,9 +10,12 @@ import { useDatabase } from "../../utils/database/Database";
 import { loadSelectedCar, selectCar } from "../../redux/cars/cars.slices";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Avatar from "../shared/avatar/Avatar";
+import {router} from "expo-router";
+import {useAlert} from "../../context/AlertProvider";
 
 const Header: React.FC = () => {
-    const { supabaseConnector } = useDatabase();
+    const { supabaseConnector, powersync } = useDatabase();
+    const { addToast } = useAlert();
     const insets = useSafeAreaInsets();
 
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -33,6 +36,23 @@ const Header: React.FC = () => {
 
     const onCarSelect = (id: string) => {
         store.dispatch(selectCar(id));
+    }
+
+    const logout = async () => {
+        try {
+            await supabaseConnector.client.auth.signOut();
+            await powersync.disconnectAndClear();
+            router.replace("/");
+            addToast({
+                type: "success",
+                title: "Sikeres kijelentkezés!",
+            });
+        } catch (error: any){
+            addToast({
+                type: "error",
+                body: "Váratlan hiba lépett fel a kijelentkezés!"
+            });
+        }
     }
 
     useEffect(() => {
@@ -64,16 +84,7 @@ const Header: React.FC = () => {
                     <Avatar.Text
                         label={ "Ka" }
                         avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
-                        onPress={
-                            async () => {
-                                try {
-                                    await supabaseConnector.client.auth.signOut();
-                                    console.log("logout")
-                                } catch (e: any){
-                                    Alert.alert(e.message)
-                                }
-                            }
-                        }
+                        onPress={ logout }
                     />
                 }
             </View>

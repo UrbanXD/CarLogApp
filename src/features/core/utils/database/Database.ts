@@ -56,10 +56,6 @@ export class Database {
             await this.attachmentQueue.init();
         }
     }
-
-    async disconnect() {
-        await this.powersync.disconnectAndClear();
-    }
 }
 
 const database = new Database();

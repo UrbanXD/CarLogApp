@@ -44,14 +44,20 @@ const FirstScreen: React.FC = () => {
         openBottomSheet({
             ...bottomSheetArgs,
             title: "Felhasználó létrehozás",
-            content: <RegisterForm />
+            content:
+                <RegisterForm
+                    close={ closeBottomSheet }
+                />
         });
     }
     const openLogin = () => {
         openBottomSheet({
             ...bottomSheetArgs,
             title: "Bejelentkezés",
-            content: <LoginForm />
+            content:
+                <LoginForm
+                    close={ closeBottomSheet }
+                />
         });
     };
 

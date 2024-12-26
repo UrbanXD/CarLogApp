@@ -88,10 +88,6 @@ export const newCarUseFormProps = {
 export const getNewCarHandleSubmit = ({ handleSubmit, database, onSubmit }: GetFormHandleSubmitArgs) =>
     handleSubmit(async (newCar: NewCarFormFieldType) => {
         try {
-            if(!database || !database.supabaseConnector || !database.db) {
-                throw Error("Hiba, supabase connector vagy DB");
-            }
-
             const { userID } = await database.supabaseConnector.fetchCredentials();
             let image = null;
             if(database.attachmentQueue && newCar.image) {

@@ -22,10 +22,12 @@ import { InputPickerDataType } from "../../../core/components/input/picker/Input
 import {useAlert} from "../../../core/context/AlertProvider";
 
 interface NewCarFormProps {
-    close?: () => void
+    close: () => void
 }
 
-const NewCarForm: React.FC<NewCarFormProps> = ({ close = () => {} }) => {
+const NewCarForm: React.FC<NewCarFormProps> = ({
+    close
+}) => {
     const database = useDatabase();
     const { addToast } = useAlert();
     const { control, handleSubmit, trigger, reset, resetField } =
