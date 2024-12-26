@@ -1,36 +1,67 @@
 import {ALERT_COLORS, ALERT_ICONS, ALERT_TITLES, AlertType} from "./constants/constants";
-import React from "react";
-import {View, Text, StyleSheet, Modal, Easing, useWindowDimensions} from "react-native";
+import React, {useCallback, useEffect, useRef, useState} from "react";
+import {View, Text, StyleSheet, Modal, Easing, useWindowDimensions, TouchableOpacity} from "react-native";
 import {theme} from "../../../constants/theme";
 import {heightPercentageToDP as hp, widthPercentageToDP} from "react-native-responsive-screen";
 import {FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT} from "../../../constants/constants";
 import Icon from "../Icon";
 import { Portal } from '@gorhom/portal';
-import Animated, {interpolate, useAnimatedStyle, useSharedValue, withTiming} from "react-native-reanimated";
+import Animated, {
+    interpolate,
+    useAnimatedStyle,
+    useDerivedValue,
+    useSharedValue,
+    withTiming
+} from "react-native-reanimated";
+import {useAlert} from "../../../context/AlertProvider";
 
-interface AlertToastProps {
+export interface AlertToastProps {
+    id?: string,
     type?: AlertType,
     title?: string,
     body?: string,
+    duration?: number
 }
 
-const AlertToast: React.FC<AlertToastProps> = ({
+const AlertToast: React.FC<AlertToastProps> = React.memo(({
+    id = Date.now().toString(),
     type = "info",
     title = ALERT_TITLES[type],
-    body
+    body,
+    duration = 4000
 }) => {
+    console.log(`Rendering Toast: ${id}`);
+
     const { width } = useWindowDimensions();
+    const { removeToast } = useAlert();
 
     const opacity = useSharedValue(0.5);
     const x = useSharedValue(-width / 2);
     const height = !body ? hp(8) : hp(9.5);
+    const [removable, setRemovable] = useState(false);
+
+    const intervalRef = useRef<NodeJS.Timeout>();
 
     const styles = useStyles(type, height);
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            opacity: opacity.value,
+            transform: [{ translateX: x.value }]
+        };
+    });
 
-    const startAnimation = () => {
-        const config = {
-            duration: 450
-        }
+    const config = {
+        duration: 450
+    };
+
+    const interval = () => {
+        intervalRef.current = setInterval(() => {
+            setRemovable(true);
+        }, duration + config.duration);
+    }
+
+    const startAnimation = useCallback(() => {
+        interval();
 
         opacity.value = withTiming(
             1,
@@ -39,24 +70,49 @@ const AlertToast: React.FC<AlertToastProps> = ({
         x.value = withTiming(
             0,
             config
-        )
+        );
+    }, [])
 
+    const endAnimation = () => {
+        opacity.value = withTiming(
+            0,
+            config
+        );
+        x.value = withTiming(
+            width / 2,
+            config
+        )
     }
 
-    React.useEffect(() => {
+    const dismissWithPress = () => {
+        setRemovable(true);
+        clearInterval(intervalRef.current);
+    }
+
+    useEffect(() => {
         startAnimation();
+
+        return () => clearInterval(intervalRef.current);
     }, []);
 
-    const animatedStyle = useAnimatedStyle(() => {
-        return {
-            opacity: opacity.value,
-            transform: [{ translateX: x.value }]
-        };
-    });
+    useEffect(() => {
+        if (removable) {
+            endAnimation();
+            const timeout = setTimeout(() => {
+                removeToast(id);
+            }, config.duration);
+
+            return () => clearTimeout(timeout);
+        }
+    }, [removable]);
 
     return (
-        <Portal hostName="toast">
-            <Animated.View style={ [styles.container, animatedStyle] }>
+        <Animated.View style={ animatedStyle }>
+            <TouchableOpacity
+                style={ styles.container }
+                activeOpacity={ 1 }
+                onPress={ dismissWithPress }
+            >
                 <Icon
                     size={ height / 1.5 }
                     icon={ ALERT_ICONS[type] }
@@ -80,16 +136,14 @@ const AlertToast: React.FC<AlertToastProps> = ({
                         </Text>
                     }
                 </View>
-            </Animated.View>
-        </Portal>
+            </TouchableOpacity>
+        </Animated.View>
     )
-}
+})
 
 const useStyles = (type: AlertType, height: number) =>
     StyleSheet.create({
         container: {
-            // position: "absolute",
-            // bottom: SIMPLE_TABBAR_HEIGHT + SEPARATOR_SIZES.normal,
             width: "80%",
             alignSelf: "center",
             height,
