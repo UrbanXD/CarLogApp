@@ -102,10 +102,10 @@ export const getNewCarHandleSubmit = ({ handleSubmit, database, onSubmit }: GetF
                 ...newCar,
                 id: getUUID(),
                 owner: userID,
-                image: image?.filename ? image.filename : null,
+                image: image ? image.filename : null,
             } as CarTableType
 
-            store.dispatch(addCar({ database, car }));
+            await store.dispatch(addCar({ database, car }));
 
             if (onSubmit) {
                 onSubmit(true);

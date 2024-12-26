@@ -18,6 +18,8 @@ import { DatabaseProvider } from '../features/core/context/DatabaseProvider';
 import Portal, {PortalHost, PortalProvider} from "@gorhom/portal";
 import {View} from "react-native";
 import {SEPARATOR_SIZES} from "../features/core/constants/constants";
+import Compactor from "../features/core/components/shared/Compactor";
+import {AlertProvider} from "../features/core/context/AlertProvider";
 
 const Layout:React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
@@ -48,48 +50,32 @@ const Layout:React.FC = () => {
     }, []);
 
     return (
-        <Provider store={ store }>
-            <SafeAreaProvider>
-                <KeyboardProvider>
-                    <GestureHandlerRootView style={{ flex: 1 }}>
-                        <BottomSheetModalProvider>
-                            <PortalProvider>
-                                <ScrollViewProvider>
-                                    <BottomSheetProvider>
-                                        <View style={{
-                                            position: "absolute",
-                                            width: "100%",
-                                            // height: "100%",
-                                            // top: insets.top,
-                                            zIndex: 1,
-                                            gap: SEPARATOR_SIZES.lightSmall
-                                        }}>
-                                            <PortalHost
-                                                name={"toast"}
-                                            />
-                                        </View>
-                                        <Stack screenOptions={{ header: () => <></>}} >
-                                            <Stack.Screen
-                                                name="index"
-                                                options={{
-                                                    header: () => <StatusBar translucent={ true } />
-                                                }}
-                                            />
-                                            <Stack.Screen
-                                                name="(main)"
-                                                options={{
-                                                    header: () => <Header />
-                                                }}
-                                            />
-                                        </Stack>
-                                    </BottomSheetProvider>
-                                </ScrollViewProvider>
-                            </PortalProvider>
-                        </BottomSheetModalProvider>
-                    </GestureHandlerRootView>
-                </KeyboardProvider>
-            </SafeAreaProvider>
-        </Provider>
+        <Compactor components={[
+            { Component: AlertProvider },
+            { Component: Provider, props: { store } },
+            { Component: SafeAreaProvider },
+            { Component: KeyboardProvider },
+            { Component: GestureHandlerRootView, props: { style: {flex: 1} } },
+            { Component: PortalProvider },
+            { Component: BottomSheetModalProvider }, // Ez előbb legyen
+            { Component: BottomSheetProvider }, // Ez utána
+            { Component: ScrollViewProvider },
+        ]}>
+            <Stack screenOptions={{ header: () => <></>}} >
+                <Stack.Screen
+                    name="index"
+                    options={{
+                        header: () => <StatusBar translucent={ true } />
+                    }}
+                />
+                <Stack.Screen
+                    name="(main)"
+                    options={{
+                        header: () => <Header />
+                    }}
+                />
+            </Stack>
+        </Compactor>
     );
 }
 
