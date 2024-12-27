@@ -5,6 +5,7 @@ import TextInput from "../text/TextInput";
 import { theme } from "../../../constants/theme";
 import Icon from "../../shared/Icon";
 import {useAlert} from "../../../../alert/context/AlertProvider";
+import pickerDisabledToast from "../../../../alert/layouts/toast/pickerDisabledToast";
 
 interface PickerDropdownInfoProps {
     toggleDropdown?: () => void
@@ -31,10 +32,7 @@ export const PickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
     const { addToast } = useAlert();
 
     const openWarning = () =>
-        addToast({
-            type: "warning",
-            body: disabledText
-        });
+        addToast(pickerDisabledToast.warning(disabledText));
 
     return (
         <TouchableOpacity

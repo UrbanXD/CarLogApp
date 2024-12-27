@@ -20,6 +20,7 @@ import MultiStepForm from "../../../core/components/multiStepForm/MultiStepForm"
 import Input from "../../../core/components/input/Input";
 import { InputPickerDataType } from "../../../core/components/input/picker/InputPicker";
 import {useAlert} from "../../../alert/context/AlertProvider";
+import newCarToast from "../../../alert/layouts/toast/newCarToast";
 
 interface NewCarFormProps {
     close: () => void
@@ -37,15 +38,9 @@ const NewCarForm: React.FC<NewCarFormProps> = ({
         if(isSuccess){
             reset();
             close();
-            addToast({
-                type: "success",
-                body: "Az autó már be is parkolt az Ön virtuális garázsába!"
-            });
+            addToast(newCarToast.success);
         } else{
-            addToast({
-                type: "error",
-                body: "Váratlan hiba lépett fel az új autó létrehozása során, próbálja újra!"
-            });
+            addToast(newCarToast.error);
         }
     }
 

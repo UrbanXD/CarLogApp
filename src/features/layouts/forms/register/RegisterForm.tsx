@@ -17,6 +17,7 @@ import MultiStepForm from "../../../core/components/multiStepForm/MultiStepForm"
 import Input from "../../../core/components/input/Input";
 import {router} from "expo-router";
 import {useAlert} from "../../../alert/context/AlertProvider";
+import registerToast from "../../../alert/layouts/toast/registerToast";
 
 interface RegisterFormProps {
     close: () => void
@@ -35,15 +36,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         if(isSuccess){
             close();
             router.replace("/(main)");
-            addToast({
-                type: "success",
-                title: "Sikeres regisztráció!",
-            });
+            addToast(registerToast.success);
         } else{
-            addToast({
-                type: "error",
-                body: "Váratlan hiba lépett fel a regisztráció során!"
-            });
+            addToast(registerToast.error);
         }
     }
 

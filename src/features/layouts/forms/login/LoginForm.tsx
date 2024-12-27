@@ -11,6 +11,7 @@ import Form from "../../../core/components/form/Form";
 import Input from "../../../core/components/input/Input";
 import {useAlert} from "../../../alert/context/AlertProvider";
 import {router} from "expo-router";
+import loginToast from "../../../alert/layouts/toast/loginToast";
 
 interface LoginFormProps {
     close: () => void
@@ -29,15 +30,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
         if(isSuccess){
             close();
             router.replace("/(main)");
-            addToast({
-                type: "success",
-                title: "Sikeres bejelentkezés!"
-            });
+            addToast(loginToast.success);
         } else{
-            addToast({
-                type: "error",
-                body: "Váratlan hiba lépett fel a bejelentkezés közben!"
-            });
+            addToast(loginToast.error);
         }
     }
 
