@@ -70,10 +70,7 @@ const HomeScreen: React.FC = () => {
     )
 }
 
-const WelcomeBlock: React.FC = () => {
-    const { openModal } = useAlert();
-
-    return (
+const WelcomeBlock: React.FC = () =>
         <Animated.View
             entering={ FadeInLeft.springify(1200) }
             style={ styles.titleContainer }
@@ -84,10 +81,7 @@ const WelcomeBlock: React.FC = () => {
             <Text style={ styles.infoText }>
                 Vezzessen számot nálunk az autóiról!
             </Text>
-            <Button.Text text={"a"} onPress={() => openModal(bottomSheetLeavingModal)}></Button.Text>
         </Animated.View>
-    )
-}
 
 interface CarsBlockProps {
     openNewCarBottomSheet: () => void
