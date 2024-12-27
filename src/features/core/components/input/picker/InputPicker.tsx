@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: hp(1.5),
-        backgroundColor: theme.colors.gray4,
+        backgroundColor: theme.colors.gray5,
         paddingHorizontal: hp(1.5),
         borderRadius: 20,
         overflow: "hidden"

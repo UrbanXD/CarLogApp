@@ -29,8 +29,9 @@ import CarouselItem from "../../core/components/shared/carousel/CarouselItem";
 import {useBottomSheet} from "../../core/context/BottomSheetProvider";
 import NewCarForm from "../../layouts/forms/addCar/NewCarForm";
 import { encode } from "base64-arraybuffer";
-import AlertToast from "../../core/components/shared/alert/AlertToast";
-import {useAlert} from "../../core/context/AlertProvider";
+import AlertToast from "../../alert/components/AlertToast";
+import {useAlert} from "../../alert/context/AlertProvider";
+import {bottomSheetLeavingModal} from "../../alert/layouts/modal/bottomSheetLeavingModal";
 
 const HomeScreen: React.FC = () => {
     const { db } = useDatabase();
@@ -70,7 +71,7 @@ const HomeScreen: React.FC = () => {
 }
 
 const WelcomeBlock: React.FC = () => {
-    const { addToast } = useAlert();
+    const { openModal } = useAlert();
 
     return (
         <Animated.View
@@ -83,9 +84,7 @@ const WelcomeBlock: React.FC = () => {
             <Text style={ styles.infoText }>
                 Vezzessen számot nálunk az autóiról!
             </Text>
-            <Button.Text text={"a"} onPress={() => addToast({
-                type: "warning"
-            })}></Button.Text>
+            <Button.Text text={"a"} onPress={() => openModal(bottomSheetLeavingModal)}></Button.Text>
         </Animated.View>
     )
 }

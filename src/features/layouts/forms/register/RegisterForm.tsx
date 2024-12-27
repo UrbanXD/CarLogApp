@@ -16,7 +16,7 @@ import { theme } from "../../../core/constants/theme";
 import MultiStepForm from "../../../core/components/multiStepForm/MultiStepForm";
 import Input from "../../../core/components/input/Input";
 import {router} from "expo-router";
-import {useAlert} from "../../../core/context/AlertProvider";
+import {useAlert} from "../../../alert/context/AlertProvider";
 
 interface RegisterFormProps {
     close: () => void

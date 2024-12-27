@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
             position: 'absolute',
             height: hp(0.5),
             width: "100%",
-            backgroundColor: theme.colors.gray3,
+            backgroundColor: theme.colors.gray4,
             zIndex: 0
         },
         verticalLine: {
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
         },
         activeCircle: {
             // borderColor: theme.colors.white,
-            backgroundColor: theme.colors.gray3,
+            backgroundColor: theme.colors.gray4,
         },
         stepText: {
             fontFamily: "Gilroy-Heavy",

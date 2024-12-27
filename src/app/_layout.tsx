@@ -19,7 +19,7 @@ import Portal, {PortalHost, PortalProvider} from "@gorhom/portal";
 import {View} from "react-native";
 import {SEPARATOR_SIZES} from "../features/core/constants/constants";
 import Compactor from "../features/core/components/shared/Compactor";
-import {AlertProvider} from "../features/core/context/AlertProvider";
+import {AlertProvider} from "../features/alert/context/AlertProvider";
 
 const Layout:React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);

@@ -9,7 +9,7 @@ import TextDivider from "../../../core/components/shared/TextDivider";
 import { theme } from "../../../core/constants/theme";
 import Form from "../../../core/components/form/Form";
 import Input from "../../../core/components/input/Input";
-import {useAlert} from "../../../core/context/AlertProvider";
+import {useAlert} from "../../../alert/context/AlertProvider";
 import {router} from "expo-router";
 
 interface LoginFormProps {

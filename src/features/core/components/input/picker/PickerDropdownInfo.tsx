@@ -4,7 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import TextInput from "../text/TextInput";
 import { theme } from "../../../constants/theme";
 import Icon from "../../shared/Icon";
-import {useAlert} from "../../../context/AlertProvider";
+import {useAlert} from "../../../../alert/context/AlertProvider";
 
 interface PickerDropdownInfoProps {
     toggleDropdown?: () => void

@@ -11,7 +11,7 @@ import { loadSelectedCar, selectCar } from "../../redux/cars/cars.slices";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Avatar from "../shared/avatar/Avatar";
 import {router} from "expo-router";
-import {useAlert} from "../../context/AlertProvider";
+import {useAlert} from "../../../alert/context/AlertProvider";
 
 const Header: React.FC = () => {
     const { supabaseConnector, powersync } = useDatabase();

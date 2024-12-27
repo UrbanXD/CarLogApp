@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
         flex: 1,
         borderWidth: 0.5,
         borderRadius: 38,
-        borderColor: theme.colors.gray3
+        borderColor: theme.colors.gray4
     },
     itemImage: {
         width: "100%",

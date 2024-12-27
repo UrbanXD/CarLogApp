@@ -19,7 +19,7 @@ import { useMultiStepForm } from "../../../core/context/MultiStepFormProvider";
 import MultiStepForm from "../../../core/components/multiStepForm/MultiStepForm";
 import Input from "../../../core/components/input/Input";
 import { InputPickerDataType } from "../../../core/components/input/picker/InputPicker";
-import {useAlert} from "../../../core/context/AlertProvider";
+import {useAlert} from "../../../alert/context/AlertProvider";
 
 interface NewCarFormProps {
     close: () => void

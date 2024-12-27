@@ -14,7 +14,7 @@ const DefaultImage: React.FC = () => {
             <Icon
                 icon={ ICON_NAMES.image }
                 size={ FONT_SIZES.extraLarge }
-                color={ theme.colors.gray3 }
+                color={ theme.colors.gray4 }
             />
         </View>
     )
@@ -26,10 +26,10 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: hexToRgba(theme.colors.gray4, 0.65),
+        backgroundColor: hexToRgba(theme.colors.gray5, 0.65),
         borderWidth: 0.5,
         borderRadius: 38,
-        borderColor: theme.colors.gray3
+        borderColor: theme.colors.gray4
     }
 })
 

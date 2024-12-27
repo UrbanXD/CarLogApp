@@ -20,7 +20,7 @@ export interface ControllerRenderArgs {
 export const CAR_NAME_LENGTH = 10;
 export const SIMPLE_HEADER_HEIGHT = hp(6.75);
 export const SIMPLE_TABBAR_HEIGHT = hp(7.5);
-export const ICON_FONT_SIZE_SCALE = 1.75;
+export const ICON_FONT_SIZE_SCALE = 1.5;
 
 export const LOCAL_STORAGE_KEYS = {
     selectedCarIndex: "selectedCarIndex"
