@@ -52,7 +52,7 @@ const useStyles = (size: number, backgroundColor: ColorValue | string) =>
             justifyContent: "center",
             alignItems: "center",
             backgroundColor,
-            borderRadius: 50,
+            borderRadius: 100,
         },
         imageIcon: {
             alignSelf: "center",
