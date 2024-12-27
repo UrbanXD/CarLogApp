@@ -23,6 +23,8 @@ export interface OpenBottomSheetArgs {
 interface BottomSheetProviderValue {
     openBottomSheet: (args: OpenBottomSheetArgs) => void
     closeBottomSheet: () => void
+    forceCloseBottomSheet: () => void
+    reopenBottomSheet: () => void
 }
 
 const BottomSheetContext = createContext<BottomSheetProviderValue | null>(null);
@@ -39,7 +41,9 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
     const [snapPoints, setSnapPoints] = useState<Array<string> | undefined>();
     const [startSnapIndex, setStartSnapIndex] = useState<number | undefined>();
     const [isHandlePanningGesture, setIsHandlePanningGesture] = useState<boolean | undefined>();
-    const [renderCloseButton, setRenderCloseButton] = useState<(() => ReactNode) | undefined>(undefined);
+    const [renderCloseButton, setRenderCloseButton] = useState<(() => ReactNode) | undefined>();
+
+    const [enableDismiss, setEnableDismiss] = useState<boolean>(false);
 
     const openBottomSheet = useCallback((args: OpenBottomSheetArgs) => {
         setBottomSheetTitle(args.title);
@@ -49,16 +53,32 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
         setIsHandlePanningGesture(args.isHandlePanningGesture);
         setRenderCloseButton(() => args.renderCloseButton);
 
+        setEnableDismiss(false);
+
         bottomSheetModalRef.current?.present();
     }, []);
 
-    const closeBottomSheet = () => bottomSheetModalRef?.current?.close()
+    const closeBottomSheet =
+        () => bottomSheetModalRef?.current?.close();
+
+    const forceCloseBottomSheet =
+        () => {
+            setEnableDismiss(true);
+            bottomSheetModalRef?.current?.dismiss();
+        }
+
+    const reopenBottomSheet =
+        () => snapPoints && bottomSheetModalRef?.current?.snapToIndex(snapPoints.length - 1)
+
+    bottomSheetModalRef?.current?.dismiss()
 
     return (
         <BottomSheetContext.Provider
             value={{
                 openBottomSheet,
-                closeBottomSheet
+                closeBottomSheet,
+                forceCloseBottomSheet,
+                reopenBottomSheet
             }}
         >
             { children }
@@ -68,7 +88,11 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
                 snapPoints={ snapPoints }
                 startSnapIndex={ startSnapIndex }
                 isHandlePanningGesture={ isHandlePanningGesture }
+                enableDismiss={ enableDismiss }
                 renderCloseButton={ renderCloseButton }
+                forceClose={ forceCloseBottomSheet }
+                reopen={ reopenBottomSheet }
+
             >
                 { bottomSheetContent }
             </CustomBottomSheet>
