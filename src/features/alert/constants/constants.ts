@@ -1,4 +1,4 @@
-import {theme} from "../../../../constants/theme";
+import {theme} from "../../core/constants/theme";
 
 export type AlertType =
     "success" |

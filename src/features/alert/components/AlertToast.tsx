@@ -1,10 +1,10 @@
-import {ALERT_COLORS, ALERT_ICONS, ALERT_TITLES, AlertType} from "./constants/constants";
+import {ALERT_COLORS, ALERT_ICONS, ALERT_TITLES, AlertType} from "../constants/constants";
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import {View, Text, StyleSheet, Modal, Easing, useWindowDimensions, TouchableOpacity} from "react-native";
-import {theme} from "../../../constants/theme";
+import {theme} from "../../core/constants/theme";
 import {heightPercentageToDP as hp, widthPercentageToDP} from "react-native-responsive-screen";
-import {FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT} from "../../../constants/constants";
-import Icon from "../Icon";
+import {FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT} from "../../core/constants/constants";
+import Icon from "../../core/components/shared/Icon";
 import { Portal } from '@gorhom/portal';
 import Animated, {
     interpolate,
@@ -13,25 +13,23 @@ import Animated, {
     useSharedValue,
     withTiming
 } from "react-native-reanimated";
-import {useAlert} from "../../../context/AlertProvider";
 
 export interface AlertToastProps {
-    id?: string,
     type?: AlertType,
     title?: string,
     body?: string,
-    duration?: number
+    duration?: number,
+    close?: () => void
 }
 
-const AlertToast: React.FC<AlertToastProps> = React.memo(({
-    id = Date.now().toString(),
+const AlertToast: React.FC<AlertToastProps> = ({
     type = "info",
     title = ALERT_TITLES[type],
     body,
-    duration = 4000
+    duration = 4000,
+    close
 }) => {
     const { width } = useWindowDimensions();
-    const { removeToast } = useAlert();
 
     const opacity = useSharedValue(0.5);
     const x = useSharedValue(-width / 2);
@@ -97,7 +95,9 @@ const AlertToast: React.FC<AlertToastProps> = React.memo(({
         if (removable) {
             endAnimation();
             const timeout = setTimeout(() => {
-                removeToast(id);
+                if(close){
+                    close();
+                }
             }, config.duration);
 
             return () => clearTimeout(timeout);
@@ -137,12 +137,11 @@ const AlertToast: React.FC<AlertToastProps> = React.memo(({
             </TouchableOpacity>
         </Animated.View>
     )
-})
+}
 
 const useStyles = (type: AlertType, height: number) =>
     StyleSheet.create({
         container: {
-            width: "80%",
             alignSelf: "center",
             height,
             backgroundColor: theme.colors.black5,
@@ -173,4 +172,4 @@ const useStyles = (type: AlertType, height: number) =>
         }
     })
 
-export default AlertToast;
+export default React.memo(AlertToast);
