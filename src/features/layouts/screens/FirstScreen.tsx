@@ -30,6 +30,7 @@ const FirstScreen: React.FC = () => {
         snapPoints: ["100%"],
         enableHandlePanningGesture: false,
         enableContentPanningGesture: false,
+        enableDismissOnClose: false,
         closeButton:
             <View style={{ alignSelf: "center" }}>
                 <Icon

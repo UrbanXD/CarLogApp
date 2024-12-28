@@ -64,7 +64,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
                 index: 0,
                 enableHandlePanningGesture: true,
                 enableContentPanningGesture: true,
-                enableDismissOnClose: false,
+                enableDismissOnClose: true,
                 enableOverDrag: false,
                 backdropComponent: () => <BottomSheetBackdrop />,
                 onChange: onChangeSnapPoint,
@@ -96,7 +96,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
 
     const onChangeSnapPoint =
         (index: number) => {
-            if(index === -1) {
+            if(index === -1 && !bottomSheetProps?.enableDismissOnClose) {
                 openModal(bottomSheetLeavingModal(reopenBottomSheet, forceCloseBottomSheet));
             }
         }
