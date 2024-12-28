@@ -49,7 +49,6 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({
         setModal(prevModal => {
             if(prevModal?.accept) {
                 prevModal.accept();
-                console.log("vot acept")
             }
             return null;
         })

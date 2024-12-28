@@ -4,21 +4,17 @@ import React, {
     ReactElement,
     ReactNode,
     useCallback,
-    useContext,
+    useContext, useEffect,
     useRef,
     useState
 } from "react";
-import {BottomSheetModal, BottomSheetProps} from "@gorhom/bottom-sheet";
-import CustomBottomSheet from "../components/BottomSheet";
-import {useKeyboard} from "@gorhom/bottom-sheet/lib/typescript/hooks";
-import {debounce} from "react-native-keyboard-controller/lib/typescript/components/KeyboardAwareScrollView/utils";
-import {Keyboard, StyleSheet} from "react-native";
-import {runOnJS} from "react-native-reanimated";
-import {BottomSheetModalProps} from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
-import {useAlert} from "../../alert/context/AlertProvider";
-import {bottomSheetLeavingModal} from "../../alert/layouts/modal/bottomSheetLeavingModal";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
+import { useAlert } from "../../alert/context/AlertProvider";
+import { bottomSheetLeavingModal } from "../../alert/layouts/modal/bottomSheetLeavingModal";
 import BottomSheetBackdrop from "../components/BottomSheetBackdrop";
 import BottomSheet from "../components/BottomSheet";
+import { KeyboardController } from "react-native-keyboard-controller";
 
 export interface OpenBottomSheetArgs extends Partial<BottomSheetModalProps> {
     title: string,
@@ -46,9 +42,15 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
     const [bottomSheetContent, setBottomSheetContent] = useState<ReactElement | undefined>();
     const [bottomSheetCloseButton, setBottomSheetCloseButton] = useState<ReactElement | undefined>();
     const [bottomSheetProps, setBottomSheetProps] = useState<Partial<BottomSheetModalProps> | null>(null);
+    const bottomSheetPropsRef = useRef(bottomSheetProps);
+
+    useEffect(() => {
+        bottomSheetPropsRef.current = bottomSheetProps;
+    }, [bottomSheetProps]);
 
     const openBottomSheet =
-        useCallback((args: OpenBottomSheetArgs) => {
+        useCallback(
+        (args: OpenBottomSheetArgs) => {
             const {
                 title,
                 content,
@@ -72,34 +74,43 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
             });
 
             bottomSheetModalRef.current?.present();
-        }, [bottomSheetTitle, bottomSheetContent, bottomSheetProps, bottomSheetCloseButton]);
+        }, [bottomSheetModalRef]);
 
     const closeBottomSheet =
-        useCallback(() =>
-            bottomSheetModalRef?.current?.close()
-        ,[bottomSheetModalRef])
+        useCallback(
+        () => {
+            bottomSheetModalRef?.current?.close();
+        },[bottomSheetModalRef]);
 
     const forceCloseBottomSheet =
+        useCallback(
         () => {
-            setBottomSheetProps(prevBottomSheetProps => {
-                return {
-                    ...prevBottomSheetProps,
-                    enableDismissOnClose: true
-                } as BottomSheetModalProps;
-            })
-            bottomSheetModalRef?.current?.dismiss();
-        }
+            if(!bottomSheetPropsRef.current?.enableDismissOnClose) {
+                setBottomSheetProps(prevBottomSheetProps => {
+                    return {
+                        ...prevBottomSheetProps,
+                        enableDismissOnClose: true
+                    };
+                })
+            }
+
+            closeBottomSheet();
+        }, [bottomSheetModalRef]);
 
     const reopenBottomSheet =
-        () =>
-            bottomSheetModalRef?.current?.snapToIndex( 0);
+        useCallback(
+        () => {
+            bottomSheetModalRef?.current?.snapToIndex(0);
+        }, [bottomSheetModalRef]);
 
     const onChangeSnapPoint =
+        useCallback(
         (index: number) => {
-            if(index === -1 && !bottomSheetProps?.enableDismissOnClose) {
+            if (index === -1 && !bottomSheetPropsRef.current?.enableDismissOnClose) {
+                KeyboardController.dismiss();
                 openModal(bottomSheetLeavingModal(reopenBottomSheet, forceCloseBottomSheet));
             }
-        }
+        }, [bottomSheetPropsRef]);
 
     return (
         <BottomSheetContext.Provider

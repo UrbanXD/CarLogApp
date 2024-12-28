@@ -1,11 +1,9 @@
-import React, { forwardRef, ReactNode, useCallback } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import React, {  forwardRef, ReactNode } from "react";
+import { StyleSheet } from "react-native";
 import { theme } from "../../core/constants/theme";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../core/constants/constants";
-import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
-import { useAlert } from "../../alert/context/AlertProvider";
-import { bottomSheetLeavingModal } from "../../alert/layouts/modal/bottomSheetLeavingModal";
+import { DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../../core/constants/constants";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import BottomSheetBackdrop from "./BottomSheetBackdrop";
 import BottomSheetContainer from "./BottomSheetContainer";
 import {BottomSheetModalProps} from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";

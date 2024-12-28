@@ -85,7 +85,8 @@ const CarsBlock: React.FC = () => {
         openBottomSheet({
             title: "Új Autó",
             content: <NewCarForm close={ closeBottomSheet } />,
-            snapPoints: ["85%"]
+            snapPoints: ["85%"],
+            enableDismissOnClose: false
         })
 
     const openCarInfoBottomSheet = (index: number) => {

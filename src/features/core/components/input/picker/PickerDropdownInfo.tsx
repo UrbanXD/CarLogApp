@@ -79,7 +79,7 @@ export const InputPickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
     disabledText
 }) => {
     const { addToast } = useAlert();
-    console.log(disabledText)
+
     const openWarning = () =>
         addToast({
             type: "warning",

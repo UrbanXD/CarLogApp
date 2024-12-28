@@ -6,7 +6,7 @@ import {useSafeAreaInsets} from "react-native-safe-area-context";
 
 interface BottomSheetContainerProps {
     title: string
-    renderCloseButton?: () => ReactElement
+    renderCloseButton?: () => ReactNode
     children: ReactNode
 }
 
