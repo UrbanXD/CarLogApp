@@ -11,7 +11,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { theme } from "../core/constants/theme";
 import { useForm } from "react-hook-form";
 import { getToday } from "../core/utils/getDate";
-import { useBottomSheet } from "../core/context/BottomSheetProvider";
+import { useBottomSheet } from "../BottomSheet/context/BottomSheetProvider";
 import { EditRideFormFieldType, editRideUseFormProps } from "../layouts/forms/editRide/editRideFormSchema";
 import InputText from "../core/components/input/text/InputText";
 import ProgressBar from "../core/components/shared/ProgressBar";

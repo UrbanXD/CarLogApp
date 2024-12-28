@@ -8,13 +8,15 @@ import {GestureHandlerRootView} from "react-native-gesture-handler";
 import {SafeAreaProvider} from "react-native-safe-area-context";
 import {BottomSheetModalProvider} from "@gorhom/bottom-sheet";
 import {store} from "../features/core/redux/store";
-import {theme} from "../features/core/constants/theme";
 import {Provider} from "react-redux";
 import {KeyboardProvider} from "react-native-keyboard-controller";
 import {StatusBar} from "expo-status-bar";
 import Header from "../features/core/components/header/Header";
-import {BottomSheetProvider} from "../features/core/context/BottomSheetProvider";
+import {BottomSheetProvider} from "../features/BottomSheet/context/BottomSheetProvider";
 import { DatabaseProvider } from '../features/core/context/DatabaseProvider';
+import { PortalProvider } from "@gorhom/portal";
+import Compactor from "../features/core/components/shared/Compactor";
+import {AlertProvider} from "../features/alert/context/AlertProvider";
 
 const Layout:React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
@@ -44,34 +46,32 @@ const Layout:React.FC = () => {
     }, []);
 
     return (
-        <Provider store={ store }>
-            <SafeAreaProvider>
-                <KeyboardProvider>
-                    <GestureHandlerRootView style={{ flex: 1 }}>
-                        <BottomSheetModalProvider>
-                            <ScrollViewProvider>
-                                <BottomSheetProvider>
-                                    <Stack screenOptions={{ header: () => <></>}} >
-                                        <Stack.Screen
-                                            name="index"
-                                            options={{
-                                                header: () => <StatusBar translucent={ true } />
-                                            }}
-                                        />
-                                        <Stack.Screen
-                                            name="(main)"
-                                            options={{
-                                                header: () => <Header />
-                                            }}
-                                        />
-                                    </Stack>
-                                </BottomSheetProvider>
-                            </ScrollViewProvider>
-                        </BottomSheetModalProvider>
-                    </GestureHandlerRootView>
-                </KeyboardProvider>
-            </SafeAreaProvider>
-        </Provider>
+        <Compactor components={[
+            { Component: AlertProvider },
+            { Component: Provider, props: { store } },
+            { Component: SafeAreaProvider },
+            { Component: KeyboardProvider },
+            { Component: GestureHandlerRootView, props: { style: {flex: 1} } },
+            { Component: PortalProvider },
+            { Component: BottomSheetModalProvider },
+            { Component: BottomSheetProvider },
+            { Component: ScrollViewProvider },
+        ]}>
+            <Stack screenOptions={{ header: () => <></>}} >
+                <Stack.Screen
+                    name="index"
+                    options={{
+                        header: () => <StatusBar translucent={ true } />
+                    }}
+                />
+                <Stack.Screen
+                    name="(main)"
+                    options={{
+                        header: () => <Header />
+                    }}
+                />
+            </Stack>
+        </Compactor>
     );
 }
 
@@ -82,4 +82,5 @@ const RootLayout: React.FC = () => {
         </DatabaseProvider>
     )
 }
+
 export default RootLayout;

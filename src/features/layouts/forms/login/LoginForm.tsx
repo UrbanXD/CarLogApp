@@ -9,12 +9,34 @@ import TextDivider from "../../../core/components/shared/TextDivider";
 import { theme } from "../../../core/constants/theme";
 import Form from "../../../core/components/form/Form";
 import Input from "../../../core/components/input/Input";
+import {useAlert} from "../../../alert/context/AlertProvider";
+import {router} from "expo-router";
+import loginToast from "../../../alert/layouts/toast/loginToast";
 
-const LoginForm: React.FC = () => {
-    const { control, handleSubmit } =
-        useForm<LoginFormFieldType>(loginUseFormProps)
+interface LoginFormProps {
+    close: () => void
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({
+    close
+}) => {
     const database = useDatabase();
-    const submitHandler = getLoginHandleSubmit({handleSubmit, database})
+    const { addToast } = useAlert();
+
+    const { control, handleSubmit } =
+        useForm<LoginFormFieldType>(loginUseFormProps);
+
+    const onSubmit = (isSuccess?: boolean) => {
+        if(isSuccess){
+            close();
+            router.replace("/(main)");
+            addToast(loginToast.success);
+        } else{
+            addToast(loginToast.error);
+        }
+    }
+
+    const submitHandler = getLoginHandleSubmit({handleSubmit, database, onSubmit})
 
     return (
         <Form>

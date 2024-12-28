@@ -39,10 +39,13 @@ export const registerUseFormProps = {
     resolver: zodResolver(registerFormSchema),
 }
 
-export const getRegisterHandleSubmit = ({ handleSubmit, database }: GetFormHandleSubmitArgs) =>
+export const getRegisterHandleSubmit = ({
+    handleSubmit,
+    database,
+    onSubmit
+}: GetFormHandleSubmitArgs) =>
     handleSubmit(async ({ email, password, firstname, lastname }: RegisterFormFieldType) => {
         try {
-            console.log(email, password, firstname, lastname)
             const response = await database.supabaseConnector?.client.auth.signUp({
                 email,
                 password,
@@ -53,6 +56,7 @@ export const getRegisterHandleSubmit = ({ handleSubmit, database }: GetFormHandl
                     }
                 }
             });
+
             if (response?.error){
                 switch (response?.error?.message) {
                     case "User already registered":
@@ -60,11 +64,20 @@ export const getRegisterHandleSubmit = ({ handleSubmit, database }: GetFormHandl
                         break;
                     default:
                         Alert.alert("Valamilyen hiba lépett fel próbálja újra!")
+                        console.log(response?.error?.message)
                         break;
                 }
+
+                if(onSubmit) {
+                    onSubmit(false);
+                }
+
                 return;
             }
-            router.replace({ pathname: "/" })
+
+            if(onSubmit) {
+                onSubmit(true);
+            }
         } catch (error: any) {
             Alert.alert(error.message);
         }

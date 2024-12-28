@@ -24,6 +24,7 @@ interface InputPickerProps {
     isCarousel?: boolean
     withSearchbar?: boolean
     disabled?: boolean
+    disabledText?: string
 }
 
 const InputPicker: React.FC<InputPickerProps> = ({
@@ -38,7 +39,8 @@ const InputPicker: React.FC<InputPickerProps> = ({
     isHorizontal = false,
     isCarousel = true,
     withSearchbar = false,
-    disabled = false
+    disabled = false,
+    disabledText
 }) => {
     const [allData, setAllData] = useState<Array<PickerDataType>>([] as Array<PickerDataType>);
     const [adjustedData, setAdjustedData] = useState<Array<InputPickerDataType>>([] as Array<InputPickerDataType>);
@@ -105,6 +107,7 @@ const InputPicker: React.FC<InputPickerProps> = ({
                         isCarousel={ isCarousel }
                         dropDownInfoType="input"
                         disabled={ disabled }
+                        disabledText={ disabledText }
                     />
                 :   <></>
         )
@@ -139,7 +142,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: hp(1.5),
-        backgroundColor: theme.colors.gray4,
+        backgroundColor: theme.colors.gray5,
         paddingHorizontal: hp(1.5),
         borderRadius: 20,
         overflow: "hidden"

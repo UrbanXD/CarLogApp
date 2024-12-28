@@ -17,7 +17,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-nat
 import { theme } from "../../core/constants/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../../core/components/shared/button/Button";
-import { useBottomSheet } from "../../core/context/BottomSheetProvider";
+import {OpenBottomSheetArgs, useBottomSheet} from "../../BottomSheet/context/BottomSheetProvider";
 import RegisterForm from "../../layouts/forms/register/RegisterForm";
 import LoginForm from "../../layouts/forms/login/LoginForm";
 import Icon from "../../core/components/shared/Icon";
@@ -28,30 +28,37 @@ const FirstScreen: React.FC = () => {
 
     const bottomSheetArgs= {
         snapPoints: ["100%"],
-        isHandlePanningGesture: false,
-        renderCloseButton:
-            () =>
-                <View style={{ alignSelf: "center" }}>
-                    <Icon
-                        icon={ ICON_NAMES.close }
-                        size={ FONT_SIZES.medium }
-                        color={ theme.colors.white }
-                        onPress={ closeBottomSheet }
-                    />
-                </View>
-    }
+        enableHandlePanningGesture: false,
+        enableContentPanningGesture: false,
+        enableDismissOnClose: false,
+        closeButton:
+            <View style={{ alignSelf: "center" }}>
+                <Icon
+                    icon={ ICON_NAMES.close }
+                    size={ FONT_SIZES.medium }
+                    color={ theme.colors.white }
+                    onPress={ closeBottomSheet }
+                />
+            </View>
+    } as Partial<OpenBottomSheetArgs>
     const openRegister = () => {
         openBottomSheet({
             ...bottomSheetArgs,
             title: "Felhasználó létrehozás",
-            content: <RegisterForm />
+            content:
+                <RegisterForm
+                    close={ closeBottomSheet }
+                />
         });
     }
     const openLogin = () => {
         openBottomSheet({
             ...bottomSheetArgs,
             title: "Bejelentkezés",
-            content: <LoginForm />
+            content:
+                <LoginForm
+                    close={ closeBottomSheet }
+                />
         });
     };
 

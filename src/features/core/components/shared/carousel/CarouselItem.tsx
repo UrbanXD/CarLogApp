@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
         flex: 1,
         borderWidth: 0.5,
         borderRadius: 38,
-        borderColor: theme.colors.gray3
+        borderColor: theme.colors.gray4
     },
     itemImage: {
         width: "100%",
@@ -180,12 +180,12 @@ const styles = StyleSheet.create({
     },
     infoSubtitleText: {
         color: theme.colors.white,
-        fontSize: FONT_SIZES.extraSmall,
+        fontSize: FONT_SIZES.tiny,
         fontFamily: "Gilroy-Medium",
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 10,
-        letterSpacing: FONT_SIZES.extraSmall * 0.05
+        letterSpacing: FONT_SIZES.tiny * 0.05
     },
     actionContainer: {
         width: "20%",

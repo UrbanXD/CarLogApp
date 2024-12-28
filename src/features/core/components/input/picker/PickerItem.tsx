@@ -53,7 +53,7 @@ const styles= StyleSheet.create({
     itemContainer: {
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: theme.colors.gray3,
+        backgroundColor: theme.colors.gray4,
         minHeight: hp(6),
         borderRadius: 15,
         paddingHorizontal: SEPARATOR_SIZES.small

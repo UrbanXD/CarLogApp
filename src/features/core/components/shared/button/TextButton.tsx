@@ -13,6 +13,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import {FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES} from "../../../constants/constants";
 import {theme} from "../../../constants/theme";
 import Icon from "../Icon";
+import getContrastingColor from "../../../utils/colors/getContrastingColor";
 
 interface TextButtonProps {
     text?: string
@@ -32,10 +33,10 @@ interface TextButtonProps {
 const TextButton: React.FC<TextButtonProps> = ({
     text,
     fontSize = FONT_SIZES.normal,
-    textColor = theme.colors.fuelYellow,
-    backgroundColor = theme.colors.black,
-    width,
+    backgroundColor = theme.colors.fuelYellow,
+    textColor = getContrastingColor(backgroundColor, theme.colors.white, theme.colors.black),
     height = hp(7),
+    width,
     iconLeft,
     iconRight,
     style,
@@ -105,8 +106,8 @@ export const useButtonStyles = (
             paddingHorizontal: width ? 0 : SEPARATOR_SIZES.small,
             width: width ?? "100%",
             height: height,
-            backgroundColor: secondaryColor,
-            color: primaryColor,
+            backgroundColor: primaryColor,
+            color: secondaryColor,
             borderRadius: 30,
             overflow: "hidden"
         },
@@ -116,7 +117,7 @@ export const useButtonStyles = (
             textAlign: "center",
             fontSize: fontSize,
             fontFamily: "Gilroy-Heavy",
-            // color: primaryColor,
+            color: secondaryColor,
             letterSpacing: fontSize * 0.075,
             flexWrap: "nowrap"
 

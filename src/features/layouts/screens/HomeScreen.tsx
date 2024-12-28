@@ -1,5 +1,6 @@
 import React, {ReactElement, useCallback, useEffect, useRef, useState} from "react";
 import {
+    ImageSourcePropType,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -26,13 +27,16 @@ import { useSelector } from "react-redux";
 import { RootState, store } from "../../core/redux/store";
 import {loadCars } from "../../core/redux/cars/cars.slices";
 import CarouselItem from "../../core/components/shared/carousel/CarouselItem";
-import {useBottomSheet} from "../../core/context/BottomSheetProvider";
+import {useBottomSheet} from "../../BottomSheet/context/BottomSheetProvider";
 import NewCarForm from "../../layouts/forms/addCar/NewCarForm";
 import { encode } from "base64-arraybuffer";
+import AlertToast from "../../alert/components/AlertToast";
+import {useAlert} from "../../alert/context/AlertProvider";
+import {bottomSheetLeavingModal} from "../../alert/layouts/modal/bottomSheetLeavingModal";
+import {undefined} from "zod";
 
 const HomeScreen: React.FC = () => {
     const { db } = useDatabase();
-    const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
     useEffect(() => {
         store.dispatch(loadCars(db))
@@ -47,16 +51,7 @@ const HomeScreen: React.FC = () => {
                 contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
             >
                 <WelcomeBlock />
-                <CarsBlock
-                    openNewCarBottomSheet={
-                        () =>
-                            openBottomSheet({
-                                title: "Új Autó",
-                                content: <NewCarForm close={ closeBottomSheet } />,
-                                snapPoints: ["85%"]
-                            })
-                    }
-                />
+                <CarsBlock />
                 <UpcomingRidesBlock />
                 <LatestExpensesBlock />
             </ScrollView>
@@ -64,8 +59,7 @@ const HomeScreen: React.FC = () => {
     )
 }
 
-const WelcomeBlock: React.FC = () => {
-    return (
+const WelcomeBlock: React.FC = () =>
         <Animated.View
             entering={ FadeInLeft.springify(1200) }
             style={ styles.titleContainer }
@@ -77,45 +71,47 @@ const WelcomeBlock: React.FC = () => {
                 Vezzessen számot nálunk az autóiról!
             </Text>
         </Animated.View>
-    )
-}
 
-interface CarsBlockProps {
-    openNewCarBottomSheet: () => void
-}
-const CarsBlock: React.FC<CarsBlockProps> = ({ openNewCarBottomSheet }) => {
-    const { attachmentQueue } = useDatabase();
+
+const CarsBlock: React.FC = () => {
+    const { openBottomSheet, closeBottomSheet } = useBottomSheet();
 
     const selectCarsState = (state: RootState) => state.cars.cars;
 
     const cars = useSelector(selectCarsState);
     const [carouselData, setCarouselData] = useState<CarouselItemType[]>([]);
 
+    const openNewCarBottomSheet = () =>
+        openBottomSheet({
+            title: "Új Autó",
+            content: <NewCarForm close={ closeBottomSheet } />,
+            snapPoints: ["85%"]
+        })
+
+    const openCarInfoBottomSheet = (index: number) => {
+        const car = cars.find(car => car .id === cars[index].id);
+
+        // if(!car) return Alert.alert('Nincs auto');
+
+        // openBottomSheet({
+        //     title: carouselData[index].id || index.toString(),
+        //     content: <CarInfo car={ car } />,
+        //     snapPoints: ["85%"]
+        // })
+    }
 
     useEffect(() => {
-        const fetchImages = async () => {
-            const mappedCars = await Promise.all(
-                cars.map(async (car) => {
-                    let img = undefined;
-                    if(car.image && attachmentQueue){
-                        const file = await attachmentQueue.getFile(car.image);
-                        img = file ? { uri: `data:image/jpeg;base64,${encode(file)}` } : null;
-                    }
+        const mappedCars = cars.map(car => {
+            return {
+                id: car.name,
+                image: car.image,
+                title: car.brand,
+                subtitle: car.model,
+            } as CarouselItemType;
+        });
 
-                    return {
-                        id: car.name,
-                        image: img,
-                        title: car.brand,
-                        subtitle: car.model,
-                    } as CarouselItemType;
-                })
-            );
-
-            setCarouselData(mappedCars);
-        }
-
-        fetchImages();
-    }, [cars, attachmentQueue]);
+        setCarouselData(mappedCars);
+    }, [cars]);
 
     return (
         <View style={ [GLOBAL_STYLE.contentContainer, { paddingHorizontal: 0, marginHorizontal: 0, backgroundColor: "transparent"}] } >
@@ -235,8 +231,8 @@ const styles = StyleSheet.create({
     },
     infoText: {
         fontFamily: "Gilroy-Mediun",
-        fontSize: FONT_SIZES.normal * 0.85,
-        letterSpacing: FONT_SIZES.normal * 0.85 * 0.05,
+        fontSize: FONT_SIZES.intermediate,
+        letterSpacing: FONT_SIZES.intermediate * 0.05,
         color: theme.colors.gray1
     },
     carouselContainer: {

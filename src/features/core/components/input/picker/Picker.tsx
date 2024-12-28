@@ -27,6 +27,7 @@ interface PickerProps {
     placeholder?: string
     error?: string
     disabled?: boolean
+    disabledText?: string
 }
 
 const Picker: React.FC<PickerProps> = (initialProps) => {
@@ -50,6 +51,7 @@ const Picker: React.FC<PickerProps> = (initialProps) => {
         error,
         isHorizontal,
         disabled,
+        disabledText
     } = props;
 
     const [isDropdownContentVisible, setIsDropdownContentVisible] = useState(!isDropdown);
@@ -78,6 +80,7 @@ const Picker: React.FC<PickerProps> = (initialProps) => {
                                 error={ error }
                                 isHorizontal={ isHorizontal }
                                 disabled={ disabled }
+                                disabledText={ disabledText }
                             />
                         :   <InputPickerDropdownInfo
                                 toggleDropdown={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
@@ -87,6 +90,7 @@ const Picker: React.FC<PickerProps> = (initialProps) => {
                                 placeholder={ placeholder }
                                 isHorizontal={ isHorizontal }
                                 disabled={ disabled }
+                                disabledText={ disabledText }
                             />
                 :   <PickerElements
                         { ...props }
