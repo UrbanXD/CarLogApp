@@ -1,21 +1,17 @@
 import React, {useState} from "react";
 import {Image, StyleSheet, View, Text, ImageBackground} from "react-native";
-import { theme } from "../core/constants/theme";
-import { FONT_SIZES, ICON_COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../core/constants/constants";
-import {CarTableType} from "../core/utils/database/powersync/AppSchema";
-import Icon from "../core/components/shared/Icon";
-import Divider from "../core/components/shared/Divider";
-import IconButton from "../core/components/shared/button/IconButton";
-import Button from "../core/components/shared/button/Button";
-import {formatImageSource} from "../core/utils/formatImageSource";
-import DefaultImage from "../core/components/shared/DefaultImage";
-import {useBottomSheet} from "../core/context/BottomSheetProvider";
-import NewCarForm from "../layouts/forms/addCar/NewCarForm";
-import TextInput from "../core/components/input/text/TextInput";
-import {deleteCar} from "../core/redux/cars/functions/deleteCar";
-import {useDatabase} from "../core/utils/database/Database";
-import {store} from "../core/redux/store";
-import {addCar} from "../core/redux/cars/functions/addCar";
+import {addCar} from "../Database/redux/cars/functions/addCar";
+import {CarTableType} from "../Database/connector/powersync/AppSchema";
+import {useDatabase} from "../Database/connector/Database";
+import {formatImageSource} from "../Shared/utils/formatImageSource";
+import DefaultImage from "../Shared/components/DefaultImage";
+import {FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES} from "../Shared/constants/constants";
+import Icon from "../Shared/components/Icon";
+import {theme} from "../Shared/constants/theme";
+import Divider from "../Shared/components/Divider";
+import Button from "../Button/components/Button";
+import {deleteCar} from "../Database/redux/cars/functions/deleteCar";
+import {store} from "../Database/redux/store";
 
 interface CarInfoProps {
     car: CarTableType
