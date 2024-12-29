@@ -3,9 +3,9 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../Shared/constants/constants";
 import {hexToRgba} from "../../Shared/utils/colors/hexToRgba";
 import {theme} from "../../Shared/constants/theme";
-import {AlertToastProps} from "../../Alert/components/AlertToast";
-import {AlertModalProps} from "../../Alert/components/AlertModal";
-import Alert from "../../Alert/components/Alert";
+import {AlertToastProps} from "../components/AlertToast";
+import {AlertModalProps} from "../components/AlertModal";
+import Alert from "../components/Alert";
 
 interface AlertProviderValue {
     addToast: (args: AlertToastProps) => void,
