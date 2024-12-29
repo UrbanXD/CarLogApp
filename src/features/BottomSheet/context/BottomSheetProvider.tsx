@@ -11,7 +11,7 @@ import React, {
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
 import { useAlert } from "../../alert/context/AlertProvider";
-import { bottomSheetLeavingModal } from "../../alert/layouts/modal/bottomSheetLeavingModal";
+import { bottomSheetLeavingModal } from "../../Alert/layouts/modal/bottomSheetLeavingModal";
 import BottomSheetBackdrop from "../components/BottomSheetBackdrop";
 import BottomSheet from "../components/BottomSheet";
 import { KeyboardController } from "react-native-keyboard-controller";

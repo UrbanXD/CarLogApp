@@ -1,7 +1,7 @@
 import React, {ReactElement, ReactNode} from "react";
 import {StyleSheet, Text, View} from "react-native";
 import {BottomSheetView} from "@gorhom/bottom-sheet";
-import {FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES} from "../../core/constants/constants";
+import {FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES} from "../../Shared/constants/constants";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 
 interface BottomSheetContainerProps {
