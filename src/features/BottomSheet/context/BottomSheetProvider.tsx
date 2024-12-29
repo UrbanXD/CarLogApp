@@ -25,6 +25,7 @@ export interface OpenBottomSheetArgs extends Partial<BottomSheetModalProps> {
 interface BottomSheetProviderValue {
     openBottomSheet: (args: OpenBottomSheetArgs) => void
     closeBottomSheet: () => void
+    forceCloseBottomSheet: () => void
 }
 
 const BottomSheetContext = createContext<BottomSheetProviderValue | null>(null);
@@ -116,7 +117,8 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
         <BottomSheetContext.Provider
             value={{
                 openBottomSheet,
-                closeBottomSheet
+                closeBottomSheet,
+                forceCloseBottomSheet
             }}
         >
             { children }

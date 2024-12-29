@@ -74,7 +74,7 @@ const WelcomeBlock: React.FC = () =>
 
 
 const CarsBlock: React.FC = () => {
-    const { openBottomSheet, closeBottomSheet } = useBottomSheet();
+    const { openBottomSheet, forceCloseBottomSheet } = useBottomSheet();
 
     const selectCarsState = (state: RootState) => state.cars.cars;
 
@@ -84,7 +84,7 @@ const CarsBlock: React.FC = () => {
     const openNewCarBottomSheet = () =>
         openBottomSheet({
             title: "Új Autó",
-            content: <NewCarForm close={ closeBottomSheet } />,
+            content: <NewCarForm close={ forceCloseBottomSheet } />,
             snapPoints: ["85%"],
             enableDismissOnClose: false
         })
