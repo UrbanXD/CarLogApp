@@ -1,4 +1,4 @@
-import React, {Context, createContext, ReactElement, useContext, useMemo} from "react";
+import React, {Context, createContext, ReactElement, useCallback, useContext, useMemo} from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../Shared/constants/constants";
 import {hexToRgba} from "../../Shared/utils/colors/hexToRgba";
@@ -27,33 +27,34 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({
     const [toasts, setToasts] = React.useState<Array<AlertToastProps & {id: string}>>([]);
     const [modal, setModal] = React.useState<AlertModalProps | null>(null);
 
-    const addToast = (props: AlertToastProps) =>
+    const addToast = useCallback((props: AlertToastProps) =>
         setToasts(prevToasts => [
             ...prevToasts,
             {
                 ...props,
                 id: Date.now().toString()
             }
-        ]);
+        ]), []);
 
-    const removeToast = (id: string) =>
+    const removeToast = useCallback((id: string) =>
         setToasts(prevToasts =>
             prevToasts.filter(toast => toast.id !== id)
-        );
+        ), []);
 
-    const openModal = (props: AlertModalProps) =>
-        setModal(props);
-
-    const acceptModal = () => {
+    const openModal = useCallback(
+        (props: AlertModalProps) =>
+                setModal(props)
+        , []);
+    const acceptModal = useCallback(() => {
         setModal(prevModal => {
             if(prevModal?.accept) {
                 prevModal.accept();
             }
             return null;
         })
-    }
+    }, [])
 
-    const closeModal = () => {
+    const closeModal = useCallback(() => {
         setModal(prevModal => {
             if(prevModal?.dismiss) {
                 prevModal.dismiss();
@@ -61,7 +62,7 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({
 
             return null;
         });
-    }
+    }, []);
 
     const contextValue = useMemo(() => ({
         addToast,
