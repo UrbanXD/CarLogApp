@@ -4,7 +4,8 @@ import React, {
     ReactElement,
     ReactNode,
     useCallback,
-    useContext, useEffect,
+    useContext,
+    useMemo,
     useRef,
     useState
 } from "react";
@@ -45,10 +46,6 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
     const [bottomSheetProps, setBottomSheetProps] = useState<Partial<BottomSheetModalProps> | null>(null);
     const bottomSheetPropsRef = useRef(bottomSheetProps);
 
-    useEffect(() => {
-        bottomSheetPropsRef.current = bottomSheetProps;
-    }, [bottomSheetProps]);
-
     const openBottomSheet =
         useCallback(
         (args: OpenBottomSheetArgs) => {
@@ -87,6 +84,10 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
         useCallback(
         () => {
             if(!bottomSheetPropsRef.current?.enableDismissOnClose) {
+                bottomSheetPropsRef.current = {
+                    ...bottomSheetPropsRef.current,
+                    enableDismissOnClose: true
+                }
                 setBottomSheetProps(prevBottomSheetProps => {
                     return {
                         ...prevBottomSheetProps,
@@ -113,13 +114,16 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
             }
         }, [bottomSheetPropsRef]);
 
+
+    const contextValue = useMemo(() => ({
+        openBottomSheet,
+        closeBottomSheet,
+        forceCloseBottomSheet,
+    }), [openBottomSheet, closeBottomSheet, forceCloseBottomSheet]);
+
     return (
         <BottomSheetContext.Provider
-            value={{
-                openBottomSheet,
-                closeBottomSheet,
-                forceCloseBottomSheet
-            }}
+            value={ contextValue }
         >
             { children }
             <BottomSheet

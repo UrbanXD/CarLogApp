@@ -1,4 +1,4 @@
-import React, { Context, createContext, ReactElement, useContext } from "react";
+import React, {Context, createContext, ReactElement, useContext, useMemo} from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../Shared/constants/constants";
 import {hexToRgba} from "../../Shared/utils/colors/hexToRgba";
@@ -63,14 +63,16 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({
         });
     }
 
+    const contextValue = useMemo(() => ({
+        addToast,
+        removeToast,
+        openModal,
+        closeModal
+    }), [addToast, removeToast, openModal, closeModal]);
+
     return (
         <AlertContext.Provider
-            value={{
-                addToast,
-                removeToast,
-                openModal,
-                closeModal
-            }}
+            value={ contextValue }
         >
             <View style={ styles.toastContainer }>
                 {
