@@ -4,7 +4,7 @@ import {addCar} from "../Database/redux/cars/functions/addCar";
 import {CarTableType} from "../Database/connector/powersync/AppSchema";
 import {useDatabase} from "../Database/connector/Database";
 import {formatImageSource} from "../Shared/utils/formatImageSource";
-import DefaultImage from "../Shared/components/DefaultImage";
+import DefaultElement from "../Shared/components/DefaultElement";
 import {FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES} from "../Shared/constants/constants";
 import Icon from "../Shared/components/Icon";
 import {theme} from "../Shared/constants/theme";
@@ -29,7 +29,7 @@ const CarInfo: React.FC<CarInfoProps> = ({ car }) => {
                                 source={ formatImageSource(car?.image) }
                                 style={ styles.image }
                             />
-                        :   <DefaultImage style={ styles.image }/>
+                        :   <DefaultElement icon={ ICON_NAMES.image } style={ styles.image }/>
                 }
                 <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                     <View style={{ flex: 1, flexDirection: "column" }}>

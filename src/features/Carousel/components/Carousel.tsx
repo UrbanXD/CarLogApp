@@ -1,4 +1,4 @@
-import React, { ReactElement, useRef } from "react";
+import React, {ReactElement, useEffect, useRef} from "react";
 import { ImageSourcePropType, useWindowDimensions, View } from "react-native";
 import Animated, { SharedValue, useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
@@ -14,7 +14,7 @@ export interface CarouselItemType {
 export interface CarouselProps {
     data: Array<any>
     renderItem: (item: any, index: number, size: number, x: SharedValue<number>) => ReactElement
-    renderDefaultItem?: () => ReactElement
+    renderDefaultItem?: (size: number, spacerWidth: number) => ReactElement
     contentWidth?: number
     itemSizePercentage?: number
     spacer?: number
@@ -60,7 +60,7 @@ const Carousel: React.FC<CarouselProps> = ({
                         }
                     </React.Fragment>
             }
-            ListEmptyComponent={ renderDefaultItem ? renderDefaultItem() : <></> }
+            ListEmptyComponent={ renderDefaultItem ? renderDefaultItem(ITEM_SIZE, SPACER) : <></> }
             keyExtractor={ (_, index) => index.toString() }
             horizontal
             snapToInterval={ ITEM_SIZE }

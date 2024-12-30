@@ -17,7 +17,7 @@ import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-nat
 import { formatImageSource } from "../../../../Shared/utils/formatImageSource";
 import {ControllerRenderArgs, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../Shared/constants/constants";
 import InputTitle from "../InputTitle";
-import DefaultImage from "../../../../Shared/components/DefaultImage";
+import DefaultElement from "../../../../Shared/components/DefaultElement";
 import { theme } from "../../../../Shared/constants/theme";
 import Icon from "../../../../Shared/components/Icon";
 import { hexToRgba } from "../../../../Shared/utils/colors/hexToRgba";
@@ -193,7 +193,7 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                                     )
                                 }
                             }
-                            renderDefaultItem={ () => <DefaultImage /> }
+                            renderDefaultItem={ () => <DefaultElement /> }
                         />
                     </View>
                     {
