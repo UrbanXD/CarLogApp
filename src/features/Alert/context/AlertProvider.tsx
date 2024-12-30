@@ -45,6 +45,7 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({
         (props: AlertModalProps) =>
                 setModal(props)
         , []);
+
     const acceptModal = useCallback(() => {
         setModal(prevModal => {
             if(prevModal?.accept) {
@@ -52,7 +53,7 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({
             }
             return null;
         })
-    }, [])
+    }, [modal])
 
     const closeModal = useCallback(() => {
         setModal(prevModal => {
@@ -62,7 +63,7 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({
 
             return null;
         });
-    }, []);
+    }, [modal]);
 
     const contextValue = useMemo(() => ({
         addToast,

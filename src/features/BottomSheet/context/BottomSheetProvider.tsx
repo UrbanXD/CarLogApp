@@ -4,7 +4,7 @@ import React, {
     ReactElement,
     ReactNode,
     useCallback,
-    useContext,
+    useContext, useEffect,
     useMemo,
     useRef,
     useState
@@ -45,6 +45,10 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
     const [bottomSheetCloseButton, setBottomSheetCloseButton] = useState<ReactElement | undefined>();
     const [bottomSheetProps, setBottomSheetProps] = useState<Partial<BottomSheetModalProps> | null>(null);
     const bottomSheetPropsRef = useRef(bottomSheetProps);
+
+    useEffect(() => {
+        bottomSheetPropsRef.current = bottomSheetProps;
+    }, [bottomSheetProps]);
 
     const openBottomSheet =
         useCallback(
