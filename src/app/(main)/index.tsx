@@ -1,7 +1,7 @@
 import React from "react";
 import { Provider } from "react-redux";
 import { store } from "../../features/Database/redux/store";
-import HomeScreen from "../../features/Screens/components/HomeScreen";
+import HomeScreen from "../../features/Screens/HomeScreen/components/HomeScreen";
 
 const Page: React.FC = () => {
     return (

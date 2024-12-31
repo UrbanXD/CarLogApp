@@ -102,6 +102,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
     },
     scrollViewContentContainer: {
         flexGrow: 1,
+        gap: SEPARATOR_SIZES.normal
     },
     formContainer: {
         flex: 1,
@@ -117,17 +118,17 @@ export const GLOBAL_STYLE = StyleSheet.create({
     contentContainer: {
         gap: SEPARATOR_SIZES.small,
         flexDirection: "column",
-        marginTop: SEPARATOR_SIZES.mediumSmall,
+        // marginTop: SEPARATOR_SIZES.mediumSmall,
+        paddingVertical: DEFAULT_SEPARATOR,
         paddingHorizontal: DEFAULT_SEPARATOR,
         marginHorizontal: DEFAULT_SEPARATOR,
         backgroundColor: theme.colors.black4,
-        padding: 20,
         borderRadius: 35
     },
     containerTitleText: {
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.normal,
-        letterSpacing: FONT_SIZES.normal * 0.05,
+        letterSpacing: FONT_SIZES.normal * 0.035,
         color: theme.colors.white,
     },
     containerText: {
