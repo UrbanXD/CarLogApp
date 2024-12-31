@@ -1,5 +1,6 @@
-import React, {ReactElement } from "react";
+import React, {ReactElement, useCallback, useEffect, useState} from "react";
 import {
+    Image,
     ImageBackground,
     StyleSheet,
     Text,
@@ -10,13 +11,14 @@ import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-nati
 import { theme } from "../../Shared/constants/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import {
-    FONT_SIZES,
+    FONT_SIZES, ICON_NAMES,
     SEPARATOR_SIZES
 } from "../../Shared/constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { CarouselItemType } from "./Carousel";
 import { hexToRgba } from "../../Shared/utils/colors/hexToRgba";
 import {formatImageSource} from "../../Shared/utils/formatImageSource";
+import DefaultElement from "../../Shared/components/DefaultElement";
 
 interface CarouselItemProps {
     index: number
@@ -39,6 +41,8 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
     renderBottomActionButton,
     renderTopActionButton
 }) => {
+    const [imageError, setImageError] = useState<boolean>(!item.image);
+
     const animatedStyle = useAnimatedStyle(() => {
         const scaleY = interpolate(
             x.value,
@@ -51,6 +55,18 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
         };
     });
 
+    const handleImageLoadError = useCallback(
+        () => {
+            console.log("imageLoadError");
+            setImageError(true)
+        },
+        [item]
+    );
+
+    useEffect(() => {
+        console.log(imageError)
+    }, [imageError]);
+
     return (
         <TouchableOpacity
             activeOpacity={ 1 }
@@ -62,17 +78,24 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                 {
                     overlay && <View style={ styles.overlay } />
                 }
-                <ImageBackground
-                    source={
-                        !item.image
-                            ? require("../../../assets/images/car1.jpg")
-                            : formatImageSource(item.image)
-                    }
+                {
+                    !imageError
+                        ?   <Image
+                                source={ formatImageSource(item?.image || "") }
+                                onError={ handleImageLoadError }
+                                style={ styles.itemImage }
+                            />
+                        :   <View style={ styles.itemImage }>
+                                <DefaultElement
+                                    icon={ ICON_NAMES.car }
+                                />
+                            </View>
+                }
+                <View
                     style={ styles.itemContentContainer }
-                    imageStyle={ styles.itemImage }
                 >
                     {
-                        overlay &&
+                        overlay && !imageError &&
                         <LinearGradient
                             locations={[ 0, 0.85 ]}
                             colors={ [hexToRgba(theme.colors.black, 0.15), hexToRgba(theme.colors.black, 0.95)] }
@@ -106,7 +129,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                             </View>
                         }
                     </View>
-                </ImageBackground>
+                </View>
             </Animated.View>
         </TouchableOpacity>
     )
@@ -115,7 +138,6 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
 const styles = StyleSheet.create({
     itemContainer: {
         flex: 1,
-        position: "relative",
         backgroundColor: theme.colors.black,
         borderRadius: 35,
     },
@@ -127,18 +149,20 @@ const styles = StyleSheet.create({
     },
     itemContentContainer: {
         flex: 1,
-        borderWidth: 0.5,
-        borderRadius: 38,
+        borderWidth: 1.5,
+        borderRadius: 35,
         borderColor: theme.colors.gray4
     },
     itemImage: {
+        position: "absolute",
         width: "100%",
-        resizeMode: "stretch",
+        height: "100%",
+        resizeMode: "cover",
         borderRadius: 35,
     },
     imageOverlay: {
         ...StyleSheet.absoluteFillObject,
-        borderRadius: 35,
+        borderRadius: 33,
     },
     topContainer: {
         flexDirection: "row",

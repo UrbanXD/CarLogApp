@@ -66,7 +66,6 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",
-        //
         backgroundColor: hexToRgba(theme.colors.gray5, 0.65),
         borderWidth: 0.5,
         borderRadius: 38,
