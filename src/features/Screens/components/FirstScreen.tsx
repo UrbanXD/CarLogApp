@@ -27,9 +27,9 @@ const FirstScreen: React.FC = () => {
     const { openBottomSheet, closeBottomSheet  } = useBottomSheet();
 
     const bottomSheetArgs= {
-        snapPoints: ["100%"],
         enableHandlePanningGesture: false,
         enableContentPanningGesture: false,
+        enableDismissOnClose: true,
         closeButton:
             <View style={{ alignSelf: "center" }}>
                 <Icon
@@ -40,6 +40,7 @@ const FirstScreen: React.FC = () => {
                 />
             </View>
     } as Partial<OpenBottomSheetArgs>
+
     const openRegister = () => {
         openBottomSheet({
             ...bottomSheetArgs,

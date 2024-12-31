@@ -13,23 +13,25 @@ import { hexToRgba } from "../utils/colors/hexToRgba";
 import React from "react";
 
 interface DefaultImageProps {
-    activityIndicator?: boolean;
+    isLoading?: boolean;
     icon?: string | ImageSourcePropType
     text?: string
+    loadingText?: string
     style?: StyleProp<ViewStyle>
 }
 
 const DefaultElement: React.FC<DefaultImageProps> = ({
-    activityIndicator = false,
+    isLoading = false,
     icon = ICON_NAMES.image,
     text,
+    loadingText = "Adatok betöltése...",
     style
 }) => {
     return (
         <View style={{ flex: 1 }}>
             <View style={ [styles.container, style] }>
                 {
-                    activityIndicator
+                    isLoading
                         ?   <ActivityIndicator
                                 size={ FONT_SIZES.extraLarge }
                                 color={ theme.colors.gray3 }
@@ -41,10 +43,15 @@ const DefaultElement: React.FC<DefaultImageProps> = ({
                             />
                 }
                 {
-                    text &&
-                    <Text style={ styles.text }>
-                        { text }
-                    </Text>
+                    isLoading
+                        ? loadingText &&
+                            <Text style={ styles.text }>
+                                { loadingText }
+                            </Text>
+                        : text &&
+                            <Text style={ styles.text }>
+                                { text }
+                            </Text>
                 }
             </View>
         </View>
