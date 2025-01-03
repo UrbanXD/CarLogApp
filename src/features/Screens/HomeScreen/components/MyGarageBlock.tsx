@@ -3,7 +3,7 @@ import {useBottomSheet} from "../../../BottomSheet/context/BottomSheetProvider";
 import {RootState} from "../../../Database/redux/store";
 import {useSelector} from "react-redux";
 import Carousel, {CarouselItemType} from "../../../Carousel/components/Carousel";
-import NewCarForm from "../../../Form/layouts/addCar/NewCarForm";
+import NewCarForm from "../../../Form/layouts/car/addCar/NewCarForm";
 import {Alert, Text, StyleSheet, View} from "react-native";
 import CarInfo from "../../../carInfo/CarInfo";
 import {DEFAULT_SEPARATOR, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../../Shared/constants/constants";
@@ -19,7 +19,7 @@ const MyGarageBlock: React.FC = () => {
         cars,
         isLoading,
         openNewCarBottomSheet,
-        openCarInfoBottomSheet
+        openCarProfile
     } = useMyGarage();
 
     const renderDefaultElement =
@@ -39,7 +39,7 @@ const MyGarageBlock: React.FC = () => {
                 x={ coordinate }
                 overlay
                 item={ item }
-                cardAction={ () => openCarInfoBottomSheet(index) }
+                cardAction={ () => openCarProfile(index) }
             />
 
     return (

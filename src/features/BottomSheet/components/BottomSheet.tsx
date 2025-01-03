@@ -19,7 +19,7 @@ interface BottomSheetProps extends Partial<BottomSheetModalProps> {
 const BottomSheet=
     forwardRef<BottomSheetModal, BottomSheetProps>((props, ref) => {
         const {
-            title= "Bottom Sheet",
+            title,
             renderContent,
             renderCloseButton,
             reopen,

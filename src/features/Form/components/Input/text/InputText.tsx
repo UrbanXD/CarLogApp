@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {
     StyleProp,
     TextStyle,
@@ -6,7 +6,7 @@ import {
     ViewStyle,
 } from "react-native";
 import { Control, Controller } from "react-hook-form";
-import { SEPARATOR_SIZES } from "../../../../Shared/constants/constants";
+import {ControllerRenderArgs, SEPARATOR_SIZES} from "../../../../Shared/constants/constants";
 import InputTitle from "../InputTitle";
 import TextInput from "./TextInput";
 
@@ -52,17 +52,26 @@ const InputText: React.FC<InputTextProps> = ({
                 <Controller
                     control={ control }
                     name={ fieldName }
-                    render={({ field: { value, onChange }, fieldState: { error }})=>
-                        <TextInput
-                            value={ value }
-                            setValue={ onChange }
-                            icon={ icon }
-                            placeholder={ placeholder }
-                            error={ error?.message }
-                            numeric={ numeric }
-                            isSecure={ isSecure }
-                            isEditable={ isEditable }
-                        />
+                    render={(args: ControllerRenderArgs) => {
+                        const { field: { value, onChange }, fieldState: { error } } = args;
+
+                        useEffect(() => {
+                            onChange(value.toString());
+                        }, []);
+
+                        return (
+                            <TextInput
+                                setValue={ onChange }
+                                value={ value.toString() }
+                                icon={ icon }
+                                placeholder={ placeholder }
+                                error={ error?.message }
+                                numeric={ numeric }
+                                isSecure={ isSecure }
+                                isEditable={ isEditable }
+                            />
+                        )
+                    }
                     }
                 />
             }

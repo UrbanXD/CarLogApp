@@ -18,7 +18,9 @@ export const deleteCar = createAsyncThunk(
                 await storage.deleteFile(localImageUri);
             }
 
-            return await carDAO.deleteCar(args.carID);
+            await carDAO.deleteCar(args.carID);
+
+            return car;
         } catch (e) {
             console.log(e);
             return rejectWithValue("");

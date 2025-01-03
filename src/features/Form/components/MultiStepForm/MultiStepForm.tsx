@@ -11,7 +11,7 @@ interface MultiStepFormProps {
     fieldsName: Array<Array<string>>
     isFirstCount?: boolean
     control: Control<any>
-    submitHandler:  (e?: (React.BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
+    submitHandler: () => Promise<void>
     trigger: UseFormTrigger<any>
     resetField?: UseFormResetField<any>
 }

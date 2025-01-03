@@ -32,7 +32,7 @@ import { useSelector } from "react-redux";
 import { RootState, store } from "../../../Database/redux/store";
 import CarouselItem from "../../../Carousel/components/CarouselItem";
 import {useBottomSheet} from "../../../BottomSheet/context/BottomSheetProvider";
-import NewCarForm from "../../../Form/layouts/addCar/NewCarForm";
+import NewCarForm from "../../../Form/layouts/car/addCar/NewCarForm";
 import {loadCars} from "../../../Database/redux/cars/functions/loadCars";
 import CarInfo from "../../../carInfo/CarInfo";
 import DefaultElement from "../../../Shared/components/DefaultElement";

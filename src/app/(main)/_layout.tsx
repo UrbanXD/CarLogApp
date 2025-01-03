@@ -3,7 +3,7 @@ import React from "react";
 import { ICON_NAMES } from "../../features/Shared/constants/constants";
 import TabBar from "../../features/Shared/components/tabBar/TabBar";
 
-const TabLayout:React.FC = () => {
+const TabLayout: React.FC = () => {
     return (
         <Tabs
             tabBar={ (props) => <TabBar { ...props } /> }

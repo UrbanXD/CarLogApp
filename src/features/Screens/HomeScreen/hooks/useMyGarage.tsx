@@ -3,9 +3,8 @@ import {RootState} from "../../../Database/redux/store";
 import {useSelector} from "react-redux";
 import React, {useEffect, useState} from "react";
 import {CarouselItemType} from "../../../Carousel/components/Carousel";
-import NewCarForm from "../../../Form/layouts/addCar/NewCarForm";
-import {Alert} from "react-native";
-import CarInfo from "../../../carInfo/CarInfo";
+import NewCarForm from "../../../Form/layouts/car/addCar/NewCarForm";
+import {router} from "expo-router";
 
 const useMyGarage = () => {
     const { openBottomSheet, forceCloseBottomSheet } = useBottomSheet();
@@ -20,20 +19,22 @@ const useMyGarage = () => {
     const openNewCarBottomSheet = () =>
         openBottomSheet({
             title: "Új Autó",
-            content: <NewCarForm close={ forceCloseBottomSheet } />,
+            content:
+                <NewCarForm
+                    forceCloseBottomSheet={ forceCloseBottomSheet }
+                />,
             snapPoints: ["85%"],
             enableDismissOnClose: false
         });
 
-    const openCarInfoBottomSheet = (index: number) => {
+    const openCarProfile= (index: number) => {
         const car = cars.find(car => car .id === cars[index].id);
 
-        if(!car) return Alert.alert('Nincs auto');
-
-        openBottomSheet({
-            title: carouselData[index].id || index.toString(),
-            content: <CarInfo car={ car } />,
-            snapPoints: ["85%"]
+        router.push({
+            pathname: "(edit)/car",
+            params: {
+                car: JSON.stringify(car),
+            }
         });
     }
 
@@ -54,7 +55,7 @@ const useMyGarage = () => {
         cars: carouselData,
         isLoading,
         openNewCarBottomSheet,
-        openCarInfoBottomSheet,
+        openCarProfile,
     }
 }
 

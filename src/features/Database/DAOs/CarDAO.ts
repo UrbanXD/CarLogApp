@@ -38,6 +38,18 @@ export class CarDAO {
 
     }
 
+    async editCar(car: CarTableType) {
+        await this.db
+            .updateTable(CAR_TABLE)
+            .set({
+                ...car
+            })
+            .where("id", "=", car.id)
+            .executeTakeFirst()
+
+        return car;
+    }
+
     async deleteCar(carID: string){
         await this.db
             .deleteFrom(CAR_TABLE)

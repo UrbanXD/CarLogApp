@@ -5,6 +5,8 @@ import { addCar } from "./functions/addCar";
 import { loadSelectedCar } from "./functions/loadSelectedCar";
 import { selectCar } from "./functions/selectCar";
 import { deleteCar } from "./functions/deleteCar";
+import {editCar} from "./functions/editCar";
+import car from "../../../../app/(edit)/car";
 
 interface CarsState {
     loading: boolean
@@ -48,8 +50,14 @@ const carsSlice = createSlice({
             .addCase(addCar.rejected, () => {
                 console.log("hiba addCar, Slices")
             })
+            .addCase(editCar.fulfilled, (state, action) => {
+                state.cars = [
+                    ...state.cars.filter(car => car.id !== action.payload.id),
+                    action.payload
+                ]
+            })
             .addCase(deleteCar.fulfilled, (state, action) => {
-                state.cars = state.cars.filter((car) => car.id !== action.payload);
+                state.cars = state.cars.filter((car) => car.id !== action.payload.id);
             })
             .addCase(deleteCar.rejected, () => {
                 console.log("hiba, delete car, slices")

@@ -60,6 +60,8 @@ export const ICON_NAMES = {
     addImage: "image-plus",
     image: "image-outline",
     trashCan: "delete-outline",
+    calendar: "calendar-range-outline",
+    reset: "refresh"
 }
 
 export const ICON_COLORS = {
@@ -96,13 +98,12 @@ export const DEFAULT_SEPARATOR = SEPARATOR_SIZES.normal
 export const GLOBAL_STYLE = StyleSheet.create({
     pageContainer: {
         flex: 1,
-        // paddingHorizontal: DEFAULT_SEPARATOR,
         paddingVertical: SEPARATOR_SIZES.small,
         paddingBottom: SIMPLE_TABBAR_HEIGHT * 1.25
     },
     scrollViewContentContainer: {
         flexGrow: 1,
-        gap: SEPARATOR_SIZES.normal
+        gap: SEPARATOR_SIZES.normal,
     },
     formContainer: {
         flex: 1,

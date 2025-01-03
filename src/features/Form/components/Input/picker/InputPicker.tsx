@@ -51,14 +51,15 @@ const InputPicker: React.FC<InputPickerProps> = ({
 
     useEffect(() => {
         setIsDataAdjusted(true);
-    }, [adjustedData]);
+    },[adjustedData]);
 
     useEffect(() => {
-        const updatedData = data.map((item, index) => ({
-            ...item,
-            id: item.id ?? index.toString(),
-            value: item.value ?? item.title
-        }));
+        const updatedData =
+            data.map((item, index) => ({
+                ...item,
+                id: item.id ?? index.toString(),
+                value: item.value ?? item.title
+            }));
 
         setAllData(updatedData);
     }, [data]);
@@ -73,10 +74,11 @@ const InputPicker: React.FC<InputPickerProps> = ({
             }
         } else {
             const filteredData = allData.filter(
-                item => item
-                        .title
-                        .toLowerCase()
-                        .includes(searchTerm.toLowerCase())
+                item =>
+                    item
+                    .title
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
             );
             setAdjustedData(filteredData);
 
@@ -86,7 +88,19 @@ const InputPicker: React.FC<InputPickerProps> = ({
 
 
     const render = (args: ControllerRenderArgs) => {
-        const { field: { onChange }, fieldState: { error } } = args;
+        const { field: { value, onChange }, fieldState: { error } } = args;
+
+        useEffect(() => {
+            if(value && value !== "") {
+                const item =
+                    adjustedData.find(item => item?.value === value);
+
+                if(item){
+                    onChange(value)
+                    setSelectedItemID(item?.id || item?.value || "");
+                }
+            }
+        }, [adjustedData]);
 
         return (
             isDataAdjusted
@@ -94,7 +108,11 @@ const InputPicker: React.FC<InputPickerProps> = ({
                         data={ adjustedData }
                         error = { error?.message }
                         searchTerm={ searchTerm }
-                        setSearchTerm={ withSearchbar ? ((value) => setSearchTerm(value)) : undefined }
+                        setSearchTerm={
+                            withSearchbar
+                                ? ((value) => setSearchTerm(value))
+                                : undefined
+                        }
                         selectedItemID={ selectedItemID }
                         onSelect={
                             (id: string) => {

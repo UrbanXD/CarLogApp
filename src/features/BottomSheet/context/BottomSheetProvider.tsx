@@ -18,7 +18,7 @@ import BottomSheet from "../components/BottomSheet";
 import { KeyboardController } from "react-native-keyboard-controller";
 
 export interface OpenBottomSheetArgs extends Partial<BottomSheetModalProps> {
-    title: string,
+    title?: string,
     content: ReactElement,
     closeButton?: ReactElement
 }
@@ -40,7 +40,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
 
     const { openModal } = useAlert();
 
-    const [bottomSheetTitle, setBottomSheetTitle] = useState("");
+    const [bottomSheetTitle, setBottomSheetTitle] = useState<string | undefined>();
     const [bottomSheetContent, setBottomSheetContent] = useState<ReactElement | undefined>();
     const [bottomSheetCloseButton, setBottomSheetCloseButton] = useState<ReactElement | undefined>();
     const [bottomSheetProps, setBottomSheetProps] = useState<Partial<BottomSheetModalProps> | null>(null);

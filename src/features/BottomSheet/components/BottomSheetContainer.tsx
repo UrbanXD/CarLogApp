@@ -5,7 +5,7 @@ import {FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES} from "../../Shared/constants/
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 
 interface BottomSheetContainerProps {
-    title: string
+    title?: string
     renderCloseButton?: () => ReactNode
     children: ReactNode
 }
@@ -22,9 +22,12 @@ const BottomSheetContainer: React.FC<BottomSheetContainerProps> = ({
         <>
             <View style={ styles.titleContainer }>
                 { renderCloseButton && renderCloseButton() }
-                <Text style={ styles.titleText }>
-                    { title }
-                </Text>
+                {
+                    title &&
+                    <Text style={ styles.titleText }>
+                        { title }
+                    </Text>
+                }
             </View>
             <BottomSheetView style={ styles.contentContainer }>
                 { children }
