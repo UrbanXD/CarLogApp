@@ -14,7 +14,7 @@ import { useAlert } from "../../../Alert/context/AlertProvider";
 import { loadSelectedCar } from "../../../Database/redux/cars/functions/loadSelectedCar";
 import { selectCar } from "../../../Database/redux/cars/functions/selectCar";
 
-const Header: React.FC = () => {
+const MainHeader: React.FC = () => {
     const { supabaseConnector, powersync } = useDatabase();
     const { addToast } = useAlert();
     const insets = useSafeAreaInsets();
@@ -107,4 +107,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Header;
+export default MainHeader;
