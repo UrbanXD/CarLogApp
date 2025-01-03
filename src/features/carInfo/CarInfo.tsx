@@ -11,11 +11,12 @@ import {theme} from "../Shared/constants/theme";
 import Divider from "../Shared/components/Divider";
 import Button from "../Button/components/Button";
 import {deleteCar} from "../Database/redux/cars/functions/deleteCar";
-import {store} from "../Database/redux/store";
+import {RootState, store} from "../Database/redux/store";
 import {OpenBottomSheetArgs, useBottomSheet} from "../BottomSheet/context/BottomSheetProvider";
 import {useAlert} from "../Alert/context/AlertProvider";
 import {router} from "expo-router";
 import EditCarForm from "../Form/layouts/car/editCar/EditCarForm";
+import {useSelector} from "react-redux";
 
 interface CarInfoProps {
     car: CarTableType
@@ -30,6 +31,8 @@ const CarInfo: React.FC<CarInfoProps> = ({
 }) => {
     const database = useDatabase();
     const { openModal } = useAlert();
+    const selectCarsImageState = (state: RootState) => state.cars.carsImage;
+    const carsImage = useSelector(selectCarsImageState);
 
     const openEditBottomSheet = (index: number) => {
         openBottomSheet({
@@ -60,7 +63,7 @@ const CarInfo: React.FC<CarInfoProps> = ({
                 {
                     car?.image
                         ?   <Image
-                                source={ formatImageSource(car?.image) }
+                                source={ formatImageSource(carsImage.find(image => image.path === car.image)?.image || "") }
                                 style={ styles.image }
                             />
                         :   <DefaultElement icon={ ICON_NAMES.image } style={ styles.image }/>

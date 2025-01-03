@@ -11,6 +11,7 @@ import car from "../../../../app/(edit)/car";
 interface CarsState {
     loading: boolean
     cars: Array<CarTableType>
+    carsImage: Array<{ path: string, image: string }>
     carsID: Array<string>
     selectedCarID: string
     loadError: boolean
@@ -19,6 +20,7 @@ interface CarsState {
 const initialState: CarsState = {
     loading: true,
     cars: [],
+    carsImage: [],
     carsID: [],
     selectedCarID: "",
     loadError: false
@@ -39,7 +41,8 @@ const carsSlice = createSlice({
             })
             .addCase(loadCars.fulfilled, (state, action) => {
                 state.loading = false;
-                state.cars = action.payload;
+                state.cars = action.payload.cars;
+                state.carsImage = action.payload.images
             })
             .addCase(addCar.fulfilled, (state, action) => {
                 state.cars = [

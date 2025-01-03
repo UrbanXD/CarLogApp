@@ -10,10 +10,12 @@ const useMyGarage = () => {
     const { openBottomSheet, forceCloseBottomSheet } = useBottomSheet();
 
     const selectCarsState = (state: RootState) => state.cars.cars;
+    const selectCarsImageState = (state: RootState) => state.cars.carsImage;
     const loadingState = (state: RootState) => state.cars.loading;
     const isLoading = useSelector(loadingState);
 
     const cars = useSelector(selectCarsState);
+    const carsImage = useSelector(selectCarsImageState);
     const [carouselData, setCarouselData] = useState<CarouselItemType[]>([]);
 
     const openNewCarBottomSheet = () =>
@@ -43,13 +45,13 @@ const useMyGarage = () => {
             cars.map(car => {
                 return {
                     id: car.name,
-                    image: car.image,
+                    image: carsImage.find(image => image.path === car.image)?.image || "",
                     title: car.brand,
                     subtitle: car.model,
                 } as CarouselItemType;
             })
         );
-    }, [cars]);
+    }, [cars, carsImage]);
 
     return {
         cars: carouselData,

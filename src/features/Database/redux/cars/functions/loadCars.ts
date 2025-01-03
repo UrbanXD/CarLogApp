@@ -15,20 +15,25 @@ export const loadCars = createAsyncThunk(
             const carDAO = new CarDAO(db);
             const cars = await carDAO.getCars();
 
-            return await Promise.all(
-                cars.map(async (car)=>{
-                        let image = undefined;
-                        if(car.image && attachmentQueue){
-                            const file = await attachmentQueue.getFile(car.image);
-                            image = file ? encode(file) : undefined;
-                        }
-                        return {
-                            ...car,
-                            image
-                        }
+            const images: Array<{path: string, image:  string}> = [];
+            const processedCars = await Promise.all(
+                cars.map(async (car) => {
+                    let image = undefined;
+                    if (car.image && attachmentQueue) {
+                        const file = await attachmentQueue.getFile(car.image);
+                        image = file ? encode(file) : undefined;
                     }
-                )
+                    if (car.image && image) {
+                        images.push({
+                            path: car.image,
+                            image,
+                        });
+                    }
+                    return car;
+                })
             );
+
+            return { cars: processedCars, images };
         } catch (e) {
             console.log(e);
             return rejectWithValue("");
