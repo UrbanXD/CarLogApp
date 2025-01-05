@@ -4,10 +4,11 @@ import Animated, { SharedValue, useAnimatedScrollHandler, useSharedValue } from 
 import { FlatList } from "react-native-gesture-handler";
 
 export interface CarouselItemType {
-    id?: string,
+    id: string,
     image?: ImageSourcePropType | string
     title?: string,
     subtitle?: string,
+    body?: string,
     selected?: boolean
 }
 
@@ -39,8 +40,13 @@ const Carousel: React.FC<CarouselProps> = ({
     const onScroll = useAnimatedScrollHandler({
         onScroll: event => {
             x.value = event.contentOffset.x;
+            console.log("onScrool")
         },
     }, []);
+
+    useEffect(() => {
+        flatlistRef.current?.scrollToOffset({ animated: false, offset:x.value })
+    }, [data]);
 
     return (
         <AnimatedFlatList
@@ -80,4 +86,4 @@ const Carousel: React.FC<CarouselProps> = ({
     )
 };
 
-export default React.memo(Carousel);
+export default Carousel;

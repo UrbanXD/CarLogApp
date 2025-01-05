@@ -58,17 +58,18 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
     const handleImageLoadError = useCallback(
         () => {
             console.log("imageLoadError");
-            setImageError(true)
+            setImageError(true);
         },
         [item]
     );
 
-    useEffect(() => {
-        console.log(imageError)
-    }, [imageError]);
+    // useEffect(() => {
+    //     // console.log(imageError)
+    // }, [imageError]);
 
     return (
         <TouchableOpacity
+            key={ item.id }
             activeOpacity={ 1 }
             style={{ width: size, paddingHorizontal: 10 }}
             onPress={ cardAction }
@@ -104,7 +105,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                     }
                     <View style={ styles.topContainer }>
                         <Text style={ styles.topContainerTitleText }>
-                            { item.id }
+                            { item.title }
                         </Text>
                         {
                             renderTopActionButton &&
@@ -116,10 +117,10 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                     <View style={ styles.bottomContainer }>
                         <View style={ styles.infoContainer }>
                             <Text numberOfLines={ 2 } style={ styles.infoTitleText }>
-                                { item.title }
+                                { item.subtitle }
                             </Text>
                             <Text numberOfLines={ 2 } style={ styles.infoSubtitleText }>
-                                { item.subtitle }
+                                { item.body }
                             </Text>
                         </View>
                         {
