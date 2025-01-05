@@ -18,6 +18,9 @@ const useMyGarage = () => {
     const carsImage = useSelector(selectCarsImageState);
     const [carouselData, setCarouselData] = useState<CarouselItemType[]>([]);
 
+    const getCar = (id: string) =>
+        cars.find(car => car.id === id);
+
     const openNewCarBottomSheet = () =>
         openBottomSheet({
             title: "Új Autó",
@@ -29,14 +32,10 @@ const useMyGarage = () => {
             enableDismissOnClose: false
         });
 
-    const openCarProfile= (index: number) => {
-        const car = cars.find(car => car .id === cars[index].id);
-
+    const openCarProfile= (id: string) => {
         router.push({
             pathname: "(edit)/car",
-            params: {
-                car: JSON.stringify(car),
-            }
+            params: { id }
         });
     }
 
@@ -44,11 +43,12 @@ const useMyGarage = () => {
         setCarouselData(
             cars.map(car => {
                 return {
-                    id: car.name,
+                    id: car.id,
                     image: carsImage.find(image => image.path === car.image)?.image || "",
-                    title: car.brand,
-                    subtitle: car.model,
-                } as CarouselItemType;
+                    title: car.name,
+                    subtitle: car.brand,
+                    body: car.model,
+                };
             })
         );
     }, [cars, carsImage]);
@@ -56,6 +56,7 @@ const useMyGarage = () => {
     return {
         cars: carouselData,
         isLoading,
+        getCar,
         openNewCarBottomSheet,
         openCarProfile,
     }

@@ -170,6 +170,7 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                             renderItem={
                                 (item: ImageSourcePropType, index: number, size: number, coordinate: SharedValue<number> ) => {
                                     const itemCarousel: CarouselItemType = {
+                                        id: index.toString(),
                                         image: item
                                     }
                                     return (

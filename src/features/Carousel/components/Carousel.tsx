@@ -40,7 +40,6 @@ const Carousel: React.FC<CarouselProps> = ({
     const onScroll = useAnimatedScrollHandler({
         onScroll: event => {
             x.value = event.contentOffset.x;
-            console.log("onScrool")
         },
     }, []);
 
