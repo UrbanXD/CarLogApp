@@ -24,12 +24,14 @@ const MyGarageBlock: React.FC = () => {
 
     const renderDefaultElement =
         (size: number, spacerSize: number) =>
-            <DefaultElement
-                isLoading={ isLoading }
-                icon={ ICON_NAMES.car }
-                text="Még egy autó se parkol a virtuális garázsában"
-                style={{ width: size - spacerSize / 2 }}
-            />
+            <View style={{ flex:1 }}>
+                <DefaultElement
+                    isLoading={ isLoading }
+                    icon={ ICON_NAMES.car }
+                    text="Még egy autó se parkol a virtuális garázsában"
+                    style={{ width: size - spacerSize / 2 }}
+                />
+            </View>
 
     const renderCarouselItem =
         (item: CarouselItemType, index: number, size: number, coordinate: SharedValue<number>) =>
@@ -39,7 +41,7 @@ const MyGarageBlock: React.FC = () => {
                 x={ coordinate }
                 overlay
                 item={ item }
-                cardAction={ () => openCarProfile(index) }
+                cardAction={ () => openCarProfile(item?.id || index.toString()) }
             />
 
     return (
