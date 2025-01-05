@@ -28,32 +28,30 @@ const DefaultElement: React.FC<DefaultImageProps> = ({
     style
 }) => {
     return (
-        <View style={{ flex: 1 }}>
-            <View style={ [styles.container, style] }>
-                {
-                    isLoading
-                        ?   <ActivityIndicator
-                                size={ FONT_SIZES.extraLarge }
-                                color={ theme.colors.gray3 }
-                            />
-                        :   <Icon
-                                icon={ icon }
-                                size={ FONT_SIZES.extraLarge }
-                                color={ theme.colors.gray3 }
-                            />
-                }
-                {
-                    isLoading
-                        ? loadingText &&
-                            <Text style={ styles.text }>
-                                { loadingText }
-                            </Text>
-                        : text &&
-                            <Text style={ styles.text }>
-                                { text }
-                            </Text>
-                }
-            </View>
+        <View style={ [styles.container, style] }>
+            {
+                isLoading
+                    ?   <ActivityIndicator
+                            size={ FONT_SIZES.extraLarge }
+                            color={ theme.colors.gray3 }
+                        />
+                    :   <Icon
+                            icon={ icon }
+                            size={ FONT_SIZES.extraLarge }
+                            color={ theme.colors.gray3 }
+                        />
+            }
+            {
+                isLoading
+                    ? loadingText &&
+                        <Text style={ styles.text }>
+                            { loadingText }
+                        </Text>
+                    : text &&
+                        <Text style={ styles.text }>
+                            { text }
+                        </Text>
+            }
         </View>
     )
 }
