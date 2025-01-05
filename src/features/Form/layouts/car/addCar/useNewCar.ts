@@ -43,6 +43,7 @@ const useNewCarForm = (
                     id: getUUID(),
                     owner: userID,
                     image: image ? image.filename : null,
+                    createdAt: Date.now().toString(),
                 } as CarTableType
 
                 await store.dispatch(addCar({ database, car }));

@@ -31,6 +31,7 @@ export interface CarTableType {
     fuelMeasurement: string
     fuelTankSize: number
     image?: string
+    createdAt: string
 }
 const car = new Table({
     name: CAR_TABLE,
@@ -46,6 +47,7 @@ const car = new Table({
         new Column({name: "fuelMeasurement", type: ColumnType.TEXT}),
         new Column({name: "fuelTankSize", type: ColumnType.INTEGER}),
         new Column({name: "image", type: ColumnType.TEXT}),
+        new Column({name: "createdAt", type: ColumnType.TEXT}),
     ]
 })
 

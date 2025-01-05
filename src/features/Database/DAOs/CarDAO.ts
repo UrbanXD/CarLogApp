@@ -21,6 +21,8 @@ export class CarDAO {
         return await this.db
             .selectFrom(CAR_TABLE)
             .selectAll()
+            .orderBy("createdAt")
+            .orderBy("name")
             .execute() as unknown as Array<CarTableType>;
     }
 
