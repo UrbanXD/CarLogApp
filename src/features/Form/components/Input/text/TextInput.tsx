@@ -1,9 +1,15 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, View, TextInput as TextInputRN } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+    StyleSheet,
+    Text,
+    View,
+    TextInput as TextInputRN,
+} from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { ICON_COLORS, ICON_NAMES } from "../../../../Shared/constants/constants";
 import { theme } from "../../../../Shared/constants/theme";
 import Icon from "../../../../Shared/components/Icon";
+import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
 
 interface TextInputProps {
     value?: string
@@ -16,7 +22,6 @@ interface TextInputProps {
     numeric?: boolean
     isSecure?: boolean
     isEditable?: boolean
-    isPickerHeader?: boolean
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -29,9 +34,10 @@ const TextInput: React.FC<TextInputProps> = ({
     error,
     numeric,
     isSecure,
-    isEditable = true,
-    isPickerHeader
+    isEditable
 }) => {
+    const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
+
     const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(isSecure);
 
@@ -39,9 +45,13 @@ const TextInput: React.FC<TextInputProps> = ({
     const onFocus = () => setFocused(true);
     const onBlur = () => setFocused(false);
 
+    useEffect(() => {
+        shouldHandleKeyboardEvents.value = focused;
+    }, [focused, shouldHandleKeyboardEvents]);
+
     return (
         <>
-            <View style={ [(isEditable || isPickerHeader) && styles.formFieldContainer, focused && isEditable && styles.activeFormFieldContainer] }>
+            <View style={ [styles.formFieldContainer, focused && styles.activeFormFieldContainer] }>
                 {
                     icon &&
                     <View style={ styles.formFieldIconContainer }>

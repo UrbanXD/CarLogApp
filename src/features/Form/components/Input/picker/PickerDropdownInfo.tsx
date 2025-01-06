@@ -100,7 +100,6 @@ export const InputPickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
                     actionIcon={ isHorizontal ? ICON_NAMES.rightArrowHead : ICON_NAMES.downArrowHead }
                     placeholder={ placeholder }
                     error={ error }
-                    isPickerHeader
                 />
             </View>
         </TouchableOpacity>

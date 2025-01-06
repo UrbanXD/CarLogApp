@@ -13,6 +13,7 @@ import {
 import { theme } from "../../../../Shared/constants/theme";
 import SearchBar from "../../../../Shared/components/SearchBar";
 import Icon from "../../../../Shared/components/Icon";
+import {heightPercentageToDP} from "react-native-responsive-screen";
 
 interface PickerElementsProps {
     data: Array<PickerDataType>
@@ -89,7 +90,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
     }, [isDropdownContentVisible, data]);
 
     return (
-        <View style={[styles.elementsContainer, !isHorizontal && { maxHeight: 30 * 5 + 5 * SEPARATOR_SIZES.small, flexDirection: "column" }]}>
+        <View style={[styles.elementsContainer, !isHorizontal && { maxHeight: heightPercentageToDP(32.5), flexDirection: "column" }]}>
             {
                 !setSearchTerm && isDropdown &&
                 <Icon

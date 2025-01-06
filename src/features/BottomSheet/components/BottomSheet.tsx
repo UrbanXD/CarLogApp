@@ -1,4 +1,4 @@
-import React, {  forwardRef, ReactNode } from "react";
+import React, { forwardRef, ReactNode } from "react";
 import { StyleSheet } from "react-native";
 import { theme } from "../../Shared/constants/theme";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -6,7 +6,7 @@ import { DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../../Shared/constants/const
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import BottomSheetBackdrop from "./BottomSheetBackdrop";
 import BottomSheetContainer from "./BottomSheetContainer";
-import {BottomSheetModalProps} from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
+import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
 
 interface BottomSheetProps extends Partial<BottomSheetModalProps> {
     title?: string
@@ -37,6 +37,9 @@ const BottomSheet=
                 <BottomSheetModal
                     ref={ ref }
                     { ...restProps }
+                    keyboardBehavior="interactive"
+                    keyboardBlurBehavior="restore"
+                    android_keyboardInputMode="adjustPan"
                     backdropComponent={ (props: any) => <BottomSheetBackdrop { ...props } /> }
                     backgroundStyle={ styles.containerBackground }
                     handleIndicatorStyle={ styles.line }
