@@ -56,13 +56,13 @@ const InputText: React.FC<InputTextProps> = ({
                         const { field: { value, onChange }, fieldState: { error } } = args;
 
                         useEffect(() => {
-                            onChange(value.toString());
+                            if(value) onChange(value.toString());
                         }, []);
 
                         return (
                             <TextInput
                                 setValue={ onChange }
-                                value={ value.toString() }
+                                value={ value ? value.toString() : "" }
                                 icon={ icon }
                                 placeholder={ placeholder }
                                 error={ error?.message }

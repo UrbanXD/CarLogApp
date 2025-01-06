@@ -1,18 +1,23 @@
-import {z} from "zod";
+import { z } from "zod";
 
 export const zNumber = z
     .preprocess(
-    (value: any) => value.toString(),
+    (value: any) => value ? value.toString() : "",
         z
         .string()
-        .min(1, "Adjon meg számot")
-        .transform((value) => (value === "" ? "" : Number(value)))
-        .refine(
-        (value) =>
-                !isNaN(Number(value)),
-        { message: "Kérem számot adjon",}
+        .transform(
+            (value) =>
+                (value === "" ? NaN : Number(value))
         )
-    );
+        .refine(
+            (value) => !isNaN(value),
+            { message: "Kérem adjon meg egy számot." }
+        )
+        .refine(
+            (value) => value > 0,
+            { message: "A számnak nullától nagyobbnak kell lennie." }
+        )
+    )
 
 export const zPickerRequired = z
     .string()
