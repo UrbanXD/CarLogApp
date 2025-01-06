@@ -51,10 +51,10 @@ export const useCarFormProps = (car?: CarFormFieldType) => {
             brand: car?.brand || "",
             model: car?.model || "",
             odometerMeasurement: car?.odometerMeasurement || ODOMETER_MEASUREMENTS[0].title,
-            odometerValue: car?.odometerValue || 0,
+            odometerValue: car?.odometerValue || "",
             fuelType: car?.fuelType || "",
             fuelMeasurement: car?.fuelMeasurement || "",
-            fuelTankSize: car?.fuelTankSize || 0,
+            fuelTankSize: car?.fuelTankSize || "",
             image: car?.image || null,
         },
         resolver: zodResolver(carFormSchema)
