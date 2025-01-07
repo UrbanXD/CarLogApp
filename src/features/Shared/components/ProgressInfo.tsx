@@ -98,14 +98,14 @@ const useStyles = (radius: number) =>
         title: {
             fontSize: FONT_SIZES.medium,
             fontFamily: "Gilroy-Heavy",
-            lineHeight: FONT_SIZES.medium * 1.1,
+            lineHeight: FONT_SIZES.medium * 1.15,
             color: theme.colors.white,
             paddingTop: SEPARATOR_SIZES.small
         },
         subtitle: {
             fontSize: FONT_SIZES.small,
             fontFamily: "Gilroy-Medium",
-            lineHeight: FONT_SIZES.small * 1.05,
+            lineHeight: FONT_SIZES.small * 1.15,
             color: theme.colors.gray1,
         }
     })
