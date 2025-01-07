@@ -1,23 +1,35 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { GLOBAL_STYLE } from "../../../Shared/constants/constants";
+import {FONT_SIZES, GLOBAL_STYLE} from "../../../Shared/constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { theme } from "../../../Shared/constants/theme";
 
 interface InputTitleProps {
     title: string,
     subtitle?: string
+    optional?: boolean
 }
 
 const InputTitle: React.FC<InputTitleProps> = ({
     title,
-    subtitle
+    subtitle,
+    optional = false
 }) => {
     return (
         <View>
-            <Text style={ styles.inputNameText }>
-                { title }
-            </Text>
+            <View>
+                <Text style={ styles.inputNameText }>
+                    {
+                        `${title} `
+                    }
+                    {
+                        optional &&
+                        <Text style={ styles.optionalText }>
+                            (opcionális)
+                        </Text>
+                    }
+                </Text>
+            </View>
             {
                 subtitle &&
                 <Text style={ styles.inputInfoText }>
@@ -30,9 +42,14 @@ const InputTitle: React.FC<InputTitleProps> = ({
 
 const styles = StyleSheet.create({
     inputNameText: {
-        fontSize: hp(2.75),
+        fontSize: FONT_SIZES.normal,
         fontFamily: "Gilroy-Heavy",
         color: theme.colors.white
+    },
+    optionalText: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.small,
+        color: theme.colors.gray2
     },
     inputInfoText: {
         ...GLOBAL_STYLE.containerText,
