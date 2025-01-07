@@ -1,7 +1,5 @@
 import React, {ReactElement, useCallback, useEffect, useState} from "react";
 import {
-    Image,
-    ImageBackground,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -19,6 +17,7 @@ import { CarouselItemType } from "./Carousel";
 import { hexToRgba } from "../../Shared/utils/colors/hexToRgba";
 import {formatImageSource} from "../../Shared/utils/formatImageSource";
 import DefaultElement from "../../Shared/components/DefaultElement";
+import Image from "../../Image/components/Image";
 
 interface CarouselItemProps {
     index: number
@@ -41,8 +40,6 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
     renderBottomActionButton,
     renderTopActionButton
 }) => {
-    const [imageError, setImageError] = useState<boolean>(!item.image);
-
     const animatedStyle = useAnimatedStyle(() => {
         const scaleY = interpolate(
             x.value,
@@ -55,18 +52,6 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
         };
     });
 
-    const handleImageLoadError = useCallback(
-        () => {
-            console.log("imageLoadError");
-            setImageError(true);
-        },
-        [item]
-    );
-
-    // useEffect(() => {
-    //     // console.log(imageError)
-    // }, [imageError]);
-
     return (
         <TouchableOpacity
             key={ item.id }
@@ -76,33 +61,11 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
             disabled={ !cardAction }
         >
             <Animated.View style={ [styles.itemContainer, animatedStyle ] }>
-                {
-                    overlay && <View style={ styles.overlay } />
-                }
-                {
-                    !imageError
-                        ?   <Image
-                                source={ formatImageSource(item?.image || "") }
-                                onError={ handleImageLoadError }
-                                style={ styles.itemImage }
-                            />
-                        :   <View style={ styles.itemImage }>
-                                <DefaultElement
-                                    icon={ ICON_NAMES.car }
-                                />
-                            </View>
-                }
-                <View
-                    style={ styles.itemContentContainer }
+                <Image
+                    source={ item.image || "" }
+                    alt={ ICON_NAMES.car }
+                    // imageStyle={}
                 >
-                    {
-                        overlay && !imageError &&
-                        <LinearGradient
-                            locations={[ 0, 0.85 ]}
-                            colors={ [hexToRgba(theme.colors.black, 0.15), hexToRgba(theme.colors.black, 0.95)] }
-                            style={ styles.imageOverlay }
-                        />
-                    }
                     <View style={ styles.topContainer }>
                         <Text style={ styles.topContainerTitleText }>
                             { item.title }
@@ -130,7 +93,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                             </View>
                         }
                     </View>
-                </View>
+                </Image>
             </Animated.View>
         </TouchableOpacity>
     )
