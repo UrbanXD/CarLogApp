@@ -5,21 +5,17 @@ import React, {useEffect, useState} from "react";
 import {CarouselItemType} from "../../../Carousel/components/Carousel";
 import NewCarForm from "../../../Form/layouts/car/addCar/NewCarForm";
 import {router} from "expo-router";
+import useCars from "../../../Shared/hooks/useCars";
 
 const useMyGarage = () => {
     const { openBottomSheet, forceCloseBottomSheet } = useBottomSheet();
+    const {
+        cars,
+        carsImage,
+        isLoading
+    } = useCars();
 
-    const selectCarsState = (state: RootState) => state.cars.cars;
-    const selectCarsImageState = (state: RootState) => state.cars.carsImage;
-    const loadingState = (state: RootState) => state.cars.loading;
-    const isLoading = useSelector(loadingState);
-
-    const cars = useSelector(selectCarsState);
-    const carsImage = useSelector(selectCarsImageState);
     const [carouselData, setCarouselData] = useState<CarouselItemType[]>([]);
-
-    const getCar = (id: string) =>
-        cars.find(car => car.id === id);
 
     const openNewCarBottomSheet = () =>
         openBottomSheet({
@@ -56,7 +52,6 @@ const useMyGarage = () => {
     return {
         cars: carouselData,
         isLoading,
-        getCar,
         openNewCarBottomSheet,
         openCarProfile,
     }

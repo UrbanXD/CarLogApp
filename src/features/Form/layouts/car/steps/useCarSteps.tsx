@@ -5,6 +5,13 @@ import OdometerStep from "./OdometerStep";
 import FuelStep from "./FuelStep";
 import React from "react";
 
+export enum CAR_FORM_STEPS {
+    NameStep,
+    CarModelStep,
+    OdometerStep,
+    FuelStep
+}
+
 const useCarSteps = (
     control: Control<any>,
     resetField: UseFormResetField<any>
