@@ -1,13 +1,9 @@
 import React from "react";
 import useEditCarForm from "./useEditCar";
-import {CarFormFieldType, carFormSchema} from "../../../constants/schemas/carSchema";
-import Form from "../../../components/Form";
-import {CarTableType} from "../../../../Database/connector/powersync/AppSchema";
+import { CarTableType } from "../../../../Database/connector/powersync/AppSchema";
 import Button from "../../../../Button/components/Button";
-import {heightPercentageToDP} from "react-native-responsive-screen";
-import {View} from "react-native";
-import {ICON_NAMES, SEPARATOR_SIZES} from "../../../../Shared/constants/constants";
-import {sub} from "@shopify/react-native-skia";
+import { View } from "react-native";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../Shared/constants/constants";
 
 interface EditCarFormProps {
     car: CarTableType
@@ -22,24 +18,16 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
     const {
         submitHandler,
         reset,
-        steps,
-        trigger,
-        formState
+        steps
     } = useEditCarForm(car, forceCloseBottomSheet);
 
     const handleSave =
         async () => await submitHandler();
 
-
     return (
-        <Form>
+        <>
             { steps[stepIndex]() }
-            <View style={{
-                flex: 1,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                gap: SEPARATOR_SIZES.lightSmall
-            }}>
+            <Button.Row>
                 <Button.Icon
                     icon={ICON_NAMES.reset}
                     onPress={ () => reset() }
@@ -49,8 +37,8 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
                     onPress={ handleSave }
                     style={{ flex: 0.9 }}
                 />
-            </View>
-        </Form>
+            </Button.Row>
+        </>
     )
 }
 
