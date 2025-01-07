@@ -19,7 +19,7 @@ const MultiStepFormButtons: React.FC<MultiStepFormButtonsProps> = ({
     } = useMultiStepForm();
 
     return (
-        <View style={ styles.buttonsContainer }>
+        <Button.Row>
             <View style={{ flex: 0.175 }}>
                 {
                     !isFirstStep &&
@@ -37,19 +37,8 @@ const MultiStepFormButtons: React.FC<MultiStepFormButtonsProps> = ({
                     />
                 }
             </View>
-        </View>
+        </Button.Row>
     )
 }
-
-const styles = StyleSheet.create({
-    buttonsContainer: {
-        width: "100%",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        paddingVertical: SEPARATOR_SIZES.small,
-        alignItems: "center",
-        gap: SEPARATOR_SIZES.small
-    }
-});
 
 export default MultiStepFormButtons;

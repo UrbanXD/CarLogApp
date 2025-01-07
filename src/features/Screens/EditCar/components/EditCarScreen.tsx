@@ -5,11 +5,11 @@ import {theme} from "../../../Shared/constants/theme";
 import {router, useGlobalSearchParams, useLocalSearchParams} from "expo-router";
 import CarInfo from "../../../carInfo/CarInfo";
 import {useBottomSheet} from "../../../BottomSheet/context/BottomSheetProvider";
+import useMyGarage from "../../HomeScreen/hooks/useMyGarage";
+import useCars from "../../../Shared/hooks/useCars";
 
 const EditCarScreen: React.FC = () => {
     const localSearchParams = useLocalSearchParams();
-    const car = JSON.parse(localSearchParams.car as string) || null;
-    const { openBottomSheet, forceCloseBottomSheet } = useBottomSheet();
 
     return (
         <SafeAreaView style={ styles.pageContainer }>
@@ -18,7 +18,9 @@ const EditCarScreen: React.FC = () => {
             {/*    nestedScrollEnabled={ true }*/}
             {/*    contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }*/}
             {/*>*/}
-                <CarInfo car={ car } openBottomSheet={ openBottomSheet } forceCloseBottomSheet={ forceCloseBottomSheet }></CarInfo>
+            {
+                <CarInfo carID={ localSearchParams.id as string } />
+            }
             {/*</ScrollView>*/}
         </SafeAreaView>
     )

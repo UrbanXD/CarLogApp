@@ -5,140 +5,49 @@ import {CarTableType} from "../Database/connector/powersync/AppSchema";
 import {useDatabase} from "../Database/connector/Database";
 import {formatImageSource} from "../Shared/utils/formatImageSource";
 import DefaultElement from "../Shared/components/DefaultElement";
-import {FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES} from "../Shared/constants/constants";
+import { FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../Shared/constants/constants";
 import Icon from "../Shared/components/Icon";
-import {theme} from "../Shared/constants/theme";
+import { theme } from "../Shared/constants/theme";
 import Divider from "../Shared/components/Divider";
 import Button from "../Button/components/Button";
-import {deleteCar} from "../Database/redux/cars/functions/deleteCar";
-import {RootState, store} from "../Database/redux/store";
-import {OpenBottomSheetArgs, useBottomSheet} from "../BottomSheet/context/BottomSheetProvider";
-import {useAlert} from "../Alert/context/AlertProvider";
-import {router} from "expo-router";
-import EditCarForm from "../Form/layouts/car/editCar/EditCarForm";
-import {useSelector} from "react-redux";
+import InformationContainer from "./InformationContainer";
+import useCarProfile from "./hooks/useCarProfile";
+import {useBottomSheet} from "../BottomSheet/context/BottomSheetProvider";
 
 interface CarInfoProps {
-    car: CarTableType
-    openBottomSheet: (args: OpenBottomSheetArgs) => void
-    forceCloseBottomSheet: () => void
+    carID: string
 }
 
-const CarInfo: React.FC<CarInfoProps> = ({
-    car,
-    openBottomSheet,
-    forceCloseBottomSheet
-}) => {
-    const database = useDatabase();
-    const { openModal } = useAlert();
-    const selectCarsImageState = (state: RootState) => state.cars.carsImage;
-    const carsImage = useSelector(selectCarsImageState);
-
-    const openEditBottomSheet = (index: number) => {
-        openBottomSheet({
-            content:
-                <EditCarForm
-                    car={ car }
-                    stepIndex={ index }
-                    forceCloseBottomSheet={ forceCloseBottomSheet }
-                />,
-            snapPoints: ["37.5%"]
-        })
-    }
-
-    const handleDeleteCar = () => {
-        openModal({
-            title: `A(z) ${car.name} nevű autó törlése`,
-            body: `Az autó kitörlése egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
-            acceptText: "Törlés",
-            accept: () => {
-                // store.dispatch(deleteCar({ database, carID: car.id }));
-            },
-        })
-    }
+const CarInfo: React.FC<CarInfoProps> = ({ carID }) => {
+    const {
+        carImage,
+        handleDeleteCar,
+        nameInformationBlock,
+        carModelInformationBlock
+    } = useCarProfile(carID);
 
     return (
         <View style={ styles.container }>
             <View style={ styles.content }>
                 {
-                    car?.image
+                    carImage
                         ?   <Image
-                                source={ formatImageSource(carsImage.find(image => image.path === car.image)?.image || "") }
+                                source={ formatImageSource(carImage) }
                                 style={ styles.image }
                             />
-                        :   <DefaultElement icon={ ICON_NAMES.image } style={ styles.image }/>
+                        :   <DefaultElement
+                                icon={ ICON_NAMES.image }
+                                style={ styles.image }
+                            />
                 }
-                <View style={ styles.columnContainer }>
-                    <View style={ styles.rowContainer }>
-                        <View style={ styles.columnTitleContainer }>
-                            <Icon
-                                icon={ ICON_NAMES.nametag }
-                                size={ FONT_SIZES.medium }
-                                color={ theme.colors.gray2 }
-                            />
-                            <Text
-                                style={ styles.carTitleText }
-                                numberOfLines={ 2 }
-                            >
-                                { car?.name }
-                            </Text>
-                        </View>
-                    </View>
-                    <View style={ styles.columnEditIconContainer }>
-                        <Button.Icon
-                            icon={ ICON_NAMES.pencil }
-                            iconSize={ FONT_SIZES.medium }
-                            iconColor={ theme.colors.gray1 }
-                            width={ FONT_SIZES.medium }
-                            backgroundColor={ "transparent" }
-                            onPress={ () => openEditBottomSheet(0) }
-                        />
-                    </View>
-                </View>
-                {/*<Divider color={ theme.colors.gray3 } />*/}
-                <View style={ styles.columnContainer }>
-                    <View style={ styles.rowContainer }>
-                        <View style={ styles.columnTitleContainer }>
-                            <Icon
-                                icon={ ICON_NAMES.car }
-                                size={ FONT_SIZES.medium }
-                                color={ theme.colors.gray2 }
-                            />
-                            <Text style={ styles.carInfoText } numberOfLines={ 3 }>
-                                { car?.brand } { car?.model }
-                            </Text>
-                        </View>
-                        <View style={ styles.columnTitleContainer }>
-                            <Icon
-                                icon={ ICON_NAMES.calendar }
-                                size={ FONT_SIZES.medium }
-                                color={ theme.colors.gray2 }
-                            />
-                            <Text
-                                style={ styles.carInfoText }
-                                numberOfLines={ 3 }
-                            >
-                                2018
-                            </Text>
-                        </View>
-                    </View>
-                    <View style={ styles.columnEditIconContainer }>
-                        <Button.Icon
-                            icon={ ICON_NAMES.pencil }
-                            iconSize={ FONT_SIZES.medium }
-                            iconColor={ theme.colors.gray1 }
-                            width={ FONT_SIZES.medium }
-                            backgroundColor={ "transparent" }
-                            onPress={ () =>{} }
-                        />
-                    </View>
-                </View>
+                <InformationContainer { ...nameInformationBlock } />
+                <InformationContainer { ...carModelInformationBlock } />
                 <Divider color={ theme.colors.gray3 } />
                 <View>
                     <Icon icon={ ICON_NAMES.pencil } color={ theme.colors.white } />
                 </View>
             </View>
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <Button.Row>
                 <Button.Icon
                     icon={ ICON_NAMES.trashCan }
                     backgroundColor={ theme.colors.googleRed }
@@ -150,7 +59,7 @@ const CarInfo: React.FC<CarInfoProps> = ({
                     text="Módosítás"
                     style={{ flex: 0.9 }}
                 />
-            </View>
+            </Button.Row>
         </View>
     )
 }
