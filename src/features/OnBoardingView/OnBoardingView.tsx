@@ -1,10 +1,8 @@
-import React, {ReactElement, ReactNode, useEffect, useRef} from "react";
-import Animated from "react-native-reanimated";
+import React, {ReactNode, useEffect, useRef} from "react";
 import {FlatList} from "react-native-gesture-handler";
-import {ScrollView, useWindowDimensions, View} from "react-native";
+import {useWindowDimensions, View} from "react-native";
 import {widthPercentageToDP} from "react-native-responsive-screen";
 import {SEPARATOR_SIZES} from "../Shared/constants/constants";
-import {AnimatedScrollView} from "react-native-reanimated/lib/typescript/reanimated2/component/ScrollView";
 
 interface OnBoardingViewProps {
     steps: Array<() => ReactNode>
