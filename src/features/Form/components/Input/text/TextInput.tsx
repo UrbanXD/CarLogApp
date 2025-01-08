@@ -51,7 +51,7 @@ const TextInput: React.FC<TextInputProps> = ({
 
     return (
         <>
-            <View style={ [styles.formFieldContainer, focused && styles.activeFormFieldContainer] }>
+            <View style={ [styles.formFieldContainer, focused && styles.activeFormFieldContainer, !!error && styles.errorFormFieldContainer] }>
                 {
                     icon &&
                     <View style={ styles.formFieldIconContainer }>
@@ -123,6 +123,10 @@ const styles = StyleSheet.create({
     activeFormFieldContainer: {
         borderWidth: 1,
         borderColor: theme.colors.gray1
+    },
+    errorFormFieldContainer: {
+        borderWidth: 1,
+        borderColor: theme.colors.redLight
     },
     formFieldIconContainer: {
         flex: 0.15,
