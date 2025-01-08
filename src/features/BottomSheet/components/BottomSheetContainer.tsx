@@ -38,8 +38,8 @@ const BottomSheetContainer: React.FC<BottomSheetContainerProps> = ({
 
 const useStyles = (top: number) =>
     StyleSheet.create({
-        titleContainer:{
-            paddingTop: top / 2
+        titleContainer: {
+            paddingVertical: top / 2.5
         },
         titleText: {
             ...GLOBAL_STYLE.containerTitleText,
