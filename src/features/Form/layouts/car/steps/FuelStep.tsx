@@ -7,12 +7,20 @@ import {FUEL_MEASUREMENTS, FUEL_TYPES} from "../../../constants/constants";
 const FuelStep: React.FC<StepProps> = ({
     control
 }) =>
-    <>
+    <Input.Group>
+        <Input.Text
+            control={ control }
+            fieldName="fuelTankSize"
+            fieldNameText="Tartály mérete"
+            placeholder="000.000.000"
+            icon={ ICON_NAMES.odometer }
+            numeric
+        />
         <Input.Picker
             data={ FUEL_TYPES }
             control={ control }
             fieldName="fuelType"
-            fieldNameText="Uzemanyag tipus"
+            fieldNameText="Típus"
             isHorizontal
             isCarousel={ false }
         />
@@ -20,18 +28,10 @@ const FuelStep: React.FC<StepProps> = ({
             data={ FUEL_MEASUREMENTS }
             control={ control }
             fieldName="fuelMeasurement"
-            fieldNameText="Uzemanyag mertekegyseg"
+            fieldNameText="Mértékegység"
             isHorizontal
             isCarousel={ false }
         />
-        <Input.Text
-            control={ control }
-            fieldName="fuelTankSize"
-            fieldNameText="Uzemanyag tartaly merete"
-            placeholder="000.000.000"
-            icon={ ICON_NAMES.odometer }
-            numeric
-        />
-    </>
+    </Input.Group>
 
 export default FuelStep;

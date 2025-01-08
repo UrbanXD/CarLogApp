@@ -4,6 +4,7 @@ import {CARS, DATA_TRANSFORM_TO_PICKER_DATA} from "../../../../Shared/constants/
 import {InputPickerDataType} from "../../../components/Input/picker/InputPicker";
 import {useWatch} from "react-hook-form";
 import Input from "../../../components/Input/Input";
+import InputGroup from "../../../components/Input/InputGroup";
 
 const CarModelStep: React.FC<StepProps> = ({
     control,
@@ -31,7 +32,7 @@ const CarModelStep: React.FC<StepProps> = ({
     }, [selectedBrandNameValue, resetField]);
 
     return (
-        <>
+        <Input.Group>
             <Input.Picker
                 data={ brands }
                 control={ control }
@@ -49,7 +50,7 @@ const CarModelStep: React.FC<StepProps> = ({
                 disabled={ !isBrandSelected }
                 disabledText={ "Először válassza ki az autó márkáját!" }
             />
-        </>
+        </Input.Group>
     )
 }
 

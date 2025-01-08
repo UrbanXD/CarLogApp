@@ -7,11 +7,11 @@ import {ODOMETER_MEASUREMENTS} from "../../../constants/constants";
 const OdometerStep: React.FC<StepProps> = ({
     control
 }) =>
-    <>
+    <Input.Group>
         <Input.Text
             control={ control }
             fieldName="odometerValue"
-            fieldNameText="Kilometerora alass"
+            fieldNameText="Kilóméteróra állás"
             placeholder="000.000.000"
             icon={ ICON_NAMES.odometer }
             numeric
@@ -20,10 +20,10 @@ const OdometerStep: React.FC<StepProps> = ({
             data={ ODOMETER_MEASUREMENTS }
             control={ control }
             fieldName="odometerMeasurement"
-            fieldNameText="Mertekegyseg"
+            fieldNameText="Mértékegység"
             isHorizontal
             isCarousel={ false }
         />
-    </>
+    </Input.Group>
 
 export default OdometerStep;
