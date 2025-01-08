@@ -9,13 +9,15 @@ export const CAR_FORM_STEPS_FIELD = [
     ["name"],
     ["brand", "model"],
     ["odometerValue", "odometerMeasurement"],
-    ["fuelType", "fuelMeasurement", "fuelTankSize"]
+    ["fuelType", "fuelMeasurement", "fuelTankSize"],
+    ["image"]
 ];
 export const CAR_FORM_STEPS_TITLE = [
     "Elnevezés",
-    "Gyártó",
-    "Autó adatok",
-    "Autó adatok"
+    "Modell",
+    "Kilométeróra",
+    "Üzemanyag",
+    "Kép"
 ];
 
 

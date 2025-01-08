@@ -4,12 +4,14 @@ import CarModelStep from "./CarModelStep";
 import OdometerStep from "./OdometerStep";
 import FuelStep from "./FuelStep";
 import React from "react";
+import ImageStep from "./ImageStep";
 
 export enum CAR_FORM_STEPS {
     NameStep,
     CarModelStep,
     OdometerStep,
-    FuelStep
+    FuelStep,
+    ImageStep
 }
 
 const useCarSteps = (
@@ -34,6 +36,10 @@ const useCarSteps = (
             <FuelStep
                 control={ control }
             />,
+        () =>
+            <ImageStep
+                control={ control }
+            />
     ]
 
 export default useCarSteps;

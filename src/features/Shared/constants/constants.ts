@@ -61,7 +61,8 @@ export const ICON_NAMES = {
     image: "image-outline",
     trashCan: "delete-outline",
     calendar: "calendar-range-outline",
-    reset: "refresh"
+    reset: "refresh",
+    upload: "upload-outline"
 }
 
 export const ICON_COLORS = {
