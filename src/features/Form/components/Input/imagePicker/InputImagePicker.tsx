@@ -1,26 +1,25 @@
 import Button from "../../../../Button/components/Button"
 import { pickImage } from "../../../../Shared/utils/pickImage";
 import {
-    Image,
     ImageSourcePropType,
     Text,
     View,
+    Image as IRN,
     StyleSheet
 } from "react-native";
 import { encode } from "base64-arraybuffer";
 import { Control, Controller } from "react-hook-form";
-import React, { useState } from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import Carousel, { CarouselItemType } from "../../../../Carousel/components/Carousel";
 import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../../../../Carousel/components/CarouselItem";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { formatImageSource } from "../../../../Shared/utils/formatImageSource";
 import {ControllerRenderArgs, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../Shared/constants/constants";
 import InputTitle from "../InputTitle";
 import DefaultElement from "../../../../Shared/components/DefaultElement";
 import { theme } from "../../../../Shared/constants/theme";
-import Icon from "../../../../Shared/components/Icon";
 import { hexToRgba } from "../../../../Shared/utils/colors/hexToRgba";
+import Image from "../../../../Image/components/Image";
 
 interface InputImagePickerProps {
     control: Control<any>
@@ -134,7 +133,7 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
         });
     }
 
-    const render = (args: ControllerRenderArgs) => {
+    const render = useCallback((args: ControllerRenderArgs) => {
         const { field: { onChange }, fieldState: { error } } = args;
 
         return (
@@ -144,14 +143,15 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                     <InputTitle
                         title={ fieldNameText }
                         subtitle={ fieldInfoText }
+                        optional
                     />
                 }
                 {
                     !multipleSelection &&
                     <>
                         <Image
-                            source={ formatImageSource(selectedImage || require("../../../../../assets/images/car2.jpg")) }
-                            style={ [styles.chosenImage, { height: size.height * 1.25 }] }
+                            source={ selectedImage }
+                            imageStyle={ [styles.chosenImage, { height: size.height * 1.25 }] }
                         />
                         <InputTitle title="Kiválasztható képek" />
                     </>
@@ -159,7 +159,7 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                 <View style={ styles.secondRowContainer }>
                     <View style={ styles.uploadButtonContainer }>
                         <Button.Icon
-                            icon={ ICON_NAMES.upArrowHead }
+                            icon={ ICON_NAMES.upload }
                             onPress={ () => getImages(onChange) }
                         />
                     </View>
@@ -182,9 +182,12 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                                             cardAction={ () => selectImage(item) }
                                             renderBottomActionButton={
                                                 () =>
-                                                    <Icon icon={ ICON_NAMES.close }
-                                                        size={ FONT_SIZES.medium }
-                                                        color={ theme.colors.redLight }
+                                                    <Button.Icon
+                                                        icon={ ICON_NAMES.close }
+                                                        iconSize={ FONT_SIZES.normal }
+                                                        iconColor={ theme.colors.redLight }
+                                                        width={ FONT_SIZES.normal * 1.2 }
+                                                        height={ FONT_SIZES.normal * 1.2 }
                                                         backgroundColor={ hexToRgba(theme.colors.black, 0.75) }
                                                         onPress={ () => removeImageFromHistory(index) }
                                                         style={ { borderColor: theme.colors.redLight, borderWidth: 2 } }
@@ -203,7 +206,7 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                 </View>
             </View>
         )
-    }
+    }, [selectedImage, history, size, multipleSelection])
 
     return (
         <Controller
@@ -220,8 +223,8 @@ const styles = StyleSheet.create({
         gap: SEPARATOR_SIZES.lightSmall,
     },
     chosenImage: {
-        width: "100%",
-        resizeMode: "stretch",
+        position: "relative",
+        resizeMode: "cover",
         borderRadius: 35,
     },
     secondRowContainer: {
