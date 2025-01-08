@@ -1,16 +1,18 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import {View, StyleSheet, ViewStyle} from "react-native";
 import {SEPARATOR_SIZES} from "../../Shared/constants/constants";
 
 interface ButtonsRowProps {
-    children: React.ReactNode;
+    style?: ViewStyle
+    children: React.ReactNode
 }
 
 const ButtonsRow: React.FC<ButtonsRowProps> = ({
+    style,
     children
 }) => {
     return (
-        <View style={ styles.container }>
+        <View style={ [styles.container, style] }>
             { children }
         </View>
     )
