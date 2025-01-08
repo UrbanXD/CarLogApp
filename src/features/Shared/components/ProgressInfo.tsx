@@ -83,7 +83,6 @@ const useStyles = (radius: number) =>
             flexDirection: "row",
             alignItems: "center",
             gap: SEPARATOR_SIZES.lightSmall,
-            padding: SEPARATOR_SIZES.small,
         },
         circularProgressBarContainer: {
             width: radius * 2,
