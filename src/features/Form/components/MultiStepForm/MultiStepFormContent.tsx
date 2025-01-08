@@ -1,7 +1,6 @@
 import React from "react";
 import { useMultiStepForm } from "../../context/MultiStepFormProvider";
-import { View } from "react-native";
-import Form from "../Form";
+import OnBoardingView from "../../../OnBoardingView/OnBoardingView";
 
 const MultiStepFormContent: React.FC = () => {
     const {
@@ -10,19 +9,10 @@ const MultiStepFormContent: React.FC = () => {
     } = useMultiStepForm();
 
     return (
-        <Form>
-            {
-                steps.map(
-                    (step, index) =>
-                        <View
-                            key={ index }
-                            style={{ display: currentStep === index ? 'flex' : 'none' }}
-                        >
-                            { step() }
-                        </View>
-                )
-            }
-        </Form>
+        <OnBoardingView
+            steps={ steps }
+            currentStep={ currentStep }
+        />
     )
 }
 

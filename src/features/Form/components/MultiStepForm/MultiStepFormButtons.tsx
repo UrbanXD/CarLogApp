@@ -19,8 +19,8 @@ const MultiStepFormButtons: React.FC<MultiStepFormButtonsProps> = ({
     } = useMultiStepForm();
 
     return (
-        <Button.Row>
-            <View style={{ flex: 0.175 }}>
+        <Button.Row style={ styles.container }>
+            <View style={ styles.backButtonContainer }>
                 {
                     !isFirstStep &&
                     <Button.MultistepFormBack
@@ -28,7 +28,7 @@ const MultiStepFormButtons: React.FC<MultiStepFormButtonsProps> = ({
                     />
                 }
             </View>
-            <View style={{ flex: 0.825 }}>
+            <View style={ styles.nextButtonContainer }>
                 {
                     ((isFirstCount && isFirstStep) || !isFirstStep) &&
                     <Button.MultistepFormNext
@@ -40,5 +40,17 @@ const MultiStepFormButtons: React.FC<MultiStepFormButtonsProps> = ({
         </Button.Row>
     )
 }
+
+const styles = StyleSheet.create({
+    container: {
+        paddingHorizontal: SEPARATOR_SIZES.medium
+    },
+    backButtonContainer: {
+        flex: 0.175
+    },
+    nextButtonContainer: {
+        flex: 0.825
+    }
+})
 
 export default MultiStepFormButtons;

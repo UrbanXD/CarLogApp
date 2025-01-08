@@ -4,6 +4,8 @@ import { useSharedValue, withTiming } from "react-native-reanimated";
 import { useFont } from "@shopify/react-native-skia";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import ProgressInfo from "../../../Shared/components/ProgressInfo";
+import {StyleSheet, View} from "react-native";
+import {SEPARATOR_SIZES} from "../../../Shared/constants/constants";
 
 interface MultiStepFormProgressInfoProps {
     isFirstCount: boolean
@@ -31,7 +33,7 @@ const MultiStepFormProgressInfo: React.FC<MultiStepFormProgressInfoProps> = ({
     if (!font) return <></>;
 
     return (
-        <>
+        <View style={ styles.container }>
             {
                 (isFirstCount && isFirstStep || !isFirstStep) &&
                 <ProgressInfo
@@ -44,8 +46,14 @@ const MultiStepFormProgressInfo: React.FC<MultiStepFormProgressInfoProps> = ({
                     stepSubtitle={ stepsTitle[currentStep + 1] !== undefined ? `Következik: ${ stepsTitle[currentStep + 1] }` : undefined }
                 />
             }
-        </>
+        </View>
     )
 }
+
+const styles = StyleSheet.create({
+    container: {
+        paddingHorizontal: SEPARATOR_SIZES.medium
+    }
+})
 
 export default MultiStepFormProgressInfo;

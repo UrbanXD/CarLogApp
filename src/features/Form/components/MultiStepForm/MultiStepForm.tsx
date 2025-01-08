@@ -4,6 +4,9 @@ import {MultiStepFormProvider} from "../../context/MultiStepFormProvider";
 import MultiStepFormProgressInfo from "./MultiStepFormProgressInfo";
 import MultiStepFormContent from "./MultiStepFormContent";
 import MultiStepFormButtons from "./MultiStepFormButtons";
+import {StyleSheet, View} from "react-native";
+import {widthPercentageToDP as wp} from "react-native-responsive-screen";
+import {SEPARATOR_SIZES} from "../../../Shared/constants/constants";
 
 interface MultiStepFormProps {
     steps: Array<() => ReactNode | null>
@@ -35,12 +38,23 @@ export const MultiStepForm: React.FC<MultiStepFormProps> = ({
         trigger={ trigger }
         resetField={ resetField }
     >
-        <MultiStepFormProgressInfo
-            isFirstCount={ isFirstCount }
-            stepsTitle={ stepsTitle }
-        />
-        <MultiStepFormContent />
-        <MultiStepFormButtons isFirstCount={ isFirstCount } />
+        <View style={ styles.container }>
+            <MultiStepFormProgressInfo
+                isFirstCount={ isFirstCount }
+                stepsTitle={ stepsTitle }
+            />
+            <MultiStepFormContent />
+            <MultiStepFormButtons isFirstCount={ isFirstCount } />
+        </View>
     </MultiStepFormProvider>
+
+const styles = StyleSheet.create({
+    container: {
+        position: "absolute",
+        height: "100%",
+        width: wp(100),
+        gap: SEPARATOR_SIZES.normal,
+    }
+})
 
 export default MultiStepForm;
