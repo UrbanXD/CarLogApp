@@ -5,7 +5,6 @@ import { CAR_TABLE } from './AppSchema';
 import { getUUID } from '../../utils/uuid';
 import { ImageType } from '../../../Shared/utils/pickImage';
 import { encode } from 'base64-arraybuffer';
-import { getFileExtension } from '../../../Shared/utils/getFileExtension';
 
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
 
