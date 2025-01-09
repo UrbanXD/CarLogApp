@@ -2,7 +2,7 @@ import { askMediaLibraryPermission } from "./getPermissions"
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import { decode } from "base64-arraybuffer";
-import { getFileExtension } from "./getFileExtension";
+import { getFileExtension } from "../../Database/utils/getFileExtension";
 import { getUUID } from "../../Database/utils/uuid";
 
 export interface ImageType {

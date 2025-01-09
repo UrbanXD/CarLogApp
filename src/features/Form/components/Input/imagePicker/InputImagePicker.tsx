@@ -1,25 +1,20 @@
 import Button from "../../../../Button/components/Button"
 import { pickImage } from "../../../../Shared/utils/pickImage";
-import {
-    ImageSourcePropType,
-    Text,
-    View,
-    Image as IRN,
-    StyleSheet
-} from "react-native";
+import { ImageSourcePropType, Text, View, StyleSheet } from "react-native";
 import { encode } from "base64-arraybuffer";
 import { Control, Controller } from "react-hook-form";
-import React, {useCallback, useEffect, useState} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Carousel, { CarouselItemType } from "../../../../Carousel/components/Carousel";
 import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../../../../Carousel/components/CarouselItem";
-import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import {ControllerRenderArgs, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../Shared/constants/constants";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { ControllerRenderArgs, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../Shared/constants/constants";
 import InputTitle from "../InputTitle";
 import DefaultElement from "../../../../Shared/components/DefaultElement";
 import { theme } from "../../../../Shared/constants/theme";
 import { hexToRgba } from "../../../../Shared/utils/colors/hexToRgba";
 import Image from "../../../../Image/components/Image";
+import { useDatabase } from "../../../../Database/connector/Database";
 
 interface InputImagePickerProps {
     control: Control<any>
@@ -134,7 +129,14 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
     }
 
     const render = useCallback((args: ControllerRenderArgs) => {
-        const { field: { onChange }, fieldState: { error } } = args;
+        const { field: { onChange, value }, fieldState: { error } } = args;
+
+        useEffect(() => {
+            onChange(value)
+            if(value && value.buffer) {
+                selectImage(encode(value.buffer));
+            }
+        }, []);
 
         return (
             <View style={ styles.inputContainer }>
