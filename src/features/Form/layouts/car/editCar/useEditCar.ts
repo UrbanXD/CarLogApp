@@ -1,19 +1,23 @@
-import {ReactElement} from "react";
-import {CarFormFieldType, useCarFormProps} from "../../../constants/schemas/carSchema";
-import {useForm} from "react-hook-form";
-import {store} from "../../../../Database/redux/store";
+import { CarFormFieldType, useCarFormProps } from "../../../constants/schemas/carSchema";
+import { useForm } from "react-hook-form";
+import { store } from "../../../../Database/redux/store";
 import useCarSteps from "../steps/useCarSteps";
-import {CarTableType} from "../../../../Database/connector/powersync/AppSchema";
-import {undefined} from "zod";
-import {decode, encode} from "base64-arraybuffer";
-import {editCar} from "../../../../Database/redux/cars/functions/editCar";
-import {useDatabase} from "../../../../Database/connector/Database";
+import { CarTableType } from "../../../../Database/connector/powersync/AppSchema";
+import { editCar } from "../../../../Database/redux/cars/functions/editCar";
+import { useDatabase } from "../../../../Database/connector/Database";
+import getFile from "../../../../Database/utils/getFile";
 
 const useEditCarForm = (
     car: CarTableType,
-    forceCloseBottomSheet: () => void
+    forceCloseBottomSheet: () => void,
+    carImage?: string
 ) => {
     const database = useDatabase();
+
+    const carFormField = {
+        ...car,
+        image: getFile(car.image, carImage)
+    } as CarFormFieldType;
 
     const {
         control,
@@ -22,17 +26,16 @@ const useEditCarForm = (
         reset,
         resetField,
         formState,
-    } =
-        useForm<CarFormFieldType>(useCarFormProps(car as CarFormFieldType));
+    } = useForm<CarFormFieldType>(useCarFormProps(carFormField));
 
     const submitHandler =
         handleSubmit(async (editedCar: CarFormFieldType) => {
             try {
-                const carTableRow = {
-                    ...car,
-                    ...editedCar,
-                } as CarTableType;
-                await store.dispatch(editCar({ database, car: carTableRow }))
+                await store.dispatch(editCar({
+                    database,
+                    oldCar: car,
+                    newCar: editedCar
+                }));
                 reset();
                 forceCloseBottomSheet();
             } catch (e) {
