@@ -1,19 +1,13 @@
 export const getFileExtension = (path?: string) => {
     if(!path) return "";
 
-    const match = /\.([a-zA-Z]+)$/.exec(path);
-    if (match) {
-        return match[1];
-    }
-    return "";
+    const fileName = path.split('/').pop() || "";
+    return fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
 }
 
 export const getFileName = (path?: string) => {
     if(!path) return "";
 
-    const match = /\.([a-zA-Z]+)$/.exec(path);
-    if (match) {
-        return match[0];
-    }
-    return "";
+    const fileName = path.split('/').pop() || "";
+    return fileName.substring(fileName.lastIndexOf('.') + 1) || "";
 }
