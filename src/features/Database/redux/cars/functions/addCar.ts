@@ -1,21 +1,45 @@
-import {createAsyncThunk} from "@reduxjs/toolkit";
-import {Database} from "../../../connector/Database";
-import {CarTableType} from "../../../connector/powersync/AppSchema";
-import {CarDAO} from "../../../DAOs/CarDAO";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { Database } from "../../../connector/Database";
+import { CarTableType } from "../../../connector/powersync/AppSchema";
+import { CarDAO } from "../../../DAOs/CarDAO";
+import { CarFormFieldType } from "../../../../Form/constants/schemas/carSchema";
+import { getUUID } from "../../../utils/uuid";
+import getImageState from "../../../utils/getImageState";
+
+interface AddCarArgs {
+    database: Database
+    car: CarFormFieldType
+}
 
 export const addCar = createAsyncThunk(
     "addCar",
-    async (args: {database: Database, car: CarTableType}, { rejectWithValue }) => {
+    async (args: AddCarArgs, { rejectWithValue }) => {
+        const { database, car } = args;
+
         try {
             const carDAO = new CarDAO(args.database.db);
 
-            const result = await carDAO.addCar(args.car);
-
-            if(result === null) {
-                return rejectWithValue("");
+            const { userID } = await database.supabaseConnector.fetchCredentials();
+            let image = null;
+            if(database.attachmentQueue && car.image) {
+                image = await database.attachmentQueue.saveFile(car.image, userID);
             }
 
-            return result;
+            const newCarTableRow = {
+                ...car,
+                id: getUUID(),
+                owner: userID,
+                image: image ? image.filename : null,
+                createdAt: Date.now().toString(),
+            } as CarTableType
+
+            const result = await carDAO.addCar(newCarTableRow);
+            if(result === null) return rejectWithValue("");
+
+            return {
+                car: result,
+                image: getImageState(newCarTableRow.image, car.image?.buffer)
+            };
         } catch (e) {
             console.log(e)
             return rejectWithValue("");

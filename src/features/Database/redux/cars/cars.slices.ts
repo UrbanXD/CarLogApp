@@ -6,7 +6,6 @@ import { loadSelectedCar } from "./functions/loadSelectedCar";
 import { selectCar } from "./functions/selectCar";
 import { deleteCar } from "./functions/deleteCar";
 import {editCar} from "./functions/editCar";
-import car from "../../../../app/(edit)/car";
 
 interface CarsState {
     loading: boolean
@@ -45,19 +44,26 @@ const carsSlice = createSlice({
                 state.carsImage = action.payload.images
             })
             .addCase(addCar.fulfilled, (state, action) => {
-                state.cars = [
-                    ...state.cars,
-                    action.payload
-                ];
+                const { car, image } = action.payload
+
+                state.cars.push(car);
+
+                if(!image) return;
+                state.carsImage.push(image);
             })
             .addCase(addCar.rejected, () => {
                 console.log("hiba addCar, Slices")
             })
             .addCase(editCar.fulfilled, (state, action) => {
-                const index = state.cars.findIndex(car => car.id === action.payload.id);
-                if (index !== -1) {
-                    state.cars[index] = action.payload;
-                }
+                const editedCar = action.payload.car;
+                const editedCarImage = action.payload.image;
+
+                const index = state.cars.findIndex(car => car.id === action.payload.car.id);
+                if(index === -1) return;
+                state.cars[index] = editedCar;
+
+                if(!editedCarImage) return;
+                state.carsImage.push(editedCarImage);
             })
             .addCase(deleteCar.fulfilled, (state, action) => {
                 state.cars = state.cars.filter((car) => car.id !== action.payload.id);
