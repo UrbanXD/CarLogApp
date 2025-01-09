@@ -2,16 +2,17 @@ import React from "react";
 import useEditCarForm from "./useEditCar";
 import { CarTableType } from "../../../../Database/connector/powersync/AppSchema";
 import Button from "../../../../Button/components/Button";
-import { View } from "react-native";
-import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../Shared/constants/constants";
+import { ICON_NAMES } from "../../../../Shared/constants/constants";
 
 interface EditCarFormProps {
     car: CarTableType
+    carImage?: string
     stepIndex: number
     forceCloseBottomSheet: () => void
 }
 const EditCarForm: React.FC<EditCarFormProps> = ({
     car,
+    carImage,
     stepIndex,
     forceCloseBottomSheet
 }) => {
@@ -19,7 +20,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
         submitHandler,
         reset,
         steps
-    } = useEditCarForm(car, forceCloseBottomSheet);
+    } = useEditCarForm(car, forceCloseBottomSheet, carImage);
 
     const handleSave =
         async () => await submitHandler();

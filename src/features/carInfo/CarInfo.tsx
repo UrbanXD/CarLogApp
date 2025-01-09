@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text, ImageBackground} from "react-native";
+import { StyleSheet, View } from "react-native";
 import { FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../Shared/constants/constants";
 import { theme } from "../Shared/constants/theme";
 import Divider from "../Shared/components/Divider";
@@ -7,6 +7,7 @@ import Button from "../Button/components/Button";
 import InformationContainer from "./InformationContainer";
 import useCarProfile from "./hooks/useCarProfile";
 import Image from "../Image/components/Image";
+import { CAR_FORM_STEPS } from "../Form/layouts/car/steps/useCarSteps";
 
 interface CarInfoProps {
     carID: string
@@ -17,7 +18,8 @@ const CarInfo: React.FC<CarInfoProps> = ({ carID }) => {
         carImage,
         handleDeleteCar,
         nameInformationBlock,
-        carModelInformationBlock
+        carModelInformationBlock,
+        openEditForm
     } = useCarProfile(carID);
 
     return (
@@ -38,7 +40,7 @@ const CarInfo: React.FC<CarInfoProps> = ({ carID }) => {
                                     width={ FONT_SIZES.medium }
                                     height={ FONT_SIZES.medium }
                                     backgroundColor={ "transparent" }
-                                    onPress={ () => {} }
+                                    onPress={ () => openEditForm(CAR_FORM_STEPS.ImageStep, "70%") }
                                 />
                             </View>
                         </View>

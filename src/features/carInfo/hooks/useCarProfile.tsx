@@ -1,20 +1,19 @@
-import {useDatabase} from "../../Database/connector/Database";
-import {useAlert} from "../../Alert/context/AlertProvider";
+import { useDatabase } from "../../Database/connector/Database";
+import { useAlert } from "../../Alert/context/AlertProvider";
 import useCars from "../../Shared/hooks/useCars";
-import {useBottomSheet} from "../../BottomSheet/context/BottomSheetProvider";
+import { useBottomSheet } from "../../BottomSheet/context/BottomSheetProvider";
 import EditCarForm from "../../Form/layouts/car/editCar/EditCarForm";
 import React from "react";
-import {ICON_NAMES} from "../../Shared/constants/constants";
-import {CAR_FORM_STEPS} from "../../Form/layouts/car/steps/useCarSteps";
+import { ICON_NAMES } from "../../Shared/constants/constants";
+import { CAR_FORM_STEPS } from "../../Form/layouts/car/steps/useCarSteps";
+import { store } from "../../Database/redux/store";
+import { deleteCar } from "../../Database/redux/cars/functions/deleteCar";
 
 const useCarProfile = (carID: string) => {
     const database = useDatabase();
     const { openModal } = useAlert();
     const { openBottomSheet, forceCloseBottomSheet } = useBottomSheet();
-    const {
-        getCar,
-        getCarImage
-    } = useCars();
+    const { getCar, getCarImage } = useCars();
 
     const car = getCar(carID);
     const carImage = getCarImage(carID)?.image;
@@ -25,7 +24,7 @@ const useCarProfile = (carID: string) => {
             body: `Az autó kitörlése egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
             acceptText: "Törlés",
             accept: () => {
-                // store.dispatch(deleteCar({ database, carID: car.id }));
+                store.dispatch(deleteCar({ database, carID: car.id }));
             },
         })
     }
@@ -35,6 +34,7 @@ const useCarProfile = (carID: string) => {
             content:
                 <EditCarForm
                     car={ car }
+                    carImage={ carImage }
                     stepIndex={ stepIndex }
                     forceCloseBottomSheet={ forceCloseBottomSheet }
                 />,
@@ -66,6 +66,7 @@ const useCarProfile = (carID: string) => {
     }
 
     return {
+        openEditForm,
         car,
         carImage,
         handleDeleteCar,
