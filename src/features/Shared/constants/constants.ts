@@ -62,7 +62,9 @@ export const ICON_NAMES = {
     trashCan: "delete-outline",
     calendar: "calendar-range-outline",
     reset: "refresh",
-    upload: "upload-outline"
+    upload: "upload-outline",
+    fuel: "gas-station-outline",
+    fuelTank: "propane-tank-outline"
 }
 
 export const ICON_COLORS = {

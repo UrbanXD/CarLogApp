@@ -29,7 +29,7 @@ const useCarProfile = (carID: string) => {
         })
     }
 
-    const openEditForm = (stepIndex: number, height: string = "37.5%") =>
+    const openEditForm = (stepIndex: number, height: string = "50%") =>
         openBottomSheet({
             content:
                 <EditCarForm
@@ -38,17 +38,16 @@ const useCarProfile = (carID: string) => {
                     stepIndex={ stepIndex }
                     forceCloseBottomSheet={ forceCloseBottomSheet }
                 />,
-            snapPoints: [height]
+            snapPoints: [height],
+            enableDismissOnClose: false
         })
 
     const nameInformationBlock = {
-        data: [
-            {
+        data: [{
                 icon: ICON_NAMES.nametag,
                 text: car?.name
-            }
-        ],
-        onEdit: () => openEditForm(CAR_FORM_STEPS.NameStep)
+        }],
+        onEdit: () => openEditForm(CAR_FORM_STEPS.NameStep, "37.5%")
     };
 
     const carModelInformationBlock = {
@@ -65,6 +64,28 @@ const useCarProfile = (carID: string) => {
         onEdit: () => openEditForm(CAR_FORM_STEPS.CarModelStep)
     }
 
+    const odometerInformationBlock = {
+        data: [{
+            icon: ICON_NAMES.odometer,
+            text: `${car.odometerValue} ${car.odometerMeasurement}`
+        }],
+        onEdit: () => openEditForm(CAR_FORM_STEPS.OdometerStep)
+    }
+
+    const fuelInformationBlock = {
+        data: [
+            {
+                icon: ICON_NAMES.fuel,
+                text: car.fuelType
+            },
+            {
+                icon: ICON_NAMES.fuelTank,
+                text: `${car.fuelTankSize} ${car.fuelMeasurement}`
+            }
+        ],
+        onEdit: () => openEditForm(CAR_FORM_STEPS.FuelStep)
+    }
+
     return {
         openEditForm,
         car,
@@ -72,6 +93,8 @@ const useCarProfile = (carID: string) => {
         handleDeleteCar,
         nameInformationBlock,
         carModelInformationBlock,
+        odometerInformationBlock,
+        fuelInformationBlock
     };
 }
 

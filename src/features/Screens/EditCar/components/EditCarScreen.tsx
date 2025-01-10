@@ -1,27 +1,24 @@
 import React from "react";
-import {SafeAreaView, ScrollView, StyleSheet} from "react-native";
-import {DEFAULT_SEPARATOR, GLOBAL_STYLE} from "../../../Shared/constants/constants";
-import {theme} from "../../../Shared/constants/theme";
-import {router, useGlobalSearchParams, useLocalSearchParams} from "expo-router";
-import CarInfo from "../../../carInfo/CarInfo";
-import {useBottomSheet} from "../../../BottomSheet/context/BottomSheetProvider";
-import useMyGarage from "../../HomeScreen/hooks/useMyGarage";
-import useCars from "../../../Shared/hooks/useCars";
+import {SafeAreaView, ScrollView, StyleSheet } from "react-native";
+import { DEFAULT_SEPARATOR, GLOBAL_STYLE } from "../../../Shared/constants/constants";
+import { theme } from "../../../Shared/constants/theme";
+import { useLocalSearchParams } from "expo-router";
+import CarInfo from "../../../carInfo/components/CarInfo";
 
 const EditCarScreen: React.FC = () => {
     const localSearchParams = useLocalSearchParams();
 
     return (
         <SafeAreaView style={ styles.pageContainer }>
-            {/*<ScrollView*/}
-            {/*    showsVerticalScrollIndicator={ false }*/}
-            {/*    nestedScrollEnabled={ true }*/}
-            {/*    contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }*/}
-            {/*>*/}
+            <ScrollView
+                showsVerticalScrollIndicator={ false }
+                nestedScrollEnabled={ true }
+                contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
+            >
             {
                 <CarInfo carID={ localSearchParams.id as string } />
             }
-            {/*</ScrollView>*/}
+            </ScrollView>
         </SafeAreaView>
     )
 }

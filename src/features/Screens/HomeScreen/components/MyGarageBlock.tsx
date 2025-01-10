@@ -1,17 +1,12 @@
-import React, {useEffect, useState} from "react";
-import {useBottomSheet} from "../../../BottomSheet/context/BottomSheetProvider";
-import {RootState} from "../../../Database/redux/store";
-import {useSelector} from "react-redux";
-import Carousel, {CarouselItemType} from "../../../Carousel/components/Carousel";
-import NewCarForm from "../../../Form/layouts/car/addCar/NewCarForm";
-import {Alert, Text, StyleSheet, View} from "react-native";
-import CarInfo from "../../../carInfo/CarInfo";
-import {DEFAULT_SEPARATOR, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES} from "../../../Shared/constants/constants";
-import {SharedValue} from "react-native-reanimated";
+import React from "react";
+import Carousel, { CarouselItemType } from "../../../Carousel/components/Carousel";
+import { Text, StyleSheet, View } from "react-native";
+import { DEFAULT_SEPARATOR, GLOBAL_STYLE, ICON_NAMES } from "../../../Shared/constants/constants";
+import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../../../Carousel/components/CarouselItem";
 import DefaultElement from "../../../Shared/components/DefaultElement";
 import Button from "../../../Button/components/Button";
-import {heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import useMyGarage from "../hooks/useMyGarage";
 
 const MyGarageBlock: React.FC = () => {
@@ -24,7 +19,7 @@ const MyGarageBlock: React.FC = () => {
 
     const renderDefaultElement =
         (size: number, spacerSize: number) =>
-            <View style={{ flex:1 }}>
+            <View style={ styles.defaultElementContainer }>
                 <DefaultElement
                     isLoading={ isLoading }
                     icon={ ICON_NAMES.car }
@@ -81,6 +76,9 @@ const styles = StyleSheet.create({
     },
     carouselContainer: {
         height: hp(27.5),
+    },
+    defaultElementContainer: {
+        flex: 1
     }
 });
 

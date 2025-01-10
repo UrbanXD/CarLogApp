@@ -1,13 +1,14 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../Shared/constants/constants";
-import { theme } from "../Shared/constants/theme";
-import Divider from "../Shared/components/Divider";
-import Button from "../Button/components/Button";
+ import { FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../Shared/constants/constants";
+import { theme } from "../../Shared/constants/theme";
+import Divider from "../../Shared/components/Divider";
+import Button from "../../Button/components/Button";
 import InformationContainer from "./InformationContainer";
-import useCarProfile from "./hooks/useCarProfile";
-import Image from "../Image/components/Image";
-import { CAR_FORM_STEPS } from "../Form/layouts/car/steps/useCarSteps";
+import useCarProfile from "../hooks/useCarProfile";
+import Image from "../../Image/components/Image";
+import { CAR_FORM_STEPS } from "../../Form/layouts/car/steps/useCarSteps";
+import { widthPercentageToDP as wp} from "react-native-responsive-screen";
 
 interface CarInfoProps {
     carID: string
@@ -19,6 +20,8 @@ const CarInfo: React.FC<CarInfoProps> = ({ carID }) => {
         handleDeleteCar,
         nameInformationBlock,
         carModelInformationBlock,
+        odometerInformationBlock,
+        fuelInformationBlock,
         openEditForm
     } = useCarProfile(carID);
 
@@ -27,31 +30,33 @@ const CarInfo: React.FC<CarInfoProps> = ({ carID }) => {
             <View style={ styles.content }>
                 <View style={ styles.imageContainer }>
                     <Image
-                        source={ carImage || "" }
+                        source={ carImage }
                         alt={ ICON_NAMES.car }
                         overlay
                     >
-                        <View style={{ flex: 1, justifyContent: "flex-end", padding: SEPARATOR_SIZES.lightSmall }}>
-                            <View style={{ alignSelf: "flex-end" }}>
+                        <View style={ styles.editImageIconContainer }>
                                 <Button.Icon
                                     icon={ ICON_NAMES.pencil }
                                     iconSize={ FONT_SIZES.medium }
                                     iconColor={ theme.colors.gray1 }
                                     width={ FONT_SIZES.medium }
                                     height={ FONT_SIZES.medium }
-                                    backgroundColor={ "transparent" }
+                                    style={ styles.editImageIcon }
+                                    backgroundColor="transparent"
                                     onPress={ () => openEditForm(CAR_FORM_STEPS.ImageStep, "70%") }
                                 />
-                            </View>
                         </View>
                     </Image>
                 </View>
-                <InformationContainer { ...nameInformationBlock } />
-                <InformationContainer { ...carModelInformationBlock } />
                 <Divider
+                    size={ wp(80) }
                     color={ theme.colors.gray3 }
                     margin={ SEPARATOR_SIZES.small }
                 />
+                <InformationContainer { ...nameInformationBlock } />
+                <InformationContainer { ...carModelInformationBlock } />
+                <InformationContainer { ...odometerInformationBlock } />
+                <InformationContainer { ...fuelInformationBlock } />
             </View>
             <Button.Row>
                 <Button.Icon
@@ -86,12 +91,14 @@ const styles = StyleSheet.create({
         gap: SEPARATOR_SIZES.small,
         overflow: "hidden",
     },
-    image: {
-        width: "80%",
-        height: "100%",
-        resizeMode: "cover",
-        borderRadius: 35,
+    editImageIconContainer: {
+        flex: 1,
+        justifyContent: "flex-end",
+        padding: SEPARATOR_SIZES.lightSmall,
     },
+    editImageIcon: {
+        alignSelf: "flex-end"
+    }
 })
 
 export default CarInfo;
