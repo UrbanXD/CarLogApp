@@ -22,7 +22,6 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingVertical: SEPARATOR_SIZES.normal,
         alignItems: "center",
         gap: SEPARATOR_SIZES.small
     }
