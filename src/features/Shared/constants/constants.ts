@@ -101,7 +101,7 @@ export const DEFAULT_SEPARATOR = SEPARATOR_SIZES.normal
 export const GLOBAL_STYLE = StyleSheet.create({
     pageContainer: {
         flex: 1,
-        paddingVertical: SEPARATOR_SIZES.small,
+        paddingVertical: DEFAULT_SEPARATOR,
         paddingBottom: SIMPLE_TABBAR_HEIGHT * 1.25
     },
     scrollViewContentContainer: {

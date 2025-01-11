@@ -32,10 +32,7 @@ const OnBoardingView: React.FC<OnBoardingViewProps> = ({
                             (step, index) =>
                                 <View
                                     key={ index }
-                                    style={{
-                                        width: widthPercentageToDP(100),
-                                        paddingHorizontal: SEPARATOR_SIZES.medium
-                                    }}
+                                    style={{ width: "100%" }}
                                 >
                                     { step() }
                                 </View>
@@ -53,10 +50,7 @@ const OnBoardingView: React.FC<OnBoardingViewProps> = ({
             bounces={ false }
             bouncesZoom={ false }
             renderToHardwareTextureAndroid
-            style={{
-                flex: 1,
-                flexDirection: "row",
-            }}
+            contentContainerStyle={{ flex: 1 }}
         />
     )
 }

@@ -1,9 +1,5 @@
 import React, { useEffect } from "react";
-import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-} from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet } from "react-native";
 import { theme } from "../../../Shared/constants/theme";
 import { GLOBAL_STYLE } from "../../../Shared/constants/constants";
 import { useDatabase } from "../../../Database/connector/Database";

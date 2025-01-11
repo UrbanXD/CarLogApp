@@ -13,7 +13,7 @@ const MyGarageBlock: React.FC = () => {
     const {
         cars,
         isLoading,
-        openNewCarBottomSheet,
+        openNewCarForm,
         openCarProfile
     } = useMyGarage();
 
@@ -59,7 +59,7 @@ const MyGarageBlock: React.FC = () => {
             <Button.Text
                 text="Autó hozzáadás"
                 width={ wp(75) }
-                onPress={ openNewCarBottomSheet }
+                onPress={ openNewCarForm }
             />
         </View>
     )

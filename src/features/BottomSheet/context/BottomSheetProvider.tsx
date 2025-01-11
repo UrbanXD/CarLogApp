@@ -19,8 +19,9 @@ import { KeyboardController } from "react-native-keyboard-controller";
 
 export interface OpenBottomSheetArgs extends Partial<BottomSheetModalProps> {
     title?: string,
-    content: ReactElement,
-    closeButton?: ReactElement
+    content: ReactNode,
+    buttons?: ReactNode
+    closeButton?: ReactNode
 }
 
 interface BottomSheetProviderValue {
@@ -41,8 +42,9 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
     const { openModal } = useAlert();
 
     const [bottomSheetTitle, setBottomSheetTitle] = useState<string | undefined>();
-    const [bottomSheetContent, setBottomSheetContent] = useState<ReactElement | undefined>();
-    const [bottomSheetCloseButton, setBottomSheetCloseButton] = useState<ReactElement | undefined>();
+    const [bottomSheetContent, setBottomSheetContent] = useState<ReactNode>();
+    const [bottomSheetButtons, setBottomSheetButtons] = useState<ReactNode>();
+    const [bottomSheetCloseButton, setBottomSheetCloseButton] = useState<ReactNode>();
     const [bottomSheetProps, setBottomSheetProps] = useState<Partial<BottomSheetModalProps> | null>(null);
     const bottomSheetPropsRef = useRef(bottomSheetProps);
 
@@ -56,12 +58,14 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
             const {
                 title,
                 content,
+                buttons,
                 closeButton,
                 ...restProps
             } = args;
 
             setBottomSheetTitle(title);
             setBottomSheetContent(content);
+            setBottomSheetButtons(buttons);
             setBottomSheetCloseButton(closeButton);
             setBottomSheetProps({
                 snapPoints: ["100%"],
@@ -114,10 +118,11 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
         (index: number) => {
             if (index === -1 && !bottomSheetPropsRef.current?.enableDismissOnClose) {
                 KeyboardController.dismiss();
-                openModal(bottomSheetLeavingModal(reopenBottomSheet, forceCloseBottomSheet));
+                setTimeout(() => {
+                    openModal(bottomSheetLeavingModal(reopenBottomSheet, forceCloseBottomSheet));
+                }, 0);
             }
         }, [bottomSheetPropsRef]);
-
 
     const contextValue = useMemo(() => ({
         openBottomSheet,
@@ -134,8 +139,9 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
                 ref={ bottomSheetModalRef }
                 { ...bottomSheetProps }
                 title={ bottomSheetTitle }
-                renderContent={ () => bottomSheetContent }
-                renderCloseButton={ () => bottomSheetCloseButton }
+                content={ bottomSheetContent }
+                buttons={ bottomSheetButtons }
+                closeButton={ bottomSheetCloseButton }
                 reopen={ reopenBottomSheet }
                 forceClose={ forceCloseBottomSheet }
             />
