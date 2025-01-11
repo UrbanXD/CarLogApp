@@ -86,24 +86,20 @@ const InputPicker: React.FC<InputPickerProps> = ({
         }
     }, [searchTerm, allData]);
 
-    useEffect(() => {
-
-    }, [selectedItemID]);
-
     const render = (args: ControllerRenderArgs) => {
         const {
             field: { value, onChange },
             fieldState: { error }
         } = args;
 
-        if(value && value !== "") {
-            const item =
-                adjustedData.find(item => item?.value === value);
-
-            if(item){
-                setSelectedItemID(item?.id || item?.value || "");
+        useEffect(() => {
+            if (value && value !== "") {
+                const item = adjustedData.find(item => item?.value === value);
+                if (item && item.id !== selectedItemID) {
+                    setSelectedItemID(item?.id || item?.value || "");
+                }
             }
-        }
+        }, [value, adjustedData, selectedItemID]);
 
         return (
             isDataAdjusted
