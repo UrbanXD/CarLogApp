@@ -7,6 +7,7 @@ import MultiStepFormButtons from "./MultiStepFormButtons";
 import {StyleSheet, View} from "react-native";
 import {widthPercentageToDP as wp} from "react-native-responsive-screen";
 import {SEPARATOR_SIZES} from "../../../Shared/constants/constants";
+import {FlatList} from "react-native-gesture-handler";
 
 interface MultiStepFormProps {
     steps: Array<() => ReactNode | null>
@@ -43,16 +44,21 @@ export const MultiStepForm: React.FC<MultiStepFormProps> = ({
                 isFirstCount={ isFirstCount }
                 stepsTitle={ stepsTitle }
             />
-            <MultiStepFormContent />
+                <FlatList
+                    data={ [] }
+                    renderItem={ () => <></> }
+                    ListEmptyComponent={
+                        <MultiStepFormContent />
+                    }
+                    showsVerticalScrollIndicator={ false }
+                />
             <MultiStepFormButtons isFirstCount={ isFirstCount } />
         </View>
     </MultiStepFormProvider>
 
 const styles = StyleSheet.create({
     container: {
-        position: "absolute",
-        height: "100%",
-        width: wp(100),
+        flexShrink: 1,
         gap: SEPARATOR_SIZES.normal,
     }
 })

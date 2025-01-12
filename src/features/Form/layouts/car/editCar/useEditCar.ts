@@ -6,6 +6,7 @@ import { CarTableType } from "../../../../Database/connector/powersync/AppSchema
 import { editCar } from "../../../../Database/redux/cars/functions/editCar";
 import { useDatabase } from "../../../../Database/connector/Database";
 import getFile from "../../../../Database/utils/getFile";
+import { UseCustomFormProps } from "../../../constants/constants";
 
 const useEditCarForm = (
     car: CarTableType,
@@ -50,7 +51,7 @@ const useEditCarForm = (
         trigger,
         steps: useCarSteps(control, resetField),
         formState
-    }
+    } as UseCustomFormProps
 }
 
 export default useEditCarForm;

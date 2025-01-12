@@ -83,7 +83,7 @@ const useCarProfile = (carID: string) => {
                 text: `${car.fuelTankSize} ${car.fuelMeasurement}`
             }
         ],
-        onEdit: () => openEditForm(CAR_FORM_STEPS.FuelStep)
+        onEdit: () => openEditForm(CAR_FORM_STEPS.FuelStep, "55%")
     }
 
     return {

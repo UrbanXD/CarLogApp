@@ -1,8 +1,7 @@
 import React from "react";
 import useEditCarForm from "./useEditCar";
 import { CarTableType } from "../../../../Database/connector/powersync/AppSchema";
-import Button from "../../../../Button/components/Button";
-import { ICON_NAMES } from "../../../../Shared/constants/constants";
+import EditForm from "../../../components/EditForm";
 
 interface EditCarFormProps {
     car: CarTableType
@@ -16,30 +15,14 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
     stepIndex,
     forceCloseBottomSheet
 }) => {
-    const {
-        submitHandler,
-        reset,
-        steps
-    } = useEditCarForm(car, forceCloseBottomSheet, carImage);
-
-    const handleSave =
-        async () => await submitHandler();
+    const restProps =
+        useEditCarForm(car, forceCloseBottomSheet, carImage);
 
     return (
-        <>
-            { steps[stepIndex]() }
-            <Button.Row>
-                <Button.Icon
-                    icon={ICON_NAMES.reset}
-                    onPress={ () => reset() }
-                />
-                <Button.Text
-                    text="Mentés"
-                    onPress={ handleSave }
-                    style={{ flex: 0.9 }}
-                />
-            </Button.Row>
-        </>
+        <EditForm
+            stepIndex={ stepIndex }
+            { ...restProps }
+        />
     )
 }
 

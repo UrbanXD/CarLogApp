@@ -1,4 +1,11 @@
 import {InputPickerDataType} from "../components/Input/picker/InputPicker";
+import {UseFormReturn} from "react-hook-form";
+import {ReactNode} from "react";
+
+export interface UseCustomFormProps extends Partial<UseFormReturn<any>>{
+    steps: Array<() => ReactNode>
+    submitHandler: () => Promise<void>
+}
 
 export const ODOMETER_MEASUREMENTS: Array<InputPickerDataType> = [
     { title: "Kilóméter (km)", value: "km" },

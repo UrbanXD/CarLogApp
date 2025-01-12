@@ -33,7 +33,7 @@ const MultiStepFormProgressInfo: React.FC<MultiStepFormProgressInfoProps> = ({
     if (!font) return <></>;
 
     return (
-        <View style={ styles.container }>
+        <>
             {
                 (isFirstCount && isFirstStep || !isFirstStep) &&
                 <ProgressInfo
@@ -46,14 +46,8 @@ const MultiStepFormProgressInfo: React.FC<MultiStepFormProgressInfoProps> = ({
                     stepSubtitle={ stepsTitle[currentStep + 1] !== undefined ? `Következik: ${ stepsTitle[currentStep + 1] }` : undefined }
                 />
             }
-        </View>
+        </>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        paddingHorizontal: SEPARATOR_SIZES.medium
-    }
-})
 
 export default MultiStepFormProgressInfo;

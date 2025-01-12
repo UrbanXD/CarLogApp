@@ -17,7 +17,7 @@ const useMyGarage = () => {
 
     const [carouselData, setCarouselData] = useState<CarouselItemType[]>([]);
 
-    const openNewCarBottomSheet = () =>
+    const openNewCarForm = () =>
         openBottomSheet({
             title: "Új Autó",
             content:
@@ -52,7 +52,7 @@ const useMyGarage = () => {
     return {
         cars: carouselData,
         isLoading,
-        openNewCarBottomSheet,
+        openNewCarForm,
         openCarProfile,
     }
 }
