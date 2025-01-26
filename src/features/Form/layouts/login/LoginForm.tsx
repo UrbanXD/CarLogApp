@@ -26,7 +26,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ forceClose }) => {
 
     const onSubmit = (isSuccess?: boolean) => {
         if(isSuccess){
-            close();
+            forceClose();
             router.replace("/(main)");
             addToast(loginToast.success);
         } else{
