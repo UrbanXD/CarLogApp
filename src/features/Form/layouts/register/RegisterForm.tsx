@@ -74,7 +74,7 @@ const StepOne: React.FC = () => {
     const { control, next } = useMultiStepForm();
 
     return (
-        <>
+        <Input.Group>
             <Input.Text
                 isInBottomSheet
                 control={ control }
@@ -97,7 +97,7 @@ const StepOne: React.FC = () => {
             <Button.Google
                 onPress={ () => 1 }
             />
-        </>
+        </Input.Group>
     )
 }
 
@@ -105,7 +105,7 @@ const StepTwo: React.FC = () => {
     const { control } = useMultiStepForm()
 
     return (
-        <>
+        <Input.Group>
             <Input.Text
                 control={ control }
                 fieldName="lastname"
@@ -122,7 +122,7 @@ const StepTwo: React.FC = () => {
                 placeholder="János"
                 isInBottomSheet
             />
-        </>
+        </Input.Group>
     )
 }
 
@@ -130,7 +130,7 @@ const StepThree: React.FC = () => {
     const { control } = useMultiStepForm()
 
     return (
-        <>
+        <Input.Group>
             <Input.Text
                 control={ control }
                 fieldName="password"
@@ -150,7 +150,7 @@ const StepThree: React.FC = () => {
                 isSecure
                 isInBottomSheet
             />
-        </>
+        </Input.Group>
     )
 }
 

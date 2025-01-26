@@ -44,6 +44,7 @@ const BottomSheet=
                     (props: any) =>
                         <BottomSheetBackdrop { ...props } />
                 }
+                topInset={ top }
                 backgroundStyle={ styles.containerBackground }
                 handleIndicatorStyle={ styles.line }
             >
@@ -69,7 +70,7 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
             flex: 1,
             gap: DEFAULT_SEPARATOR,
             paddingHorizontal: DEFAULT_SEPARATOR,
-            paddingTop: top / 3, //padding vertical nem jo!
+            paddingTop: top / 3, //padding vertical nem jo
             paddingBottom: DEFAULT_SEPARATOR
         },
         containerBackground: {

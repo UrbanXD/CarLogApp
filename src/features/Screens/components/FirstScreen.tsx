@@ -26,39 +26,26 @@ import Divider from "../../Shared/components/Divider";
 const FirstScreen: React.FC = () => {
     const { openBottomSheet, closeBottomSheet  } = useBottomSheet();
 
-    const bottomSheetArgs= {
-        enableHandlePanningGesture: false,
-        enableContentPanningGesture: false,
-        enableDismissOnClose: true,
-        closeButton:
-            <View style={{ alignSelf: "center" }}>
-                <Icon
-                    icon={ ICON_NAMES.close }
-                    size={ FONT_SIZES.medium }
-                    color={ theme.colors.white }
-                    onPress={ closeBottomSheet }
-                />
-            </View>
-    } as Partial<OpenBottomSheetArgs>
-
     const openRegister = () => {
         openBottomSheet({
-            ...bottomSheetArgs,
             title: "Felhasználó létrehozás",
             content:
                 <RegisterForm
                     close={ closeBottomSheet }
-                />
+                />,
+            snapPoints: ["85%"],
+            enableDismissOnClose: false
         });
     }
     const openLogin = () => {
         openBottomSheet({
-            ...bottomSheetArgs,
             title: "Bejelentkezés",
             content:
                 <LoginForm
                     close={ closeBottomSheet }
-                />
+                />,
+            snapPoints: ["85%"],
+            enableDismissOnClose: false
         });
     };
 

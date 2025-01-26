@@ -14,7 +14,6 @@ const GoogleButton: React.FC<GoogleButtonProps> = ({ onPress }) =>
         textColor={ theme.colors.googleRed }
         backgroundColor={ theme.colors.white }
         iconLeft={ require("../../../assets/images/google_logo.png") }
-        inverse
         onPress={ onPress }
     />
 
