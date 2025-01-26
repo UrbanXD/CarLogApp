@@ -5,17 +5,17 @@ import {
     GLOBAL_STYLE,
     ICON_NAMES,
     SEPARATOR_SIZES
-} from "../core/constants/constants";
-import Date from "../core/components/shared/Date";
+} from "../Shared/constants/constants";
+import Date from "../Shared/components/Date";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { theme } from "../core/constants/theme";
+import { theme } from "../Shared/constants/theme";
 import { useForm } from "react-hook-form";
-import { getToday } from "../core/utils/getDate";
-import { useBottomSheet } from "../core/context/BottomSheetProvider";
-import { EditRideFormFieldType, editRideUseFormProps } from "../layouts/forms/editRide/editRideFormSchema";
-import InputText from "../core/components/form/InputText/InputText";
-import ProgressBar from "../core/components/form/ProgressBar";
-import Icon from "../core/components/shared/Icon";
+import { getToday } from "../Shared/utils/getDate";
+import { useBottomSheet } from "../BottomSheet/context/BottomSheetProvider";
+import { EditRideFormFieldType, editRideUseFormProps } from "../Form/layouts/editRide/editRideFormSchema";
+import InputText from "../Form/components/Input/text/InputText";
+import ProgressBar from "../Shared/components/ProgressBar";
+import Icon from "../Shared/components/Icon";
 
 type RideType = {
     carUID: string

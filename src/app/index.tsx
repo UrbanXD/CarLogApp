@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Redirect } from "expo-router";
-import { useDatabase } from "../features/core/utils/database/Database";
+import { useDatabase } from "../features/Database/connector/Database";
 import { Session } from "@supabase/supabase-js";
-import FirstScreen from "../features/layouts/screens/FirstScreen";
+import FirstScreen from "../features/Screens/components/FirstScreen";
 
 const App: React.FC = () => {
     const { supabaseConnector } = useDatabase();

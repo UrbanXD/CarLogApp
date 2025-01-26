@@ -1,7 +1,7 @@
 import React from "react";
-import { store } from "../../features/core/redux/store";
+import { store } from "../../features/Database/redux/store";
 import { Provider } from "react-redux";
-import ServiceLogScreen from "../../features/layouts/screens/ServiceLogScreen";
+import ServiceLogScreen from "../../features/Screens/components/ServiceLogScreen";
 
 const Page: React.FC = () => {
     return (
