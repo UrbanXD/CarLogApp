@@ -46,39 +46,24 @@ export const getRegisterHandleSubmit = ({
 }: GetFormHandleSubmitArgs) =>
     handleSubmit(async ({ email, password, firstname, lastname }: RegisterFormFieldType) => {
         try {
-            const response = await database.supabaseConnector?.client.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        firstname,
-                        lastname
-                    }
-                }
-            });
-
-            if (response?.error){
-                switch (response?.error?.message) {
-                    case "User already registered":
-                        Alert.alert("Az adott email címmel már létezik regisztrált fiók!")
-                        break;
-                    default:
-                        Alert.alert("Valamilyen hiba lépett fel próbálja újra!")
-                        console.log(response?.error?.message)
-                        break;
-                }
-
-                if(onSubmit) {
-                    onSubmit(false);
-                }
-
-                return;
-            }
+            await database.supabaseConnector.register(email, password, firstname, lastname);
 
             if(onSubmit) {
                 onSubmit(true);
             }
         } catch (error: any) {
-            Alert.alert(error.message);
+            switch (error?.message) {
+                case "User already registered":
+                    Alert.alert("Az adott email címmel már létezik regisztrált fiók!")
+                    break;
+                default:
+                    Alert.alert("Valamilyen hiba lépett fel próbálja újra!")
+                    console.log(error?.message)
+                    break;
+            }
+
+            if(onSubmit) {
+                onSubmit(false);
+            }
         }
     })

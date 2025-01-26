@@ -37,13 +37,30 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
         this.storage = new SupabaseStorageAdapter({ client: this.client });
     }
 
-    async login(username: string, password: string) {
+    async login(email: string, password: string) {
         const { error } = await this.client.auth.signInWithPassword({
-            email: username,
-            password: password,
+            email,
+            password
         });
 
         if (error) {
+            throw error;
+        }
+    }
+
+    async register(email: string, password: string, firstname: string, lastname: string) {
+        const { error } = await this.client.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    firstname,
+                    lastname
+                }
+            }
+        })
+
+        if(error) {
             throw error;
         }
     }
