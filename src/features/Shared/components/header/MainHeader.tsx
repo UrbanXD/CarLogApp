@@ -85,7 +85,7 @@ const MainHeader: React.FC = () => {
                     <Avatar.Text
                         label={ "Ka" }
                         avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
-                        onPress={ logout }
+                        onPress={ () => supabaseConnector.logout(addToast) }
                     />
                 }
             </View>

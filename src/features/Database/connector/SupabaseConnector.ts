@@ -1,14 +1,12 @@
-import {
-    AbstractPowerSyncDatabase,
-    CrudEntry,
-    PowerSyncBackendConnector,
-    UpdateType,
-} from '@powersync/react-native';
+import { AbstractPowerSyncDatabase, CrudEntry, PowerSyncBackendConnector, UpdateType } from '@powersync/react-native';
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import 'react-native-url-polyfill/auto';
 import { BaseConfig } from "./BaseConfig";
 import { SupabaseStorageAdapter } from './storage/SupabaseStorageAdapter';
 import { KVStorage } from './storage/KVStorage';
+import {router} from "expo-router";
+import {AlertToastProps} from "../../Alert/components/AlertToast";
+import logoutToast from "../../Alert/layouts/toast/logoutToast";
 
 /// Postgres Response codes that we cannot recover from by retrying.
 const FATAL_RESPONSE_CODES = [
@@ -24,15 +22,18 @@ const FATAL_RESPONSE_CODES = [
 
 export class SupabaseConnector implements PowerSyncBackendConnector {
     client: SupabaseClient;
+    powersync: AbstractPowerSyncDatabase;
     storage: SupabaseStorageAdapter;
 
-    constructor(kvStorage: KVStorage) {
+    constructor(kvStorage: KVStorage, powersync: AbstractPowerSyncDatabase) {
         this.client = createClient(BaseConfig.SUPABASE_URL, BaseConfig.SUPABASE_ANON_KEY, {
             auth: {
                 persistSession: true,
                 storage: kvStorage,
             },
         });
+
+        this.powersync = powersync;
 
         this.storage = new SupabaseStorageAdapter({ client: this.client });
     }
@@ -62,6 +63,19 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
 
         if(error) {
             throw error;
+        }
+    }
+
+    async logout(addToast: (args: AlertToastProps) => void) {
+        try {
+            await this.client.auth.signOut();
+            await this.powersync.disconnectAndClear();
+
+            router.replace("/");
+
+            addToast(logoutToast.success);
+        } catch (error: any) {
+            addToast(logoutToast.error);
         }
     }
 
@@ -115,7 +129,7 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
                         break;
                 }
 
-                if (result.error) {
+                if (result && result.error) {
                     throw new Error(`Could not ${op.op} data to Supabase error: ${JSON.stringify(result)}`);
                 }
             }
