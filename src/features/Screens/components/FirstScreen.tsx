@@ -1,48 +1,36 @@
 import React from "react";
-import {
-    ImageBackground,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    View
-} from "react-native";
-import {
-    DEFAULT_SEPARATOR,
-    FONT_SIZES,
-    GLOBAL_STYLE,
-    ICON_NAMES,
-    SEPARATOR_SIZES
-} from "../../Shared/constants/constants";
+import { ImageBackground, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../Shared/constants/constants";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { theme } from "../../Shared/constants/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../../Button/components/Button";
-import {OpenBottomSheetArgs, useBottomSheet} from "../../BottomSheet/context/BottomSheetProvider";
+import { useBottomSheet } from "../../BottomSheet/context/BottomSheetProvider";
 import RegisterForm from "../../Form/layouts/register/RegisterForm";
 import LoginForm from "../../Form/layouts/login/LoginForm";
-import Icon from "../../Shared/components/Icon";
 import Divider from "../../Shared/components/Divider";
 
 const FirstScreen: React.FC = () => {
-    const { openBottomSheet, closeBottomSheet  } = useBottomSheet();
+    const { openBottomSheet, forceCloseBottomSheet  } = useBottomSheet();
 
     const openRegister = () => {
         openBottomSheet({
             title: "Felhasználó létrehozás",
             content:
                 <RegisterForm
-                    close={ closeBottomSheet }
+                    forceClose={ forceCloseBottomSheet }
                 />,
             snapPoints: ["85%"],
             enableDismissOnClose: false
         });
     }
+
     const openLogin = () => {
         openBottomSheet({
             title: "Bejelentkezés",
             content:
                 <LoginForm
-                    close={ closeBottomSheet }
+                    forceClose={ forceCloseBottomSheet }
                 />,
             snapPoints: ["85%"],
             enableDismissOnClose: false

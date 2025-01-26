@@ -9,17 +9,15 @@ import TextDivider from "../../../Shared/components/TextDivider";
 import { theme } from "../../../Shared/constants/theme";
 import Form from "../../components/Form";
 import Input from "../../components/Input/Input";
-import {useAlert} from "../../../Alert/context/AlertProvider";
-import {router} from "expo-router";
+import { useAlert } from "../../../Alert/context/AlertProvider";
+import { router } from "expo-router";
 import loginToast from "../../../Alert/layouts/toast/loginToast";
 
 interface LoginFormProps {
-    close: () => void
+    forceClose: () => void
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({
-    close
-}) => {
+const LoginForm: React.FC<LoginFormProps> = ({ forceClose }) => {
     const database = useDatabase();
     const { addToast } = useAlert();
 

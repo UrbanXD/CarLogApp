@@ -20,12 +20,10 @@ import {useAlert} from "../../../Alert/context/AlertProvider";
 import registerToast from "../../../Alert/layouts/toast/registerToast";
 
 interface RegisterFormProps {
-    close: () => void
+    forceClose: () => void
 }
 
-const RegisterForm: React.FC<RegisterFormProps> = ({
-    close
-}) => {
+const RegisterForm: React.FC<RegisterFormProps> = ({ forceClose }) => {
     const database = useDatabase();
     const { addToast } = useAlert();
 
@@ -34,7 +32,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
     const onSubmit = (isSuccess?: boolean) => {
         if(isSuccess){
-            close();
+            forceClose();
             router.replace("/(main)");
             addToast(registerToast.success);
         } else{
