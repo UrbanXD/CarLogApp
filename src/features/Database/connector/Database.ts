@@ -26,7 +26,7 @@ export class Database {
         })
         this.db = wrapPowerSyncWithKysely(this.powersync);
         this.kvStorage = new KVStorage()
-        this.supabaseConnector = new SupabaseConnector(this.kvStorage);
+        this.supabaseConnector = new SupabaseConnector(this.kvStorage, this.powersync);
         this.storage = this.supabaseConnector.storage;
 
         if(BaseConfig.SUPABASE_BUCKET){
