@@ -44,21 +44,21 @@ export const MultiStepForm: React.FC<MultiStepFormProps> = ({
                 isFirstCount={ isFirstCount }
                 stepsTitle={ stepsTitle }
             />
-                <FlatList
-                    data={ [] }
-                    renderItem={ () => <></> }
-                    ListEmptyComponent={
-                        <MultiStepFormContent />
-                    }
-                    showsVerticalScrollIndicator={ false }
-                />
+            <FlatList
+                data={ [] }
+                renderItem={ () => <></> }
+                ListEmptyComponent={
+                    <MultiStepFormContent />
+                }
+                showsVerticalScrollIndicator={ false }
+            />
             <MultiStepFormButtons isFirstCount={ isFirstCount } />
         </View>
     </MultiStepFormProvider>
 
 const styles = StyleSheet.create({
     container: {
-        flexShrink: 1,
+        flex: 1,
         gap: SEPARATOR_SIZES.normal,
     }
 })
