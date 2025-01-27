@@ -1,23 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Redirect } from "expo-router";
-import { useDatabase } from "../features/Database/connector/Database";
-import { Session } from "@supabase/supabase-js";
 import FirstScreen from "../features/Screens/components/FirstScreen";
+import { useAuth } from "../features/Auth/context/AuthProvider";
 
 const App: React.FC = () => {
-    const { supabaseConnector } = useDatabase();
-    const [session, setSession] = useState<Session | null>(null)
-
-    useEffect(() => {
-        supabaseConnector.client.auth.getSession().then(({ data: { session } }) => {
-            setSession(session)
-            console.log(session)
-        })
-
-        supabaseConnector.client.auth.onAuthStateChange((_event, session) => {
-            setSession(session)
-        })
-    }, []);
+    const { session } = useAuth();
 
     return (
         !(session && session.user)
