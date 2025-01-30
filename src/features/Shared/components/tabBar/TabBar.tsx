@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, StyleSheet, View, ViewStyle } from "react-native";
+import { Dimensions, SafeAreaView, StyleSheet, View, ViewStyle } from "react-native";
 import TabBarIcon from "./TabBarIcon";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { theme } from "../../constants/theme";
@@ -10,7 +10,6 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 interface TabBarProps{
     tabBarStyle?: ViewStyle,
     tabBarActiveTintColor?: string,
-    tabBarInactiveTintColor?: string,
 }
 
 const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
@@ -19,7 +18,6 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
     navigation,
     tabBarStyle = {},
     tabBarActiveTintColor = ICON_COLORS.active,
-    tabBarInactiveTintColor = ICON_COLORS.inactive
 }) => {
     const TAB_BAR_WIDTH =  Dimensions.get("screen").width
     const TAB_WIDTH = TAB_BAR_WIDTH / state.routes.length;
@@ -31,16 +29,14 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
     });
 
     return (
-        <View style={ [styles.container, tabBarStyle] }>
+        <SafeAreaView style={ [styles.container, tabBarStyle] }>
             <Animated.View style={ [styles.slidingElementContainer, { width: TAB_WIDTH }, slideAnimationStyle] }>
                 <View style={ styles.slidingElement } />
             </Animated.View>
             {
-                state.routes.map((route, index) => {
+                state.routes.map((route: any, index: number) => {
                     const { options } = descriptors[route.key];
                     const isFocused = state.index === index;
-
-                    const color = isFocused ? tabBarActiveTintColor : tabBarInactiveTintColor
 
                     const icons =
                         JSON.parse(
@@ -57,7 +53,7 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
 
                     const onPress = () => {
                         const event = navigation.emit({
-                            type: 'tabPress',
+                            type: "tabPress",
                             target: route.key,
                             canPreventDefault: true,
                         });
@@ -69,7 +65,7 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
 
                     const onLongPress = () => {
                         navigation.emit({
-                            type: 'tabLongPress',
+                            type: "tabLongPress",
                             target: route.key,
                         });
                     };
@@ -88,7 +84,7 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
                     );
                 })
             }
-        </View>
+        </SafeAreaView>
     )
 }
 
