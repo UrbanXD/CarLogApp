@@ -1,14 +1,4 @@
-import React, {
-    Context,
-    createContext,
-    ReactElement,
-    ReactNode,
-    useCallback,
-    useContext, useEffect,
-    useMemo,
-    useRef,
-    useState
-} from "react";
+import React, { Context, createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
 import { useAlert } from "../../Alert/context/AlertProvider";
@@ -20,7 +10,6 @@ import { KeyboardController } from "react-native-keyboard-controller";
 export interface OpenBottomSheetArgs extends Partial<BottomSheetModalProps> {
     title?: string,
     content: ReactNode,
-    buttons?: ReactNode
     closeButton?: ReactNode
 }
 
@@ -43,7 +32,6 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
 
     const [bottomSheetTitle, setBottomSheetTitle] = useState<string | undefined>();
     const [bottomSheetContent, setBottomSheetContent] = useState<ReactNode>();
-    const [bottomSheetButtons, setBottomSheetButtons] = useState<ReactNode>();
     const [bottomSheetCloseButton, setBottomSheetCloseButton] = useState<ReactNode>();
     const [bottomSheetProps, setBottomSheetProps] = useState<Partial<BottomSheetModalProps> | null>(null);
     const bottomSheetPropsRef = useRef(bottomSheetProps);
@@ -58,14 +46,12 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
             const {
                 title,
                 content,
-                buttons,
                 closeButton,
                 ...restProps
             } = args;
 
             setBottomSheetTitle(title);
             setBottomSheetContent(content);
-            setBottomSheetButtons(buttons);
             setBottomSheetCloseButton(closeButton);
             setBottomSheetProps({
                 snapPoints: ["100%"],
@@ -140,7 +126,6 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ childr
                 { ...bottomSheetProps }
                 title={ bottomSheetTitle }
                 content={ bottomSheetContent }
-                buttons={ bottomSheetButtons }
                 closeButton={ bottomSheetCloseButton }
                 reopen={ reopenBottomSheet }
                 forceClose={ forceCloseBottomSheet }
