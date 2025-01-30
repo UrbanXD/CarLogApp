@@ -66,8 +66,8 @@ const RootLayout: React.FC = () => {
     return (
         <DatabaseProvider>
             <Compactor components={[
-                { Component: AuthProvider },
                 { Component: AlertProvider },
+                { Component: AuthProvider },
                 { Component: Provider, props: { store } },
                 { Component: GestureHandlerRootView, props: { style: { flex: 1 } } },
                 { Component: BottomSheetModalProvider },

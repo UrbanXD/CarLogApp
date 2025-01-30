@@ -2,14 +2,7 @@ import { StyleSheet } from "react-native";
 import { theme } from "./theme";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { ControllerFieldState, ControllerRenderProps, UseFormHandleSubmit, UseFormStateReturn } from "react-hook-form";
-import { Database } from "../../Database/connector/Database";
 import { InputPickerDataType } from "../../Form/components/Input/picker/InputPicker";
-
-export interface GetFormHandleSubmitArgs {
-    handleSubmit: UseFormHandleSubmit<any>
-    database: Database
-    onSubmit?: (isSuccess: boolean) => void
-}
 
 export interface ControllerRenderArgs {
     field: ControllerRenderProps<any, string>
@@ -23,7 +16,8 @@ export const SIMPLE_TABBAR_HEIGHT = hp(7.5);
 export const ICON_FONT_SIZE_SCALE = 1.5;
 
 export const LOCAL_STORAGE_KEYS = {
-    selectedCarIndex: "selectedCarIndex"
+    selectedCarIndex: "selectedCarIndex",
+    notConfirmedUser: "notConfirmedUser",
 }
 
 export const ICON_NAMES = {
@@ -102,7 +96,8 @@ export const GLOBAL_STYLE = StyleSheet.create({
     pageContainer: {
         flex: 1,
         paddingVertical: DEFAULT_SEPARATOR,
-        paddingBottom: SIMPLE_TABBAR_HEIGHT * 1.25
+        paddingBottom: SIMPLE_TABBAR_HEIGHT * 1.25,
+        backgroundColor: theme.colors.black2
     },
     scrollViewContentContainer: {
         flexGrow: 1,
