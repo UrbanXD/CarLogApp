@@ -1,6 +1,6 @@
 import React from "react";
 import { Redirect } from "expo-router";
-import FirstScreen from "../features/Screens/components/FirstScreen";
+import AuthScreen from "../features/Screens/components/AuthScreen";
 import { useAuth } from "../features/Auth/context/AuthProvider";
 
 const App: React.FC = () => {
@@ -8,7 +8,7 @@ const App: React.FC = () => {
 
     return (
         !(session && session.user)
-            ?   <FirstScreen />
+            ?   <AuthScreen />
             :   <Redirect href="/(main)" />
     )
 }

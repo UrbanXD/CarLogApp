@@ -103,6 +103,8 @@ const InputOTP: React.FC<InputOTPProps> = ({
         );
     }, []);
 
+    const styles= useStyles(numberOfDigits);
+
     const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
     const colorOfFocusedDigit = useSharedValue(0);
@@ -116,7 +118,6 @@ const InputOTP: React.FC<InputOTPProps> = ({
                 )
         };
     });
-    const styles = useStyles(numberOfDigits);
 
     return (
         <View style={ styles.container }>

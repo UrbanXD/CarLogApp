@@ -12,8 +12,10 @@ import { useAuth } from "../../Auth/context/AuthProvider";
 import { router } from "expo-router";
 import registerToast from "../../Alert/layouts/toast/signUpToast";
 import SignInForm from "../../Form/layouts/auth/signIn/SignInForm";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const FirstScreen: React.FC = () => {
+const AuthScreen: React.FC = () => {
+    const { top } = useSafeAreaInsets();
     const { openBottomSheet, forceCloseBottomSheet  } = useBottomSheet();
     const { session, user } = useAuth();
 
@@ -56,12 +58,13 @@ const FirstScreen: React.FC = () => {
         }
     }
 
+    const styles = useStyles(top);
+
     return (
         <SafeAreaView style={ styles.pageContainer }>
             <ImageBackground
                 source={ require("../../../assets/images/home2.jpg") }
                 style={ styles.imageContainer }
-                imageStyle={ styles.imageContainer }
             >
                 <LinearGradient
                     locations={ [ 0, 0.35, 0.85 ] }
@@ -90,13 +93,6 @@ const FirstScreen: React.FC = () => {
                         text="Regisztráció"
                         onPress={ openRegister }
                     />
-                    {
-                        !session && user &&
-                        <Button.Text
-                            text="Verifikacio"
-                            onPress={ openVerification }
-                        />
-                    }
                     <Text style={ styles.underButtonText }>
                         Már rendelkezel felhasználóval ?
                         <Text
@@ -108,84 +104,115 @@ const FirstScreen: React.FC = () => {
                     </Text>
                 </View>
             </View>
+            {
+                !session && user &&
+                <View style={ styles.verificationContainer }>
+                    <Button.Icon
+                        icon={ "email-seal-outline" }
+                        onPress={ openVerification }
+                        style={ styles.verificationIcon }
+                    />
+                    <Text
+                        onPress={ openVerification }
+                        style={ styles.verificationText }
+                    >
+                        Hitelesítés{"\n"}folytatása
+                    </Text>
+                </View>
+            }
         </SafeAreaView>
     )
 }
 
-const styles = StyleSheet.create({
-    pageContainer: {
-        ...GLOBAL_STYLE.pageContainer,
-        paddingBottom: 0,
-        paddingVertical: 0,
-    },
-    imageContainer: {
-        flex: 0.85
-    },
-    imageGradientOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        top: 20
-    },
-    image: {
-        resizeMode: "stretch",
-    },
-    contentContainer: {
-        flex: 1,
-        flexDirection: "column",
-        justifyContent: "space-between",
-        backgroundColor: theme.colors.black,
-        paddingHorizontal: DEFAULT_SEPARATOR,
-        paddingBottom: GLOBAL_STYLE.pageContainer.paddingVertical,
-    },
-    titleContainer: {
-        top: -SEPARATOR_SIZES.lightLarge,
-        gap: SEPARATOR_SIZES.mediumSmall,
-    },
-    title: {
-        zIndex: 1,
-        top: hp(FONT_SIZES.extraLarge / -12),
-        alignSelf: "center",
-        color: theme.colors.white,
-        fontSize: FONT_SIZES.extraLarge,
-        letterSpacing: FONT_SIZES.extraLarge * 0.01,
-        fontFamily: "Gilroy-Heavy",
-        textTransform: "uppercase",
-    },
-    titleEffect: {
-        zIndex: 0,
-        position: "absolute", top: -hp(2.5),
-        color: theme.colors.black,
-        textShadowOffset: { height: 0, width: 0 },
-        textShadowColor: theme.colors.white,
-        textShadowRadius: 1,
-        textAlign: "center",
-    },
-    subtitle: {
-        alignSelf: "center",
-        color: theme.colors.gray2,
-        fontSize: FONT_SIZES.normal,
-        fontFamily: "Gilroy-Medium",
-        textTransform: "uppercase",
-        letterSpacing: FONT_SIZES.normal * 0.075
-    },
-    actionContainer: {
-        flexDirection: "column",
-        gap: SEPARATOR_SIZES.normal
-    },
-    underButtonText:{
-        color: theme.colors.white,
-        alignSelf: "center",
-        fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.small,
-        letterSpacing: FONT_SIZES.small * 0.1,
-        lineHeight: FONT_SIZES.small * 1.5,
-        textAlign: "center",
-    },
-    linkText: {
-        color: theme.colors.fuelYellow,
-        textDecorationLine: "underline",
-        fontSize: FONT_SIZES.small * 1.05,
-        letterSpacing: FONT_SIZES.small * 1.05 * 0.05,
-    }
-})
+const useStyles = (top: number) =>
+    StyleSheet.create({
+        pageContainer: {
+            ...GLOBAL_STYLE.pageContainer,
+            paddingBottom: 0,
+            paddingVertical: 0,
+        },
+        imageContainer: {
+            flex: 0.85,
 
-export default FirstScreen;
+        },
+        imageGradientOverlay: {
+            ...StyleSheet.absoluteFillObject,
+            top: 20
+        },
+        contentContainer: {
+            flex: 1,
+            flexDirection: "column",
+            justifyContent: "space-between",
+            backgroundColor: theme.colors.black,
+            paddingHorizontal: DEFAULT_SEPARATOR,
+            paddingBottom: GLOBAL_STYLE.pageContainer.paddingVertical,
+        },
+        titleContainer: {
+            top: -SEPARATOR_SIZES.lightLarge,
+            gap: SEPARATOR_SIZES.mediumSmall,
+        },
+        title: {
+            zIndex: 1,
+            top: hp(FONT_SIZES.extraLarge / -12),
+            alignSelf: "center",
+            color: theme.colors.white,
+            fontSize: FONT_SIZES.extraLarge,
+            letterSpacing: FONT_SIZES.extraLarge * 0.01,
+            fontFamily: "Gilroy-Heavy",
+            textTransform: "uppercase",
+        },
+        titleEffect: {
+            zIndex: 0,
+            position: "absolute", top: -hp(2.5),
+            color: theme.colors.black,
+            textShadowOffset: { height: 0, width: 0 },
+            textShadowColor: theme.colors.white,
+            textShadowRadius: 1,
+            textAlign: "center",
+        },
+        subtitle: {
+            alignSelf: "center",
+            color: theme.colors.gray2,
+            fontSize: FONT_SIZES.normal,
+            fontFamily: "Gilroy-Medium",
+            textTransform: "uppercase",
+            letterSpacing: FONT_SIZES.normal * 0.075
+        },
+        actionContainer: {
+            flexDirection: "column",
+            gap: SEPARATOR_SIZES.normal
+        },
+        underButtonText:{
+            color: theme.colors.white,
+            alignSelf: "center",
+            fontFamily: "Gilroy-Medium",
+            fontSize: FONT_SIZES.small,
+            letterSpacing: FONT_SIZES.small * 0.1,
+            lineHeight: FONT_SIZES.small * 1.5,
+            textAlign: "center",
+        },
+        linkText: {
+            color: theme.colors.fuelYellow,
+            textDecorationLine: "underline",
+            fontSize: FONT_SIZES.small * 1.05,
+            letterSpacing: FONT_SIZES.small * 1.05 * 0.05,
+        },
+        verificationContainer: {
+            position: "absolute",
+            top: top * 1.5,
+            right: GLOBAL_STYLE.contentContainer.paddingHorizontal,
+        },
+        verificationIcon: {
+            borderColor: theme.colors.gray4,
+            borderWidth: 0.75
+        },
+        verificationText: {
+            fontFamily: "Gilroy-Medium",
+            fontSize: FONT_SIZES.tiny * 0.925,
+            color: theme.colors.white,
+            textShadowColor: theme.colors.black,
+            textShadowRadius: 15,
+        }
+    })
+
+export default AuthScreen;
