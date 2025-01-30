@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { ImageBackground, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../Shared/constants/constants";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -6,19 +6,23 @@ import { theme } from "../../Shared/constants/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../../Button/components/Button";
 import { useBottomSheet } from "../../BottomSheet/context/BottomSheetProvider";
-import RegisterForm from "../../Form/layouts/register/RegisterForm";
-import LoginForm from "../../Form/layouts/login/LoginForm";
 import Divider from "../../Shared/components/Divider";
+import SignUpForm from "../../Form/layouts/auth/signUp/SignUpForm";
+import { useAuth } from "../../Auth/context/AuthProvider";
+import { router } from "expo-router";
+import registerToast from "../../Alert/layouts/toast/signUpToast";
+import SignInForm from "../../Form/layouts/auth/signIn/SignInForm";
 
 const FirstScreen: React.FC = () => {
     const { openBottomSheet, forceCloseBottomSheet  } = useBottomSheet();
+    const { session, user } = useAuth();
 
     const openRegister = () => {
         openBottomSheet({
             title: "Felhasználó létrehozás",
             content:
-                <RegisterForm
-                    forceClose={ forceCloseBottomSheet }
+                <SignUpForm
+                    forceCloseBottomSheet={ forceCloseBottomSheet }
                 />,
             snapPoints: ["85%"],
             enableDismissOnClose: false
@@ -29,13 +33,28 @@ const FirstScreen: React.FC = () => {
         openBottomSheet({
             title: "Bejelentkezés",
             content:
-                <LoginForm
-                    forceClose={ forceCloseBottomSheet }
+                <SignInForm
+                    forceCloseBottomSheet={ forceCloseBottomSheet }
                 />,
             snapPoints: ["85%"],
             enableDismissOnClose: false
         });
     };
+
+    const openVerification = async () => {
+        if(user && user.email) {
+            router.push({
+                pathname: "/verify",
+                params: {
+                    type: "signup",
+                    title: "Email cím hitelesítés",
+                    email: user.email,
+                    toastMessages: JSON.stringify(registerToast),
+                    replaceHREF: "/(main)"
+                }
+            });
+        }
+    }
 
     return (
         <SafeAreaView style={ styles.pageContainer }>
@@ -71,6 +90,13 @@ const FirstScreen: React.FC = () => {
                         text="Regisztráció"
                         onPress={ openRegister }
                     />
+                    {
+                        !session && user &&
+                        <Button.Text
+                            text="Verifikacio"
+                            onPress={ openVerification }
+                        />
+                    }
                     <Text style={ styles.underButtonText }>
                         Már rendelkezel felhasználóval ?
                         <Text
