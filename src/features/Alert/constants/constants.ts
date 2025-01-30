@@ -1,4 +1,8 @@
-import {theme} from "../../Shared/constants/theme";
+import { theme } from "../../Shared/constants/theme";
+import { ErrorCode } from "@supabase/auth-js/src/lib/error-codes";
+import { AlertToastProps } from "../components/AlertToast";
+
+export type ToastMessages = Record<"success" | "error" | "otp_error" | ErrorCode | string, AlertToastProps>
 
 export type AlertType =
     "success" |
