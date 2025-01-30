@@ -26,11 +26,24 @@ const Layout:React.FC = () => {
     }, []);
 
     return (
-            <Stack screenOptions={{ header: () => <></>}} >
+            <Stack
+                screenOptions={{
+                    header: () => <></>
+                }}
+            >
                 <Stack.Screen
                     name="index"
                     options={{
                         header: () => <StatusBar translucent={ true } />
+                    }}
+                />
+                <Stack.Screen
+                    name="backToRootIndex"
+                />
+                <Stack.Screen
+                    name="verify"
+                    options={{
+                        header: () => <SecondaryHeader />
                     }}
                 />
                 <Stack.Screen
@@ -56,7 +69,7 @@ const RootLayout: React.FC = () => {
                 { Component: AuthProvider },
                 { Component: AlertProvider },
                 { Component: Provider, props: { store } },
-                { Component: GestureHandlerRootView, props: { style: {flex: 1} } },
+                { Component: GestureHandlerRootView, props: { style: { flex: 1 } } },
                 { Component: BottomSheetModalProvider },
                 { Component: BottomSheetProvider },
                 { Component: SafeAreaProvider },
