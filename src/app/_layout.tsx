@@ -17,6 +17,8 @@ import Compactor from "../components/Compactor";
 import { AlertProvider } from "../features/Alert/context/AlertProvider";
 import SecondaryHeader from "../features/Navigation/components/Header/SecondaryHeader";
 import { AuthProvider } from "../features/Auth/context/AuthProvider";
+import { ThemeProvider } from "@react-navigation/native";
+import { theme } from "../constants/theme";
 
 const Layout:React.FC = () => {
     const database = useDatabase();
@@ -26,39 +28,41 @@ const Layout:React.FC = () => {
     }, []);
 
     return (
-            <Stack
-                screenOptions={{
-                    header: () => <></>
+        <Stack
+            screenOptions={{
+                header: () => <></>,
+                animation: "slide_from_right",
+                statusBarAnimation: "slide"
+            }}
+        >
+            <Stack.Screen
+                name="index"
+                options={{
+                    header: () => <StatusBar translucent={ true } />,
                 }}
-            >
-                <Stack.Screen
-                    name="index"
-                    options={{
-                        header: () => <StatusBar translucent={ true } />
-                    }}
-                />
-                <Stack.Screen
-                    name="backToRootIndex"
-                />
-                <Stack.Screen
-                    name="verify"
-                    options={{
-                        header: () => <SecondaryHeader />
-                    }}
-                />
-                <Stack.Screen
-                    name="(main)"
-                    options={{
-                        header: () => <MainHeader />
-                    }}
-                />
-                <Stack.Screen
-                    name="(edit)/car"
-                    options={{
-                        header: () => <SecondaryHeader title="Autó Adatlap" />,
-                    }}
-                />
-            </Stack>
+            />
+            <Stack.Screen
+                name="backToRootIndex"
+            />
+            <Stack.Screen
+                name="verify"
+                options={{
+                    header: () => <SecondaryHeader />,
+                }}
+            />
+            <Stack.Screen
+                name="(main)"
+                options={{
+                    header: () => <MainHeader />
+                }}
+            />
+            <Stack.Screen
+                name="(edit)/car"
+                options={{
+                    header: () => <SecondaryHeader title="Autó Adatlap" />,
+                }}
+            />
+        </Stack>
     );
 }
 
@@ -66,6 +70,7 @@ const RootLayout: React.FC = () => {
     return (
         <DatabaseProvider>
             <Compactor components={[
+                { Component: ThemeProvider, props: { value: theme } },
                 { Component: AlertProvider },
                 { Component: AuthProvider },
                 { Component: Provider, props: { store } },

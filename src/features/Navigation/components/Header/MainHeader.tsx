@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { StatusBar, View, StyleSheet } from "react-native";
-import {DEFAULT_SEPARATOR, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../../constants/constants";
+import { StatusBar, View } from "react-native";
+import { GLOBAL_STYLE, SIMPLE_HEADER_HEIGHT } from "../../../../constants/constants";
 import Picker from "../../../Form/components/Input/picker/Picker";
-import { theme } from "../../../../constants/theme";
 import { useSelector } from "react-redux";
 import { RootState, store } from "../../../Database/redux/store";
 import { createSelector } from "@reduxjs/toolkit";
@@ -46,7 +45,7 @@ const MainHeader: React.FC = () => {
         <View style={ styles.wrapper }>
             <StatusBar
                 barStyle="light-content"
-                backgroundColor={ theme.colors.black2 }
+                backgroundColor={ GLOBAL_STYLE.pageContainer.backgroundColor }
             />
             <View style={ styles.barContainer }>
                 <View style={{ flex: 1 }}>

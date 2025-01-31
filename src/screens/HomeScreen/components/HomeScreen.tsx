@@ -43,7 +43,6 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
     pageContainer: {
         ...GLOBAL_STYLE.pageContainer,
-        backgroundColor: theme.colors.black2,
         marginBottom: 0,
         paddingHorizontal: 0
     }

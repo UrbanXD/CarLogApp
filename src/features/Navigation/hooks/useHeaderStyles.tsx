@@ -1,6 +1,6 @@
-import {StyleSheet} from "react-native";
-import {DEFAULT_SEPARATOR, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT} from "../../../constants/constants";
-import {theme} from "../../../constants/theme";
+import { StyleSheet } from "react-native";
+import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/constants";
+import { theme } from "../../../constants/theme";
 
 const useHeaderStyles = (top: number) =>
     StyleSheet.create({
@@ -13,7 +13,7 @@ const useHeaderStyles = (top: number) =>
             alignItems: "center",
             gap: SEPARATOR_SIZES.lightSmall,
             height: SIMPLE_HEADER_HEIGHT,
-            backgroundColor: theme.colors.black2,
+            backgroundColor: GLOBAL_STYLE.pageContainer.backgroundColor,
             paddingTop: SEPARATOR_SIZES.lightSmall * 0.5,
             paddingHorizontal: DEFAULT_SEPARATOR,
             overflow: "hidden"
