@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {StepProps} from "../../../constants/types/types";
-import {CARS, DATA_TRANSFORM_TO_PICKER_DATA} from "../../../../Shared/constants/constants";
+import {CARS, DATA_TRANSFORM_TO_PICKER_DATA} from "../../../../../constants/constants";
 import {InputPickerDataType} from "../../../components/Input/picker/InputPicker";
 import {useWatch} from "react-hook-form";
 import Input from "../../../components/Input/Input";

@@ -6,9 +6,9 @@ import {
     TextInput as TextInputRN,
 } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { ICON_COLORS, ICON_NAMES } from "../../../../Shared/constants/constants";
-import { theme } from "../../../../Shared/constants/theme";
-import Icon from "../../../../Shared/components/Icon";
+import { ICON_COLORS, ICON_NAMES } from "../../../../../constants/constants";
+import { theme } from "../../../../../constants/theme";
+import Icon from "../../../../../components/Icon";
 import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
 
 interface TextInputProps {

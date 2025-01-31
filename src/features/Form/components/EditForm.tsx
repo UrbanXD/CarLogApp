@@ -1,8 +1,8 @@
 import React from "react";
 import { UseCustomFormProps } from "../constants/constants";
-import { ICON_NAMES, SEPARATOR_SIZES } from "../../Shared/constants/constants";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/constants";
 import { FlatList } from "react-native-gesture-handler";
-import Button from "../../Button/components/Button";
+import Button from "../../../components/Button/Button";
 import { View } from "react-native";
 
 interface EditFormProps extends UseCustomFormProps {

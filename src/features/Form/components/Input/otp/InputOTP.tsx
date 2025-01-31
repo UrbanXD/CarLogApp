@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Keyboard, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { theme } from "../../../../Shared/constants/theme";
-import { FONT_SIZES, SEPARATOR_SIZES } from "../../../../Shared/constants/constants";
+import { theme } from "../../../../../constants/theme";
+import { FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants/constants";
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
-import Button from "../../../../Button/components/Button";
+import Button from "../../../../../components/Button/Button";
 import { useDatabase } from "../../../../Database/connector/Database";
 import { AuthApiError, EmailOtpType } from "@supabase/supabase-js";
 import { router } from "expo-router";

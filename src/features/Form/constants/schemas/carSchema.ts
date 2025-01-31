@@ -1,4 +1,4 @@
-import {ImageType} from "../../../Shared/utils/pickImage";
+import {ImageType} from "../../utils/pickImage";
 import {z} from "zod";
 import {zNumber, zPickerRequired} from "../types/zodTypes";
 import car from "../../../../app/(edit)/car";

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../Shared/constants/constants";
+import { GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/constants";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import TextInput from "../text/TextInput";
-import { theme } from "../../../../Shared/constants/theme";
-import Icon from "../../../../Shared/components/Icon";
+import { theme } from "../../../../../constants/theme";
+import Icon from "../../../../../components/Icon";
 import {useAlert} from "../../../../Alert/context/AlertProvider";
 import pickerDisabledToast from "../../../../Alert/layouts/toast/pickerDisabledToast";
 

@@ -1,10 +1,10 @@
 import React from "react";
 import Input from "../../../components/Input/Input";
-import {GLOBAL_STYLE, ICON_NAMES} from "../../../../Shared/constants/constants";
+import {GLOBAL_STYLE, ICON_NAMES} from "../../../../../constants/constants";
 import {Text} from "react-native";
-import Button from "../../../../Button/components/Button";
-import TextDivider from "../../../../Shared/components/TextDivider";
-import {theme} from "../../../../Shared/constants/theme";
+import Button from "../../../../../components/Button/Button";
+import TextDivider from "../../../../../components/TextDivider";
+import {theme} from "../../../../../constants/theme";
 import Form from "../../../components/Form";
 import useSignInForm from "./useSignInForm";
 

@@ -5,11 +5,11 @@ import {
     FONT_SIZES,
     SEPARATOR_SIZES,
     SIMPLE_HEADER_HEIGHT
-} from "../../Shared/constants/constants";
+} from "../../../constants/constants";
 import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {theme} from "../../Shared/constants/theme";
-import Icon from "../../Shared/components/Icon";
-import Button from "../../Button/components/Button";
+import {theme} from "../../../constants/theme";
+import Icon from "../../../components/Icon";
+import Button from "../../../components/Button/Button";
 
 export interface AlertModalProps {
     icon?: string

@@ -1,6 +1,6 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {LOCAL_STORAGE_KEYS} from "../../../../Shared/constants/constants";
+import {LOCAL_STORAGE_KEYS} from "../../../../../constants/constants";
 
 export const selectCar = createAsyncThunk(
     "selectCar",

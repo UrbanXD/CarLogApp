@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getToday } from "../../../Shared/utils/getDate";
+import { getToday } from "../../../../utils/getDate";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 export interface EditRideFormFieldType {

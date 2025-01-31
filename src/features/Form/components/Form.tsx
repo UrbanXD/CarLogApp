@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode } from "react";
-import { GLOBAL_STYLE, SEPARATOR_SIZES } from "../../Shared/constants/constants";
+import { GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/constants";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { FlatList } from "react-native-gesture-handler";
 

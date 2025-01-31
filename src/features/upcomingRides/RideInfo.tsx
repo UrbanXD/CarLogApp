@@ -1,8 +1,8 @@
 import React from "react";
-import { FONT_SIZES, SEPARATOR_SIZES } from "../Shared/constants/constants";
-import { theme } from "../Shared/constants/theme";
+import { FONT_SIZES, SEPARATOR_SIZES } from "../../constants/constants";
+import { theme } from "../../constants/theme";
 import { StyleSheet, Text, View } from "react-native";
-import Icon from "../Shared/components/Icon";
+import Icon from "../../components/Icon";
 
 interface RideInfoProps {
     text: string,

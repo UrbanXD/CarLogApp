@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Control, Controller } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 import InputTitle from "../InputTitle";
-import { ControllerRenderArgs, SEPARATOR_SIZES } from "../../../../Shared/constants/constants";
+import { ControllerRenderArgs, SEPARATOR_SIZES } from "../../../../../constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { theme } from "../../../../Shared/constants/theme";
+import { theme } from "../../../../../constants/theme";
 import Picker, { PickerDataType } from "./Picker";
 
 export interface InputPickerDataType extends PickerDataType {

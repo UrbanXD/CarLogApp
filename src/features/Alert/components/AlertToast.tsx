@@ -1,10 +1,10 @@
 import {ALERT_COLORS, ALERT_ICONS, ALERT_TITLES, AlertType} from "../constants/constants";
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import {View, Text, StyleSheet, Modal, Easing, useWindowDimensions, TouchableOpacity} from "react-native";
-import {theme} from "../../Shared/constants/theme";
+import {theme} from "../../../constants/theme";
 import {heightPercentageToDP as hp, widthPercentageToDP} from "react-native-responsive-screen";
-import {FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT} from "../../Shared/constants/constants";
-import Icon from "../../Shared/components/Icon";
+import {FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT} from "../../../constants/constants";
+import Icon from "../../../components/Icon";
 import { Portal } from '@gorhom/portal';
 import Animated, {
     interpolate,

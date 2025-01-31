@@ -1,10 +1,10 @@
 import React from "react";
 import { StepProps } from "../../../../constants/types/types";
 import Input from "../../../../components/Input/Input";
-import { GLOBAL_STYLE, ICON_NAMES } from "../../../../../Shared/constants/constants";
-import Button from "../../../../../Button/components/Button";
-import TextDivider from "../../../../../Shared/components/TextDivider";
-import { theme } from "../../../../../Shared/constants/theme";
+import { GLOBAL_STYLE, ICON_NAMES } from "../../../../../../constants/constants";
+import Button from "../../../../../../components/Button/Button";
+import TextDivider from "../../../../../../components/TextDivider";
+import { theme } from "../../../../../../constants/theme";
 import {useMultiStepForm} from "../../../../context/MultiStepFormProvider";
 
 const EmailStep: React.FC<StepProps> = ({

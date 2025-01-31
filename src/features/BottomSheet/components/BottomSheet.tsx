@@ -1,8 +1,8 @@
 import React, { forwardRef, ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { theme } from "../../Shared/constants/theme";
+import { theme } from "../../../constants/theme";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../Shared/constants/constants";
+import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/constants";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import BottomSheetBackdrop from "./BottomSheetBackdrop";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";

@@ -1,7 +1,7 @@
 import { Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../../Shared/constants/constants";
-import { theme } from "../../../../Shared/constants/theme";
+import { FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../../../constants/constants";
+import { theme } from "../../../../../constants/theme";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface PickerItemProps {

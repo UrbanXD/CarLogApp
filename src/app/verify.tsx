@@ -1,5 +1,5 @@
 import React from "react";
-import VerifyScreen from "../features/Screens/Verify/components/VerifyScreen";
+import VerifyScreen from "../screens/VerifyScreen";
 
 const Page: React.FC = () =>
     <VerifyScreen />

@@ -1,7 +1,7 @@
 import React from "react";
 import { StepProps } from "../../../../constants/types/types";
 import Input from "../../../../components/Input/Input";
-import { ICON_NAMES } from "../../../../../Shared/constants/constants";
+import { ICON_NAMES } from "../../../../../../constants/constants";
 
 const NameStep: React.FC<StepProps> = ({ control }) =>
     <Input.Group>

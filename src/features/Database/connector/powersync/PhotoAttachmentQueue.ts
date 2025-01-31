@@ -3,7 +3,7 @@ import * as FileSystem from 'expo-file-system';
 import { BaseConfig } from '../BaseConfig';
 import { CAR_TABLE } from './AppSchema';
 import { getUUID } from '../../utils/uuid';
-import { ImageType } from '../../../Shared/utils/pickImage';
+import { ImageType } from '../../../Form/utils/pickImage';
 import { encode } from 'base64-arraybuffer';
 
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {

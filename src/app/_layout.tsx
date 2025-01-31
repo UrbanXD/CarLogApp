@@ -9,13 +9,13 @@ import { store } from "../features/Database/redux/store";
 import { Provider } from "react-redux";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { StatusBar } from "expo-status-bar";
-import MainHeader from "../features/Shared/components/header/MainHeader";
+import MainHeader from "../features/Navigation/components/Header/MainHeader";
 import { BottomSheetProvider } from "../features/BottomSheet/context/BottomSheetProvider";
 import { DatabaseProvider } from '../features/Database/context/DatabaseProvider';
 import { PortalProvider } from "@gorhom/portal";
-import Compactor from "../features/Shared/components/Compactor";
+import Compactor from "../components/Compactor";
 import { AlertProvider } from "../features/Alert/context/AlertProvider";
-import SecondaryHeader from "../features/Shared/components/header/SecondaryHeader";
+import SecondaryHeader from "../features/Navigation/components/Header/SecondaryHeader";
 import { AuthProvider } from "../features/Auth/context/AuthProvider";
 
 const Layout:React.FC = () => {

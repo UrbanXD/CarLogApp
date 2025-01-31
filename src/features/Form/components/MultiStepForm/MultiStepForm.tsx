@@ -6,7 +6,7 @@ import MultiStepFormContent from "./MultiStepFormContent";
 import MultiStepFormButtons from "./MultiStepFormButtons";
 import {StyleSheet, View} from "react-native";
 import {widthPercentageToDP as wp} from "react-native-responsive-screen";
-import {SEPARATOR_SIZES} from "../../../Shared/constants/constants";
+import {SEPARATOR_SIZES} from "../../../../constants/constants";
 import {FlatList} from "react-native-gesture-handler";
 
 interface MultiStepFormProps {

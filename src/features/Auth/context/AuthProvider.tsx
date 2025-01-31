@@ -4,7 +4,7 @@ import { useDatabase } from "../../Database/connector/Database";
 import { router } from "expo-router";
 import registerToast from "../../Alert/layouts/toast/signUpToast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LOCAL_STORAGE_KEYS } from "../../Shared/constants/constants";
+import { LOCAL_STORAGE_KEYS } from "../../../constants/constants";
 import { useAlert } from "../../Alert/context/AlertProvider";
 import logoutToast from "../../Alert/layouts/toast/signOutToast";
 

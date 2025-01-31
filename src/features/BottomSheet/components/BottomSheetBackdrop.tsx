@@ -1,6 +1,6 @@
 import React from "react";
 import { BottomSheetBackdrop as Backdrop } from "@gorhom/bottom-sheet";
-import { theme } from "../../Shared/constants/theme";
+import { theme } from "../../../constants/theme";
 
 const BottomSheetBackdrop: React.FC<any> = (props) =>
     <Backdrop

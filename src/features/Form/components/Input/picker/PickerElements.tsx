@@ -9,10 +9,10 @@ import {
     GLOBAL_STYLE,
     ICON_NAMES,
     SEPARATOR_SIZES
-} from "../../../../Shared/constants/constants";
-import { theme } from "../../../../Shared/constants/theme";
-import SearchBar from "../../../../Shared/components/SearchBar";
-import Icon from "../../../../Shared/components/Icon";
+} from "../../../../../constants/constants";
+import { theme } from "../../../../../constants/theme";
+import SearchBar from "../../../../../components/SearchBar";
+import Icon from "../../../../../components/Icon";
 import {heightPercentageToDP} from "react-native-responsive-screen";
 
 interface PickerElementsProps {

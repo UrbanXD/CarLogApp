@@ -1,4 +1,4 @@
-import { theme } from "../../Shared/constants/theme";
+import { theme } from "../../../constants/theme";
 import { ErrorCode } from "@supabase/auth-js/src/lib/error-codes";
 import { AlertToastProps } from "../components/AlertToast";
 
