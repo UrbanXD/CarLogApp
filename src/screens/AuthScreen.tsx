@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, { useCallback } from "react";
 import { ImageBackground, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants/constants";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -10,7 +10,7 @@ import Divider from "../components/Divider";
 import SignUpForm from "../features/Form/layouts/auth/signUp/SignUpForm";
 import { useAuth } from "../features/Auth/context/AuthProvider";
 import { router } from "expo-router";
-import registerToast from "../features/Alert/layouts/toast/signUpToast";
+import signUpToast from "../features/Alert/layouts/toast/signUpToast";
 import SignInForm from "../features/Form/layouts/auth/signIn/SignInForm";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -43,7 +43,7 @@ const AuthScreen: React.FC = () => {
         });
     };
 
-    const openVerification = async () => {
+    const openVerification = useCallback(async () => {
         if(user && user.email) {
             router.push({
                 pathname: "/verify",
@@ -51,12 +51,12 @@ const AuthScreen: React.FC = () => {
                     type: "signup",
                     title: "Email cím hitelesítés",
                     email: user.email,
-                    toastMessages: JSON.stringify(registerToast),
+                    toastMessages: JSON.stringify(signUpToast),
                     replaceHREF: "/(main)"
                 }
             });
         }
-    }
+    }, [user])
 
     const styles = useStyles(top);
 
@@ -71,7 +71,7 @@ const AuthScreen: React.FC = () => {
                     colors={[
                         "transparent",
                         "rgba(0,0,0,0.25)",
-                        theme.colors.black
+                        GLOBAL_STYLE.pageContainer.backgroundColor
                     ]}
                     style={ styles.imageGradientOverlay }
                 />
@@ -143,7 +143,7 @@ const useStyles = (top: number) =>
             flex: 1,
             flexDirection: "column",
             justifyContent: "space-between",
-            backgroundColor: theme.colors.black,
+            backgroundColor: "transparent",
             paddingHorizontal: DEFAULT_SEPARATOR,
             paddingBottom: GLOBAL_STYLE.pageContainer.paddingVertical,
         },
@@ -164,7 +164,7 @@ const useStyles = (top: number) =>
         titleEffect: {
             zIndex: 0,
             position: "absolute", top: -hp(2.5),
-            color: theme.colors.black,
+            color: GLOBAL_STYLE.pageContainer.backgroundColor,
             textShadowOffset: { height: 0, width: 0 },
             textShadowColor: theme.colors.white,
             textShadowRadius: 1,

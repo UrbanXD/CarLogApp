@@ -11,6 +11,11 @@ const otp_expired: AlertToastProps = {
     body: "Az Ön által megadott kód érvénytelen, esetleg lejárt."
 }
 
+const email_exists: AlertToastProps = {
+    type: "warning",
+    body: "Az Ön által megadott email címmel már regisztráltak!"
+}
+
 const error: AlertToastProps = {
     type: "error",
     body: "Váratlan hiba lépett fel a regisztráció során!"
@@ -25,5 +30,6 @@ export default {
     success,
     error,
     otp_error,
-    otp_expired
+    otp_expired,
+    email_exists
 } as ToastMessages

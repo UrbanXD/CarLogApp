@@ -1,12 +1,12 @@
-import { Session, User } from "@supabase/supabase-js";
+import { AuthApiError, Session, User } from "@supabase/supabase-js";
 import React, { Context, createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { useDatabase } from "../../Database/connector/Database";
 import { router } from "expo-router";
-import registerToast from "../../Alert/layouts/toast/signUpToast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LOCAL_STORAGE_KEYS } from "../../../constants/constants";
 import { useAlert } from "../../Alert/context/AlertProvider";
-import logoutToast from "../../Alert/layouts/toast/signOutToast";
+import signOutToast from "../../Alert/layouts/toast/signOutToast";
+import signUpToast from "../../Alert/layouts/toast/signUpToast";
 
 type SignUpFunction = (
     email: string,
@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         if(!user) {
             AsyncStorage.getItem(LOCAL_STORAGE_KEYS.notConfirmedUser).then(
-                (user) => setUser(user ? JSON.parse(user) : null)
+                (user) => setUser(user ? JSON.parse(user) as User : null)
             )
         }
     }, []);
@@ -73,11 +73,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             .auth
             .getUser()
             .then(
-                ({ data: { user } }) =>
-                    setUser(user)
+                ({ data: { user } }) => {
+                    if(user) setUser(user);
+                }
             );
 
-        AsyncStorage.removeItem(LOCAL_STORAGE_KEYS.notConfirmedUser);
+        if(session) AsyncStorage.removeItem(LOCAL_STORAGE_KEYS.notConfirmedUser);
     }, [session]);
 
     const signUp: SignUpFunction = async (
@@ -103,6 +104,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         if(error) throw error;
 
+        // mivel van email hitelesites, igy a supabase nem dob hibat, ha mar letezo emaillel regisztral
+        const { data: emailExists, error: emailError } = await supabaseConnector.client.rpc("email_exists",{ email_address: email });
+
+        if(emailError) throw emailError;
+        if(emailExists) throw { code: "email_exists" } as AuthApiError;
+
         setUser(user);
         await AsyncStorage.setItem(
             LOCAL_STORAGE_KEYS.notConfirmedUser,
@@ -115,7 +122,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 type: "signup",
                 title: "Email cím hitelesítés",
                 email: email,
-                toastMessages: JSON.stringify(registerToast),
+                toastMessages: JSON.stringify(signUpToast),
                 replaceHREF: "/(main)"
             }
         });
@@ -145,13 +152,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                     .auth
                     .signOut();
 
-            if(error) return addToast(logoutToast.error);
+            if(error) return addToast(signOutToast.error);
 
             await powersync.disconnectAndClear();
             router.replace("/backToRootIndex");
-            addToast(logoutToast.success);
+            addToast(signOutToast.success);
         } catch (e) {
-            addToast(logoutToast.error);
+            addToast(signOutToast.error);
         }
     }
 
