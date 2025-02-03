@@ -7,7 +7,7 @@ import { selectCar } from "./functions/selectCar";
 import { deleteCar } from "./functions/deleteCar";
 import {editCar} from "./functions/editCar";
 
-interface CarsState {
+export interface CarsState {
     loading: boolean
     cars: Array<CarTableType>
     carsImage: Array<{ path: string, image: string }>

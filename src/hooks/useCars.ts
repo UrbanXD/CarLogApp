@@ -1,14 +1,10 @@
-import { RootState } from "../features/Database/redux/store";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "./index.ts";
+import { CarsState } from "../features/Database/redux/cars/cars.slices.ts";
 
 const useCars = () => {
-    const selectCarsState = (state: RootState) => state.cars.cars;
-    const selectCarsImageState = (state: RootState) => state.cars.carsImage;
-    const loadingState = (state: RootState) => state.cars.loading;
-    const isLoading = useSelector(loadingState);
-
-    const cars = useSelector(selectCarsState);
-    const carsImage = useSelector(selectCarsImageState);
+    const cars = useAppSelector(state => state.cars.cars) as CarsState["cars"];
+    const carsImage = useAppSelector(state => state.cars.carsImage) as CarsState["carsImage"];
+    const isLoading = useAppSelector(state => state.cars.loading) as CarsState["loading"];
 
     const getCar = (id: string) =>
         cars.find(car => car.id === id) || cars[0];
