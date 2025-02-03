@@ -7,17 +7,18 @@ import { LOCAL_STORAGE_KEYS } from "../../../constants/constants";
 import { useAlert } from "../../Alert/context/AlertProvider";
 import signOutToast from "../../Alert/layouts/toast/signOutToast";
 import signUpToast from "../../Alert/layouts/toast/signUpToast";
+import { SignUpFormFieldType } from "../../Form/constants/schemas/signUpSchema.tsx";
+import { SignInFormFieldType } from "../../Form/constants/schemas/signInSchema.tsx";
+import signInToast from "../../Alert/layouts/toast/signInToast.ts";
 
 type SignUpFunction = (
-    email: string,
-    password: string,
-    firstname: string,
-    lastname: string
+    user: SignUpFormFieldType,
+    forceCloseBottomSheet: () => void
 ) => Promise<void>
 
 type SignInFunction = (
-    email: string,
-    password: string
+    user: SignInFormFieldType,
+    forceCloseBottomSheet: () => void
 ) => Promise<void>
 
 interface AuthProviderValue {
@@ -59,11 +60,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                     setSession(session)
             );
 
-        if(!user) {
-            AsyncStorage.getItem(LOCAL_STORAGE_KEYS.notConfirmedUser).then(
-                (user) => setUser(user ? JSON.parse(user) as User : null)
-            )
+        const handleNotVerifiedUser = async () => {
+            const userString = await AsyncStorage.getItem(LOCAL_STORAGE_KEYS.notConfirmedUser);
+
+            if(!userString) return;
+
+            setUser(JSON.parse(userString) as User);
         }
+
+        handleNotVerifiedUser();
     }, []);
 
     useEffect(() => {
@@ -82,66 +87,116 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }, [session]);
 
     const signUp: SignUpFunction = async (
-        email,
-        password,
-        firstname,
-        lastname
+        user,
+        forceCloseBottomSheet
     ) => {
-        const { data: { user }, error } =
-            await supabaseConnector
-                .client
-                .auth
-                .signUp({
-                    email,
-                    password,
-                    options: {
-                        data: {
-                            firstname,
-                            lastname
+        try {
+            const {
+                email,
+                password,
+                firstname,
+                lastname
+            } = user;
+
+            // mivel van email hitelesites, igy a supabase nem dob hibat, ha mar letezo emaillel regisztral
+            const {
+                data: emailExists,
+                error: emailError
+            } =
+                await supabaseConnector
+                    .client
+                    .rpc(
+                        "email_exists",
+                        { email_address: email }
+                    );
+
+            if(emailError) throw emailError;
+            if(emailExists) throw { code: "email_exists" } as AuthApiError;
+
+
+            const { data: { user: newUser }, error } =
+                await supabaseConnector
+                    .client
+                    .auth
+                    .signUp({
+                        email,
+                        password,
+                        options: {
+                            data: {
+                                firstname,
+                                lastname
+                            }
                         }
-                    }
-                });
+                    });
 
-        if(error) throw error;
+            if(error) throw error;
 
-        // mivel van email hitelesites, igy a supabase nem dob hibat, ha mar letezo emaillel regisztral
-        const { data: emailExists, error: emailError } = await supabaseConnector.client.rpc("email_exists",{ email_address: email });
+            setUser(newUser);
+            await AsyncStorage.setItem(
+                LOCAL_STORAGE_KEYS.notConfirmedUser,
+                JSON.stringify(newUser)
+            );
 
-        if(emailError) throw emailError;
-        if(emailExists) throw { code: "email_exists" } as AuthApiError;
+            await forceCloseBottomSheet();
 
-        setUser(user);
-        await AsyncStorage.setItem(
-            LOCAL_STORAGE_KEYS.notConfirmedUser,
-            JSON.stringify(user)
-        );
+            router.push({
+                pathname: "/verify",
+                params: {
+                    type: "signup",
+                    title: "Email cím hitelesítés",
+                    email: email,
+                    toastMessages: JSON.stringify(signUpToast),
+                    replaceHREF: "/(main)"
+                }
+            });
+        } catch (error) {
+            let toast = signUpToast[error.code];
+            if(!toast) toast = signUpToast.error;
 
-        router.push({
-            pathname: "/verify",
-            params: {
-                type: "signup",
-                title: "Email cím hitelesítés",
-                email: email,
-                toastMessages: JSON.stringify(signUpToast),
-                replaceHREF: "/(main)"
-            }
-        });
+            addToast(toast);
+        }
     }
 
     const signIn: SignInFunction = async (
-        email,
-        password
+        user,
+        forceCloseBottomSheet
     ) => {
-        const { error } =
-            await supabaseConnector
-                .client
-                .auth
-                .signInWithPassword({
-                    email,
-                    password
-                });
+        try {
+            const { error } =
+                await supabaseConnector
+                    .client
+                    .auth
+                    .signInWithPassword(user);
 
-        if (error) throw error;
+            if (error) throw error;
+
+            forceCloseBottomSheet();
+        } catch (error) {
+            if(error.code) {
+                if(error.code === "email_not_confirmed") {
+                    router.push({
+                        pathname: "/verify",
+                        params: {
+                            type: "signup",
+                            title: "Email cím hitelesítés",
+                            email: user.email,
+                            toastMessages: JSON.stringify(signInToast),
+                            replaceHREF: "/(main)"
+                        }
+                    });
+
+                    return;
+                }
+
+                const toastMessage = signInToast[error.code];
+                if(toastMessage) return addToast(toastMessage);
+
+                return addToast(signInToast.error);
+            }
+
+            console.error("hiba input useSignIn auth api")
+            addToast(signInToast.error);
+        }
     }
 
     const signOut = async () => {
