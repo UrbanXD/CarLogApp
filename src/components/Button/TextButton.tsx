@@ -1,7 +1,8 @@
 import React from "react";
 import {
+    ActivityIndicator,
     ColorValue,
-    ImageSourcePropType,
+    ImageSourcePropType, Platform,
     StyleProp,
     StyleSheet,
     Text,
@@ -27,6 +28,7 @@ interface TextButtonProps {
     style?: StyleProp<ViewStyle>
     inverse?: boolean
     disabled?: boolean
+    loadingIndicator?: boolean
     onPress: () => void
 }
 
@@ -42,8 +44,11 @@ const TextButton: React.FC<TextButtonProps> = ({
     style,
     inverse = false,
     disabled = false,
+    loadingIndicator = false,
     onPress
 }) => {
+    const [isLoading, setIsLoading] = React.useState(false);
+
     const styles = useButtonStyles(
         !inverse ? backgroundColor : textColor,
         !inverse ? textColor : backgroundColor,
@@ -52,14 +57,31 @@ const TextButton: React.FC<TextButtonProps> = ({
         fontSize
     );
 
+    const handlePress = async () => {
+        setIsLoading(true);
+        await onPress();
+        setIsLoading(false);
+    }
+
     return (
         <TouchableOpacity
-            onPress={ onPress }
-            disabled={ disabled }
+            onPress={ handlePress }
+            disabled={ disabled || isLoading }
             style={ [styles.buttonContainer, style] }
         >
             {
-                text &&
+                loadingIndicator && isLoading &&
+                <ActivityIndicator
+                    size={
+                        Platform.OS === "ios"
+                            ? "large"
+                            : styles.buttonContainer.height - SEPARATOR_SIZES.lightSmall
+                    }
+                    color={ !inverse ? textColor : backgroundColor }
+                />
+            }
+            {
+                text && ((loadingIndicator && !isLoading) || !loadingIndicator) &&
                 <>
                     <View style={ [styles.sideSpacerContainer, { paddingLeft: SEPARATOR_SIZES.lightSmall }] }>
                         {

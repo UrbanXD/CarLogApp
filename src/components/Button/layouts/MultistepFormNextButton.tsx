@@ -14,6 +14,7 @@ const MultistepFormNextButton: React.FC<MultistepFormNextButtonProps> = ({
     <TextButton
         text={ !isLastStep ? "Következő" : "Befejezés" }
         iconRight={ !isLastStep ? ICON_NAMES.rightArrowHead : undefined }
+        loadingIndicator
         onPress={ onPress }
     />
 
