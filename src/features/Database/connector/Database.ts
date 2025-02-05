@@ -3,7 +3,7 @@ import { AppSchema, DatabaseType } from "./powersync/AppSchema";
 import { SupabaseConnector } from "./SupabaseConnector";
 import { Kysely, wrapPowerSyncWithKysely } from "@powersync/kysely-driver";
 import { Context, createContext, useContext } from "react";
-import { KVStorage } from "./storage/KVStorage";
+import LargeSecureStore from "./storage/LargeSecureStorage.ts";
 import { SupabaseStorageAdapter } from "./storage/SupabaseStorageAdapter";
 import { PhotoAttachmentQueue } from "./powersync/PhotoAttachmentQueue";
 import { BaseConfig } from "./BaseConfig";
@@ -13,7 +13,7 @@ export class Database {
     powersync: AbstractPowerSyncDatabase;
     db: Kysely<DatabaseType>;
     supabaseConnector: SupabaseConnector;
-    kvStorage: KVStorage;
+    largeSecureStore: LargeSecureStore;
     storage: SupabaseStorageAdapter;
     attachmentQueue: PhotoAttachmentQueue | undefined = undefined;
 
@@ -25,8 +25,8 @@ export class Database {
             }
         })
         this.db = wrapPowerSyncWithKysely(this.powersync);
-        this.kvStorage = new KVStorage()
-        this.supabaseConnector = new SupabaseConnector(this.kvStorage, this.powersync);
+        this.largeSecureStore = new LargeSecureStore();
+        this.supabaseConnector = new SupabaseConnector(this.largeSecureStore, this.powersync);
         this.storage = this.supabaseConnector.storage;
 
         if(BaseConfig.SUPABASE_BUCKET){

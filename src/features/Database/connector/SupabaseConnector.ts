@@ -1,9 +1,9 @@
 import { AbstractPowerSyncDatabase, CrudEntry, PowerSyncBackendConnector, UpdateType } from '@powersync/react-native';
-import { SupabaseClient, createClient, VerifyEmailOtpParams, ResendParams } from '@supabase/supabase-js';
+import {SupabaseClient, createClient, VerifyEmailOtpParams, ResendParams, GoTrueAdminApi} from '@supabase/supabase-js';
 import 'react-native-url-polyfill/auto';
 import { BaseConfig } from "./BaseConfig";
 import { SupabaseStorageAdapter } from './storage/SupabaseStorageAdapter';
-import { KVStorage } from './storage/KVStorage';
+import LargeSecureStore from './storage/LargeSecureStorage.ts';
 
 /// Postgres Response codes that we cannot recover from by retrying.
 const FATAL_RESPONSE_CODES = [
@@ -22,13 +22,17 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
     powersync: AbstractPowerSyncDatabase;
     storage: SupabaseStorageAdapter;
 
-    constructor(kvStorage: KVStorage, powersync: AbstractPowerSyncDatabase) {
-        this.client = createClient(BaseConfig.SUPABASE_URL, BaseConfig.SUPABASE_ANON_KEY, {
-            auth: {
-                persistSession: true,
-                storage: kvStorage,
-            },
-        });
+    constructor(largeSecureStore: LargeSecureStore, powersync: AbstractPowerSyncDatabase) {
+        this.client = createClient(
+            BaseConfig.SUPABASE_URL,
+            BaseConfig.SUPABASE_ANON_KEY,
+            {
+                        auth: {
+                            persistSession: true,
+                            storage: largeSecureStore,
+                        },
+                   }
+        );
 
         this.powersync = powersync;
 
@@ -59,7 +63,7 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
 
         return {
             client: this.client,
-            endpoint: BaseConfig.POWER_SYNC_URL,
+            endpoint: BaseConfig.POWERSYNC_URL,
             token: session.access_token ?? '',
             expiresAt: session.expires_at ? new Date(session.expires_at * 1000) : undefined,
             userID: session.user.id,
