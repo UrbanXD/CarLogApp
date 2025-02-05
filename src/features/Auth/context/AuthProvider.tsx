@@ -27,6 +27,7 @@ interface AuthProviderValue {
     signUp: SignUpFunction
     signIn: SignInFunction
     signOut: () => void
+    deleteUserProfile: () => void
 }
 
 const AuthContext = createContext<AuthProviderValue | null>(null);
@@ -48,27 +49,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             .auth
             .getSession()
             .then(
-                ({ data: { session } }) =>
-                    setSession(session)
+                ({ data: { session } }) => setSession(session)
             );
 
         supabaseConnector
             .client
             .auth
             .onAuthStateChange(
-                (_event, session) =>
-                    setSession(session)
+                (_event, session) => setSession(session)
             );
 
-        const handleNotVerifiedUser = async () => {
-            const userString = await AsyncStorage.getItem(LOCAL_STORAGE_KEYS.notConfirmedUser);
+        AsyncStorage.getItem(LOCAL_STORAGE_KEYS.notConfirmedUser).then((value) => {
+            if(!value) return;
 
-            if(!userString) return;
-
-            setUser(JSON.parse(userString) as User);
-        }
-
-        handleNotVerifiedUser();
+            setUser(JSON.parse(value) as User);
+        });
     }, []);
 
     useEffect(() => {
@@ -79,7 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             .getUser()
             .then(
                 ({ data: { user } }) => {
-                    if(user) setUser(user);
+                    if(user) setUser(null);
                 }
             );
 
@@ -217,6 +212,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     }
 
+    const deleteUserProfile = async () => {
+        if(session?.user){
+            const { error } =
+                await supabaseConnector
+                    .client
+                    .functions
+                    .invoke(
+                        "delete-user",
+                        {
+                            method: "DELETE",
+                            body: JSON.stringify({ id: user.id })
+                        }
+                    );
+
+            if(!error) {
+                await signOut();
+            }
+        }
+    }
+
     return (
         <AuthContext.Provider
             value={{
@@ -224,7 +239,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 session,
                 signUp,
                 signIn,
-                signOut
+                signOut,
+                deleteUserProfile
             }}
         >
             { children }
