@@ -9,6 +9,10 @@ dist/
 web-build/
 android/
 
+# Supabase
+supabase/.branches
+supabase/.temp
+
 # IDEA
 .idea
 
@@ -34,6 +38,9 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
+.env.local
+.env.keys
 
 # typescript
 *.tsbuildinfo
