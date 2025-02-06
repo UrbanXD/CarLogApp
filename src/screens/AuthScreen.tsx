@@ -128,7 +128,7 @@ const useStyles = (top: number) =>
     StyleSheet.create({
         pageContainer: {
             ...GLOBAL_STYLE.pageContainer,
-            paddingBottom: 0,
+            paddingBottom: DEFAULT_SEPARATOR,
             paddingVertical: 0,
         },
         imageContainer: {
