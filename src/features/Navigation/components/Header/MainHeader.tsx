@@ -9,11 +9,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Avatar from "../../../../components/Avatar/Avatar";
 import { loadSelectedCar } from "../../../Database/redux/cars/functions/loadSelectedCar";
 import { selectCar } from "../../../Database/redux/cars/functions/selectCar";
-import { useAuth } from "../../../Auth/context/AuthProvider";
 import useHeaderStyles from "../../hooks/useHeaderStyles";
+import { router } from "expo-router";
 
 const MainHeader: React.FC = () => {
-    const { signOut } = useAuth();
     const { top } = useSafeAreaInsets();
     const styles = useHeaderStyles(top);
 
@@ -41,6 +40,10 @@ const MainHeader: React.FC = () => {
         store.dispatch(loadSelectedCar({}));
     }, []);
 
+    const openProfile = () => {
+        router.push("/(profile)/user")
+    }
+
     return (
         <View style={ styles.wrapper }>
             <StatusBar
@@ -66,7 +69,7 @@ const MainHeader: React.FC = () => {
                     <Avatar.Text
                         label={ "Ka" }
                         avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
-                        onPress={ signOut }
+                        onPress={ openProfile }
                     />
                 }
             </View>

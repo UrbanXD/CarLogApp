@@ -57,6 +57,12 @@ const Layout:React.FC = () => {
                 }}
             />
             <Stack.Screen
+                name="(profile)/user"
+                options={{
+                    header: () => <SecondaryHeader title="Profil" />
+                }}
+            />
+            <Stack.Screen
                 name="(edit)/car"
                 options={{
                     header: () => <SecondaryHeader title="Autó Adatlap" />,

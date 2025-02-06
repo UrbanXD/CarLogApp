@@ -58,7 +58,9 @@ export const ICON_NAMES = {
     reset: "refresh",
     upload: "upload-outline",
     fuel: "gas-station-outline",
-    fuelTank: "propane-tank-outline"
+    fuelTank: "propane-tank-outline",
+    settings: "cog-outline",
+    signOut: "logout"
 }
 
 export const ICON_COLORS = {
@@ -95,8 +97,7 @@ export const DEFAULT_SEPARATOR = SEPARATOR_SIZES.normal
 export const GLOBAL_STYLE = StyleSheet.create({
     pageContainer: {
         flex: 1,
-        paddingVertical: DEFAULT_SEPARATOR,
-        paddingBottom: SIMPLE_TABBAR_HEIGHT * 1.25,
+        paddingBottom: 5,
         backgroundColor: theme.colors.black2
     },
     scrollViewContentContainer: {

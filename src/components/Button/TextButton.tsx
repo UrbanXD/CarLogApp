@@ -1,18 +1,8 @@
 import React from "react";
-import {
-    ActivityIndicator,
-    ColorValue,
-    ImageSourcePropType, Platform,
-    StyleProp,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-    ViewStyle
-} from "react-native";
+import { ActivityIndicator, ColorValue, ImageSourcePropType, Platform, StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import {FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES} from "../../constants/constants";
-import {theme} from "../../constants/theme";
+import { FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/constants";
+import { theme } from "../../constants/theme";
 import Icon from "../Icon";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
 
@@ -25,6 +15,7 @@ interface TextButtonProps {
     height?: number
     iconLeft?: ImageSourcePropType | string
     iconRight?: ImageSourcePropType | string
+    textStyle?: StyleProp<TextStyle>
     style?: StyleProp<ViewStyle>
     inverse?: boolean
     disabled?: boolean
@@ -42,6 +33,7 @@ const TextButton: React.FC<TextButtonProps> = ({
     iconLeft,
     iconRight,
     style,
+    textStyle,
     inverse = false,
     disabled = false,
     loadingIndicator = false,
@@ -83,7 +75,7 @@ const TextButton: React.FC<TextButtonProps> = ({
             {
                 text && ((loadingIndicator && !isLoading) || !loadingIndicator) &&
                 <>
-                    <View style={ [styles.sideSpacerContainer, { paddingLeft: SEPARATOR_SIZES.lightSmall }] }>
+                    <View style={ styles.sideSpacerContainer }>
                         {
                             iconLeft &&
                             <Icon
@@ -93,10 +85,10 @@ const TextButton: React.FC<TextButtonProps> = ({
                             />
                         }
                     </View>
-                    <Text numberOfLines={ 2 } style={ styles.buttonText } >
+                    <Text numberOfLines={ 2 } style={ [styles.buttonText, textStyle] } >
                         { text }
                     </Text>
-                    <View style={ [styles.sideSpacerContainer, { paddingRight: SEPARATOR_SIZES.lightSmall }] }>
+                    <View style={ styles.sideSpacerContainer }>
                         {
                             iconRight &&
                             <Icon
@@ -135,7 +127,6 @@ export const useButtonStyles = (
         },
         buttonText: {
             flex: 1,
-            // alignSelf: "center",
             textAlign: "center",
             fontSize: fontSize,
             fontFamily: "Gilroy-Heavy",
@@ -146,9 +137,9 @@ export const useButtonStyles = (
         },
         sideSpacerContainer: {
             height: "100%",
-            width: fontSize * ICON_FONT_SIZE_SCALE * 0.85,
             justifyContent: "center",
             alignItems: "center",
+            marginHorizontal: fontSize * 0.25,
         }
     })
 
