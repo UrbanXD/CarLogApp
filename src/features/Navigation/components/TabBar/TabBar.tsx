@@ -90,8 +90,6 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
 
 const styles = StyleSheet.create({
     container: {
-        position: "absolute",
-        bottom: 0,
         flexDirection: "row",
         alignSelf: "center",
         justifyContent: "space-between",

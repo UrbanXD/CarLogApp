@@ -1,21 +1,25 @@
 import React from "react";
-import Animated, {FadeInLeft} from "react-native-reanimated";
-import {StyleSheet, Text} from "react-native";
-import {FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES} from "../../../constants/constants";
-import {theme} from "../../../constants/theme";
+import { StyleSheet, Text, View } from "react-native";
+import { FONT_SIZES, GLOBAL_STYLE } from "../../../constants/constants";
+import { theme } from "../../../constants/theme";
+import { useAuth } from "../../../features/Auth/context/AuthProvider.tsx";
 
-const WelcomeBlock: React.FC = () =>
-    <Animated.View
-        entering={ FadeInLeft.springify(1200) }
-        style={ styles.titleContainer }
-    >
-        <Text style={ styles.welcomeText }>
-            Üdv Urbán Ádám!
-        </Text>
-        <Text style={ styles.infoText }>
-            Vezzessen számot nálunk az autóiról!
-        </Text>
-    </Animated.View>
+const WelcomeBlock: React.FC = () => {
+    const { session } = useAuth();
+
+    return (
+        <View
+            style={ styles.titleContainer }
+        >
+            <Text style={ styles.welcomeText}>
+                Üdv { `${ session?.user.user_metadata.firstname ?? "" } ${ session?.user.user_metadata?.lastname ?? "" }` }!
+            </Text>
+            <Text style={ styles.infoText }>
+                Vezzessen számot nálunk az autóiról!
+            </Text>
+        </View>
+    )
+}
 
 const styles = StyleSheet.create({
     titleContainer: {
@@ -37,7 +41,7 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZES.intermediate,
         letterSpacing: FONT_SIZES.intermediate * 0.05,
         color: theme.colors.gray1
-    },
+    }
 })
 
 export default WelcomeBlock;

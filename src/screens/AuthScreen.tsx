@@ -157,7 +157,6 @@ const useStyles = (top: number) =>
             alignSelf: "center",
             color: theme.colors.white,
             fontSize: FONT_SIZES.extraLarge,
-            letterSpacing: FONT_SIZES.extraLarge * 0.01,
             fontFamily: "Gilroy-Heavy",
             textTransform: "uppercase",
         },
@@ -176,7 +175,7 @@ const useStyles = (top: number) =>
             fontSize: FONT_SIZES.normal,
             fontFamily: "Gilroy-Medium",
             textTransform: "uppercase",
-            letterSpacing: FONT_SIZES.normal * 0.075
+            letterSpacing: FONT_SIZES.normal * 0.05
         },
         actionContainer: {
             flexDirection: "column",
@@ -187,7 +186,7 @@ const useStyles = (top: number) =>
             alignSelf: "center",
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.small,
-            letterSpacing: FONT_SIZES.small * 0.1,
+            letterSpacing: FONT_SIZES.small * 0.05,
             lineHeight: FONT_SIZES.small * 1.5,
             textAlign: "center",
         },

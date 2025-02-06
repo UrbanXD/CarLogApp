@@ -8,13 +8,13 @@ import Divider from "../components/Divider";
 import { useLocalSearchParams } from "expo-router";
 import { EmailOtpType } from "@supabase/supabase-js";
 
-type VerifyRouteParams = {
-    type: string
-    title?: string
-    email: string
-    otpLength?: string
-    toastMessages?: string
-    replaceHREF?: string
+type VerifyRouteParams<T> = {
+    type: T
+    title?: T
+    email: T
+    otpLength?: T
+    toastMessages?: T
+    replaceHREF?: T
 }
 
 const VerifyScreen: React.FC = () => {
@@ -27,7 +27,7 @@ const VerifyScreen: React.FC = () => {
         otpLength = 6,
         toastMessages,
         replaceHREF
-    } = useLocalSearchParams<VerifyRouteParams>();
+    } = useLocalSearchParams<VerifyRouteParams<string>>();
 
     const resendOTP = async () =>
         await supabaseConnector.resendOTP({
