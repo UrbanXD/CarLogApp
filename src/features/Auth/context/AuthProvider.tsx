@@ -1,4 +1,4 @@
-import { AuthApiError, Session, User } from "@supabase/supabase-js";
+import { AuthApiError, AuthError, Session, User } from "@supabase/supabase-js";
 import React, { Context, createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { useDatabase } from "../../Database/connector/Database";
 import { router } from "expo-router";
@@ -21,12 +21,17 @@ type SignInFunction = (
     forceCloseBottomSheet: () => void
 ) => Promise<void>
 
+type ResetPasswordFunction = (
+    newPassword: string
+) => Promise<void>
+
 interface AuthProviderValue {
     user: User | null
     session: Session | null
     signUp: SignUpFunction
     signIn: SignInFunction
     signOut: () => void
+    resetPassword: ResetPasswordFunction
     deleteUserProfile: () => void
 }
 
@@ -68,6 +73,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     useEffect(() => {
         console.log("session: ", session, " :session");
+
         supabaseConnector
             .client
             .auth
@@ -163,11 +169,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                     .auth
                     .signInWithPassword(user);
 
-            if (error) throw error;
-
-            forceCloseBottomSheet();
-        } catch (error) {
-            if(error.code) {
+            if (error) {
                 if(error.code === "email_not_confirmed") {
                     router.push({
                         pathname: "/verify",
@@ -179,17 +181,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                             replaceHREF: "/(main)"
                         }
                     });
-
                     return;
                 }
 
+                throw error;
+            };
+
+            forceCloseBottomSheet();
+        } catch (error) {
+            if(error.code) {
                 const toastMessage = signInToast[error.code];
                 if(toastMessage) return addToast(toastMessage);
 
                 return addToast(signInToast.error);
             }
 
-            console.error("hiba input useSignIn auth api")
             addToast(signInToast.error);
         }
     }
@@ -202,13 +208,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                     .auth
                     .signOut();
 
-            if(error) return addToast(signOutToast.error);
+            if(error) throw error;
 
-            await powersync.disconnectAndClear();
             router.replace("/backToRootIndex");
             addToast(signOutToast.success);
-        } catch (e) {
-            addToast(signOutToast.error);
+            await powersync.disconnectAndClear();
+        } catch (error) {
+            if(error instanceof AuthError) return addToast(signOutToast.error);
+            // ha nem AuthError akkor sikeres a kijelentkezes, de mashol hiba tortent
+        }
+    }
+
+    const resetPassword: ResetPasswordFunction = async (newPassword) => {
+        try {
+            console.log("feaf")
+            const { data, error } =
+                await supabaseConnector
+                    .client
+                    .auth
+                    .resetPasswordForEmail(session?.user.email);
+            console.log("fgesfs")
+
+            // router.push({
+            //     pathname: "/verify",
+            //     params: {
+            //         type: "recovery",
+            //         title: "Jelszó módosítás",
+            //         email: email,
+            //         toastMessages: JSON.stringify(signUpToast),
+            //         replaceHREF: "/(main)"
+            //     }
+            // });
+        } catch (_){
+
         }
     }
 
@@ -240,6 +272,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 signUp,
                 signIn,
                 signOut,
+                resetPassword,
                 deleteUserProfile
             }}
         >
