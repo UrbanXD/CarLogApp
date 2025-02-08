@@ -1,24 +1,24 @@
 import React from "react";
 import Input from "../../../components/Input/Input";
-import {GLOBAL_STYLE, ICON_NAMES} from "../../../../../constants/constants";
-import {Text} from "react-native";
+import { GLOBAL_STYLE, ICON_NAMES } from "../../../../../constants/constants";
+import {Text, View} from "react-native";
 import Button from "../../../../../components/Button/Button";
 import TextDivider from "../../../../../components/TextDivider";
-import {theme} from "../../../../../constants/theme";
+import { theme } from "../../../../../constants/theme";
 import Form from "../../../components/Form";
 import useSignInForm from "./useSignInForm";
 
 interface SignInFormProps {
-    forceCloseBottomSheet: () => void
+    dismissBottomSheet?: () => void
 }
 
 const SignInForm: React.FC<SignInFormProps> = ({
-    forceCloseBottomSheet
+    dismissBottomSheet = () => {},
 }) => {
     const {
         control,
         submitHandler,
-    } = useSignInForm(forceCloseBottomSheet);
+    } = useSignInForm(dismissBottomSheet);
 
     return (
         <Form>

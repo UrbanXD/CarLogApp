@@ -12,8 +12,8 @@ interface BottomSheetProps extends Partial<BottomSheetModalProps> {
     title?: string
     content: ReactNode
     closeButton?: ReactNode
-    reopen: () => void,
-    forceClose: () => void
+    dismissBottomSheet: () => void
+    closeBottomSheet: () => void
 }
 
 const BottomSheet=
@@ -22,8 +22,8 @@ const BottomSheet=
             title,
             content,
             closeButton,
-            reopen,
-            forceClose,
+            dismissBottomSheet,
+            closeBottomSheet,
             ...restProps
         } = props;
 
@@ -33,6 +33,17 @@ const BottomSheet=
         const snaps = snapPoints as Array<string | number> || [];
         const styles = useStyles(snaps[0] === "100%", !!enableHandlePanningGesture, top);
 
+        const enhancedContent =
+            React.isValidElement(content)
+            ?   React.cloneElement(
+                    content,
+                    {
+                        dismissBottomSheet,
+                        closeBottomSheet
+                    }
+                )
+            :   content;
+
         return (
             <BottomSheetModal
                 ref={ ref }
@@ -40,6 +51,7 @@ const BottomSheet=
                 keyboardBehavior="interactive"
                 keyboardBlurBehavior="restore"
                 android_keyboardInputMode="adjustPan"
+                stackBehavior="switch"
                 backdropComponent={
                     (props: any) =>
                         <BottomSheetBackdrop { ...props } />
@@ -58,7 +70,7 @@ const BottomSheet=
                             </Text>
                         </View>
                     }
-                    { content }
+                    { enhancedContent }
                 </BottomSheetView>
             </BottomSheetModal>
         )

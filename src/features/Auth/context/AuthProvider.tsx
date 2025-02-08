@@ -13,12 +13,12 @@ import signInToast from "../../Alert/layouts/toast/signInToast.ts";
 
 type SignUpFunction = (
     user: SignUpFormFieldType,
-    forceCloseBottomSheet: () => void
+    dismissBottomSheet: () => void
 ) => Promise<void>
 
 type SignInFunction = (
     user: SignInFormFieldType,
-    forceCloseBottomSheet: () => void
+    dismissBottomSheet: () => void
 ) => Promise<void>
 
 type ResetPasswordFunction = (
@@ -89,7 +89,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const signUp: SignUpFunction = async (
         user,
-        forceCloseBottomSheet
+        dismissBottomSheet
     ) => {
         try {
             const {
@@ -138,7 +138,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 JSON.stringify(newUser)
             );
 
-            await forceCloseBottomSheet();
+            await dismissBottomSheet();
 
             router.push({
                 pathname: "/verify",
@@ -160,7 +160,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const signIn: SignInFunction = async (
         user,
-        forceCloseBottomSheet
+        dismissBottomSheet
     ) => {
         try {
             const { error } =
@@ -185,9 +185,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 }
 
                 throw error;
-            };
+            }
 
-            forceCloseBottomSheet();
+            dismissBottomSheet();
         } catch (error) {
             if(error.code) {
                 const toastMessage = signInToast[error.code];

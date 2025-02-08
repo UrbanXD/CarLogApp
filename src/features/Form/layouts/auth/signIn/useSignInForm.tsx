@@ -1,10 +1,9 @@
 import { useAuth } from "../../../../Auth/context/AuthProvider";
-import { useAlert } from "../../../../Alert/context/AlertProvider";
 import { useForm } from "react-hook-form";
 import { SignInFormFieldType, useSignInFormProps } from "../../../constants/schemas/signInSchema";
 
 const useSignInForm = (
-    forceCloseBottomSheet: () => void
+    dismissBottomSheet: () => void
 ) => {
     const { signIn } = useAuth();
 
@@ -16,7 +15,7 @@ const useSignInForm = (
     const submitHandler =
         handleSubmit(
         async (user: SignInFormFieldType) =>
-                await signIn(user, forceCloseBottomSheet)
+            await signIn(user, dismissBottomSheet)
         );
 
     return {

@@ -1,4 +1,4 @@
-import React, { Context, createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { Context, createContext, createRef, ReactNode, RefObject, useContext, useMemo, useState } from "react";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
 import { useAlert } from "../../Alert/context/AlertProvider";
@@ -13,10 +13,15 @@ export interface OpenBottomSheetArgs extends Partial<BottomSheetModalProps> {
     closeButton?: ReactNode
 }
 
+type BottomSheet = {
+    ref: RefObject<BottomSheetModal>
+    props: OpenBottomSheetArgs
+}
+
 interface BottomSheetProviderValue {
     openBottomSheet: (args: OpenBottomSheetArgs) => void
     closeBottomSheet: () => void
-    forceCloseBottomSheet: () => void
+    dismissBottomSheet: () => void
 }
 
 const BottomSheetContext = createContext<BottomSheetProviderValue | null>(null);
@@ -25,117 +30,125 @@ interface BottomSheetProviderProps {
     children: ReactNode | null
 }
 
-export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({ children }) => {
-    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-
+export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
+    children
+}) => {
     const { openModal } = useAlert();
 
-    const [bottomSheetTitle, setBottomSheetTitle] = useState<string | undefined>();
-    const [bottomSheetContent, setBottomSheetContent] = useState<ReactNode>();
-    const [bottomSheetCloseButton, setBottomSheetCloseButton] = useState<ReactNode>();
-    const [bottomSheetProps, setBottomSheetProps] = useState<Partial<BottomSheetModalProps> | null>(null);
-    const bottomSheetPropsRef = useRef(bottomSheetProps);
+    const [bottomSheets, setBottomSheets] = useState<Array<BottomSheet>>([]);
+    const [isManuallyClosed, setIsManuallyClosed] = useState<boolean>(false);
 
-    useEffect(() => {
-        bottomSheetPropsRef.current = bottomSheetProps;
-    }, [bottomSheetProps]);
+    const openBottomSheet = (args: OpenBottomSheetArgs) => {
+        const ref = createRef<BottomSheetModal>();
 
-    const openBottomSheet =
-        useCallback(
-        (args: OpenBottomSheetArgs) => {
-            const {
-                title,
-                content,
-                closeButton,
-                ...restProps
-            } = args;
-
-            setBottomSheetTitle(title);
-            setBottomSheetContent(content);
-            setBottomSheetCloseButton(closeButton);
-            setBottomSheetProps({
-                snapPoints: ["100%"],
-                index: 0,
-                enableHandlePanningGesture: true,
-                enableContentPanningGesture: true,
-                enableDismissOnClose: true,
-                enableOverDrag: false,
-                backdropComponent: () => <BottomSheetBackdrop />,
-                onChange: onChangeSnapPoint,
-                ...restProps
-            });
-
-            bottomSheetModalRef.current?.present();
-        }, [bottomSheetModalRef]);
-
-    const closeBottomSheet =
-        useCallback(
-        () => {
-            bottomSheetModalRef?.current?.close();
-        },[bottomSheetModalRef]);
-
-    const forceCloseBottomSheet =
-        useCallback(
-        () => {
-            if(!bottomSheetPropsRef.current?.enableDismissOnClose) {
-                bottomSheetPropsRef.current = {
-                    ...bottomSheetPropsRef.current,
-                    enableDismissOnClose: true
-                }
-                setBottomSheetProps(prevBottomSheetProps => {
-                    return {
-                        ...prevBottomSheetProps,
-                        enableDismissOnClose: true
-                    };
-                })
+        setBottomSheets(prevState => {
+            const prevLastIndex = prevState.length - 1;
+            if(prevLastIndex >= 0) {
+                prevState[prevLastIndex]?.ref.current?.close();
+                setIsManuallyClosed(true);
             }
 
-            closeBottomSheet();
-        }, [bottomSheetModalRef]);
+            return [...prevState, { ref, props: args }]
+        });
+        setTimeout(() => ref.current?.present(), 0);
+    }
 
-    const reopenBottomSheet =
-        useCallback(
-        () => {
-            bottomSheetModalRef?.current?.snapToIndex(0);
-        }, [bottomSheetModalRef]);
+    const getCurrentBottomSheet = () => {
+        const index = bottomSheets.length - 1;
+        if(index < 0) return null;
 
-    const onChangeSnapPoint =
-        useCallback(
-        (index: number) => {
-            if (index === -1 && !bottomSheetPropsRef.current?.enableDismissOnClose) {
-                KeyboardController.dismiss();
-                setTimeout(() => {
-                    openModal(bottomSheetLeavingModal(reopenBottomSheet, forceCloseBottomSheet));
-                }, 0);
+        return bottomSheets[index];
+    }
+
+    const closeBottomSheet = () => {
+        const bottomSheet = getCurrentBottomSheet();
+        if(!bottomSheet) return;
+
+        bottomSheet.ref.current?.close();
+    }
+
+    const dismissBottomSheet = () => {
+        const bottomSheet = getCurrentBottomSheet();
+        if(!bottomSheet) return;
+
+        setBottomSheets(
+            prevState => {
+                const lastIndex = prevState.length - 1;
+                if(lastIndex < 0) return new Array<BottomSheet>();
+                prevState[lastIndex].ref.current?.dismiss();
+
+                const newLastIndex = lastIndex - 1;
+                if(newLastIndex < 0) return new Array<BottomSheet>();
+                prevState[newLastIndex]?.ref?.current?.present();
+
+                return prevState.slice(0, newLastIndex + 1);
             }
-        }, [bottomSheetPropsRef]);
+        );
+    }
+
+    const reopenBottomSheet = () => {
+        const bottomSheet = getCurrentBottomSheet();
+        if(!bottomSheet) return;
+
+        bottomSheet.ref.current?.snapToIndex(0);
+    }
+
+    const onChangeSnapPoint = (index: number) => {
+        const bottomSheet = getCurrentBottomSheet();
+        if(!bottomSheet) return;
+
+        if(index === -1) {
+            KeyboardController.dismiss();
+            if(isManuallyClosed) return setIsManuallyClosed(false);
+
+            if(!bottomSheet.props.enableDismissOnClose) {
+                return openModal(
+                    bottomSheetLeavingModal(
+                        reopenBottomSheet,
+                        dismissBottomSheet
+                    )
+                );
+            }
+
+            dismissBottomSheet();
+        }
+    }
 
     const contextValue = useMemo(() => ({
         openBottomSheet,
         closeBottomSheet,
-        forceCloseBottomSheet,
-    }), [openBottomSheet, closeBottomSheet, forceCloseBottomSheet]);
+        dismissBottomSheet,
+    }), [openBottomSheet, closeBottomSheet, dismissBottomSheet]);
 
     return (
         <BottomSheetContext.Provider
             value={ contextValue }
         >
             { children }
-            <BottomSheet
-                ref={ bottomSheetModalRef }
-                { ...bottomSheetProps }
-                title={ bottomSheetTitle }
-                content={ bottomSheetContent }
-                closeButton={ bottomSheetCloseButton }
-                reopen={ reopenBottomSheet }
-                forceClose={ forceCloseBottomSheet }
-            />
+            {
+                bottomSheets.map(({ ref, props }, index) => (
+                    <BottomSheet
+                        key={ index }
+                        ref={ ref }
+                        index={ 0 }
+                        enableHandlePanningGesture
+                        enableContentPanningGesture
+                        enableDismissOnClose
+                        enableOverDrag={ false }
+                        backdropComponent={ () => <BottomSheetBackdrop /> }
+                        onChange={ onChangeSnapPoint }
+                        { ...props }
+                        snapPoints={ props.snapPoints || ["100%"] }
+                        dismissBottomSheet={ () => dismissBottomSheet(id) }
+                        closeBottomSheet={ () => closeBottomSheet(id) }
+                    />
+                ))
+            }
         </BottomSheetContext.Provider>
     )
 }
 
-export const useBottomSheet =
-    () =>
-        useContext<BottomSheetProviderValue>(
-            BottomSheetContext as Context<BottomSheetProviderValue>
-        );
+export const useBottomSheet = () =>
+    useContext<BottomSheetProviderValue>(
+        BottomSheetContext as Context<BottomSheetProviderValue>
+    );

@@ -4,11 +4,11 @@ import MultiStepForm from "../../../components/MultiStepForm/MultiStepForm";
 import { SIGN_UP_STEPS_FIELD, SIGN_UP_STEPS_TITLE } from "../../../constants/schemas/signUpSchema";
 
 interface SignUpFormProps {
-   forceCloseBottomSheet: () => void
+   dismissBottomSheet?: () => void
 }
 
 const SignUpForm: React.FC<SignUpFormProps> = ({
-    forceCloseBottomSheet
+    dismissBottomSheet = () => {}
 }) => {
     const {
         control,
@@ -16,7 +16,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({
         trigger,
         resetField,
         steps
-    } = useSignUpForm(forceCloseBottomSheet);
+    } = useSignUpForm(dismissBottomSheet);
 
     return (
         <MultiStepForm

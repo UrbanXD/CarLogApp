@@ -10,7 +10,7 @@ import { UseCustomFormProps } from "../../../constants/constants";
 
 const useEditCarForm = (
     car: CarTableType,
-    forceCloseBottomSheet: () => void,
+    dismissBottomSheet: () => void,
     carImage?: string
 ) => {
     const database = useDatabase();
@@ -37,8 +37,9 @@ const useEditCarForm = (
                     oldCar: car,
                     newCar: editedCar
                 }));
+
                 reset();
-                forceCloseBottomSheet();
+                dismissBottomSheet();
             } catch (e) {
                 console.error("Hiba a submitHandler-ben:", e);
             }

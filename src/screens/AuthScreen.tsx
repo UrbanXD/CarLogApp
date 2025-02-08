@@ -16,16 +16,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const AuthScreen: React.FC = () => {
     const { top } = useSafeAreaInsets();
-    const { openBottomSheet, forceCloseBottomSheet  } = useBottomSheet();
+    const { openBottomSheet } = useBottomSheet();
     const { session, user } = useAuth();
 
     const openRegister = () => {
         openBottomSheet({
             title: "Felhasználó létrehozás",
-            content:
-                <SignUpForm
-                    forceCloseBottomSheet={ forceCloseBottomSheet }
-                />,
+            content: <SignUpForm />,
             snapPoints: ["85%"],
             enableDismissOnClose: false
         });
@@ -34,10 +31,7 @@ const AuthScreen: React.FC = () => {
     const openLogin = () => {
         openBottomSheet({
             title: "Bejelentkezés",
-            content:
-                <SignInForm
-                    forceCloseBottomSheet={ forceCloseBottomSheet }
-                />,
+            content: <SignInForm />,
             snapPoints: ["85%"],
             enableDismissOnClose: false
         });

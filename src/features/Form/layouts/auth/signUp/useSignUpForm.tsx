@@ -4,7 +4,7 @@ import { useAuth } from "../../../../Auth/context/AuthProvider";
 import useSignUpSteps from "./steps/useSignUpSteps";
 
 const useSignUpForm = (
-    forceCloseBottomSheet: () => void
+    dismissBottomSheet: () => void
 ) => {
     const { signUp } = useAuth();
 
@@ -18,7 +18,7 @@ const useSignUpForm = (
     const submitHandler =
         handleSubmit(
         async (newUser: SignUpFormFieldType) =>
-            await signUp(newUser, forceCloseBottomSheet)
+            await signUp(newUser, dismissBottomSheet)
         );
 
     return {
