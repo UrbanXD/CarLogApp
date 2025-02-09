@@ -1,4 +1,14 @@
-import React, { Context, createContext, createRef, ReactNode, RefObject, useContext, useMemo, useState } from "react";
+import React, {
+    Context,
+    createContext,
+    createRef,
+    ReactNode,
+    RefObject,
+    useCallback,
+    useContext, useEffect,
+    useMemo, useRef,
+    useState
+} from "react";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
 import { useAlert } from "../../Alert/context/AlertProvider";
@@ -36,35 +46,44 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
     const { openModal } = useAlert();
 
     const [bottomSheets, setBottomSheets] = useState<Array<BottomSheet>>([]);
-    const [isManuallyClosed, setIsManuallyClosed] = useState<boolean>(false);
+    const [manuallyClosed, setManuallyClosed] = useState<boolean>(false);
 
-    const openBottomSheet = (args: OpenBottomSheetArgs) => {
-        const ref = createRef<BottomSheetModal>();
+    useEffect(() => {
+        const bottomSheet = getCurrentBottomSheet();
+        if(!bottomSheet) return;
 
-        setBottomSheets(prevState => {
-            const prevLastIndex = prevState.length - 1;
-            if(prevLastIndex >= 0) {
-                prevState[prevLastIndex]?.ref.current?.close();
-                setIsManuallyClosed(true);
-            }
+        bottomSheet.ref.current?.present();
+    }, [bottomSheets]);
 
-            return [...prevState, { ref, props: args }]
-        });
-        setTimeout(() => ref.current?.present(), 0);
-    }
-
-    const getCurrentBottomSheet = () => {
+    const getCurrentBottomSheet = useCallback(() => {
         const index = bottomSheets.length - 1;
         if(index < 0) return null;
 
         return bottomSheets[index];
+    }, [bottomSheets])
+
+    const openBottomSheet = (args: OpenBottomSheetArgs) => {
+        const newBottomSheet = {
+            ref: createRef<BottomSheetModal>(),
+            props: args
+        };
+
+        setBottomSheets(prevState => {
+            const lastIndex = prevState.length - 1;
+            if(lastIndex < 0) return [newBottomSheet];
+
+            setManuallyClosed(true);
+            prevState[lastIndex].ref.current?.close();
+
+            return [...prevState, newBottomSheet];
+        });
     }
 
     const closeBottomSheet = () => {
         const bottomSheet = getCurrentBottomSheet();
         if(!bottomSheet) return;
 
-        bottomSheet.ref.current?.close();
+        currentBottomSheet.ref.current?.close();
     }
 
     const dismissBottomSheet = () => {
@@ -75,11 +94,11 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
             prevState => {
                 const lastIndex = prevState.length - 1;
                 if(lastIndex < 0) return new Array<BottomSheet>();
+
                 prevState[lastIndex].ref.current?.dismiss();
 
                 const newLastIndex = lastIndex - 1;
                 if(newLastIndex < 0) return new Array<BottomSheet>();
-                prevState[newLastIndex]?.ref?.current?.present();
 
                 return prevState.slice(0, newLastIndex + 1);
             }
@@ -99,7 +118,9 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
 
         if(index === -1) {
             KeyboardController.dismiss();
-            if(isManuallyClosed) return setIsManuallyClosed(false);
+
+            console.log(manuallyClosed)
+            if(manuallyClosed) return setManuallyClosed(false);
 
             if(!bottomSheet.props.enableDismissOnClose) {
                 return openModal(
