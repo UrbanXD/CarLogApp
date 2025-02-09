@@ -160,8 +160,6 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
                         onChange={ onChangeSnapPoint }
                         { ...props }
                         snapPoints={ props.snapPoints || ["100%"] }
-                        dismissBottomSheet={ () => dismissBottomSheet(id) }
-                        closeBottomSheet={ () => closeBottomSheet(id) }
                     />
                 ))
             }

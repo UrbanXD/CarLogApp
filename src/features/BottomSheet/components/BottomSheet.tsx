@@ -12,8 +12,6 @@ interface BottomSheetProps extends Partial<BottomSheetModalProps> {
     title?: string
     content: ReactNode
     closeButton?: ReactNode
-    dismissBottomSheet: () => void
-    closeBottomSheet: () => void
 }
 
 const BottomSheet=
@@ -22,8 +20,6 @@ const BottomSheet=
             title,
             content,
             closeButton,
-            dismissBottomSheet,
-            closeBottomSheet,
             ...restProps
         } = props;
 
@@ -32,17 +28,6 @@ const BottomSheet=
         const { top } = useSafeAreaInsets();
         const snaps = snapPoints as Array<string | number> || [];
         const styles = useStyles(snaps[0] === "100%", !!enableHandlePanningGesture, top);
-
-        const enhancedContent =
-            React.isValidElement(content)
-            ?   React.cloneElement(
-                    content,
-                    {
-                        dismissBottomSheet,
-                        closeBottomSheet
-                    }
-                )
-            :   content;
 
         return (
             <BottomSheetModal
@@ -70,7 +55,7 @@ const BottomSheet=
                             </Text>
                         </View>
                     }
-                    { enhancedContent }
+                    { content }
                 </BottomSheetView>
             </BottomSheetModal>
         )

@@ -77,15 +77,15 @@ const RootLayout: React.FC = () => {
         <DatabaseProvider>
             <Compactor components={[
                 { Component: ThemeProvider, props: { value: theme } },
-                { Component: AlertProvider },
-                { Component: AuthProvider },
                 { Component: Provider, props: { store } },
-                { Component: GestureHandlerRootView, props: { style: { flex: 1 } } },
-                { Component: BottomSheetModalProvider },
-                { Component: BottomSheetProvider },
                 { Component: SafeAreaProvider },
                 { Component: KeyboardProvider },
                 { Component: PortalProvider },
+                { Component: GestureHandlerRootView, props: { style: { flex: 1 } } },
+                { Component: AlertProvider },
+                { Component: BottomSheetModalProvider },
+                { Component: BottomSheetProvider },
+                { Component: AuthProvider },
             ]}>
                 <Layout />
             </Compactor>
