@@ -32,6 +32,7 @@ interface BottomSheetProviderValue {
     openBottomSheet: (args: OpenBottomSheetArgs) => void
     closeBottomSheet: () => void
     dismissBottomSheet: () => void
+    dismissAllBottomSheet: () => void
 }
 
 const BottomSheetContext = createContext<BottomSheetProviderValue | null>(null);
@@ -105,6 +106,12 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         );
     }
 
+    const dismissAllBottomSheet = () => {
+        bottomSheets.map(bottomSheet => bottomSheet.ref.current?.dismiss());
+
+        setBottomSheets(new Array<BottomSheet>());
+    }
+
     const reopenBottomSheet = () => {
         const bottomSheet = getCurrentBottomSheet();
         if(!bottomSheet) return;
@@ -139,7 +146,8 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         openBottomSheet,
         closeBottomSheet,
         dismissBottomSheet,
-    }), [openBottomSheet, closeBottomSheet, dismissBottomSheet]);
+        dismissAllBottomSheet
+    }), [openBottomSheet, closeBottomSheet, dismissBottomSheet, dismissAllBottomSheet]);
 
     return (
         <BottomSheetContext.Provider
