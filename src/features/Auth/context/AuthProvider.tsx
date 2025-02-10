@@ -10,20 +10,14 @@ import signUpToast from "../../Alert/layouts/toast/signUpToast";
 import { SignUpFormFieldType } from "../../Form/constants/schemas/signUpSchema.tsx";
 import { SignInFormFieldType } from "../../Form/constants/schemas/signInSchema.tsx";
 import signInToast from "../../Alert/layouts/toast/signInToast.ts";
+import { useBottomSheet } from "../../BottomSheet/context/BottomSheetProvider.tsx";
+import VerifyOTP from "../components/VerifyOTP.tsx";
 
-type SignUpFunction = (
-    user: SignUpFormFieldType,
-    dismissBottomSheet: () => void
-) => Promise<void>
+export type SignUpFunction = (user: SignUpFormFieldType) => Promise<void>
 
-type SignInFunction = (
-    user: SignInFormFieldType,
-    dismissBottomSheet: () => void
-) => Promise<void>
+export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
 
-type ResetPasswordFunction = (
-    newPassword: string
-) => Promise<void>
+export type ResetPasswordFunction = (newPassword: string) => Promise<void>
 
 interface AuthProviderValue {
     user: User | null
@@ -44,6 +38,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { supabaseConnector, powersync } = useDatabase();
     const { addToast } = useAlert();
+    const { openBottomSheet, dismissBottomSheet, dismissAllBottomSheet } = useBottomSheet();
 
     const [user, setUser] = useState<User | null>(null);
     const [session, setSession] = useState<Session | null>(null)
@@ -87,10 +82,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if(session) AsyncStorage.removeItem(LOCAL_STORAGE_KEYS.notConfirmedUser);
     }, [session]);
 
-    const signUp: SignUpFunction = async (
-        user,
-        dismissBottomSheet
-    ) => {
+    const signUp: SignUpFunction = async (user) => {
         try {
             const {
                 email,
@@ -113,7 +105,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
             if(emailError) throw emailError;
             if(emailExists) throw { code: "email_exists" } as AuthApiError;
-
 
             const { data: { user: newUser }, error } =
                 await supabaseConnector
@@ -139,16 +130,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             );
 
             await dismissBottomSheet();
+            openBottomSheet({
+                snapPoints: ["100%"],
+                content:
+                    <VerifyOTP
+                        type="signup"
+                        title="Email cím hitelesítés"
+                        email={ user.email }
+                        handleVerification={
+                            async (errorCode?: string) => {
+                                console.log(errorCode)
+                                if(errorCode) return addToast(signUpToast[errorCode] || signUpToast.otp_error);
 
-            router.push({
-                pathname: "/verify",
-                params: {
-                    type: "signup",
-                    title: "Email cím hitelesítés",
-                    email: email,
-                    toastMessages: JSON.stringify(signUpToast),
-                    replaceHREF: "/(main)"
-                }
+                                addToast(signUpToast.success);
+                                await dismissAllBottomSheet();
+                            }
+                        }
+                    />,
+                enableDismissOnClose: true
             });
         } catch (error) {
             let toast = signUpToast[error.code];
@@ -158,10 +157,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     }
 
-    const signIn: SignInFunction = async (
-        user,
-        dismissBottomSheet
-    ) => {
+    const signIn: SignInFunction = async (user) => {
         try {
             const { error } =
                 await supabaseConnector
@@ -187,7 +183,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 throw error;
             }
 
-            dismissBottomSheet();
+            await dismissAllBottomSheet();
         } catch (error) {
             if(error.code) {
                 const toastMessage = signInToast[error.code];

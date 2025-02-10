@@ -7,18 +7,19 @@ import TextDivider from "../../../../../components/TextDivider";
 import { theme } from "../../../../../constants/theme";
 import Form from "../../../components/Form";
 import useSignInForm from "./useSignInForm";
+import {SignInFunction} from "../../../../Auth/context/AuthProvider.tsx";
 
 interface SignInFormProps {
-    dismissBottomSheet?: () => void
+    handleSignIn: SignInFunction
 }
 
 const SignInForm: React.FC<SignInFormProps> = ({
-    dismissBottomSheet = () => {},
+    handleSignIn
 }) => {
     const {
         control,
         submitHandler,
-    } = useSignInForm(dismissBottomSheet);
+    } = useSignInForm(handleSignIn);
 
     return (
         <Form>
@@ -42,6 +43,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
             </Text>
             <Button.Text
                 text="Bejelentkezés"
+                loadingIndicator
                 onPress={ submitHandler }
             />
             <TextDivider

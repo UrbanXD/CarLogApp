@@ -1,21 +1,17 @@
-import { useAuth } from "../../../../Auth/context/AuthProvider";
+import { SignInFunction } from "../../../../Auth/context/AuthProvider";
 import { useForm } from "react-hook-form";
 import { SignInFormFieldType, useSignInFormProps } from "../../../constants/schemas/signInSchema";
 
-const useSignInForm = (
-    dismissBottomSheet: () => void
-) => {
-    const { signIn } = useAuth();
-
+const useSignInForm = (signIn: SignInFunction) => {
     const {
-       control,
+        control,
         handleSubmit
     } = useForm<SignInFormFieldType>(useSignInFormProps);
 
     const submitHandler =
         handleSubmit(
         async (user: SignInFormFieldType) =>
-            await signIn(user, dismissBottomSheet)
+            await signIn(user)
         );
 
     return {

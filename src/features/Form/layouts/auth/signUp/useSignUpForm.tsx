@@ -1,13 +1,9 @@
 import { useForm } from "react-hook-form";
 import { SignUpFormFieldType, useSignUpFormProps } from "../../../constants/schemas/signUpSchema";
-import { useAuth } from "../../../../Auth/context/AuthProvider";
 import useSignUpSteps from "./steps/useSignUpSteps";
+import { SignUpFunction } from "../../../../Auth/context/AuthProvider.tsx";
 
-const useSignUpForm = (
-    dismissBottomSheet: () => void
-) => {
-    const { signUp } = useAuth();
-
+const useSignUpForm = (signUp: SignUpFunction) => {
     const {
         control,
         handleSubmit,
@@ -18,7 +14,7 @@ const useSignUpForm = (
     const submitHandler =
         handleSubmit(
         async (newUser: SignUpFormFieldType) =>
-            await signUp(newUser, dismissBottomSheet)
+            await signUp(newUser)
         );
 
     return {

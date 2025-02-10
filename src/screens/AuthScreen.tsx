@@ -9,20 +9,22 @@ import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetProvi
 import Divider from "../components/Divider";
 import SignUpForm from "../features/Form/layouts/auth/signUp/SignUpForm";
 import { useAuth } from "../features/Auth/context/AuthProvider";
-import { router } from "expo-router";
 import signUpToast from "../features/Alert/layouts/toast/signUpToast";
 import SignInForm from "../features/Form/layouts/auth/signIn/SignInForm";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import VerifyOTP from "../features/Auth/components/VerifyOTP.tsx";
+import { useAlert } from "../features/Alert/context/AlertProvider.tsx";
 
 const AuthScreen: React.FC = () => {
     const { top } = useSafeAreaInsets();
-    const { openBottomSheet } = useBottomSheet();
-    const { session, user } = useAuth();
+    const { openBottomSheet, dismissBottomSheet } = useBottomSheet();
+    const { addToast } = useAlert();
+    const { session, user, signUp, signIn } = useAuth();
 
     const openRegister = () => {
         openBottomSheet({
             title: "Felhasználó létrehozás",
-            content: <SignUpForm />,
+            content: <SignUpForm handleSignUp={ signUp } />,
             snapPoints: ["85%"],
             enableDismissOnClose: false
         });
@@ -31,23 +33,32 @@ const AuthScreen: React.FC = () => {
     const openLogin = () => {
         openBottomSheet({
             title: "Bejelentkezés",
-            content: <SignInForm />,
+            content: <SignInForm handleSignIn={ signIn } />,
             snapPoints: ["85%"],
             enableDismissOnClose: false
         });
     };
 
-    const openVerification = useCallback(async () => {
+    const openVerification = useCallback( () => {
         if(user && user.email) {
-            router.push({
-                pathname: "/verify",
-                params: {
-                    type: "signup",
-                    title: "Email cím hitelesítés",
-                    email: user.email,
-                    toastMessages: JSON.stringify(signUpToast),
-                    replaceHREF: "/(main)"
-                }
+            openBottomSheet({
+                snapPoints: ["100%"],
+                content:
+                    <VerifyOTP
+                        type="signup"
+                        title="Email cím hitelesítés"
+                        email={ user.email }
+                        handleVerification={
+                            (errorCode?: string) => {
+                                console.log(errorCode)
+                                if(errorCode) return addToast(signUpToast[errorCode] || signUpToast.otp_error);
+
+                                addToast(signUpToast.success);
+                                dismissBottomSheet();
+                            }
+                        }
+                    />,
+                enableDismissOnClose: true
             });
         }
     }, [user])
