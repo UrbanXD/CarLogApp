@@ -5,30 +5,16 @@ import { theme } from "../../../../../constants/theme";
 import { FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants/constants";
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 import Button from "../../../../../components/Button/Button";
-import { useDatabase } from "../../../../Database/connector/Database";
-import { AuthApiError, EmailOtpType } from "@supabase/supabase-js";
-import { router } from "expo-router";
-import { useAlert } from "../../../../Alert/context/AlertProvider";
-import { ToastMessages } from "../../../../Alert/constants/constants";
 
 interface InputOTPProps {
-    email: string,
-    otpType: EmailOtpType,
-    numberOfDigits?: number,
-    replaceHREF?: string,
-    toastMessages?: ToastMessages
+    numberOfDigits?: number
+    onSubmit: (token: string) => Promise<void>
 }
 
 const InputOTP: React.FC<InputOTPProps> = ({
-    email,
-    otpType,
     numberOfDigits = 6,
-    replaceHREF,
-    toastMessages
+    onSubmit
 }) => {
-    const { supabaseConnector } = useDatabase();
-    const { addToast } = useAlert();
-
     const hiddenInputRef = useRef<TextInput>(null);
 
     const [code, setCode] = useState<string>("");
@@ -60,28 +46,6 @@ const InputOTP: React.FC<InputOTPProps> = ({
 
             return value
         })
-    }
-
-    const onSubmit = async () => {
-        try {
-            await supabaseConnector.verifyOTP({
-                email: email,
-                token: code,
-                type: otpType
-            });
-
-            if(toastMessages?.success) addToast(toastMessages.success);
-
-            if(replaceHREF) return router.replace(replaceHREF);
-            if(router.canGoBack()) return router.back();
-            router.replace("/");
-        } catch (error: AuthApiError | any) {
-            if(error.code){
-                if(toastMessages?.[error.code]) return addToast(toastMessages[error.code]);
-            }
-
-            if(toastMessages?.error) addToast(toastMessages.otp_error);
-        }
     }
 
     // androidon ha a mobil back gombjaval zarom be a billenytuzetet, akkor focus marad az inputon
@@ -157,7 +121,7 @@ const InputOTP: React.FC<InputOTPProps> = ({
                 text="Tovább"
                 width={ wp(75) }
                 disabled={ code.length !== numberOfDigits }
-                onPress={ onSubmit }
+                onPress={ () => onSubmit(code) }
             />
         </View>
     )
