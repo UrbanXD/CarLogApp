@@ -6,13 +6,10 @@ import { SignInFormFieldType } from "../features/Form/constants/schemas/signInSc
 import { AuthApiError, AuthError } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LOCAL_STORAGE_KEYS } from "../constants/constants.ts";
-import VerifyOTP from "../features/Auth/components/VerifyOTP.tsx";
-import signUpToast from "../features/Alert/layouts/toast/signUpToast.ts";
-import React from "react";
 import { router } from "expo-router";
-import signInToast from "../features/Alert/layouts/toast/signInToast.ts";
-import signOutToast from "../features/Alert/layouts/toast/signOutToast.ts";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
+import { EmailVerificationBottomSheet } from "../features/BottomSheet/presets/index.ts";
+import { SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast/index.ts";
 
 export type SignUpFunction = (user: SignUpFormFieldType) => Promise<void>
 
@@ -74,26 +71,10 @@ const useAuth = () => {
             );
 
             await dismissBottomSheet();
-            openBottomSheet({
-                snapPoints: ["100%"],
-                content:
-                    <VerifyOTP
-                        type="signup"
-                        title="Email cím hitelesítés"
-                        email={ user.email }
-                        handleVerification={
-                            async (errorCode?: string) => {
-                                if(errorCode) return addToast(signUpToast[errorCode] || signUpToast.otp_error);
-
-                                addToast(signUpToast.success);
-                            }
-                        }
-                    />,
-                enableDismissOnClose: true
-            });
+            openBottomSheet(EmailVerificationBottomSheet(addToast));
         } catch (error) {
-            let toast = signUpToast[error.code];
-            if(!toast) toast = signUpToast.error;
+            let toast = SignUpToast[error.code];
+            if(!toast) toast = SignUpToast.error;
 
             addToast(toast);
         }
@@ -115,7 +96,7 @@ const useAuth = () => {
                             type: "signup",
                             title: "Email cím hitelesítés",
                             email: user.email,
-                            toastMessages: JSON.stringify(signInToast),
+                            toastMessages: JSON.stringify(SignInToast),
                             replaceHREF: "/(main)"
                         }
                     });
@@ -128,13 +109,11 @@ const useAuth = () => {
             await dismissAllBottomSheet();
         } catch (error) {
             if(error.code) {
-                const toastMessage = signInToast[error.code];
+                const toastMessage = SignInToast[error.code];
                 if(toastMessage) return addToast(toastMessage);
-
-                return addToast(signInToast.error);
             }
 
-            addToast(signInToast.error);
+            addToast(SignInToast.error);
         }
     }
 
@@ -149,10 +128,10 @@ const useAuth = () => {
             if(error) throw error;
 
             router.replace("/backToRootIndex");
-            addToast(signOutToast.success);
+            addToast(SignOutToast.success);
             await powersync.disconnectAndClear();
         } catch (error) {
-            if(error instanceof AuthError) return addToast(signOutToast.error);
+            if(error instanceof AuthError) return addToast(SignOutToast.error);
             // ha nem AuthError akkor sikeres a kijelentkezes, de mashol hiba tortent
         }
     }

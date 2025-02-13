@@ -1,8 +1,7 @@
-import {AlertModalProps} from "../../components/AlertModal";
-import {ALERT_ICONS} from "../../constants/constants";
-import {theme} from "../../../../constants/theme";
+import { AlertModalProps } from "../../components/AlertModal";
+import { ALERT_ICONS } from "../../constants/constants";
 
-export const bottomSheetLeavingModal = (reopenBottomSheet: () => void, dismissBottomSheet: () => void) => {
+export const BottomSheetLeavingModal = (reopenBottomSheet: () => void, dismissBottomSheet: () => void) => {
     return {
         icon: ALERT_ICONS.warning,
         title: "Az adatok elveszhetnek!",

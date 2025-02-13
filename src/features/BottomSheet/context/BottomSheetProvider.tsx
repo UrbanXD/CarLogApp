@@ -1,11 +1,11 @@
 import React, { createRef, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useAlert } from "../../Alert/context/AlertProvider";
-import { bottomSheetLeavingModal } from "../../Alert/layouts/modal/bottomSheetLeavingModal";
 import BottomSheetBackdrop from "../components/BottomSheetBackdrop";
 import BottomSheet from "../components/BottomSheet";
 import { KeyboardController } from "react-native-keyboard-controller";
 import { BottomSheetContext, BottomSheetType, OpenBottomSheetArgs } from "./BottomSheetContext.ts";
+import { BottomSheetLeavingModal } from "../../Alert/presets/modal/index.ts";
 
 interface BottomSheetProviderProps {
     children: ReactNode | null
@@ -94,7 +94,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
 
             if(!bottomSheet.props.enableDismissOnClose) {
                 return openModal(
-                    bottomSheetLeavingModal(
+                    BottomSheetLeavingModal(
                         reopenBottomSheet,
                         dismissBottomSheet
                     )
