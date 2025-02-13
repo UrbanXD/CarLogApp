@@ -1,17 +1,18 @@
-import React, {Context, createContext, ReactElement, useCallback, useContext, useMemo} from "react";
+import React, { Context, createContext, ReactElement, useCallback, useContext, useMemo } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/constants";
-import {hexToRgba} from "../../../utils/colors/hexToRgba";
-import {theme} from "../../../constants/theme";
-import {AlertToastProps} from "../components/AlertToast";
-import {AlertModalProps} from "../components/AlertModal";
+import { hexToRgba } from "../../../utils/colors/hexToRgba";
+import { theme } from "../../../constants/theme";
+import { AlertToastProps } from "../components/AlertToast";
+import { AlertModalProps } from "../components/AlertModal";
 import Alert from "../components/Alert";
+import { AddToastFunction, OpenModalFunction } from "../constants/constants.ts";
 
 interface AlertProviderValue {
-    addToast: (args: AlertToastProps) => void,
-    removeToast: (id: string) => void,
-    openModal: (args: AlertModalProps) => void,
-    closeModal: () => void,
+    addToast: AddToastFunction
+    removeToast: (id: string) => void
+    openModal: OpenModalFunction
+    closeModal: () => void
 }
 
 const AlertContext =

@@ -1,8 +1,12 @@
 import { theme } from "../../../constants/theme";
 import { ErrorCode } from "@supabase/auth-js/src/lib/error-codes";
 import { AlertToastProps } from "../components/AlertToast";
+import { AlertModalProps } from "../components/AlertModal.tsx";
 
-export type ToastMessages = Record<"success" | "error" | "otp_error" | ErrorCode | string, AlertToastProps>
+export type AddToastFunction = (args: AlertToastProps) => void;
+export type OpenModalFunction = (args: AlertModalProps) => void;
+
+export type ToastMessages = Record<AlertType | "otp_error" | ErrorCode | string, AlertToastProps | ((message: string) => AlertToastProps)>
 
 export type AlertType =
     "success" |
