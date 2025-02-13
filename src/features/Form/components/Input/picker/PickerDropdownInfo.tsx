@@ -4,8 +4,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import TextInput from "../text/TextInput";
 import { theme } from "../../../../../constants/theme";
 import Icon from "../../../../../components/Icon";
-import {useAlert} from "../../../../Alert/context/AlertProvider";
-import pickerDisabledToast from "../../../../Alert/layouts/toast/pickerDisabledToast";
+import { useAlert } from "../../../../Alert/context/AlertProvider";
+import { PickerDisabledToast } from "../../../../Alert/presets/toast/index.ts";
 
 interface PickerDropdownInfoProps {
     toggleDropdown?: () => void
@@ -32,7 +32,7 @@ export const PickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
     const { addToast } = useAlert();
 
     const openWarning = () =>
-        addToast(pickerDisabledToast.warning(disabledText));
+        addToast(PickerDisabledToast.warning(disabledText));
 
     return (
         <TouchableOpacity

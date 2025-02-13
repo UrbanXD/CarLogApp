@@ -4,8 +4,8 @@ import { addCar } from "../../../../Database/redux/cars/functions/addCar";
 import { useDatabase } from "../../../../Database/connector/Database";
 import { useAlert } from "../../../../Alert/context/AlertProvider";
 import { useForm } from "react-hook-form";
-import newCarToast from "../../../../Alert/layouts/toast/newCarToast";
 import useCarSteps from "../steps/useCarSteps";
+import { NewCarToast } from "../../../../Alert/presets/toast/index.ts";
 
 const useNewCarForm = (
     forceCloseBottomSheet: () => void
@@ -29,7 +29,7 @@ const useNewCarForm = (
                 //ha sikeres a hozzaadas
                 reset();
                 forceCloseBottomSheet();
-                addToast(newCarToast.success);
+                addToast(NewCarToast.success);
             } catch (e){
                 console.log(e);
                 //ha sikertelen

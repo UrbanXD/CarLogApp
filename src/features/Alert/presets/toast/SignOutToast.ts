@@ -1,4 +1,5 @@
 import { AlertToastProps } from "../../components/AlertToast";
+import {ToastMessages} from "../../constants/constants.ts";
 
 const success: AlertToastProps = {
     type: "success",
@@ -10,7 +11,7 @@ const error: AlertToastProps = {
     body: "Váratlan hiba lépett fel a kijelentkezés!"
 }
 
-export default {
+export const SignOutToast: ToastMessages = {
     success,
     error
 }

@@ -6,14 +6,11 @@ import { theme } from "../constants/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button/Button";
 import Divider from "../components/Divider";
-import SignUpForm from "../features/Form/layouts/auth/signUp/SignUpForm";
 import { useSession } from "../features/Auth/context/SessionProvider.tsx";
-import signUpToast from "../features/Alert/layouts/toast/signUpToast";
-import SignInForm from "../features/Form/layouts/auth/signIn/SignInForm";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import VerifyOTP from "../features/Auth/components/VerifyOTP.tsx";
 import { useAlert } from "../features/Alert/context/AlertProvider.tsx";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
+import { EmailVerificationBottomSheet, SignInBottomSheet, SignUpBottomSheet } from "../features/BottomSheet/presets";
 
 const AuthScreen: React.FC = () => {
     const { top } = useSafeAreaInsets();
@@ -21,43 +18,16 @@ const AuthScreen: React.FC = () => {
     const { addToast } = useAlert();
     const { session, notVerifiedUser } = useSession();
 
-    const openRegister = () => {
-        openBottomSheet({
-            title: "Felhasználó létrehozás",
-            content: <SignUpForm />,
-            snapPoints: ["90%"],
-            enableDismissOnClose: false
-        });
-    }
+    const openSignUp =
+        () => openBottomSheet(SignUpBottomSheet);
 
-    const openLogin = () => {
-        openBottomSheet({
-            title: "Bejelentkezés",
-            content: <SignInForm />,
-            snapPoints: ["90%"],
-            enableDismissOnClose: false
-        });
-    };
+    const openSignIn =
+        () => openBottomSheet(SignInBottomSheet);
+
 
     const openVerification = useCallback( () => {
         if(notVerifiedUser && notVerifiedUser.email) {
-            openBottomSheet({
-                snapPoints: ["100%"],
-                content:
-                    <VerifyOTP
-                        type="signup"
-                        title="Email cím hitelesítés"
-                        email={ notVerifiedUser.email }
-                        handleVerification={
-                            (errorCode?: string) => {
-                                if(errorCode) return addToast(signUpToast[errorCode] || signUpToast.otp_error);
-
-                                addToast(signUpToast.success);
-                            }
-                        }
-                    />,
-                enableDismissOnClose: true
-            });
+            openBottomSheet(EmailVerificationBottomSheet(addToast));
         }
     }, [notVerifiedUser])
 
@@ -94,13 +64,13 @@ const AuthScreen: React.FC = () => {
                 <View style={ styles.actionContainer }>
                     <Button.Text
                         text="Regisztráció"
-                        onPress={ openRegister }
+                        onPress={ openSignUp }
                     />
                     <Text style={ styles.underButtonText }>
                         Már rendelkezel felhasználóval ?
                         <Text
                             style={ styles.linkText }
-                            onPress={ openLogin }
+                            onPress={ openSignIn }
                         >
                             Jelentkezz be
                         </Text>

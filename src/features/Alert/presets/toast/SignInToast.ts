@@ -16,8 +16,8 @@ const invalid_credentials: AlertToastProps = {
     body: "Helytelen email cím és/vagy jelszó!"
 }
 
-export default {
+export const SignInToast: ToastMessages = {
     success,
     error,
     invalid_credentials,
-} as ToastMessages
+}

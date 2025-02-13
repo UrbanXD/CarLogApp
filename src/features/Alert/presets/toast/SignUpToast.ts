@@ -26,10 +26,10 @@ const otp_error: AlertToastProps = {
     body: "Váratlan hiba lépett fel a fiók hitelesítése során!"
 }
 
-export default {
+export const SignUpToast: ToastMessages = {
     success,
     error,
     otp_error,
     otp_expired,
     email_exists
-} as ToastMessages
+}
