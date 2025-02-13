@@ -1,13 +1,13 @@
 import React from "react";
 import TextButton from "../TextButton";
-import {ICON_NAMES} from "../../../constants/constants";
+import { ICON_NAMES } from "../../../constants/constants";
 
 interface MultistepFormNextButtonProps {
     isLastStep?: boolean
     onPress: () => void
 }
 
-const MultistepFormNextButton: React.FC<MultistepFormNextButtonProps> = ({
+export const MultistepFormNextButton: React.FC<MultistepFormNextButtonProps> = ({
     onPress,
     isLastStep
 }) =>
@@ -17,5 +17,3 @@ const MultistepFormNextButton: React.FC<MultistepFormNextButtonProps> = ({
         loadingIndicator
         onPress={ onPress }
     />
-
-export default MultistepFormNextButton;

@@ -1,13 +1,13 @@
 import React from "react";
 import TextButton from "../TextButton";
-import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {theme} from "../../../constants/theme";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { theme } from "../../../constants/theme";
 
 interface GoogleButtonProps {
     onPress: () => void;
 }
 
-const GoogleButton: React.FC<GoogleButtonProps> = ({ onPress }) =>
+export const GoogleButton: React.FC<GoogleButtonProps> = ({ onPress }) =>
     <TextButton
         text="Folytatás Google fiókkal"
         fontSize={ hp(2.35) }
@@ -16,5 +16,3 @@ const GoogleButton: React.FC<GoogleButtonProps> = ({ onPress }) =>
         iconLeft={ require("../../../assets/images/google_logo.png") }
         onPress={ onPress }
     />
-
-export default GoogleButton;

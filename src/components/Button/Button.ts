@@ -1,9 +1,7 @@
 import Row from "./ButtonsRow";
 import Text from "./TextButton";
 import Icon from "./IconButton";
-import Google from "./layouts/GoogleButton";
-import MultistepFormNext from "./layouts/MultistepFormNextButton";
-import MultistepFormBack from "./layouts/MultistepFormBackButton";
+import { GoogleButton as Google, MultistepFormBackButton as MultistepFormBack, MultistepFormNextButton as MultistepFormNext} from "./presets";
 
 const Button = {
     Row,
