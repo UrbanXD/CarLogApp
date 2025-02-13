@@ -1,11 +1,9 @@
-import {useBottomSheet} from "../../../features/BottomSheet/context/BottomSheetProvider";
-import {RootState} from "../../../features/Database/redux/store";
-import {useSelector} from "react-redux";
-import React, {useEffect, useState} from "react";
-import {CarouselItemType} from "../../../components/Carousel/Carousel";
+import React, { useEffect, useState } from "react";
+import { CarouselItemType } from "../../../components/Carousel/Carousel";
 import NewCarForm from "../../../features/Form/layouts/car/addCar/NewCarForm";
-import {router} from "expo-router";
+import { router } from "expo-router";
 import useCars from "../../../hooks/useCars";
+import { useBottomSheet } from "../../../features/BottomSheet/context/BottomSheetContext.ts";
 
 const useMyGarage = () => {
     const { openBottomSheet, forceCloseBottomSheet } = useBottomSheet();

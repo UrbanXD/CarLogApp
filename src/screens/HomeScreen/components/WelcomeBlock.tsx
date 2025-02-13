@@ -2,10 +2,10 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { FONT_SIZES, GLOBAL_STYLE } from "../../../constants/constants";
 import { theme } from "../../../constants/theme";
-import { useAuth } from "../../../features/Auth/context/AuthProvider.tsx";
+import { useSession } from "../../../features/Auth/context/SessionProvider.tsx";
 
 const WelcomeBlock: React.FC = () => {
-    const { session } = useAuth();
+    const { session } = useSession();
 
     return (
         <View

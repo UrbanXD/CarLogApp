@@ -1,25 +1,18 @@
 import React from "react";
 import Input from "../../../components/Input/Input";
 import { GLOBAL_STYLE, ICON_NAMES } from "../../../../../constants/constants";
-import {Text, View} from "react-native";
+import { Text } from "react-native";
 import Button from "../../../../../components/Button/Button";
 import TextDivider from "../../../../../components/TextDivider";
 import { theme } from "../../../../../constants/theme";
 import Form from "../../../components/Form";
 import useSignInForm from "./useSignInForm";
-import {SignInFunction} from "../../../../Auth/context/AuthProvider.tsx";
 
-interface SignInFormProps {
-    handleSignIn: SignInFunction
-}
-
-const SignInForm: React.FC<SignInFormProps> = ({
-    handleSignIn
-}) => {
+const SignInForm: React.FC = () => {
     const {
         control,
         submitHandler,
-    } = useSignInForm(handleSignIn);
+    } = useSignInForm();
 
     return (
         <Form>

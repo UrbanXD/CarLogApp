@@ -7,6 +7,7 @@ import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import BottomSheetBackdrop from "./BottomSheetBackdrop";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BottomSheetContext, useBottomSheet } from "../context/BottomSheetContext.ts";
 
 interface BottomSheetProps extends Partial<BottomSheetModalProps> {
     title?: string
@@ -55,7 +56,9 @@ const BottomSheet=
                             </Text>
                         </View>
                     }
-                    { content }
+                    <BottomSheetContext.Provider value={ useBottomSheet() }>
+                        { content }
+                    </BottomSheetContext.Provider>
                 </BottomSheetView>
             </BottomSheetModal>
         )

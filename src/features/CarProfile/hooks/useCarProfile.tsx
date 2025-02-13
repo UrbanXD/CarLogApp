@@ -1,7 +1,7 @@
 import { useDatabase } from "../../Database/connector/Database";
 import { useAlert } from "../../Alert/context/AlertProvider";
 import useCars from "../../../hooks/useCars";
-import { useBottomSheet } from "../../BottomSheet/context/BottomSheetProvider";
+import { useBottomSheet } from "../../BottomSheet/context/BottomSheetContext.ts";
 import EditCarForm from "../../Form/layouts/car/editCar/EditCarForm";
 import React from "react";
 import { ICON_NAMES } from "../../../constants/constants";

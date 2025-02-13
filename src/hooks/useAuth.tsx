@@ -1,17 +1,18 @@
-import { AuthApiError, AuthError, Session, User } from "@supabase/supabase-js";
-import React, { Context, createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { useDatabase } from "../../Database/connector/Database";
-import { router } from "expo-router";
+import { useDatabase } from "../features/Database/connector/Database.ts";
+import { useAlert } from "../features/Alert/context/AlertProvider.tsx";
+import { useSession } from "../features/Auth/context/SessionProvider.tsx";
+import { SignUpFormFieldType } from "../features/Form/constants/schemas/signUpSchema.tsx";
+import { SignInFormFieldType } from "../features/Form/constants/schemas/signInSchema.tsx";
+import { AuthApiError, AuthError } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LOCAL_STORAGE_KEYS } from "../../../constants/constants";
-import { useAlert } from "../../Alert/context/AlertProvider";
-import signOutToast from "../../Alert/layouts/toast/signOutToast";
-import signUpToast from "../../Alert/layouts/toast/signUpToast";
-import { SignUpFormFieldType } from "../../Form/constants/schemas/signUpSchema.tsx";
-import { SignInFormFieldType } from "../../Form/constants/schemas/signInSchema.tsx";
-import signInToast from "../../Alert/layouts/toast/signInToast.ts";
-import { useBottomSheet } from "../../BottomSheet/context/BottomSheetProvider.tsx";
-import VerifyOTP from "../components/VerifyOTP.tsx";
+import { LOCAL_STORAGE_KEYS } from "../constants/constants.ts";
+import VerifyOTP from "../features/Auth/components/VerifyOTP.tsx";
+import signUpToast from "../features/Alert/layouts/toast/signUpToast.ts";
+import React from "react";
+import { router } from "expo-router";
+import signInToast from "../features/Alert/layouts/toast/signInToast.ts";
+import signOutToast from "../features/Alert/layouts/toast/signOutToast.ts";
+import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
 
 export type SignUpFunction = (user: SignUpFormFieldType) => Promise<void>
 
@@ -19,68 +20,11 @@ export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
 
 export type ResetPasswordFunction = (newPassword: string) => Promise<void>
 
-interface AuthProviderValue {
-    user: User | null
-    session: Session | null
-    signUp: SignUpFunction
-    signIn: SignInFunction
-    signOut: () => void
-    resetPassword: ResetPasswordFunction
-    deleteUserProfile: () => void
-}
-
-const AuthContext = createContext<AuthProviderValue | null>(null);
-
-interface AuthProviderProps {
-    children: ReactNode | null
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+const useAuth = () => {
     const { supabaseConnector, powersync } = useDatabase();
+    const { setNotVerifiedUser } = useSession();
     const { addToast } = useAlert();
     const { openBottomSheet, dismissBottomSheet, dismissAllBottomSheet } = useBottomSheet();
-
-    const [user, setUser] = useState<User | null>(null);
-    const [session, setSession] = useState<Session | null>(null)
-
-    useEffect(() => {
-        supabaseConnector
-            .client
-            .auth
-            .getSession()
-            .then(
-                ({ data: { session } }) => setSession(session)
-            );
-
-        supabaseConnector
-            .client
-            .auth
-            .onAuthStateChange(
-                (_event, session) => setSession(session)
-            );
-
-        AsyncStorage.getItem(LOCAL_STORAGE_KEYS.notConfirmedUser).then((value) => {
-            if(!value) return;
-
-            setUser(JSON.parse(value) as User);
-        });
-    }, []);
-
-    useEffect(() => {
-        console.log("session: ", session, " :session");
-
-        supabaseConnector
-            .client
-            .auth
-            .getUser()
-            .then(
-                ({ data: { user } }) => {
-                    if(user) setUser(null);
-                }
-            );
-
-        if(session) AsyncStorage.removeItem(LOCAL_STORAGE_KEYS.notConfirmedUser);
-    }, [session]);
 
     const signUp: SignUpFunction = async (user) => {
         try {
@@ -123,7 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
             if(error) throw error;
 
-            setUser(newUser);
+            setNotVerifiedUser(newUser);
             await AsyncStorage.setItem(
                 LOCAL_STORAGE_KEYS.notConfirmedUser,
                 JSON.stringify(newUser)
@@ -139,11 +83,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                         email={ user.email }
                         handleVerification={
                             async (errorCode?: string) => {
-                                console.log(errorCode)
                                 if(errorCode) return addToast(signUpToast[errorCode] || signUpToast.otp_error);
 
                                 addToast(signUpToast.success);
-                                await dismissAllBottomSheet();
                             }
                         }
                     />,
@@ -260,21 +202,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     }
 
-    return (
-        <AuthContext.Provider
-            value={{
-                user,
-                session,
-                signUp,
-                signIn,
-                signOut,
-                resetPassword,
-                deleteUserProfile
-            }}
-        >
-            { children }
-        </AuthContext.Provider>
-    )
+    return {
+        signUp,
+        signIn,
+        signOut,
+        resetPassword,
+        deleteUserProfile
+    }
 }
 
-export const useAuth = () => useContext<AuthProviderValue>(AuthContext as Context<AuthProviderValue>);
+export default useAuth;

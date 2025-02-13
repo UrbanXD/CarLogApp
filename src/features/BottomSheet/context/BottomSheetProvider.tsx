@@ -1,41 +1,11 @@
-import React, {
-    Context,
-    createContext,
-    createRef,
-    ReactNode,
-    RefObject,
-    useCallback,
-    useContext, useEffect,
-    useMemo, useRef,
-    useState
-} from "react";
+import React, { createRef, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
 import { useAlert } from "../../Alert/context/AlertProvider";
 import { bottomSheetLeavingModal } from "../../Alert/layouts/modal/bottomSheetLeavingModal";
 import BottomSheetBackdrop from "../components/BottomSheetBackdrop";
 import BottomSheet from "../components/BottomSheet";
 import { KeyboardController } from "react-native-keyboard-controller";
-
-export interface OpenBottomSheetArgs extends Partial<BottomSheetModalProps> {
-    title?: string,
-    content: ReactNode,
-    closeButton?: ReactNode
-}
-
-type BottomSheet = {
-    ref: RefObject<BottomSheetModal>
-    props: OpenBottomSheetArgs
-}
-
-interface BottomSheetProviderValue {
-    openBottomSheet: (args: OpenBottomSheetArgs) => void
-    closeBottomSheet: () => void
-    dismissBottomSheet: () => void
-    dismissAllBottomSheet: () => void
-}
-
-const BottomSheetContext = createContext<BottomSheetProviderValue | null>(null);
+import { BottomSheetContext, BottomSheetType, OpenBottomSheetArgs } from "./BottomSheetContext.ts";
 
 interface BottomSheetProviderProps {
     children: ReactNode | null
@@ -46,7 +16,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
 }) => {
     const { openModal } = useAlert();
 
-    const [bottomSheets, setBottomSheets] = useState<Array<BottomSheet>>([]);
+    const [bottomSheets, setBottomSheets] = useState<Array<BottomSheetType>>([]);
     const [manuallyClosed, setManuallyClosed] = useState<boolean>(false);
 
     useEffect(() => {
@@ -70,12 +40,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         };
 
         setBottomSheets(prevState => {
-            const lastIndex = prevState.length - 1;
-            if(lastIndex < 0) return [newBottomSheet];
-
-            setManuallyClosed(true);
-            prevState[lastIndex].ref.current?.close();
-
+            setManuallyClosed(true); // stack behaviour = "switch", bezarja, viszont jelezni kell, hogy manualisan tortent
             return [...prevState, newBottomSheet];
         });
     }
@@ -91,25 +56,24 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         const bottomSheet = getCurrentBottomSheet();
         if(!bottomSheet) return;
 
+        bottomSheet.props.enableDismissOnClose = true;
+        bottomSheet.ref.current?.dismiss();
+
         setBottomSheets(
-            prevState => {
-                const lastIndex = prevState.length - 1;
-                if(lastIndex < 0) return new Array<BottomSheet>();
-
-                prevState[lastIndex].ref.current?.dismiss();
-
-                const newLastIndex = lastIndex - 1;
-                if(newLastIndex < 0) return new Array<BottomSheet>();
-
-                return prevState.slice(0, newLastIndex + 1);
-            }
+            prevState =>
+                prevState.slice(0, prevState.length - 1)
         );
     }
 
     const dismissAllBottomSheet = () => {
-        bottomSheets.map(bottomSheet => bottomSheet.ref.current?.dismiss());
+        setBottomSheets(prevState => {
+            prevState.map(bottomSheet => {
+                bottomSheet.props.enableDismissOnClose = true;
+                bottomSheet.ref.current?.dismiss();
+            });
 
-        setBottomSheets(new Array<BottomSheet>());
+            return new Array<BottomSheetType>();
+        })
     }
 
     const reopenBottomSheet = () => {
@@ -126,7 +90,6 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         if(index === -1) {
             KeyboardController.dismiss();
 
-            console.log(manuallyClosed)
             if(manuallyClosed) return setManuallyClosed(false);
 
             if(!bottomSheet.props.enableDismissOnClose) {
@@ -146,7 +109,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         openBottomSheet,
         closeBottomSheet,
         dismissBottomSheet,
-        dismissAllBottomSheet
+        dismissAllBottomSheet,
     }), [openBottomSheet, closeBottomSheet, dismissBottomSheet, dismissAllBottomSheet]);
 
     return (
@@ -174,8 +137,3 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         </BottomSheetContext.Provider>
     )
 }
-
-export const useBottomSheet = () =>
-    useContext<BottomSheetProviderValue>(
-        BottomSheetContext as Context<BottomSheetProviderValue>
-    );

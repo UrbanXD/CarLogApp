@@ -16,7 +16,7 @@ import { PortalProvider } from "@gorhom/portal";
 import Compactor from "../components/Compactor";
 import { AlertProvider } from "../features/Alert/context/AlertProvider";
 import SecondaryHeader from "../features/Navigation/components/Header/SecondaryHeader";
-import { AuthProvider } from "../features/Auth/context/AuthProvider";
+import { SessionProvider } from "../features/Auth/context/SessionProvider.tsx";
 import { ThemeProvider } from "@react-navigation/native";
 import { theme } from "../constants/theme";
 
@@ -72,25 +72,22 @@ const Layout:React.FC = () => {
     );
 }
 
-const RootLayout: React.FC = () => {
-    return (
-        <DatabaseProvider>
-            <Compactor components={[
-                { Component: ThemeProvider, props: { value: theme } },
-                { Component: Provider, props: { store } },
-                { Component: SafeAreaProvider },
-                { Component: KeyboardProvider },
-                { Component: PortalProvider },
-                { Component: GestureHandlerRootView, props: { style: { flex: 1 } } },
-                { Component: AlertProvider },
-                { Component: BottomSheetModalProvider },
-                { Component: BottomSheetProvider },
-                { Component: AuthProvider },
-            ]}>
-                <Layout />
-            </Compactor>
-        </DatabaseProvider>
-    )
-}
+const RootLayout: React.FC = () =>
+    <DatabaseProvider>
+        <Compactor components={[
+            { Component: ThemeProvider, props: { value: theme } },
+            { Component: Provider, props: { store } },
+            { Component: SafeAreaProvider },
+            { Component: KeyboardProvider },
+            { Component: PortalProvider },
+            { Component: GestureHandlerRootView, props: { style: { flex: 1 } } },
+            { Component: SessionProvider },
+            { Component: AlertProvider },
+            { Component: BottomSheetModalProvider },
+            { Component: BottomSheetProvider },
+        ]}>
+            <Layout />
+        </Compactor>
+    </DatabaseProvider>
 
 export default RootLayout;

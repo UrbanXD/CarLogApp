@@ -1,15 +1,16 @@
 import { useForm } from "react-hook-form";
 import { SignUpFormFieldType, useSignUpFormProps } from "../../../constants/schemas/signUpSchema";
 import useSignUpSteps from "./steps/useSignUpSteps";
-import { SignUpFunction } from "../../../../Auth/context/AuthProvider.tsx";
+import useAuth from "../../../../../hooks/useAuth.tsx";
 
-const useSignUpForm = (signUp: SignUpFunction) => {
+const useSignUpForm = () => {
     const {
         control,
         handleSubmit,
         trigger,
         resetField
     } = useForm<SignUpFormFieldType>(useSignUpFormProps);
+    const { signUp } = useAuth();
 
     const submitHandler =
         handleSubmit(

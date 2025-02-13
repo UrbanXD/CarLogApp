@@ -1,21 +1,16 @@
 import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import {
-    FONT_SIZES,
-    GLOBAL_STYLE,
-    ICON_NAMES,
-    SEPARATOR_SIZES
-} from "../../constants/constants";
+import { FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/constants";
 import Date from "../../components/Date";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { theme } from "../../constants/theme";
 import { useForm } from "react-hook-form";
 import { getToday } from "../../utils/getDate";
-import { useBottomSheet } from "../BottomSheet/context/BottomSheetProvider";
 import { EditRideFormFieldType, editRideUseFormProps } from "../Form/layouts/editRide/editRideFormSchema";
 import InputText from "../Form/components/Input/text/InputText";
 import ProgressBar from "../../components/ProgressBar";
 import Icon from "../../components/Icon";
+import { useBottomSheet } from "../BottomSheet/context/BottomSheetContext.ts";
 
 type RideType = {
     carUID: string

@@ -3,13 +3,15 @@ import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../constants/constants.ts";
 import Image from "../components/Image.tsx";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { useAuth } from "../features/Auth/context/AuthProvider.tsx";
+import { useSession } from "../features/Auth/context/SessionProvider.tsx";
 import { theme } from "../constants/theme.ts";
 import Divider from "../components/Divider.tsx";
 import Button from "../components/Button/Button.ts";
+import useAuth from "../hooks/useAuth.tsx";
 
 const ProfileScreen: React.FC = () => {
-    const { session, signOut, resetPassword } = useAuth();
+    const { session } = useSession();
+    const { signOut } = useAuth();
 
     return (
         <SafeAreaView style={ styles.pageContainer }>

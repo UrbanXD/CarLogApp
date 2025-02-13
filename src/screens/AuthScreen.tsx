@@ -5,27 +5,27 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-nat
 import { theme } from "../constants/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button/Button";
-import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetProvider";
 import Divider from "../components/Divider";
 import SignUpForm from "../features/Form/layouts/auth/signUp/SignUpForm";
-import { useAuth } from "../features/Auth/context/AuthProvider";
+import { useSession } from "../features/Auth/context/SessionProvider.tsx";
 import signUpToast from "../features/Alert/layouts/toast/signUpToast";
 import SignInForm from "../features/Form/layouts/auth/signIn/SignInForm";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import VerifyOTP from "../features/Auth/components/VerifyOTP.tsx";
 import { useAlert } from "../features/Alert/context/AlertProvider.tsx";
+import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
 
 const AuthScreen: React.FC = () => {
     const { top } = useSafeAreaInsets();
-    const { openBottomSheet, dismissBottomSheet } = useBottomSheet();
+    const { openBottomSheet } = useBottomSheet();
     const { addToast } = useAlert();
-    const { session, user, signUp, signIn } = useAuth();
+    const { session, notVerifiedUser } = useSession();
 
     const openRegister = () => {
         openBottomSheet({
             title: "Felhasználó létrehozás",
-            content: <SignUpForm handleSignUp={ signUp } />,
-            snapPoints: ["85%"],
+            content: <SignUpForm />,
+            snapPoints: ["90%"],
             enableDismissOnClose: false
         });
     }
@@ -33,35 +33,33 @@ const AuthScreen: React.FC = () => {
     const openLogin = () => {
         openBottomSheet({
             title: "Bejelentkezés",
-            content: <SignInForm handleSignIn={ signIn } />,
-            snapPoints: ["85%"],
+            content: <SignInForm />,
+            snapPoints: ["90%"],
             enableDismissOnClose: false
         });
     };
 
     const openVerification = useCallback( () => {
-        if(user && user.email) {
+        if(notVerifiedUser && notVerifiedUser.email) {
             openBottomSheet({
                 snapPoints: ["100%"],
                 content:
                     <VerifyOTP
                         type="signup"
                         title="Email cím hitelesítés"
-                        email={ user.email }
+                        email={ notVerifiedUser.email }
                         handleVerification={
                             (errorCode?: string) => {
-                                console.log(errorCode)
                                 if(errorCode) return addToast(signUpToast[errorCode] || signUpToast.otp_error);
 
                                 addToast(signUpToast.success);
-                                dismissBottomSheet();
                             }
                         }
                     />,
                 enableDismissOnClose: true
             });
         }
-    }, [user])
+    }, [notVerifiedUser])
 
     const styles = useStyles(top);
 
@@ -110,7 +108,7 @@ const AuthScreen: React.FC = () => {
                 </View>
             </View>
             {
-                !session && user &&
+                !session && notVerifiedUser &&
                 <View style={ styles.verificationContainer }>
                     <Button.Icon
                         icon={ "email-seal-outline" }
