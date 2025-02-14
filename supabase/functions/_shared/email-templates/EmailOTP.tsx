@@ -40,8 +40,6 @@ export const EmailOTP = ({
     )
 }
 
-export default EmailOTP;
-
 const main = {
     backgroundColor: "#242424",
     margin: "0 auto",

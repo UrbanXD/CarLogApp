@@ -1,15 +1,4 @@
-import { createClient } from "npm:@supabase/supabase-js@2.41.0";
-
-const supabaseAdminClient = createClient(
-    Deno.env.get("SUPABASE_URL"),
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-    {
-      global: {
-        headers: { Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}` }
-      }
-    }
-)
+import { supabaseAdminClient } from "../_shared/index.ts";
 
 interface Payload {
   id: string
@@ -20,18 +9,24 @@ const handler = async (req: Request) => {
 
   try {
     const payload = await req.text();
-    const { id } = JSON.parse(payload) as Payload;
+    const { id } =
+        JSON.parse(payload) as Payload;
 
-    const { error } = await supabaseAdminClient.auth.admin.deleteUser(id);
+    const { error } =
+        await supabaseAdminClient
+            .auth
+            .admin
+            .deleteUser(id);
+
     if (error) throw error;
-
   } catch (error) {
-    console.log("error sajnos")
     return new Response(
         JSON.stringify(error),
         {
           status: 500,
-          headers: { "Content-Type": "application/json" },
+          headers: {
+              "Content-Type": "application/json"
+          },
         }
     );
   }
@@ -40,7 +35,9 @@ const handler = async (req: Request) => {
       JSON.stringify({}),
       {
         status: 200,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json"
+        },
       }
   );
 }

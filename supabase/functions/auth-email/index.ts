@@ -1,37 +1,31 @@
-import { Resend } from "npm:resend";
-import EmailOTP from "./templates/EmailOTP.tsx";
-import React from 'npm:react@18.3.1';
-import { render } from 'npm:@react-email/components@0.0.22';
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
-
-interface WebhookResult {
-  user: {
-    email: string,
-    confirmation_sent_at: string
-  },
-  email_data: {
-    token: string
-    email_action_type: string
-  }
-}
+import React from "npm:react@18.3.1";
+import { render } from "npm:@react-email/components@0.0.22";
+import { resend, EmailOTP, AuthEmailBody } from "../_shared/index.ts";
 
 const handler = async (req: Request) => {
   if(req.method !== "POST") return new Response("Not Allowed", { status: 400 });
 
-  const payload = await req.text();
-
   try {
+    const payload = await req.text();
     const {
-      user: { email, confirmation_sent_at },
-      email_data: { email_action_type, token }
-    } = JSON.parse(payload) as WebhookResult;
+      user: {
+        email,
+        confirmation_sent_at
+      },
+      email_data: {
+        email_action_type,
+        token
+      }
+    } = JSON.parse(payload) as AuthEmailBody;
+
+    let subject: string = "Carlog App";
     let html: string;
 
     console.log(email_action_type, confirmation_sent_at)
 
     switch (email_action_type) {
       case "signup":
+        subject = "Fiók hitelesítés!";
         html = await render(
             React.createElement(EmailOTP, {
               token,
@@ -40,6 +34,21 @@ const handler = async (req: Request) => {
               footer: "Amennyiben nem Ön kezdeményezte a regisztrációt, nyugodtan figyelmen kivül hagyhatja ezt az üzenetet."
             })
         );
+        break;
+      case "delete_verification":
+        subject = "Törlés véglegesítés";
+        html = await render(
+            React.createElement(EmailOTP, {
+              token,
+              title: "Fiók Törlés Véglegesítése",
+              content: "Az alábbi kód segítségével tudja fiókjának törlését véglegesíteni, de vigyázzon ez visszafordíthatatlan folyamat!",
+              footer: "Amennyiben nem Ön kezdeményezte a regisztrációt, nyugodtan figyelmen kivül hagyhatja ezt az üzenetet."
+            })
+        );
+        break;
+      case "delete":
+        subject = "Torles";
+        html = "<bold>Felhasználó törölve</bold>";
         break;
       default:
         html = await render(
@@ -55,27 +64,30 @@ const handler = async (req: Request) => {
     const { error } = await resend.emails.send({
       from: "Carlog App <noreply@rankedarena.net>",
       to: [email],
-      subject: "Fiók hitelesítés!",
-      html: html
+      subject,
+      html
     });
 
     if (error) return console.error({ error });
 
   } catch (error) {
     return new Response(JSON.stringify(error), {
-      status: 200,
+      status: 500,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
   }
 
-  const responseHeaders = new Headers();
-  responseHeaders.set('Content-Type', 'application/json');
-  return new Response(JSON.stringify({}), {
-    status: 200,
-    headers: responseHeaders,
-  })
+  return new Response(
+      JSON.stringify({}),
+      {
+          status: 200,
+          headers: {
+              "Content-Type": "application/json"
+          },
+      }
+  );
 }
 
 Deno.serve(handler);
