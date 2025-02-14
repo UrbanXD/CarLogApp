@@ -10,7 +10,7 @@ import { useSession } from "../features/Auth/context/SessionProvider.tsx";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAlert } from "../features/Alert/context/AlertProvider.tsx";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
-import { EmailVerificationBottomSheet, SignInBottomSheet, SignUpBottomSheet } from "../features/BottomSheet/presets";
+import { SignUpVerificationBottomSheet, SignInBottomSheet, SignUpBottomSheet } from "../features/BottomSheet/presets";
 
 const AuthScreen: React.FC = () => {
     const { top } = useSafeAreaInsets();
@@ -27,7 +27,9 @@ const AuthScreen: React.FC = () => {
 
     const openVerification = useCallback( () => {
         if(notVerifiedUser && notVerifiedUser.email) {
-            openBottomSheet(EmailVerificationBottomSheet(addToast));
+            openBottomSheet(
+                SignUpVerificationBottomSheet(addToast)
+            );
         }
     }, [notVerifiedUser])
 

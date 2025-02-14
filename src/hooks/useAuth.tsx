@@ -3,12 +3,12 @@ import { useAlert } from "../features/Alert/context/AlertProvider.tsx";
 import { useSession } from "../features/Auth/context/SessionProvider.tsx";
 import { SignUpFormFieldType } from "../features/Form/constants/schemas/signUpSchema.tsx";
 import { SignInFormFieldType } from "../features/Form/constants/schemas/signInSchema.tsx";
-import { AuthApiError, AuthError } from "@supabase/supabase-js";
+import {AuthApiError, AuthError, GenerateLinkParams} from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LOCAL_STORAGE_KEYS } from "../constants/constants.ts";
 import { router } from "expo-router";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
-import { EmailVerificationBottomSheet } from "../features/BottomSheet/presets/index.ts";
+import { DeleteUserVerificationBottomSheet, ResetPasswordVerificationBottomSheet, SignUpVerificationBottomSheet } from "../features/BottomSheet/presets/index.ts";
 import { SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast/index.ts";
 
 export type SignUpFunction = (user: SignUpFormFieldType) => Promise<void>
@@ -19,7 +19,7 @@ export type ResetPasswordFunction = (newPassword: string) => Promise<void>
 
 const useAuth = () => {
     const { supabaseConnector, powersync } = useDatabase();
-    const { setNotVerifiedUser } = useSession();
+    const { session, notVerifiedUser, setNotVerifiedUser } = useSession();
     const { addToast } = useAlert();
     const { openBottomSheet, dismissBottomSheet, dismissAllBottomSheet } = useBottomSheet();
 
@@ -71,7 +71,12 @@ const useAuth = () => {
             );
 
             await dismissBottomSheet();
-            openBottomSheet(EmailVerificationBottomSheet(addToast));
+            openBottomSheet(
+                SignUpVerificationBottomSheet(
+                    newUser?.email,
+                    addToast
+                )
+            );
         } catch (error) {
             let toast = SignUpToast[error.code];
             if(!toast) toast = SignUpToast.error;
@@ -138,24 +143,23 @@ const useAuth = () => {
 
     const resetPassword: ResetPasswordFunction = async (newPassword) => {
         try {
-            console.log("feaf")
             const { data, error } =
                 await supabaseConnector
                     .client
                     .auth
                     .resetPasswordForEmail(session?.user.email);
-            console.log("fgesfs")
 
-            // router.push({
-            //     pathname: "/verify",
-            //     params: {
-            //         type: "recovery",
-            //         title: "Jelszó módosítás",
-            //         email: email,
-            //         toastMessages: JSON.stringify(signUpToast),
-            //         replaceHREF: "/(main)"
-            //     }
-            // });
+            if(error) throw error
+
+
+            openBottomSheet(
+                ResetPasswordVerificationBottomSheet(
+                    session?.user.email,
+                    newPassword,
+                    supabaseConnector,
+                    addToast
+                )
+            );
         } catch (_){
 
         }
@@ -163,20 +167,54 @@ const useAuth = () => {
 
     const deleteUserProfile = async () => {
         if(session?.user){
-            const { error } =
-                await supabaseConnector
-                    .client
-                    .functions
-                    .invoke(
-                        "delete-user",
-                        {
-                            method: "DELETE",
-                            body: JSON.stringify({ id: user.id })
-                        }
-                    );
+            try {
+                const emailParams: GenerateLinkParams = {
+                    type: "magiclink",
+                    email: session.user.email,
+                }
 
-            if(!error) {
-                await signOut();
+                const { error } =
+                    await supabaseConnector
+                        .client
+                        .functions
+                        .invoke(
+                            "generate-email",
+                            {
+                                method: "POST",
+                                body: JSON.stringify(emailParams)
+                            }
+                        );
+
+                if (error) throw error;
+
+                openBottomSheet(
+                    DeleteUserVerificationBottomSheet(
+                        emailParams.email,
+                        async (errorCode) => {
+                            console.log("error", errorCode)
+                            if(!errorCode) {
+                                const { error } =
+                                    await supabaseConnector
+                                        .client
+                                        .functions
+                                        .invoke(
+                                            "delete-user",
+                                            {
+                                                method: "DELETE",
+                                                body: JSON.stringify({ id: session.user.id })
+                                            }
+                                        );
+
+                                if(!error) {
+                                    await dismissAllBottomSheet();
+                                    await signOut();
+                                }
+                            }
+                        }
+                    )
+                )
+            } catch (error) {
+                console.log("hiba: ", error)
             }
         }
     }
