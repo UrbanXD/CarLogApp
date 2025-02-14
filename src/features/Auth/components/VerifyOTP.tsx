@@ -13,7 +13,7 @@ interface VerifyOTPProps {
     otpLength?: number
     title?: string
     subtitle?: string
-    handleVerification: (errorCode?: string) => void
+    handleVerification: (errorCode?: string) => (Promise<void> | void)
 }
 
 const VerifyOTP: React.FC<VerifyOTPProps> = ({
@@ -39,9 +39,9 @@ const VerifyOTP: React.FC<VerifyOTPProps> = ({
                 type
             });
 
-            handleVerification();
+            await handleVerification();
         } catch (error: AuthApiError | any) {
-            handleVerification(error.code || "otp_error")
+            await handleVerification(error.code || "otp_error");
         }
     }
 
