@@ -38,11 +38,15 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
                 (_event, session) => setSession(session)
             );
 
-        AsyncStorage.getItem(LOCAL_STORAGE_KEYS.notConfirmedUser).then((value) => {
-            if(!value) return;
+        AsyncStorage
+            .getItem(LOCAL_STORAGE_KEYS.notConfirmedUser)
+            .then(
+                (value) => {
+                    if(!value) return;
 
-            setNotVerifiedUser(JSON.parse(value) as User);
-        });
+                    setNotVerifiedUser(JSON.parse(value) as User);
+                }
+            );
     }, []);
 
     useEffect(() => {
