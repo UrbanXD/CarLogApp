@@ -1,14 +1,15 @@
 import React from "react";
 import { OpenBottomSheetArgs } from "../context/BottomSheetContext.ts";
-import VerifyOTP from "../../Auth/components/VerifyOTP.tsx";
-import signUpToast from "../../Alert/presets/toast/SignUpToast.ts";
-import { AddToastFunction } from "../../Alert/constants/constants.ts";
+import VerifyOTP, { HandleVerificationOtpType } from "../../Auth/components/VerifyOTP.tsx";
 
-type SignUpVerificationBottomSheetType = (email: string, addToast: AddToastFunction) => OpenBottomSheetArgs;
+type SignUpVerificationBottomSheetType = (
+    email: string,
+    handleVerification: HandleVerificationOtpType
+) => OpenBottomSheetArgs;
 
 export const SignUpVerificationBottomSheet: SignUpVerificationBottomSheetType = (
     email,
-    addToast
+    handleVerification
 ) => {
     return {
         snapPoints: ["100%"],
@@ -17,13 +18,7 @@ export const SignUpVerificationBottomSheet: SignUpVerificationBottomSheetType = 
                 type="signup"
                 title="Email cím hitelesítés"
                 email={ email }
-                handleVerification={
-                    (errorCode?: string) => {
-                        if(errorCode) return addToast(signUpToast[errorCode] || signUpToast.otp_error);
-
-                        addToast(signUpToast.success);
-                    }
-                }
+                handleVerification={ handleVerification }
             />,
         enableDismissOnClose: true
     }

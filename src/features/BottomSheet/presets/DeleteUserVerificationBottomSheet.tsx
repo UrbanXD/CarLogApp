@@ -1,9 +1,9 @@
-import {OpenBottomSheetArgs} from "../context/BottomSheetContext.ts";
-import VerifyOTP from "../../Auth/components/VerifyOTP.tsx";
+import { OpenBottomSheetArgs } from "../context/BottomSheetContext.ts";
+import VerifyOTP, { HandleVerificationOtpType } from "../../Auth/components/VerifyOTP.tsx";
 
 type DeleteUserVerificationBottomSheetType = (
     email: string,
-    handleVerification: (errorCode?: string) => Promise<void>
+    handleVerification: HandleVerificationOtpType
 ) => OpenBottomSheetArgs;
 
 export const DeleteUserVerificationBottomSheet: DeleteUserVerificationBottomSheetType = (

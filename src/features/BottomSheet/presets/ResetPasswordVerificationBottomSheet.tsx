@@ -1,22 +1,15 @@
-import {AddToastFunction} from "../../Alert/constants/constants.ts";
-import {OpenBottomSheetArgs} from "../context/BottomSheetContext.ts";
-import VerifyOTP from "../../Auth/components/VerifyOTP.tsx";
+import { OpenBottomSheetArgs } from "../context/BottomSheetContext.ts";
+import VerifyOTP, { HandleVerificationOtpType } from "../../Auth/components/VerifyOTP.tsx";
 import React from "react";
-import {SupabaseConnector} from "../../Database/connector/SupabaseConnector.ts";
-import {SignUpToast} from "../../Alert/presets/toast/index.ts";
 
 type ResetPasswordVerificationBottomSheetType = (
     email: string,
-    newPassword: string,
-    supabaseConnector: SupabaseConnector,
-    addToast: AddToastFunction
+    handleVerification: HandleVerificationOtpType
 ) => OpenBottomSheetArgs;
 
 export const ResetPasswordVerificationBottomSheet: ResetPasswordVerificationBottomSheetType = (
     email,
-    newPassword,
-    supabaseConnector,
-    addToast
+    handleVerification
 ) => {
     return {
         snapPoints: ["100%"],
@@ -25,20 +18,7 @@ export const ResetPasswordVerificationBottomSheet: ResetPasswordVerificationBott
                 type="recovery"
                 title="Jelszó módosítása"
                 email={ email }
-                handleVerification={
-                    async (errorCode?: string) => {
-                        console.log(errorCode, "apad", addToast)
-                        if(errorCode) return addToast(SignUpToast[errorCode] || SignUpToast.otp_error);
-
-                        addToast(SignUpToast.success);
-                        console.log("before update")
-                        await supabaseConnector
-                            .client
-                            .auth
-                            .updateUser({ password: newPassword });
-                        console.log("after update")
-                    }
-                }
+                handleVerification={ handleVerification }
             />,
         enableDismissOnClose: true
     }
