@@ -1,9 +1,9 @@
 import React from "react";
-import {StepProps} from "../../../../constants/types/types";
-import Input from "../../../../components/Input/Input";
-import {ICON_NAMES} from "../../../../../../constants/constants";
+import { StepProps } from "../../../../constants/types/types.ts";
+import Input from "../../../../components/Input/Input.ts";
+import { ICON_NAMES } from "../../../../../../constants/constants.ts";
 
-const PasswordStep: React.FC<StepProps> = ({ control }) =>
+export const PasswordStep: React.FC<StepProps> = ({ control }) =>
     <Input.Group>
         <Input.Text
             control={ control }
@@ -25,5 +25,3 @@ const PasswordStep: React.FC<StepProps> = ({ control }) =>
             isInBottomSheet
         />
     </Input.Group>
-
-export default PasswordStep;
