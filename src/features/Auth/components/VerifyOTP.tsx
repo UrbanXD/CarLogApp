@@ -7,13 +7,16 @@ import { theme } from "../../../constants/theme.ts";
 import { FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/constants.ts";
 import { useDatabase } from "../../Database/connector/Database.ts";
 
+export type HandleVerificationOtpType =
+    (errorCode?: string) => ( Promise<void> | void )
+
 interface VerifyOTPProps {
     type: EmailOtpType
     email: string
     otpLength?: number
     title?: string
     subtitle?: string
-    handleVerification: (errorCode?: string) => (Promise<void> | void)
+    handleVerification: HandleVerificationOtpType
 }
 
 const VerifyOTP: React.FC<VerifyOTPProps> = ({
