@@ -1,25 +1,28 @@
 import { useDatabase } from "../features/Database/connector/Database.ts";
 import { useAlert } from "../features/Alert/context/AlertProvider.tsx";
 import { useSession } from "../features/Auth/context/SessionProvider.tsx";
-import { SignUpFormFieldType } from "../features/Form/constants/schemas/signUpSchema.tsx";
+import { UserFormFieldType } from "../features/Form/constants/schemas/userSchema.tsx";
 import { SignInFormFieldType } from "../features/Form/constants/schemas/signInSchema.tsx";
-import {AuthApiError, AuthError, GenerateLinkParams} from "@supabase/supabase-js";
+import { AuthApiError, AuthError, GenerateLinkParams } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LOCAL_STORAGE_KEYS } from "../constants/constants.ts";
 import { router } from "expo-router";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
 import { DeleteUserVerificationBottomSheet, ResetPasswordVerificationBottomSheet, SignUpVerificationBottomSheet } from "../features/BottomSheet/presets/index.ts";
-import { SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast/index.ts";
+import { ChangeNameToast, ResetPasswordToast, SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast/index.ts";
+import signUpToast from "../features/Alert/presets/toast/SignUpToast.ts";
 
-export type SignUpFunction = (user: SignUpFormFieldType) => Promise<void>
+export type SignUpFunction = (user: UserFormFieldType) => Promise<void>
 
 export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
+
+export type ChangeNameFunction = (firstname: string, lastname: string) => Promise<void>
 
 export type ResetPasswordFunction = (newPassword: string) => Promise<void>
 
 const useAuth = () => {
     const { supabaseConnector, powersync } = useDatabase();
-    const { session, notVerifiedUser, setNotVerifiedUser } = useSession();
+    const { session, setNotVerifiedUser } = useSession();
     const { addToast } = useAlert();
     const { openBottomSheet, dismissBottomSheet, dismissAllBottomSheet } = useBottomSheet();
 
@@ -47,8 +50,12 @@ const useAuth = () => {
             if(emailError) throw emailError;
             if(emailExists) throw { code: "email_exists" } as AuthApiError;
 
-            const { data: { user: newUser }, error } =
-                await supabaseConnector
+            const {
+                data: {
+                    user: newUser
+                },
+                error
+            } = await supabaseConnector
                     .client
                     .auth
                     .signUp({
@@ -65,16 +72,24 @@ const useAuth = () => {
             if(error) throw error;
 
             setNotVerifiedUser(newUser);
-            await AsyncStorage.setItem(
-                LOCAL_STORAGE_KEYS.notConfirmedUser,
-                JSON.stringify(newUser)
-            );
+            await AsyncStorage
+                .setItem(
+                    LOCAL_STORAGE_KEYS.notConfirmedUser,
+                    JSON.stringify(newUser)
+                );
 
             await dismissBottomSheet();
+
             openBottomSheet(
                 SignUpVerificationBottomSheet(
                     newUser?.email,
-                    addToast
+                    async (errorCode) => {
+                        if(errorCode) return addToast(signUpToast[errorCode] || signUpToast.otp_error);
+
+                        await dismissAllBottomSheet();
+                        // kijelentkeztetes???
+                        addToast(signUpToast.success); /// nem futott le!!!!!!!!!!
+                    }
                 )
             );
         } catch (error) {
@@ -141,27 +156,81 @@ const useAuth = () => {
         }
     }
 
+    const changeName: ChangeNameFunction = async (
+        firstname,
+        lastname
+    ) => {
+        try {
+            const { error } =
+                await supabaseConnector
+                    .client
+                    .auth
+                    .updateUser({
+                        data: {
+                            firstname,
+                            lastname
+                        }
+                    });
+
+            if(error) throw error;
+
+            await dismissAllBottomSheet();
+            addToast(ChangeNameToast.success);
+        } catch (_) {
+            addToast(ChangeNameToast.error);
+        }
+    }
+
     const resetPassword: ResetPasswordFunction = async (newPassword) => {
         try {
-            const { data, error } =
+            const { error } =
                 await supabaseConnector
                     .client
                     .auth
                     .resetPasswordForEmail(session?.user.email);
 
-            if(error) throw error
-
+            if(error) throw error;
 
             openBottomSheet(
                 ResetPasswordVerificationBottomSheet(
                     session?.user.email,
-                    newPassword,
-                    supabaseConnector,
-                    addToast
+                    async (errorCode) => {
+                        if(errorCode) return addToast(ResetPasswordToast.error);
+
+                        const { error } =
+                            await supabaseConnector
+                                .client
+                                .auth
+                                .updateUser(
+                                    {
+                                        password: newPassword
+                                    }
+                                );
+
+                        if(error && error.code !== "same_password") return addToast(ResetPasswordToast.error);
+
+                        await dismissAllBottomSheet();
+                        addToast(ResetPasswordToast.success);
+                    }
                 )
             );
-        } catch (_){
+        } catch (error: AuthError){
+            if(error.code === "over_email_send_rate_limit") {
+                const secondsMatch =
+                    error.message.match(/\d+/);
 
+                let seconds: number = 60;
+                if (secondsMatch) seconds = parseInt(secondsMatch[0], 10);
+
+                return addToast(
+                    ResetPasswordToast.over_email_send_rate_limit(seconds)
+                );
+            }
+
+            addToast(
+                ResetPasswordToast[error.code] ||
+                ResetPasswordToast.error
+            );
         }
     }
 
@@ -223,6 +292,7 @@ const useAuth = () => {
         signUp,
         signIn,
         signOut,
+        changeName,
         resetPassword,
         deleteUserProfile
     }

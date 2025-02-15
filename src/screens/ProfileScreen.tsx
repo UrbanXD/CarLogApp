@@ -8,10 +8,34 @@ import { theme } from "../constants/theme.ts";
 import Divider from "../components/Divider.tsx";
 import Button from "../components/Button/Button.ts";
 import useAuth from "../hooks/useAuth.tsx";
+import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
+import { EditUserBottomSheet } from "../features/BottomSheet/presets/index.ts";
+import { EDIT_USER_FORM_STEPS } from "../features/Form/layouts/auth/user/editUser/useEditUserSteps.tsx";
 
 const ProfileScreen: React.FC = () => {
     const { session } = useSession();
-    const { signOut } = useAuth();
+    const { signOut, deleteUserProfile } = useAuth();
+    const { openBottomSheet } = useBottomSheet();
+
+    const openEditUser =
+        (stepIndex: number) =>
+            openBottomSheet(
+                EditUserBottomSheet(
+                    {
+                        email: session?.user.email,
+                        firstname: session?.user.user_metadata?.firstname,
+                        lastname: session?.user.user_metadata?.lastname,
+                    },
+                    stepIndex
+                )
+            );
+
+    const openChangeName =
+        () => openEditUser(EDIT_USER_FORM_STEPS.NameStep);
+    const openResetPassword =
+        () => openEditUser(EDIT_USER_FORM_STEPS.PasswordStep);
+    const openChangeEmail =
+        () => openEditUser(EDIT_USER_FORM_STEPS.EmailStep);
 
     return (
         <SafeAreaView style={ styles.pageContainer }>
@@ -36,9 +60,10 @@ const ProfileScreen: React.FC = () => {
                         iconRight={ ICON_NAMES.rightArrowHead }
                         text="Beállítások"
                         textStyle={{ textAlign: "left" }}
-                        onPress={ () => {} }
+                        onPress={ openChangeName }
                         backgroundColor="transparent"
                         fontSize={ FONT_SIZES.intermediate }
+                        loadingIndicator
                     />
                     <Divider />
                     <Button.Text
@@ -46,20 +71,22 @@ const ProfileScreen: React.FC = () => {
                         iconRight={ ICON_NAMES.rightArrowHead }
                         text="Jelszó csere"
                         textStyle={{ textAlign: "left" }}
-                        onPress={ () => resetPassword("") }
+                        onPress={ openResetPassword }
                         backgroundColor="transparent"
                         fontSize={ FONT_SIZES.intermediate }
+                        loadingIndicator
                     />
                     <Divider />
                     <Button.Text
                         iconLeft={ ICON_NAMES.trashCan }
                         iconRight={ ICON_NAMES.rightArrowHead }
                         text="Fiók törlése"
-                        onPress={ () => {} }
+                        onPress={ deleteUserProfile }
                         textStyle={{ textAlign: "left" }}
                         backgroundColor="transparent"
                         textColor={ theme.colors.redLight }
                         fontSize={ FONT_SIZES.intermediate }
+                        loadingIndicator
                     />
                 </View>
             </View>
@@ -67,7 +94,6 @@ const ProfileScreen: React.FC = () => {
                 iconLeft={ ICON_NAMES.signOut }
                 text="Kijelentkezés"
                 onPress={ signOut }
-                height={ hp(6) }
                 backgroundColor={ theme.colors.googleRed }
                 textColor={ theme.colors.black2 }
                 fontSize={ FONT_SIZES.intermediate }
