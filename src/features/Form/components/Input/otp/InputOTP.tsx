@@ -161,7 +161,7 @@ const useStyles = (numberOfDigits: number) =>
             textAlignVertical: "bottom",
             textAlign: "center",
             fontFamily: "Gilroy-Heavy",
-            fontSize: FONT_SIZES.large,
+            fontSize: FONT_SIZES.h1,
             color: theme.colors.white,
         }
     });

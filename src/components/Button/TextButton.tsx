@@ -25,10 +25,10 @@ interface TextButtonProps {
 
 const TextButton: React.FC<TextButtonProps> = ({
     text,
-    fontSize = FONT_SIZES.normal,
+    fontSize = FONT_SIZES.h3,
     backgroundColor = theme.colors.fuelYellow,
     textColor = getContrastingColor(backgroundColor, theme.colors.white, theme.colors.black),
-    height = hp(7),
+    height = hp(6.5),
     width,
     iconLeft,
     iconRight,

@@ -42,13 +42,13 @@ const InputTitle: React.FC<InputTitleProps> = ({
 
 const styles = StyleSheet.create({
     inputNameText: {
-        fontSize: FONT_SIZES.normal,
+        fontSize: FONT_SIZES.p1,
         fontFamily: "Gilroy-Heavy",
         color: theme.colors.white
     },
     optionalText: {
         fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.small,
+        fontSize: FONT_SIZES.p3,
         color: theme.colors.gray2
     },
     inputInfoText: {

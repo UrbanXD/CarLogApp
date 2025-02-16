@@ -20,7 +20,7 @@ interface IconButtonProps {
 
 export const IconButton: React.FC<IconButtonProps> = ({
     icon,
-    iconSize = FONT_SIZES.normal * ICON_FONT_SIZE_SCALE,
+    iconSize = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE,
     iconColor = theme.colors.black,
     backgroundColor = theme.colors.fuelYellow,
     width = hp(7),

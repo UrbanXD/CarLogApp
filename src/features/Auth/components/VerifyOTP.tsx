@@ -80,7 +80,9 @@ const VerifyOTP: React.FC<VerifyOTPProps> = ({
                 color={ theme.colors.gray3 }
             />
             <Text style={ styles.didntReceivedCodeText }>
-                Nem érkezett meg a kód az adott email címére, esetleg a kód már lejárt? <Text style={ styles.didntReceivedCodeLinkText } onPress={ resendOTP }>Újra küldés</Text>
+                Nem érkezett meg a kód az adott email címére, esetleg a kód már lejárt?
+                { "\n" }
+                <Text style={ styles.didntReceivedCodeLinkText } onPress={ resendOTP }>Újra küldés</Text>
             </Text>
         </View>
     )
@@ -95,16 +97,17 @@ const styles = StyleSheet.create({
     },
     titleText: {
         fontFamily: "Gilroy-Heavy",
-        fontSize: FONT_SIZES.medium,
+        fontSize: FONT_SIZES.h2,
         color: theme.colors.white,
-        letterSpacing: FONT_SIZES.intermediate * 0.05,
+        lineHeight: FONT_SIZES.h2 * 1.25,
+        letterSpacing: FONT_SIZES.h2 * 0.035,
         textAlign: "center"
     },
     subtitleText: {
         fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.intermediate,
-        lineHeight: FONT_SIZES.intermediate * 1.15,
-        letterSpacing: FONT_SIZES.intermediate * 0.035,
+        fontSize: FONT_SIZES.p2,
+        lineHeight: FONT_SIZES.p2 * 1.15,
+        letterSpacing: FONT_SIZES.p2 * 0.035,
         color: theme.colors.gray2,
         textAlign: "center"
     },
@@ -114,9 +117,9 @@ const styles = StyleSheet.create({
     },
     didntReceivedCodeText: {
         fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.small,
-        lineHeight: FONT_SIZES.small * 1.35,
-        letterSpacing: FONT_SIZES.small * 0.05,
+        fontSize: FONT_SIZES.p3,
+        lineHeight: FONT_SIZES.p3 * 1.25,
+        letterSpacing: FONT_SIZES.p3 * 0.035,
         color: theme.colors.gray2,
         textAlign: "center"
     },

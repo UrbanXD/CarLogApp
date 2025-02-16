@@ -26,10 +26,10 @@ const SecondaryHeader: React.FC<SecondaryHeaderProps> = ({
             <View style={ styles.barContainer }>
                 <Button.Icon
                     icon={ ICON_NAMES.leftArrow }
-                    iconSize={ FONT_SIZES.normal * ICON_FONT_SIZE_SCALE }
+                    iconSize={ FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE }
                     iconColor={ theme.colors.white }
-                    width={ FONT_SIZES.normal * ICON_FONT_SIZE_SCALE }
-                    height={ FONT_SIZES.normal * ICON_FONT_SIZE_SCALE }
+                    width={ FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE }
+                    height={ FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE }
                     backgroundColor="transparent"
                     onPress={ () => router.back() }
                 />

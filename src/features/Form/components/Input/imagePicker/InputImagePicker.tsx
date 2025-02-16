@@ -186,10 +186,10 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                                                 () =>
                                                     <Button.Icon
                                                         icon={ ICON_NAMES.close }
-                                                        iconSize={ FONT_SIZES.normal }
+                                                        iconSize={ FONT_SIZES.p1 }
                                                         iconColor={ theme.colors.redLight }
-                                                        width={ FONT_SIZES.normal * 1.2 }
-                                                        height={ FONT_SIZES.normal * 1.2 }
+                                                        width={ FONT_SIZES.p1 * 1.2 }
+                                                        height={ FONT_SIZES.p1 * 1.2 }
                                                         backgroundColor={ hexToRgba(theme.colors.black, 0.75) }
                                                         onPress={ () => removeImageFromHistory(index) }
                                                         style={ { borderColor: theme.colors.redLight, borderWidth: 2 } }

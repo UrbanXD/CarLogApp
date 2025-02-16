@@ -68,8 +68,8 @@ const styles= StyleSheet.create({
     },
     icon: {
         alignSelf: "center",
-        width: FONT_SIZES.large,
-        height: FONT_SIZES.large
+        width: FONT_SIZES.h1,
+        height: FONT_SIZES.h1
     },
     textContainer: {
         flex: 1,

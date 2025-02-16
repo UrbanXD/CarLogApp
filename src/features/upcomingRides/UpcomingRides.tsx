@@ -62,7 +62,7 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                         </View>
                             <Icon
                                 icon={ ICON_NAMES.info }
-                                size={ FONT_SIZES.medium }
+                                size={ FONT_SIZES.h2 }
                                 color={ theme.colors.white }
                                 onPress={
                                     () =>{
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     text: {
         flexWrap: "wrap",
         fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.small,
+        fontSize: FONT_SIZES.p3,
         color: theme.colors.white
     },
     contentContainer: {

@@ -88,7 +88,7 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
         },
         titleText: {
             ...GLOBAL_STYLE.containerTitleText,
-            fontSize: FONT_SIZES.medium,
+            fontSize: FONT_SIZES.h2,
             textAlign: "center"
         },
     })

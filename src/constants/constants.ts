@@ -72,13 +72,14 @@ export const ICON_COLORS = {
 }
 
 export const FONT_SIZES = {
-    tiny: hp(2),
-    small: hp(2.25),
-    intermediate: hp(2.5),
-    normal: hp(3),
-    medium: hp(3.5),
-    large: hp(5),
-    extraLarge: wp(22)
+    p4: hp(1.75),
+    p3: hp(2),
+    p2: hp(2.25),
+    p1: hp(2.75),
+    h3: hp(3),
+    h2: hp(3.5),
+    h1: hp(5),
+    title: wp(21.5)
 }
 
 export const SEPARATOR_SIZES = {
@@ -110,7 +111,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
         gap: SEPARATOR_SIZES.mediumSmall
     },
     formLinkText: {
-        fontSize: FONT_SIZES.tiny,
+        fontSize: FONT_SIZES.p3,
         paddingLeft: SEPARATOR_SIZES.small,
         fontFamily: "Gilroy-Medium",
         color: theme.colors.fuelYellow
@@ -127,15 +128,15 @@ export const GLOBAL_STYLE = StyleSheet.create({
     },
     containerTitleText: {
         fontFamily: "Gilroy-Heavy",
-        fontSize: FONT_SIZES.normal,
-        letterSpacing: FONT_SIZES.normal * 0.035,
+        fontSize: FONT_SIZES.p1,
+        letterSpacing: FONT_SIZES.p1 * 0.05,
         color: theme.colors.white,
     },
     containerText: {
         fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.small,
-        lineHeight: FONT_SIZES.small * 1.2,
-        letterSpacing: FONT_SIZES.small * 0.035,
+        fontSize: FONT_SIZES.p2,
+        lineHeight: FONT_SIZES.p2 * 1.2,
+        letterSpacing: FONT_SIZES.p2 * 0.05,
         color: theme.colors.gray1,
     },
     rowContainer: {

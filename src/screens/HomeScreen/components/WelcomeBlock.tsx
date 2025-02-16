@@ -31,15 +31,15 @@ const styles = StyleSheet.create({
     },
     welcomeText: {
         fontFamily: "Gilroy-Heavy",
-        fontSize: FONT_SIZES.medium,
-        letterSpacing: FONT_SIZES.medium * 0.045,
+        fontSize: FONT_SIZES.h2,
+        letterSpacing: FONT_SIZES.h2 * 0.045,
         color: theme.colors.white,
         textTransform: "uppercase"
     },
     infoText: {
         fontFamily: "Gilroy-Mediun",
-        fontSize: FONT_SIZES.intermediate,
-        letterSpacing: FONT_SIZES.intermediate * 0.05,
+        fontSize: FONT_SIZES.p2,
+        letterSpacing: FONT_SIZES.p2 * 0.05,
         color: theme.colors.gray1
     }
 })

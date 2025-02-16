@@ -160,14 +160,14 @@ const useStyles = (type: AlertType, height: number) =>
         },
         titleText: {
             fontFamily: "Gilroy-Heavy",
-            fontSize: FONT_SIZES.intermediate,
-            letterSpacing: FONT_SIZES.intermediate * 0.05,
+            fontSize: FONT_SIZES.p2,
+            letterSpacing: FONT_SIZES.p2 * 0.05,
             color: theme.colors.white,
         },
         text: {
             fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.tiny,
-            letterSpacing: FONT_SIZES.tiny * 0.05,
+            fontSize: FONT_SIZES.p4,
+            letterSpacing: FONT_SIZES.p4 * 0.05,
             color: theme.colors.gray1,
         }
     })

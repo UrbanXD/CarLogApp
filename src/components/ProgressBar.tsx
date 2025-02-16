@@ -44,7 +44,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
                 {
                     titles?.map((title, index) =>
                         <View style={ styles.timelineTextContainer } key={ index }>
-                            <Text numberOfLines={ 2 } key={ index } style={{ color: "white", fontSize: FONT_SIZES.small, lineHeight: FONT_SIZES.small }}>
+                            <Text numberOfLines={ 2 } key={ index } style={{ color: "white", fontSize: FONT_SIZES.p4, lineHeight: FONT_SIZES.p4 }}>
                                 { title }
                             </Text>
                         </View>

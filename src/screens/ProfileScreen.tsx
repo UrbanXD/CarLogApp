@@ -62,7 +62,7 @@ const ProfileScreen: React.FC = () => {
                         textStyle={{ textAlign: "left" }}
                         onPress={ openChangeName }
                         backgroundColor="transparent"
-                        fontSize={ FONT_SIZES.intermediate }
+                        fontSize={ FONT_SIZES.p1 }
                         loadingIndicator
                     />
                     <Divider />
@@ -73,7 +73,7 @@ const ProfileScreen: React.FC = () => {
                         textStyle={{ textAlign: "left" }}
                         onPress={ openResetPassword }
                         backgroundColor="transparent"
-                        fontSize={ FONT_SIZES.intermediate }
+                        fontSize={ FONT_SIZES.p1 }
                         loadingIndicator
                     />
                     <Divider />
@@ -85,7 +85,7 @@ const ProfileScreen: React.FC = () => {
                         textStyle={{ textAlign: "left" }}
                         backgroundColor="transparent"
                         textColor={ theme.colors.redLight }
-                        fontSize={ FONT_SIZES.intermediate }
+                        fontSize={ FONT_SIZES.p1 }
                         loadingIndicator
                     />
                 </View>
@@ -96,7 +96,7 @@ const ProfileScreen: React.FC = () => {
                 onPress={ signOut }
                 backgroundColor={ theme.colors.googleRed }
                 textColor={ theme.colors.black2 }
-                fontSize={ FONT_SIZES.intermediate }
+                fontSize={ FONT_SIZES.p1 }
             />
         </SafeAreaView>
     )
@@ -117,8 +117,8 @@ const styles = StyleSheet.create({
     },
     profileImage: {
         position: "relative",
-        width: hp(17),
-        height: hp(17),
+        width: hp(17.5),
+        height: hp(17.5),
         borderRadius: 100,
         resizeMode: "stretch"
     },

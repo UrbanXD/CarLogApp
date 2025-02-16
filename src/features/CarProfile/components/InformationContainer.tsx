@@ -24,7 +24,7 @@ const InformationContainer: React.FC<InformationContainerProps> = ({
                                 element.icon &&
                                 <Icon
                                     icon={ element.icon }
-                                    size={ FONT_SIZES.medium }
+                                    size={ FONT_SIZES.h3 }
                                     color={ theme.colors.gray2 }
                                 />
                             }
@@ -42,10 +42,10 @@ const InformationContainer: React.FC<InformationContainerProps> = ({
             onEdit &&
             <Button.Icon
                 icon={ ICON_NAMES.pencil }
-                iconSize={ FONT_SIZES.medium }
+                iconSize={ FONT_SIZES.h3 }
                 iconColor={ theme.colors.gray1 }
-                width={ FONT_SIZES.medium }
-                height={ FONT_SIZES.medium }
+                width={ FONT_SIZES.h3 }
+                height={ FONT_SIZES.h3 }
                 backgroundColor="transparent"
                 onPress={ onEdit }
             />
@@ -79,8 +79,8 @@ const styles = StyleSheet.create({
     text: {
         flexShrink: 1,
         fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.intermediate,
-        letterSpacing: FONT_SIZES.intermediate * 0.045,
+        fontSize: FONT_SIZES.p2,
+        letterSpacing: FONT_SIZES.p2 * 0.045,
         color: theme.colors.gray1,
     }
 });

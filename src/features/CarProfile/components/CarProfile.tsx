@@ -37,10 +37,10 @@ const CarProfile: React.FC<CarInfoProps> = ({ carID }) => {
                         <View style={ styles.editImageIconContainer }>
                                 <Button.Icon
                                     icon={ ICON_NAMES.pencil }
-                                    iconSize={ FONT_SIZES.medium }
+                                    iconSize={ FONT_SIZES.h2 }
                                     iconColor={ theme.colors.gray1 }
-                                    width={ FONT_SIZES.medium }
-                                    height={ FONT_SIZES.medium }
+                                    width={ FONT_SIZES.h2 }
+                                    height={ FONT_SIZES.h2 }
                                     style={ styles.editImageIcon }
                                     backgroundColor="transparent"
                                     onPress={ () => openEditForm(CAR_FORM_STEPS.ImageStep, "70%") }

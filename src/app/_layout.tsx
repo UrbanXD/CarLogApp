@@ -45,12 +45,6 @@ const Layout:React.FC = () => {
                 name="backToRootIndex"
             />
             <Stack.Screen
-                name="verify"
-                options={{
-                    header: () => <SecondaryHeader />,
-                }}
-            />
-            <Stack.Screen
                 name="(main)"
                 options={{
                     header: () => <MainHeader />

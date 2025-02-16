@@ -95,7 +95,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
                 !setSearchTerm && isDropdown &&
                 <Icon
                     icon={ ICON_NAMES.close }
-                    size={ FONT_SIZES.normal }
+                    size={ FONT_SIZES.p1 }
                     color={ theme.colors.white }
                     style={{ alignSelf: "center" }}
                     onPress={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }

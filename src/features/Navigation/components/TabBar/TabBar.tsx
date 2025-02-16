@@ -74,7 +74,7 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
                         <TabBarIcon
                             key={ index }
                             iconName={ icon }
-                            iconSize={ FONT_SIZES.medium }
+                            iconSize={ FONT_SIZES.h2 }
                             iconColor={ theme.colors.black }
                             focused={ isFocused }
                             width={ TAB_WIDTH }
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 45,
     },
     titleText: {
-        fontSize: FONT_SIZES.normal,
+        fontSize: FONT_SIZES.p1,
         alignItems: "center"
     },
     slidingElementContainer: {

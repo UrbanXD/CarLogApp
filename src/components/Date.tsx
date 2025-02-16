@@ -51,14 +51,14 @@ const useStyles = (flexDirection: "row" | "column") =>
         },
         dateTitleText: {
             fontFamily: "Gilroy-Heavy",
-            fontSize: FONT_SIZES.normal,
-            letterSpacing: FONT_SIZES.normal * 0.05,
+            fontSize: FONT_SIZES.p1,
+            letterSpacing: FONT_SIZES.p1 * 0.05,
             color: theme.colors.white
         },
         dateSubtitleText: {
             fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.small,
-            letterSpacing: FONT_SIZES.small * 0.035,
+            fontSize: FONT_SIZES.p2,
+            letterSpacing: FONT_SIZES.p2 * 0.035,
             color: theme.colors.gray1
         }
     })

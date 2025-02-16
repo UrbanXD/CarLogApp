@@ -56,8 +56,10 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         const bottomSheet = getCurrentBottomSheet();
         if(!bottomSheet) return;
 
+        const temp = bottomSheet.props.enableDismissOnClose;
         bottomSheet.props.enableDismissOnClose = true;
         bottomSheet.ref.current?.dismiss();
+        bottomSheet.props.enableDismissOnClose = temp;
 
         setBottomSheets(
             prevState =>

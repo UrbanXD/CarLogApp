@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     },
     linkText: {
         fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.small * 1.15,
+        fontSize: FONT_SIZES.p2,
         textAlign: "center",
         color: theme.colors.fuelYellow,
     },

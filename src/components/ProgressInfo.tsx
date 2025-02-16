@@ -90,22 +90,19 @@ const useStyles = (radius: number) =>
         },
         titleContainer: {
             flex: 1,
-            gap: SEPARATOR_SIZES.lightSmall,
             justifyContent: "center",
             alignSelf: "flex-start"
         },
         title: {
-            fontSize: FONT_SIZES.medium,
+            fontSize: FONT_SIZES.h3,
             fontFamily: "Gilroy-Heavy",
-            lineHeight: FONT_SIZES.medium * 1.15,
             color: theme.colors.white,
             paddingTop: SEPARATOR_SIZES.small
         },
         subtitle: {
-            fontSize: FONT_SIZES.small,
+            fontSize: FONT_SIZES.p2,
             fontFamily: "Gilroy-Medium",
-            lineHeight: FONT_SIZES.small * 1.15,
-            color: theme.colors.gray1,
+            color: theme.colors.gray1
         }
     })
 

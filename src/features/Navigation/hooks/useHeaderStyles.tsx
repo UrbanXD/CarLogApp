@@ -20,9 +20,9 @@ const useHeaderStyles = (top: number) =>
         },
         title: {
             fontFamily: "Gilroy-Heavy",
-            fontSize:  FONT_SIZES.normal,
+            fontSize:  FONT_SIZES.h3,
             color: theme.colors.white,
-            letterSpacing: FONT_SIZES.normal * 0.05
+            letterSpacing: FONT_SIZES.h3 * 0.05
         }
     })
 

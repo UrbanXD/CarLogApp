@@ -68,7 +68,7 @@ const AlertModal: React.FC<AlertModalProps> = ({
                     <View style={ styles.buttonContainer }>
                         <Button.Text
                             text={ acceptText }
-                            fontSize={ FONT_SIZES.small }
+                            fontSize={ FONT_SIZES.p2 }
                             backgroundColor={ color }
                             height={ hp(5.5) }
                             onPress={ accept }
@@ -77,7 +77,7 @@ const AlertModal: React.FC<AlertModalProps> = ({
                             text={ dismissText }
                             height={ hp(5.5) }
                             backgroundColor={ "transparent" }
-                            fontSize={ FONT_SIZES.small }
+                            fontSize={ FONT_SIZES.p2 }
                             textColor={ color }
                             style={{ borderColor: color, borderWidth: 2.5 }}
                             onPress={ dismiss }
@@ -121,21 +121,20 @@ const useStyles = (iconSize: number) =>
         textContainer: {
             flex: 1,
             alignItems: "center",
-            gap: SEPARATOR_SIZES.lightSmall
         },
         titleText: {
             fontFamily: "Gilroy-Heavy",
-            fontSize: FONT_SIZES.normal,
+            fontSize: FONT_SIZES.h3,
             color: theme.colors.white,
-            lineHeight: FONT_SIZES.normal,
-            letterSpacing: FONT_SIZES.normal * 0.05,
+            lineHeight: FONT_SIZES.h3 * 1.25,
+            letterSpacing: FONT_SIZES.h3 * 0.05,
             textAlign: "center"
         },
         text: {
             fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.small,
+            fontSize: FONT_SIZES.p2,
             color: theme.colors.gray1,
-            lineHeight: FONT_SIZES.small * 1.35,
+            lineHeight: FONT_SIZES.p2 * 1.05,
             textAlign: "center"
         },
         buttonContainer: {

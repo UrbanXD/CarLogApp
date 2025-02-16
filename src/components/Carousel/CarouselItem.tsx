@@ -140,36 +140,34 @@ const styles = StyleSheet.create({
     },
     topContainerTitleText: {
         flex: 1,
-        paddingVertical: hp(1),
         color: theme.colors.white,
         fontFamily: "Gilroy-Heavy",
-        fontSize: FONT_SIZES.normal,
+        fontSize: FONT_SIZES.p1,
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
         textShadowOffset: { width: -1, height: 1 },
         textShadowRadius: 10,
-        letterSpacing: FONT_SIZES.normal * 0.05,
-        lineHeight: FONT_SIZES.normal * 0.85,
+        letterSpacing: FONT_SIZES.p1 * 0.05,
     },
     infoContainer: {
         flex: 1,
     },
     infoTitleText: {
         color: theme.colors.white,
-        fontSize: FONT_SIZES.small,
+        fontSize: FONT_SIZES.p2,
         fontFamily: "Gilroy-Heavy",
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 10,
-        letterSpacing: FONT_SIZES.small * 0.05
+        letterSpacing: FONT_SIZES.p2 * 0.05
     },
     infoSubtitleText: {
         color: theme.colors.white,
-        fontSize: FONT_SIZES.tiny,
+        fontSize: FONT_SIZES.p4,
         fontFamily: "Gilroy-Medium",
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 10,
-        letterSpacing: FONT_SIZES.tiny * 0.05
+        letterSpacing: FONT_SIZES.p4 * 0.05
     },
     actionContainer: {
         width: "20%",

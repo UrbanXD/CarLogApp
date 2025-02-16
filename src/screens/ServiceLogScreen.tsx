@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
         height: hp(11),
     },
     kilometerText: {
-        fontSize: FONT_SIZES.tiny,
+        fontSize: FONT_SIZES.p4,
         textAlign: "center",
     },
     descriptionText: {

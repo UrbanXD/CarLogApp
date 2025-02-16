@@ -32,12 +32,12 @@ const DefaultElement: React.FC<DefaultImageProps> = ({
             {
                 isLoading
                     ?   <ActivityIndicator
-                            size={ FONT_SIZES.extraLarge }
+                            size={ FONT_SIZES.title }
                             color={ theme.colors.gray3 }
                         />
                     :   <Icon
                             icon={ icon }
-                            size={ FONT_SIZES.extraLarge }
+                            size={ FONT_SIZES.title }
                             color={ theme.colors.gray3 }
                         />
             }
@@ -72,9 +72,9 @@ const styles = StyleSheet.create({
     },
     text: {
         fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.intermediate,
-        letterSpacing: FONT_SIZES.intermediate * 0.025,
-        lineHeight: FONT_SIZES.intermediate * 1.25,
+        fontSize: FONT_SIZES.p2,
+        letterSpacing: FONT_SIZES.p2 * 0.025,
+        lineHeight: FONT_SIZES.p2 * 1.25,
         color: theme.colors.gray2,
         textAlign: "center"
     }

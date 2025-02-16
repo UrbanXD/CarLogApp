@@ -67,7 +67,8 @@ const AuthScreen: React.FC = () => {
                         onPress={ openSignUp }
                     />
                     <Text style={ styles.underButtonText }>
-                        Már rendelkezel felhasználóval ?
+                        Már rendelkezel felhasználóval?
+                        { "\n" }
                         <Text
                             style={ styles.linkText }
                             onPress={ openSignIn }
@@ -126,10 +127,10 @@ const useStyles = (top: number) =>
         },
         title: {
             zIndex: 1,
-            top: hp(FONT_SIZES.extraLarge / -12),
+            top: hp(FONT_SIZES.title / -12),
             alignSelf: "center",
             color: theme.colors.white,
-            fontSize: FONT_SIZES.extraLarge,
+            fontSize: FONT_SIZES.title,
             fontFamily: "Gilroy-Heavy",
             textTransform: "uppercase",
         },
@@ -145,10 +146,10 @@ const useStyles = (top: number) =>
         subtitle: {
             alignSelf: "center",
             color: theme.colors.gray2,
-            fontSize: FONT_SIZES.normal,
+            fontSize: FONT_SIZES.p1,
             fontFamily: "Gilroy-Medium",
             textTransform: "uppercase",
-            letterSpacing: FONT_SIZES.normal * 0.05
+            letterSpacing: FONT_SIZES.p1 * 0.05
         },
         actionContainer: {
             flexDirection: "column",
@@ -158,16 +159,17 @@ const useStyles = (top: number) =>
             color: theme.colors.white,
             alignSelf: "center",
             fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.small,
-            letterSpacing: FONT_SIZES.small * 0.05,
-            lineHeight: FONT_SIZES.small * 1.5,
+            fontSize: FONT_SIZES.p2,
+            letterSpacing: FONT_SIZES.p2 * 0.05,
+            lineHeight: FONT_SIZES.p2 * 1.25,
             textAlign: "center",
         },
         linkText: {
             color: theme.colors.fuelYellow,
             textDecorationLine: "underline",
-            fontSize: FONT_SIZES.small * 1.05,
-            letterSpacing: FONT_SIZES.small * 1.05 * 0.05,
+            fontSize: FONT_SIZES.p1,
+            lineHeight: FONT_SIZES.p1 * 1.25,
+            letterSpacing: FONT_SIZES.p1 * 0.05,
         },
         verificationContainer: {
             position: "absolute",
@@ -180,7 +182,7 @@ const useStyles = (top: number) =>
         },
         verificationText: {
             fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.tiny * 0.925,
+            fontSize: FONT_SIZES.p3,
             color: theme.colors.white,
             textShadowColor: theme.colors.black,
             textShadowRadius: 15,
