@@ -3,15 +3,17 @@ import { StyleSheet, Text, View } from "react-native";
 import { FONT_SIZES, GLOBAL_STYLE } from "../../../constants/constants";
 import { theme } from "../../../constants/theme";
 import { useSession } from "../../../features/Auth/context/SessionProvider.tsx";
+import useAuth from "../../../hooks/useAuth.tsx";
 
 const WelcomeBlock: React.FC = () => {
     const { session } = useSession();
+    const {changeEmail} = useAuth();
 
     return (
         <View
             style={ styles.titleContainer }
         >
-            <Text style={ styles.welcomeText}>
+            <Text style={ styles.welcomeText} onPress={() => changeEmail("urbanadam6996@gmail.com")}>
                 Üdv { `${ session?.user.user_metadata.firstname ?? "" } ${ session?.user.user_metadata?.lastname ?? "" }` }!
             </Text>
             <Text style={ styles.infoText }>

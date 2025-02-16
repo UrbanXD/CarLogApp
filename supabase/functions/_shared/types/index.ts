@@ -11,6 +11,7 @@ export type EmailAction =
 
 export type UserRecord = {
     email: string
+    new_email: string | null
     created_at: string | null
     confirmation_sent_at: string | null
     recovery_sent_at: string | null

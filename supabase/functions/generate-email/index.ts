@@ -18,6 +18,7 @@ const handler = async (req: Request) => {
     const authEmailBody: AuthEmailBody = {
         user: {
             email: data.user.email,
+            new_email: data.user.new_email,
             confirmation_sent_at: new Date().toISOString(),
         },
         email_data: {

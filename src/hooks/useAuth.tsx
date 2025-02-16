@@ -16,6 +16,8 @@ export type SignUpFunction = (user: UserFormFieldType) => Promise<void>
 
 export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
 
+export type ChangeEmailFunction = (newEmail: string) => Promise<void>
+
 export type ChangeNameFunction = (firstname: string, lastname: string) => Promise<void>
 
 export type ResetPasswordFunction = (newPassword: string) => Promise<void>
@@ -148,6 +150,48 @@ const useAuth = () => {
         }
     }
 
+    const changeEmail: ChangeEmailFunction = async (
+        newEmail
+    ) => {
+        try {
+            const emailParams: GenerateLinkParams = {
+                type: "email_change_new",
+                email: session.user.email,
+                new_email: newEmail
+            }
+
+            const { error } =
+                await supabaseConnector
+                    .client
+                    .functions
+                    .invoke(
+                        "generate-email",
+                        {
+                            method: "POST",
+                            body: JSON.stringify(emailParams)
+                        }
+                    );
+
+            if (error) throw error;
+
+            // const { error } =
+            //     await supabaseConnector
+            //         .client
+            //         .auth
+            //         .updateUser({
+            //             password: newEmail
+            //         });
+            //
+            // if(error) throw error;
+
+            addToast(ChangeNameToast.success);
+            await dismissAllBottomSheet();
+        } catch (error) {
+            console.log(error, error.code)
+            addToast(ChangeNameToast[error.code] || ChangeNameToast.error);
+        }
+    }
+
     const changeName: ChangeNameFunction = async (
         firstname,
         lastname
@@ -173,7 +217,9 @@ const useAuth = () => {
         }
     }
 
-    const resetPassword: ResetPasswordFunction = async (newPassword) => {
+    const resetPassword: ResetPasswordFunction = async (
+        newPassword
+    ) => {
         try {
             const { error } =
                 await supabaseConnector
@@ -286,6 +332,7 @@ const useAuth = () => {
         signIn,
         signOut,
         openUserVerification,
+        changeEmail,
         changeName,
         resetPassword,
         deleteUserProfile
