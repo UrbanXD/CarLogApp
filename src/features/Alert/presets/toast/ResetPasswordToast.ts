@@ -14,6 +14,11 @@ const over_email_send_rate_limit = (seconds: number | string) => {
     }
 }
 
+const otp_expired: AlertToastProps = {
+    type: "warning",
+    body: "Az Ön által megadott kód érvénytelen, esetleg lejárt."
+}
+
 const error: AlertToastProps = {
     type: "error",
     body: "Váratlan hiba lépett fel a jelszó módosítása közben!"
@@ -22,5 +27,6 @@ const error: AlertToastProps = {
 export const ResetPasswordToast: ToastMessages = {
     success,
     error,
-    over_email_send_rate_limit
+    over_email_send_rate_limit,
+    otp_expired
 }

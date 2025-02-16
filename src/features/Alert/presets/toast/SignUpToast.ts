@@ -7,7 +7,7 @@ const success: AlertToastProps = {
 }
 
 const otp_expired: AlertToastProps = {
-    type: "error",
+    type: "warning",
     body: "Az Ön által megadott kód érvénytelen, esetleg lejárt."
 }
 

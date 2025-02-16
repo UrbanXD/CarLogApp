@@ -5,3 +5,4 @@ export * from "./SignOutToast.ts";
 export * from "./SignUpToast.ts";
 export * from "./ResetPasswordToast.ts";
 export * from "./ChangeNameToast.ts";
+export * from "./DeleteUserToast.ts";
