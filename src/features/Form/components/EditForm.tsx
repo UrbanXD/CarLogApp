@@ -39,6 +39,7 @@ const EditForm: React.FC<EditFormProps> = ({
                     text="Mentés"
                     onPress={ handleSave }
                     style={{ flex: 0.9 }}
+                    loadingIndicator
                 />
             </Button.Row>
         </View>

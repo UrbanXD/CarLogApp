@@ -8,15 +8,15 @@ import Button from "../components/Button/Button";
 import Divider from "../components/Divider";
 import { useSession } from "../features/Auth/context/SessionProvider.tsx";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAlert } from "../features/Alert/context/AlertProvider.tsx";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
-import { SignUpVerificationBottomSheet, SignInBottomSheet, SignUpBottomSheet } from "../features/BottomSheet/presets";
+import { SignInBottomSheet, SignUpBottomSheet } from "../features/BottomSheet/presets";
+import useAuth from "../hooks/useAuth.tsx";
 
 const AuthScreen: React.FC = () => {
     const { top } = useSafeAreaInsets();
     const { openBottomSheet } = useBottomSheet();
-    const { addToast } = useAlert();
     const { session, notVerifiedUser } = useSession();
+    const { openUserVerification } = useAuth();
 
     const openSignUp =
         () => openBottomSheet(SignUpBottomSheet);
@@ -27,9 +27,7 @@ const AuthScreen: React.FC = () => {
 
     const openVerification = useCallback( () => {
         if(notVerifiedUser && notVerifiedUser.email) {
-            openBottomSheet(
-                SignUpVerificationBottomSheet(addToast)
-            );
+            openUserVerification(notVerifiedUser.email);
         }
     }, [notVerifiedUser])
 

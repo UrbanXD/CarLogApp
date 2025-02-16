@@ -9,8 +9,8 @@ import { LOCAL_STORAGE_KEYS } from "../constants/constants.ts";
 import { router } from "expo-router";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
 import { DeleteUserVerificationBottomSheet, ResetPasswordVerificationBottomSheet, SignUpVerificationBottomSheet } from "../features/BottomSheet/presets/index.ts";
-import { ChangeNameToast, ResetPasswordToast, SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast/index.ts";
-import signUpToast from "../features/Alert/presets/toast/SignUpToast.ts";
+import { ChangeNameToast, DeleteUserToast, ResetPasswordToast, SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast/index.ts";
+import { HandleVerificationOtpType } from "../features/Auth/components/VerifyOTP.tsx";
 
 export type SignUpFunction = (user: UserFormFieldType) => Promise<void>
 
@@ -24,7 +24,24 @@ const useAuth = () => {
     const { supabaseConnector, powersync } = useDatabase();
     const { session, setNotVerifiedUser } = useSession();
     const { addToast } = useAlert();
-    const { openBottomSheet, dismissBottomSheet, dismissAllBottomSheet } = useBottomSheet();
+    const { openBottomSheet, dismissAllBottomSheet } = useBottomSheet();
+
+    const openUserVerification = (email: string) => {
+        const handleSignUpVerification: HandleVerificationOtpType =
+            async (errorCode) => {
+                if(errorCode) return addToast(SignUpToast[errorCode] || SignUpToast.otp_error);
+
+                addToast(SignUpToast.success);
+                await dismissAllBottomSheet();
+            }
+
+        openBottomSheet(
+            SignUpVerificationBottomSheet(
+                email,
+                handleSignUpVerification
+            )
+        );
+    }
 
     const signUp: SignUpFunction = async (user) => {
         try {
@@ -78,25 +95,9 @@ const useAuth = () => {
                     JSON.stringify(newUser)
                 );
 
-            await dismissBottomSheet();
-
-            openBottomSheet(
-                SignUpVerificationBottomSheet(
-                    newUser?.email,
-                    async (errorCode) => {
-                        if(errorCode) return addToast(signUpToast[errorCode] || signUpToast.otp_error);
-
-                        await dismissAllBottomSheet();
-                        // kijelentkeztetes???
-                        addToast(signUpToast.success); /// nem futott le!!!!!!!!!!
-                    }
-                )
-            );
+            openUserVerification(newUser?.email);
         } catch (error) {
-            let toast = SignUpToast[error.code];
-            if(!toast) toast = SignUpToast.error;
-
-            addToast(toast);
+            addToast(SignUpToast[error.code] || SignUpToast.error);
         }
     }
 
@@ -110,22 +111,13 @@ const useAuth = () => {
 
             if (error) {
                 if(error.code === "email_not_confirmed") {
-                    router.push({
-                        pathname: "/verify",
-                        params: {
-                            type: "signup",
-                            title: "Email cím hitelesítés",
-                            email: user.email,
-                            toastMessages: JSON.stringify(SignInToast),
-                            replaceHREF: "/(main)"
-                        }
-                    });
-                    return;
+                    return openUserVerification(user.email);
                 }
 
                 throw error;
             }
 
+            addToast(SignInToast.success);
             await dismissAllBottomSheet();
         } catch (error) {
             if(error.code) {
@@ -137,7 +129,7 @@ const useAuth = () => {
         }
     }
 
-    const signOut = async () => {
+    const signOut = async (disabledToast?: boolean = false) => {
         try {
             const { error } =
                 await supabaseConnector
@@ -147,12 +139,12 @@ const useAuth = () => {
 
             if(error) throw error;
 
-            router.replace("/backToRootIndex");
-            addToast(SignOutToast.success);
+            await router.replace("/backToRootIndex");
+            if(!disabledToast) addToast(SignOutToast.success);
             await powersync.disconnectAndClear();
         } catch (error) {
-            if(error instanceof AuthError) return addToast(SignOutToast.error);
-            // ha nem AuthError akkor sikeres a kijelentkezes, de mashol hiba tortent
+            if(error instanceof AuthError && !disabledToast) return addToast(SignOutToast.error);
+            // ha nem AuthError akkor sikeres a kijelentkezes, de mashol hiba tortent (pl: powersync)
         }
     }
 
@@ -174,10 +166,10 @@ const useAuth = () => {
 
             if(error) throw error;
 
-            await dismissAllBottomSheet();
             addToast(ChangeNameToast.success);
-        } catch (_) {
-            addToast(ChangeNameToast.error);
+            await dismissAllBottomSheet();
+        } catch (error) {
+            addToast(ChangeNameToast[error.code] || ChangeNameToast.error);
         }
     }
 
@@ -191,27 +183,30 @@ const useAuth = () => {
 
             if(error) throw error;
 
+            const handleResetPasswordVerification: HandleVerificationOtpType =
+                async (errorCode) => {
+                    if(errorCode) return addToast(ResetPasswordToast[errorCode] || ResetPasswordToast.error);
+
+                    const { error } =
+                        await supabaseConnector
+                            .client
+                            .auth
+                            .updateUser(
+                                {
+                                    password: newPassword
+                                }
+                            );
+
+                    if(error && error.code !== "same_password") return addToast(ResetPasswordToast[error.code] || ResetPasswordToast.error);
+
+                    addToast(ResetPasswordToast.success);
+                    await dismissAllBottomSheet();
+                }
+
             openBottomSheet(
                 ResetPasswordVerificationBottomSheet(
                     session?.user.email,
-                    async (errorCode) => {
-                        if(errorCode) return addToast(ResetPasswordToast.error);
-
-                        const { error } =
-                            await supabaseConnector
-                                .client
-                                .auth
-                                .updateUser(
-                                    {
-                                        password: newPassword
-                                    }
-                                );
-
-                        if(error && error.code !== "same_password") return addToast(ResetPasswordToast.error);
-
-                        await dismissAllBottomSheet();
-                        addToast(ResetPasswordToast.success);
-                    }
+                    handleResetPasswordVerification
                 )
             );
         } catch (error: AuthError){
@@ -222,15 +217,10 @@ const useAuth = () => {
                 let seconds: number = 60;
                 if (secondsMatch) seconds = parseInt(secondsMatch[0], 10);
 
-                return addToast(
-                    ResetPasswordToast.over_email_send_rate_limit(seconds)
-                );
+                return addToast(ResetPasswordToast.over_email_send_rate_limit(seconds));
             }
 
-            addToast(
-                ResetPasswordToast[error.code] ||
-                ResetPasswordToast.error
-            );
+            addToast(ResetPasswordToast[error.code] || ResetPasswordToast.error);
         }
     }
 
@@ -256,34 +246,37 @@ const useAuth = () => {
 
                 if (error) throw error;
 
+                const handleDeleteUserVerification: HandleVerificationOtpType =
+                    async (errorCode) => {
+                        if(errorCode) return addToast(DeleteUserToast[errorCode] || DeleteUserToast.error);
+
+                        const { error } =
+                            await supabaseConnector
+                                .client
+                                .functions
+                                .invoke(
+                                    "delete-user",
+                                    {
+                                        method: "DELETE",
+                                        body: JSON.stringify({ id: session.user.id })
+                                    }
+                                );
+
+                        if(error) return addToast(DeleteUserToast[error.code] || DeleteUserToast.error);
+
+                        await dismissAllBottomSheet();
+                        await signOut(true);
+                        addToast(DeleteUserToast.success);
+                    }
+
                 openBottomSheet(
                     DeleteUserVerificationBottomSheet(
                         emailParams.email,
-                        async (errorCode) => {
-                            console.log("error", errorCode)
-                            if(!errorCode) {
-                                const { error } =
-                                    await supabaseConnector
-                                        .client
-                                        .functions
-                                        .invoke(
-                                            "delete-user",
-                                            {
-                                                method: "DELETE",
-                                                body: JSON.stringify({ id: session.user.id })
-                                            }
-                                        );
-
-                                if(!error) {
-                                    await dismissAllBottomSheet();
-                                    await signOut();
-                                }
-                            }
-                        }
+                        handleDeleteUserVerification
                     )
                 )
             } catch (error) {
-                console.log("hiba: ", error)
+                addToast(DeleteUserToast[error.code] || DeleteUserToast.error);
             }
         }
     }
@@ -292,6 +285,7 @@ const useAuth = () => {
         signUp,
         signIn,
         signOut,
+        openUserVerification,
         changeName,
         resetPassword,
         deleteUserProfile
