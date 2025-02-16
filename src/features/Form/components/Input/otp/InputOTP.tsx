@@ -67,6 +67,10 @@ const InputOTP: React.FC<InputOTPProps> = ({
         );
     }, []);
 
+    useEffect(() => {
+        setTimeout(() => hiddenInputRef.current?.focus(), 0); // auto focus
+    }, [hiddenInputRef]);
+
     const styles= useStyles(numberOfDigits);
 
     const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -113,7 +117,6 @@ const InputOTP: React.FC<InputOTPProps> = ({
                     maxLength={ numberOfDigits }
                     keyboardType="number-pad"
                     enterKeyHint="next"
-                    autoFocus
                     style={ styles.hiddenInput }
                 />
             </View>
