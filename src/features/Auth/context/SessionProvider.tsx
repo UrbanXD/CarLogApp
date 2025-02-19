@@ -7,7 +7,7 @@ import { LOCAL_STORAGE_KEYS } from "../../../constants/constants";
 interface SessionProviderValue {
     session: Session | null
     notVerifiedUser: User | null
-    setNotVerifiedUser: (value: User) => void
+    setNotVerifiedUser: (value: User | null) => void
 }
 
 const SessionContext = createContext<SessionProviderValue | null>(null);

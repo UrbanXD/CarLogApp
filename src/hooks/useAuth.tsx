@@ -3,14 +3,15 @@ import { useAlert } from "../features/Alert/context/AlertProvider.tsx";
 import { useSession } from "../features/Auth/context/SessionProvider.tsx";
 import { UserFormFieldType } from "../features/Form/constants/schemas/userSchema.tsx";
 import { SignInFormFieldType } from "../features/Form/constants/schemas/signInSchema.tsx";
-import { AuthApiError, AuthError, GenerateLinkParams } from "@supabase/supabase-js";
+import { AuthError, GenerateLinkParams } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LOCAL_STORAGE_KEYS } from "../constants/constants.ts";
 import { router } from "expo-router";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
 import { DeleteUserVerificationBottomSheet, ResetPasswordVerificationBottomSheet, SignUpVerificationBottomSheet } from "../features/BottomSheet/presets/index.ts";
-import { ChangeNameToast, DeleteUserToast, ResetPasswordToast, SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast/index.ts";
+import { ChangeNameToast, DeleteUserToast, ResetPasswordToast, SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast";
 import { HandleVerificationOtpType } from "../features/Auth/components/VerifyOTP.tsx";
+import { getToastMessage } from "../features/Alert/constants/constants.ts";
 
 export type SignUpFunction = (user: UserFormFieldType) => Promise<void>
 
@@ -31,10 +32,18 @@ const useAuth = () => {
     const openUserVerification = (email: string) => {
         const handleSignUpVerification: HandleVerificationOtpType =
             async (errorCode) => {
-                if(errorCode) return addToast(SignUpToast[errorCode] || SignUpToast.otp_error);
+                if(errorCode) {
+                    return addToast(
+                        getToastMessage({
+                            messages: SignUpToast,
+                            error: { code: errorCode },
+                            defaultErrorCode: "otp_error"
+                        })
+                    )
+                }
 
-                addToast(SignUpToast.success);
-                await dismissAllBottomSheet();
+                addToast(SignUpToast.success());
+                dismissAllBottomSheet();
             }
 
         openBottomSheet(
@@ -67,7 +76,7 @@ const useAuth = () => {
                     );
 
             if(emailError) throw emailError;
-            if(emailExists) throw { code: "email_exists" } as AuthApiError;
+            if(emailExists) throw { code: "email_exists" } as AuthError;
 
             const {
                 data: {
@@ -97,9 +106,9 @@ const useAuth = () => {
                     JSON.stringify(newUser)
                 );
 
-            openUserVerification(newUser?.email);
+            if(newUser?.email) openUserVerification(newUser.email);
         } catch (error) {
-            addToast(SignUpToast[error.code] || SignUpToast.error);
+            addToast(getToastMessage({ messages: SignUpToast, error }));
         }
     }
 
@@ -119,19 +128,14 @@ const useAuth = () => {
                 throw error;
             }
 
-            addToast(SignInToast.success);
-            await dismissAllBottomSheet();
+            addToast(SignInToast.success());
+            dismissAllBottomSheet();
         } catch (error) {
-            if(error.code) {
-                const toastMessage = SignInToast[error.code];
-                if(toastMessage) return addToast(toastMessage);
-            }
-
-            addToast(SignInToast.error);
+            addToast(getToastMessage({ messages: SignInToast, error }));
         }
     }
 
-    const signOut = async (disabledToast?: boolean = false) => {
+    const signOut = async (disabledToast: boolean = false) => {
         try {
             const { error } =
                 await supabaseConnector
@@ -141,11 +145,11 @@ const useAuth = () => {
 
             if(error) throw error;
 
-            await router.replace("/backToRootIndex");
-            if(!disabledToast) addToast(SignOutToast.success);
+            router.replace("/backToRootIndex");
+            if(!disabledToast) addToast(SignOutToast.success());
             await powersync.disconnectAndClear();
         } catch (error) {
-            if(error instanceof AuthError && !disabledToast) return addToast(SignOutToast.error);
+            if(error instanceof AuthError && !disabledToast) return addToast(getToastMessage({ messages: SignOutToast, error }));
             // ha nem AuthError akkor sikeres a kijelentkezes, de mashol hiba tortent (pl: powersync)
         }
     }
@@ -154,10 +158,13 @@ const useAuth = () => {
         newEmail
     ) => {
         try {
+            if(!session) throw { code: "session_not_found" };
+            if(!session.user.email) throw { code: "email_not_found" };
+
             const emailParams: GenerateLinkParams = {
                 type: "email_change_new",
                 email: session.user.email,
-                new_email: newEmail
+                newEmail
             }
 
             const { error } =
@@ -184,11 +191,10 @@ const useAuth = () => {
             //
             // if(error) throw error;
 
-            addToast(ChangeNameToast.success);
+            addToast(ChangeNameToast.success());
             await dismissAllBottomSheet();
         } catch (error) {
-            console.log(error, error.code)
-            addToast(ChangeNameToast[error.code] || ChangeNameToast.error);
+            addToast(getToastMessage({ messages: ChangeNameToast, error }));
         }
     }
 
@@ -210,10 +216,10 @@ const useAuth = () => {
 
             if(error) throw error;
 
-            addToast(ChangeNameToast.success);
-            await dismissAllBottomSheet();
+            addToast(ChangeNameToast.success());
+            dismissAllBottomSheet();
         } catch (error) {
-            addToast(ChangeNameToast[error.code] || ChangeNameToast.error);
+            addToast(getToastMessage({ messages: ChangeNameToast, error }));
         }
     }
 
@@ -221,17 +227,20 @@ const useAuth = () => {
         newPassword
     ) => {
         try {
+            if(!session) throw { code: "session_not_found" };
+            if(!session.user.email) throw { code: "email_not_found" };
+
             const { error } =
                 await supabaseConnector
                     .client
                     .auth
-                    .resetPasswordForEmail(session?.user.email);
+                    .resetPasswordForEmail(session.user.email);
 
             if(error) throw error;
 
             const handleResetPasswordVerification: HandleVerificationOtpType =
                 async (errorCode) => {
-                    if(errorCode) return addToast(ResetPasswordToast[errorCode] || ResetPasswordToast.error);
+                    if(errorCode) return addToast(getToastMessage({ messages: ResetPasswordToast, error: { code: errorCode } }));
 
                     const { error } =
                         await supabaseConnector
@@ -243,10 +252,10 @@ const useAuth = () => {
                                 }
                             );
 
-                    if(error && error.code !== "same_password") return addToast(ResetPasswordToast[error.code] || ResetPasswordToast.error);
+                    if(error && error.code !== "same_password") return addToast(getToastMessage({ messages: ResetPasswordToast, error }));
 
-                    addToast(ResetPasswordToast.success);
-                    await dismissAllBottomSheet();
+                    addToast(ResetPasswordToast.success());
+                    dismissAllBottomSheet();
                 }
 
             openBottomSheet(
@@ -255,24 +264,17 @@ const useAuth = () => {
                     handleResetPasswordVerification
                 )
             );
-        } catch (error: AuthError){
-            if(error.code === "over_email_send_rate_limit") {
-                const secondsMatch =
-                    error.message.match(/\d+/);
-
-                let seconds: number = 60;
-                if (secondsMatch) seconds = parseInt(secondsMatch[0], 10);
-
-                return addToast(ResetPasswordToast.over_email_send_rate_limit(seconds));
-            }
-
-            addToast(ResetPasswordToast[error.code] || ResetPasswordToast.error);
+        } catch (error){
+            addToast(getToastMessage({ messages: ResetPasswordToast, error }));
         }
     }
 
     const deleteUserProfile = async () => {
         if(session?.user){
             try {
+                if(!session) throw { code: "session_not_found" };
+                if(!session.user.email) throw { code: "email_not_found" };
+
                 const emailParams: GenerateLinkParams = {
                     type: "magiclink",
                     email: session.user.email,
@@ -294,7 +296,7 @@ const useAuth = () => {
 
                 const handleDeleteUserVerification: HandleVerificationOtpType =
                     async (errorCode) => {
-                        if(errorCode) return addToast(DeleteUserToast[errorCode] || DeleteUserToast.error);
+                        if(errorCode) throw { code: errorCode };
 
                         const { error } =
                             await supabaseConnector
@@ -308,11 +310,11 @@ const useAuth = () => {
                                     }
                                 );
 
-                        if(error) return addToast(DeleteUserToast[error.code] || DeleteUserToast.error);
+                        if(error) throw error;
 
-                        await dismissAllBottomSheet();
+                        dismissAllBottomSheet();
                         await signOut(true);
-                        addToast(DeleteUserToast.success);
+                        addToast(DeleteUserToast.success());
                     }
 
                 openBottomSheet(
@@ -322,7 +324,7 @@ const useAuth = () => {
                     )
                 )
             } catch (error) {
-                addToast(DeleteUserToast[error.code] || DeleteUserToast.error);
+                addToast(getToastMessage({ messages: DeleteUserToast, error }));
             }
         }
     }
