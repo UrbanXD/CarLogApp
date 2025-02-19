@@ -8,7 +8,7 @@ export type OpenModalFunction = (args: AlertModalProps) => void;
 
 type ToastMessageCode = AlertType | "otp_error" | ErrorCode | string
 
-export type ToastMessage = (message?: string | number) => AlertToastProps
+export type ToastMessage = (message?: string) => AlertToastProps
 export type ToastMessages = Record<ToastMessageCode, ToastMessage>
 
 export const getToastMessage: (

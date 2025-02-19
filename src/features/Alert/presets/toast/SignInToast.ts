@@ -1,19 +1,24 @@
-import { AlertToastProps } from "../../components/AlertToast";
-import { ToastMessages } from "../../constants/constants";
+import { ToastMessage, ToastMessages } from "../../constants/constants";
 
-const success: AlertToastProps = {
-    type: "success",
-    title: "Sikeres bejelentkezés!"
+const success: ToastMessage = () => {
+    return {
+        type: "success",
+        title: "Sikeres bejelentkezés!"
+    }
 }
 
-const error: AlertToastProps = {
-    type: "error",
-    body: "Váratlan hiba lépett fel a bejelentkezés közben!"
+const error: ToastMessage = () => {
+    return {
+        type: "error",
+        body: "Váratlan hiba lépett fel a bejelentkezés közben!"
+    }
 }
 
-const invalid_credentials: AlertToastProps = {
-    type: "warning",
-    body: "Helytelen email cím és/vagy jelszó!"
+const invalid_credentials: ToastMessage = () => {
+    return {
+        type: "warning",
+        body: "Helytelen email cím és/vagy jelszó!"
+    }
 }
 
 export const SignInToast: ToastMessages = {
