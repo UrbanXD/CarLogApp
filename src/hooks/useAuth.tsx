@@ -11,7 +11,7 @@ import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetConte
 import { DeleteUserVerificationBottomSheet, ResetPasswordVerificationBottomSheet, SignUpVerificationBottomSheet } from "../features/BottomSheet/presets/index.ts";
 import { ChangeNameToast, DeleteUserToast, ResetPasswordToast, SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast";
 import { HandleVerificationOtpType } from "../features/Auth/components/VerifyOTP.tsx";
-import { getToastMessage } from "../features/Alert/constants/constants.ts";
+import { getToastMessage } from "../features/Alert/utils/getToastMessage.ts";
 
 export type SignUpFunction = (user: UserFormFieldType) => Promise<void>
 

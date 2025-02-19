@@ -1,18 +1,12 @@
-import {ALERT_COLORS, ALERT_ICONS, ALERT_TITLES, AlertType} from "../constants/constants";
-import React, {useCallback, useEffect, useRef, useState} from "react";
-import {View, Text, StyleSheet, Modal, Easing, useWindowDimensions, TouchableOpacity} from "react-native";
-import {theme} from "../../../constants/theme";
-import {heightPercentageToDP as hp, widthPercentageToDP} from "react-native-responsive-screen";
-import {FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT} from "../../../constants/constants";
+import { ALERT_COLORS, ALERT_ICONS, ALERT_TITLES } from "../constants/constants";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity } from "react-native";
+import { theme } from "../../../constants/theme";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/constants";
 import Icon from "../../../components/Icon";
-import { Portal } from '@gorhom/portal';
-import Animated, {
-    interpolate,
-    useAnimatedStyle,
-    useDerivedValue,
-    useSharedValue,
-    withTiming
-} from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming} from "react-native-reanimated";
+import { AlertType } from "../constants/types.ts";
 
 export interface AlertToastProps {
     type?: AlertType,

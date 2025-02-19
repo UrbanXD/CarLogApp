@@ -1,4 +1,4 @@
-import { ToastMessage, ToastMessages } from "../../constants/constants";
+import { ToastMessage, ToastMessages } from "../../constants/types.ts";
 
 const success: ToastMessage = () => {
     return {

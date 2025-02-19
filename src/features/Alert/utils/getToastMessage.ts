@@ -1,0 +1,33 @@
+import { AlertToastProps } from "../components/AlertToast.tsx";
+import { ToastMessages } from "../../constants/types.ts";
+
+export const getToastMessage: (
+    args: {
+        messages: ToastMessages
+        error?: unknown
+        defaultErrorCode?: string
+    }
+) => AlertToastProps = ({
+                            messages,
+                            error = null,
+                            defaultErrorCode = "error"
+                        }) => {
+    if(error === null) messages.success();
+
+    if(typeof error === "object" && error && "code" in error && typeof error.code === "string") {
+        let message: string | undefined;
+        if(error.code === "over_email_send_rate_limit" && "message" in error && typeof error.message === "string") {
+            const secondsMatch =
+                error.message.match(/\d+/);
+
+            let seconds: number = 60;
+            if (secondsMatch) seconds = parseInt(secondsMatch[0], 10);
+
+            message = String(seconds);
+        }
+
+        return messages[error.code](message);
+    }
+
+    return messages[defaultErrorCode]() || messages.error();
+}

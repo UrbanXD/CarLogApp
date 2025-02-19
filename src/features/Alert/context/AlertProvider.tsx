@@ -6,7 +6,7 @@ import { theme } from "../../../constants/theme";
 import { AlertToastProps } from "../components/AlertToast";
 import { AlertModalProps } from "../components/AlertModal";
 import Alert from "../components/Alert";
-import { AddToastFunction, OpenModalFunction } from "../constants/constants.ts";
+import { AddToastFunction, OpenModalFunction } from "../constants/types.ts";
 
 interface AlertProviderValue {
     addToast: AddToastFunction
