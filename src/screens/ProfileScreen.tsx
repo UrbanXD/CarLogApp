@@ -67,6 +67,17 @@ const ProfileScreen: React.FC = () => {
                     />
                     <Divider />
                     <Button.Text
+                        iconLeft={ ICON_NAMES.email }
+                        iconRight={ ICON_NAMES.rightArrowHead }
+                        text="Email csere"
+                        textStyle={{ textAlign: "left" }}
+                        onPress={ openChangeEmail }
+                        backgroundColor="transparent"
+                        fontSize={ FONT_SIZES.p1 }
+                        loadingIndicator
+                    />
+                    <Divider />
+                    <Button.Text
                         iconLeft={ ICON_NAMES.password }
                         iconRight={ ICON_NAMES.rightArrowHead }
                         text="Jelszó csere"

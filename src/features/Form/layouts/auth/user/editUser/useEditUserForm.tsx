@@ -7,7 +7,7 @@ export const useEditUserForm = (
     user: Partial<UserFormFieldType>,
     stepIndex: number
 ) => {
-    const { resetPassword, changeName } = useAuth();
+    const { resetPassword, changeEmail, changeName } = useAuth();
 
     const {
         control,
@@ -20,7 +20,9 @@ export const useEditUserForm = (
         handleSubmit(async (editedUser: Partial<UserFormFieldType>) => {
             switch (stepIndex) {
                 case EDIT_USER_FORM_STEPS.EmailStep:
-                    console.log("email change not implemented")
+                    if(!editedUser.email) return;
+
+                    await changeEmail(editedUser.email);
                     break;
                 case EDIT_USER_FORM_STEPS.PasswordStep:
                     if(!editedUser.password) return;

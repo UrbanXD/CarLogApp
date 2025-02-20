@@ -8,19 +8,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LOCAL_STORAGE_KEYS } from "../constants/constants.ts";
 import { router } from "expo-router";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
-import { DeleteUserVerificationBottomSheet, ResetPasswordVerificationBottomSheet, SignUpVerificationBottomSheet } from "../features/BottomSheet/presets/index.ts";
-import { ChangeNameToast, DeleteUserToast, ResetPasswordToast, SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast";
+import { ChangeEmailToast, ChangeNameToast, DeleteUserToast, ResetPasswordToast, SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast";
 import { HandleVerificationOtpType } from "../features/Auth/components/VerifyOTP.tsx";
 import { getToastMessage } from "../features/Alert/utils/getToastMessage.ts";
+import { OTPVerificationBottomSheet } from "../features/BottomSheet/presets/index.ts";
 
 export type SignUpFunction = (user: UserFormFieldType) => Promise<void>
-
 export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
-
 export type ChangeEmailFunction = (newEmail: string) => Promise<void>
-
 export type ChangeNameFunction = (firstname: string, lastname: string) => Promise<void>
-
 export type ResetPasswordFunction = (newPassword: string) => Promise<void>
 
 const useAuth = () => {
@@ -39,7 +35,7 @@ const useAuth = () => {
                             error: { code: errorCode },
                             defaultErrorCode: "otp_error"
                         })
-                    )
+                    );
                 }
 
                 addToast(SignUpToast.success());
@@ -47,10 +43,12 @@ const useAuth = () => {
             }
 
         openBottomSheet(
-            SignUpVerificationBottomSheet(
+            OTPVerificationBottomSheet({
+                type: "signup",
+                title: "Email cím hitelesítés",
                 email,
-                handleSignUpVerification
-            )
+                handleVerification: handleSignUpVerification
+            })
         );
     }
 
@@ -161,40 +159,68 @@ const useAuth = () => {
             if(!session) throw { code: "session_not_found" };
             if(!session.user.email) throw { code: "email_not_found" };
 
-            const emailParams: GenerateLinkParams = {
-                type: "email_change_new",
-                email: session.user.email,
-                newEmail
-            }
-
             const { error } =
                 await supabaseConnector
                     .client
-                    .functions
-                    .invoke(
-                        "generate-email",
-                        {
-                            method: "POST",
-                            body: JSON.stringify(emailParams)
+                    .auth
+                    .updateUser({
+                        email: newEmail
+                    });
+
+            if(error) throw error;
+
+            const handleCurrentEmailVerification: HandleVerificationOtpType =
+                async (errorCode) => {
+                    if(errorCode) {
+                        return addToast(
+                            getToastMessage({
+                                messages: ChangeEmailToast,
+                                error: { code: errorCode }
+                            })
+                        );
+                    }
+
+                    const handleNewEmailVerification: HandleVerificationOtpType =
+                        async (errorCode) => {
+                            if(errorCode) {
+                                return addToast(
+                                    getToastMessage({
+                                        messages: ChangeEmailToast,
+                                        error: { code: errorCode }
+                                    })
+                                );
+                            }
+
+                            addToast(ChangeEmailToast.success());
+                            dismissAllBottomSheet();
+                            await signOut(true);
                         }
-                    );
 
-            if (error) throw error;
+                    openBottomSheet(
+                        OTPVerificationBottomSheet({
+                            type: "email_change",
+                            title: "Új email cím hitelesítés",
+                            email: newEmail,
+                            handleVerification: handleNewEmailVerification
+                        })
+                    )
+                }
 
-            // const { error } =
-            //     await supabaseConnector
-            //         .client
-            //         .auth
-            //         .updateUser({
-            //             password: newEmail
-            //         });
-            //
-            // if(error) throw error;
-
-            addToast(ChangeNameToast.success());
-            await dismissAllBottomSheet();
+            openBottomSheet(
+                OTPVerificationBottomSheet({
+                    type: "email_change",
+                    title: "Email módosítási kérelem hitelesítés",
+                    email: session.user.email,
+                    handleVerification: handleCurrentEmailVerification
+                })
+            );
         } catch (error) {
-            addToast(getToastMessage({ messages: ChangeNameToast, error }));
+            addToast(
+                getToastMessage({
+                    messages: ChangeEmailToast,
+                    error
+                })
+            );
         }
     }
 
@@ -240,7 +266,14 @@ const useAuth = () => {
 
             const handleResetPasswordVerification: HandleVerificationOtpType =
                 async (errorCode) => {
-                    if(errorCode) return addToast(getToastMessage({ messages: ResetPasswordToast, error: { code: errorCode } }));
+                    if(errorCode) {
+                        return addToast(
+                            getToastMessage({
+                                messages: ResetPasswordToast,
+                                error: { code: errorCode }
+                            })
+                        );
+                    }
 
                     const { error } =
                         await supabaseConnector
@@ -252,17 +285,27 @@ const useAuth = () => {
                                 }
                             );
 
-                    if(error && error.code !== "same_password") return addToast(getToastMessage({ messages: ResetPasswordToast, error }));
+                    if(error && error.code !== "same_password") {
+                        return addToast(
+                            getToastMessage({
+                                messages: ResetPasswordToast,
+                                error
+                            })
+                        );
+                    }
 
                     addToast(ResetPasswordToast.success());
                     dismissAllBottomSheet();
+                    await signOut(true);
                 }
 
             openBottomSheet(
-                ResetPasswordVerificationBottomSheet(
-                    session?.user.email,
-                    handleResetPasswordVerification
-                )
+                OTPVerificationBottomSheet({
+                        type: "recovery",
+                        title: "Jelszó módosítása",
+                        email: session.user.email,
+                        handleVerification: handleResetPasswordVerification
+                })
             );
         } catch (error){
             addToast(getToastMessage({ messages: ResetPasswordToast, error }));
@@ -296,7 +339,14 @@ const useAuth = () => {
 
                 const handleDeleteUserVerification: HandleVerificationOtpType =
                     async (errorCode) => {
-                        if(errorCode) throw { code: errorCode };
+                        if(errorCode) {
+                            return addToast(
+                                getToastMessage({
+                                    messages: DeleteUserToast,
+                                    error: { code: errorCode }
+                                })
+                            );
+                        }
 
                         const { error } =
                             await supabaseConnector
@@ -312,17 +362,19 @@ const useAuth = () => {
 
                         if(error) throw error;
 
+                        addToast(DeleteUserToast.success());
                         dismissAllBottomSheet();
                         await signOut(true);
-                        addToast(DeleteUserToast.success());
                     }
 
                 openBottomSheet(
-                    DeleteUserVerificationBottomSheet(
-                        emailParams.email,
-                        handleDeleteUserVerification
-                    )
-                )
+                    OTPVerificationBottomSheet({
+                        type: "magiclink", // magiclink viselkedik ugy mint ha torlest verifyolna *mivel supabasebe nincs implementalva ez meg*
+                        title: "Fiók törlése",
+                        email: emailParams.email,
+                        handleVerification: handleDeleteUserVerification
+                    })
+                );
             } catch (error) {
                 addToast(getToastMessage({ messages: DeleteUserToast, error }));
             }
