@@ -1,3 +1,9 @@
+export type Email = {
+    to: Array<string>
+    subject: string
+    html: string
+}
+
 export type EmailAction =
     | "signup"
     | "delete"
@@ -21,6 +27,7 @@ export interface AuthEmailBody {
     user: UserRecord
     email_data: {
         token: string | null
+        token_new: string | null
         email_action_type: EmailAction
     }
 }
