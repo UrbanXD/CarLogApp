@@ -8,14 +8,15 @@ export const getToastMessage: (
         defaultErrorCode?: string
     }
 ) => AlertToastProps = ({
-                            messages,
-                            error = null,
-                            defaultErrorCode = "error"
-                        }) => {
+    messages,
+    error = null,
+    defaultErrorCode = "error"
+}) => {
     if(error === null) messages.success();
 
     if(typeof error === "object" && error && "code" in error && typeof error.code === "string") {
         let message: string | undefined;
+
         if(error.code === "over_email_send_rate_limit" && "message" in error && typeof error.message === "string") {
             const secondsMatch =
                 error.message.match(/\d+/);
@@ -26,8 +27,10 @@ export const getToastMessage: (
             message = String(seconds);
         }
 
-        return messages[error.code](message);
+        const getToast = messages[error.code] || messages[defaultErrorCode] || messages.error;
+        return getToast ? getToast(message) : { type: "error", body: "Váratlan hiba lépett fel!" };
     }
 
-    return messages[defaultErrorCode]() || messages.error();
+    const getToast = messages[defaultErrorCode] || messages.error;
+    return getToast ? getToast() : { type: "error", body: "Váratlan hiba lépett fel!" };
 }
