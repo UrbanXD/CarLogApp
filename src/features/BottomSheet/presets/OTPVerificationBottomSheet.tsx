@@ -1,22 +1,29 @@
+import React from "react";
 import { OpenBottomSheetArgs } from "../context/BottomSheetContext.ts";
 import VerifyOTP, { HandleVerificationOtpType } from "../../Auth/components/VerifyOTP.tsx";
-import React from "react";
+import { EmailOtpType } from "@supabase/supabase-js";
 
-type ResetPasswordVerificationBottomSheetType = (
-    email: string,
+type OtpVerificationBottomSheetArgs = {
+    type: EmailOtpType
+    title: string
+    email: string
     handleVerification: HandleVerificationOtpType
-) => OpenBottomSheetArgs;
+}
 
-export const ResetPasswordVerificationBottomSheet: ResetPasswordVerificationBottomSheetType = (
+type OTPVerificationBottomSheetType = (args: OtpVerificationBottomSheetArgs) => OpenBottomSheetArgs;
+
+export const OTPVerificationBottomSheet: OTPVerificationBottomSheetType = ({
+    type,
+    title,
     email,
     handleVerification
-) => {
+}) => {
     return {
         snapPoints: ["100%"],
         content:
             <VerifyOTP
-                type="recovery"
-                title="Jelszó módosítása"
+                type={ type }
+                title={ title }
                 email={ email }
                 handleVerification={ handleVerification }
             />,
