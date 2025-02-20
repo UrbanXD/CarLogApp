@@ -7,7 +7,6 @@ const handler = async (req: Request) => {
 
     try {
         const payload = await req.text();
-        console.log(JSON.parse(payload))
         const {
             user: {
                 email,
