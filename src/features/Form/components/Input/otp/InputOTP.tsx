@@ -125,6 +125,7 @@ const InputOTP: React.FC<InputOTPProps> = ({
                 width={ wp(75) }
                 disabled={ code.length !== numberOfDigits }
                 onPress={ () => onSubmit(code) }
+                loadingIndicator
             />
         </View>
     )
