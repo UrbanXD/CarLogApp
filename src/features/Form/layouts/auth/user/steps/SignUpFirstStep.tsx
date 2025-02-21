@@ -7,11 +7,13 @@ import TextDivider from "../../../../../../components/TextDivider.tsx";
 import { theme } from "../../../../../../constants/theme.ts";
 import { useMultiStepForm } from "../../../../context/MultiStepFormProvider.tsx";
 import { EmailStep } from "./EmailStep.tsx";
+import useAuth from "../../../../../../hooks/useAuth.tsx";
 
 export const SignUpFirstStep: React.FC<StepProps> = ({
     control,
 }) => {
     const { next } = useMultiStepForm();
+    const { googleAuth } = useAuth();
 
     return (
         <Input.Group>
@@ -27,9 +29,7 @@ export const SignUpFirstStep: React.FC<StepProps> = ({
                 lineHeight={ 1 }
                 marginVertical={ GLOBAL_STYLE.formContainer.gap }
             />
-            <Button.Google
-                onPress={() => 1}
-            />
+            <Button.Google />
         </Input.Group>
     )
 }

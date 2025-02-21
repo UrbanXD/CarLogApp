@@ -12,6 +12,7 @@ import { ChangeEmailToast, ChangeNameToast, DeleteUserToast, ResetPasswordToast,
 import { HandleVerificationOtpType } from "../features/Auth/components/VerifyOTP.tsx";
 import { getToastMessage } from "../features/Alert/utils/getToastMessage.ts";
 import { OTPVerificationBottomSheet } from "../features/BottomSheet/presets/index.ts";
+import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
 
 export type SignUpFunction = (user: UserFormFieldType) => Promise<void>
 export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
@@ -107,6 +108,56 @@ const useAuth = () => {
             if(newUser?.email) openUserVerification(newUser.email);
         } catch (error) {
             addToast(getToastMessage({ messages: SignUpToast, error }));
+        }
+    }
+
+    GoogleSignin.configure({
+        scopes: ["https://www.googleapis.com/auth/userinfo.profile"],
+        webClientId: "251073631752-trpq7qoo5hniiok8vdfnm8ui2bd1p6sb.apps.googleusercontent.com"
+    });
+
+    const googleAuth = async () => {
+        try {
+            await GoogleSignin.hasPlayServices();
+            const { data: { idToken, user: { familyName, givenName, photo } } } =
+                await GoogleSignin.signIn();
+
+            if(idToken) {
+                const { error } =
+                    await supabaseConnector
+                        .client
+                        .auth
+                        .signInWithIdToken({
+                            provider: "google",
+                            token: idToken
+                        });
+
+                console.log(givenName, familyName, error, "lol")
+
+                if(error) throw error;
+                console.log(givenName, familyName)
+
+                await supabaseConnector
+                    .client
+                    .auth
+                    .updateUser({
+                        data: {
+                            firstname: givenName || "",
+                            lastname: familyName || "",
+                        }
+                    })
+            }
+        } catch (error: any) {
+            console.log(error.code, error)
+            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+                // user cancelled the login flow
+            } else if (error.code === statusCodes.IN_PROGRESS) {
+                // operation (e.g. sign in) is in progress already
+            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+                // play services not available or outdated
+            } else {
+                // some other error happened
+            }
         }
     }
 
@@ -385,6 +436,7 @@ const useAuth = () => {
         signUp,
         signIn,
         signOut,
+        googleAuth,
         openUserVerification,
         changeEmail,
         changeName,

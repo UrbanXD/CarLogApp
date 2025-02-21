@@ -44,9 +44,8 @@ const SignInForm: React.FC = () => {
                 color={ theme.colors.gray1 }
                 lineHeight={ 1 }
                 marginVertical={ GLOBAL_STYLE.formContainer.gap }
-
             />
-            <Button.Google onPress={ () => 1 } />
+            <Button.Google />
         </Form>
     )
 }
