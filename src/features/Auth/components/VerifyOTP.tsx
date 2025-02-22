@@ -5,7 +5,7 @@ import { AuthApiError, EmailOtpType } from "@supabase/supabase-js";
 import Divider from "../../../components/Divider.tsx";
 import { theme } from "../../../constants/theme.ts";
 import { FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/constants.ts";
-import { useDatabase } from "../../Database/connector/Database.ts";
+import useAuth from "../../../hooks/useAuth.tsx";
 
 export type HandleVerificationOtpType =
     (errorCode?: string) => ( Promise<void> | void )
@@ -27,7 +27,7 @@ const VerifyOTP: React.FC<VerifyOTPProps> = ({
     subtitle,
     handleVerification,
 }) => {
-    const { supabaseConnector } = useDatabase();
+    const { verifyOTP, resendOTP } = useAuth();
 
     const defaultSubtitle = () =>
         <Text style={ styles.subtitleText }>
@@ -36,7 +36,7 @@ const VerifyOTP: React.FC<VerifyOTPProps> = ({
 
     const onSubmit = async (token: string) => {
         try {
-            await supabaseConnector.verifyOTP({
+            await verifyOTP({
                 email,
                 token,
                 type
@@ -48,8 +48,8 @@ const VerifyOTP: React.FC<VerifyOTPProps> = ({
         }
     }
 
-    const resendOTP = async () =>
-        await supabaseConnector.resendOTP({
+    const resend = async () =>
+        await resendOTP({
             type: "signup",
             email: email,
         });
@@ -82,7 +82,7 @@ const VerifyOTP: React.FC<VerifyOTPProps> = ({
             <Text style={ styles.didntReceivedCodeText }>
                 Nem érkezett meg a kód az adott email címére, esetleg a kód már lejárt?
                 { "\n" }
-                <Text style={ styles.didntReceivedCodeLinkText } onPress={ resendOTP }>Újra küldés</Text>
+                <Text style={ styles.didntReceivedCodeLinkText } onPress={ resend }>Újra küldés</Text>
             </Text>
         </View>
     )

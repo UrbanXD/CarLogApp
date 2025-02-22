@@ -3,7 +3,7 @@ import { useAlert } from "../features/Alert/context/AlertProvider.tsx";
 import { useSession } from "../features/Auth/context/SessionProvider.tsx";
 import { UserFormFieldType } from "../features/Form/constants/schemas/userSchema.tsx";
 import { SignInFormFieldType } from "../features/Form/constants/schemas/signInSchema.tsx";
-import { AuthError, GenerateLinkParams } from "@supabase/supabase-js";
+import { AuthError, GenerateLinkParams, ResendParams, VerifyEmailOtpParams } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LOCAL_STORAGE_KEYS } from "../constants/constants.ts";
 import { router } from "expo-router";
@@ -21,7 +21,8 @@ export type ChangeNameFunction = (firstname: string, lastname: string) => Promis
 export type ResetPasswordFunction = (newPassword: string) => Promise<void>
 
 const useAuth = () => {
-    const { supabaseConnector, powersync } = useDatabase();
+    const database = useDatabase();
+    const { supabaseConnector } = database;
     const { session, setNotVerifiedUser } = useSession();
     const { addToast } = useAlert();
     const { openBottomSheet, dismissAllBottomSheet } = useBottomSheet();
@@ -196,7 +197,7 @@ const useAuth = () => {
 
             router.replace("/backToRootIndex");
             if(!disabledToast) addToast(SignOutToast.success());
-            await powersync.disconnectAndClear();
+            await database.disconnect();
         } catch (error) {
             if(error instanceof AuthError && !disabledToast) return addToast(getToastMessage({ messages: SignOutToast, error }));
             // ha nem AuthError akkor sikeres a kijelentkezes, de mashol hiba tortent (pl: powersync)
@@ -432,6 +433,32 @@ const useAuth = () => {
         }
     }
 
+    const verifyOTP = async (args: VerifyEmailOtpParams) => {
+        const { data, error } =
+            await supabaseConnector
+                .client
+                .auth
+                .verifyOtp(args);
+
+        if(error) throw error;
+        if(data.session) {
+            await supabaseConnector
+                .client
+                .auth
+                .setSession(data.session);
+        }
+    }
+
+    const resendOTP = async (args: ResendParams)=> {
+        const { error } =
+            await supabaseConnector
+                .client
+                .auth
+                .resend(args);
+
+        if(error) throw error;
+    }
+
     return {
         signUp,
         signIn,
@@ -441,7 +468,9 @@ const useAuth = () => {
         changeEmail,
         changeName,
         resetPassword,
-        deleteUserProfile
+        deleteUserProfile,
+        verifyOTP,
+        resendOTP
     }
 }
 
