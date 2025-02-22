@@ -3,7 +3,6 @@ import { AppSchema, DatabaseType } from "./powersync/AppSchema";
 import { SupabaseConnector } from "./SupabaseConnector";
 import { Kysely, wrapPowerSyncWithKysely } from "@powersync/kysely-driver";
 import { Context, createContext, useContext } from "react";
-import LargeSecureStore from "./storage/LargeSecureStorage.ts";
 import { SupabaseStorageAdapter } from "./storage/SupabaseStorageAdapter";
 import { PhotoAttachmentQueue } from "./powersync/PhotoAttachmentQueue";
 import { BaseConfig } from "./BaseConfig";
@@ -13,7 +12,6 @@ export class Database {
     powersync: AbstractPowerSyncDatabase;
     db: Kysely<DatabaseType>;
     supabaseConnector: SupabaseConnector;
-    largeSecureStore: LargeSecureStore;
     storage: SupabaseStorageAdapter;
     attachmentQueue: PhotoAttachmentQueue | undefined = undefined;
 
@@ -21,12 +19,11 @@ export class Database {
         this.powersync = new PowerSyncDatabase({
             schema: AppSchema,
             database: {
-                dbFilename: "carlog-app.sqlite"
+                dbFilename: "powersync-carlog.sqlite"
             }
         })
         this.db = wrapPowerSyncWithKysely(this.powersync);
-        this.largeSecureStore = new LargeSecureStore();
-        this.supabaseConnector = new SupabaseConnector(this.largeSecureStore, this.powersync);
+        this.supabaseConnector = new SupabaseConnector(this.powersync);
         this.storage = this.supabaseConnector.storage;
 
         if(BaseConfig.SUPABASE_BUCKET){
@@ -41,7 +38,7 @@ export class Database {
                     return { retry: true };
                 },
                 onUploadError: async (attachment: AttachmentRecord, exception: any) => {
-                    console.log("upload hiba",exception)
+                    console.log("attachment upload hiba", exception)
                     return { retry: false };
                 }
             });
@@ -55,6 +52,10 @@ export class Database {
         if(this.attachmentQueue){
             await this.attachmentQueue.init();
         }
+    }
+
+    async disconnect() {
+        await this.powersync.disconnectAndClear();
     }
 }
 

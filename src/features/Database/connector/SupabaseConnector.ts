@@ -1,5 +1,5 @@
 import { AbstractPowerSyncDatabase, CrudEntry, PowerSyncBackendConnector, UpdateType } from '@powersync/react-native';
-import {SupabaseClient, createClient, VerifyEmailOtpParams, ResendParams, GoTrueAdminApi} from '@supabase/supabase-js';
+import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import 'react-native-url-polyfill/auto';
 import { BaseConfig } from "./BaseConfig";
 import { SupabaseStorageAdapter } from './storage/SupabaseStorageAdapter';
@@ -22,35 +22,20 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
     powersync: AbstractPowerSyncDatabase;
     storage: SupabaseStorageAdapter;
 
-    constructor(largeSecureStore: LargeSecureStore, powersync: AbstractPowerSyncDatabase) {
+    constructor(powersync: AbstractPowerSyncDatabase) {
         this.client = createClient(
             BaseConfig.SUPABASE_URL,
             BaseConfig.SUPABASE_ANON_KEY,
             {
                         auth: {
                             persistSession: true,
-                            storage: largeSecureStore,
+                            storage: new LargeSecureStore(),
                         },
                    }
         );
 
         this.powersync = powersync;
-
         this.storage = new SupabaseStorageAdapter({ client: this.client });
-    }
-
-    async verifyOTP(args: VerifyEmailOtpParams) {
-        const { data, error } = await this.client.auth.verifyOtp(args);
-
-        if(error) throw error;
-
-        if(data.session) await this.client.auth.setSession(data.session);
-    }
-
-    async resendOTP(args: ResendParams) {
-        const { error } = await this.client.auth.resend(args);
-
-        if(error) throw error;
     }
 
     async fetchCredentials() {
@@ -72,7 +57,6 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
 
     async uploadData(database: AbstractPowerSyncDatabase): Promise<void> {
         const transaction = await database.getNextCrudTransaction();
-
         if (!transaction) return;
 
         let lastOp: CrudEntry | null = null;
@@ -104,10 +88,10 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
             console.debug(ex);
             if (typeof ex.code == 'string' && FATAL_RESPONSE_CODES.some((regex) => regex.test(ex.code))) {
                 console.error(`Data upload error - discarding ${lastOp}`, ex);
-                return await transaction.complete();
+                await transaction.complete();
+            } else {
+                throw ex;
             }
-
-            throw ex;
         }
     }
 }
