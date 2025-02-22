@@ -3,19 +3,14 @@ import MultiStepForm from "../../../components/MultiStepForm/MultiStepForm";
 import { CAR_FORM_STEPS_FIELD, CAR_FORM_STEPS_TITLE } from "../../../constants/schemas/carSchema";
 import useNewCarForm from "./useNewCar";
 
-interface NewCarFormProps {
-    forceCloseBottomSheet: () => void
-}
-const NewCarForm: React.FC<NewCarFormProps> = ({
-    forceCloseBottomSheet
-}) => {
+const NewCarForm: React.FC = () => {
     const {
         control,
         submitHandler,
         trigger,
         resetField,
         steps
-    } = useNewCarForm(forceCloseBottomSheet);
+    } = useNewCarForm();
 
     return (
         <MultiStepForm

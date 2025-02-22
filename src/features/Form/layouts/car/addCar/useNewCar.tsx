@@ -6,11 +6,11 @@ import { useAlert } from "../../../../Alert/context/AlertProvider";
 import { useForm } from "react-hook-form";
 import useCarSteps from "../steps/useCarSteps";
 import { NewCarToast } from "../../../../Alert/presets/toast/index.ts";
+import { useBottomSheet } from "../../../../BottomSheet/context/BottomSheetContext.ts";
 
-const useNewCarForm = (
-    forceCloseBottomSheet: () => void
-) => {
+const useNewCarForm = () => {
     const database = useDatabase();
+    const { dismissAllBottomSheet } = useBottomSheet();
     const { addToast } = useAlert();
 
     const {
@@ -26,14 +26,12 @@ const useNewCarForm = (
             try {
                 await store.dispatch(addCar({ database, car: newCar }));
 
-                //ha sikeres a hozzaadas
                 reset();
-                forceCloseBottomSheet();
-                addToast(NewCarToast.success);
+                dismissAllBottomSheet();
+                addToast(NewCarToast.success());
             } catch (e){
                 console.log(e);
-                //ha sikertelen
-                addToast(newCarToast.error);
+                addToast(newCarToast.error());
             }
         })
 

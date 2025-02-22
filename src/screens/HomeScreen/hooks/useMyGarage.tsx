@@ -6,7 +6,7 @@ import useCars from "../../../hooks/useCars";
 import { useBottomSheet } from "../../../features/BottomSheet/context/BottomSheetContext.ts";
 
 const useMyGarage = () => {
-    const { openBottomSheet, forceCloseBottomSheet } = useBottomSheet();
+    const { openBottomSheet } = useBottomSheet();
     const {
         cars,
         carsImage,
@@ -19,9 +19,7 @@ const useMyGarage = () => {
         openBottomSheet({
             title: "Új Autó",
             content:
-                <NewCarForm
-                    forceCloseBottomSheet={ forceCloseBottomSheet }
-                />,
+                <NewCarForm />,
             snapPoints: ["85%"],
             enableDismissOnClose: false
         });

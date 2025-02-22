@@ -33,7 +33,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         return bottomSheets[index];
     }, [bottomSheets])
 
-    const openBottomSheet = (args: OpenBottomSheetArgs) => {
+    const openBottomSheet = useCallback((args: OpenBottomSheetArgs) => {
         const newBottomSheet = {
             ref: createRef<BottomSheetModal>(),
             props: args
@@ -43,16 +43,16 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
             setManuallyClosed(true); // stack behaviour = "switch", bezarja, viszont jelezni kell, hogy manualisan tortent
             return [...prevState, newBottomSheet];
         });
-    }
+    }, []);
 
-    const closeBottomSheet = () => {
+    const closeBottomSheet = useCallback(() => {
         const bottomSheet = getCurrentBottomSheet();
         if(!bottomSheet) return;
 
         currentBottomSheet.ref.current?.close();
-    }
+    }, []);
 
-    const dismissBottomSheet = () => {
+    const dismissBottomSheet = useCallback(() => {
         const bottomSheet = getCurrentBottomSheet();
         if(!bottomSheet) return;
 
@@ -65,9 +65,9 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
             prevState =>
                 prevState.slice(0, prevState.length - 1)
         );
-    }
+    }, []);
 
-    const dismissAllBottomSheet = () => {
+    const dismissAllBottomSheet = useCallback(() => {
         setBottomSheets(prevState => {
             prevState.map(bottomSheet => {
                 bottomSheet.props.enableDismissOnClose = true;
@@ -76,16 +76,16 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
 
             return new Array<BottomSheetType>();
         })
-    }
+    }, []);
 
-    const reopenBottomSheet = () => {
+    const reopenBottomSheet = useCallback(() => {
         const bottomSheet = getCurrentBottomSheet();
         if(!bottomSheet) return;
 
         bottomSheet.ref.current?.snapToIndex(0);
-    }
+    }, [])
 
-    const onChangeSnapPoint = (index: number) => {
+    const onChangeSnapPoint = useCallback((index: number) => {
         const bottomSheet = getCurrentBottomSheet();
         if(!bottomSheet) return;
 
@@ -105,7 +105,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
 
             dismissBottomSheet();
         }
-    }
+    }, []);
 
     const contextValue = useMemo(() => ({
         openBottomSheet,
