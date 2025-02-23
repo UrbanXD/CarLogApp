@@ -8,6 +8,7 @@ interface SessionProviderValue {
     session: Session | null
     notVerifiedUser: User | null
     setNotVerifiedUser: (value: User | null) => void
+    refreshSession: () => Promise<void>
 }
 
 const SessionContext = createContext<SessionProviderValue | null>(null);
@@ -65,12 +66,23 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
         if(session) AsyncStorage.removeItem(LOCAL_STORAGE_KEYS.notConfirmedUser);
     }, [session]);
 
+    const refreshSession = async () => {
+        const { error } =
+            await supabaseConnector
+                .client
+                .auth
+                .refreshSession();
+
+        if(error) console.error("refreshError", error);
+    }
+
     return (
         <SessionContext.Provider
             value={{
                 session,
                 notVerifiedUser,
-                setNotVerifiedUser
+                setNotVerifiedUser,
+                refreshSession
             }}
         >
             { children }
