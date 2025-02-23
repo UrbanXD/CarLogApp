@@ -1,22 +1,14 @@
 import { OpenBottomSheetArgs } from "../context/BottomSheetContext.ts";
 import React from "react";
-import { UserFormFieldType } from "../../Form/constants/schemas/userSchema.tsx";
-import { EditUserForm } from "../../Form/layouts/auth/user/editUser/EditUserForm.tsx";
+import { EditUserForm, EditUserFormProps } from "../../Form/layouts/auth/user/editUser/EditUserForm.tsx";
 
-type EditUserBottomSheetType = (
-    user: Partial<UserFormFieldType>,
-    stepIndex: number
-) => OpenBottomSheetArgs
+type EditUserBottomSheetType = (args: EditUserFormProps) => OpenBottomSheetArgs
 
-export const EditUserBottomSheet: EditUserBottomSheetType = (
-    user,
-    stepIndex
-) => {
+export const EditUserBottomSheet: EditUserBottomSheetType = (args) => {
     return {
         content:
             <EditUserForm
-                user={ user }
-                stepIndex={ stepIndex }
+                { ...args }
             />,
         snapPoints: ["40%"],
         enableDismissOnClose: false

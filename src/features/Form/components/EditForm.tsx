@@ -14,7 +14,6 @@ const EditForm: React.FC<EditFormProps> = ({
     steps,
     reset = () => {},
     submitHandler
-
 }) => {
     const handleSave =
         async () => await submitHandler();
@@ -32,7 +31,7 @@ const EditForm: React.FC<EditFormProps> = ({
             />
             <Button.Row>
                 <Button.Icon
-                    icon={ICON_NAMES.reset}
+                    icon={ ICON_NAMES.reset }
                     onPress={ () => reset && reset() }
                 />
                 <Button.Text

@@ -14,24 +14,27 @@ import { EDIT_USER_FORM_STEPS } from "../features/Form/layouts/auth/user/editUse
 
 const ProfileScreen: React.FC = () => {
     const { session } = useSession();
-    const { signOut, deleteUserProfile } = useAuth();
+    const { signOut, deleteUserProfile, linkIdentity } = useAuth();
     const { openBottomSheet } = useBottomSheet();
 
     const openEditUser =
-        (stepIndex: number) =>
+        (stepIndex: number, passwordReset?: boolean = true) =>
             openBottomSheet(
-                EditUserBottomSheet(
-                    {
+                EditUserBottomSheet({
+                    user: {
                         email: session?.user.email,
                         firstname: session?.user.user_metadata?.firstname,
                         lastname: session?.user.user_metadata?.lastname,
                     },
+                    passwordReset,
                     stepIndex
-                )
+                })
             );
 
     const openChangeName =
         () => openEditUser(EDIT_USER_FORM_STEPS.NameStep);
+    const openAddPasswordToOAuthUser =
+        () => openEditUser(EDIT_USER_FORM_STEPS.PasswordStep, false);
     const openResetPassword =
         () => openEditUser(EDIT_USER_FORM_STEPS.PasswordStep);
     const openChangeEmail =
@@ -67,6 +70,17 @@ const ProfileScreen: React.FC = () => {
                     />
                     <Divider />
                     <Button.Text
+                        iconLeft={ ICON_NAMES.user }
+                        iconRight={ ICON_NAMES.rightArrowHead }
+                        text="link identity"
+                        textStyle={{ textAlign: "left" }}
+                        onPress={ () => linkIdentity("email") }
+                        backgroundColor="transparent"
+                        fontSize={ FONT_SIZES.p1 }
+                        loadingIndicator
+                    />
+                    <Divider />
+                    <Button.Text
                         iconLeft={ ICON_NAMES.email }
                         iconRight={ ICON_NAMES.rightArrowHead }
                         text="Email csere"
@@ -80,9 +94,9 @@ const ProfileScreen: React.FC = () => {
                     <Button.Text
                         iconLeft={ ICON_NAMES.password }
                         iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Jelszó csere"
+                        text={ session?.user.user_metadata.has_password ? "Jelszó csere" : "Jelszó hozzáadás"}
                         textStyle={{ textAlign: "left" }}
-                        onPress={ openResetPassword }
+                        onPress={ session?.user.user_metadata.has_password ? openResetPassword : openAddPasswordToOAuthUser }
                         backgroundColor="transparent"
                         fontSize={ FONT_SIZES.p1 }
                         loadingIndicator

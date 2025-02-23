@@ -3,7 +3,7 @@ import { useAlert } from "../features/Alert/context/AlertProvider.tsx";
 import { useSession } from "../features/Auth/context/SessionProvider.tsx";
 import { UserFormFieldType } from "../features/Form/constants/schemas/userSchema.tsx";
 import { SignInFormFieldType } from "../features/Form/constants/schemas/signInSchema.tsx";
-import { AuthError, GenerateLinkParams, ResendParams, VerifyEmailOtpParams } from "@supabase/supabase-js";
+import { AuthError, GenerateLinkParams, Provider, ResendParams, VerifyEmailOtpParams } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LOCAL_STORAGE_KEYS } from "../constants/constants.ts";
 import { router } from "expo-router";
@@ -11,7 +11,7 @@ import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetConte
 import { ChangeEmailToast, ChangeNameToast, DeleteUserToast, ResetPasswordToast, SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast";
 import { HandleVerificationOtpType } from "../features/Auth/components/VerifyOTP.tsx";
 import { getToastMessage } from "../features/Alert/utils/getToastMessage.ts";
-import { OTPVerificationBottomSheet } from "../features/BottomSheet/presets/index.ts";
+import { OTPVerificationBottomSheet} from "../features/BottomSheet/presets/index.ts";
 import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
 
 export type SignUpFunction = (user: UserFormFieldType) => Promise<void>
@@ -23,7 +23,7 @@ export type ResetPasswordFunction = (newPassword: string) => Promise<void>
 const useAuth = () => {
     const database = useDatabase();
     const { supabaseConnector } = database;
-    const { session, setNotVerifiedUser } = useSession();
+    const { session, setNotVerifiedUser, refreshSession } = useSession();
     const { addToast } = useAlert();
     const { openBottomSheet, dismissAllBottomSheet } = useBottomSheet();
 
@@ -123,31 +123,35 @@ const useAuth = () => {
             const { data: { idToken, user: { familyName, givenName, photo } } } =
                 await GoogleSignin.signIn();
 
-            if(idToken) {
-                const { error } =
-                    await supabaseConnector
-                        .client
-                        .auth
-                        .signInWithIdToken({
-                            provider: "google",
-                            token: idToken
-                        });
+            if(!idToken) throw { code: "token_missing" };
 
-                console.log(givenName, familyName, error, "lol")
-
-                if(error) throw error;
-                console.log(givenName, familyName)
-
+            const { data: { user }, error } =
                 await supabaseConnector
                     .client
                     .auth
-                    .updateUser({
-                        data: {
-                            firstname: givenName || "",
-                            lastname: familyName || "",
-                        }
-                    })
-            }
+                    .signInWithIdToken({
+                        provider: "google",
+                        token: idToken
+                    });
+
+            if(error) throw error;
+            if(!user) throw { code: "user_not_found" };
+
+            const { data: { identities }, error: s } = await supabaseConnector.client.auth.getUserIdentities()
+            console.log(user.app_metadata.providers, identities, s)
+            // login tortent igy a nevet ne mentsuk le
+            if(user.app_metadata.providers && user.app_metadata.providers.length >= 1) return;
+
+            // uj fiok kerult letrehozasra, mentsuk le a nevet a felhasznalonak
+            await supabaseConnector
+                .client
+                .auth
+                .updateUser({
+                    data: {
+                        firstname: givenName || "",
+                        lastname: familyName || "",
+                    }
+                });
         } catch (error: any) {
             console.log(error.code, error)
             if (error.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -298,6 +302,30 @@ const useAuth = () => {
             dismissAllBottomSheet();
         } catch (error) {
             addToast(getToastMessage({ messages: ChangeNameToast, error }));
+        }
+    }
+
+    const addPasswordToOAuthUser: ResetPasswordFunction = async (
+        newPassword
+    ) => {
+        try {
+            if(!session) throw { code: "session_not_found" } as AuthError;
+            if(session.user.user_metadata.has_password) throw { code: "has_password" };
+
+            const { error } =
+                await supabaseConnector
+                    .client
+                    .auth
+                    .updateUser({
+                        password: newPassword
+                    });
+
+            if(error) throw error;
+
+            addToast({ type: "success", title: "SIKER" })
+            await refreshSession();
+        } catch (error) {
+            console.error(error, error.code, "lol");
         }
     }
 
@@ -459,6 +487,19 @@ const useAuth = () => {
         if(error) throw error;
     }
 
+    const linkIdentity = async (provider: Provider) => {
+        try {
+            if(!session) throw { code: "session_not_found" } as AuthError;
+
+            const userProviders: Array<string> = session.user.app_metadata.providers || [session.user.app_metadata.provider];
+            if(userProviders.includes(provider)) throw { code: "identity_already_exists" } as AuthError;
+
+            // nincs megvalositva meg Supabaseben (native flowra) az identity hozzarendeles, igy automatic linking lesz ujra beloginoltatassal (de mas emailre nem rakhato)
+        } catch (error) {
+            console.log("linkIdentity error: ", error);
+        }
+    }
+
     return {
         signUp,
         signIn,
@@ -468,9 +509,11 @@ const useAuth = () => {
         changeEmail,
         changeName,
         resetPassword,
+        addPasswordToOAuthUser,
         deleteUserProfile,
         verifyOTP,
-        resendOTP
+        resendOTP,
+        linkIdentity
     }
 }
 
