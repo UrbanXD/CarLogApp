@@ -2,7 +2,6 @@ import React from "react";
 import { useMultiStepForm } from "../../context/MultiStepFormProvider";
 import { StyleSheet, View } from "react-native";
 import Button from "../../../../components/Button/Button";
-import { SEPARATOR_SIZES } from "../../../../constants/constants";
 
 interface MultiStepFormButtonsProps {
     isFirstCount: boolean

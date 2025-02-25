@@ -38,7 +38,7 @@ export const addCar = createAsyncThunk(
 
             return {
                 car: result,
-                image: getImageState(newCarTableRow.image, car.image?.buffer)
+                image: getImageState(newCarTableRow.image ?? undefined, car.image?.buffer)
             };
         } catch (e) {
             console.log(e)

@@ -5,7 +5,7 @@ import BottomSheetBackdrop from "../components/BottomSheetBackdrop";
 import BottomSheet from "../components/BottomSheet";
 import { KeyboardController } from "react-native-keyboard-controller";
 import { BottomSheetContext, BottomSheetType, OpenBottomSheetArgs } from "./BottomSheetContext.ts";
-import { BottomSheetLeavingModal } from "../../Alert/presets/modal/index.ts";
+import { BottomSheetLeavingModal } from "../../Alert/presets/modal";
 
 interface BottomSheetProviderProps {
     children: ReactNode | null
@@ -49,7 +49,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         const bottomSheet = getCurrentBottomSheet();
         if(!bottomSheet) return;
 
-        currentBottomSheet.ref.current?.close();
+        bottomSheet.ref.current?.close();
     }, []);
 
     const dismissBottomSheet = useCallback(() => {

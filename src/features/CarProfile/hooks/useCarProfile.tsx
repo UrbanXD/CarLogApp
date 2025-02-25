@@ -8,6 +8,7 @@ import { ICON_NAMES } from "../../../constants/constants";
 import { CAR_FORM_STEPS } from "../../Form/layouts/car/steps/useCarSteps";
 import { store } from "../../Database/redux/store";
 import { deleteCar } from "../../Database/redux/cars/functions/deleteCar";
+import { InformationContainerProps } from "../components/InformationContainer.tsx";
 
 const useCarProfile = (carID: string) => {
     const database = useDatabase();
@@ -48,7 +49,7 @@ const useCarProfile = (carID: string) => {
                 text: car?.name
         }],
         onEdit: () => openEditForm(CAR_FORM_STEPS.NameStep, "37.5%")
-    };
+    } as InformationContainerProps;
 
     const carModelInformationBlock = {
         data: [
@@ -62,7 +63,7 @@ const useCarProfile = (carID: string) => {
             }
         ],
         onEdit: () => openEditForm(CAR_FORM_STEPS.CarModelStep)
-    }
+    } as InformationContainerProps;
 
     const odometerInformationBlock = {
         data: [{
@@ -70,7 +71,7 @@ const useCarProfile = (carID: string) => {
             text: `${car.odometerValue} ${car.odometerMeasurement}`
         }],
         onEdit: () => openEditForm(CAR_FORM_STEPS.OdometerStep)
-    }
+    } as InformationContainerProps;
 
     const fuelInformationBlock = {
         data: [
@@ -84,7 +85,7 @@ const useCarProfile = (carID: string) => {
             }
         ],
         onEdit: () => openEditForm(CAR_FORM_STEPS.FuelStep, "55%")
-    }
+    } as InformationContainerProps;
 
     return {
         openEditForm,

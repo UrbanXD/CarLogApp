@@ -14,7 +14,6 @@ import DefaultElement from "../../../../../components/DefaultElement";
 import { theme } from "../../../../../constants/theme";
 import { hexToRgba } from "../../../../../utils/colors/hexToRgba";
 import Image from "../../../../../components/Image";
-import { useDatabase } from "../../../../Database/connector/Database";
 
 interface InputImagePickerProps {
     control: Control<any>

@@ -1,5 +1,5 @@
 import React from "react";
-import { ColorValue, View, Text, StyleSheet, useWindowDimensions, TouchableOpacity, ViewStyle, StyleProp } from "react-native";
+import { ColorValue, Text, StyleSheet, useWindowDimensions, TouchableOpacity, ViewStyle, StyleProp } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { theme } from "../../constants/theme";
 import getContrastingColor from "../../utils/colors/getContrastingColor";

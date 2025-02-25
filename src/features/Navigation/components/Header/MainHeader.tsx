@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { StatusBar, View } from "react-native";
 import { GLOBAL_STYLE, SIMPLE_HEADER_HEIGHT } from "../../../../constants/constants";
-import Picker from "../../../Form/components/Input/picker/Picker";
+import Picker, {PickerDataType} from "../../../Form/components/Input/picker/Picker";
 import { useSelector } from "react-redux";
-import { RootState, store } from "../../../Database/redux/store";
+import { store } from "../../../Database/redux/store";
 import { createSelector } from "@reduxjs/toolkit";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Avatar from "../../../../components/Avatar/Avatar";
@@ -11,6 +11,7 @@ import { loadSelectedCar } from "../../../Database/redux/cars/functions/loadSele
 import { selectCar } from "../../../Database/redux/cars/functions/selectCar";
 import useHeaderStyles from "../../hooks/useHeaderStyles";
 import { router } from "expo-router";
+import { RootState } from "../../../Database/redux";
 
 const MainHeader: React.FC = () => {
     const { top } = useSafeAreaInsets();
@@ -28,7 +29,7 @@ const MainHeader: React.FC = () => {
         }))
     );
 
-    const cars = useSelector(selectCarsForCarousel);
+    const cars = useSelector(selectCarsForCarousel) as Array<PickerDataType>;
     const carsIsLoading = useSelector<RootState>(state => state.cars.loading);
     const selectedCarID = useSelector<RootState, string>(state => state.cars.selectedCarID);
 

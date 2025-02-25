@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/constants";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import TextInput from "../text/TextInput";
 import { theme } from "../../../../../constants/theme";
 import Icon from "../../../../../components/Icon";
 import { useAlert } from "../../../../Alert/context/AlertProvider";
-import { PickerDisabledToast } from "../../../../Alert/presets/toast/index.ts";
+import { PickerDisabledToast } from "../../../../Alert/presets/toast";
 
 interface PickerDropdownInfoProps {
     toggleDropdown?: () => void

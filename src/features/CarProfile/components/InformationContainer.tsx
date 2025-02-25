@@ -5,7 +5,7 @@ import { FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/cons
 import { theme } from "../../../constants/theme";
 import Icon from "../../../components/Icon";
 
-interface InformationContainerProps {
+export interface InformationContainerProps {
     data: Array<{ icon?: string | ImageSourcePropType; text: string }>
     onEdit?: () => void
 }

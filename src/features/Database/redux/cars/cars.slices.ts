@@ -5,7 +5,7 @@ import { addCar } from "./functions/addCar";
 import { loadSelectedCar } from "./functions/loadSelectedCar";
 import { selectCar } from "./functions/selectCar";
 import { deleteCar } from "./functions/deleteCar";
-import {editCar} from "./functions/editCar";
+import { editCar } from "./functions/editCar";
 
 export interface CarsState {
     loading: boolean

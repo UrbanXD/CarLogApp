@@ -1,5 +1,5 @@
 import { theme } from "../../../constants/theme";
-export const getToastMessage = (message: string) => {}
+
 export const ALERT_COLORS = {
     success: theme.colors.greenLight,
     info: theme.colors.blueLight,

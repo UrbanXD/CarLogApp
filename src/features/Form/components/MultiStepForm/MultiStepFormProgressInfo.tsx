@@ -4,8 +4,6 @@ import { useSharedValue, withTiming } from "react-native-reanimated";
 import { useFont } from "@shopify/react-native-skia";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import ProgressInfo from "../../../../components/ProgressInfo";
-import {StyleSheet, View} from "react-native";
-import {SEPARATOR_SIZES} from "../../../../constants/constants";
 
 interface MultiStepFormProgressInfoProps {
     isFirstCount: boolean

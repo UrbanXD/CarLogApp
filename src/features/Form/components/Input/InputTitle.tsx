@@ -1,7 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import {FONT_SIZES, GLOBAL_STYLE} from "../../../../constants/constants";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { FONT_SIZES, GLOBAL_STYLE } from "../../../../constants/constants";
 import { theme } from "../../../../constants/theme";
 
 interface InputTitleProps {

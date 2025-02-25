@@ -5,7 +5,7 @@ import { EDIT_USER_FORM_STEPS, useEditUserSteps } from "./useEditUserSteps.tsx";
 
 export const useEditUserForm = (
     user: Partial<UserFormFieldType>,
-    passwordReset?: boolean = true,
+    passwordReset: boolean = true,
     stepIndex: number
 ) => {
     const { addPasswordToOAuthUser, resetPassword, changeEmail, changeName } = useAuth();
@@ -33,7 +33,7 @@ export const useEditUserForm = (
                     await addPasswordToOAuthUser(editedUser.password);
                     break;
                 case EDIT_USER_FORM_STEPS.NameStep:
-                    await changeName(editedUser.firstname, editedUser.lastname);
+                    await changeName(editedUser.firstname ?? "", editedUser.lastname ?? "");
                     break;
             }
         })

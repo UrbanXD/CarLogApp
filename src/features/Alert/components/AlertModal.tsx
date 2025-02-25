@@ -1,13 +1,8 @@
 import React from "react";
-import {ImageSourcePropType, StyleSheet, View, Text, ColorValue} from "react-native";
-import Animated from "react-native-reanimated";
-import {
-    FONT_SIZES,
-    SEPARATOR_SIZES,
-    SIMPLE_HEADER_HEIGHT
-} from "../../../constants/constants";
-import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {theme} from "../../../constants/theme";
+import { StyleSheet, View, Text, ColorValue } from "react-native";
+import { FONT_SIZES, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/constants";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { theme } from "../../../constants/theme";
 import Icon from "../../../components/Icon";
 import Button from "../../../components/Button/Button";
 
@@ -37,55 +32,53 @@ const AlertModal: React.FC<AlertModalProps> = ({
     const styles = useStyles(iconSize);
 
     return (
-        // <Animated.View>
-            <View style={ styles.container }>
-                {
-                    icon &&
-                    <View style={ styles.iconContainer }>
-                        <Icon
-                            icon={ icon }
-                            size={ iconSize }
-                            backgroundColor={ color }
-                            style={ styles.icon }
-                        />
-                    </View>
-                }
-                <View style={ styles.contentContainer }>
-                    <View style={ styles.textContainer }>
-                        {
-                            title &&
-                            <Text style={ styles.titleText }>
-                                { title }
-                            </Text>
-                        }
-                        {
-                            body &&
-                            <Text style={ styles.text }>
-                                { body }
-                            </Text>
-                        }
-                    </View>
-                    <View style={ styles.buttonContainer }>
-                        <Button.Text
-                            text={ acceptText }
-                            fontSize={ FONT_SIZES.p2 }
-                            backgroundColor={ color }
-                            height={ hp(5.5) }
-                            onPress={ accept }
-                        />
-                        <Button.Text
-                            text={ dismissText }
-                            height={ hp(5.5) }
-                            backgroundColor={ "transparent" }
-                            fontSize={ FONT_SIZES.p2 }
-                            textColor={ color }
-                            style={{ borderColor: color, borderWidth: 2.5 }}
-                            onPress={ dismiss }
-                        />
-                    </View>
+        <View style={ styles.container }>
+            {
+                icon &&
+                <View style={ styles.iconContainer }>
+                    <Icon
+                        icon={ icon }
+                        size={ iconSize }
+                        backgroundColor={ color }
+                        style={ styles.icon }
+                    />
+                </View>
+            }
+            <View style={ styles.contentContainer }>
+                <View style={ styles.textContainer }>
+                    {
+                        title &&
+                        <Text style={ styles.titleText }>
+                            { title }
+                        </Text>
+                    }
+                    {
+                        body &&
+                        <Text style={ styles.text }>
+                            { body }
+                        </Text>
+                    }
+                </View>
+                <View style={ styles.buttonContainer }>
+                    <Button.Text
+                        text={ acceptText }
+                        fontSize={ FONT_SIZES.p2 }
+                        backgroundColor={ color }
+                        height={ hp(5.5) }
+                        onPress={ accept }
+                    />
+                    <Button.Text
+                        text={ dismissText }
+                        height={ hp(5.5) }
+                        backgroundColor={ "transparent" }
+                        fontSize={ FONT_SIZES.p2 }
+                        textColor={ color }
+                        style={{ borderColor: color, borderWidth: 2.5 }}
+                        onPress={ dismiss }
+                    />
                 </View>
             </View>
-        // </Animated.View>
+        </View>
     )
 }
 

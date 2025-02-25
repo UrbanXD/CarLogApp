@@ -11,7 +11,7 @@ import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetConte
 import { ChangeEmailToast, ChangeNameToast, DeleteUserToast, ResetPasswordToast, SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast";
 import { HandleVerificationOtpType } from "../features/Auth/components/VerifyOTP.tsx";
 import { getToastMessage } from "../features/Alert/utils/getToastMessage.ts";
-import { OTPVerificationBottomSheet} from "../features/BottomSheet/presets/index.ts";
+import { OTPVerificationBottomSheet } from "../features/BottomSheet/presets";
 import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
 
 export type SignUpFunction = (user: UserFormFieldType) => Promise<void>
@@ -120,10 +120,9 @@ const useAuth = () => {
     const googleAuth = async () => {
         try {
             await GoogleSignin.hasPlayServices();
-            const { data: { idToken, user: { familyName, givenName, photo } } } =
-                await GoogleSignin.signIn();
+            const { data: googleData } = await GoogleSignin.signIn();
 
-            if(!idToken) throw { code: "token_missing" };
+            if(!googleData?.idToken) throw { code: "token_missing" };
 
             const { data: { user }, error } =
                 await supabaseConnector
@@ -131,16 +130,16 @@ const useAuth = () => {
                     .auth
                     .signInWithIdToken({
                         provider: "google",
-                        token: idToken
+                        token: googleData.idToken
                     });
 
             if(error) throw error;
             if(!user) throw { code: "user_not_found" };
 
-            const { data: { identities }, error: s } = await supabaseConnector.client.auth.getUserIdentities()
-            console.log(user.app_metadata.providers, identities, s)
+            const { data: userData, error: s } = await supabaseConnector.client.auth.getUserIdentities()
+
             // login tortent igy a nevet ne mentsuk le
-            if(user.app_metadata.providers && user.app_metadata.providers.length >= 1) return;
+            if(user.app_metadata.providers && user.app_metadata.providers.length > 1) return;
 
             // uj fiok kerult letrehozasra, mentsuk le a nevet a felhasznalonak
             await supabaseConnector
@@ -148,8 +147,8 @@ const useAuth = () => {
                 .auth
                 .updateUser({
                     data: {
-                        firstname: givenName || "",
-                        lastname: familyName || "",
+                        firstname: googleData.user.givenName || "",
+                        lastname: googleData.user.familyName || "",
                     }
                 });
         } catch (error: any) {
@@ -325,7 +324,7 @@ const useAuth = () => {
             addToast({ type: "success", title: "SIKER" })
             await refreshSession();
         } catch (error) {
-            console.error(error, error.code, "lol");
+            console.error(error, "lol");
         }
     }
 
@@ -469,6 +468,7 @@ const useAuth = () => {
                 .verifyOtp(args);
 
         if(error) throw error;
+
         if(data.session) {
             await supabaseConnector
                 .client

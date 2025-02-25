@@ -7,5 +7,5 @@
   "typeRoots": [
     "./types"
   ],
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "types/env.d.ts"]
 }

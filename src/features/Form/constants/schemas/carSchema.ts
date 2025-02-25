@@ -1,9 +1,8 @@
-import {ImageType} from "../../utils/pickImage";
-import {z} from "zod";
-import {zNumber, zPickerRequired} from "../types/zodTypes";
-import car from "../../../../app/(edit)/car";
-import {ODOMETER_MEASUREMENTS} from "../constants";
-import {zodResolver} from "@hookform/resolvers/zod";
+import { ImageType } from "../../utils/pickImage";
+import { z } from "zod";
+import { zNumber, zPickerRequired } from "../types/zodTypes";
+import { ODOMETER_MEASUREMENTS } from "../constants";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export const CAR_FORM_STEPS_FIELD = [
     ["name"],

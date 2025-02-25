@@ -1,5 +1,5 @@
 import { Control } from "react-hook-form";
-import { NameStep, PasswordStep, SignUpFirstStep} from "../steps/index.ts";
+import { NameStep, PasswordStep, SignUpFirstStep} from "../steps";
 
 export const useSignUpSteps = (
     control: Control<any>

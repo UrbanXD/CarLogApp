@@ -1,5 +1,5 @@
 import { Control } from "react-hook-form";
-import { EmailStep, NameStep, PasswordStep } from "../steps/index.ts";
+import { EmailStep, NameStep, PasswordStep } from "../steps";
 
 export enum EDIT_USER_FORM_STEPS {
     EmailStep,

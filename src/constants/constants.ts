@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { theme } from "./theme";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { ControllerFieldState, ControllerRenderProps, UseFormHandleSubmit, UseFormStateReturn } from "react-hook-form";
+import { ControllerFieldState, ControllerRenderProps, UseFormStateReturn } from "react-hook-form";
 import { InputPickerDataType } from "../features/Form/components/Input/picker/InputPicker";
 
 export interface ControllerRenderArgs {
