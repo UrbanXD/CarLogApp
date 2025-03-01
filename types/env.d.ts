@@ -4,4 +4,5 @@ declare module '@env' {
     export const SUPABASE_BUCKET: string
     export const RESEND_API_KEY: string
     export const POWERSYNC_URL: string
+    export const GOOGLE_WEBCLIENTID: string
 }

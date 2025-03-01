@@ -4,6 +4,7 @@ import {
     SUPABASE_BUCKET,
     RESEND_API_KEY,
     POWERSYNC_URL,
+    GOOGLE_WEBCLIENTID
 } from "@env";
 
 export const BaseConfig = {
@@ -12,4 +13,5 @@ export const BaseConfig = {
     SUPABASE_BUCKET: SUPABASE_BUCKET,
     RESEND_API_KEY: RESEND_API_KEY,
     POWERSYNC_URL: POWERSYNC_URL,
+    GOOGLE_WEBCLIENTID: GOOGLE_WEBCLIENTID
 }
