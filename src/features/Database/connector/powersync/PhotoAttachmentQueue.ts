@@ -1,6 +1,6 @@
 import { AbstractAttachmentQueue, AttachmentRecord, AttachmentState } from '@powersync/attachments';
 import * as FileSystem from 'expo-file-system';
-import { BaseConfig } from '../BaseConfig';
+import { BaseConfig } from '../../../../constants/BaseConfig.ts';
 import { CAR_TABLE } from './AppSchema';
 import { getUUID } from '../../utils/uuid';
 import { ImageType } from '../../../Form/utils/pickImage';

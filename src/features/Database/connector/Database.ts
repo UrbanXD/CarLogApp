@@ -5,7 +5,7 @@ import { Kysely, wrapPowerSyncWithKysely } from "@powersync/kysely-driver";
 import { Context, createContext, useContext } from "react";
 import { SupabaseStorageAdapter } from "./storage/SupabaseStorageAdapter";
 import { PhotoAttachmentQueue } from "./powersync/PhotoAttachmentQueue";
-import { BaseConfig } from "./BaseConfig";
+import { BaseConfig } from "../../../constants/BaseConfig.ts";
 import { AttachmentRecord } from "@powersync/attachments";
 
 export class Database {

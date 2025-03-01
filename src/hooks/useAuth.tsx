@@ -8,11 +8,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LOCAL_STORAGE_KEYS } from "../constants/constants.ts";
 import { router } from "expo-router";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
-import { ChangeEmailToast, ChangeNameToast, DeleteUserToast, ResetPasswordToast, SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast";
+import { AddPasswordToast, ChangeEmailToast, ChangeNameToast, DeleteUserToast, GoogleAuthToast, ResetPasswordToast, SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast";
 import { HandleVerificationOtpType } from "../features/Auth/components/VerifyOTP.tsx";
 import { getToastMessage } from "../features/Alert/utils/getToastMessage.ts";
 import { OTPVerificationBottomSheet } from "../features/BottomSheet/presets";
-import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { BaseConfig } from "../constants/BaseConfig.ts";
 
 export type SignUpFunction = (user: UserFormFieldType) => Promise<void>
 export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
@@ -108,21 +109,33 @@ const useAuth = () => {
 
             if(newUser?.email) openUserVerification(newUser.email);
         } catch (error) {
-            addToast(getToastMessage({ messages: SignUpToast, error }));
+            addToast(
+                getToastMessage({
+                    messages: SignUpToast,
+                    error
+                })
+            );
         }
     }
 
     GoogleSignin.configure({
         scopes: ["https://www.googleapis.com/auth/userinfo.profile"],
-        webClientId: "251073631752-trpq7qoo5hniiok8vdfnm8ui2bd1p6sb.apps.googleusercontent.com"
+        webClientId: BaseConfig.GOOGLE_WEBCLIENTID
     });
 
     const googleAuth = async () => {
         try {
             await GoogleSignin.hasPlayServices();
             const { data: googleData } = await GoogleSignin.signIn();
-
             if(!googleData?.idToken) throw { code: "token_missing" };
+
+            const { data: alreadyRegistered } =
+                await supabaseConnector
+                    .client
+                    .rpc(
+                        "email_exists",
+                        { email_address: googleData.user.email }
+                    );
 
             const { data: { user }, error } =
                 await supabaseConnector
@@ -136,10 +149,11 @@ const useAuth = () => {
             if(error) throw error;
             if(!user) throw { code: "user_not_found" };
 
-            const { data: userData, error: s } = await supabaseConnector.client.auth.getUserIdentities()
-
             // login tortent igy a nevet ne mentsuk le
-            if(user.app_metadata.providers && user.app_metadata.providers.length > 1) return;
+            if(alreadyRegistered) {
+                addToast(SignInToast.success());
+                return dismissAllBottomSheet();
+            }
 
             // uj fiok kerult letrehozasra, mentsuk le a nevet a felhasznalonak
             await supabaseConnector
@@ -151,17 +165,16 @@ const useAuth = () => {
                         lastname: googleData.user.familyName || "",
                     }
                 });
-        } catch (error: any) {
-            console.log(error.code, error)
-            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-                // user cancelled the login flow
-            } else if (error.code === statusCodes.IN_PROGRESS) {
-                // operation (e.g. sign in) is in progress already
-            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-                // play services not available or outdated
-            } else {
-                // some other error happened
-            }
+
+            addToast(SignUpToast.success());
+            dismissAllBottomSheet();
+        } catch (error) {
+            addToast(
+                getToastMessage({
+                    messages: GoogleAuthToast,
+                    error
+                })
+            );
         }
     }
 
@@ -184,7 +197,12 @@ const useAuth = () => {
             addToast(SignInToast.success());
             dismissAllBottomSheet();
         } catch (error) {
-            addToast(getToastMessage({ messages: SignInToast, error }));
+            addToast(
+                getToastMessage({
+                    messages: SignInToast,
+                    error
+                })
+            );
         }
     }
 
@@ -202,7 +220,14 @@ const useAuth = () => {
             if(!disabledToast) addToast(SignOutToast.success());
             await database.disconnect();
         } catch (error) {
-            if(error instanceof AuthError && !disabledToast) return addToast(getToastMessage({ messages: SignOutToast, error }));
+            if(error instanceof AuthError && !disabledToast) {
+                return addToast(
+                    getToastMessage({
+                        messages: SignOutToast,
+                        error
+                    })
+                );
+            }
             // ha nem AuthError akkor sikeres a kijelentkezes, de mashol hiba tortent (pl: powersync)
         }
     }
@@ -300,7 +325,12 @@ const useAuth = () => {
             addToast(ChangeNameToast.success());
             dismissAllBottomSheet();
         } catch (error) {
-            addToast(getToastMessage({ messages: ChangeNameToast, error }));
+            addToast(
+                getToastMessage({
+                    messages: ChangeNameToast,
+                    error
+                })
+            );
         }
     }
 
@@ -321,10 +351,15 @@ const useAuth = () => {
 
             if(error) throw error;
 
-            addToast({ type: "success", title: "SIKER" })
+            addToast(AddPasswordToast.success())
             await refreshSession();
         } catch (error) {
-            console.error(error, "lol");
+            addToast(
+                getToastMessage({
+                    messages: AddPasswordToast,
+                    error
+                })
+            );
         }
     }
 
@@ -387,7 +422,12 @@ const useAuth = () => {
                 })
             );
         } catch (error){
-            addToast(getToastMessage({ messages: ResetPasswordToast, error }));
+            addToast(
+                getToastMessage({
+                    messages: ResetPasswordToast,
+                    error
+                })
+            );
         }
     }
 
@@ -455,7 +495,12 @@ const useAuth = () => {
                     })
                 );
             } catch (error) {
-                addToast(getToastMessage({ messages: DeleteUserToast, error }));
+                addToast(
+                    getToastMessage({
+                        messages: DeleteUserToast,
+                        error
+                    })
+                );
             }
         }
     }

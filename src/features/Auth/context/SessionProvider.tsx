@@ -51,8 +51,6 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     }, []);
 
     useEffect(() => {
-        console.log("session: ", session, " :session");
-
         supabaseConnector
             .client
             .auth
