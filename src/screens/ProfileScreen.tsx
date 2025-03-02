@@ -42,7 +42,7 @@ const ProfileScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={ styles.pageContainer }>
-            <View style={{ gap: SEPARATOR_SIZES.extraMedium }}>
+            <View style={ styles.container }>
                 <View style={ styles.informationContainer }>
                     <Image
                         source={ require("../../src/assets/images/car1.jpg") }
@@ -57,7 +57,7 @@ const ProfileScreen: React.FC = () => {
                         </Text>
                     </View>
                 </View>
-                <View>
+                <View style={ styles.actionButtonsContainer }>
                     <Button.Text
                         iconLeft={ ICON_NAMES.settings }
                         iconRight={ ICON_NAMES.rightArrowHead }
@@ -114,15 +114,15 @@ const ProfileScreen: React.FC = () => {
                         loadingIndicator
                     />
                 </View>
+                <Button.Text
+                    iconLeft={ ICON_NAMES.signOut }
+                    text="Kijelentkezés"
+                    onPress={ signOut }
+                    backgroundColor={ theme.colors.googleRed }
+                    textColor={ theme.colors.black2 }
+                    fontSize={ FONT_SIZES.p1 }
+                />
             </View>
-            <Button.Text
-                iconLeft={ ICON_NAMES.signOut }
-                text="Kijelentkezés"
-                onPress={ signOut }
-                backgroundColor={ theme.colors.googleRed }
-                textColor={ theme.colors.black2 }
-                fontSize={ FONT_SIZES.p1 }
-            />
         </SafeAreaView>
     )
 }
@@ -130,24 +130,49 @@ const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
     pageContainer: {
         ...GLOBAL_STYLE.pageContainer,
-        paddingHorizontal: DEFAULT_SEPARATOR,
+    },
+    container: {
+        position: "absolute",
+        bottom: 0,
+        width: "100%",
+        height: "90%",
         justifyContent: "space-between",
+        gap: DEFAULT_SEPARATOR,
+        backgroundColor: theme.colors.black5,
+        paddingHorizontal: DEFAULT_SEPARATOR,
         paddingBottom: DEFAULT_SEPARATOR,
+        borderTopStartRadius: 40,
+        borderTopEndRadius: 40,
+        shadowColor: theme.colors.black5,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.60,
+        shadowRadius: 24,
+        elevation: 12,
     },
     informationContainer: {
         flexDirection: "column",
-        gap: SEPARATOR_SIZES.mediumSmall,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        gap: SEPARATOR_SIZES.lightSmall
     },
     profileImage: {
         position: "relative",
-        width: hp(17.5),
-        height: hp(17.5),
+        top: -hp(9),
+        alignSelf: "center",
+        width: hp(22.5),
+        height: hp(22.5),
+        borderWidth: hp(1),
+        borderColor: theme.colors.black5,
         borderRadius: 100,
-        resizeMode: "stretch"
+        resizeMode: "stretch",
+        shadowColor: theme.colors.black5,
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 1,
+        shadowRadius: 24,
+        elevation: 12,
     },
     textContainer: {
+        top: -hp(9),
         gap: SEPARATOR_SIZES.lightSmall / 2
     },
     nameText: {
@@ -160,18 +185,8 @@ const styles = StyleSheet.create({
         lineHeight: GLOBAL_STYLE.containerText.fontSize,
         textAlign: "center"
     },
-    actionContainer: {
-        flex: 1,
-        backgroundColor: theme.colors.black4,
-        borderRadius: 25,
-        gap: 10,
-        paddingVertical: SEPARATOR_SIZES.mediumSmall,
-        paddingHorizontal: SEPARATOR_SIZES.mediumSmall
-    },
-    container: {
-        height: 50,
-        width: "100%",
-        backgroundColor: "red"
+    actionButtonsContainer: {
+        top: -hp(4.5)
     }
 });
 
