@@ -1,10 +1,10 @@
 import React from "react";
 import { useEditUserForm } from "./useEditUserForm.tsx";
-import { User } from "@supabase/supabase-js";
 import EditForm from "../../../../components/EditForm.tsx";
+import { UserFormFieldType } from "../../../../constants/schemas/userSchema.tsx";
 
 export interface EditUserFormProps {
-    user: Partial<User>
+    user: Partial<UserFormFieldType>
     passwordReset?: boolean
     stepIndex: number
 }
