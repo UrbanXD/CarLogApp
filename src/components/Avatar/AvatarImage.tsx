@@ -24,12 +24,11 @@ const AvatarImage: React.FC<AvatarImageProps> = ({
     onPressBadge
 }) => {
     const BORDER_WIDTH = hp(1);
-
     const styles =
         useStyles(
             borderColor ? avatarSize + BORDER_WIDTH : avatarSize,
             borderColor,
-            borderColor ? BORDER_WIDTH : undefined
+            borderColor ? BORDER_WIDTH : 0
         );
 
     return (

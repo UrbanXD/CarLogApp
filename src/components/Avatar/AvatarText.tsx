@@ -24,7 +24,6 @@ const AvatarText: React.FC<AvatarTextProps> = ({
     onPress,
 }) => {
     const BORDER_WIDTH = hp(1);
-
     const styles =
         useStyles(
             borderColor ? avatarSize + BORDER_WIDTH : avatarSize,
@@ -32,7 +31,7 @@ const AvatarText: React.FC<AvatarTextProps> = ({
             color,
             backgroundColor,
             borderColor,
-            borderColor ? BORDER_WIDTH : undefined
+            borderColor ? BORDER_WIDTH : 0
         );
 
     return (
@@ -61,7 +60,6 @@ const useStyles = (
 ) => {
     return StyleSheet.create({
         container: {
-            alignSelf: "center",
             justifyContent: "center",
             alignItems: "center",
             width: avatarSize,
@@ -69,15 +67,13 @@ const useStyles = (
             backgroundColor: backgroundColor,
             borderRadius: avatarSize / 2,
             borderWidth,
-            borderColor,
+            borderColor
         },
         labelText: {
             fontFamily: "Gilroy-Medium",
             fontSize: avatarSize / ( labelLength > 1 ? labelLength : labelLength + 0.5),
             color: color,
-            lineHeight: avatarSize,
-            textAlign: "center",
-            textAlignVertical: "center",
+            textAlign: "center"
         }
     })
 }
