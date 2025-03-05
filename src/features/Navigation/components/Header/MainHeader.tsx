@@ -12,8 +12,11 @@ import { selectCar } from "../../../Database/redux/cars/functions/selectCar";
 import useHeaderStyles from "../../hooks/useHeaderStyles";
 import { router } from "expo-router";
 import { RootState } from "../../../Database/redux";
+import { useSession } from "../../../Auth/context/SessionProvider.tsx";
+import { getLabelByName } from "../../../../utils/getLabelByName.ts";
 
 const MainHeader: React.FC = () => {
+    const { session } = useSession();
     const { top } = useSafeAreaInsets();
     const styles = useHeaderStyles(top);
 
@@ -36,6 +39,9 @@ const MainHeader: React.FC = () => {
     const onCarSelect = (id: string) => {
         store.dispatch(selectCar(id));
     }
+
+    const name = `${ session?.user.user_metadata.lastname } ${ session?.user.user_metadata.firstname }`;
+    const nameLabel = getLabelByName(name);
 
     useEffect(() => {
         store.dispatch(loadSelectedCar({}));
@@ -68,7 +74,7 @@ const MainHeader: React.FC = () => {
                 {
                     !isDropdownVisible &&
                     <Avatar.Text
-                        label={ "Ka" }
+                        label={ nameLabel }
                         avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
                         onPress={ openProfile }
                     />

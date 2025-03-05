@@ -9,16 +9,21 @@ import Divider from "../components/Divider.tsx";
 import Button from "../components/Button/Button.ts";
 import useAuth from "../hooks/useAuth.tsx";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
-import { EditUserBottomSheet } from "../features/BottomSheet/presets/index.ts";
+import { EditUserBottomSheet } from "../features/BottomSheet/presets";
 import { EDIT_USER_FORM_STEPS } from "../features/Form/layouts/auth/user/editUser/useEditUserSteps.tsx";
+import Avatar from "../components/Avatar/Avatar.ts";
+import { getLabelByName } from "../utils/getLabelByName.ts";
 
 const ProfileScreen: React.FC = () => {
     const { session } = useSession();
     const { signOut, deleteUserProfile, linkIdentity } = useAuth();
     const { openBottomSheet } = useBottomSheet();
 
+    const name = `${ session?.user.user_metadata.lastname } ${ session?.user.user_metadata.firstname }`;
+    const nameLabel = getLabelByName(name);
+
     const openEditUser =
-        (stepIndex: number, passwordReset?: boolean = true) =>
+        (stepIndex: number, passwordReset: boolean = true) =>
             openBottomSheet(
                 EditUserBottomSheet({
                     user: {
@@ -44,13 +49,19 @@ const ProfileScreen: React.FC = () => {
         <SafeAreaView style={ styles.pageContainer }>
             <View style={ styles.container }>
                 <View style={ styles.informationContainer }>
-                    <Image
-                        source={ require("../../src/assets/images/car1.jpg") }
-                        imageStyle={ styles.profileImage }
+                    {/*<Avatar.Image*/}
+                    {/*    avatarSize={ hp(21) }*/}
+                    {/*    borderColor={ theme.colors.black5 }*/}
+                    {/*    style={ styles.profileImage }*/}
+                    {/*/>*/}
+                    <Avatar.Text
+                        label={ `${ nameLabel }` }
+                        avatarSize={ hp(21) }
+                        style={ styles.profileImage }
                     />
                     <View style={ styles.textContainer }>
                         <Text style={ styles.nameText }>
-                            { `${ session?.user.user_metadata.lastname } ${ session?.user.user_metadata.firstname }` }
+                            { name }
                         </Text>
                         <Text style={ styles.emailText }>
                             { session?.user.email }
@@ -72,9 +83,9 @@ const ProfileScreen: React.FC = () => {
                     <Button.Text
                         iconLeft={ ICON_NAMES.user }
                         iconRight={ ICON_NAMES.rightArrowHead }
-                        text="link identity"
+                        text="Identity link"
                         textStyle={{ textAlign: "left" }}
-                        onPress={ () => linkIdentity("email") }
+                        onPress={ () => {} }
                         backgroundColor="transparent"
                         fontSize={ FONT_SIZES.p1 }
                         loadingIndicator
@@ -159,17 +170,6 @@ const styles = StyleSheet.create({
         position: "relative",
         top: -hp(9),
         alignSelf: "center",
-        width: hp(22.5),
-        height: hp(22.5),
-        borderWidth: hp(1),
-        borderColor: theme.colors.black5,
-        borderRadius: 100,
-        resizeMode: "stretch",
-        shadowColor: theme.colors.black5,
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 1,
-        shadowRadius: 24,
-        elevation: 12,
     },
     textContainer: {
         top: -hp(9),
