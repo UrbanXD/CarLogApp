@@ -9,6 +9,7 @@ interface AvatarTextProps {
     avatarSize?: number
     color?: ColorValue
     backgroundColor?: ColorValue | string
+    borderColor?: ColorValue | string
     style?: StyleProp<ViewStyle>
     onPress?: () => void
 }
@@ -18,12 +19,21 @@ const AvatarText: React.FC<AvatarTextProps> = ({
     avatarSize = hp(5),
     backgroundColor = theme.colors.fuelYellow,
     color = getContrastingColor(backgroundColor, theme.colors.white, theme.colors.black),
+    borderColor,
     style,
     onPress,
 }) => {
-    const { fontScale } = useWindowDimensions();
+    const BORDER_WIDTH = hp(1);
 
-    const styles = useStyles(avatarSize, color, backgroundColor, fontScale);
+    const styles =
+        useStyles(
+            borderColor ? avatarSize + BORDER_WIDTH : avatarSize,
+            label.length,
+            color,
+            backgroundColor,
+            borderColor,
+            borderColor ? BORDER_WIDTH : undefined
+        );
 
     return (
         <TouchableOpacity
@@ -41,22 +51,33 @@ const AvatarText: React.FC<AvatarTextProps> = ({
     )
 }
 
-const useStyles = (avatarSize: number, color: ColorValue | string, backgroundColor: ColorValue | string, fontScale: number) => {
+const useStyles = (
+    avatarSize: number,
+    labelLength: number,
+    color: ColorValue | string,
+    backgroundColor: ColorValue | string,
+    borderColor?: ColorValue | string,
+    borderWidth?: number,
+) => {
     return StyleSheet.create({
         container: {
+            alignSelf: "center",
             justifyContent: "center",
             alignItems: "center",
             width: avatarSize,
             height: avatarSize,
             backgroundColor: backgroundColor,
             borderRadius: avatarSize / 2,
+            borderWidth,
+            borderColor,
         },
         labelText: {
-            fontSize: avatarSize / 2,
+            fontFamily: "Gilroy-Medium",
+            fontSize: avatarSize / ( labelLength > 1 ? labelLength : labelLength + 0.5),
             color: color,
-            lineHeight: avatarSize / fontScale,
-            textAlign: 'center',
-            textAlignVertical: 'center',
+            lineHeight: avatarSize,
+            textAlign: "center",
+            textAlignVertical: "center",
         }
     })
 }

@@ -49,16 +49,17 @@ const ProfileScreen: React.FC = () => {
         <SafeAreaView style={ styles.pageContainer }>
             <View style={ styles.container }>
                 <View style={ styles.informationContainer }>
-                    {/*<Avatar.Image*/}
-                    {/*    avatarSize={ hp(21) }*/}
-                    {/*    borderColor={ theme.colors.black5 }*/}
-                    {/*    style={ styles.profileImage }*/}
-                    {/*/>*/}
-                    <Avatar.Text
-                        label={ `${ nameLabel }` }
+                    <Avatar.Image
+                        source={ require("../assets/images/home.jpg") }
                         avatarSize={ hp(21) }
+                        borderColor={ theme.colors.black5 }
                         style={ styles.profileImage }
                     />
+                    {/*<Avatar.Text*/}
+                    {/*    label={ `${ nameLabel }` }*/}
+                    {/*    avatarSize={ hp(21) }*/}
+                    {/*    style={ styles.profileImage }*/}
+                    {/*/>*/}
                     <View style={ styles.textContainer }>
                         <Text style={ styles.nameText }>
                             { name }
