@@ -1,6 +1,6 @@
 import React, { forwardRef, ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { theme } from "../../../constants/theme";
+import { Colors } from "../../../constants/colors";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/constants";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
@@ -74,7 +74,7 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
             paddingBottom: DEFAULT_SEPARATOR
         },
         containerBackground: {
-            backgroundColor: theme.colors.black,
+            backgroundColor: Colors.black,
             borderTopLeftRadius: !isFullScreen ? 55 : 0,
             borderTopRightRadius: !isFullScreen ? 55 : 0,
         },
@@ -83,7 +83,7 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
             marginTop: SEPARATOR_SIZES.normal,
             width: hp(15),
             height: isHandlePanningGesture ? hp(0.75) : 0,
-            backgroundColor: theme.colors.white2,
+            backgroundColor: Colors.white2,
             borderRadius: 35
         },
         titleText: {

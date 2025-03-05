@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { FONT_SIZES, GLOBAL_STYLE } from "../../../constants/constants";
-import { theme } from "../../../constants/theme";
+import { Colors } from "../../../constants/colors";
 import { useSession } from "../../../features/Auth/context/SessionProvider.tsx";
 import useAuth from "../../../hooks/useAuth.tsx";
 
@@ -35,14 +35,14 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.h2,
         letterSpacing: FONT_SIZES.h2 * 0.045,
-        color: theme.colors.white,
+        color: Colors.white,
         textTransform: "uppercase"
     },
     infoText: {
         fontFamily: "Gilroy-Mediun",
         fontSize: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.05,
-        color: theme.colors.gray1
+        color: Colors.gray1
     }
 })
 

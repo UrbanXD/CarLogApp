@@ -2,7 +2,7 @@ import React, { Context, createContext, ReactElement, useCallback, useContext, u
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/constants";
 import { hexToRgba } from "../../../utils/colors/hexToRgba";
-import { theme } from "../../../constants/theme";
+import { Colors } from "../../../constants/colors";
 import { AlertToastProps } from "../components/AlertToast";
 import { AlertModalProps } from "../components/AlertModal";
 import Alert from "../components/Alert";
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
         height: "100%",
         alignItems: "center",
         zIndex: 1,
-        backgroundColor: hexToRgba(theme.colors.black, 0.75)
+        backgroundColor: hexToRgba(Colors.black, 0.75)
     },
     modalContainer: {
         position: "absolute",

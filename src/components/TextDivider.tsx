@@ -1,6 +1,6 @@
 import React from "react";
 import { ColorValue, StyleSheet, View, Text } from "react-native";
-import { theme } from "../constants/theme";
+import { Colors } from "../constants/colors/Colors.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface TextDividerProps {
@@ -12,7 +12,7 @@ interface TextDividerProps {
 
 const TextDivider: React.FC<TextDividerProps> = ({
     title,
-    color = theme.colors.white,
+    color = Colors.white,
     lineHeight = 1,
     marginVertical = 0
 }) => {

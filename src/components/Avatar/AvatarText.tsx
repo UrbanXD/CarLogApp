@@ -1,8 +1,10 @@
 import React from "react";
-import { ColorValue, Text, StyleSheet, useWindowDimensions, TouchableOpacity, ViewStyle, StyleProp } from "react-native";
+import { ColorValue, Text, StyleSheet, TouchableOpacity, ViewStyle, StyleProp } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { theme } from "../../constants/theme";
+import { Colors } from "../../constants/colors";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
+import Button from "../Button/Button.ts";
+import { ICON_NAMES } from "../../constants/constants.ts";
 
 interface AvatarTextProps {
     label: string
@@ -12,16 +14,18 @@ interface AvatarTextProps {
     borderColor?: ColorValue | string
     style?: StyleProp<ViewStyle>
     onPress?: () => void
+    onPressBadge?: () => void
 }
 
 const AvatarText: React.FC<AvatarTextProps> = ({
     label,
     avatarSize = hp(5),
-    backgroundColor = theme.colors.fuelYellow,
-    color = getContrastingColor(backgroundColor, theme.colors.white, theme.colors.black),
+    backgroundColor = Colors.fuelYellow,
+    color = getContrastingColor(backgroundColor, Colors.white, Colors.black),
     borderColor,
     style,
     onPress,
+    onPressBadge
 }) => {
     const BORDER_WIDTH = hp(1);
     const styles =
@@ -40,6 +44,17 @@ const AvatarText: React.FC<AvatarTextProps> = ({
             onPress={ onPress }
             disabled={ !onPress }
         >
+            {
+                onPressBadge &&
+                <Button.Icon
+                    icon={ ICON_NAMES.addImage }
+                    iconSize={ avatarSize / 6 }
+                    style={ styles.badge }
+                    backgroundColor={ color }
+                    iconColor={ backgroundColor }
+                    onPress={ onPressBadge }
+                />
+            }
             <Text
                 style={ styles.labelText }
                 numberOfLines={ 1 }
@@ -68,6 +83,14 @@ const useStyles = (
             borderRadius: avatarSize / 2,
             borderWidth,
             borderColor
+        },
+        badge: {
+            position: "absolute",
+            right: 0,
+            bottom: avatarSize / 20,
+            zIndex: 1,
+            elevation: 2.5,
+            shadowColor: Colors.gray2,
         },
         labelText: {
             fontFamily: "Gilroy-Medium",

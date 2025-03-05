@@ -40,7 +40,7 @@ const AvatarImage: React.FC<AvatarImageProps> = ({
             {
                 onPressBadge &&
                 <Button.Icon
-                    icon={ ICON_NAMES.addImage }
+                    icon={ ICON_NAMES.swap }
                     iconSize={ avatarSize / 6 }
                     style={ styles.badge }
                     onPress={ onPressBadge }

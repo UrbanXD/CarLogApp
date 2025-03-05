@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, View, Text, ColorValue } from "react-native";
 import { FONT_SIZES, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { theme } from "../../../constants/theme";
+import { Colors } from "../../../constants/colors";
 import Icon from "../../../components/Icon";
 import Button from "../../../components/Button/Button";
 
@@ -21,7 +21,7 @@ const AlertModal: React.FC<AlertModalProps> = ({
     icon,
     title,
     body,
-    color = theme.colors.fuelYellow,
+    color = Colors.fuelYellow,
     accept = () => {},
     acceptText= "Folytatás",
     dismiss = () => {},
@@ -90,7 +90,7 @@ const useStyles = (iconSize: number) =>
             alignSelf: "center",
             width: "100%",
             minHeight: hp(25),
-            backgroundColor: theme.colors.black5,
+            backgroundColor: Colors.black5,
             padding: SEPARATOR_SIZES.small,
             borderRadius: 35,
             zIndex: 2
@@ -105,7 +105,7 @@ const useStyles = (iconSize: number) =>
             top: -iconSize / 1.35,
             alignSelf: "center",
             borderWidth: hp(1),
-            borderColor: theme.colors.black5
+            borderColor: Colors.black5
         },
         contentContainer: {
             flex: 1,
@@ -118,7 +118,7 @@ const useStyles = (iconSize: number) =>
         titleText: {
             fontFamily: "Gilroy-Heavy",
             fontSize: FONT_SIZES.h3,
-            color: theme.colors.white,
+            color: Colors.white,
             lineHeight: FONT_SIZES.h3 * 1.25,
             letterSpacing: FONT_SIZES.h3 * 0.05,
             textAlign: "center"
@@ -126,7 +126,7 @@ const useStyles = (iconSize: number) =>
         text: {
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p2,
-            color: theme.colors.gray1,
+            color: Colors.gray1,
             lineHeight: FONT_SIZES.p2 * 1.05,
             textAlign: "center"
         },

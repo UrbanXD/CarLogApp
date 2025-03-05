@@ -10,7 +10,7 @@ import {
     ICON_NAMES,
     SEPARATOR_SIZES
 } from "../../../../../constants/constants";
-import { theme } from "../../../../../constants/theme";
+import { Colors } from "../../../../../constants/colors";
 import SearchBar from "../../../../../components/SearchBar";
 import Icon from "../../../../../components/Icon";
 import {heightPercentageToDP} from "react-native-responsive-screen";
@@ -96,7 +96,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
                 <Icon
                     icon={ ICON_NAMES.close }
                     size={ FONT_SIZES.p1 }
-                    color={ theme.colors.white }
+                    color={ Colors.white }
                     style={{ alignSelf: "center" }}
                     onPress={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
                 />

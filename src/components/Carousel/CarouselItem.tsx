@@ -1,17 +1,8 @@
-import React, {ReactElement, useCallback, useEffect, useState} from "react";
-import {
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
-import { theme } from "../../constants/theme";
-import {
-    FONT_SIZES, ICON_NAMES,
-    SEPARATOR_SIZES
-} from "../../constants/constants";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { Colors } from "../../constants/colors";
+import { FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/constants";
 import { CarouselItemType } from "./Carousel";
 import { hexToRgba } from "../../utils/colors/hexToRgba";
 import Image from "../Image";
@@ -23,8 +14,8 @@ interface CarouselItemProps {
     overlay?: boolean
     item: CarouselItemType
     cardAction?: () => void
-    renderBottomActionButton?: () => ReactElement
-    renderTopActionButton?: () => ReactElement
+    renderBottomActionButton?: () => React.ReactElement
+    renderTopActionButton?: () => React.ReactElement
 }
 
 const CarouselItem: React.FC<CarouselItemProps> = ({
@@ -99,12 +90,12 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
 const styles = StyleSheet.create({
     itemContainer: {
         flex: 1,
-        backgroundColor: theme.colors.black,
+        backgroundColor: Colors.black,
         borderRadius: 35,
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: hexToRgba(theme.colors.white, 0.035),
+        backgroundColor: hexToRgba(Colors.white, 0.035),
         borderRadius: 35,
         zIndex: 1
     },
@@ -112,7 +103,7 @@ const styles = StyleSheet.create({
         flex: 1,
         borderWidth: 1.5,
         borderRadius: 35,
-        borderColor: theme.colors.gray4
+        borderColor: Colors.gray4
     },
     itemImage: {
         position: "absolute",
@@ -140,7 +131,7 @@ const styles = StyleSheet.create({
     },
     topContainerTitleText: {
         flex: 1,
-        color: theme.colors.white,
+        color: Colors.white,
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.p1,
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
@@ -152,7 +143,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     infoTitleText: {
-        color: theme.colors.white,
+        color: Colors.white,
         fontSize: FONT_SIZES.p2,
         fontFamily: "Gilroy-Heavy",
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
@@ -161,7 +152,7 @@ const styles = StyleSheet.create({
         letterSpacing: FONT_SIZES.p2 * 0.05
     },
     infoSubtitleText: {
-        color: theme.colors.white,
+        color: Colors.white,
         fontSize: FONT_SIZES.p4,
         fontFamily: "Gilroy-Medium",
         textShadowColor: 'rgba(0, 0, 0, 0.75)',

@@ -4,7 +4,7 @@ import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZE
 import Image from "../components/Image.tsx";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { useSession } from "../features/Auth/context/SessionProvider.tsx";
-import { theme } from "../constants/theme.ts";
+import { Colors } from "../constants/colors";
 import Divider from "../components/Divider.tsx";
 import Button from "../components/Button/Button.ts";
 import useAuth from "../hooks/useAuth.tsx";
@@ -13,6 +13,7 @@ import { EditUserBottomSheet } from "../features/BottomSheet/presets";
 import { EDIT_USER_FORM_STEPS } from "../features/Form/layouts/auth/user/editUser/useEditUserSteps.tsx";
 import Avatar from "../components/Avatar/Avatar.ts";
 import { getLabelByName } from "../utils/getLabelByName.ts";
+import {AvatarColors} from "../constants/colors/avatarColors.ts";
 
 const ProfileScreen: React.FC = () => {
     const { session } = useSession();
@@ -20,7 +21,9 @@ const ProfileScreen: React.FC = () => {
     const { openBottomSheet } = useBottomSheet();
 
     const name = `${ session?.user.user_metadata.lastname } ${ session?.user.user_metadata.firstname }`;
-    const nameLabel = getLabelByName(name);
+    const avatarColor = session?.user.user_metadata.avatarColor;
+    // const avatarImage = require("../assets/images/car2.jpg");
+    const avatarImage = undefined;
 
     const openEditUser =
         (stepIndex: number, passwordReset: boolean = true) =>
@@ -49,17 +52,23 @@ const ProfileScreen: React.FC = () => {
         <SafeAreaView style={ styles.pageContainer }>
             <View style={ styles.container }>
                 <View style={ styles.informationContainer }>
-                    <Avatar.Image
-                        source={ require("../assets/images/home.jpg") }
-                        avatarSize={ hp(21) }
-                        borderColor={ theme.colors.black5 }
-                        style={ styles.profileImage }
-                    />
-                    {/*<Avatar.Text*/}
-                    {/*    label={ `${ nameLabel }` }*/}
-                    {/*    avatarSize={ hp(21) }*/}
-                    {/*    style={ styles.profileImage }*/}
-                    {/*/>*/}
+                    {
+                        avatarImage
+                            ?   <Avatar.Image
+                                    source={ avatarImage }
+                                    avatarSize={ hp(20) }
+                                    borderColor={ Colors.black5 }
+                                    style={ styles.profileImage }
+                                />
+                            :   <Avatar.Text
+                                    label={ getLabelByName(name) }
+                                    avatarSize={ hp(20) }
+                                    backgroundColor={ avatarColor }
+                                    borderColor={ Colors.black5 }
+                                    style={ styles.profileImage }
+                                    onPressBadge={() => ""}
+                                />
+                    }
                     <View style={ styles.textContainer }>
                         <Text style={ styles.nameText }>
                             { name }
@@ -121,7 +130,7 @@ const ProfileScreen: React.FC = () => {
                         onPress={ deleteUserProfile }
                         textStyle={{ textAlign: "left" }}
                         backgroundColor="transparent"
-                        textColor={ theme.colors.redLight }
+                        textColor={ Colors.redLight }
                         fontSize={ FONT_SIZES.p1 }
                         loadingIndicator
                     />
@@ -130,8 +139,8 @@ const ProfileScreen: React.FC = () => {
                     iconLeft={ ICON_NAMES.signOut }
                     text="Kijelentkezés"
                     onPress={ signOut }
-                    backgroundColor={ theme.colors.googleRed }
-                    textColor={ theme.colors.black2 }
+                    backgroundColor={ Colors.googleRed }
+                    textColor={ Colors.black2 }
                     fontSize={ FONT_SIZES.p1 }
                 />
             </View>
@@ -150,12 +159,12 @@ const styles = StyleSheet.create({
         height: "90%",
         justifyContent: "space-between",
         gap: DEFAULT_SEPARATOR,
-        backgroundColor: theme.colors.black5,
+        backgroundColor: Colors.black5,
         paddingHorizontal: DEFAULT_SEPARATOR,
         paddingBottom: DEFAULT_SEPARATOR,
         borderTopStartRadius: 40,
         borderTopEndRadius: 40,
-        shadowColor: theme.colors.black5,
+        shadowColor: Colors.black5,
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.60,
         shadowRadius: 24,

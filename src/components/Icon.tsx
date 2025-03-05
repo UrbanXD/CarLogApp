@@ -3,7 +3,7 @@ import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import React from "react";
 import getContrastingColor from "../utils/colors/getContrastingColor";
-import {theme} from "../constants/theme";
+import {Colors} from "../constants/colors/Colors.ts";
 
 interface IconProps {
     icon: ImageSourcePropType | string
@@ -18,7 +18,7 @@ const Icon: React.FC<IconProps> = ({
     icon,
     size = hp(5),
     backgroundColor = "transparent",
-    color = getContrastingColor(backgroundColor, theme.colors.white, theme.colors.black),
+    color = getContrastingColor(backgroundColor, Colors.white, Colors.black),
     style,
     onPress
 }) => {

@@ -17,8 +17,7 @@ import Compactor from "../components/Compactor";
 import { AlertProvider } from "../features/Alert/context/AlertProvider";
 import SecondaryHeader from "../features/Navigation/components/Header/SecondaryHeader";
 import { SessionProvider } from "../features/Auth/context/SessionProvider.tsx";
-import { ThemeProvider } from "@react-navigation/native";
-import { theme } from "../constants/theme";
+import {DefaultTheme, ThemeProvider} from "@react-navigation/native";
 
 const Layout:React.FC = () => {
     const database = useDatabase();
@@ -69,7 +68,6 @@ const Layout:React.FC = () => {
 const RootLayout: React.FC = () =>
     <DatabaseProvider>
         <Compactor components={[
-            { Component: ThemeProvider, props: { value: theme } },
             { Component: Provider, props: { store } },
             { Component: SafeAreaProvider },
             { Component: KeyboardProvider },

@@ -4,7 +4,7 @@ import Input from "../../../../components/Input/Input.ts";
 import { GLOBAL_STYLE, ICON_NAMES } from "../../../../../../constants/constants.ts";
 import Button from "../../../../../../components/Button/Button.ts";
 import TextDivider from "../../../../../../components/TextDivider.tsx";
-import { theme } from "../../../../../../constants/theme.ts";
+import { Colors } from "../../../../../../constants/colors";
 import { useMultiStepForm } from "../../../../context/MultiStepFormProvider.tsx";
 import { EmailStep } from "./EmailStep.tsx";
 
@@ -23,7 +23,7 @@ export const SignUpFirstStep: React.FC<StepProps> = ({
             />
             <TextDivider
                 title="vagy"
-                color={ theme.colors.gray1 }
+                color={ Colors.gray1 }
                 lineHeight={ 1 }
                 marginVertical={ GLOBAL_STYLE.formContainer.gap }
             />

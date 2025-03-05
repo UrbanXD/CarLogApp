@@ -4,7 +4,7 @@ import { GLOBAL_STYLE, ICON_NAMES } from "../../../../../constants/constants";
 import { Text } from "react-native";
 import Button from "../../../../../components/Button/Button";
 import TextDivider from "../../../../../components/TextDivider";
-import { theme } from "../../../../../constants/theme";
+import { Colors } from "../../../../../constants/colors";
 import Form from "../../../components/Form";
 import useSignInForm from "./useSignInForm";
 
@@ -41,7 +41,7 @@ const SignInForm: React.FC = () => {
             />
             <TextDivider
                 title="vagy"
-                color={ theme.colors.gray1 }
+                color={ Colors.gray1 }
                 lineHeight={ 1 }
                 marginVertical={ GLOBAL_STYLE.formContainer.gap }
             />

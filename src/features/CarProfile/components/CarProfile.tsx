@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
  import { FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/constants";
-import { theme } from "../../../constants/theme";
+import { Colors } from "../../../constants/colors";
 import Divider from "../../../components/Divider";
 import Button from "../../../components/Button/Button";
 import InformationContainer from "./InformationContainer";
@@ -38,7 +38,7 @@ const CarProfile: React.FC<CarInfoProps> = ({ carID }) => {
                                 <Button.Icon
                                     icon={ ICON_NAMES.pencil }
                                     iconSize={ FONT_SIZES.h2 }
-                                    iconColor={ theme.colors.gray1 }
+                                    iconColor={ Colors.gray1 }
                                     width={ FONT_SIZES.h2 }
                                     height={ FONT_SIZES.h2 }
                                     style={ styles.editImageIcon }
@@ -50,7 +50,7 @@ const CarProfile: React.FC<CarInfoProps> = ({ carID }) => {
                 </View>
                 <Divider
                     size={ wp(80) }
-                    color={ theme.colors.gray3 }
+                    color={ Colors.gray3 }
                     margin={ SEPARATOR_SIZES.small }
                 />
                 <InformationContainer { ...nameInformationBlock } />
@@ -61,8 +61,8 @@ const CarProfile: React.FC<CarInfoProps> = ({ carID }) => {
             <Button.Row>
                 <Button.Icon
                     icon={ ICON_NAMES.trashCan }
-                    backgroundColor={ theme.colors.googleRed }
-                    iconColor={ theme.colors.black }
+                    backgroundColor={ Colors.googleRed }
+                    iconColor={ Colors.black }
                     onPress={ handleDeleteCar }
                 />
                 <Button.Text

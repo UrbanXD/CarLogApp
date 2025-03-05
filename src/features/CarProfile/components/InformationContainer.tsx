@@ -2,7 +2,7 @@ import React from "react";
 import { ImageSourcePropType, StyleSheet, Text, View } from "react-native";
 import Button from "../../../components/Button/Button";
 import { FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/constants";
-import { theme } from "../../../constants/theme";
+import { Colors } from "../../../constants/colors";
 import Icon from "../../../components/Icon";
 
 export interface InformationContainerProps {
@@ -25,7 +25,7 @@ const InformationContainer: React.FC<InformationContainerProps> = ({
                                 <Icon
                                     icon={ element.icon }
                                     size={ FONT_SIZES.h3 }
-                                    color={ theme.colors.gray2 }
+                                    color={ Colors.gray2 }
                                 />
                             }
                             <Text
@@ -43,7 +43,7 @@ const InformationContainer: React.FC<InformationContainerProps> = ({
             <Button.Icon
                 icon={ ICON_NAMES.pencil }
                 iconSize={ FONT_SIZES.h3 }
-                iconColor={ theme.colors.gray1 }
+                iconColor={ Colors.gray1 }
                 width={ FONT_SIZES.h3 }
                 height={ FONT_SIZES.h3 }
                 backgroundColor="transparent"
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        backgroundColor: theme.colors.gray5,
+        backgroundColor: Colors.gray5,
         paddingHorizontal: SEPARATOR_SIZES.lightSmall,
         paddingVertical: SEPARATOR_SIZES.small,
         borderRadius: 15
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.045,
-        color: theme.colors.gray1,
+        color: Colors.gray1,
     }
 });
 

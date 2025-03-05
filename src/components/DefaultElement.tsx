@@ -6,7 +6,7 @@ import {
     ViewStyle,
     Text, ActivityIndicator
 } from "react-native";
-import { theme } from "../constants/theme";
+import { Colors } from "../constants/colors/Colors.ts";
 import {FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES} from "../constants/constants";
 import Icon from "./Icon";
 import { hexToRgba } from "../utils/colors/hexToRgba";
@@ -33,12 +33,12 @@ const DefaultElement: React.FC<DefaultImageProps> = ({
                 isLoading
                     ?   <ActivityIndicator
                             size={ FONT_SIZES.title }
-                            color={ theme.colors.gray3 }
+                            color={ Colors.gray3 }
                         />
                     :   <Icon
                             icon={ icon }
                             size={ FONT_SIZES.title }
-                            color={ theme.colors.gray3 }
+                            color={ Colors.gray3 }
                         />
             }
             {
@@ -64,10 +64,10 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: hexToRgba(theme.colors.gray5, 0.65),
+        backgroundColor: hexToRgba(Colors.gray5, 0.65),
         borderWidth: 0.5,
         borderRadius: 38,
-        borderColor: theme.colors.gray5,
+        borderColor: Colors.gray5,
         paddingHorizontal: SEPARATOR_SIZES.small
     },
     text: {
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.025,
         lineHeight: FONT_SIZES.p2 * 1.25,
-        color: theme.colors.gray2,
+        color: Colors.gray2,
         textAlign: "center"
     }
 })

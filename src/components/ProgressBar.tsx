@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { theme } from "../constants/theme";
+import { Colors } from "../constants/colors/Colors.ts";
 import { FONT_SIZES, SEPARATOR_SIZES } from "../constants/constants";
 
 interface ProgressBarProps {
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
             position: 'absolute',
             height: hp(0.5),
             width: "100%",
-            backgroundColor: theme.colors.gray4,
+            backgroundColor: Colors.gray4,
             zIndex: 0
         },
         verticalLine: {
@@ -94,28 +94,28 @@ const styles = StyleSheet.create({
             width: hp(2),
             height: hp(2),
             borderRadius: 50,
-            backgroundColor: theme.colors.gray2,
+            backgroundColor: Colors.gray2,
             zIndex: 9,
         },
         doneCircle: {
-            borderColor: theme.colors.fuelYellow,
-            backgroundColor: theme.colors.fuelYellow
+            borderColor: Colors.fuelYellow,
+            backgroundColor: Colors.fuelYellow
         },
         activeCircle: {
-            // borderColor: theme.colors.white,
-            backgroundColor: theme.colors.gray4,
+            // borderColor: Colors.white,
+            backgroundColor: Colors.gray4,
         },
         stepText: {
             fontFamily: "Gilroy-Heavy",
             fontSize: hp(3),
             textAlign: "center",
-            color: theme.colors.white,
-            textShadowColor: theme.colors.black,
+            color: Colors.white,
+            textShadowColor: Colors.black,
             textShadowOffset: {width: -1, height: 1},
             textShadowRadius: 5
         },
         doneLine: {
-            backgroundColor: theme.colors.fuelYellow
+            backgroundColor: Colors.fuelYellow
         }
     });
 

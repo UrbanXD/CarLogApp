@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { ImageBackground, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants/constants";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { theme } from "../constants/theme";
+import { Colors } from "../constants/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button/Button";
 import Divider from "../components/Divider";
@@ -57,7 +57,7 @@ const AuthScreen: React.FC = () => {
                     <Divider
                         size={ wp(70) }
                         thickness={ 2 }
-                        color={ theme.colors.fuelYellow }
+                        color={ Colors.fuelYellow }
                     />
                     <Text style={ styles.subtitle }>Kezelje nálunk autóit</Text>
                 </View>
@@ -129,7 +129,7 @@ const useStyles = (top: number) =>
             zIndex: 1,
             top: hp(FONT_SIZES.title / -12),
             alignSelf: "center",
-            color: theme.colors.white,
+            color: Colors.white,
             fontSize: FONT_SIZES.title,
             fontFamily: "Gilroy-Heavy",
             textTransform: "uppercase",
@@ -139,13 +139,13 @@ const useStyles = (top: number) =>
             position: "absolute", top: -hp(2.5),
             color: GLOBAL_STYLE.pageContainer.backgroundColor,
             textShadowOffset: { height: 0, width: 0 },
-            textShadowColor: theme.colors.white,
+            textShadowColor: Colors.white,
             textShadowRadius: 1,
             textAlign: "center",
         },
         subtitle: {
             alignSelf: "center",
-            color: theme.colors.gray2,
+            color: Colors.gray2,
             fontSize: FONT_SIZES.p1,
             fontFamily: "Gilroy-Medium",
             textTransform: "uppercase",
@@ -156,7 +156,7 @@ const useStyles = (top: number) =>
             gap: SEPARATOR_SIZES.normal
         },
         underButtonText:{
-            color: theme.colors.white,
+            color: Colors.white,
             alignSelf: "center",
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p2,
@@ -165,7 +165,7 @@ const useStyles = (top: number) =>
             textAlign: "center",
         },
         linkText: {
-            color: theme.colors.fuelYellow,
+            color: Colors.fuelYellow,
             textDecorationLine: "underline",
             fontSize: FONT_SIZES.p1,
             lineHeight: FONT_SIZES.p1 * 1.25,
@@ -177,14 +177,14 @@ const useStyles = (top: number) =>
             right: GLOBAL_STYLE.contentContainer.paddingHorizontal,
         },
         verificationIcon: {
-            borderColor: theme.colors.gray4,
+            borderColor: Colors.gray4,
             borderWidth: 0.75
         },
         verificationText: {
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p3,
-            color: theme.colors.white,
-            textShadowColor: theme.colors.black,
+            color: Colors.white,
+            textShadowColor: Colors.black,
             textShadowRadius: 15,
         }
     })

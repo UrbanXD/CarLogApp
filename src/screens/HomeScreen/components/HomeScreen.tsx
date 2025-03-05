@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { SafeAreaView, ScrollView, StyleSheet } from "react-native";
-import { theme } from "../../../constants/theme";
+import { Colors } from "../../../constants/colors";
 import { GLOBAL_STYLE } from "../../../constants/constants";
 import { useDatabase } from "../../../features/Database/connector/Database";
 import { store } from "../../../features/Database/redux/store";
@@ -30,7 +30,7 @@ const HomeScreen: React.FC = () => {
                 <Divider
                     thickness={ 2.5 }
                     size={ wp(75) }
-                    color={ theme.colors.gray4 }
+                    color={ Colors.gray4 }
                 />
                 <MyGarageBlock />
                 <UpcomingRidesBlock />

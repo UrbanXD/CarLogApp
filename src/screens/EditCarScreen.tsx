@@ -1,7 +1,7 @@
 import React from "react";
 import {SafeAreaView, ScrollView, StyleSheet } from "react-native";
 import {DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES} from "../constants/constants";
-import { theme } from "../constants/theme";
+import { Colors } from "../constants/colors";
 import { useLocalSearchParams } from "expo-router";
 import CarProfile from "../features/CarProfile/components/CarProfile";
 
@@ -26,7 +26,7 @@ const EditCarScreen: React.FC = () => {
 const styles = StyleSheet.create({
     pageContainer: {
         ...GLOBAL_STYLE.pageContainer,
-        backgroundColor: theme.colors.black2,
+        backgroundColor: Colors.black2,
         marginBottom: 0,
         paddingHorizontal: DEFAULT_SEPARATOR,
         paddingBottom: SEPARATOR_SIZES.small

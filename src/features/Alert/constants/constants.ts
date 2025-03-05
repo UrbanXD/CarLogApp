@@ -1,10 +1,10 @@
-import { theme } from "../../../constants/theme";
+import { Colors } from "../../../constants/colors";
 
 export const ALERT_COLORS = {
-    success: theme.colors.greenLight,
-    info: theme.colors.blueLight,
-    warning: theme.colors.fuelYellow,
-    error: theme.colors.redDark,
+    success: Colors.greenLight,
+    info: Colors.blueLight,
+    warning: Colors.fuelYellow,
+    error: Colors.redDark,
 }
 
 export const ALERT_ICONS = {

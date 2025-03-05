@@ -2,7 +2,7 @@ import React from "react";
 import { Dimensions, SafeAreaView, StyleSheet, View, ViewStyle } from "react-native";
 import TabBarIcon from "./TabBarIcon";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
-import { theme } from "../../../../constants/theme";
+import { Colors } from "../../../../constants/colors";
 import { FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT } from "../../../../constants/constants";
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs'
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -75,7 +75,7 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
                             key={ index }
                             iconName={ icon }
                             iconSize={ FONT_SIZES.h2 }
-                            iconColor={ theme.colors.black }
+                            iconColor={ Colors.black }
                             focused={ isFocused }
                             width={ TAB_WIDTH }
                             onPress={ onPress }
@@ -95,10 +95,10 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         height: SIMPLE_TABBAR_HEIGHT,
-        backgroundColor: theme.colors.fuelYellow,
+        backgroundColor: Colors.fuelYellow,
         borderWidth: 3.5,
         borderBottomWidth: 0,
-        borderColor: theme.colors.black5,
+        borderColor: Colors.black5,
         borderTopRightRadius: 45,
         borderTopLeftRadius: 45,
     },
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     slidingElement: {
         width: "100%",
         height: hp(0.5),
-        backgroundColor: theme.colors.black5
+        backgroundColor: Colors.black5
     }
 })
 

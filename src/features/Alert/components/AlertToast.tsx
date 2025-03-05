@@ -1,7 +1,7 @@
 import { ALERT_COLORS, ALERT_ICONS, ALERT_TITLES } from "../constants/constants";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity } from "react-native";
-import { theme } from "../../../constants/theme";
+import { Colors } from "../../../constants/colors";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/constants";
 import Icon from "../../../components/Icon";
@@ -138,7 +138,7 @@ const useStyles = (type: AlertType, height: number) =>
         container: {
             alignSelf: "center",
             height,
-            backgroundColor: theme.colors.black5,
+            backgroundColor: Colors.black5,
             borderRadius: 35,
             borderColor: ALERT_COLORS[type],
             borderWidth: 1.5,
@@ -156,13 +156,13 @@ const useStyles = (type: AlertType, height: number) =>
             fontFamily: "Gilroy-Heavy",
             fontSize: FONT_SIZES.p2,
             letterSpacing: FONT_SIZES.p2 * 0.05,
-            color: theme.colors.white,
+            color: Colors.white,
         },
         text: {
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p4,
             letterSpacing: FONT_SIZES.p4 * 0.05,
-            color: theme.colors.gray1,
+            color: Colors.gray1,
         }
     })
 

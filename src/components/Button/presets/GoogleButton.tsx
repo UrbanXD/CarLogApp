@@ -1,7 +1,7 @@
 import React from "react";
 import TextButton from "../TextButton";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { theme } from "../../../constants/theme";
+import { Colors } from "../../../constants/colors/Colors.ts";
 import useAuth from "../../../hooks/useAuth.tsx";
 
 export const GoogleButton: React.FC = () => {
@@ -11,8 +11,8 @@ export const GoogleButton: React.FC = () => {
         <TextButton
             text="Folytatás Google fiókkal"
             fontSize={ hp(2.35) }
-            textColor={ theme.colors.googleRed }
-            backgroundColor={ theme.colors.white }
+            textColor={ Colors.googleRed }
+            backgroundColor={ Colors.white }
             iconLeft={ require("../../../assets/images/google_logo.png") }
             onPress={ googleAuth }
         />

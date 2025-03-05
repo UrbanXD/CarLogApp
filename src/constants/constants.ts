@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { theme } from "./theme";
+import { Colors } from "./colors";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { ControllerFieldState, ControllerRenderProps, UseFormStateReturn } from "react-hook-form";
 import { InputPickerDataType } from "../features/Form/components/Input/picker/InputPicker";
@@ -60,15 +60,16 @@ export const ICON_NAMES = {
     fuel: "gas-station-outline",
     fuelTank: "propane-tank-outline",
     settings: "cog-outline",
-    signOut: "logout"
+    signOut: "logout",
+    swap: "swap-horizontal"
 }
 
 export const ICON_COLORS = {
-    default: theme.colors.white,
-    good: theme.colors.greenLight,
+    default: Colors.white,
+    good: Colors.greenLight,
     wrong: "red",
-    active: theme.colors.white,
-    inactive: theme.colors.gray1
+    active: Colors.white,
+    inactive: Colors.gray1
 }
 
 export const FONT_SIZES = {
@@ -99,7 +100,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
     pageContainer: {
         flex: 1,
         paddingBottom: 5,
-        backgroundColor: theme.colors.black2
+        backgroundColor: Colors.black2
     },
     scrollViewContentContainer: {
         flexGrow: 1,
@@ -114,7 +115,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
         fontSize: FONT_SIZES.p3,
         paddingLeft: SEPARATOR_SIZES.small,
         fontFamily: "Gilroy-Medium",
-        color: theme.colors.fuelYellow
+        color: Colors.fuelYellow
     },
     contentContainer: {
         gap: SEPARATOR_SIZES.small,
@@ -123,21 +124,21 @@ export const GLOBAL_STYLE = StyleSheet.create({
         paddingVertical: DEFAULT_SEPARATOR,
         paddingHorizontal: DEFAULT_SEPARATOR,
         marginHorizontal: DEFAULT_SEPARATOR,
-        backgroundColor: theme.colors.black4,
+        backgroundColor: Colors.black4,
         borderRadius: 35
     },
     containerTitleText: {
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.p1,
         letterSpacing: FONT_SIZES.p1 * 0.05,
-        color: theme.colors.white,
+        color: Colors.white,
     },
     containerText: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
         lineHeight: FONT_SIZES.p2 * 1.2,
         letterSpacing: FONT_SIZES.p2 * 0.05,
-        color: theme.colors.gray1,
+        color: Colors.gray1,
     },
     rowContainer: {
         flexDirection: "row",
@@ -145,7 +146,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
         alignItems: "center",
         gap: SEPARATOR_SIZES.lightSmall,
         height: hp(8.5),
-        backgroundColor: theme.colors.black2,
+        backgroundColor: Colors.black2,
         borderRadius: 15,
         padding: SEPARATOR_SIZES.small
     },

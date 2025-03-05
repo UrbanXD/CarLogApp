@@ -1,6 +1,6 @@
 import React from "react";
 import { StatusBar, Text, View } from "react-native";
-import { theme } from "../../../../constants/theme";
+import { Colors } from "../../../../constants/colors";
 import useHeaderStyles from "../../hooks/useHeaderStyles";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Button from "../../../../components/Button/Button";
@@ -27,7 +27,7 @@ const SecondaryHeader: React.FC<SecondaryHeaderProps> = ({
                 <Button.Icon
                     icon={ ICON_NAMES.leftArrow }
                     iconSize={ FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE }
-                    iconColor={ theme.colors.white }
+                    iconColor={ Colors.white }
                     width={ FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE }
                     height={ FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE }
                     backgroundColor="transparent"

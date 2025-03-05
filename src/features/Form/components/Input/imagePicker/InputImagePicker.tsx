@@ -11,7 +11,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { ControllerRenderArgs, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/constants";
 import InputTitle from "../InputTitle";
 import DefaultElement from "../../../../../components/DefaultElement";
-import { theme } from "../../../../../constants/theme";
+import { Colors } from "../../../../../constants/colors";
 import { hexToRgba } from "../../../../../utils/colors/hexToRgba";
 import Image from "../../../../../components/Image";
 
@@ -186,12 +186,12 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                                                     <Button.Icon
                                                         icon={ ICON_NAMES.close }
                                                         iconSize={ FONT_SIZES.p1 }
-                                                        iconColor={ theme.colors.redLight }
+                                                        iconColor={ Colors.redLight }
                                                         width={ FONT_SIZES.p1 * 1.2 }
                                                         height={ FONT_SIZES.p1 * 1.2 }
-                                                        backgroundColor={ hexToRgba(theme.colors.black, 0.75) }
+                                                        backgroundColor={ hexToRgba(Colors.black, 0.75) }
                                                         onPress={ () => removeImageFromHistory(index) }
-                                                        style={ { borderColor: theme.colors.redLight, borderWidth: 2 } }
+                                                        style={ { borderColor: Colors.redLight, borderWidth: 2 } }
                                                     />
                                             }
                                         />

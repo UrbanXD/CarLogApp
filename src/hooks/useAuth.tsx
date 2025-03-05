@@ -14,6 +14,7 @@ import { getToastMessage } from "../features/Alert/utils/getToastMessage.ts";
 import { OTPVerificationBottomSheet } from "../features/BottomSheet/presets";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { BaseConfig } from "../constants/BaseConfig.ts";
+import {AvatarColors} from "../constants/colors/index.ts";
 
 export type SignUpFunction = (user: UserFormFieldType) => Promise<void>
 export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
@@ -93,7 +94,8 @@ const useAuth = () => {
                         options: {
                             data: {
                                 firstname,
-                                lastname
+                                lastname,
+                                avatarColor: AvatarColors[Math.floor(Math.random() * AvatarColors.length)],
                             }
                         }
                     });

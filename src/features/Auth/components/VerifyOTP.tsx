@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import Input from "../../Form/components/Input/Input.ts";
 import { AuthApiError, EmailOtpType } from "@supabase/supabase-js";
 import Divider from "../../../components/Divider.tsx";
-import { theme } from "../../../constants/theme.ts";
+import { Colors } from "../../../constants/colors";
 import { FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/constants.ts";
 import useAuth from "../../../hooks/useAuth.tsx";
 
@@ -77,7 +77,7 @@ const VerifyOTP: React.FC<VerifyOTPProps> = ({
             />
             <Divider
                 thickness={ 3.5 }
-                color={ theme.colors.gray3 }
+                color={ Colors.gray3 }
             />
             <Text style={ styles.didntReceivedCodeText }>
                 Nem érkezett meg a kód az adott email címére, esetleg a kód már lejárt?
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     titleText: {
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.h2,
-        color: theme.colors.white,
+        color: Colors.white,
         lineHeight: FONT_SIZES.h2 * 1.25,
         letterSpacing: FONT_SIZES.h2 * 0.035,
         textAlign: "center"
@@ -108,23 +108,23 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZES.p2,
         lineHeight: FONT_SIZES.p2 * 1.15,
         letterSpacing: FONT_SIZES.p2 * 0.035,
-        color: theme.colors.gray2,
+        color: Colors.gray2,
         textAlign: "center"
     },
     subtitleEmailText: {
         fontFamily: "Gilroy-Heavy",
-        color: theme.colors.gray1
+        color: Colors.gray1
     },
     didntReceivedCodeText: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p3,
         lineHeight: FONT_SIZES.p3 * 1.25,
         letterSpacing: FONT_SIZES.p3 * 0.035,
-        color: theme.colors.gray2,
+        color: Colors.gray2,
         textAlign: "center"
     },
     didntReceivedCodeLinkText: {
-        color: theme.colors.fuelYellow,
+        color: Colors.fuelYellow,
         textDecorationLine: "underline"
     }
 });

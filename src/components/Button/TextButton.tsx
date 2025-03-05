@@ -2,7 +2,7 @@ import React from "react";
 import { ActivityIndicator, ColorValue, ImageSourcePropType, Platform, StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/constants";
-import { theme } from "../../constants/theme";
+import { Colors } from "../../constants/colors/Colors.ts";
 import Icon from "../Icon";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
 
@@ -26,8 +26,8 @@ interface TextButtonProps {
 const TextButton: React.FC<TextButtonProps> = ({
     text,
     fontSize = FONT_SIZES.h3,
-    backgroundColor = theme.colors.fuelYellow,
-    textColor = getContrastingColor(backgroundColor, theme.colors.white, theme.colors.black),
+    backgroundColor = Colors.fuelYellow,
+    textColor = getContrastingColor(backgroundColor, Colors.white, Colors.black),
     height = hp(6.5),
     width,
     iconLeft,
