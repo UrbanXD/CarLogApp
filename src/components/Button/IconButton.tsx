@@ -23,8 +23,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
     iconSize = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE,
     iconColor = theme.colors.black,
     backgroundColor = theme.colors.fuelYellow,
-    width = hp(7),
-    height = hp(7),
+    width = iconSize * 1.5,
+    height = iconSize * 1.5,
     style,
     inverse = false,
     disabled = false,
@@ -69,7 +69,7 @@ export const useButtonStyles = (
             height: height,
             backgroundColor: primaryColor,
             color: secondaryColor,
-            borderRadius: 100
+            borderRadius: height / 2,
         }
     })
 
