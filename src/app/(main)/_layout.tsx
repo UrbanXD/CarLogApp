@@ -9,7 +9,7 @@ const TabLayout: React.FC = () => {
             tabBar={ (props) => <TabBar { ...props } /> }
             screenOptions={{
                 headerShown: false,
-                animation: "shift"
+                animation: "none"
             }}
         >
             <Tabs.Screen
