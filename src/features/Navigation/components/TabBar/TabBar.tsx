@@ -1,11 +1,11 @@
 import React from "react";
 import { Dimensions, SafeAreaView, StyleSheet, View, ViewStyle } from "react-native";
 import TabBarIcon from "./TabBarIcon";
-import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
+import Animated, { Extrapolation, interpolate, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { Colors } from "../../../../constants/colors";
 import { FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT } from "../../../../constants/constants";
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs'
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { useScreenScrollView } from "../../../ScreenScrollView/context/ScreenScrollViewProvider.tsx";
 
 interface TabBarProps{
     tabBarStyle?: ViewStyle,
@@ -17,19 +17,48 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
     descriptors,
     navigation,
     tabBarStyle = {},
-    tabBarActiveTintColor = ICON_COLORS.active,
+    tabBarActiveTintColor = ICON_COLORS.active
 }) => {
-    const TAB_BAR_WIDTH =  Dimensions.get("screen").width
+    const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView);
+    const { offset } = useScreenScrollView();
+
+    const TAB_BAR_WIDTH =  Dimensions.get("screen").width;
     const TAB_WIDTH = TAB_BAR_WIDTH / state.routes.length;
 
     const slideAnimationStyle = useAnimatedStyle(() => {
+        const translateX = withTiming(TAB_WIDTH * state.index);
         return {
-            transform: [{ translateX: withTiming(TAB_WIDTH * state.index) }]
+            transform: [{ translateX }]
         }
     });
+    const animatedStyle = useAnimatedStyle(() => {
+        const translateY = withTiming(
+            interpolate(
+                offset.value,
+                [0, SIMPLE_TABBAR_HEIGHT],
+                [0, SIMPLE_TABBAR_HEIGHT * 2],
+                Extrapolation.CLAMP
+            ),
+            { duration: 750 }
+        );
 
+        const opacity = withTiming(
+            interpolate(
+                offset.value,
+                [0, SIMPLE_TABBAR_HEIGHT],
+                [1, 0.15],
+                Extrapolation.CLAMP
+            ),
+            { duration: 750 }
+        )
+
+        return {
+            transform: [{ translateY }],
+            opacity,
+        };
+    });
     return (
-        <SafeAreaView style={ [styles.container, tabBarStyle] }>
+        <AnimatedSafeAreaView style={ [styles.container, tabBarStyle, animatedStyle] }>
             <Animated.View style={ [styles.slidingElementContainer, { width: TAB_WIDTH }, slideAnimationStyle] }>
                 <View style={ styles.slidingElement } />
             </Animated.View>
@@ -75,7 +104,7 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
                             key={ index }
                             iconName={ icon }
                             iconSize={ FONT_SIZES.h2 }
-                            iconColor={ Colors.black }
+                            iconColor={ Colors.fuelYellow }
                             focused={ isFocused }
                             width={ TAB_WIDTH }
                             onPress={ onPress }
@@ -84,23 +113,26 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
                     );
                 })
             }
-        </SafeAreaView>
+        </AnimatedSafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
+        position: "absolute",
+        left: 0,
+        bottom: 0,
+        zIndex: 1,
         flexDirection: "row",
         alignSelf: "center",
         justifyContent: "space-between",
         alignItems: "center",
         height: SIMPLE_TABBAR_HEIGHT,
-        backgroundColor: Colors.fuelYellow,
-        borderWidth: 3.5,
-        borderBottomWidth: 0,
-        borderColor: Colors.black5,
-        borderTopRightRadius: 45,
-        borderTopLeftRadius: 45,
+        backgroundColor: Colors.black,
+        borderColor: Colors.gray4,
+        borderBottomWidth: 2.5,
+        borderTopStartRadius: 45,
+        borderTopEndRadius: 45,
     },
     titleText: {
         fontSize: FONT_SIZES.p1,
@@ -109,11 +141,12 @@ const styles = StyleSheet.create({
     slidingElementContainer: {
         ...StyleSheet.absoluteFillObject,
         justifyContent: "flex-end",
+        bottom: -2.5
     },
     slidingElement: {
         width: "100%",
-        height: hp(0.5),
-        backgroundColor: Colors.black5
+        height: 2.5,
+        backgroundColor: Colors.fuelYellow
     }
 })
 

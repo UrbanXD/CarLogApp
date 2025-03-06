@@ -11,6 +11,7 @@ import UpcomingRidesBlock from "./UpcomingRidesBlock";
 import Divider from "../../../components/Divider";
 import LatestExpensesBlock from "./LatestExpensesBlock";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { ScreenScrollView } from "../../../features/ScreenScrollView/components/ScreenScrollView.tsx";
 
 const HomeScreen: React.FC = () => {
     const database = useDatabase();
@@ -20,32 +21,18 @@ const HomeScreen: React.FC = () => {
     }, []);
 
     return (
-        <SafeAreaView style={ styles.pageContainer }>
-            <ScrollView
-                showsVerticalScrollIndicator={ false }
-                nestedScrollEnabled={ true }
-                contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
-            >
-                <WelcomeBlock />
-                <Divider
-                    thickness={ 2.5 }
-                    size={ wp(75) }
-                    color={ Colors.gray4 }
-                />
-                <MyGarageBlock />
-                <UpcomingRidesBlock />
-                <LatestExpensesBlock />
-            </ScrollView>
-        </SafeAreaView>
+        <ScreenScrollView>
+            <WelcomeBlock />
+            <Divider
+                thickness={ 2.5 }
+                size={ wp(75) }
+                color={ Colors.gray4 }
+            />
+            <MyGarageBlock />
+            <UpcomingRidesBlock />
+            <LatestExpensesBlock />
+        </ScreenScrollView>
     )
 }
-
-const styles = StyleSheet.create({
-    pageContainer: {
-        ...GLOBAL_STYLE.pageContainer,
-        marginBottom: 0,
-        paddingHorizontal: 0
-    }
-})
 
 export default HomeScreen;

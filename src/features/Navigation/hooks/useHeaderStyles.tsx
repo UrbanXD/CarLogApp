@@ -14,7 +14,6 @@ const useHeaderStyles = (top: number) =>
             gap: SEPARATOR_SIZES.lightSmall,
             height: SIMPLE_HEADER_HEIGHT,
             backgroundColor: GLOBAL_STYLE.pageContainer.backgroundColor,
-            paddingTop: SEPARATOR_SIZES.lightSmall * 0.5,
             paddingHorizontal: DEFAULT_SEPARATOR,
             overflow: "hidden"
         },
