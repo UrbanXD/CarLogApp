@@ -16,8 +16,8 @@ import { PortalProvider } from "@gorhom/portal";
 import Compactor from "../components/Compactor";
 import { AlertProvider } from "../features/Alert/context/AlertProvider";
 import SecondaryHeader from "../features/Navigation/components/Header/SecondaryHeader";
-import { SessionProvider } from "../features/Auth/context/SessionProvider.tsx";
 import { ScreenScrollViewProvider } from "../features/ScreenScrollView/context/ScreenScrollViewProvider.tsx";
+import { AuthProvider } from "../contexts/Auth/AuthProvider.tsx";
 
 const Layout:React.FC = () => {
     const database = useDatabase();
@@ -74,7 +74,7 @@ const RootLayout: React.FC = () =>
             { Component: ScreenScrollViewProvider },
             { Component: PortalProvider },
             { Component: GestureHandlerRootView, props: { style: { flex: 1 } } },
-            { Component: SessionProvider },
+            { Component: AuthProvider },
             { Component: AlertProvider },
             { Component: BottomSheetModalProvider },
             { Component: BottomSheetProvider },
