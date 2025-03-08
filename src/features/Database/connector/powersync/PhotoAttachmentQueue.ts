@@ -1,7 +1,7 @@
 import { AbstractAttachmentQueue, AttachmentRecord, AttachmentState } from '@powersync/attachments';
 import * as FileSystem from 'expo-file-system';
 import { BaseConfig } from '../../../../constants/BaseConfig.ts';
-import { CAR_TABLE } from './AppSchema';
+import { CAR_TABLE, USER_TABLE } from './AppSchema';
 import { getUUID } from '../../utils/uuid';
 import { ImageType } from '../../../Form/utils/pickImage';
 import { encode } from 'base64-arraybuffer';
@@ -27,31 +27,20 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
 
     onAttachmentIdsChange(onUpdate: (ids: string[]) => void): void {
         console.log(this.table, "taxxx")
-        const imgSQL =
-                `SELECT image as image FROM ${CAR_TABLE} WHERE image IS NOT NULL`;
+        const imgSQL = `
+            SELECT image as image FROM ${CAR_TABLE} WHERE image IS NOT NULL
+            UNION ALL
+            SELECT avatarImage as image FROM ${USER_TABLE} WHERE avatarImage IS NOT NULL
+        `;
         // UNION-nal lehet meg tobb tablat hozza irni es onnan is kiszedni ha lesz
-
-        // this.powersync.watch("SELECT * FROM attachments", [], {
-        //     onResult: async (result) => {
-        //         console.log(result.rows?._array, "kutya");
-        //     }
-        // })
 
         this.powersync.watch(imgSQL, [], {
             onResult:
                 async (result) => {
                     return onUpdate(
-                    result.rows?._array.map(
-                            (r) => {
-                                // const file = r.image.substring(r.image.lastIndexOf('/') + 1, r.image.length);
-                                // const extension = getFileExtension(r.image);
-                                //
-                                // const id = file.substring(0, file.length - 1 - extension.length)
-                                // console.log("cica ", id)
-                                return r.image;
-                            }
-                        )
-                        ?? []
+                        result.rows?._array.map(
+                                (r) => r.image
+                        ) ?? []
                     )}
         });
     }

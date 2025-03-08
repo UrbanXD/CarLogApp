@@ -7,8 +7,11 @@ export const SERVICE_TABLE = "service";
 
 const user = new Table({
     id: column.text,
+    email: column.text,
     firstname: column.text,
-    lastname: column.text
+    lastname: column.text,
+    avatarImage: column.text,
+    avatarColor: column.text
 })
 
 const car = new Table({
