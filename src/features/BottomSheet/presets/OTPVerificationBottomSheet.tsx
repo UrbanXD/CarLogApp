@@ -1,6 +1,6 @@
 import React from "react";
 import { OpenBottomSheetArgs } from "../context/BottomSheetContext.ts";
-import VerifyOTP, { HandleVerificationOtpType } from "../../Auth/components/VerifyOTP.tsx";
+import VerifyOTP, { HandleVerificationOtpType } from "../../Form/layouts/auth/otp/VerifyOTP.tsx";
 import { EmailOtpType } from "@supabase/supabase-js";
 
 type OtpVerificationBottomSheetArgs = {

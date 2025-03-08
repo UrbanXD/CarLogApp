@@ -6,17 +6,17 @@ import { Colors } from "../constants/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button/Button";
 import Divider from "../components/Divider";
-import { useSession } from "../features/Auth/context/SessionProvider.tsx";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
 import { SignInBottomSheet, SignUpBottomSheet } from "../features/BottomSheet/presets";
-import useAuth from "../hooks/useAuth.tsx";
+import { useAuth } from "../contexts/Auth/AuthContext.ts";
+import { useUserManagement } from "../hooks/useUserManagement.ts";
 
 const AuthScreen: React.FC = () => {
     const { top } = useSafeAreaInsets();
     const { openBottomSheet } = useBottomSheet();
-    const { session, notVerifiedUser } = useSession();
-    const { openUserVerification } = useAuth();
+    const { session, notVerifiedUser } = useAuth();
+    const { openUserVerification } = useUserManagement();
 
     const openSignUp =
         () => openBottomSheet(SignUpBottomSheet);

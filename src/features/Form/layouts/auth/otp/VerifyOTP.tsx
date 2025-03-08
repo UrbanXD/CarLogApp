@@ -1,11 +1,11 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import Input from "../../Form/components/Input/Input.ts";
+import Input from "../../../components/Input/Input.ts";
 import { AuthApiError, EmailOtpType } from "@supabase/supabase-js";
-import Divider from "../../../components/Divider.tsx";
-import { Colors } from "../../../constants/colors";
-import { FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/constants.ts";
-import useAuth from "../../../hooks/useAuth.tsx";
+import Divider from "../../../../../components/Divider.tsx";
+import { Colors } from "../../../../../constants/colors/index.ts";
+import { FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants/constants.ts";
+import { useUserManagement } from "../../../../../hooks/useUserManagement.ts";
 
 export type HandleVerificationOtpType =
     (errorCode?: string) => ( Promise<void> | void )
@@ -27,7 +27,7 @@ const VerifyOTP: React.FC<VerifyOTPProps> = ({
     subtitle,
     handleVerification,
 }) => {
-    const { verifyOTP, resendOTP } = useAuth();
+    const { verifyOTP, resendOTP } = useUserManagement();
 
     const defaultSubtitle = () =>
         <Text style={ styles.subtitleText }>

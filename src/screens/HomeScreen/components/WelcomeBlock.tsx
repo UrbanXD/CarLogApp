@@ -2,18 +2,16 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { FONT_SIZES, GLOBAL_STYLE } from "../../../constants/constants";
 import { Colors } from "../../../constants/colors";
-import { useSession } from "../../../features/Auth/context/SessionProvider.tsx";
-import useAuth from "../../../hooks/useAuth.tsx";
+import { useAuth } from "../../../contexts/Auth/AuthContext.ts";
 
 const WelcomeBlock: React.FC = () => {
-    const { session } = useSession();
-    const {changeEmail} = useAuth();
+    const { session } = useAuth();
 
     return (
         <View
             style={ styles.titleContainer }
         >
-            <Text style={ styles.welcomeText} onPress={() => changeEmail("urbanadam6996@gmail.com")}>
+            <Text style={ styles.welcomeText }>
                 Üdv { `${ session?.user.user_metadata.firstname ?? "" } ${ session?.user.user_metadata?.lastname ?? "" }` }!
             </Text>
             <Text style={ styles.infoText }>

@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { Redirect } from "expo-router";
 import AuthScreen from "../screens/AuthScreen";
-import { useSession } from "../features/Auth/context/SessionProvider.tsx";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
+import { useAuth } from "../contexts/Auth/AuthContext.ts";
 
 const App: React.FC = () => {
-    const { session } = useSession();
+    const { session } = useAuth();
     const { dismissAllBottomSheet } = useBottomSheet();
 
     useEffect(() => {

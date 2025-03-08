@@ -1,14 +1,19 @@
 import { UserFormFieldType, useUserFormProps } from "../../../../constants/schemas/userSchema.tsx";
 import { useForm } from "react-hook-form";
-import useAuth from "../../../../../../hooks/useAuth.tsx";
 import { EDIT_USER_FORM_STEPS, useEditUserSteps } from "./useEditUserSteps.tsx";
+import { useUserManagement } from "../../../../../../hooks/useUserManagement.ts";
 
 export const useEditUserForm = (
     user: Partial<UserFormFieldType>,
     passwordReset: boolean = true,
     stepIndex: number
 ) => {
-    const { addPasswordToOAuthUser, resetPassword, changeEmail, changeName } = useAuth();
+    const {
+        addPasswordToOAuthUser,
+        resetPassword,
+        changeEmail,
+        changeName
+    } = useUserManagement();
 
     const {
         control,

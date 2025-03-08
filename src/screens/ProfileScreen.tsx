@@ -1,38 +1,35 @@
 import React from "react";
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../constants/constants.ts";
-import Image from "../components/Image.tsx";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { useSession } from "../features/Auth/context/SessionProvider.tsx";
 import { Colors } from "../constants/colors";
 import Divider from "../components/Divider.tsx";
 import Button from "../components/Button/Button.ts";
-import useAuth from "../hooks/useAuth.tsx";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
 import { EditUserBottomSheet } from "../features/BottomSheet/presets";
 import { EDIT_USER_FORM_STEPS } from "../features/Form/layouts/auth/user/editUser/useEditUserSteps.tsx";
 import Avatar from "../components/Avatar/Avatar.ts";
 import { getLabelByName } from "../utils/getLabelByName.ts";
-import {AvatarColors} from "../constants/colors/avatarColors.ts";
+import { useAuth } from "../contexts/Auth/AuthContext.ts";
+import { useUserManagement } from "../hooks/useUserManagement.ts";
 
 const ProfileScreen: React.FC = () => {
-    const { session } = useSession();
-    const { signOut, deleteUserProfile, linkIdentity } = useAuth();
+    const { session, user } = useAuth();
+    const { signOut, deleteUserProfile } = useUserManagement();
     const { openBottomSheet } = useBottomSheet();
 
-    const name = `${ session?.user.user_metadata.lastname } ${ session?.user.user_metadata.firstname }`;
-    const avatarColor = session?.user.user_metadata.avatarColor;
-    // const avatarImage = require("../assets/images/car2.jpg");
-    const avatarImage = undefined;
+    const name = `${ user.lastname } ${ user.firstname }`;
+    const avatarColor = user.avatarColor;
+    const avatarImage = user.avatarImage.image;
 
     const openEditUser =
         (stepIndex: number, passwordReset: boolean = true) =>
             openBottomSheet(
                 EditUserBottomSheet({
                     user: {
-                        email: session?.user.email,
-                        firstname: session?.user.user_metadata?.firstname,
-                        lastname: session?.user.user_metadata?.lastname,
+                        email: user?.email,
+                        firstname: user?.firstname,
+                        lastname: user?.lastname,
                     },
                     passwordReset,
                     stepIndex
@@ -59,7 +56,8 @@ const ProfileScreen: React.FC = () => {
                                     avatarSize={ hp(20) }
                                     borderColor={ Colors.black5 }
                                     style={ styles.profileImage }
-                                />
+                                    onPressBadge={() => ""}
+                            />
                             :   <Avatar.Text
                                     label={ getLabelByName(name) }
                                     avatarSize={ hp(20) }
@@ -74,7 +72,7 @@ const ProfileScreen: React.FC = () => {
                             { name }
                         </Text>
                         <Text style={ styles.emailText }>
-                            { session?.user.email }
+                            { user?.email }
                         </Text>
                     </View>
                 </View>

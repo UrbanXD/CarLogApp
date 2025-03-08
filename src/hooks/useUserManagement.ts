@@ -1,20 +1,36 @@
 import { useDatabase } from "../features/Database/connector/Database.ts";
 import { useAlert } from "../features/Alert/context/AlertProvider.tsx";
-import { useSession } from "../features/Auth/context/SessionProvider.tsx";
-import { UserFormFieldType } from "../features/Form/constants/schemas/userSchema.tsx";
-import { SignInFormFieldType } from "../features/Form/constants/schemas/signInSchema.tsx";
-import { AuthError, GenerateLinkParams, Provider, ResendParams, VerifyEmailOtpParams } from "@supabase/supabase-js";
+import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { BaseConfig } from "../constants/BaseConfig.ts";
+import { HandleVerificationOtpType } from "../features/Form/layouts/auth/otp/VerifyOTP.tsx";
+import { getToastMessage } from "../features/Alert/utils/getToastMessage.ts";
+import {
+    AddPasswordToast,
+    ChangeEmailToast,
+    ChangeNameToast,
+    DeleteUserToast,
+    GoogleAuthToast,
+    ResetPasswordToast,
+    SignInToast,
+    SignOutToast,
+    SignUpToast
+} from "../features/Alert/presets/toast/index.ts";
+import { OTPVerificationBottomSheet } from "../features/BottomSheet/presets/index.ts";
+import {
+    AuthError,
+    GenerateLinkParams,
+    Provider,
+    ResendParams,
+    VerifyEmailOtpParams
+} from "@supabase/supabase-js";
+import { AvatarColors } from "../constants/colors/index.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LOCAL_STORAGE_KEYS } from "../constants/constants.ts";
 import { router } from "expo-router";
-import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
-import { AddPasswordToast, ChangeEmailToast, ChangeNameToast, DeleteUserToast, GoogleAuthToast, ResetPasswordToast, SignInToast, SignOutToast, SignUpToast } from "../features/Alert/presets/toast";
-import { HandleVerificationOtpType } from "../features/Auth/components/VerifyOTP.tsx";
-import { getToastMessage } from "../features/Alert/utils/getToastMessage.ts";
-import { OTPVerificationBottomSheet } from "../features/BottomSheet/presets";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { BaseConfig } from "../constants/BaseConfig.ts";
-import {AvatarColors} from "../constants/colors/index.ts";
+import { UserFormFieldType } from "../features/Form/constants/schemas/userSchema.tsx";
+import { SignInFormFieldType } from "../features/Form/constants/schemas/signInSchema.tsx";
+import { useAuth } from "../contexts/Auth/AuthContext.ts";
 
 export type SignUpFunction = (user: UserFormFieldType) => Promise<void>
 export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
@@ -22,12 +38,17 @@ export type ChangeEmailFunction = (newEmail: string) => Promise<void>
 export type ChangeNameFunction = (firstname: string, lastname: string) => Promise<void>
 export type ResetPasswordFunction = (newPassword: string) => Promise<void>
 
-const useAuth = () => {
+export const useUserManagement = () => {
     const database = useDatabase();
     const { supabaseConnector } = database;
-    const { session, setNotVerifiedUser, refreshSession } = useSession();
+    const { session, setNotVerifiedUser, refreshSession } = useAuth();
     const { addToast } = useAlert();
     const { openBottomSheet, dismissAllBottomSheet } = useBottomSheet();
+
+    GoogleSignin.configure({
+        scopes: ["https://www.googleapis.com/auth/userinfo.profile"],
+        webClientId: BaseConfig.GOOGLE_WEBCLIENTID
+    });
 
     const openUserVerification = (email: string) => {
         const handleSignUpVerification: HandleVerificationOtpType =
@@ -119,11 +140,6 @@ const useAuth = () => {
             );
         }
     }
-
-    GoogleSignin.configure({
-        scopes: ["https://www.googleapis.com/auth/userinfo.profile"],
-        webClientId: BaseConfig.GOOGLE_WEBCLIENTID
-    });
 
     const googleAuth = async () => {
         try {
@@ -417,10 +433,10 @@ const useAuth = () => {
 
             openBottomSheet(
                 OTPVerificationBottomSheet({
-                        type: "recovery",
-                        title: "Jelszó módosítása",
-                        email: session.user.email,
-                        handleVerification: handleResetPasswordVerification
+                    type: "recovery",
+                    title: "Jelszó módosítása",
+                    email: session.user.email,
+                    handleVerification: handleResetPasswordVerification
                 })
             );
         } catch (error){
@@ -563,5 +579,3 @@ const useAuth = () => {
         linkIdentity
     }
 }
-
-export default useAuth;

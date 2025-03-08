@@ -1,13 +1,13 @@
 import { useForm } from "react-hook-form";
 import { SignInFormFieldType, useSignInFormProps } from "../../../constants/schemas/signInSchema";
-import useAuth from "../../../../../hooks/useAuth.tsx";
+import { useUserManagement } from "../../../../../hooks/useUserManagement.ts";
 
 const useSignInForm = () => {
     const {
         control,
         handleSubmit
     } = useForm<SignInFormFieldType>(useSignInFormProps);
-    const { signIn } = useAuth();
+    const { signIn } = useUserManagement();
 
     const submitHandler =
         handleSubmit(
