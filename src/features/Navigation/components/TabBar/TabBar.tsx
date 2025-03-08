@@ -104,7 +104,7 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
                             key={ index }
                             iconName={ icon }
                             iconSize={ FONT_SIZES.h2 }
-                            iconColor={ Colors.fuelYellow }
+                            iconColor={ Colors.gray1 }
                             focused={ isFocused }
                             width={ TAB_WIDTH }
                             onPress={ onPress }
@@ -128,9 +128,10 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         height: SIMPLE_TABBAR_HEIGHT,
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.black2,
         borderColor: Colors.gray4,
-        borderBottomWidth: 2.5,
+        borderWidth: 0.5,
+        // borderBottomWidth: 2.5,
         borderTopStartRadius: 45,
         borderTopEndRadius: 45,
     },
@@ -141,12 +142,11 @@ const styles = StyleSheet.create({
     slidingElementContainer: {
         ...StyleSheet.absoluteFillObject,
         justifyContent: "flex-end",
-        bottom: -2.5
     },
     slidingElement: {
         width: "100%",
-        height: 2.5,
-        backgroundColor: Colors.fuelYellow
+        height: 2,
+        backgroundColor: Colors.gray1
     }
 })
 

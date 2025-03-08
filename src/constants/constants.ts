@@ -61,7 +61,8 @@ export const ICON_NAMES = {
     fuelTank: "propane-tank-outline",
     settings: "cog-outline",
     signOut: "logout",
-    swap: "swap-horizontal"
+    swap: "swap-horizontal",
+    add: "plus"
 }
 
 export const ICON_COLORS = {
@@ -99,11 +100,11 @@ export const DEFAULT_SEPARATOR = SEPARATOR_SIZES.normal
 export const GLOBAL_STYLE = StyleSheet.create({
     pageContainer: {
         flex: 1,
-        paddingBottom: 5,
+        paddingBottom: SEPARATOR_SIZES.lightSmall,
         backgroundColor: Colors.black2
     },
     scrollViewContentContainer: {
-        flexGrow: 1,
+        // flexGrow: 1,
         gap: SEPARATOR_SIZES.normal,
     },
     formContainer: {
