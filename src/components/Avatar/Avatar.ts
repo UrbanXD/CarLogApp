@@ -1,9 +1,11 @@
 import Text from "./AvatarText";
 import Image from "./AvatarImage";
+import Skeleton from "./AvatarSkeleton";
 
 const Avatar = {
     Text,
-    Image
+    Image,
+    Skeleton
 }
 
 export default Avatar;

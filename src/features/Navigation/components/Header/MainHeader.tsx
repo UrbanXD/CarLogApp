@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StatusBar, View } from "react-native";
+import {ActivityIndicator, StatusBar, View} from "react-native";
 import { GLOBAL_STYLE, SIMPLE_HEADER_HEIGHT } from "../../../../constants/constants";
 import Picker, {PickerDataType} from "../../../Form/components/Input/picker/Picker";
 import { useSelector } from "react-redux";
@@ -16,7 +16,7 @@ import { getLabelByName } from "../../../../utils/getLabelByName.ts";
 import { useAuth } from "../../../../contexts/Auth/AuthContext.ts";
 
 const MainHeader: React.FC = () => {
-    const { user} = useAuth();
+    const { user, isUserLoading} = useAuth();
     const { top } = useSafeAreaInsets();
     const styles = useHeaderStyles(top);
 
@@ -74,18 +74,22 @@ const MainHeader: React.FC = () => {
                 </View>
                 {
                     !isDropdownVisible && (
-                        avatarImage
-                            ?   <Avatar.Image
-                                    source={ avatarImage }
+                        isUserLoading
+                            ?   <Avatar.Skeleton
                                     avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
-                                    onPress={ openProfile }
                                 />
-                            :   <Avatar.Text
-                                    label={ getLabelByName(name) }
-                                    avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
-                                    backgroundColor={ avatarColor }
-                                    onPress={ openProfile }
-                                />
+                            :   avatarImage
+                                    ?   <Avatar.Image
+                                            source={ avatarImage }
+                                            avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
+                                            onPress={ openProfile }
+                                        />
+                                    :   <Avatar.Text
+                                            label={ getLabelByName(name) }
+                                            avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
+                                            backgroundColor={ avatarColor }
+                                            onPress={ openProfile }
+                                        />
                     )
                 }
             </View>
