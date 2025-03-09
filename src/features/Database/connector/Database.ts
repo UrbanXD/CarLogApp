@@ -7,13 +7,17 @@ import { SupabaseStorageAdapter } from "./storage/SupabaseStorageAdapter";
 import { PhotoAttachmentQueue } from "./powersync/PhotoAttachmentQueue";
 import { BaseConfig } from "../../../constants/BaseConfig.ts";
 import { AttachmentRecord } from "@powersync/attachments";
+import { UserDAO } from "../DAOs/UserDAO.ts";
+import { CarDAO } from "../DAOs/CarDAO.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
     db: Kysely<DatabaseType>;
     supabaseConnector: SupabaseConnector;
     storage: SupabaseStorageAdapter;
-    attachmentQueue: PhotoAttachmentQueue | undefined = undefined;
+    attachmentQueue?: PhotoAttachmentQueue;
+    private _userDAO?: UserDAO;
+    private _carDAO?: CarDAO;
 
     constructor() {
         this.powersync = new PowerSyncDatabase({
@@ -43,6 +47,20 @@ export class Database {
                 }
             });
         }
+    }
+
+    get userDAO(): UserDAO {
+        if (!this._userDAO) {
+            this._userDAO = new UserDAO(this);
+        }
+        return this._userDAO;
+    }
+
+    get carDAO(): CarDAO {
+        if (!this._carDAO) {
+            this._carDAO = new CarDAO(this.db);
+        }
+        return this._carDAO;
     }
 
     async init() {
