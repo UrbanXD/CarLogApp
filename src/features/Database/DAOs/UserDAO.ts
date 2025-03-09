@@ -1,12 +1,15 @@
 import { Kysely } from "@powersync/kysely-driver";
 import { DatabaseType, USER_TABLE, UserTableType } from "../connector/powersync/AppSchema.ts";
+import { SupabaseConnector } from "../connector/SupabaseConnector.ts";
+import { Database } from "../connector/Database.ts";
 
 export class UserDAO {
     db: Kysely<DatabaseType>
+    supabaseConnector: SupabaseConnector
 
-    constructor(db: Kysely<DatabaseType>) {
-        this.db = db;
-        this.supabaseConnector = supabaseConnector;
+    constructor(database: Database) {
+        this.db = database.db;
+        this.supabaseConnector = database.supabaseConnector;
     }
 
     async getUser(userId: string) {
@@ -14,6 +17,14 @@ export class UserDAO {
             .selectFrom(USER_TABLE)
             .selectAll()
             .where("id", "=", userId)
+            .executeTakeFirstOrThrow() as unknown as UserTableType;
+    }
+
+    async updateUser(user: UserTableType) {
+        return await this.db
+            .updateTable(USER_TABLE)
+            .set(user)
+            .where("id", "=", user.id)
             .executeTakeFirstOrThrow() as unknown as UserTableType;
     }
 }
