@@ -42,7 +42,7 @@ const MainHeader: React.FC = () => {
 
     const name = `${ user?.lastname } ${ user?.firstname }`;
     const avatarColor = user?.avatarColor;
-    const avatarImage = user?.avatarImage.image;
+    const avatarImage = user?.avatarImage?.image;
 
     useEffect(() => {
         store.dispatch(loadSelectedCar({}));

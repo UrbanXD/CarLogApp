@@ -1,31 +1,61 @@
-import {useDatabase} from "../features/Database/connector/Database.ts";
-import {useEffect, useState} from "react";
-import {Session, User} from "@supabase/supabase-js";
+import { useDatabase } from "../features/Database/connector/Database";
+import { useCallback, useEffect, useState } from "react";
+import { Session, User } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LOCAL_STORAGE_KEYS } from "../constants/constants.ts";
-import { store } from "../features/Database/redux/store.ts";
-import { loadUser } from "../features/Database/redux/user/functions/loadUser.ts";
-import { loadCars } from "../features/Database/redux/cars/functions/loadCars.ts";
-import { useAppSelector } from "./index.ts";
-import { UserState } from "../features/Database/redux/user/user.slices.ts";
+import { LOCAL_STORAGE_KEYS } from "../constants/constants";
+import { store } from "../features/Database/redux/store";
+import { loadCars } from "../features/Database/redux/cars/functions/loadCars";
+import { getImageFromAttachmentQueue } from "../features/Database/utils/getImageFromAttachmentQueue";
+import { UserTableType } from "../features/Database/connector/powersync/AppSchema.ts";
+
+export type UserType = UserTableType & {
+    avatarImage?: { path: string, image: string }
+}
 
 export const useSession = () => {
     const database = useDatabase();
-    const { supabaseConnector } = database;
+    const { supabaseConnector, attachmentQueue } = database;
 
     const [session, setSession] = useState<Session | null>(null);
     const [notVerifiedUser, setNotVerifiedUser] = useState<User | null>(null);
+    const [user, setUser] = useState<UserType | null>(null);
 
-    const user = useAppSelector(state => state.user.user) as UserState["user"];
+    const fetchUser = useCallback(async (userId: string) => {
+        if(!session || !session.user) return;
+
+        try {
+            const userTableRow = await database.userDAO.getUser(userId);
+            const avatarImage =
+                await getImageFromAttachmentQueue(
+                    attachmentQueue,
+                    userTableRow.avatarImage
+                );
+
+            setUser({
+                ...userTableRow,
+                avatarImage
+            });
+        } catch (_) {
+            const avatarImage =
+                await getImageFromAttachmentQueue(
+                    attachmentQueue,
+                    session.user.user_metadata.avatarImage
+                );
+
+            setUser({
+                email: session.user.email,
+                firstname: session.user.user_metadata.firstname,
+                lastname: session.user.user_metadata.lastname,
+                avatarColor: session.user.user_metadata.avatarColor,
+                avatarImage
+            });
+        }
+    })
 
     const fetchLocalData = async (userId: string) => {
         // adatok betoltese local db-bol
-        store.dispatch(
-            loadUser({
-                database,
-                userId
-            })
-        );
+        fetchUser(userId).then(user => {});
+
         store.dispatch(loadCars(database));
     }
 
