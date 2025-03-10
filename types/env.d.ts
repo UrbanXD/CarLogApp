@@ -5,4 +5,6 @@ declare module '@env' {
     export const RESEND_API_KEY: string
     export const POWERSYNC_URL: string
     export const GOOGLE_WEBCLIENTID: string
+    export const LOCAL_STORAGE_KEY_SELECTED_CAR_INDEX: string
+    export const LOCAL_STORAGE_KEY_NOT_VERIFIED_USER: string
 }
