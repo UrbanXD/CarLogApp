@@ -1,65 +1,45 @@
 import { useDatabase } from "../features/Database/connector/Database";
-import { useCallback, useEffect, useState } from "react";
-import { Session, User } from "@supabase/supabase-js";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LOCAL_STORAGE_KEYS } from "../constants/constants";
+import { useEffect, useState } from "react";
+import { Session } from "@supabase/supabase-js";
 import { store } from "../features/Database/redux/store";
 import { loadCars } from "../features/Database/redux/cars/functions/loadCars";
-import { getImageFromAttachmentQueue } from "../features/Database/utils/getImageFromAttachmentQueue";
 import { UserTableType } from "../features/Database/connector/powersync/AppSchema.ts";
-
-export type UserType = Omit<UserTableType, "avatarImage"> & {
-    avatarImage?: { path: string, image: string } | null
-}
+import { useUser } from "./useUser.ts";
+import { loadUser } from "../features/Database/redux/user/functions/loadUser.ts";
 
 export const useSession = () => {
     const database = useDatabase();
-    const { supabaseConnector, attachmentQueue } = database;
+    const { supabaseConnector } = database;
+    const {
+        user,
+        isUserLoading,
+        notVerifiedUser,
+        fetchNotVerifiedUser,
+        updateNotVerifiedUser
+    } = useUser();
 
     const [session, setSession] = useState<Session | null>(null);
     const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
 
-    const [user, setUser] = useState<UserType | null>(null);
-    const [isUserLoading, setIsUserLoading] = useState<boolean>(true);
 
-    const [notVerifiedUser, setNotVerifiedUser] = useState<User | null>(null);
+    // adatok betoltese local db-bol
+    const fetchLocalData = async () => {
+        if(!session || !session.user) return
 
-    const fetchUser = useCallback(async (userId: string) => {
-        if(!session || !session.user) return;
+        void updateNotVerifiedUser(null);
 
-        try {
-            const userTableRow = await database.userDAO.getUser(userId);
-            const avatarImage =
-                await getImageFromAttachmentQueue(
-                    attachmentQueue,
-                    userTableRow.avatarImage
-                );
-
-            setUser({
-                ...userTableRow,
-                avatarImage
-            });
-        } catch (_) {
-            const avatarImage =
-                await getImageFromAttachmentQueue(
-                    attachmentQueue,
-                    session.user.user_metadata.avatarImage
-                );
-
-            setUser({
+        store.dispatch(loadUser({
+            database,
+            userId: session.user.id,
+            defaultUserValue: {
                 id: session.user.id,
-                email: session.user.email ?? null,
+                email: session.user.email,
                 firstname: session.user.user_metadata.firstname,
                 lastname: session.user.user_metadata.lastname,
                 avatarColor: session.user.user_metadata.avatarColor,
-                avatarImage
-            });
-        }
-    }, [])
-
-    const fetchLocalData = async (userId: string) => {
-        // adatok betoltese local db-bol
-        fetchUser(userId).then(_ => setIsUserLoading(false));
+                avatarImage: session.user.user_metadata.avatarImage,
+            } as UserTableType
+        }));
 
         store.dispatch(loadCars(database));
     }
@@ -83,15 +63,8 @@ export const useSession = () => {
                 (_event, session) => setSession(session)
             );
 
-        AsyncStorage
-            .getItem(LOCAL_STORAGE_KEYS.notConfirmedUser)
-            .then(
-                (value) => {
-                    if(!value) return;
 
-                    setNotVerifiedUser(JSON.parse(value) as User);
-                }
-            );
+        void fetchNotVerifiedUser();
     }, []);
 
     useEffect(() => {
@@ -101,13 +74,12 @@ export const useSession = () => {
             .getUser()
             .then(
                 ({ data: { user } }) => {
-                    if(user) setNotVerifiedUser(null);
+                    if(user) void updateNotVerifiedUser(user);
                 }
             );
 
         if(session && session.user) {
-            void AsyncStorage.removeItem(LOCAL_STORAGE_KEYS.notConfirmedUser);
-            void fetchLocalData(session.user.id);
+            void fetchLocalData();
         }
     }, [session]);
 
@@ -124,11 +96,10 @@ export const useSession = () => {
     return {
         session,
         isSessionLoading,
+        refreshSession,
         user,
         isUserLoading,
-        notVerifiedUser,
-        setNotVerifiedUser,
-        refreshSession
+        notVerifiedUser
     }
 }
 
