@@ -17,8 +17,11 @@ export const useSession = () => {
     const { supabaseConnector, attachmentQueue } = database;
 
     const [session, setSession] = useState<Session | null>(null);
+    const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
+
     const [user, setUser] = useState<UserType | null>(null);
     const [isUserLoading, setIsUserLoading] = useState<boolean>(true);
+
     const [notVerifiedUser, setNotVerifiedUser] = useState<User | null>(null);
 
     const fetchUser = useCallback(async (userId: string) => {
@@ -55,7 +58,7 @@ export const useSession = () => {
 
     const fetchLocalData = async (userId: string) => {
         // adatok betoltese local db-bol
-        fetchUser(userId).then(user => setIsUserLoading(false));
+        fetchUser(userId).then(_ => setIsUserLoading(false));
 
         store.dispatch(loadCars(database));
     }
@@ -66,7 +69,10 @@ export const useSession = () => {
             .auth
             .getSession()
             .then(
-                ({ data: { session } }) => setSession(session)
+                ({ data: { session } }) => {
+                    setSession(session);
+                    setIsSessionLoading(false);
+                }
             );
 
         supabaseConnector
@@ -116,6 +122,7 @@ export const useSession = () => {
 
     return {
         session,
+        isSessionLoading,
         user,
         isUserLoading,
         notVerifiedUser,
