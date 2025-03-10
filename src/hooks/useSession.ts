@@ -99,7 +99,8 @@ export const useSession = () => {
         refreshSession,
         user,
         isUserLoading,
-        notVerifiedUser
+        notVerifiedUser,
+        updateNotVerifiedUser
     }
 }
 

@@ -15,8 +15,8 @@ import {
     SignInToast,
     SignOutToast,
     SignUpToast
-} from "../features/Alert/presets/toast/index.ts";
-import { OTPVerificationBottomSheet } from "../features/BottomSheet/presets/index.ts";
+} from "../features/Alert/presets/toast";
+import { OTPVerificationBottomSheet } from "../features/BottomSheet/presets";
 import {
     AuthError,
     GenerateLinkParams,
@@ -24,9 +24,7 @@ import {
     ResendParams,
     VerifyEmailOtpParams
 } from "@supabase/supabase-js";
-import { AvatarColors } from "../constants/colors/index.ts";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LOCAL_STORAGE_KEYS } from "../constants/constants.ts";
+import { AvatarColors } from "../constants/colors";
 import { router } from "expo-router";
 import { UserFormFieldType } from "../features/Form/constants/schemas/userSchema.tsx";
 import { SignInFormFieldType } from "../features/Form/constants/schemas/signInSchema.tsx";
@@ -41,7 +39,7 @@ export type ResetPasswordFunction = (newPassword: string) => Promise<void>
 export const useUserManagement = () => {
     const database = useDatabase();
     const { supabaseConnector } = database;
-    const { session, setNotVerifiedUser, refreshSession } = useAuth();
+    const { session, updateNotVerifiedUser, refreshSession } = useAuth();
     const { addToast } = useAlert();
     const { openBottomSheet, dismissAllBottomSheet } = useBottomSheet();
 
@@ -123,12 +121,7 @@ export const useUserManagement = () => {
 
             if(error) throw error;
 
-            setNotVerifiedUser(newUser);
-            await AsyncStorage
-                .setItem(
-                    LOCAL_STORAGE_KEYS.notConfirmedUser,
-                    JSON.stringify(newUser)
-                );
+            void updateNotVerifiedUser(newUser);
 
             if(newUser?.email) openUserVerification(newUser.email);
         } catch (error) {
