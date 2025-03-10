@@ -8,8 +8,8 @@ import { loadCars } from "../features/Database/redux/cars/functions/loadCars";
 import { getImageFromAttachmentQueue } from "../features/Database/utils/getImageFromAttachmentQueue";
 import { UserTableType } from "../features/Database/connector/powersync/AppSchema.ts";
 
-export type UserType = UserTableType & {
-    avatarImage?: { path: string, image: string }
+export type UserType = Omit<UserTableType, "avatarImage"> & {
+    avatarImage?: { path: string, image: string } | null
 }
 
 export const useSession = () => {
@@ -47,14 +47,15 @@ export const useSession = () => {
                 );
 
             setUser({
-                email: session.user.email,
+                id: session.user.id,
+                email: session.user.email ?? null,
                 firstname: session.user.user_metadata.firstname,
                 lastname: session.user.user_metadata.lastname,
                 avatarColor: session.user.user_metadata.avatarColor,
                 avatarImage
             });
         }
-    })
+    }, [])
 
     const fetchLocalData = async (userId: string) => {
         // adatok betoltese local db-bol
@@ -105,8 +106,8 @@ export const useSession = () => {
             );
 
         if(session && session.user) {
-            AsyncStorage.removeItem(LOCAL_STORAGE_KEYS.notConfirmedUser);
-            fetchLocalData(session.user.id);
+            void AsyncStorage.removeItem(LOCAL_STORAGE_KEYS.notConfirmedUser);
+            void fetchLocalData(session.user.id);
         }
     }, [session]);
 

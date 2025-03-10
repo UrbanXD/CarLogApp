@@ -2,7 +2,7 @@ import React, { ProviderProps } from "react";
 import { AuthContext } from "./AuthContext.ts";
 import { useSession } from "../../hooks/useSession.ts";
 
-export const AuthProvider: React.FC<ProviderProps> = ({
+export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     children
 }) => {
     const sessionValue = useSession();

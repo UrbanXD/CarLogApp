@@ -1,7 +1,7 @@
 import { PhotoAttachmentQueue } from "../connector/powersync/PhotoAttachmentQueue.ts";
 import { encode } from "base64-arraybuffer";
 
-export const getImageFromAttachmentQueue = async (attachmentQueue?: PhotoAttachmentQueue, path?: string) => {
+export const getImageFromAttachmentQueue = async (attachmentQueue?: PhotoAttachmentQueue, path?: string | null) => {
     if(attachmentQueue && path) {
         try {
             const file = await attachmentQueue.getFile(path);
