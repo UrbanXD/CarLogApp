@@ -1,6 +1,7 @@
 import { UserTableType } from "../../connector/powersync/AppSchema.ts";
 import { createSlice } from "@reduxjs/toolkit";
 import { loadUser } from "./functions/loadUser.ts";
+import { updateUser } from "./functions/updateUser.ts";
 
 export type UserType = Omit<UserTableType, "avatarImage"> & {
     avatarImage?: { path: string, image: string } | null
@@ -25,11 +26,18 @@ const userSlice = createSlice({
             .addCase(loadUser.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(loadUser.rejected, (state) => {
+            .addCase(loadUser.rejected, (state, action) => {
                 state.isLoading = false;
+                state.user = action.payload?.user ?? null;
             })
             .addCase(loadUser.fulfilled, (state, action) => {
                 state.isLoading = false;
+                state.user = action.payload.user;
+            })
+            .addCase(updateUser.rejected, (state, action) => {
+                state.user = action.payload?.user ?? null;
+            })
+            .addCase(updateUser.fulfilled, (state, action) => {
                 state.user = action.payload.user;
             })
     },

@@ -12,6 +12,7 @@ export const useSession = () => {
     const { supabaseConnector } = database;
     const {
         user,
+        setUser,
         isUserLoading,
         notVerifiedUser,
         fetchNotVerifiedUser,
@@ -63,7 +64,6 @@ export const useSession = () => {
                 (_event, session) => setSession(session)
             );
 
-
         void fetchNotVerifiedUser();
     }, []);
 
@@ -90,7 +90,7 @@ export const useSession = () => {
                 .auth
                 .refreshSession();
 
-        if(error) console.error("refreshError", error);
+        if(error) console.debug("refreshError", error);
     }
 
     return {
@@ -98,6 +98,7 @@ export const useSession = () => {
         isSessionLoading,
         refreshSession,
         user,
+        setUser,
         isUserLoading,
         notVerifiedUser,
         updateNotVerifiedUser

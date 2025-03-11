@@ -14,10 +14,14 @@ interface LoadUserArgs {
     defaultUserValue: UserTableType
 }
 
+interface AsyncThunkConfig {
+    rejectValue: { user: UserType }
+}
+
 export const loadUser =
-    createAsyncThunk<LoadUserReturn, LoadUserArgs>(
+    createAsyncThunk<LoadUserReturn, LoadUserArgs, AsyncThunkConfig>(
         "user/load",
-        async (args, _) => {
+        async (args, { rejectWithValue }) => {
             const {
                 database: { userDAO, attachmentQueue },
                 userId,
@@ -31,7 +35,7 @@ export const loadUser =
                 return { user: { ...user, avatarImage } };
             } catch (_) {
                 const avatarImage = await getImageFromAttachmentQueue(attachmentQueue, defaultUserValue.avatarImage)
-                return { user: { ...defaultUserValue, avatarImage } };
+                return rejectWithValue({ user: { ...defaultUserValue, avatarImage } });
             }
         }
     )
