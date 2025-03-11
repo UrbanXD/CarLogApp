@@ -29,17 +29,21 @@ import { router } from "expo-router";
 import { UserFormFieldType } from "../features/Form/constants/schemas/userSchema.tsx";
 import { SignInFormFieldType } from "../features/Form/constants/schemas/signInSchema.tsx";
 import { useAuth } from "../contexts/Auth/AuthContext.ts";
+import { UserState } from "../features/Database/redux/user/user.slices.ts";
+import { UserTableType } from "../features/Database/connector/powersync/AppSchema.ts";
+import { ToastMessages } from "../features/Alert/constants/types.ts";
 
 export type SignUpFunction = (user: UserFormFieldType) => Promise<void>
 export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
 export type ChangeEmailFunction = (newEmail: string) => Promise<void>
+export type ChangeUserMetadataFunction = (newUser: Partial<UserFormFieldType>, toastMessages: ToastMessages) => Promise<void>
 export type ChangeNameFunction = (firstname: string, lastname: string) => Promise<void>
 export type ResetPasswordFunction = (newPassword: string) => Promise<void>
 
 export const useUserManagement = () => {
     const database = useDatabase();
-    const { supabaseConnector } = database;
-    const { session, updateNotVerifiedUser, refreshSession } = useAuth();
+    const { supabaseConnector, userDAO } = database;
+    const { session, user, setUser, updateNotVerifiedUser, refreshSession } = useAuth();
     const { addToast } = useAlert();
     const { openBottomSheet, dismissAllBottomSheet } = useBottomSheet();
 
@@ -315,11 +319,42 @@ export const useUserManagement = () => {
         }
     }
 
+    const changeUserMetadata: ChangeUserMetadataFunction = async (
+        newUser,
+        toastMessages
+    ) => {
+        try {
+            const t = await userDAO.updateUser({
+                ...user,
+                avatarImage: user?.avatarImage?.path,
+                ...newUser,
+            } as UserTableType);
+
+            console.log(t)
+
+            // setUser({
+            //     ...user,
+            //     ...t
+            // } as UserState["user"]);
+
+            addToast(ChangeNameToast.success());
+            dismissAllBottomSheet();
+        } catch (error) {
+            addToast(
+                getToastMessage({
+                    messages: toastMessages,
+                    error
+                })
+            );
+        }
+    }
+
     const changeName: ChangeNameFunction = async (
         firstname,
         lastname
     ) => {
         try {
+
             const { error } =
                 await supabaseConnector
                     .client
@@ -333,6 +368,11 @@ export const useUserManagement = () => {
 
             if(error) throw error;
 
+            setUser({
+                ...user,
+                firstname,
+                lastname
+            } as UserState["user"]);
             addToast(ChangeNameToast.success());
             dismissAllBottomSheet();
         } catch (error) {
@@ -563,6 +603,7 @@ export const useUserManagement = () => {
         googleAuth,
         openUserVerification,
         changeEmail,
+        changeUserMetadata,
         changeName,
         resetPassword,
         addPasswordToOAuthUser,

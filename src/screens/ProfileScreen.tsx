@@ -12,24 +12,27 @@ import Avatar from "../components/Avatar/Avatar.ts";
 import { getLabelByName } from "../utils/getLabelByName.ts";
 import { useAuth } from "../contexts/Auth/AuthContext.ts";
 import { useUserManagement } from "../hooks/useUserManagement.ts";
+import { Redirect } from "expo-router";
 
 const ProfileScreen: React.FC = () => {
     const { session, user } = useAuth();
     const { signOut, deleteUserProfile } = useUserManagement();
     const { openBottomSheet } = useBottomSheet();
 
+    if(!user) return Redirect({ href: "backToRootIndex" });
+    console.log(session?.user.user_metadata.lastname, user.lastname)
     const name = `${ user.lastname } ${ user.firstname }`;
     const avatarColor = user.avatarColor;
-    const avatarImage = user.avatarImage.image;
+    const avatarImage = user.avatarImage?.image;
 
     const openEditUser =
         (stepIndex: number, passwordReset: boolean = true) =>
             openBottomSheet(
                 EditUserBottomSheet({
                     user: {
-                        email: user?.email,
-                        firstname: user?.firstname,
-                        lastname: user?.lastname,
+                        email: user.email ?? undefined,
+                        firstname: user.firstname ?? undefined,
+                        lastname: user.lastname ?? undefined,
                     },
                     passwordReset,
                     stepIndex
@@ -61,7 +64,7 @@ const ProfileScreen: React.FC = () => {
                             :   <Avatar.Text
                                     label={ getLabelByName(name) }
                                     avatarSize={ hp(20) }
-                                    backgroundColor={ avatarColor }
+                                    backgroundColor={ avatarColor ?? undefined }
                                     borderColor={ Colors.black5 }
                                     style={ styles.profileImage }
                                     onPressBadge={() => ""}

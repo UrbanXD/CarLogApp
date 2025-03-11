@@ -2,6 +2,7 @@ import { UserFormFieldType, useUserFormProps } from "../../../../constants/schem
 import { useForm } from "react-hook-form";
 import { EDIT_USER_FORM_STEPS, useEditUserSteps } from "./useEditUserSteps.tsx";
 import { useUserManagement } from "../../../../../../hooks/useUserManagement.ts";
+import { ChangeNameToast } from "../../../../../Alert/presets/toast";
 
 export const useEditUserForm = (
     user: Partial<UserFormFieldType>,
@@ -12,7 +13,8 @@ export const useEditUserForm = (
         addPasswordToOAuthUser,
         resetPassword,
         changeEmail,
-        changeName
+        changeName,
+        changeUserMetadata
     } = useUserManagement();
 
     const {
@@ -31,14 +33,15 @@ export const useEditUserForm = (
                     await changeEmail(editedUser.email);
                     break;
                 case EDIT_USER_FORM_STEPS.PasswordStep:
-                    console.log("lol")
                     if(!editedUser.password) return;
-                    console.log("lol")
+
                     if(passwordReset) return await resetPassword(editedUser.password);
+
                     await addPasswordToOAuthUser(editedUser.password);
                     break;
                 case EDIT_USER_FORM_STEPS.NameStep:
-                    await changeName(editedUser.firstname ?? "", editedUser.lastname ?? "");
+                    await changeUserMetadata(editedUser, ChangeNameToast);
+                    // await changeName(editedUser.firstname ?? "", editedUser.lastname ?? "");
                     break;
             }
         })
