@@ -25,7 +25,7 @@ export class Database {
             database: {
                 dbFilename: "powersync-carlog.sqlite"
             }
-        })
+        });
         this.db = wrapPowerSyncWithKysely(this.powersync);
         this.supabaseConnector = new SupabaseConnector(this.powersync);
         this.storage = this.supabaseConnector.storage;
