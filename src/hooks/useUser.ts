@@ -4,19 +4,22 @@ import { BaseConfig } from "../constants/BaseConfig.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UserState } from "../features/Database/redux/user/user.slices.ts";
 import { useAppSelector } from "./index.ts";
-import { store } from "../features/Database/redux/store.ts";
+import { AppDispatch } from "../features/Database/redux/store.ts";
 import { updateUser} from "../features/Database/redux/user/functions/updateUser.ts";
 import { useDatabase } from "../features/Database/connector/Database.ts";
+import { UserTableType } from "../features/Database/connector/powersync/AppSchema.ts";
+import { useDispatch } from "react-redux";
 
 export const useUser = () => {
     const database = useDatabase();
+    const dispatch = useDispatch<AppDispatch>();
 
     const user = useAppSelector(state => state.user.user) as UserState["user"];
     const isUserLoading = useAppSelector(state => state.user.isLoading) as UserState["isLoading"];
     const [notVerifiedUser, setNotVerifiedUser] = useState<User | null>(null);
 
-    const setUser = (newUser: UserState["user"]) => {
-        store.dispatch(updateUser({ database, newUser }));
+    const setUser = (newUser: UserTableType | null) => {
+        dispatch(updateUser({ database, newUser }));
     }
 
     const fetchNotVerifiedUser = async () => {

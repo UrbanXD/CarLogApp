@@ -29,7 +29,6 @@ import { router } from "expo-router";
 import { UserFormFieldType } from "../features/Form/constants/schemas/userSchema.tsx";
 import { SignInFormFieldType } from "../features/Form/constants/schemas/signInSchema.tsx";
 import { useAuth } from "../contexts/Auth/AuthContext.ts";
-import { UserState } from "../features/Database/redux/user/user.slices.ts";
 import { UserTableType } from "../features/Database/connector/powersync/AppSchema.ts";
 import { ToastMessages } from "../features/Alert/constants/types.ts";
 
@@ -324,18 +323,12 @@ export const useUserManagement = () => {
         toastMessages
     ) => {
         try {
-            const t = await userDAO.updateUser({
-                ...user,
-                avatarImage: user?.avatarImage?.path,
-                ...newUser,
-            } as UserTableType);
-
-            console.log(t)
-
-            // setUser({
-            //     ...user,
-            //     ...t
-            // } as UserState["user"]);
+            setUser(
+                await userDAO.updateUser({
+                    ...user,
+                    ...newUser,
+                } as UserTableType)
+            );
 
             addToast(ChangeNameToast.success());
             dismissAllBottomSheet();
@@ -343,42 +336,6 @@ export const useUserManagement = () => {
             addToast(
                 getToastMessage({
                     messages: toastMessages,
-                    error
-                })
-            );
-        }
-    }
-
-    const changeName: ChangeNameFunction = async (
-        firstname,
-        lastname
-    ) => {
-        try {
-
-            const { error } =
-                await supabaseConnector
-                    .client
-                    .auth
-                    .updateUser({
-                        data: {
-                            firstname,
-                            lastname
-                        }
-                    });
-
-            if(error) throw error;
-
-            setUser({
-                ...user,
-                firstname,
-                lastname
-            } as UserState["user"]);
-            addToast(ChangeNameToast.success());
-            dismissAllBottomSheet();
-        } catch (error) {
-            addToast(
-                getToastMessage({
-                    messages: ChangeNameToast,
                     error
                 })
             );
@@ -604,7 +561,6 @@ export const useUserManagement = () => {
         openUserVerification,
         changeEmail,
         changeUserMetadata,
-        changeName,
         resetPassword,
         addPasswordToOAuthUser,
         deleteUserProfile,

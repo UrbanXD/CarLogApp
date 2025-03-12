@@ -5,14 +5,14 @@ import { Colors } from "../../../constants/colors";
 import { useAuth } from "../../../contexts/Auth/AuthContext.ts";
 
 const WelcomeBlock: React.FC = () => {
-    const { session } = useAuth();
+    const { user } = useAuth();
 
     return (
         <View
             style={ styles.titleContainer }
         >
             <Text style={ styles.welcomeText }>
-                Üdv { `${ session?.user.user_metadata.firstname ?? "" } ${ session?.user.user_metadata?.lastname ?? "" }` }!
+                Üdv { `${ user?.firstname ?? "" } ${ user?.lastname ?? "" }` }!
             </Text>
             <Text style={ styles.infoText }>
                 Vezzessen számot nálunk az autóiról!

@@ -2,10 +2,11 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Database } from "../../../connector/Database.ts";
 import { UserTableType } from "../../../connector/powersync/AppSchema.ts";
 import { getImageFromAttachmentQueue } from "../../../utils/getImageFromAttachmentQueue.ts";
-import { UserType } from "../user.slices";
+import { ImageType } from "../user.slices.ts";
 
 interface LoadUserReturn {
-    user: UserType
+    user: UserTableType | null
+    userAvatar: ImageType | null
 }
 
 interface LoadUserArgs {
@@ -15,7 +16,7 @@ interface LoadUserArgs {
 }
 
 interface AsyncThunkConfig {
-    rejectValue: { user: UserType }
+    rejectValue: LoadUserReturn
 }
 
 export const loadUser =
@@ -30,12 +31,12 @@ export const loadUser =
 
             try {
                 const user = await userDAO.getUser(userId);
-                const avatarImage = await getImageFromAttachmentQueue(attachmentQueue, user.avatarImage)
+                const userAvatar = await getImageFromAttachmentQueue(attachmentQueue, user.avatarImage);
 
-                return { user: { ...user, avatarImage } };
+                return { user, userAvatar };
             } catch (_) {
-                const avatarImage = await getImageFromAttachmentQueue(attachmentQueue, defaultUserValue.avatarImage)
-                return rejectWithValue({ user: { ...defaultUserValue, avatarImage } });
+                const userAvatar = await getImageFromAttachmentQueue(attachmentQueue, defaultUserValue.avatarImage);
+                return rejectWithValue({ user: defaultUserValue, userAvatar });
             }
         }
     )

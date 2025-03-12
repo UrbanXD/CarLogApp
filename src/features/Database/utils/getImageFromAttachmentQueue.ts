@@ -1,7 +1,10 @@
 import { PhotoAttachmentQueue } from "../connector/powersync/PhotoAttachmentQueue.ts";
 import { encode } from "base64-arraybuffer";
+import { ImageType } from "../redux/user/user.slices.ts";
 
-export const getImageFromAttachmentQueue = async (attachmentQueue?: PhotoAttachmentQueue, path?: string | null) => {
+type GetImageFromAttachmentQueueFunction = (attachmentQueue?: PhotoAttachmentQueue, path?: string | null) => Promise<ImageType | null>;
+
+export const getImageFromAttachmentQueue: GetImageFromAttachmentQueueFunction = async (attachmentQueue, path) => {
     if(attachmentQueue && path) {
         try {
             const file = await attachmentQueue.getFile(path);

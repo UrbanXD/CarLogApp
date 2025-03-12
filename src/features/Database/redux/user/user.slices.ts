@@ -3,18 +3,21 @@ import { createSlice } from "@reduxjs/toolkit";
 import { loadUser } from "./functions/loadUser.ts";
 import { updateUser } from "./functions/updateUser.ts";
 
-export type UserType = Omit<UserTableType, "avatarImage"> & {
-    avatarImage?: { path: string, image: string } | null
+export type ImageType = {
+    path: string
+    image: string
 }
 
 export interface UserState {
     isLoading: boolean
-    user: UserType | null
+    user: UserTableType | null
+    userAvatar: ImageType | null
 }
 
 const initialState: UserState = {
     isLoading: true,
-    user: null
+    user: null,
+    userAvatar: null
 }
 
 const userSlice = createSlice({
@@ -29,16 +32,16 @@ const userSlice = createSlice({
             .addCase(loadUser.rejected, (state, action) => {
                 state.isLoading = false;
                 state.user = action.payload?.user ?? null;
+                state.userAvatar = action.payload?.userAvatar ?? null;
             })
             .addCase(loadUser.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.user = action.payload.user;
-            })
-            .addCase(updateUser.rejected, (state, action) => {
-                state.user = action.payload?.user ?? null;
+                state.userAvatar = action.payload.userAvatar;
             })
             .addCase(updateUser.fulfilled, (state, action) => {
                 state.user = action.payload.user;
+                state.userAvatar = action.payload.userAvatar;
             })
     },
 })
