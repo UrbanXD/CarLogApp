@@ -5,7 +5,7 @@ import { useDatabase } from "../../../../Database/connector/Database";
 import { useAlert } from "../../../../Alert/context/AlertProvider";
 import { useForm } from "react-hook-form";
 import useCarSteps from "../steps/useCarSteps";
-import { NewCarToast } from "../../../../Alert/presets/toast/index.ts";
+import { NewCarToast } from "../../../../Alert/presets/toast";
 import { useBottomSheet } from "../../../../BottomSheet/context/BottomSheetContext.ts";
 
 const useNewCarForm = () => {
@@ -31,7 +31,7 @@ const useNewCarForm = () => {
                 addToast(NewCarToast.success());
             } catch (e){
                 console.log(e);
-                addToast(newCarToast.error());
+                addToast(NewCarToast.error());
             }
         })
 

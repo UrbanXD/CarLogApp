@@ -119,7 +119,7 @@ const useStyles = (top: number) =>
             justifyContent: "space-between",
             backgroundColor: "transparent",
             paddingHorizontal: DEFAULT_SEPARATOR,
-            paddingBottom: GLOBAL_STYLE.pageContainer.paddingVertical,
+            paddingBottom: GLOBAL_STYLE.pageContainer.paddingBottom,
         },
         titleContainer: {
             top: -SEPARATOR_SIZES.lightLarge,

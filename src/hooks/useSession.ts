@@ -1,27 +1,25 @@
 import { useDatabase } from "../features/Database/connector/Database";
 import { useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
-import { store } from "../features/Database/redux/store";
+import { AppDispatch } from "../features/Database/redux/store";
 import { loadCars } from "../features/Database/redux/cars/functions/loadCars";
 import { UserTableType } from "../features/Database/connector/powersync/AppSchema.ts";
 import { useUser } from "./useUser.ts";
 import { loadUser } from "../features/Database/redux/user/functions/loadUser.ts";
+import { useDispatch } from "react-redux";
 
 export const useSession = () => {
+    const dispatch = useDispatch<AppDispatch>();
     const database = useDatabase();
     const { supabaseConnector } = database;
+    const userValue = useUser();
     const {
-        user,
-        setUser,
-        isUserLoading,
-        notVerifiedUser,
         fetchNotVerifiedUser,
         updateNotVerifiedUser
-    } = useUser();
+    } = userValue;
 
     const [session, setSession] = useState<Session | null>(null);
     const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
-
 
     // adatok betoltese local db-bol
     const fetchLocalData = async () => {
@@ -29,7 +27,7 @@ export const useSession = () => {
 
         void updateNotVerifiedUser(null);
 
-        store.dispatch(loadUser({
+        dispatch(loadUser({
             database,
             userId: session.user.id,
             defaultUserValue: {
@@ -42,7 +40,7 @@ export const useSession = () => {
             } as UserTableType
         }));
 
-        store.dispatch(loadCars(database));
+        dispatch(loadCars(database));
     }
 
     useEffect(() => {
@@ -97,11 +95,7 @@ export const useSession = () => {
         session,
         isSessionLoading,
         refreshSession,
-        user,
-        setUser,
-        isUserLoading,
-        notVerifiedUser,
-        updateNotVerifiedUser
+        ...userValue
     }
 }
 

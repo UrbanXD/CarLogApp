@@ -6,7 +6,7 @@ import { useScreenScrollView } from "../context/ScreenScrollViewProvider.tsx";
 
 interface ScreenScrollViewProps {
     style?: ViewStyle,
-    children?: React.ReactElement,
+    children?: React.ReactNode,
 }
 
 export const ScreenScrollView: React.FC<ScreenScrollViewProps> = ({

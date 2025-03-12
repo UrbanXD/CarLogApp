@@ -2,7 +2,6 @@ import { useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { BaseConfig } from "../constants/BaseConfig.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { UserState } from "../features/Database/redux/user/user.slices.ts";
 import { useAppSelector } from "./index.ts";
 import { AppDispatch } from "../features/Database/redux/store.ts";
 import { updateUser} from "../features/Database/redux/user/functions/updateUser.ts";
@@ -14,8 +13,9 @@ export const useUser = () => {
     const database = useDatabase();
     const dispatch = useDispatch<AppDispatch>();
 
-    const user = useAppSelector(state => state.user.user) as UserState["user"];
-    const isUserLoading = useAppSelector(state => state.user.isLoading) as UserState["isLoading"];
+    const user = useAppSelector(state => state.user.user);
+    const userAvatar = useAppSelector(state => state.user.userAvatar);
+    const isUserLoading = useAppSelector(state => state.user.isLoading);
     const [notVerifiedUser, setNotVerifiedUser] = useState<User | null>(null);
 
     const setUser = (newUser: UserTableType | null) => {
@@ -42,6 +42,7 @@ export const useUser = () => {
     return {
         user,
         setUser,
+        userAvatar,
         isUserLoading,
         notVerifiedUser,
         fetchNotVerifiedUser,

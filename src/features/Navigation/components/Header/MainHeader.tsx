@@ -16,9 +16,12 @@ import { getLabelByName } from "../../../../utils/getLabelByName.ts";
 import { useAuth } from "../../../../contexts/Auth/AuthContext.ts";
 
 const MainHeader: React.FC = () => {
-    const { user, isUserLoading} = useAuth();
+    const { user, userAvatar, isUserLoading} = useAuth();
     const { top } = useSafeAreaInsets();
     const styles = useHeaderStyles(top);
+
+    const name = `${ user?.lastname } ${ user?.firstname }`;
+    const avatarColor = user?.avatarColor;
 
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const selectCarsState = (state: RootState) => state.cars.cars;
@@ -39,10 +42,6 @@ const MainHeader: React.FC = () => {
     const onCarSelect = (id: string) => {
         store.dispatch(selectCar(id));
     }
-
-    const name = `${ user?.lastname } ${ user?.firstname }`;
-    const avatarColor = user?.avatarColor;
-    const avatarImage = user?.avatarImage?.image;
 
     useEffect(() => {
         store.dispatch(loadSelectedCar({}));
@@ -78,16 +77,16 @@ const MainHeader: React.FC = () => {
                             ?   <Avatar.Skeleton
                                     avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
                                 />
-                            :   avatarImage
+                            :   userAvatar
                                     ?   <Avatar.Image
-                                            source={ avatarImage }
+                                            source={ userAvatar.image }
                                             avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
                                             onPress={ openProfile }
                                         />
                                     :   <Avatar.Text
                                             label={ getLabelByName(name) }
                                             avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
-                                            backgroundColor={ avatarColor }
+                                            backgroundColor={ avatarColor ?? undefined }
                                             onPress={ openProfile }
                                         />
                     )

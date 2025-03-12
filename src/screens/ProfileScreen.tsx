@@ -15,7 +15,7 @@ import { useUserManagement } from "../hooks/useUserManagement.ts";
 import { Redirect } from "expo-router";
 
 const ProfileScreen: React.FC = () => {
-    const { session, user } = useAuth();
+    const { session, user, userAvatar } = useAuth();
     const { signOut, deleteUserProfile } = useUserManagement();
     const { openBottomSheet } = useBottomSheet();
 
@@ -23,7 +23,6 @@ const ProfileScreen: React.FC = () => {
     console.log(session?.user.user_metadata.lastname, user.lastname)
     const name = `${ user.lastname } ${ user.firstname }`;
     const avatarColor = user.avatarColor;
-    const avatarImage = user.avatarImage?.image;
 
     const openEditUser =
         (stepIndex: number, passwordReset: boolean = true) =>
@@ -53,9 +52,9 @@ const ProfileScreen: React.FC = () => {
             <View style={ styles.container }>
                 <View style={ styles.informationContainer }>
                     {
-                        avatarImage
+                        userAvatar
                             ?   <Avatar.Image
-                                    source={ avatarImage }
+                                    source={ userAvatar.image }
                                     avatarSize={ hp(20) }
                                     borderColor={ Colors.black5 }
                                     style={ styles.profileImage }

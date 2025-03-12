@@ -13,7 +13,6 @@ export const useEditUserForm = (
         addPasswordToOAuthUser,
         resetPassword,
         changeEmail,
-        changeName,
         changeUserMetadata
     } = useUserManagement();
 

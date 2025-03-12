@@ -17,7 +17,7 @@ const useEditCarForm = (
 
     const carFormField = {
         ...car,
-        image: getFile(car.image, carImage)
+        image: getFile(car.image ?? undefined, carImage)
     } as CarFormFieldType;
 
     const {
