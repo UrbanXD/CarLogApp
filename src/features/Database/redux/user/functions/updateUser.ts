@@ -24,7 +24,7 @@ export const updateUser =
         "user/update",
         async (args, { getState }) => {
             const {
-                user: { user }
+                user: { user, userAvatar }
             } = getState();
             const {
                 database: { attachmentQueue },
@@ -32,13 +32,10 @@ export const updateUser =
             } = args;
 
             if(!newUser) return { user: null, userAvatar: null };
-
-            let newUserAvatar = null;
+            let newUserAvatar = userAvatar || null;
             if(user?.avatarImage !== newUser.avatarImage) {
                 newUserAvatar = await getImageFromAttachmentQueue(attachmentQueue, newUser.avatarImage);
             }
-
-            console.log(user, newUser);
 
             return { user: newUser, userAvatar: newUserAvatar };
         }

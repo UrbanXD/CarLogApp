@@ -20,7 +20,6 @@ const ProfileScreen: React.FC = () => {
     const { openBottomSheet } = useBottomSheet();
 
     if(!user) return Redirect({ href: "backToRootIndex" });
-    console.log(session?.user.user_metadata.lastname, user.lastname)
     const name = `${ user.lastname } ${ user.firstname }`;
     const avatarColor = user.avatarColor;
 
