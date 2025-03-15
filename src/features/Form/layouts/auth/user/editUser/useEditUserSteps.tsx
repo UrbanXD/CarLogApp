@@ -1,10 +1,12 @@
 import { Control } from "react-hook-form";
 import { EmailStep, NameStep, PasswordStep } from "../steps";
+import {AvatarStep} from "../steps/AvatarStep.tsx";
 
 export enum EDIT_USER_FORM_STEPS {
     EmailStep,
     NameStep,
-    PasswordStep
+    PasswordStep,
+    AvatarStep
 }
 
 export const useEditUserSteps = (
@@ -17,10 +19,14 @@ export const useEditUserSteps = (
             />,
         () =>
             <NameStep
-                control={control}
+                control={ control }
             />,
         () =>
             <PasswordStep
-                control={control}
+                control={ control }
+            />,
+        () =>
+            <AvatarStep
+                control={ control }
             />
     ]

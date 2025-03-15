@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
-import { SignInFormFieldType, useSignInFormProps } from "../../../constants/schemas/signInSchema";
 import { useUserManagement } from "../../../../../hooks/useUserManagement.ts";
+import { SignInFormFieldType, useSignInFormProps } from "../../../constants/schemas/userSchema.tsx";
 
 const useSignInForm = () => {
     const {

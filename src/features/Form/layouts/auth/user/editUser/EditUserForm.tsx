@@ -1,10 +1,10 @@
 import React from "react";
 import { useEditUserForm } from "./useEditUserForm.tsx";
 import EditForm from "../../../../components/EditForm.tsx";
-import { UserFormFieldType } from "../../../../constants/schemas/userSchema.tsx";
+import { EditUserFormFieldType } from "../../../../constants/schemas/userSchema.tsx";
 
 export interface EditUserFormProps {
-    user: Partial<UserFormFieldType>
+    user: Partial<EditUserFormFieldType>
     passwordReset?: boolean
     stepIndex: number
 }

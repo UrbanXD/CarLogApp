@@ -1,6 +1,6 @@
 import { ImageType } from "../../utils/pickImage";
 import { z } from "zod";
-import { zNumber, zPickerRequired } from "../types/zodTypes";
+import {zImage, zNumber, zPickerRequired} from "../types/zodTypes";
 import { ODOMETER_MEASUREMENTS } from "../constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -19,19 +19,6 @@ export const CAR_FORM_STEPS_TITLE = [
     "Kép"
 ];
 
-
-export interface CarFormFieldType {
-    name: string
-    brand: string
-    model: string
-    odometerMeasurement: string
-    odometerValue: number
-    fuelType: string
-    fuelMeasurement: string
-    fuelTankSize: number
-    image?: ImageType | null
-}
-
 export const carFormSchema = z
     .object({
         name: z.string().min(2, "2 karakter legyen min").max(20, "20 karakter legyen max"),
@@ -42,8 +29,10 @@ export const carFormSchema = z
         fuelType: zPickerRequired,
         fuelMeasurement: zPickerRequired,
         fuelTankSize: zNumber,
-        image: z.any(),
+        image: zImage.optional(),
     });
+
+export type CarFormFieldType = z.infer<typeof carFormSchema>
 
 export const useCarFormProps = (car?: CarFormFieldType) => {
     return {

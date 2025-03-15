@@ -26,17 +26,15 @@ import {
 } from "@supabase/supabase-js";
 import { AvatarColors } from "../constants/colors";
 import { router } from "expo-router";
-import { UserFormFieldType } from "../features/Form/constants/schemas/userSchema.tsx";
-import { SignInFormFieldType } from "../features/Form/constants/schemas/signInSchema.tsx";
+import { EditUserFormFieldType, SignInFormFieldType, SignUpFormFieldType } from "../features/Form/constants/schemas/userSchema.tsx";
 import { useAuth } from "../contexts/Auth/AuthContext.ts";
 import { UserTableType } from "../features/Database/connector/powersync/AppSchema.ts";
 import { ToastMessages } from "../features/Alert/constants/types.ts";
 
-export type SignUpFunction = (user: UserFormFieldType) => Promise<void>
+export type SignUpFunction = (user: SignUpFormFieldType) => Promise<void>
 export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
 export type ChangeEmailFunction = (newEmail: string) => Promise<void>
-export type ChangeUserMetadataFunction = (newUser: Partial<UserFormFieldType>, toastMessages: ToastMessages) => Promise<void>
-export type ChangeNameFunction = (firstname: string, lastname: string) => Promise<void>
+export type ChangeUserMetadataFunction = (newUser: Partial<EditUserFormFieldType>, toastMessages: ToastMessages) => Promise<void>
 export type ResetPasswordFunction = (newPassword: string) => Promise<void>
 
 export const useUserManagement = () => {
@@ -323,14 +321,14 @@ export const useUserManagement = () => {
         toastMessages
     ) => {
         try {
-            setUser(
-                await userDAO.updateUser({
-                    ...user,
-                    ...newUser,
-                } as UserTableType)
-            );
+            const updatedUser = await userDAO.updateUser({
+                ...user,
+                ...newUser,
+            });
 
-            addToast(ChangeNameToast.success());
+            setUser(updatedUser);
+
+            addToast(toastMessages.success());
             dismissAllBottomSheet();
         } catch (error) {
             addToast(

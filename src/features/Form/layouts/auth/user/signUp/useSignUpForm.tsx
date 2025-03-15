@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { UserFormFieldType, useUserFormProps } from "../../../../constants/schemas/userSchema.tsx";
+import { SignUpFormFieldType, useSignUpFormProps } from "../../../../constants/schemas/userSchema.tsx";
 import { useSignUpSteps } from "./useSignUpSteps.tsx";
 import { useUserManagement } from "../../../../../../hooks/useUserManagement.ts";
 
@@ -9,12 +9,12 @@ const useSignUpForm = () => {
         handleSubmit,
         trigger,
         resetField
-    } = useForm<UserFormFieldType>(useUserFormProps());
+    } = useForm<SignUpFormFieldType>(useSignUpFormProps());
     const { signUp } = useUserManagement();
 
     const submitHandler =
         handleSubmit(
-        async (newUser: UserFormFieldType) =>
+        async (newUser: SignUpFormFieldType) =>
             await signUp(newUser)
         );
 

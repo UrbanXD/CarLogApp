@@ -45,6 +45,8 @@ const ProfileScreen: React.FC = () => {
         () => openEditUser(EDIT_USER_FORM_STEPS.PasswordStep);
     const openChangeEmail =
         () => openEditUser(EDIT_USER_FORM_STEPS.EmailStep);
+    const openChangeAvatar =
+        () => openEditUser(EDIT_USER_FORM_STEPS.AvatarStep)
 
     return (
         <SafeAreaView style={ styles.pageContainer }>
@@ -84,6 +86,17 @@ const ProfileScreen: React.FC = () => {
                         text="Beállítások"
                         textStyle={{ textAlign: "left" }}
                         onPress={ openChangeName }
+                        backgroundColor="transparent"
+                        fontSize={ FONT_SIZES.p1 }
+                        loadingIndicator
+                    />
+                    <Divider />
+                    <Button.Text
+                        iconLeft={ ICON_NAMES.settings }
+                        iconRight={ ICON_NAMES.rightArrowHead }
+                        text="Avatar"
+                        textStyle={{ textAlign: "left" }}
+                        onPress={ openChangeAvatar }
                         backgroundColor="transparent"
                         fontSize={ FONT_SIZES.p1 }
                         loadingIndicator

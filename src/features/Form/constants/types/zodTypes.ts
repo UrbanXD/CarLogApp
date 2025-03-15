@@ -1,4 +1,7 @@
 import { z } from "zod";
+import {ImageType} from "../../utils/pickImage.ts";
+import {ColorValue} from "react-native";
+import {valueOf} from "react-native-url-polyfill";
 
 export const zNumber = z
     .preprocess(
@@ -24,6 +27,12 @@ export const zPickerRequired = z
     .min(1, "Válasszon ki egy elemet!");
 
 export const zImage = z
-    .any()
-    // .refine(value => (value === "" ? "" : Number(value)))
+    .custom<ImageType | null>(value => value instanceof ImageType || value === null)
+    // .refine(
+    //     files => [ 'image/jpg', 'image/jpeg', 'image/png' ].includes( files?.[ 0 ]?.type ),
+    //     'Accepted Formats: JPG/JPEG/PNG'
+    // )
+    // .refine( files => files?.[ 0 ]?.size <= 1 * 1024 * 1024, "Size shouldn't be more than 1 MB" )
 
+export const zColor = z
+    .custom<ColorValue | null>(value => value instanceof ColorValue || valueO === null)

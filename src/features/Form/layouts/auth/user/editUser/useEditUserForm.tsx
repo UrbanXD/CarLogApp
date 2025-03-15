@@ -1,11 +1,11 @@
-import { UserFormFieldType, useUserFormProps } from "../../../../constants/schemas/userSchema.tsx";
+import { EditUserFormFieldType, useEditUserFormProps } from "../../../../constants/schemas/userSchema.tsx";
 import { useForm } from "react-hook-form";
 import { EDIT_USER_FORM_STEPS, useEditUserSteps } from "./useEditUserSteps.tsx";
 import { useUserManagement } from "../../../../../../hooks/useUserManagement.ts";
 import { ChangeNameToast } from "../../../../../Alert/presets/toast";
 
 export const useEditUserForm = (
-    user: Partial<UserFormFieldType>,
+    user: Partial<EditUserFormFieldType>,
     passwordReset: boolean = true,
     stepIndex: number
 ) => {
@@ -20,11 +20,11 @@ export const useEditUserForm = (
         control,
         handleSubmit,
         reset
-    } = useForm<Partial<UserFormFieldType>>(useUserFormProps(user));
+    } = useForm<Partial<EditUserFormFieldType>>(useEditUserFormProps(user));
 
 
     const submitHandler =
-        handleSubmit(async (editedUser: Partial<UserFormFieldType>) => {
+        handleSubmit(async (editedUser: Partial<EditUserFormFieldType>) => {
             switch (stepIndex) {
                 case EDIT_USER_FORM_STEPS.EmailStep:
                     if(!editedUser.email) return;
@@ -40,7 +40,10 @@ export const useEditUserForm = (
                     break;
                 case EDIT_USER_FORM_STEPS.NameStep:
                     await changeUserMetadata(editedUser, ChangeNameToast);
-                    // await changeName(editedUser.firstname ?? "", editedUser.lastname ?? "");
+                    break;
+                case EDIT_USER_FORM_STEPS.AvatarStep:
+                    const avatar = editedUser.avatar;
+                    console.log(avatar, typeof avatar)
                     break;
             }
         })
