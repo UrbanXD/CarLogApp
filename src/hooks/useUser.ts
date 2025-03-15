@@ -2,16 +2,14 @@ import { useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { BaseConfig } from "../constants/BaseConfig.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useAppSelector } from "./index.ts";
-import { AppDispatch } from "../features/Database/redux/store.ts";
+import { useAppDispatch, useAppSelector } from "./index.ts";
 import { updateUser} from "../features/Database/redux/user/functions/updateUser.ts";
 import { useDatabase } from "../features/Database/connector/Database.ts";
 import { UserTableType } from "../features/Database/connector/powersync/AppSchema.ts";
-import { useDispatch } from "react-redux";
 
 export const useUser = () => {
     const database = useDatabase();
-    const dispatch = useDispatch<AppDispatch>();
+    const dispatch = useAppDispatch();
 
     const user = useAppSelector(state => state.user.user);
     const userAvatar = useAppSelector(state => state.user.userAvatar);

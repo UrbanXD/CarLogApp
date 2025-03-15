@@ -1,15 +1,14 @@
 import { useDatabase } from "../features/Database/connector/Database";
 import { useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
-import { AppDispatch } from "../features/Database/redux/store";
 import { loadCars } from "../features/Database/redux/cars/functions/loadCars";
 import { UserTableType } from "../features/Database/connector/powersync/AppSchema.ts";
 import { useUser } from "./useUser.ts";
 import { loadUser } from "../features/Database/redux/user/functions/loadUser.ts";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "./index.ts";
 
 export const useSession = () => {
-    const dispatch = useDispatch<AppDispatch>();
+    const dispatch = useAppDispatch();
     const database = useDatabase();
     const { supabaseConnector } = database;
     const userValue = useUser();
