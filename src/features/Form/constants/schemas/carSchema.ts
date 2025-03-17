@@ -1,7 +1,5 @@
-import { ImageType } from "../../utils/pickImage";
 import { z } from "zod";
-import {zImage, zNumber, zPickerRequired} from "../types/zodTypes";
-import { ODOMETER_MEASUREMENTS } from "../constants";
+import { zImage, zNumber, zPickerRequired } from "../types/zodTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 export const CAR_FORM_STEPS_FIELD = [
@@ -19,7 +17,7 @@ export const CAR_FORM_STEPS_TITLE = [
     "Kép"
 ];
 
-export const carFormSchema = z
+const carFormSchema = z
     .object({
         name: z.string().min(2, "2 karakter legyen min").max(20, "20 karakter legyen max"),
         brand: zPickerRequired,
@@ -32,21 +30,32 @@ export const carFormSchema = z
         image: zImage.optional(),
     });
 
-export type CarFormFieldType = z.infer<typeof carFormSchema>
+export type AddCarFormFieldType = z.infer<typeof carFormSchema>;
 
-export const useCarFormProps = (car?: CarFormFieldType) => {
+const editCarFormSchema = carFormSchema.partial();
+export type EditCarFormFieldType = z.infer<typeof editCarFormSchema>;
+
+export const useAddCarFormProps = () => {
+    const defaultValues: AddCarFormFieldType = {
+        name: "",
+        brand: "",
+        model: "",
+        odometerValue: NaN,
+        fuelType: "",
+        fuelMeasurement: "",
+        fuelTankSize: NaN,
+        image: null
+    }
+
     return {
-        defaultValues: {
-            name: car?.name || "",
-            brand: car?.brand || "",
-            model: car?.model || "",
-            odometerMeasurement: car?.odometerMeasurement || ODOMETER_MEASUREMENTS[0].title,
-            odometerValue: car?.odometerValue || NaN,
-            fuelType: car?.fuelType || "",
-            fuelMeasurement: car?.fuelMeasurement || "",
-            fuelTankSize: car?.fuelTankSize || NaN,
-            image: car?.image || null,
-        },
+        defaultValues,
         resolver: zodResolver(carFormSchema)
+    }
+}
+
+export const useEditCarFormProps = (car?: EditCarFormFieldType) => {
+    return {
+        defaultValues: car,
+        resolver: zodResolver(editCarFormSchema)
     }
 }

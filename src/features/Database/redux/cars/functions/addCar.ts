@@ -2,13 +2,13 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Database } from "../../../connector/Database";
 import { CarTableType } from "../../../connector/powersync/AppSchema";
 import { CarDAO } from "../../../DAOs/CarDAO";
-import { CarFormFieldType } from "../../../../Form/constants/schemas/carSchema";
+import { AddCarFormFieldType } from "../../../../Form/constants/schemas/carSchema";
 import { getUUID } from "../../../utils/uuid";
 import getImageState from "../../../utils/getImageState";
 
 interface AddCarArgs {
     database: Database
-    car: CarFormFieldType
+    car: AddCarFormFieldType
 }
 
 export const addCar = createAsyncThunk(
@@ -25,13 +25,13 @@ export const addCar = createAsyncThunk(
                 image = await database.attachmentQueue.saveFile(car.image, userID);
             }
 
-            const newCarTableRow = {
+            const newCarTableRow: CarTableType = {
                 ...car,
                 id: getUUID(),
                 owner: userID,
                 image: image ? image.filename : null,
                 createdAt: Date.now().toString(),
-            } as CarTableType
+            }
 
             const result = await carDAO.addCar(newCarTableRow);
             if(result === null) return rejectWithValue("");

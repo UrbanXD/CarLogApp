@@ -1,8 +1,6 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {ImageType} from "../../utils/pickImage.ts";
-import {carFormSchema} from "./carSchema.ts";
-import {zColor, zImage} from "../types/zodTypes.ts";
+import { zColor, zImage } from "../types/zodTypes.ts";
 
 export const SIGN_UP_STEPS_FIELD = [
     ["email"],
@@ -15,7 +13,7 @@ export const SIGN_UP_STEPS_TITLE = [
     "Jelszó"
 ];
 
-export const userSchema = z
+const userSchema = z
     .object({
         email: z.string().email("Nem megfelelő email cím formátum"),
         firstname: z.string().min(2, "Nem elég hosszú a név"),
@@ -35,10 +33,11 @@ const signUpFormSchema =
         .extend({
             password: z.string().min(6, "Legalább 6 karakter hosszúnak kell lennie a jelszónak").regex(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*?[#?!@$%^.&*-]).+$/, "A jelszónak legalább tartalmaznia kell egy kis- és nagybetűt, egy számot és egy speciális karaktert"),
             rpassword: z.string(),
-        }).refine(data => data.password === data.rpassword, {
-        message: "A két jelszó nem egyezik",
-        path: ["rpassword"]
-    })
+        })
+        .refine(data => data.password === data.rpassword, {
+            message: "A két jelszó nem egyezik",
+            path: ["rpassword"]
+        });
 export type SignUpFormFieldType = z.infer<typeof signUpFormSchema>;
 
 const editUserFormSchema = userSchema.partial();
@@ -69,11 +68,9 @@ export const useSignUpFormProps = () => {
     }
 }
 
-export const useEditUserFormProps = (user: Partial<EditUserFormFieldType>) => {
-    const defaultValues: EditUserFormFieldType = user;
-
+export const useEditUserFormProps = (user: EditUserFormFieldType) => {
     return {
-        defaultValues,
+        defaultValues: user,
         resolver: zodResolver(editUserFormSchema)
     }
 }

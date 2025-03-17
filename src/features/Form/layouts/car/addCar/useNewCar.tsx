@@ -1,4 +1,4 @@
-import { CarFormFieldType, useCarFormProps } from "../../../constants/schemas/carSchema";
+import { useAddCarFormProps, AddCarFormFieldType } from "../../../constants/schemas/carSchema";
 import { store } from "../../../../Database/redux/store";
 import { addCar } from "../../../../Database/redux/cars/functions/addCar";
 import { useDatabase } from "../../../../Database/connector/Database";
@@ -19,10 +19,10 @@ const useNewCarForm = () => {
         trigger,
         reset,
         resetField
-    } = useForm<CarFormFieldType>(useCarFormProps());
+    } = useForm<AddCarFormFieldType>(useAddCarFormProps());
 
     const submitHandler =
-        handleSubmit(async (newCar: CarFormFieldType) => {
+        handleSubmit(async (newCar: AddCarFormFieldType) => {
             try {
                 await store.dispatch(addCar({ database, car: newCar }));
 

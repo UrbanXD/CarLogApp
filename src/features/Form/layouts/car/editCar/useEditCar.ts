@@ -1,24 +1,20 @@
-import { CarFormFieldType, useCarFormProps } from "../../../constants/schemas/carSchema";
+import { EditCarFormFieldType, useEditCarFormProps } from "../../../constants/schemas/carSchema";
 import { useForm } from "react-hook-form";
-import { store } from "../../../../Database/redux/store";
 import useCarSteps from "../steps/useCarSteps";
 import { CarTableType } from "../../../../Database/connector/powersync/AppSchema";
 import { editCar } from "../../../../Database/redux/cars/functions/editCar";
 import { useDatabase } from "../../../../Database/connector/Database";
 import getFile from "../../../../Database/utils/getFile";
 import { UseCustomFormProps } from "../../../constants/constants";
+import { useAppDispatch } from "../../../../../hooks/index.ts";
 
 const useEditCarForm = (
     car: CarTableType,
     dismissBottomSheet: () => void,
     carImage?: string
 ) => {
+    const dispatch = useAppDispatch();
     const database = useDatabase();
-
-    const carFormField = {
-        ...car,
-        image: getFile(car.image ?? undefined, carImage)
-    } as CarFormFieldType;
 
     const {
         control,
@@ -27,16 +23,22 @@ const useEditCarForm = (
         reset,
         resetField,
         formState,
-    } = useForm<CarFormFieldType>(useCarFormProps(carFormField));
+    } = useForm<EditCarFormFieldType>(
+            useEditCarFormProps({
+                ...car,
+                image: getFile(car.image ?? undefined, carImage)
+            })
+        );
 
     const submitHandler =
-        handleSubmit(async (editedCar: CarFormFieldType) => {
+        handleSubmit(async (editedCar: EditCarFormFieldType) => {
             try {
-                await store.dispatch(editCar({
+                console.log(editedCar, "grs")
+                dispatch(editCar({
                     database,
                     oldCar: car,
                     newCar: editedCar
-                }));
+                }))
 
                 reset();
                 dismissBottomSheet();
