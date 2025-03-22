@@ -1,7 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Database } from "../../../connector/Database.ts";
-import { getImageFromAttachmentQueue } from "../../../utils/getImageFromAttachmentQueue.ts";
-import { UserState } from "../user.slices";
+import { ImageType, UserState } from "../user.slices";
 import { UserTableType } from "../../../connector/powersync/AppSchema.ts";
 import { RootState } from "../../index.ts";
 
@@ -13,6 +12,7 @@ interface UpdateUserReturn {
 export interface UpdateUserArgs {
     database: Database
     newUser: UserTableType | null
+    newAvatar: ImageType | null
 }
 
 interface AsyncThunkConfig {
@@ -24,18 +24,18 @@ export const updateUser =
         "user/update",
         async (args, { getState }) => {
             const {
-                user: { user: oldUser, userAvatar: oldUserAvatar }
+                user: { user: oldUser, userAvatar: oldAvatar }
             } = getState();
             const {
-                database: { attachmentQueue },
-                newUser
+                newUser,
+                newAvatar
             } = args;
 
-            if(!newUser) return { user: null, userAvatar: null };
+            if(!newUser) return { user: oldUser, userAvatar: oldAvatar };
 
-            let newUserAvatar = oldUserAvatar || null;
-            if(oldUser?.avatarImage !== newUser.avatarImage) {
-                newUserAvatar = await getImageFromAttachmentQueue(attachmentQueue, newUser.avatarImage);
+            let newUserAvatar = oldAvatar || null;
+            if(oldAvatar.path !== newAvatar.path) {
+                newUserAvatar = newAvatar;
             }
 
             return { user: newUser, userAvatar: newUserAvatar };

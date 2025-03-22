@@ -26,21 +26,23 @@ import {
 } from "@supabase/supabase-js";
 import { AvatarColors } from "../constants/colors";
 import { router } from "expo-router";
-import { EditUserFormFieldType, SignInFormFieldType, SignUpFormFieldType } from "../features/Form/constants/schemas/userSchema.tsx";
+import { SignInFormFieldType, SignUpFormFieldType } from "../features/Form/constants/schemas/userSchema.tsx";
 import { useAuth } from "../contexts/Auth/AuthContext.ts";
 import { UserTableType } from "../features/Database/connector/powersync/AppSchema.ts";
 import { ToastMessages } from "../features/Alert/constants/types.ts";
+import { getPathFromImageType } from "../utils/getPathFromImageType.ts";
+import getImageState from "../features/Database/utils/getImageState.ts";
 
 export type SignUpFunction = (user: SignUpFormFieldType) => Promise<void>
 export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
 export type ChangeEmailFunction = (newEmail: string) => Promise<void>
-export type ChangeUserMetadataFunction = (newUser: Partial<EditUserFormFieldType>, toastMessages: ToastMessages) => Promise<void>
+export type ChangeUserMetadataFunction = (newUser: Partial<UserTableType> | null, toastMessages: ToastMessages) => Promise<void>
 export type ResetPasswordFunction = (newPassword: string) => Promise<void>
 
 export const useUserManagement = () => {
     const database = useDatabase();
-    const { supabaseConnector, userDAO } = database;
-    const { session, user, setUser, updateNotVerifiedUser, refreshSession } = useAuth();
+    const { supabaseConnector, attachmentQueue, userDAO } = database;
+    const { session, user, userAvatar, setUser, updateNotVerifiedUser, refreshSession } = useAuth();
     const { addToast } = useAlert();
     const { openBottomSheet, dismissAllBottomSheet } = useBottomSheet();
 
@@ -124,7 +126,17 @@ export const useUserManagement = () => {
 
             void updateNotVerifiedUser(newUser);
 
-            if(newUser?.email) openUserVerification(newUser.email);
+            if(newUser?.email) {
+                openUserVerification(newUser.email);
+                await userDAO.insertUser({
+                    id: newUser.id,
+                    email: newUser.email,
+                    firstname: newUser.user_metadata.firstname,
+                    lastname: newUser.user_metadata.lastname,
+                    avatarColor: newUser.user_metadata.avatarColor,
+                    avatarImage: newUser.user_metadata.avatarImage,
+                });
+            }
         } catch (error) {
             addToast(
                 getToastMessage({
@@ -168,15 +180,14 @@ export const useUserManagement = () => {
             }
 
             // uj fiok kerult letrehozasra, mentsuk le a nevet a felhasznalonak
-            await supabaseConnector
-                .client
-                .auth
-                .updateUser({
-                    data: {
-                        firstname: googleData.user.givenName || "",
-                        lastname: googleData.user.familyName || "",
-                    }
-                });
+            await userDAO.insertUser({
+                id: user.id,
+                email: user.email,
+                firstname: googleData.user.givenName || "",
+                lastname: googleData.user.familyName || "",
+                avatarColor: AvatarColors[Math.floor(Math.random() * AvatarColors.length)],
+                avatarImage: null
+            });
 
             addToast(SignUpToast.success());
             dismissAllBottomSheet();
@@ -321,16 +332,29 @@ export const useUserManagement = () => {
         toastMessages
     ) => {
         try {
+            let newUserAvatar = userAvatar;
+            if(newUser?.avatarImage && user?.avatarImage !== getPathFromImageType(newUser.avatarImage, user?.id)) {
+                try {
+
+                } catch (_) {
+
+                }
+                const newAvatarImage = await attachmentQueue.saveFile(newUser.avatarImage, user.id);
+                newUserAvatar = getImageState(newAvatarImage.filename, newUser.avatarImage.buffer);
+            }
+
             const updatedUser = await userDAO.updateUser({
                 ...user,
                 ...newUser,
+                avatarImage: newUserAvatar ? newUserAvatar.path : null
             });
 
-            setUser(updatedUser);
+            setUser(updatedUser, newUserAvatar);
 
             addToast(toastMessages.success());
             dismissAllBottomSheet();
         } catch (error) {
+            console.log(error)
             addToast(
                 getToastMessage({
                     messages: toastMessages,

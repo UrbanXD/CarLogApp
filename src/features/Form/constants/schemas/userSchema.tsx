@@ -16,9 +16,9 @@ export const SIGN_UP_STEPS_TITLE = [
 const userSchema = z
     .object({
         email: z.string().email("Nem megfelelő email cím formátum"),
-        firstname: z.string().min(2, "Nem elég hosszú a név"),
-        lastname: z.string().min(2, "Nem elég hosszú a név"),
-        avatar: z.custom<zImage | zColor>().optional(),
+        firstname: z.string().optional(),
+        lastname: z.string().optional(),
+        avatarImage: z.custom<zImage | zColor>().optional(),
     });
 
 const signInFormSchema =

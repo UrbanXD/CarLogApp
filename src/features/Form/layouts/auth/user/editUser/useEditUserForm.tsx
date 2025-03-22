@@ -2,7 +2,7 @@ import { EditUserFormFieldType, useEditUserFormProps } from "../../../../constan
 import { useForm } from "react-hook-form";
 import { EDIT_USER_FORM_STEPS, useEditUserSteps } from "./useEditUserSteps.tsx";
 import { useUserManagement } from "../../../../../../hooks/useUserManagement.ts";
-import { ChangeNameToast } from "../../../../../Alert/presets/toast";
+import {ChangeNameToast, SignUpToast} from "../../../../../Alert/presets/toast";
 
 export const useEditUserForm = (
     user: Partial<EditUserFormFieldType>,
@@ -42,8 +42,7 @@ export const useEditUserForm = (
                     await changeUserMetadata(editedUser, ChangeNameToast);
                     break;
                 case EDIT_USER_FORM_STEPS.AvatarStep:
-                    const avatar = editedUser.avatar;
-                    console.log(avatar, typeof avatar)
+                    await changeUserMetadata(editedUser, SignUpToast)
                     break;
             }
         })

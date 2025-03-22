@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "./index.ts";
 import { updateUser} from "../features/Database/redux/user/functions/updateUser.ts";
 import { useDatabase } from "../features/Database/connector/Database.ts";
 import { UserTableType } from "../features/Database/connector/powersync/AppSchema.ts";
+import { ImageType } from "../features/Database/redux/user/user.slices.ts";
 
 export const useUser = () => {
     const database = useDatabase();
@@ -16,8 +17,8 @@ export const useUser = () => {
     const isUserLoading = useAppSelector(state => state.user.isLoading);
     const [notVerifiedUser, setNotVerifiedUser] = useState<User | null>(null);
 
-    const setUser = (newUser: UserTableType | null) => {
-        dispatch(updateUser({ database, newUser }));
+    const setUser = (newUser: UserTableType | null, newAvatar?: ImageType | null ) => {
+        dispatch(updateUser({ database, newUser, newAvatar }));
     }
 
     const fetchNotVerifiedUser = async () => {

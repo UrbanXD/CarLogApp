@@ -27,10 +27,7 @@ export const zPickerRequired = z
     .min(1, "Válasszon ki egy elemet!");
 
 export const zImage = z
-    .custom<ImageType | null>(value => {
-        console.log(value, value === null || value instanceof ImageType)
-        return value === null || value instanceof ImageType
-    })
+    .custom<ImageType | null>(value => value === null || value instanceof ImageType)
     // .refine(
     //     files => [ 'image/jpg', 'image/jpeg', 'image/png' ].includes( files?.[ 0 ]?.type ),
     //     'Accepted Formats: JPG/JPEG/PNG'

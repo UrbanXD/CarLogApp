@@ -17,17 +17,17 @@ export const pickImage = async (options?: ImagePicker.ImagePickerOptions): Promi
 
     let pickerResult =
         await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: ["images"],
             allowsEditing: !options?.allowsMultipleSelection,
             ...options
         });
 
 
     if(!pickerResult.canceled) {
-        const imgs = pickerResult.assets;
+        const assets = pickerResult.assets;
 
         const images = await Promise.all(
-            imgs.map(async (img) => {
+            assets.map(async (img) => {
                 const base64 = await FileSystem.readAsStringAsync(img.uri, { encoding: "base64" });
                 const fileExtension = getFileExtension(img.uri);
 

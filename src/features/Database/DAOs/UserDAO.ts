@@ -20,6 +20,19 @@ export class UserDAO {
             .executeTakeFirstOrThrow() as unknown as UserTableType;
     }
 
+    async insertUser(user: UserTableType) {
+        await this.db
+            .insertInto(USER_TABLE)
+            .values(user)
+            .execute()
+
+        try {
+            return await this.getUser(user.id);
+        } catch (e) {
+            return null;
+        }
+    }
+
     async updateUser(user: UserTableType) {
         await this.db
             .updateTable(USER_TABLE)

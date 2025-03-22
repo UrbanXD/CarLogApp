@@ -7,6 +7,6 @@ export const AvatarStep: React.FC<StepProps> = ({
 }) =>
     <InputImagePicker
         control={ control }
-        fieldName="avatar"
+        fieldName="avatarImage"
         fieldNameText="Profilkép"
     />
