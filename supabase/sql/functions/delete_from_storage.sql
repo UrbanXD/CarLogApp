@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE public.delete_image(file_path IN TEXT)
+CREATE OR REPLACE PROCEDURE public.delete_from_storage(file_path IN TEXT)
 LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = public, extensions, vault
 AS $$

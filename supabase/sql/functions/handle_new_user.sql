@@ -4,8 +4,8 @@ LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = 'public, auth'
 AS $$
 BEGIN
-    INSERT INTO public.user (id, firstname, lastname)
-    VALUES (NEW.id, NEW.raw_user_meta_data ->> 'firstname', NEW.raw_user_meta_data ->> 'lastname');
+    INSERT INTO public.user (id, email, firstname, lastname, 'avatarColor')
+    VALUES (NEW.id, NEW.email, NEW.raw_user_meta_data ->> 'firstname', NEW.raw_user_meta_data ->> 'lastname', NEW.raw_user_meta_data ->> 'avatarColor');
 
     UPDATE auth.users
     SET raw_user_meta_data = jsonb_set(
