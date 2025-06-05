@@ -6,7 +6,7 @@ import {
     ViewStyle,
 } from "react-native";
 import { Control, Controller } from "react-hook-form";
-import {ControllerRenderArgs, SEPARATOR_SIZES} from "../../../../Shared/constants/constants";
+import {ControllerRenderArgs, SEPARATOR_SIZES} from "../../../../../constants/constants";
 import InputTitle from "../InputTitle";
 import TextInput from "./TextInput";
 

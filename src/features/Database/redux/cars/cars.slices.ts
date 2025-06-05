@@ -5,9 +5,9 @@ import { addCar } from "./functions/addCar";
 import { loadSelectedCar } from "./functions/loadSelectedCar";
 import { selectCar } from "./functions/selectCar";
 import { deleteCar } from "./functions/deleteCar";
-import {editCar} from "./functions/editCar";
+import { editCar } from "./functions/editCar";
 
-interface CarsState {
+export interface CarsState {
     loading: boolean
     cars: Array<CarTableType>
     carsImage: Array<{ path: string, image: string }>
@@ -87,4 +87,4 @@ const carsSlice = createSlice({
     }
 });
 
-export default carsSlice.reducer;
+export const carsReducer = carsSlice.reducer;

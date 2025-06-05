@@ -1,8 +1,8 @@
 import React from "react";
 import { UseCustomFormProps } from "../constants/constants";
-import { ICON_NAMES, SEPARATOR_SIZES } from "../../Shared/constants/constants";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/constants";
 import { FlatList } from "react-native-gesture-handler";
-import Button from "../../Button/components/Button";
+import Button from "../../../components/Button/Button";
 import { View } from "react-native";
 
 interface EditFormProps extends UseCustomFormProps {
@@ -14,7 +14,6 @@ const EditForm: React.FC<EditFormProps> = ({
     steps,
     reset = () => {},
     submitHandler
-
 }) => {
     const handleSave =
         async () => await submitHandler();
@@ -32,13 +31,14 @@ const EditForm: React.FC<EditFormProps> = ({
             />
             <Button.Row>
                 <Button.Icon
-                    icon={ICON_NAMES.reset}
+                    icon={ ICON_NAMES.reset }
                     onPress={ () => reset && reset() }
                 />
                 <Button.Text
                     text="Mentés"
                     onPress={ handleSave }
                     style={{ flex: 0.9 }}
+                    loadingIndicator
                 />
             </Button.Row>
         </View>

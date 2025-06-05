@@ -1,0 +1,36 @@
+import React from "react";
+import {SafeAreaView, ScrollView, StyleSheet } from "react-native";
+import {DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES} from "../constants/constants";
+import { Colors } from "../constants/colors";
+import { useLocalSearchParams } from "expo-router";
+import CarProfile from "../features/CarProfile/components/CarProfile";
+
+const EditCarScreen: React.FC = () => {
+    const localSearchParams = useLocalSearchParams();
+
+    return (
+        <SafeAreaView style={ styles.pageContainer }>
+            <ScrollView
+                showsVerticalScrollIndicator={ false }
+                nestedScrollEnabled={ true }
+                contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
+            >
+            {
+                <CarProfile carID={ localSearchParams.id as string } />
+            }
+            </ScrollView>
+        </SafeAreaView>
+    )
+}
+
+const styles = StyleSheet.create({
+    pageContainer: {
+        ...GLOBAL_STYLE.pageContainer,
+        backgroundColor: Colors.black2,
+        marginBottom: 0,
+        paddingHorizontal: DEFAULT_SEPARATOR,
+        paddingBottom: SEPARATOR_SIZES.small
+    }
+})
+
+export default EditCarScreen;

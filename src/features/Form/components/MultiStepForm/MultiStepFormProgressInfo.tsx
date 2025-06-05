@@ -3,9 +3,7 @@ import { useMultiStepForm } from "../../context/MultiStepFormProvider";
 import { useSharedValue, withTiming } from "react-native-reanimated";
 import { useFont } from "@shopify/react-native-skia";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import ProgressInfo from "../../../Shared/components/ProgressInfo";
-import {StyleSheet, View} from "react-native";
-import {SEPARATOR_SIZES} from "../../../Shared/constants/constants";
+import ProgressInfo from "../../../../components/ProgressInfo";
 
 interface MultiStepFormProgressInfoProps {
     isFirstCount: boolean

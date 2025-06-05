@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ImageSourcePropType } from "react-native";
 import {
     ICON_NAMES,
-} from "../../../../Shared/constants/constants";
+} from "../../../../../constants/constants";
 import { InputPickerDropdownInfo, PickerDropdownInfo } from "./PickerDropdownInfo";
 import PickerElements from "./PickerElements";
 

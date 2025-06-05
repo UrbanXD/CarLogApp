@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Control, Controller } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 import InputTitle from "../InputTitle";
-import { ControllerRenderArgs, SEPARATOR_SIZES } from "../../../../Shared/constants/constants";
+import { ControllerRenderArgs, SEPARATOR_SIZES } from "../../../../../constants/constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { theme } from "../../../../Shared/constants/theme";
+import { Colors } from "../../../../../constants/colors";
 import Picker, { PickerDataType } from "./Picker";
 
 export interface InputPickerDataType extends PickerDataType {
@@ -159,14 +159,14 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: hp(1.5),
-        backgroundColor: theme.colors.gray5,
+        backgroundColor: Colors.gray5,
         paddingHorizontal: hp(1.5),
         borderRadius: 20,
         overflow: "hidden"
     },
     activeFormFieldContainer: {
         borderWidth: 1,
-        borderColor: theme.colors.gray1
+        borderColor: Colors.gray1
     },
     formFieldIconContainer: {
         flex: 0.2,
@@ -174,19 +174,19 @@ const styles = StyleSheet.create({
     },
     textInput: {
         flex: 1,
-        color: theme.colors.gray1,
+        color: Colors.gray1,
         // fontFamily: "Gilroy-Medium",
         fontSize: hp(2.25)
     },
     placeholderText: {
-        color: theme.colors.gray2
+        color: Colors.gray2
     },
     errorText: {
         paddingLeft: hp(2),
         fontFamily: "Gilroy-Medium",
         fontSize: hp(1.85),
         letterSpacing: hp(1.85) * 0.05,
-        color: theme.colors.redLight
+        color: Colors.redLight
     }
 })
 

@@ -1,6 +1,6 @@
-import {createAsyncThunk} from "@reduxjs/toolkit";
-import {CarDAO} from "../../../DAOs/CarDAO";
-import {Database} from "../../../connector/Database";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { CarDAO } from "../../../DAOs/CarDAO";
+import { Database } from "../../../connector/Database";
 
 export const deleteCar = createAsyncThunk(
     "deleteCar",

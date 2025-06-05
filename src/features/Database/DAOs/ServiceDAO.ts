@@ -1,6 +1,5 @@
 import { Kysely } from "@powersync/kysely-driver";
-import {DatabaseType, SERVICE_TABLE, ServiceTableType} from "../connector/powersync/AppSchema";
-import {convertTableTypeToRowType} from "../utils/convertTableTypeToRowType";
+import { DatabaseType, SERVICE_TABLE, ServiceTableType } from "../connector/powersync/AppSchema";
 
 export class ServiceDAO {
     db: Kysely<DatabaseType>
@@ -12,7 +11,7 @@ export class ServiceDAO {
     async addService(service: ServiceTableType) {
         await this.db
             .insertInto(SERVICE_TABLE)
-            .values(convertTableTypeToRowType(service))
+            .values(service)
             .execute()
 
         return service;

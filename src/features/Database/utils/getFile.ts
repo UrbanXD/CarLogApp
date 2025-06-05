@@ -1,7 +1,8 @@
 import { getFileExtension, getFileName } from "./getFileExtension";
 import { decode } from "base64-arraybuffer";
+import { ImageType } from "../../Form/utils/pickImage.ts";
 
-const getFile = (path?: string, buffer?: string) => {
+const getFile = (path?: string, buffer?: string): ImageType | null => {
     if(!path || !buffer) return null;
 
     return {
