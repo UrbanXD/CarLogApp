@@ -1,22 +1,21 @@
-import {createAsyncThunk} from "@reduxjs/toolkit";
-import {Database} from "../../../connector/Database";
-import {CarTableType} from "../../../connector/powersync/AppSchema";
-import {CarDAO} from "../../../DAOs/CarDAO";
-import {CarFormFieldType} from "../../../../Form/constants/schemas/carSchema";
-import {encode} from "base64-arraybuffer";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { Database } from "../../../connector/Database";
+import { CarTableType } from "../../../connector/powersync/AppSchema";
+import { CarDAO } from "../../../DAOs/CarDAO";
+import { EditCarFormFieldType } from "../../../../Form/constants/schemas/carSchema";
 import getImageState from "../../../utils/getImageState";
 
 interface EditCarArgs {
     database: Database
     oldCar: CarTableType
-    newCar: CarFormFieldType
+    newCar: EditCarFormFieldType
 }
 
 export const editCar = createAsyncThunk(
     "editCar",
     async (args: EditCarArgs, { rejectWithValue })=> {
         const { database, oldCar, newCar } = args;
-
+        console.log(newCar)
         try {
             const carDAO = new CarDAO(database.db);
 
@@ -34,7 +33,7 @@ export const editCar = createAsyncThunk(
 
             await carDAO.editCar(newCarTableRow);
 
-            const newImageState = getImageState(newCarTableRow.image, newCar.image?.buffer)
+            const newImageState = getImageState(newCarTableRow.image ?? undefined, newCar.image?.buffer)
             return {
                 car: newCarTableRow,
                 image: newImageState

@@ -3,10 +3,16 @@ module.exports = function(api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [
-      '@babel/plugin-transform-async-generator-functions'
-
-      // // NOTE: this is only necessary if you are using reanimated for animations
-      // 'react-native-reanimated/plugin',
+      '@babel/plugin-transform-async-generator-functions',
+      'react-native-reanimated/plugin',
+      [
+          'module:react-native-dotenv',
+        {
+          envName: 'APP_ENV',
+          moduleName: '@env',
+          path: '.env',
+        }
+      ],
     ],
   };
 };

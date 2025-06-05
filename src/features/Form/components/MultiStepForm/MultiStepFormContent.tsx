@@ -1,6 +1,6 @@
 import React from "react";
 import { useMultiStepForm } from "../../context/MultiStepFormProvider";
-import OnBoardingView from "../../../OnBoardingView/OnBoardingView";
+import OnBoardingView from "../../../../components/OnBoardingView";
 
 const MultiStepFormContent: React.FC = () => {
     const {

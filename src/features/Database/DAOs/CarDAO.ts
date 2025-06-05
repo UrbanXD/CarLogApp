@@ -1,6 +1,5 @@
 import { Kysely } from "@powersync/kysely-driver";
-import {CAR_TABLE, CarTableType, DatabaseType} from "../connector/powersync/AppSchema";
-import {convertTableTypeToRowType} from "../utils/convertTableTypeToRowType";
+import { CAR_TABLE, CarTableType, DatabaseType } from "../connector/powersync/AppSchema";
 
 export class CarDAO {
     db: Kysely<DatabaseType>
@@ -29,7 +28,7 @@ export class CarDAO {
     async addCar(car: CarTableType) {
         await this.db
             .insertInto(CAR_TABLE)
-            .values(convertTableTypeToRowType(car))
+            .values(car)
             .execute()
 
         try {

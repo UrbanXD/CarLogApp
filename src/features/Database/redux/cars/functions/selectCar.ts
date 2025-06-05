@@ -1,12 +1,12 @@
-import {createAsyncThunk} from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {LOCAL_STORAGE_KEYS} from "../../../../Shared/constants/constants";
+import { BaseConfig } from "../../../../../constants/BaseConfig.ts";
 
 export const selectCar = createAsyncThunk(
     "selectCar",
     async (id: string, { rejectWithValue })=> {
         try {
-            await AsyncStorage.setItem(LOCAL_STORAGE_KEYS.selectedCarIndex, id.toString());
+            await AsyncStorage.setItem(BaseConfig.LOCAL_STORAGE_KEY_SELECTED_CAR_INDEX, id.toString());
             return id;
         } catch (e) {
             console.log(e);

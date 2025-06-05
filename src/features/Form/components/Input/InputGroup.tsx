@@ -1,6 +1,6 @@
 import React, {ReactNode} from "react";
 import {StyleSheet, View} from "react-native";
-import {SEPARATOR_SIZES} from "../../../Shared/constants/constants";
+import {SEPARATOR_SIZES} from "../../../../constants/constants";
 
 interface InputGroupProps {
     children?: ReactNode;

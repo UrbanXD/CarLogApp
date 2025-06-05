@@ -43,7 +43,8 @@
             "./src/assets/fonts/DoubleFeature20.ttf"
           ]
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "extra": {
       "router": {

@@ -1,21 +1,16 @@
 import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import {
-    FONT_SIZES,
-    GLOBAL_STYLE,
-    ICON_NAMES,
-    SEPARATOR_SIZES
-} from "../Shared/constants/constants";
-import Date from "../Shared/components/Date";
+import { FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/constants";
+import Date from "../../components/Date";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { theme } from "../Shared/constants/theme";
+import { Colors } from "../../constants/colors";
 import { useForm } from "react-hook-form";
-import { getToday } from "../Shared/utils/getDate";
-import { useBottomSheet } from "../BottomSheet/context/BottomSheetProvider";
+import { getToday } from "../../utils/getDate";
 import { EditRideFormFieldType, editRideUseFormProps } from "../Form/layouts/editRide/editRideFormSchema";
 import InputText from "../Form/components/Input/text/InputText";
-import ProgressBar from "../Shared/components/ProgressBar";
-import Icon from "../Shared/components/Icon";
+import ProgressBar from "../../components/ProgressBar";
+import Icon from "../../components/Icon";
+import { useBottomSheet } from "../BottomSheet/context/BottomSheetContext.ts";
 
 type RideType = {
     carUID: string
@@ -51,7 +46,7 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                                 dateUnderSubtitle={ ride.dateSubtitle }
                             />
                             <View style={{ flex: 1, gap: SEPARATOR_SIZES.lightSmall }}>
-                                <Text numberOfLines={ 2 } style={ [GLOBAL_STYLE.containerText, { color: theme.colors.white }] }>
+                                <Text numberOfLines={ 2 } style={ [GLOBAL_STYLE.containerText, { color: Colors.white }] }>
                                     { ride.client }
                                 </Text>
                                 <ScrollView contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }>
@@ -61,14 +56,14 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                                         titles={["Zenta", "Kamenica"]}
                                     />
                                 </ScrollView>
-                                <Text numberOfLines={ 1 } style={ [GLOBAL_STYLE.containerText, { color: theme.colors.white }] }>
+                                <Text numberOfLines={ 1 } style={ [GLOBAL_STYLE.containerText, { color: Colors.white }] }>
                                     100 km
                                 </Text>
                         </View>
                             <Icon
                                 icon={ ICON_NAMES.info }
-                                size={ FONT_SIZES.medium }
-                                color={ theme.colors.white }
+                                size={ FONT_SIZES.h2 }
+                                color={ Colors.white }
                                 onPress={
                                     () =>{
                                         console.log("xdd")
@@ -173,8 +168,8 @@ const styles = StyleSheet.create({
     text: {
         flexWrap: "wrap",
         fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.small,
-        color: theme.colors.white
+        fontSize: FONT_SIZES.p3,
+        color: Colors.white
     },
     contentContainer: {
         flexDirection: "row",
@@ -184,7 +179,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "row",
         height: hp(22.5),
-        backgroundColor: theme.colors.black2,
+        backgroundColor: Colors.black2,
         borderRadius: 15,
         padding: SEPARATOR_SIZES.small,
     },

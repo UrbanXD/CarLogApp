@@ -3,30 +3,31 @@ import { AppSchema, DatabaseType } from "./powersync/AppSchema";
 import { SupabaseConnector } from "./SupabaseConnector";
 import { Kysely, wrapPowerSyncWithKysely } from "@powersync/kysely-driver";
 import { Context, createContext, useContext } from "react";
-import { KVStorage } from "./storage/KVStorage";
 import { SupabaseStorageAdapter } from "./storage/SupabaseStorageAdapter";
 import { PhotoAttachmentQueue } from "./powersync/PhotoAttachmentQueue";
-import { BaseConfig } from "./BaseConfig";
+import { BaseConfig } from "../../../constants/BaseConfig.ts";
 import { AttachmentRecord } from "@powersync/attachments";
+import { UserDAO } from "../DAOs/UserDAO.ts";
+import { CarDAO } from "../DAOs/CarDAO.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
     db: Kysely<DatabaseType>;
     supabaseConnector: SupabaseConnector;
-    kvStorage: KVStorage;
     storage: SupabaseStorageAdapter;
-    attachmentQueue: PhotoAttachmentQueue | undefined = undefined;
+    attachmentQueue?: PhotoAttachmentQueue;
+    private _userDAO?: UserDAO;
+    private _carDAO?: CarDAO;
 
     constructor() {
         this.powersync = new PowerSyncDatabase({
             schema: AppSchema,
             database: {
-                dbFilename: "carlog-app.sqlite"
+                dbFilename: "powersync-carlog.sqlite"
             }
-        })
+        });
         this.db = wrapPowerSyncWithKysely(this.powersync);
-        this.kvStorage = new KVStorage()
-        this.supabaseConnector = new SupabaseConnector(this.kvStorage, this.powersync);
+        this.supabaseConnector = new SupabaseConnector(this.powersync);
         this.storage = this.supabaseConnector.storage;
 
         if(BaseConfig.SUPABASE_BUCKET){
@@ -41,11 +42,25 @@ export class Database {
                     return { retry: true };
                 },
                 onUploadError: async (attachment: AttachmentRecord, exception: any) => {
-                    console.log("upload hiba",exception)
+                    console.log("attachment upload hiba", exception)
                     return { retry: false };
                 }
             });
         }
+    }
+
+    get userDAO(): UserDAO {
+        if (!this._userDAO) {
+            this._userDAO = new UserDAO(this);
+        }
+        return this._userDAO;
+    }
+
+    get carDAO(): CarDAO {
+        if (!this._carDAO) {
+            this._carDAO = new CarDAO(this.db);
+        }
+        return this._carDAO;
     }
 
     async init() {
@@ -55,6 +70,10 @@ export class Database {
         if(this.attachmentQueue){
             await this.attachmentQueue.init();
         }
+    }
+
+    async disconnect() {
+        await this.powersync.disconnectAndClear();
     }
 }
 

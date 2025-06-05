@@ -1,19 +1,18 @@
-import React, { forwardRef, ReactNode } from "react";
+import React, { forwardRef, ReactNode, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { theme } from "../../Shared/constants/theme";
+import { Colors } from "../../../constants/colors";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../Shared/constants/constants";
+import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/constants";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import BottomSheetBackdrop from "./BottomSheetBackdrop";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BottomSheetContext, useBottomSheet } from "../context/BottomSheetContext.ts";
 
 interface BottomSheetProps extends Partial<BottomSheetModalProps> {
     title?: string
     content: ReactNode
     closeButton?: ReactNode
-    reopen: () => void,
-    forceClose: () => void
 }
 
 const BottomSheet=
@@ -22,11 +21,10 @@ const BottomSheet=
             title,
             content,
             closeButton,
-            reopen,
-            forceClose,
             ...restProps
         } = props;
 
+        const [isLayoutReady, setIsLayoutReady] = useState(false);
         const { snapPoints, enableHandlePanningGesture } = restProps;
 
         const { top } = useSafeAreaInsets();
@@ -40,6 +38,7 @@ const BottomSheet=
                 keyboardBehavior="interactive"
                 keyboardBlurBehavior="restore"
                 android_keyboardInputMode="adjustPan"
+                stackBehavior="switch"
                 backdropComponent={
                     (props: any) =>
                         <BottomSheetBackdrop { ...props } />
@@ -48,7 +47,10 @@ const BottomSheet=
                 backgroundStyle={ styles.containerBackground }
                 handleIndicatorStyle={ styles.line }
             >
-                <BottomSheetView style={ styles.container }>
+                <BottomSheetView
+                    style={ styles.container }
+                    onLayout={ () => setIsLayoutReady(true) }
+                >
                     {
                         title &&
                         <View>
@@ -58,7 +60,9 @@ const BottomSheet=
                             </Text>
                         </View>
                     }
-                    { content }
+                    <BottomSheetContext.Provider value={ useBottomSheet() }>
+                        { isLayoutReady && content }
+                    </BottomSheetContext.Provider>
                 </BottomSheetView>
             </BottomSheetModal>
         )
@@ -74,7 +78,7 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
             paddingBottom: DEFAULT_SEPARATOR
         },
         containerBackground: {
-            backgroundColor: theme.colors.black,
+            backgroundColor: Colors.black,
             borderTopLeftRadius: !isFullScreen ? 55 : 0,
             borderTopRightRadius: !isFullScreen ? 55 : 0,
         },
@@ -83,12 +87,12 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
             marginTop: SEPARATOR_SIZES.normal,
             width: hp(15),
             height: isHandlePanningGesture ? hp(0.75) : 0,
-            backgroundColor: theme.colors.white2,
+            backgroundColor: Colors.white2,
             borderRadius: 35
         },
         titleText: {
             ...GLOBAL_STYLE.containerTitleText,
-            fontSize: FONT_SIZES.medium,
+            fontSize: FONT_SIZES.h2,
             textAlign: "center"
         },
     })

@@ -1,18 +1,12 @@
-import {ALERT_COLORS, ALERT_ICONS, ALERT_TITLES, AlertType} from "../constants/constants";
-import React, {useCallback, useEffect, useRef, useState} from "react";
-import {View, Text, StyleSheet, Modal, Easing, useWindowDimensions, TouchableOpacity} from "react-native";
-import {theme} from "../../Shared/constants/theme";
-import {heightPercentageToDP as hp, widthPercentageToDP} from "react-native-responsive-screen";
-import {FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT} from "../../Shared/constants/constants";
-import Icon from "../../Shared/components/Icon";
-import { Portal } from '@gorhom/portal';
-import Animated, {
-    interpolate,
-    useAnimatedStyle,
-    useDerivedValue,
-    useSharedValue,
-    withTiming
-} from "react-native-reanimated";
+import { ALERT_COLORS, ALERT_ICONS, ALERT_TITLES } from "../constants/constants";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity } from "react-native";
+import { Colors } from "../../../constants/colors";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/constants";
+import Icon from "../../../components/Icon";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming} from "react-native-reanimated";
+import { AlertType } from "../constants/types.ts";
 
 export interface AlertToastProps {
     type?: AlertType,
@@ -144,7 +138,7 @@ const useStyles = (type: AlertType, height: number) =>
         container: {
             alignSelf: "center",
             height,
-            backgroundColor: theme.colors.black5,
+            backgroundColor: Colors.black5,
             borderRadius: 35,
             borderColor: ALERT_COLORS[type],
             borderWidth: 1.5,
@@ -160,15 +154,15 @@ const useStyles = (type: AlertType, height: number) =>
         },
         titleText: {
             fontFamily: "Gilroy-Heavy",
-            fontSize: FONT_SIZES.intermediate,
-            letterSpacing: FONT_SIZES.intermediate * 0.05,
-            color: theme.colors.white,
+            fontSize: FONT_SIZES.p2,
+            letterSpacing: FONT_SIZES.p2 * 0.05,
+            color: Colors.white,
         },
         text: {
             fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.tiny,
-            letterSpacing: FONT_SIZES.tiny * 0.05,
-            color: theme.colors.gray1,
+            fontSize: FONT_SIZES.p4,
+            letterSpacing: FONT_SIZES.p4 * 0.05,
+            color: Colors.gray1,
         }
     })
 

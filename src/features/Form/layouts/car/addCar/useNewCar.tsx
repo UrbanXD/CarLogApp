@@ -1,16 +1,16 @@
-import { CarFormFieldType, useCarFormProps } from "../../../constants/schemas/carSchema";
+import { useAddCarFormProps, AddCarFormFieldType } from "../../../constants/schemas/carSchema";
 import { store } from "../../../../Database/redux/store";
 import { addCar } from "../../../../Database/redux/cars/functions/addCar";
 import { useDatabase } from "../../../../Database/connector/Database";
 import { useAlert } from "../../../../Alert/context/AlertProvider";
 import { useForm } from "react-hook-form";
-import newCarToast from "../../../../Alert/layouts/toast/newCarToast";
 import useCarSteps from "../steps/useCarSteps";
+import { NewCarToast } from "../../../../Alert/presets/toast";
+import { useBottomSheet } from "../../../../BottomSheet/context/BottomSheetContext.ts";
 
-const useNewCarForm = (
-    forceCloseBottomSheet: () => void
-) => {
+const useNewCarForm = () => {
     const database = useDatabase();
+    const { dismissAllBottomSheet } = useBottomSheet();
     const { addToast } = useAlert();
 
     const {
@@ -19,21 +19,19 @@ const useNewCarForm = (
         trigger,
         reset,
         resetField
-    } = useForm<CarFormFieldType>(useCarFormProps());
+    } = useForm<AddCarFormFieldType>(useAddCarFormProps());
 
     const submitHandler =
-        handleSubmit(async (newCar: CarFormFieldType) => {
+        handleSubmit(async (newCar: AddCarFormFieldType) => {
             try {
                 await store.dispatch(addCar({ database, car: newCar }));
 
-                //ha sikeres a hozzaadas
                 reset();
-                forceCloseBottomSheet();
-                addToast(newCarToast.success);
+                dismissAllBottomSheet();
+                addToast(NewCarToast.success());
             } catch (e){
                 console.log(e);
-                //ha sikertelen
-                addToast(newCarToast.error);
+                addToast(NewCarToast.error());
             }
         })
 

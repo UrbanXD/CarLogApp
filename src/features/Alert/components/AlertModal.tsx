@@ -1,15 +1,10 @@
 import React from "react";
-import {ImageSourcePropType, StyleSheet, View, Text, ColorValue} from "react-native";
-import Animated from "react-native-reanimated";
-import {
-    FONT_SIZES,
-    SEPARATOR_SIZES,
-    SIMPLE_HEADER_HEIGHT
-} from "../../Shared/constants/constants";
-import {heightPercentageToDP as hp} from "react-native-responsive-screen";
-import {theme} from "../../Shared/constants/theme";
-import Icon from "../../Shared/components/Icon";
-import Button from "../../Button/components/Button";
+import { StyleSheet, View, Text, ColorValue } from "react-native";
+import { FONT_SIZES, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/constants";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { Colors } from "../../../constants/colors";
+import Icon from "../../../components/Icon";
+import Button from "../../../components/Button/Button";
 
 export interface AlertModalProps {
     icon?: string
@@ -26,7 +21,7 @@ const AlertModal: React.FC<AlertModalProps> = ({
     icon,
     title,
     body,
-    color = theme.colors.fuelYellow,
+    color = Colors.fuelYellow,
     accept = () => {},
     acceptText= "Folytatás",
     dismiss = () => {},
@@ -37,55 +32,53 @@ const AlertModal: React.FC<AlertModalProps> = ({
     const styles = useStyles(iconSize);
 
     return (
-        // <Animated.View>
-            <View style={ styles.container }>
-                {
-                    icon &&
-                    <View style={ styles.iconContainer }>
-                        <Icon
-                            icon={ icon }
-                            size={ iconSize }
-                            backgroundColor={ color }
-                            style={ styles.icon }
-                        />
-                    </View>
-                }
-                <View style={ styles.contentContainer }>
-                    <View style={ styles.textContainer }>
-                        {
-                            title &&
-                            <Text style={ styles.titleText }>
-                                { title }
-                            </Text>
-                        }
-                        {
-                            body &&
-                            <Text style={ styles.text }>
-                                { body }
-                            </Text>
-                        }
-                    </View>
-                    <View style={ styles.buttonContainer }>
-                        <Button.Text
-                            text={ acceptText }
-                            fontSize={ FONT_SIZES.small }
-                            backgroundColor={ color }
-                            height={ hp(5.5) }
-                            onPress={ accept }
-                        />
-                        <Button.Text
-                            text={ dismissText }
-                            height={ hp(5.5) }
-                            backgroundColor={ "transparent" }
-                            fontSize={ FONT_SIZES.small }
-                            textColor={ color }
-                            style={{ borderColor: color, borderWidth: 2.5 }}
-                            onPress={ dismiss }
-                        />
-                    </View>
+        <View style={ styles.container }>
+            {
+                icon &&
+                <View style={ styles.iconContainer }>
+                    <Icon
+                        icon={ icon }
+                        size={ iconSize }
+                        backgroundColor={ color }
+                        style={ styles.icon }
+                    />
+                </View>
+            }
+            <View style={ styles.contentContainer }>
+                <View style={ styles.textContainer }>
+                    {
+                        title &&
+                        <Text style={ styles.titleText }>
+                            { title }
+                        </Text>
+                    }
+                    {
+                        body &&
+                        <Text style={ styles.text }>
+                            { body }
+                        </Text>
+                    }
+                </View>
+                <View style={ styles.buttonContainer }>
+                    <Button.Text
+                        text={ acceptText }
+                        fontSize={ FONT_SIZES.p2 }
+                        backgroundColor={ color }
+                        height={ hp(5.5) }
+                        onPress={ accept }
+                    />
+                    <Button.Text
+                        text={ dismissText }
+                        height={ hp(5.5) }
+                        backgroundColor={ "transparent" }
+                        fontSize={ FONT_SIZES.p2 }
+                        textColor={ color }
+                        style={{ borderColor: color, borderWidth: 2.5 }}
+                        onPress={ dismiss }
+                    />
                 </View>
             </View>
-        // </Animated.View>
+        </View>
     )
 }
 
@@ -97,7 +90,7 @@ const useStyles = (iconSize: number) =>
             alignSelf: "center",
             width: "100%",
             minHeight: hp(25),
-            backgroundColor: theme.colors.black5,
+            backgroundColor: Colors.black5,
             padding: SEPARATOR_SIZES.small,
             borderRadius: 35,
             zIndex: 2
@@ -112,7 +105,7 @@ const useStyles = (iconSize: number) =>
             top: -iconSize / 1.35,
             alignSelf: "center",
             borderWidth: hp(1),
-            borderColor: theme.colors.black5
+            borderColor: Colors.black5
         },
         contentContainer: {
             flex: 1,
@@ -121,21 +114,20 @@ const useStyles = (iconSize: number) =>
         textContainer: {
             flex: 1,
             alignItems: "center",
-            gap: SEPARATOR_SIZES.lightSmall
         },
         titleText: {
             fontFamily: "Gilroy-Heavy",
-            fontSize: FONT_SIZES.normal,
-            color: theme.colors.white,
-            lineHeight: FONT_SIZES.normal,
-            letterSpacing: FONT_SIZES.normal * 0.05,
+            fontSize: FONT_SIZES.h3,
+            color: Colors.white,
+            lineHeight: FONT_SIZES.h3 * 1.25,
+            letterSpacing: FONT_SIZES.h3 * 0.05,
             textAlign: "center"
         },
         text: {
             fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.small,
-            color: theme.colors.gray1,
-            lineHeight: FONT_SIZES.small * 1.35,
+            fontSize: FONT_SIZES.p2,
+            color: Colors.gray1,
+            lineHeight: FONT_SIZES.p2 * 1.05,
             textAlign: "center"
         },
         buttonContainer: {
