@@ -21,6 +21,7 @@ const useMyGarage = () => {
             content:
                 <NewCarForm />,
             snapPoints: ["85%"],
+            enableOverDrag: false,
             enableDismissOnClose: false
         });
 

@@ -1,3 +1,29 @@
+CREATE OR REPLACE PROCEDURE public.flag_user_files_for_delete(owner_id IN UUID)
+LANGUAGE plpsql
+SECURITY DEFINER SET search_path = storage, pg_temp;
+AS $$
+BEGIN
+    UPDATE storage.objects SET
+        owner = null,
+        owner_id = 'delete_flag'
+        metadata = null
+    WHERE owner = owner_id;
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE public.flag_file_for_delete(file_path IN TEXT)
+LANGUAGE plpsql
+SECURITY DEFINER SET search_path = storage, pg_temp;
+AS $$
+BEGIN
+    UPDATE storage.objects SET
+        owner = null,
+        owner_id = 'delete_flag'
+        metadata = null
+    WHERE owner = auth.uid() AND auth.uid() IS NOT NULL AND name = file_path;
+END;
+$$;
+
 CREATE OR REPLACE PROCEDURE public.delete_from_storage(file_path IN TEXT)
 LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = public, extensions, vault

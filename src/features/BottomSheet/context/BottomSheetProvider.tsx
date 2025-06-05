@@ -23,7 +23,11 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         const bottomSheet = getCurrentBottomSheet();
         if(!bottomSheet) return;
 
-        bottomSheet.ref.current?.present();
+        const timeout = setTimeout(() => {
+            bottomSheet.ref.current?.present();
+        }, 100);
+
+        return () => clearTimeout(timeout);
     }, [bottomSheets]);
 
     const getCurrentBottomSheet = useCallback(() => {

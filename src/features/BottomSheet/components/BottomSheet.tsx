@@ -1,4 +1,4 @@
-import React, { forwardRef, ReactNode } from "react";
+import React, { forwardRef, ReactNode, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Colors } from "../../../constants/colors";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -24,6 +24,7 @@ const BottomSheet=
             ...restProps
         } = props;
 
+        const [isLayoutReady, setIsLayoutReady] = useState(false);
         const { snapPoints, enableHandlePanningGesture } = restProps;
 
         const { top } = useSafeAreaInsets();
@@ -46,7 +47,10 @@ const BottomSheet=
                 backgroundStyle={ styles.containerBackground }
                 handleIndicatorStyle={ styles.line }
             >
-                <BottomSheetView style={ styles.container }>
+                <BottomSheetView
+                    style={ styles.container }
+                    onLayout={ () => setIsLayoutReady(true) }
+                >
                     {
                         title &&
                         <View>
@@ -57,7 +61,7 @@ const BottomSheet=
                         </View>
                     }
                     <BottomSheetContext.Provider value={ useBottomSheet() }>
-                        { content }
+                        { isLayoutReady && content }
                     </BottomSheetContext.Provider>
                 </BottomSheetView>
             </BottomSheetModal>
