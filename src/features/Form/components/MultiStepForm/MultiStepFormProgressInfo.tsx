@@ -5,20 +5,13 @@ import { useFont } from "@shopify/react-native-skia";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import ProgressInfo from "../../../../components/ProgressInfo";
 
-interface MultiStepFormProgressInfoProps {
-    isFirstCount: boolean
-    stepsTitle: Array<string>
-}
-
-const MultiStepFormProgressInfo: React.FC<MultiStepFormProgressInfoProps> = ({
-    isFirstCount,
-    stepsTitle
-}) => {
+const MultiStepFormProgressInfo: React.FC = () => {
     const {
         steps,
         stepsCount,
         currentStep,
         currentStepText,
+        isFirstCount,
         isFirstStep,
     } = useMultiStepForm();
 
@@ -40,8 +33,8 @@ const MultiStepFormProgressInfo: React.FC<MultiStepFormProgressInfoProps> = ({
                     end={ end }
                     font={ font }
                     statusText={ `${ stepsCount } / ${ currentStepText }` }
-                    stepTitle={ stepsTitle[currentStep] }
-                    stepSubtitle={ stepsTitle[currentStep + 1] !== undefined ? `Következik: ${ stepsTitle[currentStep + 1] }` : undefined }
+                    stepTitle={ steps[currentStep]?.title || "" }
+                    stepSubtitle={ steps[currentStep + 1]?.title !== undefined ? `Következik: ${ steps[currentStep + 1].title }` : undefined }
                 />
             }
         </>

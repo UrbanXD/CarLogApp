@@ -1,4 +1,4 @@
-import React, { forwardRef, ReactNode, useState } from "react";
+import React, { forwardRef, ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Colors } from "../../../constants/colors";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -58,7 +58,7 @@ const BottomSheet=
                         </View>
                     }
                     <BottomSheetContext.Provider value={ useBottomSheet() }>
-                            { content }
+                        { content }
                     </BottomSheetContext.Provider>
                 </BottomSheetView>
             </BottomSheetModal>

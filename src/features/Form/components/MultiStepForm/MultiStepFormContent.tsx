@@ -11,7 +11,7 @@ const MultiStepFormContent: React.FC = () => {
 
     return (
         <OnBoardingView
-            steps={ steps }
+            steps={ steps.map(step => step.render) }
             currentStep={ currentStep }
             visibleHeight={ contentVisibleHeight }
         />

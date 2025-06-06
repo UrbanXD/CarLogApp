@@ -7,11 +7,10 @@ import MultiStepFormButtons from "./MultiStepFormButtons";
 import { LayoutChangeEvent, StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../../constants/constants";
 import { FlatList } from "react-native-gesture-handler";
+import { Steps } from "../../constants/types/types.ts";
 
 interface MultiStepFormProps {
-    steps: Array<() => ReactNode | null>
-    stepsTitle: Array<string>
-    fieldsName: Array<Array<string>>
+    steps: Steps
     isFirstCount?: boolean
     control: Control<any>
     submitHandler: () => Promise<void>
@@ -21,8 +20,6 @@ interface MultiStepFormProps {
 
 export const MultiStepForm: React.FC<MultiStepFormProps> = ({
     steps,
-    stepsTitle,
-    fieldsName,
     isFirstCount = true,
     control,
     submitHandler,
@@ -38,7 +35,6 @@ export const MultiStepForm: React.FC<MultiStepFormProps> = ({
     return (
         <MultiStepFormProvider
             steps={ steps }
-            fieldsName={ fieldsName }
             isFirstCount={ isFirstCount }
             control={ control }
             submitHandler={ submitHandler }
@@ -47,20 +43,17 @@ export const MultiStepForm: React.FC<MultiStepFormProps> = ({
             contentVisibleAreaHeight={ contentVisibleAreaHeight }
         >
             <View style={ styles.container }>
-                <MultiStepFormProgressInfo
-                    isFirstCount={isFirstCount}
-                    stepsTitle={stepsTitle}
-                />
+                <MultiStepFormProgressInfo />
                 <FlatList
                     onLayout={ handleLayout }
                     data={ [] }
                     renderItem={ () => <></> }
                     ListEmptyComponent={
-                        <MultiStepFormContent/>
+                        <MultiStepFormContent />
                     }
                     showsVerticalScrollIndicator={ false }
                 />
-                <MultiStepFormButtons isFirstCount={ isFirstCount } />
+                <MultiStepFormButtons />
             </View>
         </MultiStepFormProvider>
     )

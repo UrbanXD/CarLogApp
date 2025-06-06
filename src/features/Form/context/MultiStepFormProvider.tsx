@@ -1,8 +1,9 @@
 import React, { Context, createContext, ReactNode, useContext, useState} from "react";
 import { Control, SubmitHandler, UseFormResetField, UseFormTrigger } from "react-hook-form";
+import { Steps } from "../constants/types/types.ts";
 
 interface MultiStepFormProviderValue {
-    steps: Array<() => ReactNode | null>
+    steps: Steps
     stepsCount: number
     control: Control<any>
     submitHandler: SubmitHandler<any>
@@ -10,6 +11,7 @@ interface MultiStepFormProviderValue {
     resetField?: UseFormResetField<any>
     currentStep: number
     currentStepText: string
+    isFirstCount
     isFirstStep: boolean
     isLastStep: boolean
     goTo: (index: number) => void
@@ -21,8 +23,9 @@ const MultiStepFormContext = createContext<MultiStepFormProviderValue | null>(nu
 
 interface MultiStepFormProviderProps {
     children: ReactNode | null
-    steps: Array<() => ReactNode | null>
-    fieldsName: Array<Array<string>>
+    steps: Steps
+    optionalSteps?: Array<() => ReactNode | null>
+    resultStep?: (args: any) => ReactNode | null
     isFirstCount?: boolean
     control: Control<any>
     submitHandler:  (e?: (React.BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
@@ -34,7 +37,6 @@ interface MultiStepFormProviderProps {
 export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
     children,
     steps,
-    fieldsName,
     isFirstCount = true,
     control,
     submitHandler,
@@ -50,7 +52,7 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
             return;
         }
 
-        const isValid = await trigger(fieldsName[currentStep]);
+        const isValid = await trigger(steps[currentStep].fields);
         if(!isValid) return
 
         setCurrentStep(currentStep + 1);
@@ -78,6 +80,7 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
                 resetField,
                 currentStep,
                 currentStepText: (currentStep + (isFirstCount ? 1 : 0)).toString(),
+                isFirstCount,
                 isFirstStep: currentStep === 0,
                 isLastStep: currentStep === steps.length - 1,
                 goTo,

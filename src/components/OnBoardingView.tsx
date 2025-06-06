@@ -1,11 +1,11 @@
-import React, { ReactNode, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { FlatList } from "react-native-gesture-handler";
-import {LayoutChangeEvent, ScrollView, StyleSheet, useWindowDimensions, View} from "react-native";
+import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { DEFAULT_SEPARATOR } from "../constants/constants";
-import Animated from "react-native-reanimated";
+import { RenderComponent } from "../features/Form/constants/types/types.ts";
 
 interface OnBoardingViewProps {
-    steps: Array<() => ReactNode>
+    steps: RenderComponent
     currentStep?: number
     visibleHeight?: number
 }

@@ -1,10 +1,10 @@
-import {Control, UseFormResetField} from "react-hook-form";
 import NameStep from "./NameStep";
 import CarModelStep from "./CarModelStep";
 import OdometerStep from "./OdometerStep";
 import FuelStep from "./FuelStep";
 import React from "react";
 import ImageStep from "./ImageStep";
+import { StepProps, Steps } from "../../../constants/types/types.ts";
 
 export enum CAR_FORM_STEPS {
     NameStep,
@@ -15,31 +15,51 @@ export enum CAR_FORM_STEPS {
 }
 
 const useCarSteps = (
-    control: Control<any>,
-    resetField: UseFormResetField<any>
-) =>
+    control: StepProps["control"],
+    resetField: StepProps["resetField"],
+): Steps =>
     [
-        () =>
-            <NameStep
-                control={ control }
-            />,
-        () =>
-            <CarModelStep
-                control={ control }
-                resetField={ resetField }
-            />,
-        () =>
-            <OdometerStep
-                control={ control }
-            />,
-        () =>
-            <FuelStep
-                control={ control }
-            />,
-        () =>
-            <ImageStep
-                control={ control }
-            />
+        {
+            title: "Elnevezés",
+            fields: ["name"],
+            render: () =>
+                <NameStep
+                    control={ control }
+                />
+        },
+        {
+            title: "Modell",
+            fields: ["brand", "model"],
+            render: () =>
+                <CarModelStep
+                    control={ control }
+                    resetField={ resetField }
+                />
+        },
+        {
+            title: "Kilométeróra",
+            fields: ["odometerValue", "odometerMeasurement"],
+            render: () =>
+                <OdometerStep
+                    control={ control }
+                />
+        },
+        {
+            title: "Üzemanyag",
+            fields: ["fuelType", "fuelMeasurement", "fuelTankSize"],
+            render: () =>
+                <FuelStep
+                    control={ control }
+                />
+        },
+        {
+            title: "Kép",
+            fields: ["image"],
+            render: () =>
+                <ImageStep
+                    control={ control }
+                />
+        },
     ]
 
 export default useCarSteps;
