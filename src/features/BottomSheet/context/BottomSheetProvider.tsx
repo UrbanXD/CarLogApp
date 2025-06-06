@@ -23,11 +23,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         const bottomSheet = getCurrentBottomSheet();
         if(!bottomSheet) return;
 
-        const timeout = setTimeout(() => {
-            bottomSheet.ref.current?.present();
-        }, 100);
-
-        return () => clearTimeout(timeout);
+        bottomSheet.ref.current?.present();
     }, [bottomSheets]);
 
     const getCurrentBottomSheet = useCallback(() => {
@@ -38,7 +34,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
     }, [bottomSheets])
 
     const openBottomSheet = useCallback((args: OpenBottomSheetArgs) => {
-        const newBottomSheet = {
+        const newBottomSheet: BottomSheetType = {
             ref: createRef<BottomSheetModal>(),
             props: args
         };

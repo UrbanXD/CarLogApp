@@ -4,7 +4,7 @@ import { MultiStepFormProvider } from "../../context/MultiStepFormProvider";
 import MultiStepFormProgressInfo from "./MultiStepFormProgressInfo";
 import MultiStepFormContent from "./MultiStepFormContent";
 import MultiStepFormButtons from "./MultiStepFormButtons";
-import { StyleSheet, View } from "react-native";
+import { LayoutChangeEvent, StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../../constants/constants";
 import { FlatList } from "react-native-gesture-handler";
 
@@ -28,33 +28,43 @@ export const MultiStepForm: React.FC<MultiStepFormProps> = ({
     submitHandler,
     trigger,
     resetField
-}) =>
-    <MultiStepFormProvider
-        steps={ steps }
-        fieldsName={ fieldsName }
-        isFirstCount={ isFirstCount }
-        control={ control }
-        submitHandler={ submitHandler }
-        trigger={ trigger }
-        resetField={ resetField }
-    >
-        <View style={ styles.container }>
-            <MultiStepFormProgressInfo
-                isFirstCount={ isFirstCount }
-                stepsTitle={ stepsTitle }
-            />
-            <FlatList
-                data={ [] }
-                renderItem={ () => <></> }
-                ListEmptyComponent={
-                    <MultiStepFormContent />
-                }
-                showsVerticalScrollIndicator={ false }
-            />
-            <MultiStepFormButtons isFirstCount={ isFirstCount } />
-        </View>
-    </MultiStepFormProvider>
+}) => {
+    const [contentVisibleAreaHeight, setContentVisibleAreaHeight] = React.useState<number | undefined>();
 
+    const handleLayout = (event: LayoutChangeEvent) => {
+        setContentVisibleAreaHeight(event.nativeEvent.layout.height);
+    }
+
+    return (
+        <MultiStepFormProvider
+            steps={ steps }
+            fieldsName={ fieldsName }
+            isFirstCount={ isFirstCount }
+            control={ control }
+            submitHandler={ submitHandler }
+            trigger={ trigger }
+            resetField={ resetField }
+            contentVisibleAreaHeight={ contentVisibleAreaHeight }
+        >
+            <View style={ styles.container }>
+                <MultiStepFormProgressInfo
+                    isFirstCount={isFirstCount}
+                    stepsTitle={stepsTitle}
+                />
+                <FlatList
+                    onLayout={ handleLayout }
+                    data={ [] }
+                    renderItem={ () => <></> }
+                    ListEmptyComponent={
+                        <MultiStepFormContent/>
+                    }
+                    showsVerticalScrollIndicator={ false }
+                />
+                <MultiStepFormButtons isFirstCount={ isFirstCount } />
+            </View>
+        </MultiStepFormProvider>
+    )
+}
 const styles = StyleSheet.create({
     container: {
         flex: 1,

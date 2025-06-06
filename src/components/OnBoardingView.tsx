@@ -1,16 +1,19 @@
 import React, { ReactNode, useEffect, useRef } from "react";
 import { FlatList } from "react-native-gesture-handler";
-import { useWindowDimensions, View } from "react-native";
+import {LayoutChangeEvent, ScrollView, StyleSheet, useWindowDimensions, View} from "react-native";
 import { DEFAULT_SEPARATOR } from "../constants/constants";
+import Animated from "react-native-reanimated";
 
 interface OnBoardingViewProps {
     steps: Array<() => ReactNode>
     currentStep?: number
+    visibleHeight?: number
 }
 
 const OnBoardingView: React.FC<OnBoardingViewProps> = ({
     steps,
-    currentStep = 0
+    currentStep = 0,
+    visibleHeight
 }) => {
     const scrollViewRef = useRef<FlatList>(null);
 
@@ -19,19 +22,32 @@ const OnBoardingView: React.FC<OnBoardingViewProps> = ({
         scrollViewRef.current?.scrollToOffset({ offset: currentStep * width, animated: true });
     }, [scrollViewRef, currentStep, width]);
 
+    const styles = StyleSheet.create({
+       container: {
+           flexDirection: "row",
+           gap: 2 * DEFAULT_SEPARATOR
+       },
+       stepContainer: {
+           width: width - 2 * DEFAULT_SEPARATOR, // - 2*gap
+       }
+    });
 
     return (
         <FlatList
             data={ [] }
             renderItem={ () => <></> }
             ListEmptyComponent={
-                <View style={{ flexDirection: "row", gap: 2 * DEFAULT_SEPARATOR }}>
+                <View style={ styles.container }>
                     {
                         steps.map(
                             (step, index) =>
                                 <View
                                     key={ index }
-                                    style={{ width: width - 2 * DEFAULT_SEPARATOR }}
+                                    style={[
+                                        styles.stepContainer, {
+                                            height: visibleHeight && currentStep !== index ? visibleHeight : "100%"
+                                        }
+                                    ]}
                                 >
                                     { step() }
                                 </View>

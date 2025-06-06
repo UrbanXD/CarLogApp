@@ -15,6 +15,7 @@ interface MultiStepFormProviderValue {
     goTo: (index: number) => void
     next: () => void
     back: () => void
+    contentVisibleHeight?: number
 }
 const MultiStepFormContext = createContext<MultiStepFormProviderValue | null>(null);
 
@@ -27,6 +28,7 @@ interface MultiStepFormProviderProps {
     submitHandler:  (e?: (React.BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
     trigger: UseFormTrigger<any>
     resetField?: UseFormResetField<any>
+    contentVisibleAreaHeight?: number
 }
 
 export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
@@ -37,7 +39,8 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
     control,
     submitHandler,
     trigger,
-    resetField
+    resetField,
+    contentVisibleAreaHeight
 }) => {
     const [currentStep, setCurrentStep] = useState(0);
 
@@ -79,7 +82,8 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
                 isLastStep: currentStep === steps.length - 1,
                 goTo,
                 next,
-                back
+                back,
+                contentVisibleHeight: contentVisibleAreaHeight
             }}
         >
             { children }

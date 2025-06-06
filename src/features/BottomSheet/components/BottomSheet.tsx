@@ -24,7 +24,6 @@ const BottomSheet=
             ...restProps
         } = props;
 
-        const [isLayoutReady, setIsLayoutReady] = useState(false);
         const { snapPoints, enableHandlePanningGesture } = restProps;
 
         const { top } = useSafeAreaInsets();
@@ -43,14 +42,12 @@ const BottomSheet=
                     (props: any) =>
                         <BottomSheetBackdrop { ...props } />
                 }
+                enableDynamicSizing={ false }
                 topInset={ top }
                 backgroundStyle={ styles.containerBackground }
                 handleIndicatorStyle={ styles.line }
             >
-                <BottomSheetView
-                    style={ styles.container }
-                    onLayout={ () => setIsLayoutReady(true) }
-                >
+                <BottomSheetView style={ styles.container } >
                     {
                         title &&
                         <View>
@@ -61,7 +58,7 @@ const BottomSheet=
                         </View>
                     }
                     <BottomSheetContext.Provider value={ useBottomSheet() }>
-                        { isLayoutReady && content }
+                            { content }
                     </BottomSheetContext.Provider>
                 </BottomSheetView>
             </BottomSheetModal>
