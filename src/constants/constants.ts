@@ -98,7 +98,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
         backgroundColor: Colors.black2
     },
     scrollViewContentContainer: {
-        // flexGrow: 1,
+        flexGrow: 1,
         gap: SEPARATOR_SIZES.normal,
     },
     formContainer: {

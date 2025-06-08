@@ -1,24 +1,39 @@
 import React, { useEffect } from "react";
 import { Redirect } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import AuthScreen from "../screens/AuthScreen";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
 import { useAuth } from "../contexts/Auth/AuthContext.ts";
-import {View} from "react-native";
+import { useFonts } from "expo-font";
+
+SplashScreen.preventAutoHideAsync();
 
 const App: React.FC = () => {
+    const [isFontsLoaded, fontsLoadError] = useFonts({
+        "Gilroy-Heavy": require("../assets/fonts/Gilroy-Heavy.otf"),
+        "Gilroy-Medium": require("../assets/fonts/Gilroy-Medium.ttf"),
+        "Gilroy-Regular": require("../assets/fonts/Gilroy-Regular.ttf"),
+        "DSEG7": require("../assets/fonts/DSEG7ClassicMini-Bold.ttf"),
+    });
+
     const { session, isSessionLoading } = useAuth();
     const { dismissAllBottomSheet } = useBottomSheet();
 
+
     useEffect(() => {
-        if(session) dismissAllBottomSheet(); /// pl: becsukja az email hitelesitot
+        if (isFontsLoaded && !isSessionLoading || fontsLoadError) {
+            SplashScreen.hideAsync();
+        }
+    }, [isFontsLoaded, fontsLoadError, isSessionLoading]);
+
+    useEffect(() => {
+        if(session) dismissAllBottomSheet();
     }, [session]);
 
     return (
-        isSessionLoading
-            ?   <View style={{ flex:1, backgroundColor: 'black' }} /> /// skeleton komponens utan kivaltasra kerul
-            :   !(session && session.user)
-                    ?   <AuthScreen />
-                    :   <Redirect href="/(main)" />
+        !(session && session.user)
+            ?   <AuthScreen />
+            :   <Redirect href="/(main)" />
     )
 }
 
