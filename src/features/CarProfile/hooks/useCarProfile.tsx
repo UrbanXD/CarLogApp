@@ -4,11 +4,8 @@ import useCars from "../../../hooks/useCars";
 import { useBottomSheet } from "../../BottomSheet/context/BottomSheetContext.ts";
 import EditCarForm from "../../Form/layouts/car/editCar/EditCarForm";
 import React from "react";
-import { ICON_NAMES } from "../../../constants/constants";
-import { CAR_FORM_STEPS } from "../../Form/layouts/car/steps/useCarSteps";
 import { store } from "../../Database/redux/store";
 import { deleteCar } from "../../Database/redux/cars/functions/deleteCar";
-import { InformationContainerProps } from "../components/InformationContainer.tsx";
 
 const useCarProfile = (carID: string) => {
     const database = useDatabase();
@@ -43,59 +40,11 @@ const useCarProfile = (carID: string) => {
             enableDismissOnClose: false
         })
 
-    const nameInformationBlock = {
-        data: [{
-                icon: ICON_NAMES.nametag,
-                text: car?.name
-        }],
-        onEdit: () => openEditForm(CAR_FORM_STEPS.NameStep, "37.5%")
-    } as InformationContainerProps;
-
-    const carModelInformationBlock = {
-        data: [
-            {
-                icon: ICON_NAMES.car,
-                text: `${car.brand} ${car.model}`
-            },
-            {
-                icon: ICON_NAMES.calendar,
-                text: "2025"
-            }
-        ],
-        onEdit: () => openEditForm(CAR_FORM_STEPS.CarModelStep)
-    } as InformationContainerProps;
-
-    const odometerInformationBlock = {
-        data: [{
-            icon: ICON_NAMES.odometer,
-            text: `${car.odometerValue} ${car.odometerMeasurement}`
-        }],
-        onEdit: () => openEditForm(CAR_FORM_STEPS.OdometerStep)
-    } as InformationContainerProps;
-
-    const fuelInformationBlock = {
-        data: [
-            {
-                icon: ICON_NAMES.fuel,
-                text: car.fuelType
-            },
-            {
-                icon: ICON_NAMES.fuelTank,
-                text: `${car.fuelTankSize} ${car.fuelMeasurement}`
-            }
-        ],
-        onEdit: () => openEditForm(CAR_FORM_STEPS.FuelStep, "55%")
-    } as InformationContainerProps;
-
     return {
         openEditForm,
         car,
         carImage,
-        handleDeleteCar,
-        nameInformationBlock,
-        carModelInformationBlock,
-        odometerInformationBlock,
-        fuelInformationBlock
+        handleDeleteCar
     };
 }
 
