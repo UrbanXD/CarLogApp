@@ -11,7 +11,7 @@ export type Step = {
 
 export type ResultStep = {
     type: "result"
-    render: (goTo: (index: number) => void) => ReactNode | null
+    render: (goTo?: (index: number) => void) => ReactNode | null
 }
 
 export type Steps = Array<Step | ResultStep>

@@ -1,11 +1,11 @@
-import { useDatabase } from "../../Database/connector/Database";
-import { useAlert } from "../../Alert/context/AlertProvider";
-import useCars from "../../../hooks/useCars";
-import { useBottomSheet } from "../../BottomSheet/context/BottomSheetContext.ts";
-import EditCarForm from "../../Form/layouts/car/editCar/EditCarForm";
+import { useDatabase } from "../features/Database/connector/Database.ts";
+import { useAlert } from "../features/Alert/context/AlertProvider.tsx";
+import useCars from "./useCars.ts";
+import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
+import EditCarForm from "../features/Form/layouts/car/editCar/EditCarForm.tsx";
 import React from "react";
-import { store } from "../../Database/redux/store";
-import { deleteCar } from "../../Database/redux/cars/functions/deleteCar";
+import { store } from "../features/Database/redux/store.ts";
+import { deleteCar } from "../features/Database/redux/cars/functions/deleteCar.ts";
 
 const useCarProfile = (carID: string) => {
     const database = useDatabase();
@@ -27,7 +27,7 @@ const useCarProfile = (carID: string) => {
         })
     }
 
-    const openEditForm = (stepIndex: number, height: string = "50%") =>
+    const openEditCarStep = (stepIndex: number, height: string = "50%") =>
         openBottomSheet({
             content:
                 <EditCarForm
@@ -41,10 +41,10 @@ const useCarProfile = (carID: string) => {
         })
 
     return {
-        openEditForm,
         car,
         carImage,
-        handleDeleteCar
+        handleDeleteCar,
+        openEditCarStep
     };
 }
 

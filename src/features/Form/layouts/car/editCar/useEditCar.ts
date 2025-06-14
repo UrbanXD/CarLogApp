@@ -52,7 +52,7 @@ const useEditCarForm = (
         submitHandler,
         reset,
         trigger,
-        steps: useCarSteps(control, resetField).map(step => step.render),
+        steps: useCarSteps(control, resetField).steps.map(step => step.render),
         formState
     } as UseCustomFormProps
 }

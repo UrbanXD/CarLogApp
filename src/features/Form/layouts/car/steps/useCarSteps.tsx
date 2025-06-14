@@ -5,7 +5,7 @@ import FuelStep from "./FuelStep";
 import React from "react";
 import ImageStep from "./ImageStep";
 import { ResultStep, StepProps, Steps } from "../../../constants/types/types.ts";
-import CarProfile from "../../../../CarProfile/components/CarProfile.tsx";
+import CarProfile from "../../../../../components/CarProfile/CarProfile.ts";
 
 export enum CAR_FORM_STEPS {
     NameStep,
@@ -69,7 +69,7 @@ const useCarSteps = (
             type: "result",
             title: "Összesítő adatlap", //kitorolni, lehet undifned hiba lesz onboarding eseten idk
             render: (goTo) =>
-                <CarProfile car={ getValues() } goTo={ goTo } />
+                <CarProfile.ByObj car={ getValues() } goTo={ goTo } />
         }
     }
 }
