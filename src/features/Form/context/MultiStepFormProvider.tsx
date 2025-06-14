@@ -1,6 +1,7 @@
-import React, {Context, createContext, ReactNode, useContext, useEffect, useRef, useState} from "react";
+import React, { Context, createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { Control, SubmitHandler, UseFormResetField, UseFormTrigger } from "react-hook-form";
-import {RenderComponent, ResultStep, Step, Steps} from "../constants/types/types.ts";
+import { ResultStep, Steps } from "../constants/types/types.ts";
+import { Keyboard } from "react-native";
 
 interface MultiStepFormProviderValue {
     steps: Steps
@@ -70,12 +71,14 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
             if(!isValid) return;
         }
 
+        Keyboard.dismiss();
         setCurrentStep(prevState => ++prevState);
     }
 
     const back = () => {
         if(isFirstStep()) return;
 
+        Keyboard.dismiss();
         setCurrentStep(prevState => --prevState);
     }
 
