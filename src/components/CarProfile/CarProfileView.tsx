@@ -107,8 +107,18 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                     />
                 </Button.Row>
             </View>
-            <Odometer value={ car.odometerValue } measurement={ car.odometerMeasurement } />
-            <FuelGauge value={ 232 } tankSize={ car.fuelTankSize } fuelType={ car.fuelType } measurement={ car.fuelMeasurement } />
+            <Odometer
+                value={ car.odometerValue }
+                measurement={ car.odometerMeasurement }
+                openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.OdometerStep) }
+            />
+            <FuelGauge
+                value={ 0 }
+                tankSize={ car.fuelTankSize }
+                fuelType={ car.fuelType }
+                measurement={ car.fuelMeasurement }
+                openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.FuelStep, "65%") }
+            />
         </ScrollView>
     </View>
 
