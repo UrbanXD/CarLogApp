@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Control, UseFormResetField } from "react-hook-form";
+import {Control, UseFormGetValues, UseFormResetField} from "react-hook-form";
 
 export type RenderComponent = () => ReactNode | null
 
@@ -9,9 +9,15 @@ export type Step = {
     render: RenderComponent
 }
 
-export type Steps = Array<Step>
+export type ResultStep = {
+    type: "result"
+    render: (goTo: (index: number) => void) => ReactNode | null
+}
+
+export type Steps = Array<Step | ResultStep>
 
 export interface StepProps {
     control: Control<any>
     resetField?: UseFormResetField<any | undefined>
+    getValues?: UseFormGetValues<any | undefined>
 }

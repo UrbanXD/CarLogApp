@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { Control, UseFormResetField, UseFormTrigger } from "react-hook-form";
 import { MultiStepFormProvider } from "../../context/MultiStepFormProvider";
 import MultiStepFormProgressInfo from "./MultiStepFormProgressInfo";
@@ -7,10 +7,11 @@ import MultiStepFormButtons from "./MultiStepFormButtons";
 import { LayoutChangeEvent, StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../../constants/constants";
 import { FlatList } from "react-native-gesture-handler";
-import { Steps } from "../../constants/types/types.ts";
+import { ResultStep, Steps } from "../../constants/types/types.ts";
 
 interface MultiStepFormProps {
     steps: Steps
+    resultStep?: ResultStep
     isFirstCount?: boolean
     control: Control<any>
     submitHandler: () => Promise<void>
@@ -18,8 +19,9 @@ interface MultiStepFormProps {
     resetField?: UseFormResetField<any>
 }
 
-export const MultiStepForm: React.FC<MultiStepFormProps> = ({
+const MultiStepForm: React.FC<MultiStepFormProps> = ({
     steps,
+    resultStep,
     isFirstCount = true,
     control,
     submitHandler,
@@ -35,6 +37,7 @@ export const MultiStepForm: React.FC<MultiStepFormProps> = ({
     return (
         <MultiStepFormProvider
             steps={ steps }
+            resultStep={ resultStep }
             isFirstCount={ isFirstCount }
             control={ control }
             submitHandler={ submitHandler }
@@ -45,8 +48,8 @@ export const MultiStepForm: React.FC<MultiStepFormProps> = ({
             <View style={ styles.container }>
                 <MultiStepFormProgressInfo />
                 <FlatList
-                    onLayout={ handleLayout }
                     data={ [] }
+                    onLayout={ handleLayout }
                     renderItem={ () => <></> }
                     ListEmptyComponent={
                         <MultiStepFormContent />
@@ -65,4 +68,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default MultiStepForm;
+export default React.memo(MultiStepForm);

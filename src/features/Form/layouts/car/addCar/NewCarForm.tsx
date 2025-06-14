@@ -13,7 +13,8 @@ const NewCarForm: React.FC = () => {
 
     return (
         <MultiStepForm
-            steps={ steps }
+            steps={ steps.steps }
+            resultStep={ steps.resultStep }
             control={ control }
             submitHandler={ submitHandler }
             trigger={ trigger }

@@ -1,17 +1,18 @@
-import React, { Context, createContext, ReactNode, useContext, useState} from "react";
+import React, {Context, createContext, ReactNode, useContext, useEffect, useRef, useState} from "react";
 import { Control, SubmitHandler, UseFormResetField, UseFormTrigger } from "react-hook-form";
-import { Steps } from "../constants/types/types.ts";
+import {RenderComponent, ResultStep, Step, Steps} from "../constants/types/types.ts";
 
 interface MultiStepFormProviderValue {
     steps: Steps
-    stepsCount: number
     control: Control<any>
     submitHandler: SubmitHandler<any>
     trigger: UseFormTrigger<any>
     resetField?: UseFormResetField<any>
     currentStep: number
     currentStepText: string
-    isFirstCount
+    realStepsCount: number
+    isFirstCount: boolean
+    isLastCount: boolean
     isFirstStep: boolean
     isLastStep: boolean
     goTo: (index: number) => void
@@ -24,8 +25,7 @@ const MultiStepFormContext = createContext<MultiStepFormProviderValue | null>(nu
 interface MultiStepFormProviderProps {
     children: ReactNode | null
     steps: Steps
-    optionalSteps?: Array<() => ReactNode | null>
-    resultStep?: (args: any) => ReactNode | null
+    resultStep?: ResultStep
     isFirstCount?: boolean
     control: Control<any>
     submitHandler:  (e?: (React.BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
@@ -37,6 +37,7 @@ interface MultiStepFormProviderProps {
 export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
     children,
     steps,
+    resultStep,
     isFirstCount = true,
     control,
     submitHandler,
@@ -44,45 +45,66 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
     resetField,
     contentVisibleAreaHeight
 }) => {
+    const [formSteps, setFormSteps] = useState<Steps>(steps);
     const [currentStep, setCurrentStep] = useState(0);
 
+    useEffect(() => {
+        if(!resultStep || formSteps[formSteps.length - 1] == resultStep) return;
+
+        setFormSteps(prevState => [...prevState, resultStep]);
+    }, []);
+
+    const isFirstStep = () => currentStep === 0;
+
+    const isLastStep = () => currentStep >= formSteps.length - 1;
+
     const next = async () => {
-        if(currentStep >= steps.length - 1) {
+        if(isLastStep()) {
             await submitHandler();
             return;
         }
 
-        const isValid = await trigger(steps[currentStep].fields);
-        if(!isValid) return
+        const currentStepFields = formSteps[currentStep]?.fields;
+        if(currentStepFields && currentStepFields.length > 0) {
+            const isValid = await trigger(currentStepFields);
+            if(!isValid) return;
+        }
 
-        setCurrentStep(currentStep + 1);
+        setCurrentStep(prevState => ++prevState);
     }
 
     const back = () => {
-        setCurrentStep(i => {
-            if (i <= 0) return i;
-            return i - 1;
-        })
+        if(isFirstStep()) return;
+
+        setCurrentStep(prevState => --prevState);
     }
 
     const goTo = (index: number) => {
+        if(index < 0 || index >= formSteps.length) return;
         setCurrentStep(index);
     }
+
+    const getCurrentStepText = () =>
+        (currentStep + (isFirstCount ? 1 : 0)).toString();
+
+    const getRealStepsCount = () =>
+        (formSteps.length - (!isFirstCount ? 1 : 0) - (!!resultStep ? 1 : 0));
 
     return (
         <MultiStepFormContext.Provider
             value={{
-                steps,
-                stepsCount: steps.length - (!isFirstCount ? 1 : 0),
+                steps: formSteps,
                 control,
                 submitHandler,
                 trigger,
                 resetField,
                 currentStep,
-                currentStepText: (currentStep + (isFirstCount ? 1 : 0)).toString(),
+                currentStepText: getCurrentStepText(),
+                realStepsCount: getRealStepsCount(),
                 isFirstCount,
-                isFirstStep: currentStep === 0,
-                isLastStep: currentStep === steps.length - 1,
+                isLastCount: !resultStep,
+                isFirstStep: isFirstStep(),
+                isLastStep: isLastStep(),
                 goTo,
                 next,
                 back,
