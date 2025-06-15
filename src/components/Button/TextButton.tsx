@@ -28,7 +28,7 @@ const TextButton: React.FC<TextButtonProps> = ({
     fontSize = FONT_SIZES.h3,
     backgroundColor = Colors.fuelYellow,
     textColor = getContrastingColor(backgroundColor, Colors.white, Colors.black),
-    height = hp(6.5),
+    height = hp(6),
     width,
     iconLeft,
     iconRight,
@@ -75,29 +75,35 @@ const TextButton: React.FC<TextButtonProps> = ({
             {
                 text && ((loadingIndicator && !isLoading) || !loadingIndicator) &&
                 <>
-                    <View style={ styles.sideSpacerContainer }>
-                        {
-                            iconLeft &&
-                            <Icon
-                                icon={ iconLeft }
-                                size={ fontSize * ICON_FONT_SIZE_SCALE * 0.85 }
-                                color={ styles.buttonContainer.color }
-                            />
-                        }
-                    </View>
+                    {
+                        (iconLeft || iconRight) &&
+                        <View style={ styles.sideSpacerContainer }>
+                            {
+                                iconLeft &&
+                                <Icon
+                                    icon={ iconLeft }
+                                    size={ fontSize * ICON_FONT_SIZE_SCALE * 0.85 }
+                                    color={ styles.buttonContainer.color }
+                                />
+                            }
+                        </View>
+                    }
                     <Text numberOfLines={ 2 } style={ [styles.buttonText, textStyle] } >
                         { text }
                     </Text>
-                    <View style={ styles.sideSpacerContainer }>
-                        {
-                            iconRight &&
-                            <Icon
-                                icon={ iconRight }
-                                size={ fontSize * ICON_FONT_SIZE_SCALE * 0.85 }
-                                color={ styles.buttonContainer.color }
-                            />
-                        }
-                    </View>
+                    {
+                        (iconLeft || iconRight) &&
+                        <View style={ styles.sideSpacerContainer }>
+                            {
+                                iconRight &&
+                                <Icon
+                                    icon={ iconRight }
+                                    size={ fontSize * ICON_FONT_SIZE_SCALE * 0.85 }
+                                    color={ styles.buttonContainer.color }
+                                />
+                            }
+                        </View>
+                    }
                 </>
             }
         </TouchableOpacity>
@@ -117,7 +123,7 @@ export const useButtonStyles = (
             alignSelf: "center",
             justifyContent: "center",
             alignItems: "center",
-            paddingHorizontal: width ? 0 : SEPARATOR_SIZES.small,
+            paddingHorizontal: SEPARATOR_SIZES.small,
             width: width ?? "100%",
             height: height,
             backgroundColor: primaryColor,
@@ -132,14 +138,15 @@ export const useButtonStyles = (
             fontFamily: "Gilroy-Heavy",
             color: secondaryColor,
             letterSpacing: fontSize * 0.075,
-            flexWrap: "nowrap"
+            flexWrap: "nowrap",
+            marginHorizontal: SEPARATOR_SIZES.lightSmall
 
         },
         sideSpacerContainer: {
+            flex: 0.15,
             height: "100%",
             justifyContent: "center",
             alignItems: "center",
-            marginHorizontal: fontSize * 0.25,
         }
     })
 

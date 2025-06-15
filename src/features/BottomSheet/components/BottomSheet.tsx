@@ -71,8 +71,7 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
             flex: 1,
             gap: DEFAULT_SEPARATOR,
             paddingHorizontal: DEFAULT_SEPARATOR,
-            paddingTop: top / 3, //padding vertical nem jo
-            paddingBottom: DEFAULT_SEPARATOR
+            paddingBottom: DEFAULT_SEPARATOR,
         },
         containerBackground: {
             backgroundColor: Colors.black,
@@ -81,9 +80,10 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
         },
         line: {
             alignSelf: "center",
-            marginTop: SEPARATOR_SIZES.normal,
+            marginTop: SEPARATOR_SIZES.small,
+            marginBottom: SEPARATOR_SIZES.lightSmall,
             width: hp(15),
-            height: isHandlePanningGesture ? hp(0.75) : 0,
+            height: isHandlePanningGesture ? hp(0.65) : 0,
             backgroundColor: Colors.white2,
             borderRadius: 35
         },
