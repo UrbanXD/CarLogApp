@@ -50,7 +50,7 @@ const Odometer: React.FC<OdometerProps> = ({
                     value.split("").map((digit, index) => (
                         <View key={ index } style={ styles.digitContainer }>
                             <Text style={ DEFAULT_VALUE_LENGTH < 6 && index < (value.length - DEFAULT_VALUE_LENGTH) ? [styles.backgroundDigitText, { position: "relative" }] : styles.digitText }>{ digit }</Text>
-                            <Text style={ styles.backgroundDigitText }>0</Text>
+                            <Text style={ styles.backgroundDigitText }>8</Text>
                         </View>
                     ))
                 }
