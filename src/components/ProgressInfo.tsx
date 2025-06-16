@@ -82,7 +82,7 @@ const useStyles = (radius: number) =>
         container: {
             flexDirection: "row",
             alignItems: "center",
-            gap: SEPARATOR_SIZES.lightSmall,
+            gap: SEPARATOR_SIZES.lightSmall
         },
         circularProgressBarContainer: {
             width: radius * 2,
@@ -91,13 +91,12 @@ const useStyles = (radius: number) =>
         titleContainer: {
             flex: 1,
             justifyContent: "center",
-            alignSelf: "flex-start"
+            alignSelf: "center"
         },
         title: {
             fontSize: FONT_SIZES.h3,
             fontFamily: "Gilroy-Heavy",
-            color: Colors.white,
-            paddingTop: SEPARATOR_SIZES.small
+            color: Colors.white
         },
         subtitle: {
             fontSize: FONT_SIZES.p2,

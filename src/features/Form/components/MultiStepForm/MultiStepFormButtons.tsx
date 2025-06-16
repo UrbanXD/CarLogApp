@@ -2,6 +2,7 @@ import React from "react";
 import { useMultiStepForm } from "../../context/MultiStepFormProvider";
 import { StyleSheet, View } from "react-native";
 import Button from "../../../../components/Button/Button";
+import { SEPARATOR_SIZES } from "../../../../constants/constants.ts";
 
 const MultiStepFormButtons: React.FC = () => {
     const {
@@ -13,7 +14,7 @@ const MultiStepFormButtons: React.FC = () => {
     } = useMultiStepForm();
 
     return (
-        <Button.Row>
+        <Button.Row style={{ marginBottom: SEPARATOR_SIZES.lightSmall }}>
             <View style={ styles.backButtonContainer }>
                 {
                     !isFirstStep &&

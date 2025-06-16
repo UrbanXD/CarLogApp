@@ -64,7 +64,7 @@ const MultiStepForm: React.FC<MultiStepFormProps> = ({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        gap: SEPARATOR_SIZES.normal,
+        gap: SEPARATOR_SIZES.lightSmall
     }
 })
 
