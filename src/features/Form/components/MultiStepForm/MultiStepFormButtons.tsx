@@ -2,15 +2,11 @@ import React from "react";
 import { useMultiStepForm } from "../../context/MultiStepFormProvider";
 import { StyleSheet, View } from "react-native";
 import Button from "../../../../components/Button/Button";
+import { SEPARATOR_SIZES } from "../../../../constants/constants.ts";
 
-interface MultiStepFormButtonsProps {
-    isFirstCount: boolean
-}
-
-const MultiStepFormButtons: React.FC<MultiStepFormButtonsProps> = ({
-    isFirstCount
-}) => {
+const MultiStepFormButtons: React.FC = () => {
     const {
+        isFirstCount,
         isFirstStep,
         isLastStep,
         next,
@@ -18,22 +14,17 @@ const MultiStepFormButtons: React.FC<MultiStepFormButtonsProps> = ({
     } = useMultiStepForm();
 
     return (
-        <Button.Row>
+        <Button.Row style={{ marginBottom: SEPARATOR_SIZES.lightSmall }}>
             <View style={ styles.backButtonContainer }>
                 {
                     !isFirstStep &&
-                    <Button.MultistepFormBack
-                        onPress={ back }
-                    />
+                    <Button.MultistepFormBack onPress={ back } />
                 }
             </View>
             <View style={ styles.nextButtonContainer }>
                 {
                     ((isFirstCount && isFirstStep) || !isFirstStep) &&
-                    <Button.MultistepFormNext
-                        onPress={ next }
-                        isLastStep={ isLastStep }
-                    />
+                    <Button.MultistepFormNext onPress={ next } isLastStep={ isLastStep } />
                 }
             </View>
         </Button.Row>

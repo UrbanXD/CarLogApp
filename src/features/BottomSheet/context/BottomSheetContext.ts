@@ -5,6 +5,8 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 export type BottomSheetType = {
     ref: RefObject<BottomSheetModal>
     props: OpenBottomSheetArgs
+    manuallyClosed: boolean
+    forceClose: boolean
 }
 
 export interface OpenBottomSheetArgs extends Partial<BottomSheetModalProps> {

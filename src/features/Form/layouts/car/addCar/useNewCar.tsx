@@ -18,7 +18,8 @@ const useNewCarForm = () => {
         handleSubmit,
         trigger,
         reset,
-        resetField
+        resetField,
+        getValues
     } = useForm<AddCarFormFieldType>(useAddCarFormProps());
 
     const submitHandler =
@@ -40,7 +41,7 @@ const useNewCarForm = () => {
         submitHandler,
         trigger,
         resetField,
-        steps: useCarSteps(control, resetField)
+        steps: useCarSteps(control, resetField, getValues)
     }
 }
 

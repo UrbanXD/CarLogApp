@@ -2,17 +2,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { zColor, zImage } from "../types/zodTypes.ts";
 
-export const SIGN_UP_STEPS_FIELD = [
-    ["email"],
-    ["firstname", "lastname"],
-    ["password", "rpassword"]
-];
-export const SIGN_UP_STEPS_TITLE = [
-    "",
-    "Személyes adatok",
-    "Jelszó"
-];
-
 const userSchema = z
     .object({
         email: z.string().email("Nem megfelelő email cím formátum"),

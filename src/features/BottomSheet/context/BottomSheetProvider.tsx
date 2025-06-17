@@ -17,17 +17,14 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
     const { openModal } = useAlert();
 
     const [bottomSheets, setBottomSheets] = useState<Array<BottomSheetType>>([]);
-    const [manuallyClosed, setManuallyClosed] = useState<boolean>(false);
+    const [bottomSheetOpenable, setBottomSheetOpenable] = useState<boolean>(true);
 
     useEffect(() => {
         const bottomSheet = getCurrentBottomSheet();
         if(!bottomSheet) return;
 
-        const timeout = setTimeout(() => {
-            bottomSheet.ref.current?.present();
-        }, 100);
-
-        return () => clearTimeout(timeout);
+        bottomSheet.ref.current?.present();
+        bottomSheet.ref.current?.snapToIndex(0);
     }, [bottomSheets]);
 
     const getCurrentBottomSheet = useCallback(() => {
@@ -38,45 +35,44 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
     }, [bottomSheets])
 
     const openBottomSheet = useCallback((args: OpenBottomSheetArgs) => {
-        const newBottomSheet = {
+        if(!bottomSheetOpenable) return;
+        setBottomSheetOpenable(false);
+
+        const newBottomSheet: BottomSheetType = {
             ref: createRef<BottomSheetModal>(),
-            props: args
+            props: args,
+            manuallyClosed: false,
+            forceClose: false
         };
 
         setBottomSheets(prevState => {
-            setManuallyClosed(true); // stack behaviour = "switch", bezarja, viszont jelezni kell, hogy manualisan tortent
+            if(prevState.length >= 1) prevState[prevState.length - 1].manuallyClosed = true; // stack behaviour = "switch", bezarja, viszont jelezni kell, hogy manualisan tortent
+            setTimeout(() => setBottomSheetOpenable(true), 500);
+
             return [...prevState, newBottomSheet];
         });
-    }, []);
+    }, [bottomSheetOpenable]);
 
     const closeBottomSheet = useCallback(() => {
         const bottomSheet = getCurrentBottomSheet();
         if(!bottomSheet) return;
 
         bottomSheet.ref.current?.close();
-    }, []);
+    }, [getCurrentBottomSheet]);
 
     const dismissBottomSheet = useCallback(() => {
         const bottomSheet = getCurrentBottomSheet();
         if(!bottomSheet) return;
 
-        const temp = bottomSheet.props.enableDismissOnClose;
-        bottomSheet.props.enableDismissOnClose = true;
         bottomSheet.ref.current?.dismiss();
-        bottomSheet.props.enableDismissOnClose = temp;
+        bottomSheet.forceClose = true;
 
-        setBottomSheets(
-            prevState =>
-                prevState.slice(0, prevState.length - 1)
-        );
-    }, []);
+        setBottomSheets(prevState => prevState.slice(0, prevState.length - 1));
+    }, [getCurrentBottomSheet]);
 
     const dismissAllBottomSheet = useCallback(() => {
         setBottomSheets(prevState => {
-            prevState.map(bottomSheet => {
-                bottomSheet.props.enableDismissOnClose = true;
-                bottomSheet.ref.current?.dismiss();
-            });
+            prevState.map(bottomSheet => bottomSheet.ref.current?.dismiss());
 
             return new Array<BottomSheetType>();
         })
@@ -87,7 +83,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         if(!bottomSheet) return;
 
         bottomSheet.ref.current?.snapToIndex(0);
-    }, [])
+    }, [getCurrentBottomSheet])
 
     const onChangeSnapPoint = useCallback((index: number) => {
         const bottomSheet = getCurrentBottomSheet();
@@ -96,20 +92,12 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         if(index === -1) {
             KeyboardController.dismiss();
 
-            if(manuallyClosed) return setManuallyClosed(false);
+            if(bottomSheet.manuallyClosed) return bottomSheet.manuallyClosed; // manualis bezaras eseten semmit ne csinaljon
+            if(bottomSheet.props.enableDismissOnClose || bottomSheet.forceClose) return dismissBottomSheet(); // ha azonnal bezarhato akkor vegezze el
 
-            if(!bottomSheet.props.enableDismissOnClose) {
-                return openModal(
-                    BottomSheetLeavingModal(
-                        reopenBottomSheet,
-                        dismissBottomSheet
-                    )
-                );
-            }
-
-            dismissBottomSheet();
+            openModal(BottomSheetLeavingModal(reopenBottomSheet, dismissBottomSheet));
         }
-    }, []);
+    }, [bottomSheets, getCurrentBottomSheet]);
 
     const contextValue = useMemo(() => ({
         openBottomSheet,

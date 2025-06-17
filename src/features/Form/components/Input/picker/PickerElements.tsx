@@ -146,7 +146,6 @@ const styles= StyleSheet.create({
         overflow: "hidden"
     },
     elementsScrollViewContainer: {
-        ...GLOBAL_STYLE.scrollViewContentContainer,
         gap: SEPARATOR_SIZES.small
     },
     separator: {

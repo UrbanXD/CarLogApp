@@ -1,9 +1,9 @@
-import {InputPickerDataType} from "../components/Input/picker/InputPicker";
-import {UseFormReturn} from "react-hook-form";
-import {ReactNode} from "react";
+import { InputPickerDataType } from "../components/Input/picker/InputPicker";
+import { UseFormReturn } from "react-hook-form";
+import { RenderComponent } from "./types/types.ts";
 
 export interface UseCustomFormProps extends Partial<UseFormReturn<any>>{
-    steps: Array<() => ReactNode>
+    steps: Array<RenderComponent>
     submitHandler: () => Promise<void>
 }
 

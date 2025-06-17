@@ -1,4 +1,4 @@
-import React, { forwardRef, ReactNode, useState } from "react";
+import React, { forwardRef, ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Colors } from "../../../constants/colors";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -24,7 +24,6 @@ const BottomSheet=
             ...restProps
         } = props;
 
-        const [isLayoutReady, setIsLayoutReady] = useState(false);
         const { snapPoints, enableHandlePanningGesture } = restProps;
 
         const { top } = useSafeAreaInsets();
@@ -43,14 +42,12 @@ const BottomSheet=
                     (props: any) =>
                         <BottomSheetBackdrop { ...props } />
                 }
+                enableDynamicSizing={ false }
                 topInset={ top }
                 backgroundStyle={ styles.containerBackground }
                 handleIndicatorStyle={ styles.line }
             >
-                <BottomSheetView
-                    style={ styles.container }
-                    onLayout={ () => setIsLayoutReady(true) }
-                >
+                <BottomSheetView style={ styles.container } >
                     {
                         title &&
                         <View>
@@ -61,7 +58,7 @@ const BottomSheet=
                         </View>
                     }
                     <BottomSheetContext.Provider value={ useBottomSheet() }>
-                        { isLayoutReady && content }
+                        { content }
                     </BottomSheetContext.Provider>
                 </BottomSheetView>
             </BottomSheetModal>
@@ -74,8 +71,7 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
             flex: 1,
             gap: DEFAULT_SEPARATOR,
             paddingHorizontal: DEFAULT_SEPARATOR,
-            paddingTop: top / 3, //padding vertical nem jo
-            paddingBottom: DEFAULT_SEPARATOR
+            paddingBottom: DEFAULT_SEPARATOR,
         },
         containerBackground: {
             backgroundColor: Colors.black,
@@ -84,9 +80,10 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
         },
         line: {
             alignSelf: "center",
-            marginTop: SEPARATOR_SIZES.normal,
+            marginTop: SEPARATOR_SIZES.small,
+            marginBottom: SEPARATOR_SIZES.lightSmall,
             width: hp(15),
-            height: isHandlePanningGesture ? hp(0.75) : 0,
+            height: isHandlePanningGesture ? hp(0.65) : 0,
             backgroundColor: Colors.white2,
             borderRadius: 35
         },

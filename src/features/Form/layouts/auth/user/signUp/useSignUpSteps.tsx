@@ -1,20 +1,32 @@
-import { Control } from "react-hook-form";
 import { NameStep, PasswordStep, SignUpFirstStep} from "../steps";
+import { StepProps, Steps } from "../../../../constants/types/types.ts";
 
 export const useSignUpSteps = (
-    control: Control<any>
-) =>
+    control: StepProps["control"]
+): Steps =>
     [
-        () =>
-            <SignUpFirstStep
-                control={ control }
-            />,
-        () =>
-            <NameStep
-                control={ control }
-            />,
-        () =>
-            <PasswordStep
-                control={ control }
-            />
+        {
+            title: "",
+            fields: ["email"],
+            render: () =>
+                <SignUpFirstStep
+                    control={ control }
+                />
+        },
+        {
+            title: "Személyes adatok",
+            fields: ["firstname", "lastname"],
+            render: () =>
+                <NameStep
+                    control={ control }
+                />
+        },
+        {
+            title: "Jelszó",
+            fields: ["password", "rpassword"],
+            render: () =>
+                <PasswordStep
+                    control={ control }
+                />
+        }
     ]

@@ -5,26 +5,23 @@ import { useFont } from "@shopify/react-native-skia";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import ProgressInfo from "../../../../components/ProgressInfo";
 
-interface MultiStepFormProgressInfoProps {
-    isFirstCount: boolean
-    stepsTitle: Array<string>
-}
-
-const MultiStepFormProgressInfo: React.FC<MultiStepFormProgressInfoProps> = ({
-    isFirstCount,
-    stepsTitle
-}) => {
+const MultiStepFormProgressInfo: React.FC = () => {
     const {
         steps,
-        stepsCount,
         currentStep,
         currentStepText,
+        realStepsCount,
+        isFirstCount,
+        isLastCount,
         isFirstStep,
+        isLastStep
     } = useMultiStepForm();
 
     const end = useSharedValue(0);
     useEffect(() => {
-        end.value = withTiming((currentStep + (steps.length === stepsCount ? 1 : 0)) / stepsCount, { duration: 1500 });
+        if(isLastStep && !isLastCount) return;
+
+        end.value = withTiming(Number(currentStepText) / realStepsCount, { duration: 1500 });
     }, [currentStep]);
 
     const font = useFont(require("../../../../assets/fonts/Gilroy-Heavy.otf"), hp(3));
@@ -33,15 +30,15 @@ const MultiStepFormProgressInfo: React.FC<MultiStepFormProgressInfoProps> = ({
     return (
         <>
             {
-                (isFirstCount && isFirstStep || !isFirstStep) &&
+                ((!isFirstStep && !isLastStep) || (isFirstStep && isFirstCount) || (isLastStep && isLastCount)) &&
                 <ProgressInfo
                     radius={ hp(6) }
                     strokeWidth={ hp(1.25) }
                     end={ end }
                     font={ font }
-                    statusText={ `${ stepsCount } / ${ currentStepText }` }
-                    stepTitle={ stepsTitle[currentStep] }
-                    stepSubtitle={ stepsTitle[currentStep + 1] !== undefined ? `Következik: ${ stepsTitle[currentStep + 1] }` : undefined }
+                    statusText={ `${ realStepsCount } / ${ currentStepText }` }
+                    stepTitle={ steps[currentStep]?.title || "" }
+                    stepSubtitle={ steps[currentStep + 1]?.title !== undefined ? `Következik: ${ steps[currentStep + 1].title }` : undefined }
                 />
             }
         </>

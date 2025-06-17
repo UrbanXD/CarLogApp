@@ -12,6 +12,7 @@ export const MultistepFormBackButton: React.FC<MultistepFormBackButtonProps> = (
 }) =>
     <IconButton
         icon={ ICON_NAMES.leftArrowHead }
-        width={ hp(7) }
+        width={ hp(6) }
+        height={ hp(6) }
         onPress={ onPress }
     />
