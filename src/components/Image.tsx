@@ -1,15 +1,15 @@
 import React, {useEffect, useState} from "react";
-import {ImageSourcePropType, Image as ImageRN, StyleProp, View, ViewStyle, StyleSheet, ImageStyle} from "react-native";
+import { ImageSourcePropType, Image as ImageRN, View, ViewStyle, StyleSheet, ImageStyle } from "react-native";
 import DefaultElement from "./DefaultElement";
-import {ICON_NAMES} from "../constants/constants";
-import {Colors} from "../constants/colors/Colors.ts";
-import {hexToRgba} from "../utils/colors/hexToRgba";
-import {LinearGradient} from "expo-linear-gradient";
+import { COLORS, ICON_NAMES } from "../constants/index.ts";
+import { hexToRgba } from "../utils/colors/hexToRgba";
+import { LinearGradient } from "expo-linear-gradient";
+import { ImageSource } from "../types/index.ts";
 
 interface ImageProps {
-    source?: ImageSourcePropType | string
+    source?: ImageSource
     alt?: string
-    imageStyle?: StyleProp<ImageStyle>
+    imageStyle?: ImageStyle
     overlay?: boolean
     children?: React.ReactNode
 }
@@ -60,7 +60,7 @@ const Image: React.FC<ImageProps> = ({
                         overlay && !imageError &&
                         <LinearGradient
                             locations={[ 0, 0.85 ]}
-                            colors={ [hexToRgba(Colors.black, 0.15), hexToRgba(Colors.black, 0.90)] }
+                            colors={ [hexToRgba(COLORS.black, 0.15), hexToRgba(COLORS.black, 0.90)] }
                             style={ styles.imageOverlay }
                         />
                     }
@@ -76,14 +76,14 @@ const useStyles = (a: StyleProp<ViewStyle>) =>
         overlay: {
             ...StyleSheet.absoluteFillObject,
             zIndex: 1,
-            backgroundColor: hexToRgba(Colors.white, 0.035),
+            backgroundColor: hexToRgba(COLORS.white, 0.035),
             borderRadius: 35,
         },
         contentContainer: {
             flex: 1,
             borderWidth: 1.5,
             borderRadius: 35,
-            borderColor: Colors.gray4
+            borderColor: COLORS.gray4
         },
         image: {
             position: "absolute",

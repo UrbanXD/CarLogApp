@@ -1,7 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { FONT_SIZES, GLOBAL_STYLE } from "../../../constants/constants";
-import { Colors } from "../../../constants/colors";
+import { COLORS, FONT_SIZES, GLOBAL_STYLE } from "../../../constants/index.ts";
 import { useAuth } from "../../../contexts/Auth/AuthContext.ts";
 
 const WelcomeBlock: React.FC = () => {
@@ -33,14 +32,14 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.h2,
         letterSpacing: FONT_SIZES.h2 * 0.045,
-        color: Colors.white,
+        color: COLORS.white,
         textTransform: "uppercase"
     },
     infoText: {
         fontFamily: "Gilroy-Mediun",
         fontSize: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.05,
-        color: Colors.gray1
+        color: COLORS.gray1
     }
 })
 

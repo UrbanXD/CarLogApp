@@ -1,8 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
-import { Colors } from "../../constants/colors";
-import { FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/constants";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { CarouselItemType } from "./Carousel";
 import { hexToRgba } from "../../utils/colors/hexToRgba";
 import Image from "../Image";
@@ -90,12 +89,12 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
 const styles = StyleSheet.create({
     itemContainer: {
         flex: 1,
-        backgroundColor: Colors.black,
+        backgroundColor: COLORS.black,
         borderRadius: 35,
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: hexToRgba(Colors.white, 0.035),
+        backgroundColor: hexToRgba(COLORS.white, 0.035),
         borderRadius: 35,
         zIndex: 1
     },
@@ -103,7 +102,7 @@ const styles = StyleSheet.create({
         flex: 1,
         borderWidth: 1.5,
         borderRadius: 35,
-        borderColor: Colors.gray4
+        borderColor: COLORS.gray4
     },
     itemImage: {
         position: "absolute",
@@ -131,7 +130,7 @@ const styles = StyleSheet.create({
     },
     topContainerTitleText: {
         flex: 1,
-        color: Colors.white,
+        color: COLORS.white,
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.p1,
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
@@ -143,7 +142,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     infoTitleText: {
-        color: Colors.white,
+        color: COLORS.white,
         fontSize: FONT_SIZES.p2,
         fontFamily: "Gilroy-Heavy",
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
@@ -152,7 +151,7 @@ const styles = StyleSheet.create({
         letterSpacing: FONT_SIZES.p2 * 0.05
     },
     infoSubtitleText: {
-        color: Colors.white,
+        color: COLORS.white,
         fontSize: FONT_SIZES.p4,
         fontFamily: "Gilroy-Medium",
         textShadowColor: 'rgba(0, 0, 0, 0.75)',

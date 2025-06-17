@@ -1,8 +1,8 @@
 import React from "react";
 import { SafeAreaView, StyleSheet } from "react-native";
-import { DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants/constants";
+import { DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants/index.ts";
 import { useLocalSearchParams } from "expo-router";
-import CarProfile from "../components/CarProfile/CarProfile.ts";
+import CarProfile from "../features/car/components/carProfile/CarProfile.ts";
 
 const EditCarScreen: React.FC = () => {
     const localSearchParams = useLocalSearchParams();

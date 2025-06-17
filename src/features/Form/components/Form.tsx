@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode } from "react";
-import { GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/constants";
+import { GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { FlatList } from "react-native-gesture-handler";
 
 interface FormProps {

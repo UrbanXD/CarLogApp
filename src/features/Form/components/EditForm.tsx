@@ -1,6 +1,6 @@
 import React from "react";
 import { UseCustomFormProps } from "../constants/constants";
-import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/constants";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { FlatList } from "react-native-gesture-handler";
 import Button from "../../../components/Button/Button";
 import { View } from "react-native";

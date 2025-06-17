@@ -1,16 +1,16 @@
 import React from "react";
 import { StyleSheet, View, Text, ColorValue } from "react-native";
-import { FONT_SIZES, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/constants";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { Colors } from "../../../constants/colors";
 import Icon from "../../../components/Icon";
 import Button from "../../../components/Button/Button";
+import { Color } from "../../../types/index.ts";
 
 export interface AlertModalProps {
     icon?: string
     title?: string
     body?: string
-    color?: ColorValue | string
+    color?: Color
     accept?: () => void
     acceptText?: string
     dismiss?: () => void
@@ -21,7 +21,7 @@ const AlertModal: React.FC<AlertModalProps> = ({
     icon,
     title,
     body,
-    color = Colors.fuelYellow,
+    color = COLORS.fuelYellow,
     accept = () => {},
     acceptText= "Folytatás",
     dismiss = () => {},
@@ -90,7 +90,7 @@ const useStyles = (iconSize: number) =>
             alignSelf: "center",
             width: "100%",
             minHeight: hp(25),
-            backgroundColor: Colors.black5,
+            backgroundColor: COLORS.black5,
             padding: SEPARATOR_SIZES.small,
             borderRadius: 35,
             zIndex: 2
@@ -105,7 +105,7 @@ const useStyles = (iconSize: number) =>
             top: -iconSize / 1.35,
             alignSelf: "center",
             borderWidth: hp(1),
-            borderColor: Colors.black5
+            borderColor: COLORS.black5
         },
         contentContainer: {
             flex: 1,
@@ -118,7 +118,7 @@ const useStyles = (iconSize: number) =>
         titleText: {
             fontFamily: "Gilroy-Heavy",
             fontSize: FONT_SIZES.h3,
-            color: Colors.white,
+            color: COLORS.white,
             lineHeight: FONT_SIZES.h3 * 1.25,
             letterSpacing: FONT_SIZES.h3 * 0.05,
             textAlign: "center"
@@ -126,7 +126,7 @@ const useStyles = (iconSize: number) =>
         text: {
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p2,
-            color: Colors.gray1,
+            color: COLORS.gray1,
             lineHeight: FONT_SIZES.p2 * 1.05,
             textAlign: "center"
         },

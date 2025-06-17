@@ -1,10 +1,10 @@
-import { Colors } from "../../../constants/colors";
+import { COLORS } from "../../../constants/Colors.ts";
 
 export const ALERT_COLORS = {
-    success: Colors.greenLight,
-    info: Colors.blueLight,
-    warning: Colors.fuelYellow,
-    error: Colors.redDark,
+    success: COLORS.greenLight,
+    info: COLORS.blueLight,
+    warning: COLORS.fuelYellow,
+    error: COLORS.redDark,
 }
 
 export const ALERT_ICONS = {

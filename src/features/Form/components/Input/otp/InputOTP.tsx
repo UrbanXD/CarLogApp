@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Keyboard, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { Colors } from "../../../../../constants/colors";
-import { FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants/constants";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 import Button from "../../../../../components/Button/Button";
 
@@ -152,10 +151,10 @@ const useStyles = (numberOfDigits: number) =>
         codeInputContainer: {
             width: wp(100 / numberOfDigits) - 2 * SEPARATOR_SIZES.lightSmall,
             borderBottomWidth: 3.5,
-            borderColor: Colors.gray3,
+            borderColor: COLORS.gray3,
         },
         focusedCodeInputContainer: {
-            borderColor: Colors.fuelYellow,
+            borderColor: COLORS.fuelYellow,
         },
         codeText: {
             height: "100%",
@@ -163,7 +162,7 @@ const useStyles = (numberOfDigits: number) =>
             textAlign: "center",
             fontFamily: "Gilroy-Heavy",
             fontSize: FONT_SIZES.h1,
-            color: Colors.white,
+            color: COLORS.white,
         }
     });
 

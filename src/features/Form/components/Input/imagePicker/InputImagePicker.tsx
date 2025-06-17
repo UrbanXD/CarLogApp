@@ -8,19 +8,20 @@ import Carousel, { CarouselItemType } from "../../../../../components/Carousel/C
 import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../../../../../components/Carousel/CarouselItem";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { ControllerRenderArgs, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/constants";
+import { ControllerRenderArgs, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import InputTitle from "../InputTitle";
 import DefaultElement from "../../../../../components/DefaultElement";
-import { Colors } from "../../../../../constants/colors";
+import { COLORS } from "../../../../../constants/index.ts";
 import { hexToRgba } from "../../../../../utils/colors/hexToRgba";
 import Image from "../../../../../components/Image";
+import {ImageSource} from "../../../../../types/index.ts";
 
 interface InputImagePickerProps {
     control: Control<any>
     fieldName: string
     fieldNameText?: string
     fieldInfoText?: string
-    defaultImages?: Array<ImageSourcePropType | string>
+    defaultImages?: Array<ImageSource>
     limitOfImages?: number
     multipleSelection?: boolean
 }
@@ -186,12 +187,12 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                                                     <Button.Icon
                                                         icon={ ICON_NAMES.close }
                                                         iconSize={ FONT_SIZES.p1 }
-                                                        iconColor={ Colors.redLight }
+                                                        iconColor={ COLORS.redLight }
                                                         width={ FONT_SIZES.p1 * 1.2 }
                                                         height={ FONT_SIZES.p1 * 1.2 }
-                                                        backgroundColor={ hexToRgba(Colors.black, 0.75) }
+                                                        backgroundColor={ hexToRgba(COLORS.black, 0.75) }
                                                         onPress={ () => removeImageFromHistory(index) }
-                                                        style={ { borderColor: Colors.redLight, borderWidth: 2 } }
+                                                        style={ { borderColor: COLORS.redLight, borderWidth: 2 } }
                                                     />
                                             }
                                         />

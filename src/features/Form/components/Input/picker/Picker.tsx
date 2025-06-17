@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ImageSourcePropType } from "react-native";
-import {
-    ICON_NAMES,
-} from "../../../../../constants/constants";
+import { ICON_NAMES } from "../../../../../constants/index.ts";
 import { InputPickerDropdownInfo, PickerDropdownInfo } from "./PickerDropdownInfo";
 import PickerElements from "./PickerElements";
 

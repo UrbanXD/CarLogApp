@@ -1,11 +1,11 @@
-import { useDatabase } from "../features/Database/connector/Database.ts";
-import { useAlert } from "../features/Alert/context/AlertProvider.tsx";
-import useCars from "./useCars.ts";
-import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
-import EditCarForm from "../features/Form/layouts/car/editCar/EditCarForm.tsx";
+import { useDatabase } from "../../Database/connector/Database.ts";
+import { useAlert } from "../../Alert/context/AlertProvider.tsx";
+import useCars from "../../../hooks/useCars.ts";
+import { useBottomSheet } from "../../BottomSheet/context/BottomSheetContext.ts";
+import EditCarForm from "../components/forms/EditCarForm.tsx";
 import React from "react";
-import { store } from "../features/Database/redux/store.ts";
-import { deleteCar } from "../features/Database/redux/cars/functions/deleteCar.ts";
+import { store } from "../../Database/redux/store.ts";
+import { deleteCar } from "../../Database/redux/cars/functions/deleteCar.ts";
 
 const useCarProfile = (carID: string) => {
     const database = useDatabase();

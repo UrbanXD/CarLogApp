@@ -1,23 +1,16 @@
-import {
-    ImageSourcePropType,
-    StyleProp,
-    StyleSheet,
-    View,
-    ViewStyle,
-    Text, ActivityIndicator
-} from "react-native";
-import { Colors } from "../constants/colors/Colors.ts";
-import {FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES} from "../constants/constants";
+import React from "react";
+import { StyleSheet, View, ViewStyle, Text, ActivityIndicator } from "react-native";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import Icon from "./Icon";
 import { hexToRgba } from "../utils/colors/hexToRgba";
-import React from "react";
+import { ImageSource } from "../types/index.ts";
 
 interface DefaultImageProps {
     isLoading?: boolean;
-    icon?: string | ImageSourcePropType
+    icon?: ImageSource
     text?: string
     loadingText?: string
-    style?: StyleProp<ViewStyle>
+    style?: ViewStyle
 }
 
 const DefaultElement: React.FC<DefaultImageProps> = ({
@@ -33,12 +26,12 @@ const DefaultElement: React.FC<DefaultImageProps> = ({
                 isLoading
                     ?   <ActivityIndicator
                             size={ FONT_SIZES.title }
-                            color={ Colors.gray3 }
+                            color={ COLORS.gray3 }
                         />
                     :   <Icon
                             icon={ icon }
                             size={ FONT_SIZES.title }
-                            color={ Colors.gray3 }
+                            color={ COLORS.gray3 }
                         />
             }
             {
@@ -64,10 +57,10 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: hexToRgba(Colors.gray5, 0.65),
+        backgroundColor: hexToRgba(COLORS.gray5, 0.65),
         borderWidth: 0.5,
         borderRadius: 38,
-        borderColor: Colors.gray5,
+        borderColor: COLORS.gray5,
         paddingHorizontal: SEPARATOR_SIZES.small
     },
     text: {
@@ -75,7 +68,7 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.025,
         lineHeight: FONT_SIZES.p2 * 1.25,
-        color: Colors.gray2,
+        color: COLORS.gray2,
         textAlign: "center"
     }
 })

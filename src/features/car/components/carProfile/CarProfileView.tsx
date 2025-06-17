@@ -1,18 +1,18 @@
 import React from "react";
-import { CarTableType } from "../../features/Database/connector/powersync/AppSchema.ts";
+import { CarTableType } from "../../../Database/connector/powersync/AppSchema.ts";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import Image from "../Image.tsx";
+import Image from "../../../../components/Image.tsx";
 import {
+    COLORS,
     FONT_SIZES,
     GLOBAL_STYLE,
     ICON_FONT_SIZE_SCALE,
     ICON_NAMES,
     SEPARATOR_SIZES
-} from "../../constants/constants.ts";
-import Button from "../Button/Button.ts";
-import { Colors } from "../../constants/colors/index.ts";
-import { CAR_FORM_STEPS } from "../../features/Form/layouts/car/steps/useCarSteps.tsx";
-import Divider from "../Divider.tsx";
+} from "../../../../constants/index.ts";
+import Button from "../../../../components/Button/Button.ts";
+import { CAR_FORM_STEPS } from "../../hooks/useCarSteps.tsx";
+import Divider from "../../../../components/Divider.tsx";
 import Odometer from "../Odometer.tsx";
 import FuelGauge from "../FuelGauge.tsx";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -45,7 +45,7 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                         <Button.Icon
                             icon={ ICON_NAMES.pencil }
                             iconSize={ FONT_SIZES.h2 }
-                            iconColor={ Colors.gray1 }
+                            iconColor={ COLORS.gray1 }
                             width={ FONT_SIZES.h2 }
                             height={ FONT_SIZES.h2 }
                             style={ styles.editImageIcon }
@@ -61,7 +61,7 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                     <Button.Icon
                         icon={ ICON_NAMES.pencil }
                         iconSize={ FONT_SIZES.h3 }
-                        iconColor={ Colors.gray1 }
+                        iconColor={ COLORS.gray1 }
                         width={ FONT_SIZES.h3 }
                         height={ FONT_SIZES.h3 }
                         backgroundColor="transparent"
@@ -69,7 +69,7 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                     />
                 </View>
                 <Divider
-                    color={ Colors.gray3 }
+                    color={ COLORS.gray3 }
                     margin={ SEPARATOR_SIZES.lightSmall / 2.5 }
                 />
                 <View style={ styles.carInfoRow }>
@@ -90,19 +90,19 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                         <Button.Icon
                             icon={ ICON_NAMES.trashCan }
                             iconSize={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
-                            backgroundColor={ Colors.googleRed }
-                            iconColor={ Colors.black }
+                            backgroundColor={ COLORS.googleRed }
+                            iconColor={ COLORS.black }
                             height={ FONT_SIZES.p2 * 2 }
                             onPress={ handleDeleteCar }
                         />
                     }
                     <Button.Text
                         text="Módosítás"
-                        textColor={ Colors.gray1 }
+                        textColor={ COLORS.gray1 }
                         fontSize={ FONT_SIZES.p2 }
                         height={ FONT_SIZES.p2 * 2 }
                         backgroundColor="transparent"
-                        style={{ flex: 0.75, borderColor: Colors.gray1, borderWidth: 2.5 }}
+                        style={{ flex: 0.75, borderColor: COLORS.gray1, borderWidth: 2.5 }}
                         onPress={() => openEditCarStep(CAR_FORM_STEPS.CarModelStep)}
                     />
                 </Button.Row>
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     },
     contentRowContainer: {
         gap: SEPARATOR_SIZES.lightSmall / 2.5,
-        backgroundColor: Colors.black4,
+        backgroundColor: COLORS.black4,
         padding: SEPARATOR_SIZES.small,
         borderRadius: 35
     },
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.h2,
         letterSpacing: FONT_SIZES.h2 * 0.045,
-        color: Colors.white
+        color: COLORS.white
     },
     carInfoRow: {
         flex: 1,
@@ -172,13 +172,13 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.05,
-        color: Colors.gray1,
+        color: COLORS.gray1,
     },
     carInfoText: {
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.05,
-        color: Colors.gray1
+        color: COLORS.gray1
     }
 });
 

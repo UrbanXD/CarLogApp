@@ -1,7 +1,7 @@
+import React from "react";
 import { View, StyleSheet, ColorValue } from "react-native";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { Colors } from "../constants/colors";
-import React from "react";
+import { COLORS } from "../constants/index.ts";
 
 interface DividerProps {
     size?: number
@@ -15,7 +15,7 @@ const Divider: React.FC<DividerProps> = ({
     isVertical = false,
     size = isVertical ? hp(100) : wp(100),
     thickness = 1,
-    color = Colors.white,
+    color = COLORS.white,
     margin = 0,
 }) => {
     const styles = useStyles(size, thickness, color, margin);

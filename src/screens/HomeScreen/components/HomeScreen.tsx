@@ -1,5 +1,5 @@
 import React from "react";
-import { Colors } from "../../../constants/colors";
+import { COLORS } from "../../../constants/index.ts";
 import WelcomeBlock from "./WelcomeBlock";
 import MyGarageBlock from "./MyGarageBlock";
 import UpcomingRidesBlock from "./UpcomingRidesBlock";
@@ -14,7 +14,7 @@ const HomeScreen: React.FC = () =>
         <Divider
             thickness={ 2.5 }
             size={ wp(75) }
-            color={ Colors.gray4 }
+            color={ COLORS.gray4 }
         />
         <MyGarageBlock />
         <UpcomingRidesBlock />

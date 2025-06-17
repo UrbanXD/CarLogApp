@@ -1,7 +1,6 @@
 import { Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../../../constants/constants";
-import { Colors } from "../../../../../constants/colors";
+import { COLORS, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface PickerItemProps {
@@ -53,14 +52,14 @@ const styles= StyleSheet.create({
     itemContainer: {
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: Colors.gray4,
+        backgroundColor: COLORS.gray4,
         minHeight: hp(6),
         borderRadius: 15,
         paddingHorizontal: SEPARATOR_SIZES.small
     },
     selectedItemContainer: {
         borderWidth: 1.5,
-        borderColor: Colors.gray1
+        borderColor: COLORS.gray1
     },
     iconContainer: {
         flex: 0.25,

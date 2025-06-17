@@ -1,12 +1,12 @@
-import NameStep from "./NameStep";
-import CarModelStep from "./CarModelStep";
-import OdometerStep from "./OdometerStep";
-import FuelStep from "./FuelStep";
+import NameStep from "../components/forms/steps/NameStep.tsx";
+import CarModelStep from "../components/forms/steps/CarModelStep.tsx";
+import OdometerStep from "../components/forms/steps/OdometerStep.tsx";
+import FuelStep from "../components/forms/steps/FuelStep.tsx";
 import React from "react";
-import ImageStep from "./ImageStep";
-import { ResultStep, StepProps, Steps } from "../../../constants/types/types.ts";
-import CarProfile from "../../../../../components/CarProfile/CarProfile.ts";
-import { CarEditNameToast } from "../../../../Alert/presets/toast/CarEditNameToast.ts";
+import ImageStep from "../components/forms/steps/ImageStep.tsx";
+import { ResultStep, StepProps, Steps } from "../../Form/constants/types/types.ts";
+import CarProfile from "../components/carProfile/CarProfile.ts";
+import { CarEditNameToast } from "../../Alert/presets/toast/CarEditNameToast.ts";
 
 export enum CAR_FORM_STEPS {
     NameStep,

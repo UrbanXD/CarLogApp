@@ -1,10 +1,9 @@
 import React from "react";
 import { StatusBar, Text, View } from "react-native";
-import { Colors } from "../../../../constants/colors";
 import useHeaderStyles from "../../hooks/useHeaderStyles";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Button from "../../../../components/Button/Button";
-import { FONT_SIZES, GLOBAL_STYLE, ICON_FONT_SIZE_SCALE, ICON_NAMES } from "../../../../constants/constants";
+import { COLORS, FONT_SIZES, GLOBAL_STYLE, ICON_FONT_SIZE_SCALE, ICON_NAMES } from "../../../../constants/index.ts";
 import { router } from "expo-router";
 
 interface SecondaryHeaderProps {
@@ -27,7 +26,7 @@ const SecondaryHeader: React.FC<SecondaryHeaderProps> = ({
                 <Button.Icon
                     icon={ ICON_NAMES.leftArrow }
                     iconSize={ FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE }
-                    iconColor={ Colors.white }
+                    iconColor={ COLORS.white }
                     width={ FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE }
                     height={ FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE }
                     backgroundColor="transparent"

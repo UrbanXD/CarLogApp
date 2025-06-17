@@ -1,9 +1,8 @@
 import React from "react";
 import { StyleSheet, View, Text, LayoutChangeEvent } from "react-native";
-import { FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../constants/constants.ts";
-import { Colors } from "../constants/colors/index.ts";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import Button from "./Button/Button.ts";
+import Button from "../../../components/Button/Button.ts";
 
 interface OdometerProps {
     value: number | string
@@ -34,7 +33,7 @@ const Odometer: React.FC<OdometerProps> = ({
                     <Button.Icon
                         icon={ ICON_NAMES.pencil }
                         iconSize={ FONT_SIZES.h3 }
-                        iconColor={ Colors.gray1 }
+                        iconColor={ COLORS.gray1 }
                         width={ FONT_SIZES.h3 }
                         height={ FONT_SIZES.h3 }
                         backgroundColor="transparent"
@@ -80,27 +79,27 @@ const useStyles = (numberOfDigits: number, odometerContainerWidth: number) => St
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.05,
-        color: Colors.gray1,
+        color: COLORS.gray1,
     },
     digitContainer: {
         height: hp(5),
         width: (odometerContainerWidth / numberOfDigits) - SEPARATOR_SIZES.lightSmall,
         position:"relative",
-        backgroundColor: Colors.gray5,
+        backgroundColor: COLORS.gray5,
         alignItems: "center",
         justifyContent: "center"
     },
     digitText: {
         fontFamily: "DSEG7",
         fontSize: FONT_SIZES.p1,
-        color: Colors.gray1,
+        color: COLORS.gray1,
         zIndex: 1,
     },
     backgroundDigitText: {
         position: "absolute",
         fontFamily: "DSEG7",
         fontSize: FONT_SIZES.p1,
-        color: Colors.gray4,
+        color: COLORS.gray4,
     }
 })
 

@@ -1,10 +1,9 @@
 import React, {useEffect, useRef, useState} from "react";
-import {StepProps} from "../../../constants/types/types";
-import {CARS, DATA_TRANSFORM_TO_PICKER_DATA} from "../../../../../constants/constants";
-import {InputPickerDataType} from "../../../components/Input/picker/InputPicker";
-import {useWatch} from "react-hook-form";
-import Input from "../../../components/Input/Input";
-import InputGroup from "../../../components/Input/InputGroup";
+import { StepProps } from "../../../../Form/constants/types/types.ts";
+import { CARS, DATA_TRANSFORM_TO_PICKER_DATA } from "../../../../../constants/index.ts";
+import { InputPickerDataType } from "../../../../Form/components/Input/picker/InputPicker.tsx";
+import { useWatch } from "react-hook-form";
+import Input from "../../../../Form/components/Input/Input.ts";
 
 const CarModelStep: React.FC<StepProps> = ({
     control,

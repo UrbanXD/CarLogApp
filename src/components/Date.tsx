@@ -1,7 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { FONT_SIZES, SEPARATOR_SIZES } from "../constants/constants";
-import { Colors } from "../constants/colors/Colors.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface DateProps {
@@ -53,13 +52,13 @@ const useStyles = (flexDirection: "row" | "column") =>
             fontFamily: "Gilroy-Heavy",
             fontSize: FONT_SIZES.p1,
             letterSpacing: FONT_SIZES.p1 * 0.05,
-            color: Colors.white
+            color: COLORS.white
         },
         dateSubtitleText: {
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p2,
             letterSpacing: FONT_SIZES.p2 * 0.035,
-            color: Colors.gray1
+            color: COLORS.gray1
         }
     })
 

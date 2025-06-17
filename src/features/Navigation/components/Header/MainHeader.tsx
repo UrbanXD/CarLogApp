@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {ActivityIndicator, StatusBar, View} from "react-native";
-import { GLOBAL_STYLE, SIMPLE_HEADER_HEIGHT } from "../../../../constants/constants";
+import { StatusBar, View } from "react-native";
+import { GLOBAL_STYLE, SIMPLE_HEADER_HEIGHT } from "../../../../constants/index.ts";
 import Picker, {PickerDataType} from "../../../Form/components/Input/picker/Picker";
 import { useSelector } from "react-redux";
 import { store } from "../../../Database/redux/store";

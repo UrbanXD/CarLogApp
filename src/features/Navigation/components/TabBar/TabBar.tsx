@@ -2,8 +2,7 @@ import React from "react";
 import { Dimensions, SafeAreaView, StyleSheet, View, ViewStyle } from "react-native";
 import TabBarIcon from "./TabBarIcon";
 import Animated, { Extrapolation, interpolate, useAnimatedStyle, withTiming } from "react-native-reanimated";
-import { Colors } from "../../../../constants/colors";
-import { FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT } from "../../../../constants/constants";
+import { COLORS, FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT } from "../../../../constants/index.ts";
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs'
 import { useScreenScrollView } from "../../../ScreenScrollView/context/ScreenScrollViewProvider.tsx";
 
@@ -104,7 +103,7 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
                             key={ index }
                             iconName={ icon }
                             iconSize={ FONT_SIZES.h2 }
-                            iconColor={ Colors.gray1 }
+                            iconColor={ COLORS.gray1 }
                             focused={ isFocused }
                             width={ TAB_WIDTH }
                             onPress={ onPress }
@@ -128,8 +127,8 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         height: SIMPLE_TABBAR_HEIGHT,
-        backgroundColor: Colors.black2,
-        borderColor: Colors.gray4,
+        backgroundColor: COLORS.black2,
+        borderColor: COLORS.gray4,
         borderWidth: 0.5,
         // borderBottomWidth: 2.5,
         borderTopStartRadius: 45,
@@ -146,7 +145,7 @@ const styles = StyleSheet.create({
     slidingElement: {
         width: "100%",
         height: 2,
-        backgroundColor: Colors.gray1
+        backgroundColor: COLORS.gray1
     }
 })
 

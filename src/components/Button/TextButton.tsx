@@ -1,22 +1,22 @@
 import React from "react";
-import { ActivityIndicator, ColorValue, ImageSourcePropType, Platform, StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native";
+import { ActivityIndicator, Platform, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/constants";
-import { Colors } from "../../constants/colors/Colors.ts";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
 import Icon from "../Icon";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
+import { Color, ImageSource } from "../../types/index.ts";
 
 interface TextButtonProps {
     text?: string
     fontSize?: number
-    textColor?: ColorValue
-    backgroundColor?: ColorValue
+    textColor?: Color
+    backgroundColor?: Color
     width?: number
     height?: number
-    iconLeft?: ImageSourcePropType | string
-    iconRight?: ImageSourcePropType | string
-    textStyle?: StyleProp<TextStyle>
-    style?: StyleProp<ViewStyle>
+    iconLeft?: ImageSource
+    iconRight?: ImageSource
+    textStyle?: TextStyle
+    style?: ViewStyle
     inverse?: boolean
     disabled?: boolean
     loadingIndicator?: boolean
@@ -26,8 +26,8 @@ interface TextButtonProps {
 const TextButton: React.FC<TextButtonProps> = ({
     text,
     fontSize = FONT_SIZES.h3,
-    backgroundColor = Colors.fuelYellow,
-    textColor = getContrastingColor(backgroundColor, Colors.white, Colors.black),
+    backgroundColor = COLORS.fuelYellow,
+    textColor = getContrastingColor(backgroundColor, COLORS.white, COLORS.black),
     height = hp(6),
     width,
     iconLeft,
@@ -111,8 +111,8 @@ const TextButton: React.FC<TextButtonProps> = ({
 }
 
 export const useButtonStyles = (
-    primaryColor: ColorValue,
-    secondaryColor: ColorValue,
+    primaryColor: Color,
+    secondaryColor: Color,
     width: number | undefined ,
     height: number,
     fontSize: number

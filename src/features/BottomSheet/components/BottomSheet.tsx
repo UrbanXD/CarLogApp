@@ -1,8 +1,7 @@
 import React, { forwardRef, ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { Colors } from "../../../constants/colors";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/constants";
+import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import BottomSheetBackdrop from "./BottomSheetBackdrop";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
@@ -74,7 +73,7 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
             paddingBottom: DEFAULT_SEPARATOR,
         },
         containerBackground: {
-            backgroundColor: Colors.black,
+            backgroundColor: COLORS.black,
             borderTopLeftRadius: !isFullScreen ? 55 : 0,
             borderTopRightRadius: !isFullScreen ? 55 : 0,
         },
@@ -84,7 +83,7 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
             marginBottom: SEPARATOR_SIZES.lightSmall,
             width: hp(15),
             height: isHandlePanningGesture ? hp(0.65) : 0,
-            backgroundColor: Colors.white2,
+            backgroundColor: COLORS.white2,
             borderRadius: 35
         },
         titleText: {

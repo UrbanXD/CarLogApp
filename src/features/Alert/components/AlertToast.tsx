@@ -1,12 +1,11 @@
-import { ALERT_COLORS, ALERT_ICONS, ALERT_TITLES } from "../constants/constants";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity } from "react-native";
-import { Colors } from "../../../constants/colors";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/constants";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import Icon from "../../../components/Icon";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming} from "react-native-reanimated";
 import { AlertType } from "../constants/types.ts";
+import { ALERT_TITLES, ALERT_COLORS, ALERT_ICONS } from "../../../constants";
 
 export interface AlertToastProps {
     type?: AlertType,
@@ -138,7 +137,7 @@ const useStyles = (type: AlertType, height: number) =>
         container: {
             alignSelf: "center",
             height,
-            backgroundColor: Colors.black5,
+            backgroundColor: COLORS.black5,
             borderRadius: 35,
             borderColor: ALERT_COLORS[type],
             borderWidth: 1.5,
@@ -156,13 +155,13 @@ const useStyles = (type: AlertType, height: number) =>
             fontFamily: "Gilroy-Heavy",
             fontSize: FONT_SIZES.p2,
             letterSpacing: FONT_SIZES.p2 * 0.05,
-            color: Colors.white,
+            color: COLORS.white,
         },
         text: {
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p4,
             letterSpacing: FONT_SIZES.p4 * 0.05,
-            color: Colors.gray1,
+            color: COLORS.gray1,
         }
     })
 

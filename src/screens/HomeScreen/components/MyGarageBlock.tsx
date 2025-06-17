@@ -1,7 +1,7 @@
 import React from "react";
 import Carousel, { CarouselItemType } from "../../../components/Carousel/Carousel";
 import { Text, StyleSheet, View } from "react-native";
-import { DEFAULT_SEPARATOR, GLOBAL_STYLE, ICON_NAMES } from "../../../constants/constants";
+import { DEFAULT_SEPARATOR, GLOBAL_STYLE, ICON_NAMES } from "../../../constants/index.ts";
 import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../../../components/Carousel/CarouselItem";
 import DefaultElement from "../../../components/DefaultElement";

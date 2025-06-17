@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { CarouselItemType } from "../../../components/Carousel/Carousel";
-import NewCarForm from "../../../features/Form/layouts/car/addCar/NewCarForm";
+import NewCarForm from "../../../features/car/components/forms/NewCarForm.tsx";
 import { router } from "expo-router";
 import useCars from "../../../hooks/useCars";
 import { useBottomSheet } from "../../../features/BottomSheet/context/BottomSheetContext.ts";

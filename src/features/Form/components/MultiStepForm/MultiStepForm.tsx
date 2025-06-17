@@ -5,7 +5,7 @@ import MultiStepFormProgressInfo from "./MultiStepFormProgressInfo";
 import MultiStepFormContent from "./MultiStepFormContent";
 import MultiStepFormButtons from "./MultiStepFormButtons";
 import { LayoutChangeEvent, StyleSheet, View } from "react-native";
-import { SEPARATOR_SIZES } from "../../../../constants/constants";
+import { SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { FlatList } from "react-native-gesture-handler";
 import { ResultStep, Steps } from "../../constants/types/types.ts";
 

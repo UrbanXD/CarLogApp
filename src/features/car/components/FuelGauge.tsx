@@ -1,9 +1,8 @@
 import React from "react";
 import { StyleSheet, View, Text } from "react-native";
-import { Colors } from "../constants/colors/index.ts";
-import { FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../constants/constants.ts";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import Button from "./Button/Button.ts";
+import Button from "../../../components/Button/Button.ts";
 
 interface FuelGaugeProps {
     value: number
@@ -35,7 +34,7 @@ const FuelGauge: React.FC<FuelGaugeProps> = ({
                     <Button.Icon
                         icon={ ICON_NAMES.pencil }
                         iconSize={ FONT_SIZES.h3 }
-                        iconColor={ Colors.gray1 }
+                        iconColor={ COLORS.gray1 }
                         width={ FONT_SIZES.h3 }
                         height={ FONT_SIZES.h3 }
                         style={{ alignSelf: "flex-end" }}
@@ -75,19 +74,19 @@ const useStyles = (fuelPercent: number, fuelValueLength: number) => StyleSheet.c
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.05,
-        color: Colors.gray1,
+        color: COLORS.gray1,
         flexShrink: 1
     },
     progressBar: {
         width: "100%",
         height: hp(5),
-        backgroundColor: Colors.gray5,
+        backgroundColor: COLORS.gray5,
     },
     bar: {
         position: "absolute",
         width: fuelPercent == 0 ? 1 : `${fuelPercent}%`,
         height: "100%",
-        backgroundColor: Colors.fuelYellow,
+        backgroundColor: COLORS.fuelYellow,
     },
     lowFuelBar: {
         backgroundColor: "red"
@@ -100,7 +99,7 @@ const useStyles = (fuelPercent: number, fuelValueLength: number) => StyleSheet.c
         left: "25%",
         width: 5,
         height: "100%",
-        backgroundColor: Colors.black,
+        backgroundColor: COLORS.black,
         zIndex: 1
     },
     fuelValueContainer: {
@@ -115,14 +114,14 @@ const useStyles = (fuelPercent: number, fuelValueLength: number) => StyleSheet.c
     fuelValueText: {
         position: "absolute",
         transform: fuelPercent > (FONT_SIZES.p4 * fuelValueLength / 3) ? [] : [{ translateX: FONT_SIZES.p4 * fuelValueLength }],
-        backgroundColor: Colors.black,
+        backgroundColor: COLORS.black,
         width: FONT_SIZES.p4 * fuelValueLength,
         borderRadius: 2.5,
         paddingVertical: 3.5,
         paddingHorizontal: SEPARATOR_SIZES.lightSmall,
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.p4,
-        color: Colors.gray1,
+        color: COLORS.gray1,
         textAlign: "center",
     },
     fuelGaugeInfoContainer: {
@@ -133,7 +132,7 @@ const useStyles = (fuelPercent: number, fuelValueLength: number) => StyleSheet.c
     fuelGaugeInfoText: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p4,
-        color: Colors.gray1,
+        color: COLORS.gray1,
     }
 })
 

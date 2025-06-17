@@ -2,7 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Database } from "../../../connector/Database";
 import { CarTableType } from "../../../connector/powersync/AppSchema";
 import { CarDAO } from "../../../DAOs/CarDAO";
-import { AddCarFormFieldType } from "../../../../Form/constants/schemas/carSchema";
+import { AddCarFormFieldType } from "../../../../car/schemas/carSchema.ts";
 import { getUUID } from "../../../utils/uuid";
 import getImageState from "../../../utils/getImageState";
 

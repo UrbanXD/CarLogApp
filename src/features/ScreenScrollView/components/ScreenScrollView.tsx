@@ -1,6 +1,6 @@
 import React from "react";
 import { SafeAreaView, ViewStyle } from "react-native";
-import { GLOBAL_STYLE, SIMPLE_TABBAR_HEIGHT } from "../../../constants/constants.ts";
+import { GLOBAL_STYLE, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
 import Animated, { useAnimatedScrollHandler, useSharedValue, withTiming } from "react-native-reanimated";
 import { useScreenScrollView } from "../context/ScreenScrollViewProvider.tsx";
 

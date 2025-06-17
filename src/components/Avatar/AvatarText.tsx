@@ -1,18 +1,18 @@
 import React from "react";
-import { ColorValue, Text, StyleSheet, TouchableOpacity, ViewStyle, StyleProp } from "react-native";
+import { Text, StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { Colors } from "../../constants/colors";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
 import Button from "../Button/Button.ts";
-import { ICON_NAMES } from "../../constants/constants.ts";
+import { ICON_NAMES, COLORS } from "../../constants/index.ts";
+import { Color } from "../../types/index.ts";
 
 interface AvatarTextProps {
     label: string
     avatarSize?: number
-    color?: ColorValue
-    backgroundColor?: ColorValue | string
-    borderColor?: ColorValue | string
-    style?: StyleProp<ViewStyle>
+    color?: Color
+    backgroundColor?: Color
+    borderColor?: Color
+    style?: ViewStyle
     onPress?: () => void
     onPressBadge?: () => void
 }
@@ -20,8 +20,8 @@ interface AvatarTextProps {
 const AvatarText: React.FC<AvatarTextProps> = ({
     label,
     avatarSize = hp(5),
-    backgroundColor = Colors.fuelYellow,
-    color = getContrastingColor(backgroundColor, Colors.white, Colors.black),
+    backgroundColor = COLORS.fuelYellow,
+    color = getContrastingColor(backgroundColor, COLORS.white, COLORS.black),
     borderColor,
     style,
     onPress,
@@ -68,10 +68,10 @@ const AvatarText: React.FC<AvatarTextProps> = ({
 const useStyles = (
     avatarSize: number,
     labelLength: number,
-    color: ColorValue | string,
-    backgroundColor: ColorValue | string,
-    borderColor?: ColorValue | string,
-    borderWidth?: number,
+    color: Color,
+    backgroundColor: Color,
+    borderColor?: Color,
+    borderWidth?: number
 ) => {
     return StyleSheet.create({
         container: {
@@ -90,7 +90,7 @@ const useStyles = (
             bottom: avatarSize / 20,
             zIndex: 1,
             elevation: 2.5,
-            shadowColor: Colors.gray2,
+            shadowColor: COLORS.gray2,
         },
         labelText: {
             fontFamily: "Gilroy-Medium",

@@ -1,15 +1,15 @@
 import React from "react";
-import { CarTableType } from "../../../../Database/connector/powersync/AppSchema";
-import EditForm from "../../../components/EditForm";
-import { useAppDispatch } from "../../../../../hooks/index.ts";
-import { useDatabase } from "../../../../Database/connector/Database.ts";
-import { useBottomSheet } from "../../../../BottomSheet/context/BottomSheetContext.ts";
-import { useAlert } from "../../../../Alert/context/AlertProvider.tsx";
+import { CarTableType } from "../../../Database/connector/powersync/AppSchema.ts";
+import EditForm from "../../../Form/components/EditForm.tsx";
+import { useAppDispatch } from "../../../../hooks/index.ts";
+import { useDatabase } from "../../../Database/connector/Database.ts";
+import { useBottomSheet } from "../../../BottomSheet/context/BottomSheetContext.ts";
+import { useAlert } from "../../../Alert/context/AlertProvider.tsx";
 import { useForm } from "react-hook-form";
-import { EditCarFormFieldType, useEditCarFormProps} from "../../../constants/schemas/carSchema.ts";
-import getFile from "../../../../Database/utils/getFile.ts";
-import useCarSteps from "../steps/useCarSteps.tsx";
-import { editCar } from "../../../../Database/redux/cars/functions/editCar.ts";
+import { EditCarFormFieldType, useEditCarFormProps} from "../../schemas/carSchema.ts";
+import getFile from "../../../Database/utils/getFile.ts";
+import useCarSteps from "../../hooks/useCarSteps.tsx";
+import { editCar } from "../../../Database/redux/cars/functions/editCar.ts";
 
 interface EditCarFormProps {
     car: CarTableType

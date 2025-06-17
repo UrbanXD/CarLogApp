@@ -1,6 +1,6 @@
 import React from "react";
-import {Text, View} from "react-native";
-import {GLOBAL_STYLE, ICON_NAMES} from "../../../constants/constants";
+import { Text, View } from "react-native";
+import { GLOBAL_STYLE, ICON_NAMES } from "../../../constants/index.ts";
 import Link from "../../../components/Link";
 
 const LatestExpensesBlock: React.FC = () => {

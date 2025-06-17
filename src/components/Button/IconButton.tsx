@@ -1,18 +1,17 @@
 import React from "react";
-import { ColorValue, ImageSourcePropType, StyleProp, StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { Colors } from "../../constants/colors/Colors.ts";
+import { StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
 import Icon from "../Icon";
-import { FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/constants";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
+import { Color, ImageSource } from "../../types/index.ts";
 
 interface IconButtonProps {
-    icon: ImageSourcePropType | string
+    icon: ImageSource
     iconSize?: number
-    iconColor?: ColorValue
-    backgroundColor?: ColorValue
+    iconColor?: Color
+    backgroundColor?: Color
     width?: number
     height?: number
-    style?: StyleProp<ViewStyle>
+    style?: ViewStyle
     inverse?: boolean
     disabled?: boolean
     onPress: () => void
@@ -21,8 +20,8 @@ interface IconButtonProps {
 export const IconButton: React.FC<IconButtonProps> = ({
     icon,
     iconSize = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE,
-    iconColor = Colors.black,
-    backgroundColor = Colors.fuelYellow,
+    iconColor = COLORS.black,
+    backgroundColor = COLORS.fuelYellow,
     width = iconSize * 1.5,
     height = iconSize * 1.5,
     style,
@@ -53,8 +52,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
 }
 
 export const useButtonStyles = (
-    primaryColor: ColorValue,
-    secondaryColor: ColorValue,
+    primaryColor: Color,
+    secondaryColor: Color,
     width: number,
     height: number,
 ) =>

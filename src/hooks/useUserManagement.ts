@@ -24,7 +24,7 @@ import {
     ResendParams,
     VerifyEmailOtpParams
 } from "@supabase/supabase-js";
-import { AvatarColors } from "../constants/colors";
+import { AVATAR_COLOR } from "../constants/index.ts";
 import { router } from "expo-router";
 import { SignInFormFieldType, SignUpFormFieldType } from "../features/Form/constants/schemas/userSchema.tsx";
 import { useAuth } from "../contexts/Auth/AuthContext.ts";
@@ -117,7 +117,7 @@ export const useUserManagement = () => {
                             data: {
                                 firstname,
                                 lastname,
-                                avatarColor: AvatarColors[Math.floor(Math.random() * AvatarColors.length)],
+                                avatarColor: AVATAR_COLOR[Math.floor(Math.random() * AVATAR_COLOR.length)],
                             }
                         }
                     });
@@ -185,7 +185,7 @@ export const useUserManagement = () => {
                 email: user.email,
                 firstname: googleData.user.givenName || "",
                 lastname: googleData.user.familyName || "",
-                avatarColor: AvatarColors[Math.floor(Math.random() * AvatarColors.length)],
+                avatarColor: AVATAR_COLOR[Math.floor(Math.random() * AVATAR_COLOR.length)],
                 avatarImage: null
             });
 

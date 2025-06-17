@@ -1,7 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { FONT_SIZES, GLOBAL_STYLE } from "../../../../constants/constants";
-import { Colors } from "../../../../constants/colors";
+import { COLORS, FONT_SIZES, GLOBAL_STYLE } from "../../../../constants/index.ts";
 
 interface InputTitleProps {
     title: string,
@@ -43,12 +42,12 @@ const styles = StyleSheet.create({
     inputNameText: {
         fontSize: FONT_SIZES.p1,
         fontFamily: "Gilroy-Heavy",
-        color: Colors.white
+        color: COLORS.white
     },
     optionalText: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p3,
-        color: Colors.gray2
+        color: COLORS.gray2
     },
     inputInfoText: {
         ...GLOBAL_STYLE.containerText,

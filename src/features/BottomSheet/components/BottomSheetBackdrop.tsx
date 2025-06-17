@@ -1,6 +1,6 @@
 import React from "react";
 import { BottomSheetBackdrop as Backdrop } from "@gorhom/bottom-sheet";
-import { Colors } from "../../../constants/colors";
+import { COLORS } from "../../../constants/index.ts";
 
 const BottomSheetBackdrop: React.FC<any> = (props) =>
     <Backdrop
@@ -8,7 +8,7 @@ const BottomSheetBackdrop: React.FC<any> = (props) =>
         disappearsOnIndex={ -1 }
         opacity={ 0.6 }
         { ...props }
-        style={ [props.style, { backgroundColor: Colors.black }] }
+        style={ [props.style, { backgroundColor: COLORS.black }] }
     />
 
 export default BottomSheetBackdrop;

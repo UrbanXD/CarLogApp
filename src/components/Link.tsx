@@ -1,7 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import { FONT_SIZES } from "../constants/constants";
-import { Colors } from "../constants/colors/Colors.ts";
+import { COLORS, FONT_SIZES } from "../constants/index.ts";
 import Icon from "./Icon";
 
 interface LinkProps {
@@ -42,7 +41,7 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
         textAlign: "center",
-        color: Colors.fuelYellow,
+        color: COLORS.fuelYellow,
     },
 })
 

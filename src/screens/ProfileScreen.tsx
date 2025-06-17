@@ -1,8 +1,7 @@
 import React from "react";
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
-import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../constants/constants.ts";
+import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { Colors } from "../constants/colors";
 import Divider from "../components/Divider.tsx";
 import Button from "../components/Button/Button.ts";
 import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
@@ -57,7 +56,7 @@ const ProfileScreen: React.FC = () => {
                             ?   <Avatar.Image
                                     source={ userAvatar.image }
                                     avatarSize={ hp(20) }
-                                    borderColor={ Colors.black5 }
+                                    borderColor={ COLORS.black5 }
                                     style={ styles.profileImage }
                                     onPressBadge={() => ""}
                             />
@@ -65,7 +64,7 @@ const ProfileScreen: React.FC = () => {
                                     label={ getLabelByName(name) }
                                     avatarSize={ hp(20) }
                                     backgroundColor={ avatarColor ?? undefined }
-                                    borderColor={ Colors.black5 }
+                                    borderColor={ COLORS.black5 }
                                     style={ styles.profileImage }
                                     onPressBadge={() => ""}
                                 />
@@ -142,7 +141,7 @@ const ProfileScreen: React.FC = () => {
                         onPress={ deleteUserProfile }
                         textStyle={{ textAlign: "left" }}
                         backgroundColor="transparent"
-                        textColor={ Colors.redLight }
+                        textColor={ COLORS.redLight }
                         fontSize={ FONT_SIZES.p1 }
                         loadingIndicator
                     />
@@ -151,8 +150,8 @@ const ProfileScreen: React.FC = () => {
                     iconLeft={ ICON_NAMES.signOut }
                     text="Kijelentkezés"
                     onPress={ signOut }
-                    backgroundColor={ Colors.googleRed }
-                    textColor={ Colors.black2 }
+                    backgroundColor={ COLORS.googleRed }
+                    textColor={ COLORS.black2 }
                     fontSize={ FONT_SIZES.p1 }
                 />
             </View>
@@ -171,12 +170,12 @@ const styles = StyleSheet.create({
         height: "90%",
         justifyContent: "space-between",
         gap: DEFAULT_SEPARATOR,
-        backgroundColor: Colors.black5,
+        backgroundColor: COLORS.black5,
         paddingHorizontal: DEFAULT_SEPARATOR,
         paddingBottom: DEFAULT_SEPARATOR,
         borderTopStartRadius: 40,
         borderTopEndRadius: 40,
-        shadowColor: Colors.black5,
+        shadowColor: COLORS.black5,
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.60,
         shadowRadius: 24,

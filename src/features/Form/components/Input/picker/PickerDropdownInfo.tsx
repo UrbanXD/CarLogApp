@@ -1,8 +1,7 @@
 import React from "react";
-import { GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/constants";
+import { COLORS, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import TextInput from "../text/TextInput";
-import { Colors } from "../../../../../constants/colors";
 import Icon from "../../../../../components/Icon";
 import { useAlert } from "../../../../Alert/context/AlertProvider";
 import { PickerDisabledToast } from "../../../../Alert/presets/toast";
@@ -44,7 +43,7 @@ export const PickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
                 <Icon
                     icon={ icon }
                     size={ styles.titleText.fontSize * 2 }
-                    color={ Colors.white }
+                    color={ COLORS.white }
                 />
             }
             <View>
@@ -61,7 +60,7 @@ export const PickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
             <Icon
                 icon={ isHorizontal ? ICON_NAMES.rightArrowHead : ICON_NAMES.downArrowHead }
                 size={ styles.titleText.fontSize * 2 }
-                color={ Colors.white }
+                color={ COLORS.white }
                 // style={ { marginLeft: -styles.titleText.fontSize + SEPARATOR_SIZES.lightSmall } }
             />
         </TouchableOpacity>

@@ -1,7 +1,6 @@
 import React from "react";
-import { FONT_SIZES, GLOBAL_STYLE } from "../constants/constants";
+import { COLORS, FONT_SIZES, GLOBAL_STYLE } from "../constants/index.ts";
 import { Platform, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
-import { Colors } from "../constants/colors";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { formatNumber } from "../utils/formatNumber";
 import Divider from "../components/Divider";
@@ -90,7 +89,7 @@ const ServiceLogScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
     pageContainer: {
-        backgroundColor: Colors.black2,
+        backgroundColor: COLORS.black2,
         marginBottom: 0,
         paddingHorizontal: 0
     },
@@ -103,7 +102,7 @@ const styles = StyleSheet.create({
     },
     descriptionText: {
         fontFamily: "Gilroy-Heavy",
-        color: Colors.white,
+        color: COLORS.white,
         textAlign: "center",
         letterSpacing: Platform.OS === "android" ? 0 : 0.4
     },

@@ -1,12 +1,7 @@
 import React, {useEffect} from "react";
-import {
-    StyleProp,
-    TextStyle,
-    View,
-    ViewStyle,
-} from "react-native";
+import { View } from "react-native";
 import { Control, Controller } from "react-hook-form";
-import {ControllerRenderArgs, SEPARATOR_SIZES} from "../../../../../constants/constants";
+import { ControllerRenderArgs, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import InputTitle from "../InputTitle";
 import TextInput from "./TextInput";
 
@@ -20,9 +15,6 @@ interface InputTextProps {
     numeric?: boolean
     isSecure?: boolean
     isEditable?: boolean
-    style?: StyleProp<ViewStyle>
-    textStyle?: StyleProp<TextStyle>
-    isInBottomSheet?: boolean
 }
 
 const InputText: React.FC<InputTextProps> = ({
@@ -34,10 +26,7 @@ const InputText: React.FC<InputTextProps> = ({
     placeholder = "",
     numeric = false,
     isSecure= false,
-    isEditable = true,
-    style,
-    textStyle,
-    isInBottomSheet = false
+    isEditable = true
 }) => {
     return (
         <View style={{ flexDirection: "column", gap: SEPARATOR_SIZES.lightSmall }}>

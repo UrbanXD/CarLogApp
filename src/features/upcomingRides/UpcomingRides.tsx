@@ -1,9 +1,8 @@
 import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/constants";
+import { COLORS, FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/index.ts";
 import Date from "../../components/Date";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { Colors } from "../../constants/colors";
 import { useForm } from "react-hook-form";
 import { getToday } from "../../utils/getDate";
 import { EditRideFormFieldType, editRideUseFormProps } from "../Form/layouts/editRide/editRideFormSchema";
@@ -46,7 +45,7 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                                 dateUnderSubtitle={ ride.dateSubtitle }
                             />
                             <View style={{ flex: 1, gap: SEPARATOR_SIZES.lightSmall }}>
-                                <Text numberOfLines={ 2 } style={ [GLOBAL_STYLE.containerText, { color: Colors.white }] }>
+                                <Text numberOfLines={ 2 } style={ [GLOBAL_STYLE.containerText, { color: COLORS.white }] }>
                                     { ride.client }
                                 </Text>
                                 <ScrollView contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }>
@@ -56,14 +55,14 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                                         titles={["Zenta", "Kamenica"]}
                                     />
                                 </ScrollView>
-                                <Text numberOfLines={ 1 } style={ [GLOBAL_STYLE.containerText, { color: Colors.white }] }>
+                                <Text numberOfLines={ 1 } style={ [GLOBAL_STYLE.containerText, { color: COLORS.white }] }>
                                     100 km
                                 </Text>
                         </View>
                             <Icon
                                 icon={ ICON_NAMES.info }
                                 size={ FONT_SIZES.h2 }
-                                color={ Colors.white }
+                                color={ COLORS.white }
                                 onPress={
                                     () =>{
                                         console.log("xdd")
@@ -169,7 +168,7 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p3,
-        color: Colors.white
+        color: COLORS.white
     },
     contentContainer: {
         flexDirection: "row",
@@ -179,7 +178,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "row",
         height: hp(22.5),
-        backgroundColor: Colors.black2,
+        backgroundColor: COLORS.black2,
         borderRadius: 15,
         padding: SEPARATOR_SIZES.small,
     },

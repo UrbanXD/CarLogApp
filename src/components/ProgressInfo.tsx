@@ -1,9 +1,8 @@
 import React from "react";
 import { SharedValue } from "react-native-reanimated";
-import { Colors } from "../constants/colors/Colors.ts";
 import { View, Text as TextRN, StyleSheet } from "react-native";
 import { Canvas, Skia, Path, Text, SkFont } from "@shopify/react-native-skia";
-import { FONT_SIZES, SEPARATOR_SIZES } from "../constants/constants";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
 
 interface ProgressInfoProps {
     radius: number
@@ -39,7 +38,7 @@ const ProgressInfo: React.FC<ProgressInfoProps> = ({ radius, strokeWidth, end, f
                         strokeJoin="round"
                         strokeCap="round"
                         style="stroke"
-                        color={ Colors.gray4 }
+                        color={ COLORS.gray4 }
                         start={ 0 }
                         end={ 1 }
                     />
@@ -49,7 +48,7 @@ const ProgressInfo: React.FC<ProgressInfoProps> = ({ radius, strokeWidth, end, f
                         strokeJoin="round"
                         strokeCap="round"
                         style="stroke"
-                        color={ Colors.greenLight }
+                        color={ COLORS.greenLight }
                         start={ 0 }
                         end={ end }
                     />
@@ -96,12 +95,12 @@ const useStyles = (radius: number) =>
         title: {
             fontSize: FONT_SIZES.h3,
             fontFamily: "Gilroy-Heavy",
-            color: Colors.white
+            color: COLORS.white
         },
         subtitle: {
             fontSize: FONT_SIZES.p2,
             fontFamily: "Gilroy-Medium",
-            color: Colors.gray1
+            color: COLORS.gray1
         }
     })
 

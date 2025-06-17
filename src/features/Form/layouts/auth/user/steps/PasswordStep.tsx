@@ -1,7 +1,7 @@
 import React from "react";
 import { StepProps } from "../../../../constants/types/types.ts";
 import Input from "../../../../components/Input/Input.ts";
-import { ICON_NAMES } from "../../../../../../constants/constants.ts";
+import { ICON_NAMES } from "../../../../../../constants/index.ts";
 
 export const PasswordStep: React.FC<StepProps> = ({ control }) =>
     <Input.Group>

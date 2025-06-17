@@ -1,17 +1,18 @@
 import React from "react";
-import { TouchableOpacity, StyleSheet, ViewStyle, StyleProp, ColorValue, ImageSourcePropType } from "react-native";
+import { TouchableOpacity, StyleSheet, ViewStyle } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { ICON_NAMES } from "../../constants/constants.ts";
+import { ICON_NAMES } from "../../constants/index.ts";
 import Button from "../Button/Button.ts";
 import Image from "../Image.tsx";
+import { Color, ImageSource } from "../../types/index.ts";
 
 interface AvatarImageProps {
-    source: ImageSourcePropType | string
+    source: ImageSource
     avatarSize?: number
-    borderColor?: ColorValue | string
-    style?: StyleProp<ViewStyle>
+    borderColor?: Color
+    style?: ViewStyle
     onPress?: () => void
-    badgeIcon?: string | ImageSourcePropType
+    badgeIcon?: ImageSource
     onPressBadge?: () => void
 }
 
@@ -57,7 +58,7 @@ const AvatarImage: React.FC<AvatarImageProps> = ({
 
 const useStyles = (
     avatarSize: number,
-    borderColor?: ColorValue | string,
+    borderColor?: Color,
     borderWidth?: number
 ) => {
     return StyleSheet.create({

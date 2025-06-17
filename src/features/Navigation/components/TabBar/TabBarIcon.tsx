@@ -7,7 +7,7 @@ import Animated, {
     withSpring,
 } from "react-native-reanimated";
 import Icon from "../../../../components/Icon";
-import { Colors } from "../../../../constants/colors";
+import { COLORS } from "../../../../constants/index.ts";
 
 interface TabBarIconProp {
     focused: boolean
@@ -22,7 +22,7 @@ interface TabBarIconProp {
 const TabBarIcon: React.FC<TabBarIconProp> = ({
     focused,
     iconName = "home",
-    iconColor = Colors.white,
+    iconColor = COLORS.white,
     iconSize,
     onPress,
     onLongPress,

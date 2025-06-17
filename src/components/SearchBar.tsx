@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ICON_NAMES } from "../constants/constants";
+import { ICON_NAMES } from "../constants/index.ts";
 import TextInput from "../features/Form/components/Input/text/TextInput";
 
 interface SearchBarProps {

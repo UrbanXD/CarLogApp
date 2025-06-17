@@ -6,8 +6,7 @@ import {
     TextInput as TextInputRN,
 } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { ICON_COLORS, ICON_NAMES } from "../../../../../constants/constants";
-import { Colors } from "../../../../../constants/colors";
+import { COLORS, ICON_COLORS, ICON_NAMES } from "../../../../../constants/index.ts";
 import Icon from "../../../../../components/Icon";
 import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
 
@@ -115,18 +114,18 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: hp(1.5),
-        backgroundColor: Colors.gray5,
+        backgroundColor: COLORS.gray5,
         paddingHorizontal: hp(1.5),
         borderRadius: 20,
         overflow: "hidden"
     },
     activeFormFieldContainer: {
         borderWidth: 1,
-        borderColor: Colors.gray1
+        borderColor: COLORS.gray1
     },
     errorFormFieldContainer: {
         borderWidth: 1,
-        borderColor: Colors.redLight
+        borderColor: COLORS.redLight
     },
     formFieldIconContainer: {
         flex: 0.15,
@@ -134,18 +133,18 @@ const styles = StyleSheet.create({
     },
     textInput: {
         flex: 1,
-        color: Colors.gray1,
+        color: COLORS.gray1,
         fontSize: hp(2.25)
     },
     placeholderText: {
-        color: Colors.gray2
+        color: COLORS.gray2
     },
     errorText: {
         paddingLeft: hp(2),
         fontFamily: "Gilroy-Medium",
         fontSize: hp(1.85),
         letterSpacing: hp(1.85) * 0.05,
-        color: Colors.redLight
+        color: COLORS.redLight
     }
 })
 

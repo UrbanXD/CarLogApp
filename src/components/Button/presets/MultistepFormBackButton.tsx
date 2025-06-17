@@ -1,6 +1,6 @@
 import React from "react";
 import IconButton from "../IconButton";
-import { ICON_NAMES } from "../../../constants/constants";
+import { ICON_NAMES } from "../../../constants/index.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface MultistepFormBackButtonProps {

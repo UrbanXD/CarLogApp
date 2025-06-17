@@ -1,7 +1,7 @@
-import React, {useState} from "react";
-import {getDate} from "../../../utils/getDate";
-import {ScrollView, Text, View} from "react-native";
-import {GLOBAL_STYLE, ICON_NAMES} from "../../../constants/constants";
+import React, { useState } from "react";
+import { getDate } from "../../../utils/getDate";
+import { ScrollView, Text, View } from "react-native";
+import { GLOBAL_STYLE, ICON_NAMES } from "../../../constants/index.ts";
 import UpcomingRides from "../../../features/upcomingRides/UpcomingRides";
 import Link from "../../../components/Link";
 

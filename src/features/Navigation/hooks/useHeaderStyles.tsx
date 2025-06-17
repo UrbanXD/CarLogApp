@@ -1,6 +1,5 @@
 import { StyleSheet } from "react-native";
-import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/constants";
-import { Colors } from "../../../constants/colors";
+import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
 
 const useHeaderStyles = (top: number) =>
     StyleSheet.create({
@@ -20,7 +19,7 @@ const useHeaderStyles = (top: number) =>
         title: {
             fontFamily: "Gilroy-Heavy",
             fontSize:  FONT_SIZES.h3,
-            color: Colors.white,
+            color: COLORS.white,
             letterSpacing: FONT_SIZES.h3 * 0.05
         }
     })

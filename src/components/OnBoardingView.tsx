@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { FlatList } from "react-native-gesture-handler";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
-import { DEFAULT_SEPARATOR } from "../constants/constants";
+import { DEFAULT_SEPARATOR } from "../constants/index.ts";
 import { RenderComponent } from "../features/Form/constants/types/types.ts";
 
 interface OnBoardingViewProps {

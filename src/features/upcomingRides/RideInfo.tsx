@@ -1,6 +1,5 @@
 import React from "react";
-import { FONT_SIZES, SEPARATOR_SIZES } from "../../constants/constants";
-import { Colors } from "../../constants/colors";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { StyleSheet, Text, View } from "react-native";
 import Icon from "../../components/Icon";
 
@@ -18,7 +17,7 @@ const RideInfo: React.FC<RideInfoProps> = ({
             <Icon
                 icon={ icon }
                 size={ styles.text.fontSize * 1.2 }
-                color={ Colors.white }
+                color={ COLORS.white }
             />
             <Text numberOfLines={ 2 } style={ styles.text }>
                 { text }
@@ -39,7 +38,7 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p3,
-        color: Colors.gray1
+        color: COLORS.gray1
     }
 })
 

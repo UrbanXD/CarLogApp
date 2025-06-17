@@ -4,13 +4,13 @@ import { FlatList } from "react-native-gesture-handler";
 import PickerItem from "./PickerItem";
 import { StyleSheet, Text, View } from "react-native";
 import {
+    COLORS,
     DEFAULT_SEPARATOR,
     FONT_SIZES,
     GLOBAL_STYLE,
     ICON_NAMES,
     SEPARATOR_SIZES
-} from "../../../../../constants/constants";
-import { Colors } from "../../../../../constants/colors";
+} from "../../../../../constants/index.ts";
 import SearchBar from "../../../../../components/SearchBar";
 import Icon from "../../../../../components/Icon";
 import {heightPercentageToDP} from "react-native-responsive-screen";
@@ -96,7 +96,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
                 <Icon
                     icon={ ICON_NAMES.close }
                     size={ FONT_SIZES.p1 }
-                    color={ Colors.white }
+                    color={ COLORS.white }
                     style={{ alignSelf: "center" }}
                     onPress={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
                 />

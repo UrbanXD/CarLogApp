@@ -1,12 +1,12 @@
-import { useAddCarFormProps, AddCarFormFieldType } from "../../../constants/schemas/carSchema";
-import { store } from "../../../../Database/redux/store";
-import { addCar } from "../../../../Database/redux/cars/functions/addCar";
-import { useDatabase } from "../../../../Database/connector/Database";
-import { useAlert } from "../../../../Alert/context/AlertProvider";
+import { useAddCarFormProps, AddCarFormFieldType } from "../schemas/carSchema.ts";
+import { store } from "../../Database/redux/store.ts";
+import { addCar } from "../../Database/redux/cars/functions/addCar.ts";
+import { useDatabase } from "../../Database/connector/Database.ts";
+import { useAlert } from "../../Alert/context/AlertProvider.tsx";
 import { useForm } from "react-hook-form";
-import useCarSteps from "../steps/useCarSteps";
-import { NewCarToast } from "../../../../Alert/presets/toast";
-import { useBottomSheet } from "../../../../BottomSheet/context/BottomSheetContext.ts";
+import useCarSteps from "./useCarSteps.tsx";
+import { NewCarToast } from "../../Alert/presets/toast/index.ts";
+import { useBottomSheet } from "../../BottomSheet/context/BottomSheetContext.ts";
 
 const useNewCarForm = () => {
     const database = useDatabase();
