@@ -6,6 +6,7 @@ import React from "react";
 import ImageStep from "./ImageStep";
 import { ResultStep, StepProps, Steps } from "../../../constants/types/types.ts";
 import CarProfile from "../../../../../components/CarProfile/CarProfile.ts";
+import { CarEditNameToast } from "../../../../Alert/presets/toast/CarEditNameToast.ts";
 
 export enum CAR_FORM_STEPS {
     NameStep,
@@ -27,47 +28,43 @@ const useCarSteps = (
                 title: "Elnevezés",
                 fields: ["name"],
                 render: () =>
-                    <NameStep
-                        control={control}
-                    />
+                    <NameStep control={ control } />,
+                editToastMessages: CarEditNameToast
             },
             {
                 title: "Modell",
                 fields: ["brand", "model"],
                 render: () =>
                     <CarModelStep
-                        control={control}
-                        resetField={resetField}
-                    />
+                        control={ control }
+                        resetField={ resetField }
+                    />,
+                editToastMessages: CarEditNameToast
             },
             {
                 title: "Kilométeróra",
                 fields: ["odometerValue", "odometerMeasurement"],
                 render: () =>
-                    <OdometerStep
-                        control={control}
-                    />
+                    <OdometerStep control={ control } />,
+                editToastMessages: CarEditNameToast
             },
             {
                 title: "Üzemanyag",
                 fields: ["fuelType", "fuelMeasurement", "fuelTankSize"],
                 render: () =>
-                    <FuelStep
-                        control={control}
-                    />
+                    <FuelStep control={ control } />,
+                editToastMessages: CarEditNameToast
             },
             {
                 title: "Kép",
                 fields: ["image"],
                 render: () =>
-                    <ImageStep
-                        control={control}
-                    />
+                    <ImageStep control={ control } />,
+                editToastMessages: CarEditNameToast
             }
         ],
         resultStep: getValues && {
             type: "result",
-            title: "Összesítő adatlap", //kitorolni, lehet undifned hiba lesz onboarding eseten idk
             render: (goTo) =>
                 <CarProfile.ByObj car={ getValues() } goTo={ goTo } />
         }

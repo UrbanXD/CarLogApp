@@ -16,7 +16,7 @@ const EditForm: React.FC<EditFormProps> = ({
     submitHandler
 }) => {
     const handleSave =
-        async () => await submitHandler();
+        async () => await submitHandler(stepIndex);
 
     return (
         <View style={{ flex: 1, gap: SEPARATOR_SIZES.normal }}>
