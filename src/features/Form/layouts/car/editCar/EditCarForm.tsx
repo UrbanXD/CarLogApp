@@ -7,16 +7,14 @@ interface EditCarFormProps {
     car: CarTableType
     carImage?: string
     stepIndex: number
-    dismissBottomSheet: () => void
 }
 const EditCarForm: React.FC<EditCarFormProps> = ({
     car,
     carImage,
-    stepIndex,
-    dismissBottomSheet
+    stepIndex
 }) => {
     const restProps =
-        useEditCarForm(car, dismissBottomSheet, carImage);
+        useEditCarForm(car, carImage);
 
     return (
         <EditForm

@@ -10,7 +10,7 @@ import { deleteCar } from "../features/Database/redux/cars/functions/deleteCar.t
 const useCarProfile = (carID: string) => {
     const database = useDatabase();
     const { openModal } = useAlert();
-    const { openBottomSheet, dismissBottomSheet } = useBottomSheet();
+    const { openBottomSheet } = useBottomSheet();
     const { getCar, getCarImage } = useCars();
 
     const car = getCar(carID);
@@ -34,7 +34,6 @@ const useCarProfile = (carID: string) => {
                     car={ car }
                     carImage={ carImage }
                     stepIndex={ stepIndex }
-                    dismissBottomSheet={ dismissBottomSheet }
                 />,
             snapPoints: [height],
             enableDismissOnClose: false
