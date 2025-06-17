@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState, ReactNode} from "react";
 import { ImageSourcePropType, Image as ImageRN, View, ViewStyle, StyleSheet, ImageStyle } from "react-native";
 import DefaultElement from "./DefaultElement";
 import { COLORS, ICON_NAMES } from "../constants/index.ts";
@@ -11,7 +11,7 @@ interface ImageProps {
     alt?: string
     imageStyle?: ImageStyle
     overlay?: boolean
-    children?: React.ReactNode
+    children?: ReactNode
 }
 
 const Image: React.FC<ImageProps> = ({

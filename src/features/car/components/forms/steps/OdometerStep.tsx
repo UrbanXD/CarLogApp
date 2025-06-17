@@ -1,8 +1,8 @@
 import React from "react";
-import { StepProps } from "../../../../Form/constants/types/types.ts";
 import Input from "../../../../Form/components/Input/Input.ts";
 import { ICON_NAMES } from "../../../../../constants/index.ts";
 import { ODOMETER_MEASUREMENTS } from "../../../../Form/constants/constants.ts";
+import { StepProps } from "../../../../../types/index.ts";
 
 const OdometerStep: React.FC<StepProps> = ({
     control

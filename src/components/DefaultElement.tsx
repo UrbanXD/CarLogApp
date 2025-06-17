@@ -5,7 +5,7 @@ import Icon from "./Icon";
 import { hexToRgba } from "../utils/colors/hexToRgba";
 import { ImageSource } from "../types/index.ts";
 
-interface DefaultImageProps {
+interface DefaultElementProps {
     isLoading?: boolean;
     icon?: ImageSource
     text?: string
@@ -13,7 +13,7 @@ interface DefaultImageProps {
     style?: ViewStyle
 }
 
-const DefaultElement: React.FC<DefaultImageProps> = ({
+const DefaultElement: React.FC<DefaultElementProps> = ({
     isLoading = false,
     icon = ICON_NAMES.image,
     text,

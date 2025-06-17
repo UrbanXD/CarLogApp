@@ -1,6 +1,6 @@
 import { InputPickerDataType } from "../components/Input/picker/InputPicker";
 import { UseFormReturn } from "react-hook-form";
-import { RenderComponent } from "./types/types.ts";
+import { RenderComponent } from "../../../types/index.ts";
 
 export interface UseCustomFormProps extends Partial<UseFormReturn<any>>{
     steps: Array<RenderComponent>

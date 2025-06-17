@@ -1,9 +1,9 @@
-import React, {useEffect, useRef, useState} from "react";
-import { StepProps } from "../../../../Form/constants/types/types.ts";
+import React, { useEffect, useRef, useState } from "react";
 import { CARS, DATA_TRANSFORM_TO_PICKER_DATA } from "../../../../../constants/index.ts";
 import { InputPickerDataType } from "../../../../Form/components/Input/picker/InputPicker.tsx";
 import { useWatch } from "react-hook-form";
 import Input from "../../../../Form/components/Input/Input.ts";
+import { StepProps } from "../../../../../types/index.ts";
 
 const CarModelStep: React.FC<StepProps> = ({
     control,

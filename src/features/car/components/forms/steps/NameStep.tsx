@@ -1,7 +1,7 @@
 import React from "react";
-import { StepProps } from "../../../../Form/constants/types/types.ts";
 import Input from "../../../../Form/components/Input/Input.ts";
 import { ICON_NAMES } from "../../../../../constants/index.ts";
+import { StepProps } from "../../../../../types/index.ts";
 
 const NameStep: React.FC<StepProps> = ({
     control

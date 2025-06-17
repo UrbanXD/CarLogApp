@@ -1,11 +1,11 @@
 import React from "react";
-import { StepProps } from "../../../../constants/types/types.ts";
 import Input from "../../../../components/Input/Input.ts";
 import { COLORS, GLOBAL_STYLE, ICON_NAMES } from "../../../../../../constants/index.ts";
 import Button from "../../../../../../components/Button/Button.ts";
 import TextDivider from "../../../../../../components/TextDivider.tsx";
 import { useMultiStepForm } from "../../../../context/MultiStepFormProvider.tsx";
 import { EmailStep } from "./EmailStep.tsx";
+import { StepProps } from "../../../../../../types/index.ts";
 
 export const SignUpFirstStep: React.FC<StepProps> = ({
     control,

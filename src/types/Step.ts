@@ -1,8 +1,7 @@
+import { RenderComponent} from "./RenderComponent.ts";
+import { ToastMessages } from "../features/Alert/constants/types.ts";
 import { ReactNode } from "react";
-import { Control, UseFormGetValues, UseFormResetField } from "react-hook-form";
-import { ToastMessages } from "../../../Alert/constants/types.ts";
-
-export type RenderComponent = () => ReactNode | null
+import {Control, UseFormGetValues, UseFormResetField} from "react-hook-form";
 
 export type Step = {
     title: string
@@ -11,12 +10,12 @@ export type Step = {
     editToastMessages?: ToastMessages
 }
 
+export type Steps = Array<Step>
+
 export type ResultStep = {
     type: "result"
     render: (goTo?: (index: number) => void) => ReactNode | null
 }
-
-export type Steps = Array<Step>
 
 export interface StepProps {
     control: Control<any>

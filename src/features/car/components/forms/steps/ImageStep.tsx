@@ -1,6 +1,6 @@
 import React from "react";
-import { StepProps } from "../../../../Form/constants/types/types.ts";
 import InputImagePicker from "../../../../Form/components/Input/imagePicker/InputImagePicker.tsx";
+import { StepProps } from "../../../../../types/index.ts";
 
 const ImageStep: React.FC<StepProps> = ({
     control

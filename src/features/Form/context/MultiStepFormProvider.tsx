@@ -1,7 +1,7 @@
 import React, { Context, createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { Control, SubmitHandler, UseFormResetField, UseFormTrigger } from "react-hook-form";
-import { ResultStep, Steps } from "../constants/types/types.ts";
 import { Keyboard } from "react-native";
+import { ResultStep, Steps } from "../../../types/index.ts";
 
 interface MultiStepFormProviderValue {
     steps: Steps

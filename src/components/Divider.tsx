@@ -2,11 +2,12 @@ import React from "react";
 import { View, StyleSheet, ColorValue } from "react-native";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { COLORS } from "../constants/index.ts";
+import { Color } from "../types/index.ts";
 
 interface DividerProps {
     size?: number
     thickness?: number
-    color?: ColorValue | string
+    color?: Color
     margin?: number
     isVertical?: boolean
 }

@@ -4,9 +4,9 @@ import OdometerStep from "../components/forms/steps/OdometerStep.tsx";
 import FuelStep from "../components/forms/steps/FuelStep.tsx";
 import React from "react";
 import ImageStep from "../components/forms/steps/ImageStep.tsx";
-import { ResultStep, StepProps, Steps } from "../../Form/constants/types/types.ts";
 import CarProfile from "../components/carProfile/CarProfile.ts";
 import { CarEditNameToast } from "../../Alert/presets/toast/CarEditNameToast.ts";
+import { ResultStep, StepProps, Steps } from "../../../../../types/index.ts";
 
 export enum CAR_FORM_STEPS {
     NameStep,

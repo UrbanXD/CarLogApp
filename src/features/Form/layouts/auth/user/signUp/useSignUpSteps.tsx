@@ -1,5 +1,5 @@
 import { NameStep, PasswordStep, SignUpFirstStep} from "../steps";
-import { StepProps, Steps } from "../../../../constants/types/types.ts";
+import { StepProps, Steps } from "../../../../../../types/index.ts";
 
 export const useSignUpSteps = (
     control: StepProps["control"]

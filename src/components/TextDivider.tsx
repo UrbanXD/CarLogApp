@@ -2,10 +2,11 @@ import React from "react";
 import { ColorValue, StyleSheet, View, Text } from "react-native";
 import { COLORS } from "../constants/index.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { Color } from "../types/index.ts";
 
 interface TextDividerProps {
     title: string
-    color?: ColorValue | string
+    color?: Color
     lineHeight?: number
     marginVertical?: number
 }
