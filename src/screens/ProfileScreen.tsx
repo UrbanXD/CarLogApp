@@ -4,13 +4,13 @@ import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARA
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Divider from "../components/Divider.tsx";
 import Button from "../components/Button/Button.ts";
-import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
-import { EditUserBottomSheet } from "../features/BottomSheet/presets";
-import { EDIT_USER_FORM_STEPS } from "../features/Form/layouts/auth/user/editUser/useEditUserSteps.tsx";
+import { useBottomSheet } from "../contexts/BottomSheet/BottomSheetContext.ts";
+import { EditUserBottomSheet } from "../components/BottomSheet/presets/index.ts";
+import { EDIT_USER_FORM_STEPS } from "../features/user/hooks/useEditUserSteps.tsx";
 import Avatar from "../components/Avatar/Avatar.ts";
 import { getLabelByName } from "../utils/getLabelByName.ts";
 import { useAuth } from "../contexts/Auth/AuthContext.ts";
-import { useUserManagement } from "../hooks/useUserManagement.ts";
+import { useUserManagement } from "../features/user/hooks/useUserManagement.ts";
 import { Redirect } from "expo-router";
 
 const ProfileScreen: React.FC = () => {

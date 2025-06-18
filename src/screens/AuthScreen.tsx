@@ -6,10 +6,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button/Button";
 import Divider from "../components/Divider";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
-import { SignInBottomSheet, SignUpBottomSheet } from "../features/BottomSheet/presets";
+import { useBottomSheet } from "../contexts/BottomSheet/BottomSheetContext.ts";
+import { SignInBottomSheet, SignUpBottomSheet } from "../components/BottomSheet/presets/index.ts";
 import { useAuth } from "../contexts/Auth/AuthContext.ts";
-import { useUserManagement } from "../hooks/useUserManagement.ts";
+import { useUserManagement } from "../features/user/hooks/useUserManagement.ts";
 
 const AuthScreen: React.FC = () => {
     const { top } = useSafeAreaInsets();

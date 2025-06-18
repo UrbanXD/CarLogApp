@@ -1,23 +1,23 @@
 import { Stack } from 'expo-router/stack';
 import React, { useEffect } from "react";
 import '@azure/core-asynciterator-polyfill';
-import { useDatabase } from "../features/Database/connector/Database";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { store } from "../features/Database/redux/store";
 import { Provider } from "react-redux";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { StatusBar } from "expo-status-bar";
-import MainHeader from "../features/Navigation/components/Header/MainHeader";
-import { BottomSheetProvider } from "../features/BottomSheet/context/BottomSheetProvider";
-import { DatabaseProvider } from '../features/Database/context/DatabaseProvider';
+import MainHeader from "../components/Navigation/Header/MainHeader";
+import { BottomSheetProvider } from "../contexts/BottomSheet/BottomSheetProvider.tsx";
 import { PortalProvider } from "@gorhom/portal";
 import Compactor from "../components/Compactor";
 import { AlertProvider } from "../features/Alert/context/AlertProvider";
-import SecondaryHeader from "../features/Navigation/components/Header/SecondaryHeader";
-import { ScreenScrollViewProvider } from "../features/ScreenScrollView/context/ScreenScrollViewProvider.tsx";
+import SecondaryHeader from "../components/Navigation/Header/SecondaryHeader";
+import { ScreenScrollViewProvider } from "../contexts/ScreenScrollViewProvider.tsx";
 import { AuthProvider } from "../contexts/Auth/AuthProvider.tsx";
+import { useDatabase } from "../database/connector/Database.ts";
+import { DatabaseProvider } from "../contexts/DatabaseProvider.tsx";
+import { store } from "../database/redux/store.ts";
 
 const Layout:React.FC = () => {
     const database = useDatabase();

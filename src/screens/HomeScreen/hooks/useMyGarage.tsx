@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { CarouselItemType } from "../../../components/Carousel/Carousel";
 import NewCarForm from "../../../features/car/components/forms/NewCarForm.tsx";
 import { router } from "expo-router";
-import useCars from "../../../hooks/useCars";
-import { useBottomSheet } from "../../../features/BottomSheet/context/BottomSheetContext.ts";
+import useCars from "../../../features/car/hooks/useCars.ts";
+import { useBottomSheet } from "../../../contexts/BottomSheet/BottomSheetContext.ts";
 
 const useMyGarage = () => {
     const { openBottomSheet } = useBottomSheet();

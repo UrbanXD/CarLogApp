@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ICON_NAMES } from "../constants/index.ts";
-import TextInput from "../features/Form/components/Input/text/TextInput";
+import TextInput from "./Input/text/TextInput";
 
 interface SearchBarProps {
     onTextChange: (value: any) => void

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { zImage, zNumber, zPickerRequired } from "../../Form/constants/types/zodTypes.ts";
+import { zImage, zNumber, zPickerRequired } from "../../../types/zodTypes.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const carFormSchema = z

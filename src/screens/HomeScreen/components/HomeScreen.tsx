@@ -6,7 +6,7 @@ import UpcomingRidesBlock from "./UpcomingRidesBlock";
 import Divider from "../../../components/Divider";
 import LatestExpensesBlock from "./LatestExpensesBlock";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { ScreenScrollView } from "../../../features/ScreenScrollView/components/ScreenScrollView.tsx";
+import { ScreenScrollView } from "../../../components/ScreenScrollView.tsx";
 
 const HomeScreen: React.FC = () =>
     <ScreenScrollView>

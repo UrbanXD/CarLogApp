@@ -1,5 +1,5 @@
 import React from "react";
-import Input from "../../../../Form/components/Input/Input.ts";
+import Input from "../../../../../components/Input/Input.ts";
 import { ICON_NAMES } from "../../../../../constants/index.ts";
 import { StepProps } from "../../../../../types/index.ts";
 

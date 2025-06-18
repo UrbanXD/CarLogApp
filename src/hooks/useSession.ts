@@ -1,24 +1,48 @@
-import { useDatabase } from "../features/Database/connector/Database";
 import { useEffect, useState } from "react";
-import { Session } from "@supabase/supabase-js";
-import { loadCars } from "../features/Database/redux/cars/functions/loadCars";
-import { UserTableType } from "../features/Database/connector/powersync/AppSchema.ts";
-import { useUser } from "./useUser.ts";
-import { loadUser } from "../features/Database/redux/user/functions/loadUser.ts";
-import { useAppDispatch } from "./index.ts";
+import { Session, User } from "@supabase/supabase-js";
+import { loadUser } from "../database/redux/user/actions/loadUser.ts";
+import { useAppDispatch, useAppSelector } from "./index.ts";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BaseConfig } from "../constants/BaseConfig.ts";
+import { useDatabase } from "../database/connector/Database.ts";
+import { UserTableType } from "../database/connector/powersync/AppSchema.ts";
+import { ImageType } from "../utils/pickImage.ts";
+import { loadCars } from "../database/redux/car/actions/loadCars.ts";
+import { updateUser } from "../database/redux/user/actions/updateUser.ts";
 
 export const useSession = () => {
     const dispatch = useAppDispatch();
     const database = useDatabase();
     const { supabaseConnector } = database;
-    const userValue = useUser();
-    const {
-        fetchNotVerifiedUser,
-        updateNotVerifiedUser
-    } = userValue;
+
+    const user = useAppSelector(state=> state.user.user);
+    const userAvatar = useAppSelector(state=> state.user.userAvatar);
+    const isUserLoading = useAppSelector(state => state.user.isLoading);
+    const [notVerifiedUser, setNotVerifiedUser] = useState<User | null>(null);
 
     const [session, setSession] = useState<Session | null>(null);
     const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
+
+    const setUser = (newUser: UserTableType | null, newAvatar?: ImageType | null ) => {
+        dispatch(updateUser({ database, newUser, newAvatar }));
+    }
+
+    const fetchNotVerifiedUser = async () => {
+        const newNotVerifiedUser = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_USER)
+        if(!newNotVerifiedUser) return;
+
+        setNotVerifiedUser(JSON.parse(newNotVerifiedUser));
+    }
+
+    const updateNotVerifiedUser = async (newNotVerifiedUser: User | null) => {
+        setNotVerifiedUser(newNotVerifiedUser);
+
+        if(newNotVerifiedUser) {
+            void AsyncStorage.setItem(BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_USER, JSON.stringify(newNotVerifiedUser));
+        } else {
+            void AsyncStorage.removeItem(BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_USER);
+        }
+    }
 
     // adatok betoltese local db-bol
     const fetchLocalData = async () => {
@@ -94,7 +118,13 @@ export const useSession = () => {
         session,
         isSessionLoading,
         refreshSession,
-        ...userValue
+        user,
+        setUser,
+        userAvatar,
+        isUserLoading,
+        notVerifiedUser,
+        fetchNotVerifiedUser,
+        updateNotVerifiedUser
     }
 }
 

@@ -1,5 +1,5 @@
 import React from "react";
-import MultiStepForm from "../../../Form/components/MultiStepForm/MultiStepForm.tsx";
+import MultiStepForm from "../../../../components/Form/MultiStepForm.tsx";
 import useNewCarForm from "../../hooks/useNewCar.tsx";
 
 const NewCarForm: React.FC = () => {

@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { CARS, DATA_TRANSFORM_TO_PICKER_DATA } from "../../../../../constants/index.ts";
-import { InputPickerDataType } from "../../../../Form/components/Input/picker/InputPicker.tsx";
+import { InputPickerDataType } from "../../../../../components/Input/picker/InputPicker.tsx";
 import { useWatch } from "react-hook-form";
-import Input from "../../../../Form/components/Input/Input.ts";
+import Input from "../../../../../components/Input/Input.ts";
 import { StepProps } from "../../../../../types/index.ts";
+import { CARS, DATA_TRANSFORM_TO_PICKER_DATA } from "../../../../../constants/index.ts";
 
 const CarModelStep: React.FC<StepProps> = ({
     control,
@@ -12,7 +12,6 @@ const CarModelStep: React.FC<StepProps> = ({
     const [isBrandSelected, setIsBrandSelected] = useState(false);
     const [brands] = useState(DATA_TRANSFORM_TO_PICKER_DATA(Object.keys(CARS)));
     const [models, setModels] = useState<Array<InputPickerDataType>>([]);
-
     const selectedBrandName = useRef<string>("");
 
     const selectedBrandNameValue = useWatch({
