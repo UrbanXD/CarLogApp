@@ -9,7 +9,7 @@ import { EditRideFormFieldType, editRideUseFormProps } from "../schemas/editRide
 import InputText from "../../../components/Input/text/InputText.tsx";
 import ProgressBar from "../../../components/ProgressBar.tsx";
 import Icon from "../../../components/Icon.tsx";
-import { useBottomSheet } from "../../../contexts/BottomSheet/BottomSheetContext.ts";
+import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 
 type RideType = {
     carUID: string

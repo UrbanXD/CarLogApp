@@ -4,7 +4,7 @@ import { EditUserFormFieldType, useEditUserFormProps } from "../../schemas/userS
 import { useUserManagement } from "../../hooks/useUserManagement.ts";
 import { useForm } from "react-hook-form";
 import { EDIT_USER_FORM_STEPS, useEditUserSteps } from "../../hooks/useEditUserSteps.tsx";
-import { ChangeNameToast, SignUpToast } from "../../../Alert/presets/toast/index.ts";
+import { ChangeNameToast, SignUpToast } from "../../presets/toast/index.ts";
 
 export interface EditUserFormProps {
     user: Partial<EditUserFormFieldType>

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Redirect } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import AuthScreen from "../screens/AuthScreen";
-import { useBottomSheet } from "../contexts/BottomSheet/BottomSheetContext.ts";
+import { useBottomSheet } from "../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useAuth } from "../contexts/Auth/AuthContext.ts";
 import { useFonts } from "expo-font";
 

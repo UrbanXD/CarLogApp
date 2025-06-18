@@ -1,16 +1,17 @@
 import React from "react";
 import EditForm from "../../../../components/Form/EditForm.tsx";
 import { useAppDispatch } from "../../../../hooks/index.ts";
-import { useBottomSheet } from "../../../../contexts/BottomSheet/BottomSheetContext.ts";
-import { useAlert } from "../../../Alert/context/AlertProvider.tsx";
+import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
+import { useAlert } from "../../../../ui/alert/contexts/AlertProvider.tsx";
 import { useForm } from "react-hook-form";
 import { EditCarFormFieldType, useEditCarFormProps } from "../../schemas/carSchema.ts";
 import getFile from "../../../../database/utils/getFile.ts";
 import useCarSteps from "../../hooks/useCarSteps.tsx";
 import { CarTableType } from "../../../../database/connector/powersync/AppSchema.ts";
 import { useDatabase } from "../../../../database/connector/Database.ts";
+import { editCar } from "../../../../database/redux/car/actions/editCar.ts";
 
-interface EditCarFormProps {
+export interface EditCarFormProps {
     car: CarTableType
     carImage?: string
     stepIndex: number

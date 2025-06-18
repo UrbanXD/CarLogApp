@@ -5,7 +5,7 @@ import { InputPickerDataType } from "../components/Input/picker/InputPicker";
 export * from "./Colors.ts";
 export * from "./Icons.ts";
 export * from "./FontSizes.ts";
-export * from "./Alert.ts";
+export * from "../ui/alert/constants/index.ts";
 export * from "./SeparatorSizes.ts";
 export * from "./GlobalStyles.ts";
 
@@ -58,7 +58,7 @@ export const DATA_TRANSFORM_TO_PICKER_DATA = (data: any, titleSelector?: string,
     const picker_data = [] as Array<InputPickerDataType>;
 
     data
-        .map((item: any, index) => {
+        .map((item: any) => {
             picker_data.push({
                 title: titleSelector ? item[titleSelector] : item,
                 subtitle: subtitleSelector && item[subtitleSelector],

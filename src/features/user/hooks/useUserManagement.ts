@@ -1,10 +1,10 @@
 import { useDatabase } from "../../../database/connector/Database.ts";
-import { useAlert } from "../../Alert/context/AlertProvider.tsx";
-import { useBottomSheet } from "../../../contexts/BottomSheet/BottomSheetContext.ts";
+import { useAlert } from "../../../ui/alert/contexts/AlertProvider.tsx";
+import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { BaseConfig } from "../../../constants/BaseConfig.ts";
 import { HandleVerificationOtpType } from "../components/forms/VerifyOtpForm.tsx";
-import { getToastMessage } from "../../Alert/utils/getToastMessage.ts";
+import { getToastMessage } from "../../../ui/alert/utils/getToastMessage.ts";
 import {
     AddPasswordToast,
     ChangeEmailToast,
@@ -15,8 +15,8 @@ import {
     SignInToast,
     SignOutToast,
     SignUpToast
-} from "../../Alert/presets/toast/index.ts";
-import { OTPVerificationBottomSheet } from "../../../components/BottomSheet/presets/index.ts";
+} from "../presets/toast/index.ts";
+import { OtpVerificationBottomSheet } from "../presets/bottomSheet/index.ts";
 import {
     AuthError,
     GenerateLinkParams,
@@ -29,7 +29,7 @@ import { router } from "expo-router";
 import { SignInFormFieldType, SignUpFormFieldType } from "../schemas/userSchema.tsx";
 import { useAuth } from "../../../contexts/Auth/AuthContext.ts";
 import { UserTableType } from "../../database/connector/powersync/AppSchema.ts";
-import { ToastMessages } from "../../Alert/constants/types.ts";
+import { ToastMessages } from "../../../ui/alert/types/index.ts";
 import getImageState from "../../../database/utils/getImageState.ts";
 import { getPathFromImageType } from "../../../utils/getPathFromImageType.ts";
 
@@ -69,7 +69,7 @@ export const useUserManagement = () => {
             }
 
         openBottomSheet(
-            OTPVerificationBottomSheet({
+            OtpVerificationBottomSheet({
                 type: "signup",
                 title: "Email cím hitelesítés",
                 email,
@@ -300,7 +300,7 @@ export const useUserManagement = () => {
                         }
 
                     openBottomSheet(
-                        OTPVerificationBottomSheet({
+                        OtpVerificationBottomSheet({
                             type: "email_change",
                             title: "Új email cím hitelesítés",
                             email: newEmail,
@@ -310,7 +310,7 @@ export const useUserManagement = () => {
                 }
 
             openBottomSheet(
-                OTPVerificationBottomSheet({
+                OtpVerificationBottomSheet({
                     type: "email_change",
                     title: "Email módosítási kérelem hitelesítés",
                     email: session.user.email,
@@ -444,7 +444,7 @@ export const useUserManagement = () => {
                 }
 
             openBottomSheet(
-                OTPVerificationBottomSheet({
+                OtpVerificationBottomSheet({
                     type: "recovery",
                     title: "Jelszó módosítása",
                     email: session.user.email,
@@ -517,7 +517,7 @@ export const useUserManagement = () => {
                     }
 
                 openBottomSheet(
-                    OTPVerificationBottomSheet({
+                    OtpVerificationBottomSheet({
                         type: "magiclink", // magiclink viselkedik ugy mint ha torlest verifyolna *mivel supabasebe nincs implementalva ez meg*
                         title: "Fiók törlése",
                         email: emailParams.email,

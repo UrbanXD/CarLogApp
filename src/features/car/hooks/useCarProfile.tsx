@@ -1,13 +1,13 @@
-import React from "react";
-import { useAlert } from "../../Alert/context/AlertProvider.tsx";
+import { useAlert } from "../../../ui/alert/contexts/AlertProvider.tsx";
 import useCars from "./useCars.ts";
-import { useBottomSheet } from "../../../contexts/BottomSheet/BottomSheetContext.ts";
-import EditCarForm from "../components/forms/EditCarForm.tsx";
+import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useDatabase } from "../../../database/connector/Database.ts";
-import { store } from "../../../database/redux/store.ts";
 import { deleteCar } from "../../../database/redux/car/actions/deleteCar.ts";
+import { CarEditBottomSheet } from "../presets/bottomSheet/index.ts";
+import {useAppDispatch} from "../../../hooks/index.ts";
 
 const useCarProfile = (carID: string) => {
+    const dispatch = useAppDispatch();
     const database = useDatabase();
     const { openModal } = useAlert();
     const { openBottomSheet } = useBottomSheet();
@@ -22,22 +22,18 @@ const useCarProfile = (carID: string) => {
             body: `Az autó kitörlése egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
             acceptText: "Törlés",
             accept: () => {
-                store.dispatch(deleteCar({ database, carID: car.id }));
+                dispatch(deleteCar({ database, carID: car.id }));
             },
         })
     }
 
     const openEditCarStep = (stepIndex: number, height: string = "50%") =>
-        openBottomSheet({
-            content:
-                <EditCarForm
-                    car={ car }
-                    carImage={ carImage }
-                    stepIndex={ stepIndex }
-                />,
-            snapPoints: [height],
-            enableDismissOnClose: false
-        })
+        openBottomSheet(CarEditBottomSheet({
+            car,
+            carImage,
+            stepIndex,
+            height
+        }))
 
     return {
         car,

@@ -3,7 +3,8 @@ import { CarouselItemType } from "../../../components/Carousel/Carousel";
 import NewCarForm from "../../../features/car/components/forms/NewCarForm.tsx";
 import { router } from "expo-router";
 import useCars from "../../../features/car/hooks/useCars.ts";
-import { useBottomSheet } from "../../../contexts/BottomSheet/BottomSheetContext.ts";
+import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
+import {CarCreateBottomSheet} from "../../../features/car/presets/bottomSheet/index.ts";
 
 const useMyGarage = () => {
     const { openBottomSheet } = useBottomSheet();
@@ -16,14 +17,7 @@ const useMyGarage = () => {
     const [carouselData, setCarouselData] = useState<CarouselItemType[]>([]);
 
     const openNewCarForm = () =>
-        openBottomSheet({
-            title: "Új Autó",
-            content:
-                <NewCarForm />,
-            snapPoints: ["85%"],
-            enableOverDrag: false,
-            enableDismissOnClose: false
-        });
+        openBottomSheet(CarCreateBottomSheet);
 
     const openCarProfile= (id: string) => {
         router.push({
