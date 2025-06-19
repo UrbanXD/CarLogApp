@@ -1,21 +1,21 @@
 import React from "react";
-import Carousel, { CarouselItemType } from "../../../components/Carousel/Carousel";
+import Carousel, { CarouselItemType } from "../../../components/Carousel/Carousel.tsx";
 import { Text, StyleSheet, View } from "react-native";
 import { DEFAULT_SEPARATOR, GLOBAL_STYLE, ICON_NAMES } from "../../../constants/index.ts";
 import { SharedValue } from "react-native-reanimated";
-import CarouselItem from "../../../components/Carousel/CarouselItem";
-import DefaultElement from "../../../components/DefaultElement";
-import Button from "../../../components/Button/Button";
+import CarouselItem from "../../../components/Carousel/CarouselItem.tsx";
+import DefaultElement from "../../../components/DefaultElement.tsx";
+import Button from "../../../components/Button/Button.ts";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import useMyGarage from "../hooks/useMyGarage";
+import useGarage from "../hooks/useGarage.tsx";
 
-const MyGarageBlock: React.FC = () => {
+const Garage: React.FC = () => {
     const {
         cars,
         loading,
         openNewCarForm,
         openCarProfile
-    } = useMyGarage();
+    } = useGarage();
 
     const renderDefaultElement =
         (size: number, spacerSize: number) =>
@@ -82,4 +82,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default React.memo(MyGarageBlock);
+export default React.memo(Garage);
