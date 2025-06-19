@@ -6,7 +6,7 @@ import { CarCreateToast } from "../presets/toast/index.ts";
 import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useDatabase } from "../../../database/connector/Database.ts";
 import { store } from "../../../database/redux/store.ts";
-import { addCar } from "../../../database/redux/car/actions/addCar.ts";
+import { addCar } from "../model/actions/addCar.ts";
 
 const useNewCarForm = () => {
     const database = useDatabase();

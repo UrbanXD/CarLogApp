@@ -1,28 +1,17 @@
+import { CarsState } from "../types/index.ts";
 import { createSlice } from "@reduxjs/toolkit";
-import { CarTableType } from "../../connector/powersync/AppSchema.ts";
-import { loadCars } from "./actions/loadCars.ts";
-import { addCar } from "./actions/addCar.ts";
-import { loadSelectedCar } from "./actions/loadSelectedCar.ts";
-import { selectCar } from "./actions/selectCar.ts";
-import { deleteCar } from "./actions/deleteCar.ts";
-import { editCar } from "./actions/editCar.ts";
-
-export interface CarsState {
-    loading: boolean
-    cars: Array<CarTableType>
-    carsImage: Array<{ path: string, image: string }>
-    carsID: Array<string>
-    selectedCarID: string
-    loadError: boolean
-}
+import { loadCars } from "../actions/loadCars.ts";
+import { addCar } from "../actions/addCar.ts";
+import { editCar } from "../actions/editCar.ts";
+import { deleteCar } from "../actions/deleteCar.ts";
+import { loadSelectedCar } from "../actions/loadSelectedCar.ts";
+import { selectCar } from "../actions/selectCar.ts";
 
 const initialState: CarsState = {
     loading: true,
+    loadError: false,
     cars: [],
-    carsImage: [],
-    carsID: [],
-    selectedCarID: "",
-    loadError: false
+    selectedCarId: ""
 }
 
 const carsSlice = createSlice({
@@ -40,30 +29,21 @@ const carsSlice = createSlice({
             })
             .addCase(loadCars.fulfilled, (state, action) => {
                 state.loading = false;
-                state.cars = action.payload.cars;
-                state.carsImage = action.payload.images;
+                state.cars = action.payload;
             })
             .addCase(addCar.fulfilled, (state, action) => {
-                const { car, image } = action.payload
-
-                state.cars.push(car);
-
-                if(!image) return;
-                state.carsImage.push(image);
+                if(!action.payload) return;
+                state.cars.push(action.payload);
             })
             .addCase(addCar.rejected, () => {
                 console.log("hiba addCar, Slices")
             })
             .addCase(editCar.fulfilled, (state, action) => {
-                const editedCar = action.payload.car;
-                const editedCarImage = action.payload.image;
+                const editedCar = action.payload;
 
-                const index = state.cars.findIndex(car => car.id === action.payload.car.id);
+                const index = state.cars.findIndex(car => car.id === editedCar.id);
                 if(index === -1) return;
                 state.cars[index] = editedCar;
-
-                if(!editedCarImage) return;
-                state.carsImage.push(editedCarImage);
             })
             .addCase(deleteCar.fulfilled, (state, action) => {
                 state.cars = state.cars.filter((car) => car.id !== action.payload.id);

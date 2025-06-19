@@ -5,20 +5,17 @@ import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetC
 import { useAlert } from "../../../../ui/alert/contexts/AlertProvider.tsx";
 import { useForm } from "react-hook-form";
 import { EditCarFormFieldType, useEditCarFormProps } from "../../schemas/carSchema.ts";
-import getFile from "../../../../database/utils/getFile.ts";
 import useCarSteps from "../../hooks/useCarSteps.tsx";
-import { CarTableType } from "../../../../database/connector/powersync/AppSchema.ts";
 import { useDatabase } from "../../../../database/connector/Database.ts";
-import { editCar } from "../../../../database/redux/car/actions/editCar.ts";
+import { editCar } from "../../model/actions/editCar.ts";
+import { CarDto } from "../../model/types/index.ts";
 
 export interface EditCarFormProps {
-    car: CarTableType
-    carImage?: string
+    car: CarDto
     stepIndex: number
 }
 const EditCarForm: React.FC<EditCarFormProps> = ({
     car,
-    carImage,
     stepIndex
 }) => {
     const dispatch = useAppDispatch();
@@ -28,7 +25,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
 
     const editCarFormFieldType: EditCarFormFieldType = {
         ...car,
-        image: getFile(car.image ?? undefined, carImage)
+        image: car.image?.image || null
     };
     const {
         control,

@@ -6,7 +6,7 @@ import { hexToRgba } from "../utils/colors/hexToRgba";
 import { ImageSource } from "../types/index.ts";
 
 interface DefaultElementProps {
-    isLoading?: boolean;
+    loading?: boolean;
     icon?: ImageSource
     text?: string
     loadingText?: string
@@ -14,7 +14,7 @@ interface DefaultElementProps {
 }
 
 const DefaultElement: React.FC<DefaultElementProps> = ({
-    isLoading = false,
+    loading = false,
     icon = ICON_NAMES.image,
     text,
     loadingText = "Adatok betöltése...",
@@ -23,7 +23,7 @@ const DefaultElement: React.FC<DefaultElementProps> = ({
     return (
         <View style={ [styles.container, style] }>
             {
-                isLoading
+                loading
                     ?   <ActivityIndicator
                             size={ FONT_SIZES.title }
                             color={ COLORS.gray3 }
@@ -35,7 +35,7 @@ const DefaultElement: React.FC<DefaultElementProps> = ({
                         />
             }
             {
-                isLoading
+                loading
                     ? loadingText &&
                         <Text style={ styles.text }>
                             { loadingText }

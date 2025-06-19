@@ -1,5 +1,5 @@
 import { Kysely } from "@powersync/kysely-driver";
-import { CAR_TABLE, CarTableType, DatabaseType } from "../connector/powersync/AppSchema.ts";
+import { CAR_TABLE, CarTableType, DatabaseType } from "../../../../database/connector/powersync/AppSchema.ts";
 
 export class CarDAO {
     db: Kysely<DatabaseType>
@@ -32,7 +32,7 @@ export class CarDAO {
             .execute()
 
         try {
-            return await this.getCar(car.id);
+            return await this.getCar(car.id) as unknown as CarTableType;
         } catch (e) {
             return null;
         }
@@ -42,9 +42,7 @@ export class CarDAO {
     async editCar(car: CarTableType) {
         await this.db
             .updateTable(CAR_TABLE)
-            .set({
-                ...car
-            })
+            .set({ ...car })
             .where("id", "=", car.id)
             .executeTakeFirst()
 
@@ -60,4 +58,3 @@ export class CarDAO {
         return carID;
     }
 }
-export type CarDAOType = typeof CarDAO["prototype"];

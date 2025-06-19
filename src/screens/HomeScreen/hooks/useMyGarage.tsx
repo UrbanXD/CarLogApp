@@ -8,16 +8,11 @@ import {CarCreateBottomSheet} from "../../../features/car/presets/bottomSheet/in
 
 const useMyGarage = () => {
     const { openBottomSheet } = useBottomSheet();
-    const {
-        cars,
-        carsImage,
-        isLoading
-    } = useCars();
+    const { cars, loading } = useCars();
 
     const [carouselData, setCarouselData] = useState<CarouselItemType[]>([]);
 
-    const openNewCarForm = () =>
-        openBottomSheet(CarCreateBottomSheet);
+    const openNewCarForm = () => openBottomSheet(CarCreateBottomSheet);
 
     const openCarProfile= (id: string) => {
         router.push({
@@ -31,18 +26,18 @@ const useMyGarage = () => {
             cars.map(car => {
                 return {
                     id: car.id,
-                    image: carsImage.find(image => image.path === car.image)?.image || "",
+                    image: car.image?.image || "",
                     title: car.name,
                     subtitle: car.brand,
                     body: car.model,
                 };
             })
         );
-    }, [cars, carsImage]);
+    }, [cars]);
 
     return {
         cars: carouselData,
-        isLoading,
+        loading,
         openNewCarForm,
         openCarProfile,
     }

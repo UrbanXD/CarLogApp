@@ -7,7 +7,7 @@ import { BaseConfig } from "../constants/BaseConfig.ts";
 import { useDatabase } from "../database/connector/Database.ts";
 import { UserTableType } from "../database/connector/powersync/AppSchema.ts";
 import { ImageType } from "../utils/pickImage.ts";
-import { loadCars } from "../database/redux/car/actions/loadCars.ts";
+import { loadCars } from "../features/car/model/actions/loadCars.ts";
 import { updateUser } from "../features/user/model/actions/updateUser.ts";
 import { getUser, isUserLoading } from "../features/user/model/selectors/index.ts";
 

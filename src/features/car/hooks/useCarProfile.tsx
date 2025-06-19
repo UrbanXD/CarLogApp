@@ -2,7 +2,7 @@ import { useAlert } from "../../../ui/alert/contexts/AlertProvider.tsx";
 import useCars from "./useCars.ts";
 import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useDatabase } from "../../../database/connector/Database.ts";
-import { deleteCar } from "../../../database/redux/car/actions/deleteCar.ts";
+import { deleteCar } from "../model/actions/deleteCar.ts";
 import { CarEditBottomSheet } from "../presets/bottomSheet/index.ts";
 import {useAppDispatch} from "../../../hooks/index.ts";
 
@@ -11,10 +11,9 @@ const useCarProfile = (carID: string) => {
     const database = useDatabase();
     const { openModal } = useAlert();
     const { openBottomSheet } = useBottomSheet();
-    const { getCar, getCarImage } = useCars();
+    const { getCar } = useCars();
 
     const car = getCar(carID);
-    const carImage = getCarImage(carID)?.image;
 
     const handleDeleteCar = () => {
         openModal({
@@ -30,14 +29,12 @@ const useCarProfile = (carID: string) => {
     const openEditCarStep = (stepIndex: number, height: string = "50%") =>
         openBottomSheet(CarEditBottomSheet({
             car,
-            carImage,
             stepIndex,
             height
         }))
 
     return {
         car,
-        carImage,
         handleDeleteCar,
         openEditCarStep
     };

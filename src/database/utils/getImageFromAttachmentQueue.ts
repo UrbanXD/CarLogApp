@@ -1,8 +1,8 @@
 import { PhotoAttachmentQueue } from "../connector/powersync/PhotoAttachmentQueue.ts";
 import { encode } from "base64-arraybuffer";
-import {ImageType} from "../../features/user/model/types/user.ts";
+import { Image } from "../../types/index.ts";
 
-type GetImageFromAttachmentQueueFunction = (attachmentQueue?: PhotoAttachmentQueue, path?: string | null) => Promise<ImageType | null>;
+type GetImageFromAttachmentQueueFunction = (attachmentQueue?: PhotoAttachmentQueue, path?: string | null) => Promise<Image | null>;
 
 export const getImageFromAttachmentQueue: GetImageFromAttachmentQueueFunction = async (attachmentQueue, path) => {
     if(attachmentQueue && path) {

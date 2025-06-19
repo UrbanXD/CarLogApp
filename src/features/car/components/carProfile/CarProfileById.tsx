@@ -9,7 +9,6 @@ interface CarProfileByIdProps {
 const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId }) => {
     const {
         car,
-        carImage,
         handleDeleteCar,
         openEditCarStep
     } = useCarProfile(carId);
@@ -17,7 +16,6 @@ const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId }) => {
     return (
         <CarProfileView
             car={ car }
-            carImage={ carImage }
             handleDeleteCar={ handleDeleteCar }
             openEditCarStep={ openEditCarStep }
         />

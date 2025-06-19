@@ -1,22 +1,18 @@
 import { useAppSelector } from "../../../hooks/index.ts";
+import { getCars, isLoading } from "../model/selectors/index.ts";
+import { CarDto } from "../model/types/index.ts";
 
 const useCars = () => {
-    const cars = useAppSelector(state => state.cars.cars);
-    const carsImage = useAppSelector(state => state.cars.carsImage);
-    const isLoading = useAppSelector(state => state.cars.loading);
+    const cars = useAppSelector(getCars);
+    const loading = useAppSelector(isLoading);
 
-    const getCar = (id: string) =>
+    const getCar = (id: string): CarDto =>
         cars.find(car => car.id === id) || cars[0];
-
-    const getCarImage = (id: string) =>
-        carsImage.find(image => image.path === getCar(id)?.image);
 
     return {
         cars,
-        carsImage,
-        isLoading,
-        getCar,
-        getCarImage
+        loading,
+        getCar
     }
 }
 

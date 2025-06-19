@@ -11,9 +11,12 @@ import { router } from "expo-router";
 import { getLabelByName } from "../../../utils/getLabelByName.ts";
 import { useAuth } from "../../../contexts/Auth/AuthContext.ts";
 import { RootState } from "../../../database/redux/index.ts";
-import { loadSelectedCar } from "../../../database/redux/car/actions/loadSelectedCar.ts";
-import { selectCar } from "../../../database/redux/car/actions/selectCar.ts";
+import { loadSelectedCar } from "../../../features/car/model/actions/loadSelectedCar.ts";
+import { selectCar } from "../../../features/car/model/actions/selectCar.ts";
 import { store } from "../../../database/redux/store.ts";
+import {getCarsAsCarouselElements, isLoading} from "../../../features/car/model/selectors/index.ts";
+import {useAppSelector} from "../../../hooks/index.ts";
+import {getSelectedCarId} from "../../../features/car/model/selectors/getSelectedCarId.ts";
 
 const MainHeader: React.FC = () => {
     const { user, userLoading} = useAuth();
@@ -24,20 +27,10 @@ const MainHeader: React.FC = () => {
     const avatarColor = user?.avatarColor;
 
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-    const selectCarsState = (state: RootState) => state.cars.cars;
 
-    const selectCarsForCarousel = createSelector(
-        [selectCarsState],
-        (cars) => cars.map(car => ({
-            id: car.id,
-            title: car.name,
-            subtitle: `${ car.brand }, ${ car.model }`,
-        }))
-    );
-
-    const cars = useSelector(selectCarsForCarousel) as Array<PickerDataType>;
-    const carsIsLoading = useSelector<RootState>(state => state.cars.loading);
-    const selectedCarID = useSelector<RootState, string>(state => state.cars.selectedCarID);
+    const cars = useAppSelector(getCarsAsCarouselElements());
+    const carsLoading = useAppSelector(isLoading);
+    const selectedCarId = useAppSelector(getSelectedCarId);
 
     const onCarSelect = (id: string) => {
         store.dispatch(selectCar(id));
@@ -60,10 +53,10 @@ const MainHeader: React.FC = () => {
             <View style={ styles.barContainer }>
                 <View style={{ flex: 1 }}>
                     {
-                        !carsIsLoading &&
+                        !carsLoading &&
                         <Picker
                             data={ cars }
-                            selectedItemID={ selectedCarID }
+                            selectedItemId={ selectedCarId }
                             isDropdown={ true }
                             onDropdownToggle={ setIsDropdownVisible }
                             onSelect={ onCarSelect }

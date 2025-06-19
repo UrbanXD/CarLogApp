@@ -8,7 +8,6 @@ type CarEditBottomSheet = (args: CarEditBottomSheetArgs) => OpenBottomSheetArgs;
 
 export const CarEditBottomSheet: CarEditBottomSheet = ({
     car,
-    carImage,
     stepIndex,
     height
 }) => {
@@ -16,7 +15,6 @@ export const CarEditBottomSheet: CarEditBottomSheet = ({
         content:
             <EditCarForm
                 car={ car }
-                carImage={ carImage }
                 stepIndex={ stepIndex }
             />,
         snapPoints: [height],

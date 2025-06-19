@@ -7,7 +7,7 @@ import { SupabaseStorageAdapter } from "./storage/SupabaseStorageAdapter.ts";
 import { PhotoAttachmentQueue } from "./powersync/PhotoAttachmentQueue.ts";
 import { AttachmentRecord } from "@powersync/attachments";
 import { UserDAO } from "../../features/user/model/dao/UserDAO.ts";
-import { CarDAO } from "../DAOs/CarDAO.ts";
+import { CarDAO } from "../../features/car/model/dao/CarDAO.ts";
 import { BaseConfig } from "../../constants/BaseConfig.ts";
 
 export class Database {

@@ -1,5 +1,4 @@
 import React from "react";
-import { CarTableType } from "../../../Database/connector/powersync/AppSchema.ts";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Image from "../../../../components/Image.tsx";
 import {
@@ -16,17 +15,16 @@ import Divider from "../../../../components/Divider.tsx";
 import Odometer from "../Odometer.tsx";
 import FuelGauge from "../FuelGauge.tsx";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { CarDto } from "../../model/types/index.ts";
 
 interface CarProfileViewProps {
-    car: CarTableType
-    carImage?: string
+    car: CarDto
     handleDeleteCar?: () => void
     openEditCarStep?: (stepIndex: number, bottomSheetHeight?: string) => void
 }
 
 const CarProfileView: React.FC<CarProfileViewProps> = ({
     car,
-    carImage,
     handleDeleteCar,
     openEditCarStep
 }) =>
@@ -37,7 +35,7 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
         >
             <View style={ styles.imageContainer }>
                 <Image
-                    source={ carImage }
+                    source={ car.image?.image }
                     alt={ ICON_NAMES.car }
                     overlay
                 >

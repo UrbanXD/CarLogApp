@@ -12,7 +12,7 @@ import useMyGarage from "../hooks/useMyGarage";
 const MyGarageBlock: React.FC = () => {
     const {
         cars,
-        isLoading,
+        loading,
         openNewCarForm,
         openCarProfile
     } = useMyGarage();
@@ -21,7 +21,7 @@ const MyGarageBlock: React.FC = () => {
         (size: number, spacerSize: number) =>
             <View style={ styles.defaultElementContainer }>
                 <DefaultElement
-                    isLoading={ isLoading }
+                    loading={ loading }
                     icon={ ICON_NAMES.car }
                     text="Még egy autó se parkol a virtuális garázsában"
                     style={{ width: size - spacerSize / 2 }}

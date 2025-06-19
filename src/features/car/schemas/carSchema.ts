@@ -18,6 +18,7 @@ const carFormSchema = z
 export type AddCarFormFieldType = z.infer<typeof carFormSchema>;
 
 const editCarFormSchema = carFormSchema.partial();
+
 export type EditCarFormFieldType = z.infer<typeof editCarFormSchema>;
 
 export const useAddCarFormProps = () => {
