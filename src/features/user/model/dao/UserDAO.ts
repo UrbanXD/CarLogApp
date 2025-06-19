@@ -1,7 +1,7 @@
 import { Kysely } from "@powersync/kysely-driver";
-import { DatabaseType, USER_TABLE, UserTableType } from "../connector/powersync/AppSchema.ts";
-import { SupabaseConnector } from "../connector/SupabaseConnector.ts";
-import { Database } from "../connector/Database.ts";
+import { DatabaseType, USER_TABLE, UserTableType } from "../../../../database/connector/powersync/AppSchema.ts";
+import { SupabaseConnector } from "../../../../database/connector/SupabaseConnector.ts";
+import { Database } from "../../../../database/connector/Database.ts";
 
 export class UserDAO {
     db: Kysely<DatabaseType>

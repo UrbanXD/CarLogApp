@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
-import { loadUser } from "../database/redux/user/actions/loadUser.ts";
+import { loadUser } from "../features/user/model/actions/loadUser.ts";
 import { useAppDispatch, useAppSelector } from "./index.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BaseConfig } from "../constants/BaseConfig.ts";
@@ -8,20 +8,20 @@ import { useDatabase } from "../database/connector/Database.ts";
 import { UserTableType } from "../database/connector/powersync/AppSchema.ts";
 import { ImageType } from "../utils/pickImage.ts";
 import { loadCars } from "../database/redux/car/actions/loadCars.ts";
-import { updateUser } from "../database/redux/user/actions/updateUser.ts";
+import { updateUser } from "../features/user/model/actions/updateUser.ts";
+import { getUser, isUserLoading } from "../features/user/model/selectors/index.ts";
 
 export const useSession = () => {
     const dispatch = useAppDispatch();
     const database = useDatabase();
     const { supabaseConnector } = database;
 
-    const user = useAppSelector(state=> state.user.user);
-    const userAvatar = useAppSelector(state=> state.user.userAvatar);
-    const isUserLoading = useAppSelector(state => state.user.isLoading);
+    const user = useAppSelector(getUser);
+    const userLoading = useAppSelector(isUserLoading);
     const [notVerifiedUser, setNotVerifiedUser] = useState<User | null>(null);
 
     const [session, setSession] = useState<Session | null>(null);
-    const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
+    const [sessionLoading, setSessionLoading] = useState<boolean>(true);
 
     const setUser = (newUser: UserTableType | null, newAvatar?: ImageType | null ) => {
         dispatch(updateUser({ database, newUser, newAvatar }));
@@ -74,7 +74,7 @@ export const useSession = () => {
             .then(
                 ({ data: { session } }) => {
                     setSession(session);
-                    setIsSessionLoading(false);
+                    setSessionLoading(false);
                 }
             );
 
@@ -116,12 +116,11 @@ export const useSession = () => {
 
     return {
         session,
-        isSessionLoading,
+        sessionLoading,
         refreshSession,
         user,
         setUser,
-        userAvatar,
-        isUserLoading,
+        userLoading,
         notVerifiedUser,
         fetchNotVerifiedUser,
         updateNotVerifiedUser

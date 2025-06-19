@@ -1,6 +1,6 @@
 import { PhotoAttachmentQueue } from "../connector/powersync/PhotoAttachmentQueue.ts";
 import { encode } from "base64-arraybuffer";
-import { ImageType } from "../redux/user/user.slices.ts";
+import {ImageType} from "../../features/user/model/types/user.ts";
 
 type GetImageFromAttachmentQueueFunction = (attachmentQueue?: PhotoAttachmentQueue, path?: string | null) => Promise<ImageType | null>;
 

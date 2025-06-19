@@ -6,7 +6,7 @@ import { Context, createContext, useContext } from "react";
 import { SupabaseStorageAdapter } from "./storage/SupabaseStorageAdapter.ts";
 import { PhotoAttachmentQueue } from "./powersync/PhotoAttachmentQueue.ts";
 import { AttachmentRecord } from "@powersync/attachments";
-import { UserDAO } from "../DAOs/UserDAO.ts";
+import { UserDAO } from "../../features/user/model/dao/UserDAO.ts";
 import { CarDAO } from "../DAOs/CarDAO.ts";
 import { BaseConfig } from "../../constants/BaseConfig.ts";
 

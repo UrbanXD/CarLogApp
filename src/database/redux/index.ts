@@ -1,6 +1,6 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import { CarsState, carsReducer } from "./car/cars.slices.ts";
-import { UserState, userReducer } from "./user/user.slices.ts";
+import { UserState, userReducer } from "../../features/user/model/slice/index.ts";
 import carsApiSlices from "./car/cars.api.slices.ts";
 import { Reducer } from "react";
 

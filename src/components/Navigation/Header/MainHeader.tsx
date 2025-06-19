@@ -16,7 +16,7 @@ import { selectCar } from "../../../database/redux/car/actions/selectCar.ts";
 import { store } from "../../../database/redux/store.ts";
 
 const MainHeader: React.FC = () => {
-    const { user, userAvatar, isUserLoading} = useAuth();
+    const { user, userLoading} = useAuth();
     const { top } = useSafeAreaInsets();
     const styles = useHeaderStyles(top);
 
@@ -73,13 +73,13 @@ const MainHeader: React.FC = () => {
                 </View>
                 {
                     !isDropdownVisible && (
-                        isUserLoading
+                        userLoading
                             ?   <Avatar.Skeleton
                                     avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
                                 />
-                            :   userAvatar
+                            :   user?.userAvatar
                                     ?   <Avatar.Image
-                                            source={ userAvatar.image }
+                                            source={ user.userAvatar.image }
                                             avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
                                             onPress={ openProfile }
                                         />

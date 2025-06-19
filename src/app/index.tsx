@@ -9,22 +9,22 @@ import { useFonts } from "expo-font";
 SplashScreen.preventAutoHideAsync();
 
 const App: React.FC = () => {
-    const [isFontsLoaded, fontsLoadError] = useFonts({
+    const [fontsLoaded, fontsLoadError] = useFonts({
         "Gilroy-Heavy": require("../assets/fonts/Gilroy-Heavy.otf"),
         "Gilroy-Medium": require("../assets/fonts/Gilroy-Medium.ttf"),
         "Gilroy-Regular": require("../assets/fonts/Gilroy-Regular.ttf"),
         "DSEG7": require("../assets/fonts/DSEG7ClassicMini-Bold.ttf"),
     });
 
-    const { session, isSessionLoading } = useAuth();
+    const { session, sessionLoading } = useAuth();
     const { dismissAllBottomSheet } = useBottomSheet();
 
 
     useEffect(() => {
-        if (isFontsLoaded && !isSessionLoading || fontsLoadError) {
+        if (fontsLoaded && !sessionLoading || fontsLoadError) {
             SplashScreen.hideAsync();
         }
-    }, [isFontsLoaded, fontsLoadError, isSessionLoading]);
+    }, [fontsLoaded, fontsLoadError, sessionLoading]);
 
     useEffect(() => {
         if(session) dismissAllBottomSheet();

@@ -1,8 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { Database } from "../../../connector/Database.ts";
-import { ImageType, UserState } from "../user.slices.ts";
-import { UserTableType } from "../../../connector/powersync/AppSchema.ts";
-import { RootState } from "../../index.ts";
+import { Database } from "../../../../database/connector/Database.ts";
+import { ImageType, UserState } from "../../../../database/redux/user/user.slices.ts";
+import { UserTableType } from "../../../../database/connector/powersync/AppSchema.ts";
+import { RootState } from "../../../../database/redux/index.ts";
 
 interface UpdateUserReturn {
     user: UserState["user"] | null;

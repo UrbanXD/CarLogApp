@@ -42,7 +42,7 @@ export type ResetPasswordFunction = (newPassword: string) => Promise<void>
 export const useUserManagement = () => {
     const database = useDatabase();
     const { supabaseConnector, attachmentQueue, userDAO } = database;
-    const { session, user, userAvatar, setUser, updateNotVerifiedUser, refreshSession } = useAuth();
+    const { session, user, setUser, updateNotVerifiedUser, refreshSession } = useAuth();
     const { addToast } = useAlert();
     const { openBottomSheet, dismissAllBottomSheet } = useBottomSheet();
 
@@ -332,7 +332,7 @@ export const useUserManagement = () => {
         toastMessages
     ) => {
         try {
-            let newUserAvatar = userAvatar;
+            let newUserAvatar = user.userAvatar;
             if(newUser?.avatarImage && user?.avatarImage !== getPathFromImageType(newUser.avatarImage, user?.id)) {
                 try {
 
