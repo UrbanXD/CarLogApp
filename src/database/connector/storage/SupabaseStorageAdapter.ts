@@ -1,7 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { decode } from 'base64-arraybuffer';
 import * as FileSystem from 'expo-file-system';
-import { BaseConfig } from '../../../constants/BaseConfig.ts';
+import { BaseConfig } from '../../../constants/index.ts';
 import { StorageAdapter } from '@powersync/attachments';
 
 export interface SupabaseStorageAdapterOptions {

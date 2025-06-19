@@ -3,7 +3,7 @@ import { Session, User } from "@supabase/supabase-js";
 import { loadUser } from "../features/user/model/actions/loadUser.ts";
 import { useAppDispatch, useAppSelector } from "./index.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { BaseConfig } from "../constants/BaseConfig.ts";
+import { BaseConfig } from "../constants/index.ts";
 import { useDatabase } from "../database/connector/Database.ts";
 import { UserTableType } from "../database/connector/powersync/AppSchema.ts";
 import { ImageType } from "../utils/pickImage.ts";

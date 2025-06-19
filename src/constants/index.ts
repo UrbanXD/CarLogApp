@@ -2,12 +2,13 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { ControllerFieldState, ControllerRenderProps, UseFormStateReturn } from "react-hook-form";
 import { InputPickerDataType } from "../components/Input/picker/InputPicker";
 
-export * from "./Colors.ts";
-export * from "./Icons.ts";
-export * from "./FontSizes.ts";
+export * from "./baseConfig.ts";
+export * from "./colors.ts";
+export * from "./icons.ts";
+export * from "./fontSizes.ts";
 export * from "../ui/alert/constants/index.ts";
-export * from "./SeparatorSizes.ts";
-export * from "./GlobalStyles.ts";
+export * from "./separatorSizes.ts";
+export * from "./globalStyles.ts";
 
 export interface ControllerRenderArgs {
     field: ControllerRenderProps<any, string>

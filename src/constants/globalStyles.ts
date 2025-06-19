@@ -1,8 +1,8 @@
 import { StyleSheet } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { COLORS } from "./Colors.ts";
-import { DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "./SeparatorSizes.ts";
-import { FONT_SIZES } from "./FontSizes.ts";
+import { COLORS } from "./colors.ts";
+import { DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "./separatorSizes.ts";
+import { FONT_SIZES } from "./fontSizes.ts";
 
 export const GLOBAL_STYLE = StyleSheet.create({
     pageContainer: {

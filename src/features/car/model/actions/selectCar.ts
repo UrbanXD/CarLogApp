@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { BaseConfig } from "../../../../constants/BaseConfig.ts";
+import { BaseConfig } from "../../../../constants/index.ts";
 
 export const selectCar = createAsyncThunk(
     "selectCar",

@@ -2,13 +2,12 @@ import { useDatabase } from "../../../database/connector/Database.ts";
 import { useAlert } from "../../../ui/alert/contexts/AlertProvider.tsx";
 import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { BaseConfig } from "../../../constants/BaseConfig.ts";
+import { BaseConfig } from "../../../constants/index.ts";
 import { HandleVerificationOtpType } from "../components/forms/VerifyOtpForm.tsx";
 import { getToastMessage } from "../../../ui/alert/utils/getToastMessage.ts";
 import {
     AddPasswordToast,
     ChangeEmailToast,
-    ChangeNameToast,
     DeleteUserToast,
     GoogleAuthToast,
     ResetPasswordToast,

@@ -1,4 +1,4 @@
-import { COLORS } from "../../../constants/Colors.ts";
+import { COLORS } from "../../../constants/colors.ts";
 
 export const ALERT_ICONS = {
     success: "check-circle-outline",

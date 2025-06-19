@@ -1,4 +1,4 @@
-import { COLORS } from "./Colors.ts";
+import { COLORS } from "./colors.ts";
 
 export const ICON_NAMES = {
     close: "close",

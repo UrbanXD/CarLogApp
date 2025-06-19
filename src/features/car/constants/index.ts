@@ -9,8 +9,7 @@ export interface UseCustomFormProps extends Partial<UseFormReturn<any>>{
 
 export const ODOMETER_MEASUREMENTS: Array<InputPickerDataType> = [
     { title: "Kilóméter (km)", value: "km" },
-    { title: "ascdvsvxfbvbbr", value: "a" },
-    { title: "Mérföld (m)", value: "mile" }
+    { title: "Mérföld (mi)", value: "mi" }
 ];
 
 export const FUEL_TYPES: Array<InputPickerDataType> = [

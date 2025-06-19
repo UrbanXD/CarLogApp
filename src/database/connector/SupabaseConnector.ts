@@ -1,7 +1,7 @@
 import { AbstractPowerSyncDatabase, CrudEntry, PowerSyncBackendConnector, UpdateType } from '@powersync/react-native';
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import 'react-native-url-polyfill/auto';
-import { BaseConfig } from "../../constants/BaseConfig.ts";
+import { BaseConfig } from "../../constants/index.ts";
 import { SupabaseStorageAdapter } from './storage/SupabaseStorageAdapter.ts';
 import LargeSecureStore from './storage/LargeSecureStorage.ts';
 
