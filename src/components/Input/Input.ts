@@ -12,6 +12,6 @@ const Input = {
     Title,
     Group,
     OTP
-}
+};
 
 export default Input;

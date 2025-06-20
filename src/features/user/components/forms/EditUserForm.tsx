@@ -7,10 +7,11 @@ import { EDIT_USER_FORM_STEPS, useEditUserSteps } from "../../hooks/useEditUserS
 import { ChangeNameToast, SignUpToast } from "../../presets/toast/index.ts";
 
 export interface EditUserFormProps {
-    user: Partial<EditUserFormFieldType>
-    passwordReset?: boolean
-    stepIndex: number
+    user: Partial<EditUserFormFieldType>;
+    passwordReset?: boolean;
+    stepIndex: number;
 }
+
 export const EditUserForm: React.FC<EditUserFormProps> = ({
     user,
     passwordReset,
@@ -31,7 +32,7 @@ export const EditUserForm: React.FC<EditUserFormProps> = ({
 
     const submitHandler =
         handleSubmit(async (editedUser: Partial<EditUserFormFieldType>) => {
-            switch (stepIndex) {
+            switch(stepIndex) {
                 case EDIT_USER_FORM_STEPS.EmailStep:
                     if(!editedUser.email) return;
 
@@ -48,7 +49,7 @@ export const EditUserForm: React.FC<EditUserFormProps> = ({
                     await changeUserMetadata(editedUser, ChangeNameToast);
                     break;
                 case EDIT_USER_FORM_STEPS.AvatarStep:
-                    await changeUserMetadata(editedUser, SignUpToast)
+                    await changeUserMetadata(editedUser, SignUpToast);
                     break;
             }
         });
@@ -60,5 +61,5 @@ export const EditUserForm: React.FC<EditUserFormProps> = ({
             submitHandler={ submitHandler }
             reset={ reset }
         />
-    )
-}
+    );
+};

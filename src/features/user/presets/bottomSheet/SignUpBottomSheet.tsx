@@ -4,7 +4,7 @@ import SignUpForm from "../../components/forms/SignUpForm.tsx";
 
 export const SignUpBottomSheet: OpenBottomSheetArgs = {
     title: "Felhasználó létrehozás",
-    content: <SignUpForm />,
+    content: <SignUpForm/>,
     snapPoints: ["90%"],
     enableDismissOnClose: false
-}
+};

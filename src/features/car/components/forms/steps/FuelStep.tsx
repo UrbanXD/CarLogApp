@@ -32,6 +32,6 @@ const FuelStep: React.FC<StepProps> = ({
             isHorizontal
             isCarousel={ false }
         />
-    </Input.Group>
+    </Input.Group>;
 
 export default FuelStep;

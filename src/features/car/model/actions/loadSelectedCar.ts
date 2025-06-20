@@ -8,9 +8,9 @@ export const loadSelectedCar = createAsyncThunk(
         try {
             const id = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_SELECTED_CAR_INDEX);
             return id ? id : "";
-        } catch (e) {
+        } catch(e) {
             console.log("loadSelectedCar", e);
             return rejectWithValue(0);
         }
     }
-)
+);

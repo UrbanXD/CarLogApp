@@ -20,7 +20,7 @@ export enum CAR_FORM_STEPS {
 const useCarSteps = (
     control: StepProps["control"],
     resetField: StepProps["resetField"],
-    getValues?: StepProps["getValues"],
+    getValues?: StepProps["getValues"]
 ): { steps: Steps, resultStep?: ResultStep } => {
     return {
         steps: [
@@ -28,7 +28,7 @@ const useCarSteps = (
                 title: "Elnevezés",
                 fields: ["name"],
                 render: () =>
-                    <NameStep control={ control } />,
+                    <NameStep control={ control }/>,
                 editToastMessages: CarEditNameToast
             },
             {
@@ -45,29 +45,29 @@ const useCarSteps = (
                 title: "Kilométeróra",
                 fields: ["odometerValue", "odometerMeasurement"],
                 render: () =>
-                    <OdometerStep control={ control } />,
+                    <OdometerStep control={ control }/>,
                 editToastMessages: CarEditNameToast
             },
             {
                 title: "Üzemanyag",
                 fields: ["fuelType", "fuelMeasurement", "fuelTankSize"],
                 render: () =>
-                    <FuelStep control={ control } />,
+                    <FuelStep control={ control }/>,
                 editToastMessages: CarEditNameToast
             },
             {
                 title: "Kép",
                 fields: ["image"],
                 render: () =>
-                    <ImageStep control={ control } />,
+                    <ImageStep control={ control }/>,
                 editToastMessages: CarEditNameToast
             }
         ],
         resultStep: getValues && {
             type: "result",
             render: (goTo) =>
-                <CarProfile.ByObj car={ getValues() } goTo={ goTo } />
+                <CarProfile.ByObj car={ getValues() } goTo={ goTo }/>
         }
-    }
-}
+    };
+};
 export default useCarSteps;

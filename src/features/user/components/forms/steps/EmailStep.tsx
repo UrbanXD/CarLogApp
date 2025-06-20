@@ -13,4 +13,4 @@ export const EmailStep: React.FC<StepProps> = ({
         fieldNameText="Email cím"
         icon={ ICON_NAMES.email }
         placeholder="carlog@gmail.com"
-    />
+    />;

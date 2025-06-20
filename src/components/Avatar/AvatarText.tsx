@@ -1,20 +1,20 @@
 import React from "react";
-import { Text, StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, ViewStyle } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
 import Button from "../Button/Button.ts";
-import { ICON_NAMES, COLORS } from "../../constants/index.ts";
+import { COLORS, ICON_NAMES } from "../../constants/index.ts";
 import { Color } from "../../types/index.ts";
 
 interface AvatarTextProps {
-    label: string
-    avatarSize?: number
-    color?: Color
-    backgroundColor?: Color
-    borderColor?: Color
-    style?: ViewStyle
-    onPress?: () => void
-    onPressBadge?: () => void
+    label: string;
+    avatarSize?: number;
+    color?: Color;
+    backgroundColor?: Color;
+    borderColor?: Color;
+    style?: ViewStyle;
+    onPress?: () => void;
+    onPressBadge?: () => void;
 }
 
 const AvatarText: React.FC<AvatarTextProps> = ({
@@ -47,12 +47,12 @@ const AvatarText: React.FC<AvatarTextProps> = ({
             {
                 onPressBadge &&
                 <Button.Icon
-                    icon={ ICON_NAMES.add }
-                    iconSize={ avatarSize / 6 }
-                    style={ styles.badge }
-                    backgroundColor={ color }
-                    iconColor={ backgroundColor }
-                    onPress={ onPressBadge }
+                   icon={ ICON_NAMES.add }
+                   iconSize={ avatarSize / 6 }
+                   style={ styles.badge }
+                   backgroundColor={ color }
+                   iconColor={ backgroundColor }
+                   onPress={ onPressBadge }
                 />
             }
             <Text
@@ -62,8 +62,8 @@ const AvatarText: React.FC<AvatarTextProps> = ({
                 { label }
             </Text>
         </TouchableOpacity>
-    )
-}
+    );
+};
 
 const useStyles = (
     avatarSize: number,
@@ -90,15 +90,15 @@ const useStyles = (
             bottom: avatarSize / 20,
             zIndex: 1,
             elevation: 2.5,
-            shadowColor: COLORS.gray2,
+            shadowColor: COLORS.gray2
         },
         labelText: {
             fontFamily: "Gilroy-Medium",
-            fontSize: avatarSize / ( labelLength > 1 ? labelLength : labelLength + 0.5),
+            fontSize: avatarSize / (labelLength > 1 ? labelLength : labelLength + 0.5),
             color: color,
             textAlign: "center"
         }
-    })
-}
+    });
+};
 
 export default AvatarText;

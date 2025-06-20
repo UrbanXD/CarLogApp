@@ -12,5 +12,5 @@ export const EditUserBottomSheet: EditUserBottomSheetType = (args) => {
             />,
         snapPoints: ["40%"],
         enableDismissOnClose: false
-    }
-}
+    };
+};

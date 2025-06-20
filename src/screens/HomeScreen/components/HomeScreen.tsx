@@ -14,7 +14,7 @@ const HomeScreen: React.FC = () => {
 
     return (
         <ScreenScrollView>
-            <View style={ styles.titleContainer } >
+            <View style={ styles.titleContainer }>
                 <Text style={ styles.welcomeText }>
                     Üdv { `${ user?.firstname ?? "" } ${ user?.lastname ?? "" }` }!
                 </Text>
@@ -31,8 +31,8 @@ const HomeScreen: React.FC = () => {
             <UpcomingRidesBlock/>
             <LatestExpensesBlock/>
         </ScreenScrollView>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     titleContainer: {

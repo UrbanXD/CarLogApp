@@ -1,11 +1,6 @@
 import React, { useEffect } from "react";
 import { Pressable, StyleSheet } from "react-native";
-import Animated, {
-    interpolate,
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-} from "react-native-reanimated";
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import Icon from "../../Icon.tsx";
 import { COLORS } from "../../../constants/index.ts";
 
@@ -35,14 +30,14 @@ const TabBarIcon: React.FC<TabBarIconProp> = ({
         scale.value = withSpring(
             focused ? 1 : 0,
             { duration: 2000 }
-        )
+        );
     }, [focused, scale]);
 
     useEffect(() => {
         icon.value = withSpring(
             focused ? 1 : 0,
             { duration: 1500 }
-        )
+        );
     }, [focused, icon]);
 
 
@@ -51,17 +46,19 @@ const TabBarIcon: React.FC<TabBarIconProp> = ({
             icon.value,
             [0, 1],
             [1, 1.5]
-        )
+        );
 
         return {
-            transform: [{
-                scale: sizeValue,
-            }],
+            transform: [
+                {
+                    scale: sizeValue
+                }
+            ],
             alignItems: "center",
             alignSelf: "center",
             justifyContent: "center"
-        }
-    })
+        };
+    });
 
     const styles = useStyles(width);
 
@@ -79,8 +76,8 @@ const TabBarIcon: React.FC<TabBarIconProp> = ({
                 />
             </Animated.View>
         </Pressable>
-    )
-}
+    );
+};
 
 export default TabBarIcon;
 
@@ -93,4 +90,4 @@ const useStyles = (iconWidth: number) =>
             height: "100%",
             width: iconWidth
         }
-    })
+    });

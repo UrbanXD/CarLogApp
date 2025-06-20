@@ -7,7 +7,14 @@ export type OpenModalFunction = (args: AlertModalProps) => void;
 
 // 12501 = GOOGLE AUTH FLOW CANCELLED CODE
 // ASYNC_OP_IN_PROGRESS = GOOGLE AUTH OPERATION IS IN PROGRESS ALREADY
-export type ToastMessageCode = AlertType | "otp_error" | "token_missing" | "12501" | "ASYNC_OP_IN_PROGRESS" | ErrorCode | string
+export type ToastMessageCode =
+    AlertType
+    | "otp_error"
+    | "token_missing"
+    | "12501"
+    | "ASYNC_OP_IN_PROGRESS"
+    | ErrorCode
+    | string
 
 export type ToastMessage = (message?: string) => AlertToastProps
 export type ToastMessages = Record<ToastMessageCode, ToastMessage>

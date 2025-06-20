@@ -26,7 +26,7 @@ export const PickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
     placeholder,
     isHorizontal,
     disabled,
-    disabledText,
+    disabledText
 }) => {
     const { addToast } = useAlert();
 
@@ -41,18 +41,18 @@ export const PickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
             {
                 icon &&
                 <Icon
-                    icon={ icon }
-                    size={ styles.titleText.fontSize * 2 }
-                    color={ COLORS.white }
+                   icon={ icon }
+                   size={ styles.titleText.fontSize * 2 }
+                   color={ COLORS.white }
                 />
             }
             <View>
-                <Text style={ styles.titleText } numberOfLines={ 1 } >
+                <Text style={ styles.titleText } numberOfLines={ 1 }>
                     { title ? title : placeholder }
                 </Text>
                 {
                     subtitle &&
-                    <Text style={ styles.subtitleText } numberOfLines={ 1 } >
+                    <Text style={ styles.subtitleText } numberOfLines={ 1 }>
                         { subtitle }
                     </Text>
                 }
@@ -64,8 +64,8 @@ export const PickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
                 // style={ { marginLeft: -styles.titleText.fontSize + SEPARATOR_SIZES.lightSmall } }
             />
         </TouchableOpacity>
-    )
-}
+    );
+};
 
 export const InputPickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
     toggleDropdown,
@@ -102,8 +102,8 @@ export const InputPickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
                 />
             </View>
         </TouchableOpacity>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -123,4 +123,4 @@ const styles = StyleSheet.create({
         letterSpacing: GLOBAL_STYLE.containerText.letterSpacing * 0.8,
         textAlign: "center"
     }
-})
+});

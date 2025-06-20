@@ -2,9 +2,9 @@ import { InputPickerDataType } from "../../../components/Input/picker/InputPicke
 import { UseFormReturn } from "react-hook-form";
 import { RenderComponent } from "../../../types/index.ts";
 
-export interface UseCustomFormProps extends Partial<UseFormReturn<any>>{
-    steps: Array<RenderComponent>
-    submitHandler: () => Promise<void>
+export interface UseCustomFormProps extends Partial<UseFormReturn<any>> {
+    steps: Array<RenderComponent>;
+    submitHandler: () => Promise<void>;
 }
 
 export const ODOMETER_MEASUREMENTS: Array<InputPickerDataType> = [
@@ -16,7 +16,7 @@ export const FUEL_TYPES: Array<InputPickerDataType> = [
     { title: "Dízel" },
     { title: "Benzin" },
     { title: "Elektromos" },
-    { title: "LPG" },
+    { title: "LPG" }
 ];
 
 export const FUEL_MEASUREMENTS: Array<InputPickerDataType> = [

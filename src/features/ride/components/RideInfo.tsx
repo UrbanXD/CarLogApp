@@ -23,8 +23,8 @@ const RideInfo: React.FC<RideInfoProps> = ({
                 { text }
             </Text>
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -40,6 +40,6 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZES.p3,
         color: COLORS.gray1
     }
-})
+});
 
 export default RideInfo;

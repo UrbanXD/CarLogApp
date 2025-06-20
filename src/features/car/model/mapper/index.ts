@@ -21,14 +21,17 @@ export const toCarDto = async (car?: CarTableType, attachmentQueue?: PhotoAttach
         fuelTankSize: car.fuelTankSize,
         image: carImage,
         createdAt: car.createdAt
-    }
-}
+    };
+};
 
-export const toCarDtoArray = async (cars?: Array<CarTableType> = [], attachmentQueue?: PhotoAttachmentQueue): Array<CarDto> => {
+export const toCarDtoArray = async (
+    cars?: Array<CarTableType> = [],
+    attachmentQueue?: PhotoAttachmentQueue
+): Array<CarDto> => {
     return await Promise.all(
         cars.map(async (car) => await toCarDto(car, attachmentQueue))
     );
-}
+};
 
 export const toCarEntity = (carDto: CarDto): CarTableType => {
     return {
@@ -44,5 +47,5 @@ export const toCarEntity = (carDto: CarDto): CarTableType => {
         fuelTankSize: carDto.fuelTankSize,
         image: carDto.image?.path ?? null,
         createdAt: carDto.createdAt
-    }
-}
+    };
+};

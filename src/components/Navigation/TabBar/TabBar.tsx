@@ -3,10 +3,10 @@ import { Dimensions, SafeAreaView, StyleSheet, View, ViewStyle } from "react-nat
 import TabBarIcon from "./TabBarIcon.tsx";
 import Animated, { Extrapolation, interpolate, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { COLORS, FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
-import { BottomTabBarProps } from '@react-navigation/bottom-tabs'
+import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { useScreenScrollView } from "../../../contexts/ScreenScrollViewProvider.tsx";
 
-interface TabBarProps{
+interface TabBarProps {
     tabBarStyle?: ViewStyle,
     tabBarActiveTintColor?: string,
 }
@@ -21,14 +21,14 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
     const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView);
     const { offset } = useScreenScrollView();
 
-    const TAB_BAR_WIDTH =  Dimensions.get("screen").width;
+    const TAB_BAR_WIDTH = Dimensions.get("screen").width;
     const TAB_WIDTH = TAB_BAR_WIDTH / state.routes.length;
 
     const slideAnimationStyle = useAnimatedStyle(() => {
         const translateX = withTiming(TAB_WIDTH * state.index);
         return {
             transform: [{ translateX }]
-        }
+        };
     });
     const animatedStyle = useAnimatedStyle(() => {
         const translateY = withTiming(
@@ -49,17 +49,17 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
                 Extrapolation.CLAMP
             ),
             { duration: 750 }
-        )
+        );
 
         return {
             transform: [{ translateY }],
-            opacity,
+            opacity
         };
     });
     return (
         <AnimatedSafeAreaView style={ [styles.container, tabBarStyle, animatedStyle] }>
             <Animated.View style={ [styles.slidingElementContainer, { width: TAB_WIDTH }, slideAnimationStyle] }>
-                <View style={ styles.slidingElement } />
+                <View style={ styles.slidingElement }/>
             </Animated.View>
             {
                 state.routes.map((route: any, index: number) => {
@@ -69,24 +69,24 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
                     const icons =
                         JSON.parse(
                             options.tabBarIcon
-                                ?   options.tabBarIcon({
-                                        focused: isFocused,
-                                        color: isFocused ? tabBarActiveTintColor : "red",
-                                        size: 500,
-                                    }) as string
-                                :   "help"
-                        )
+                            ? options.tabBarIcon({
+                                focused: isFocused,
+                                color: isFocused ? tabBarActiveTintColor : "red",
+                                size: 500
+                            }) as string
+                            : "help"
+                        );
 
-                    const icon = icons[isFocused ? "active" : "inactive"]
+                    const icon = icons[isFocused ? "active" : "inactive"];
 
                     const onPress = () => {
                         const event = navigation.emit({
                             type: "tabPress",
                             target: route.key,
-                            canPreventDefault: true,
+                            canPreventDefault: true
                         });
 
-                        if (!isFocused && !event.defaultPrevented) {
+                        if(!isFocused && !event.defaultPrevented) {
                             navigation.navigate(route.name, route.params);
                         }
                     };
@@ -94,7 +94,7 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
                     const onLongPress = () => {
                         navigation.emit({
                             type: "tabLongPress",
-                            target: route.key,
+                            target: route.key
                         });
                     };
 
@@ -113,8 +113,8 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
                 })
             }
         </AnimatedSafeAreaView>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
         borderWidth: 0.5,
         // borderBottomWidth: 2.5,
         borderTopStartRadius: 45,
-        borderTopEndRadius: 45,
+        borderTopEndRadius: 45
     },
     titleText: {
         fontSize: FONT_SIZES.p1,
@@ -140,13 +140,13 @@ const styles = StyleSheet.create({
     },
     slidingElementContainer: {
         ...StyleSheet.absoluteFillObject,
-        justifyContent: "flex-end",
+        justifyContent: "flex-end"
     },
     slidingElement: {
         width: "100%",
         height: 2,
         backgroundColor: COLORS.gray1
     }
-})
+});
 
 export default TabBar;

@@ -1,4 +1,4 @@
-import { NameStep, PasswordStep, SignUpFirstStep} from "../components/forms/steps/index.ts";
+import { NameStep, PasswordStep, SignUpFirstStep } from "../components/forms/steps/index.ts";
 import { StepProps, Steps } from "../../../types/index.ts";
 
 export const useSignUpSteps = (
@@ -29,4 +29,4 @@ export const useSignUpSteps = (
                     control={ control }
                 />
         }
-    ]
+    ];

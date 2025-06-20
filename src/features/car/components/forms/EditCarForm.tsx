@@ -11,9 +11,10 @@ import { editCar } from "../../model/actions/editCar.ts";
 import { CarDto } from "../../model/types/index.ts";
 
 export interface EditCarFormProps {
-    car: CarDto
-    stepIndex: number
+    car: CarDto;
+    stepIndex: number;
 }
+
 const EditCarForm: React.FC<EditCarFormProps> = ({
     car,
     stepIndex
@@ -46,11 +47,11 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
                 })).unwrap();
 
                 const step = steps[stepIndex ?? 0];
-                if (steps[stepIndex] && step.editToastMessages) {
+                if(steps[stepIndex] && step.editToastMessages) {
                     addToast(step.editToastMessages.success());
                 }
                 dismissBottomSheet();
-            } catch (e) {
+            } catch(e) {
                 console.error("Hiba a submitHandler-ben:", e);
             }
         });
@@ -62,7 +63,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
             submitHandler={ submitHandler }
             reset={ reset }
         />
-    )
-}
+    );
+};
 
 export default EditCarForm;

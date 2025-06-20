@@ -43,7 +43,7 @@ export const ICON_NAMES = {
     signOut: "logout",
     swap: "swap-horizontal",
     add: "plus"
-}
+};
 
 export const ICON_COLORS = {
     default: COLORS.white,
@@ -51,4 +51,4 @@ export const ICON_COLORS = {
     wrong: "red",
     active: COLORS.white,
     inactive: COLORS.gray1
-}
+};

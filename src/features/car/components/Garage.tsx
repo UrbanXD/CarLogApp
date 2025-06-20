@@ -1,6 +1,6 @@
 import React from "react";
 import Carousel, { CarouselItemType } from "../../../components/Carousel/Carousel.tsx";
-import { Text, StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { DEFAULT_SEPARATOR, GLOBAL_STYLE, ICON_NAMES } from "../../../constants/index.ts";
 import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../../../components/Carousel/CarouselItem.tsx";
@@ -24,9 +24,9 @@ const Garage: React.FC = () => {
                     loading={ loading }
                     icon={ ICON_NAMES.car }
                     text="Még egy autó se parkol a virtuális garázsában"
-                    style={{ width: size - spacerSize / 2 }}
+                    style={ { width: size - spacerSize / 2 } }
                 />
-            </View>
+            </View>;
 
     const renderCarouselItem =
         (item: CarouselItemType, index: number, size: number, coordinate: SharedValue<number>) =>
@@ -37,11 +37,11 @@ const Garage: React.FC = () => {
                 overlay
                 item={ item }
                 cardAction={ () => openCarProfile(item?.id || index.toString()) }
-            />
+            />;
 
     return (
-        <View style={ styles.contentContainer } >
-            <View style={{ paddingHorizontal: DEFAULT_SEPARATOR }}>
+        <View style={ styles.contentContainer }>
+            <View style={ { paddingHorizontal: DEFAULT_SEPARATOR } }>
                 <Text style={ GLOBAL_STYLE.containerTitleText }>
                     Garázs
                 </Text>
@@ -62,8 +62,8 @@ const Garage: React.FC = () => {
                 onPress={ openNewCarForm }
             />
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     contentContainer: {
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
         backgroundColor: "transparent"
     },
     carouselContainer: {
-        height: hp(27.5),
+        height: hp(27.5)
     },
     defaultElementContainer: {
         flex: 1

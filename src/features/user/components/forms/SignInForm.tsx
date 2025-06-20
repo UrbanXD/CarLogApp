@@ -5,7 +5,7 @@ import { Text } from "react-native";
 import Button from "../../../../components/Button/Button.ts";
 import TextDivider from "../../../../components/TextDivider.tsx";
 import Form from "../../../../components/Form/Form.tsx";
-import { useForm} from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { SignInFormFieldType, useSignInFormProps } from "../../schemas/userSchema.tsx";
 import { useUserManagement } from "../../hooks/useUserManagement.ts";
 
@@ -53,9 +53,9 @@ const SignInForm: React.FC = () => {
                 lineHeight={ 1 }
                 marginVertical={ GLOBAL_STYLE.formContainer.gap }
             />
-            <Button.Google />
+            <Button.Google/>
         </Form>
-    )
-}
+    );
+};
 
 export default SignInForm;

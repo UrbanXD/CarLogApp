@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text, ColorValue } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Icon from "../../../components/Icon.tsx";
@@ -7,14 +7,14 @@ import Button from "../../../components/Button/Button.ts";
 import { Color } from "../../../types/index.ts";
 
 export interface AlertModalProps {
-    icon?: string
-    title?: string
-    body?: string
-    color?: Color
-    accept?: () => void
-    acceptText?: string
-    dismiss?: () => void
-    dismissText?: string
+    icon?: string;
+    title?: string;
+    body?: string;
+    color?: Color;
+    accept?: () => void;
+    acceptText?: string;
+    dismiss?: () => void;
+    dismissText?: string;
 }
 
 const AlertModal: React.FC<AlertModalProps> = ({
@@ -23,9 +23,9 @@ const AlertModal: React.FC<AlertModalProps> = ({
     body,
     color = COLORS.fuelYellow,
     accept = () => {},
-    acceptText= "Folytatás",
+    acceptText = "Folytatás",
     dismiss = () => {},
-    dismissText= "Mégse",
+    dismissText = "Mégse"
 }) => {
     const iconSize = hp(11.5);
 
@@ -36,12 +36,12 @@ const AlertModal: React.FC<AlertModalProps> = ({
             {
                 icon &&
                 <View style={ styles.iconContainer }>
-                    <Icon
-                        icon={ icon }
-                        size={ iconSize }
-                        backgroundColor={ color }
-                        style={ styles.icon }
-                    />
+                   <Icon
+                      icon={ icon }
+                      size={ iconSize }
+                      backgroundColor={ color }
+                      style={ styles.icon }
+                   />
                 </View>
             }
             <View style={ styles.contentContainer }>
@@ -73,14 +73,14 @@ const AlertModal: React.FC<AlertModalProps> = ({
                         backgroundColor={ "transparent" }
                         fontSize={ FONT_SIZES.p2 }
                         textColor={ color }
-                        style={{ borderColor: color, borderWidth: 2.5 }}
+                        style={ { borderColor: color, borderWidth: 2.5 } }
                         onPress={ dismiss }
                     />
                 </View>
             </View>
         </View>
-    )
-}
+    );
+};
 
 const useStyles = (iconSize: number) =>
     StyleSheet.create({
@@ -96,7 +96,7 @@ const useStyles = (iconSize: number) =>
             zIndex: 2
         },
         iconContainer: {
-            height: (iconSize * 1.45) / 1.85,
+            height: (iconSize * 1.45) / 1.85
         },
         icon: {
             position: "absolute",
@@ -113,7 +113,7 @@ const useStyles = (iconSize: number) =>
         },
         textContainer: {
             flex: 1,
-            alignItems: "center",
+            alignItems: "center"
         },
         titleText: {
             fontFamily: "Gilroy-Heavy",
@@ -131,8 +131,8 @@ const useStyles = (iconSize: number) =>
             textAlign: "center"
         },
         buttonContainer: {
-            gap: SEPARATOR_SIZES.small,
-        },
-    })
+            gap: SEPARATOR_SIZES.small
+        }
+    });
 
 export default React.memo(AlertModal);

@@ -13,7 +13,7 @@ const App: React.FC = () => {
         "Gilroy-Heavy": require("../assets/fonts/Gilroy-Heavy.otf"),
         "Gilroy-Medium": require("../assets/fonts/Gilroy-Medium.ttf"),
         "Gilroy-Regular": require("../assets/fonts/Gilroy-Regular.ttf"),
-        "DSEG7": require("../assets/fonts/DSEG7ClassicMini-Bold.ttf"),
+        "DSEG7": require("../assets/fonts/DSEG7ClassicMini-Bold.ttf")
     });
 
     const { session, sessionLoading } = useAuth();
@@ -21,7 +21,7 @@ const App: React.FC = () => {
 
 
     useEffect(() => {
-        if (fontsLoaded && !sessionLoading || fontsLoadError) {
+        if(fontsLoaded && !sessionLoading || fontsLoadError) {
             SplashScreen.hideAsync();
         }
     }, [fontsLoaded, fontsLoadError, sessionLoading]);
@@ -32,9 +32,9 @@ const App: React.FC = () => {
 
     return (
         !(session && session.user)
-            ?   <AuthScreen />
-            :   <Redirect href="/(main)" />
-    )
-}
+        ? <AuthScreen/>
+        : <Redirect href="/(main)"/>
+    );
+};
 
 export default App;

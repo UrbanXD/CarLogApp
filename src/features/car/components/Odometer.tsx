@@ -1,13 +1,13 @@
 import React from "react";
-import { StyleSheet, View, Text, LayoutChangeEvent } from "react-native";
+import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Button from "../../../components/Button/Button.ts";
 
 interface OdometerProps {
-    value: number | string
-    measurement: string
-    openEditForm?: () => void
+    value: number | string;
+    measurement: string;
+    openEditForm?: () => void;
 }
 
 const Odometer: React.FC<OdometerProps> = ({
@@ -21,7 +21,7 @@ const Odometer: React.FC<OdometerProps> = ({
     const [odometerContainerWidth, setOdometerContainerWidth] = React.useState(0);
     const onOdometerContainerLayout = (event: LayoutChangeEvent) => {
         setOdometerContainerWidth(event.nativeEvent.layout.width);
-    }
+    };
 
     const styles = useStyles(value.length, odometerContainerWidth);
     return (
@@ -31,13 +31,13 @@ const Odometer: React.FC<OdometerProps> = ({
                 {
                     openEditForm &&
                     <Button.Icon
-                        icon={ ICON_NAMES.pencil }
-                        iconSize={ FONT_SIZES.h3 }
-                        iconColor={ COLORS.gray1 }
-                        width={ FONT_SIZES.h3 }
-                        height={ FONT_SIZES.h3 }
-                        backgroundColor="transparent"
-                        onPress={ openEditForm }
+                       icon={ ICON_NAMES.pencil }
+                       iconSize={ FONT_SIZES.h3 }
+                       iconColor={ COLORS.gray1 }
+                       width={ FONT_SIZES.h3 }
+                       height={ FONT_SIZES.h3 }
+                       backgroundColor="transparent"
+                       onPress={ openEditForm }
                     />
                 }
             </View>
@@ -48,15 +48,18 @@ const Odometer: React.FC<OdometerProps> = ({
                 {
                     value.split("").map((digit, index) => (
                         <View key={ index } style={ styles.digitContainer }>
-                            <Text style={ DEFAULT_VALUE_LENGTH < 6 && index < (value.length - DEFAULT_VALUE_LENGTH) ? [styles.backgroundDigitText, { position: "relative" }] : styles.digitText }>{ digit }</Text>
+                            <Text
+                                style={ DEFAULT_VALUE_LENGTH < 6 && index < (value.length - DEFAULT_VALUE_LENGTH)
+                                        ? [styles.backgroundDigitText, { position: "relative" }]
+                                        : styles.digitText }>{ digit }</Text>
                             <Text style={ styles.backgroundDigitText }>8</Text>
                         </View>
                     ))
                 }
             </View>
         </View>
-    )
-}
+    );
+};
 
 const useStyles = (numberOfDigits: number, odometerContainerWidth: number) => StyleSheet.create({
     container: {
@@ -79,12 +82,12 @@ const useStyles = (numberOfDigits: number, odometerContainerWidth: number) => St
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.05,
-        color: COLORS.gray1,
+        color: COLORS.gray1
     },
     digitContainer: {
         height: hp(5),
         width: (odometerContainerWidth / numberOfDigits) - SEPARATOR_SIZES.lightSmall,
-        position:"relative",
+        position: "relative",
         backgroundColor: COLORS.gray5,
         alignItems: "center",
         justifyContent: "center"
@@ -93,14 +96,14 @@ const useStyles = (numberOfDigits: number, odometerContainerWidth: number) => St
         fontFamily: "DSEG7",
         fontSize: FONT_SIZES.p1,
         color: COLORS.gray1,
-        zIndex: 1,
+        zIndex: 1
     },
     backgroundDigitText: {
         position: "absolute",
         fontFamily: "DSEG7",
         fontSize: FONT_SIZES.p1,
-        color: COLORS.gray4,
+        color: COLORS.gray4
     }
-})
+});
 
 export default Odometer;

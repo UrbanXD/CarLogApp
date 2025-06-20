@@ -6,8 +6,8 @@ import { AddCarFormFieldType } from "../../schemas/carSchema.ts";
 import { toCarDto } from "../mapper/index.ts";
 
 interface AddCarArgs {
-    database: Database
-    car: AddCarFormFieldType
+    database: Database;
+    car: AddCarFormFieldType;
 }
 
 export const addCar = createAsyncThunk(
@@ -31,17 +31,17 @@ export const addCar = createAsyncThunk(
                 id: getUUID(),
                 owner: userID,
                 image: image ? image.filename : null,
-                createdAt: Date.now().toString(),
-            }
+                createdAt: Date.now().toString()
+            };
 
-            const result= await carDAO.addCar(newCarTableRow);
+            const result = await carDAO.addCar(newCarTableRow);
             if(result) return await toCarDto(result, attachmentQueue);
 
             //toroljuk a kepet majd a jovoben
             return rejectWithValue("");
-        } catch (e) {
-            console.log(e)
+        } catch(e) {
+            console.log(e);
             return rejectWithValue("");
         }
     }
-)
+);

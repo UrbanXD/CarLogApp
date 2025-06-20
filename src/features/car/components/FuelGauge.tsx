@@ -1,15 +1,15 @@
 import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Button from "../../../components/Button/Button.ts";
 
 interface FuelGaugeProps {
-    value: number
-    tankSize: number
-    fuelType: string
-    measurement: string
-    openEditForm?: () => void
+    value: number;
+    tankSize: number;
+    fuelType: string;
+    measurement: string;
+    openEditForm?: () => void;
 }
 
 const FuelGauge: React.FC<FuelGaugeProps> = ({
@@ -26,28 +26,28 @@ const FuelGauge: React.FC<FuelGaugeProps> = ({
         <View style={ styles.container }>
             <View style={ styles.infoContainer }>
                 <Text style={ styles.titleText }>
-                    Üzemanyagóra ({ fuelType }){"\n"}
+                    Üzemanyagóra ({ fuelType }){ "\n" }
                     <Text style={ styles.fuelValueText }>{ percent.toFixed(2) }%</Text>
                 </Text>
                 {
                     openEditForm &&
                     <Button.Icon
-                        icon={ ICON_NAMES.pencil }
-                        iconSize={ FONT_SIZES.h3 }
-                        iconColor={ COLORS.gray1 }
-                        width={ FONT_SIZES.h3 }
-                        height={ FONT_SIZES.h3 }
-                        style={{ alignSelf: "flex-end" }}
-                        backgroundColor="transparent"
-                        onPress={ openEditForm }
+                       icon={ ICON_NAMES.pencil }
+                       iconSize={ FONT_SIZES.h3 }
+                       iconColor={ COLORS.gray1 }
+                       width={ FONT_SIZES.h3 }
+                       height={ FONT_SIZES.h3 }
+                       style={ { alignSelf: "flex-end" } }
+                       backgroundColor="transparent"
+                       onPress={ openEditForm }
                     />
                 }
             </View>
             <View style={ styles.progressBar }>
-                <View style={ styles.tag } />
-                <View style={ [styles.tag, { left: "50%" }] } />
-                <View style={ [styles.tag, { left: "75%" }] } />
-                <View style={ [styles.bar, percent <= 26 && styles.lowFuelBar, percent > 76 && styles.highFuelBar]} />
+                <View style={ styles.tag }/>
+                <View style={ [styles.tag, { left: "50%" }] }/>
+                <View style={ [styles.tag, { left: "75%" }] }/>
+                <View style={ [styles.bar, percent <= 26 && styles.lowFuelBar, percent > 76 && styles.highFuelBar] }/>
                 <View style={ styles.fuelValueContainer }>
                     <Text style={ styles.fuelValueText }>{ value }{ measurement }</Text>
                 </View>
@@ -57,12 +57,12 @@ const FuelGauge: React.FC<FuelGaugeProps> = ({
                 <Text style={ styles.fuelGaugeInfoText }>{ tankSize }{ measurement }</Text>
             </View>
         </View>
-    )
-}
+    );
+};
 
 const useStyles = (fuelPercent: number, fuelValueLength: number) => StyleSheet.create({
     container: {
-        gap: SEPARATOR_SIZES.lightSmall,
+        gap: SEPARATOR_SIZES.lightSmall
     },
     infoContainer: {
         flexDirection: "row",
@@ -80,13 +80,13 @@ const useStyles = (fuelPercent: number, fuelValueLength: number) => StyleSheet.c
     progressBar: {
         width: "100%",
         height: hp(5),
-        backgroundColor: COLORS.gray5,
+        backgroundColor: COLORS.gray5
     },
     bar: {
         position: "absolute",
-        width: fuelPercent == 0 ? 1 : `${fuelPercent}%`,
+        width: fuelPercent == 0 ? 1 : `${ fuelPercent }%`,
         height: "100%",
-        backgroundColor: COLORS.fuelYellow,
+        backgroundColor: COLORS.fuelYellow
     },
     lowFuelBar: {
         backgroundColor: "red"
@@ -104,7 +104,7 @@ const useStyles = (fuelPercent: number, fuelValueLength: number) => StyleSheet.c
     },
     fuelValueContainer: {
         position: "absolute",
-        width: `${fuelPercent}%`,
+        width: `${ fuelPercent }%`,
         height: "100%",
         backgroundColor: "transparent",
         justifyContent: "center",
@@ -113,7 +113,9 @@ const useStyles = (fuelPercent: number, fuelValueLength: number) => StyleSheet.c
     },
     fuelValueText: {
         position: "absolute",
-        transform: fuelPercent > (FONT_SIZES.p4 * fuelValueLength / 3) ? [] : [{ translateX: FONT_SIZES.p4 * fuelValueLength }],
+        transform: fuelPercent > (FONT_SIZES.p4 * fuelValueLength / 3)
+                   ? []
+                   : [{ translateX: FONT_SIZES.p4 * fuelValueLength }],
         backgroundColor: COLORS.black,
         width: FONT_SIZES.p4 * fuelValueLength,
         borderRadius: 2.5,
@@ -122,7 +124,7 @@ const useStyles = (fuelPercent: number, fuelValueLength: number) => StyleSheet.c
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.p4,
         color: COLORS.gray1,
-        textAlign: "center",
+        textAlign: "center"
     },
     fuelGaugeInfoContainer: {
         flexDirection: "row",
@@ -132,8 +134,8 @@ const useStyles = (fuelPercent: number, fuelValueLength: number) => StyleSheet.c
     fuelGaugeInfoText: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p4,
-        color: COLORS.gray1,
+        color: COLORS.gray1
     }
-})
+});
 
 export default FuelGauge;

@@ -10,13 +10,13 @@ interface UpdateUserReturn {
 }
 
 export interface UpdateUserArgs {
-    database: Database
-    newUser: UserTableType | null
-    newAvatar: ImageType | null
+    database: Database;
+    newUser: UserTableType | null;
+    newAvatar: ImageType | null;
 }
 
 interface AsyncThunkConfig {
-    state: RootState
+    state: RootState;
 }
 
 export const updateUser =
@@ -40,4 +40,4 @@ export const updateUser =
 
             return { user: newUser, userAvatar: newUserAvatar };
         }
-    )
+    );

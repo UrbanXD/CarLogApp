@@ -1,26 +1,21 @@
 import React, { useEffect, useState } from "react";
-import {
-    StyleSheet,
-    Text,
-    View,
-    TextInput as TextInputRN,
-} from "react-native";
+import { StyleSheet, Text, TextInput as TextInputRN, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, ICON_COLORS, ICON_NAMES } from "../../../constants/index.ts";
 import Icon from "../../Icon.tsx";
 import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
 
 interface TextInputProps {
-    value?: string
-    setValue?: (text: string) => void
-    icon?: string
-    actionIcon?: string
-    onAction?: () => void
-    placeholder?: string
-    error?: string
-    numeric?: boolean
-    isSecure?: boolean
-    isEditable?: boolean
+    value?: string;
+    setValue?: (text: string) => void;
+    icon?: string;
+    actionIcon?: string;
+    onAction?: () => void;
+    placeholder?: string;
+    error?: string;
+    numeric?: boolean;
+    isSecure?: boolean;
+    isEditable?: boolean;
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -50,15 +45,20 @@ const TextInput: React.FC<TextInputProps> = ({
 
     return (
         <>
-            <View style={ [styles.formFieldContainer, focused && styles.activeFormFieldContainer, !!error && styles.errorFormFieldContainer] }>
+            <View
+                style={ [
+                    styles.formFieldContainer,
+                    focused && styles.activeFormFieldContainer,
+                    !!error && styles.errorFormFieldContainer
+                ] }>
                 {
                     icon &&
                     <View style={ styles.formFieldIconContainer }>
-                        <Icon
-                            icon={ icon }
-                            size={ hp(4.5) }
-                            color={ styles.textInput.color }
-                        />
+                       <Icon
+                          icon={ icon }
+                          size={ hp(4.5) }
+                          color={ styles.textInput.color }
+                       />
                     </View>
                 }
                 <TextInputRN
@@ -76,24 +76,24 @@ const TextInput: React.FC<TextInputProps> = ({
                 {
                     isSecure &&
                     <View style={ styles.formFieldIconContainer }>
-                        <Icon
-                            icon={ secure ? ICON_NAMES.eyeOff : ICON_NAMES.eye }
-                            size={ hp(3.25) }
-                            color={ ICON_COLORS.default }
-                            onPress={ changeSecure }
-                        />
+                       <Icon
+                          icon={ secure ? ICON_NAMES.eyeOff : ICON_NAMES.eye }
+                          size={ hp(3.25) }
+                          color={ ICON_COLORS.default }
+                          onPress={ changeSecure }
+                       />
                     </View>
                 }
                 {
                     actionIcon &&
                     <View style={ styles.formFieldIconContainer }>
-                        <Icon
-                            icon={ actionIcon }
-                            size={ hp(4.5) }
-                            color={ ICON_COLORS.default }
-                            // style={{ alignSelf: "center" }}
-                            onPress={ onAction }
-                        />
+                       <Icon
+                          icon={ actionIcon }
+                          size={ hp(4.5) }
+                          color={ ICON_COLORS.default }
+                           // style={{ alignSelf: "center" }}
+                          onPress={ onAction }
+                       />
                     </View>
                 }
             </View>
@@ -104,8 +104,8 @@ const TextInput: React.FC<TextInputProps> = ({
                 </Text>
             }
         </>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     formFieldContainer: {
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     },
     formFieldIconContainer: {
         flex: 0.15,
-        alignItems: "center",
+        alignItems: "center"
     },
     textInput: {
         flex: 1,
@@ -146,6 +146,6 @@ const styles = StyleSheet.create({
         letterSpacing: hp(1.85) * 0.05,
         color: COLORS.redLight
     }
-})
+});
 
 export default TextInput;

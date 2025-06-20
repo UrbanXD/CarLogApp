@@ -16,10 +16,10 @@ export interface OpenBottomSheetArgs extends Partial<BottomSheetModalProps> {
 }
 
 interface BottomSheetProviderValue {
-    openBottomSheet: (args: OpenBottomSheetArgs) => void
-    closeBottomSheet: () => void
-    dismissBottomSheet: () => void
-    dismissAllBottomSheet: () => void
+    openBottomSheet: (args: OpenBottomSheetArgs) => void;
+    closeBottomSheet: () => void;
+    dismissBottomSheet: () => void;
+    dismissAllBottomSheet: () => void;
 }
 
 export const BottomSheetContext =

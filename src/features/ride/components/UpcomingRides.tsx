@@ -27,7 +27,7 @@ type RideType = {
 }
 
 interface UpcomingRidesProps {
-    rides: Array<RideType>
+    rides: Array<RideType>;
 }
 
 const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
@@ -44,34 +44,36 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                                 dateUpperSubtitle={ ride.time }
                                 dateUnderSubtitle={ ride.dateSubtitle }
                             />
-                            <View style={{ flex: 1, gap: SEPARATOR_SIZES.lightSmall }}>
-                                <Text numberOfLines={ 2 } style={ [GLOBAL_STYLE.containerText, { color: COLORS.white }] }>
+                            <View style={ { flex: 1, gap: SEPARATOR_SIZES.lightSmall } }>
+                                <Text numberOfLines={ 2 }
+                                      style={ [GLOBAL_STYLE.containerText, { color: COLORS.white }] }>
                                     { ride.client }
                                 </Text>
                                 <ScrollView contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }>
                                     <ProgressBar
                                         isVertical
-                                        stepsCount={3}
-                                        titles={["Zenta", "Kamenica"]}
+                                        stepsCount={ 3 }
+                                        titles={ ["Zenta", "Kamenica"] }
                                     />
                                 </ScrollView>
-                                <Text numberOfLines={ 1 } style={ [GLOBAL_STYLE.containerText, { color: COLORS.white }] }>
+                                <Text numberOfLines={ 1 }
+                                      style={ [GLOBAL_STYLE.containerText, { color: COLORS.white }] }>
                                     100 km
                                 </Text>
-                        </View>
+                            </View>
                             <Icon
                                 icon={ ICON_NAMES.info }
                                 size={ FONT_SIZES.h2 }
                                 color={ COLORS.white }
                                 onPress={
-                                    () =>{
-                                        console.log("xdd")
+                                    () => {
+                                        console.log("xdd");
                                         openBottomSheet({
                                             title: "Edit Ride",
-                                            content: <EditRideForm ride={ ride } />,
+                                            content: <EditRideForm ride={ ride }/>,
                                             snapPoints: ["85%"]
-                                        })
-                                        }
+                                        });
+                                    }
                                 }
                             />
                         </View>
@@ -79,11 +81,11 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                 )
             }
         </View>
-    )
-}
+    );
+};
 
 interface EditRideFormProps {
-    ride: RideType
+    ride: RideType;
 }
 
 const EditRideForm: React.FC<EditRideFormProps> = React.memo(({ ride }) => {
@@ -100,7 +102,7 @@ const EditRideForm: React.FC<EditRideFormProps> = React.memo(({ ride }) => {
                 ...editRideUseFormProps,
                 values: rideValue
             }
-        )
+        );
 
 
     return (
@@ -111,36 +113,36 @@ const EditRideForm: React.FC<EditRideFormProps> = React.memo(({ ride }) => {
                     dateUnderSubtitle={ ride.dateSubtitle }
                     flexDirection="row"
                 />
-                <Text style={{color: "white" }}>
+                <Text style={ { color: "white" } }>
                     { ride.time }
                 </Text>
             </View>
             <View style={ styles.infoContentContainer }>
-                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <View style={ { flexDirection: "row", justifyContent: "space-between" } }>
                     <InputText
-                        control={control}
-                        fieldName={"carUID"}
+                        control={ control }
+                        fieldName={ "carUID" }
                         isEditable={ true }
                     />
-                    <View style={{ backgroundColor: "blue" }}>
-                        <Text style={{ color: "white"}}>Szemelyek szama { ride.client }</Text>
+                    <View style={ { backgroundColor: "blue" } }>
+                        <Text style={ { color: "white" } }>Szemelyek szama { ride.client }</Text>
                     </View>
                 </View>
-                <View style={{ flexDirection: "row" }}>
-                    <View style={{ flex: 1, backgroundColor: "red" }}>
-                        <Text style={{ color: "white" }}>CAr ID</Text>
+                <View style={ { flexDirection: "row" } }>
+                    <View style={ { flex: 1, backgroundColor: "red" } }>
+                        <Text style={ { color: "white" } }>CAr ID</Text>
                     </View>
                 </View>
-                <View style={{ flexDirection: "row" }}>
-                    <View style={{ flex: 1, backgroundColor: "red" }}>
-                        <Text style={{ color: "white" }}>Comment</Text>
+                <View style={ { flexDirection: "row" } }>
+                    <View style={ { flex: 1, backgroundColor: "red" } }>
+                        <Text style={ { color: "white" } }>Comment</Text>
                     </View>
                 </View>
-                <Text style={{ color: "white" }}> Locations pl: Utca 21. (Zenta) </Text>
+                <Text style={ { color: "white" } }> Locations pl: Utca 21. (Zenta) </Text>
             </View>
         </View>
-    )
-})
+    );
+});
 
 const styles = StyleSheet.create({
     infoContainer: {
@@ -180,13 +182,13 @@ const styles = StyleSheet.create({
         height: hp(22.5),
         backgroundColor: COLORS.black2,
         borderRadius: 15,
-        padding: SEPARATOR_SIZES.small,
+        padding: SEPARATOR_SIZES.small
     },
     rowContentContainer: {
         flex: 1,
         gap: SEPARATOR_SIZES.lightSmall,
         justifyContent: "center"
     }
-})
+});
 
 export default UpcomingRides;

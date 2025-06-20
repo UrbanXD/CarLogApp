@@ -10,7 +10,7 @@ const getFile = (path?: string, buffer?: string): ImageType | null => {
         fileExtension: getFileExtension(path),
         mediaType: "image/jpeg",  /// getMediaType
         buffer: decode(buffer)
-    }
-}
+    };
+};
 
 export default getFile;

@@ -13,7 +13,7 @@ export const ScreenScrollView: React.FC<ScreenScrollViewProps> = ({
     style,
     children
 }) => {
-    const { offset} = useScreenScrollView();
+    const { offset } = useScreenScrollView();
     const prevOffset = useSharedValue(0);
     const SCROLL_BOUNCE_THRESHOLD = 0.25;
 
@@ -21,11 +21,11 @@ export const ScreenScrollView: React.FC<ScreenScrollViewProps> = ({
         onScroll: event => {
             const currentOffset = event.contentOffset.y < 0 ? 0 : event.contentOffset.y;
 
-            if(Math.abs(prevOffset.value - currentOffset) > SCROLL_BOUNCE_THRESHOLD){
+            if(Math.abs(prevOffset.value - currentOffset) > SCROLL_BOUNCE_THRESHOLD) {
                 offset.value = withTiming(
                     currentOffset < prevOffset.value
-                        ? 0
-                        : SIMPLE_TABBAR_HEIGHT * 2,
+                    ? 0
+                    : SIMPLE_TABBAR_HEIGHT * 2,
                     { duration: 300 }
                 );
             }
@@ -44,5 +44,5 @@ export const ScreenScrollView: React.FC<ScreenScrollViewProps> = ({
                 { children }
             </Animated.ScrollView>
         </SafeAreaView>
-    )
-}
+    );
+};

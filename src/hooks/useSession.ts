@@ -23,30 +23,33 @@ export const useSession = () => {
     const [session, setSession] = useState<Session | null>(null);
     const [sessionLoading, setSessionLoading] = useState<boolean>(true);
 
-    const setUser = (newUser: UserTableType | null, newAvatar?: ImageType | null ) => {
+    const setUser = (newUser: UserTableType | null, newAvatar?: ImageType | null) => {
         dispatch(updateUser({ database, newUser, newAvatar }));
-    }
+    };
 
     const fetchNotVerifiedUser = async () => {
-        const newNotVerifiedUser = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_USER)
+        const newNotVerifiedUser = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_USER);
         if(!newNotVerifiedUser) return;
 
         setNotVerifiedUser(JSON.parse(newNotVerifiedUser));
-    }
+    };
 
     const updateNotVerifiedUser = async (newNotVerifiedUser: User | null) => {
         setNotVerifiedUser(newNotVerifiedUser);
 
         if(newNotVerifiedUser) {
-            void AsyncStorage.setItem(BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_USER, JSON.stringify(newNotVerifiedUser));
+            void AsyncStorage.setItem(
+                BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_USER,
+                JSON.stringify(newNotVerifiedUser)
+            );
         } else {
             void AsyncStorage.removeItem(BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_USER);
         }
-    }
+    };
 
     // adatok betoltese local db-bol
     const fetchLocalData = async () => {
-        if(!session || !session.user) return
+        if(!session || !session.user) return;
 
         void updateNotVerifiedUser(null);
 
@@ -59,45 +62,45 @@ export const useSession = () => {
                 firstname: session.user.user_metadata.firstname,
                 lastname: session.user.user_metadata.lastname,
                 avatarColor: session.user.user_metadata.avatarColor,
-                avatarImage: session.user.user_metadata.avatarImage,
+                avatarImage: session.user.user_metadata.avatarImage
             } as UserTableType
         }));
 
         dispatch(loadCars(database));
-    }
+    };
 
     useEffect(() => {
         supabaseConnector
-            .client
-            .auth
-            .getSession()
-            .then(
-                ({ data: { session } }) => {
-                    setSession(session);
-                    setSessionLoading(false);
-                }
-            );
+        .client
+        .auth
+        .getSession()
+        .then(
+            ({ data: { session } }) => {
+                setSession(session);
+                setSessionLoading(false);
+            }
+        );
 
         supabaseConnector
-            .client
-            .auth
-            .onAuthStateChange(
-                (_event, session) => setSession(session)
-            );
+        .client
+        .auth
+        .onAuthStateChange(
+            (_event, session) => setSession(session)
+        );
 
         void fetchNotVerifiedUser();
     }, []);
 
     useEffect(() => {
         supabaseConnector
-            .client
-            .auth
-            .getUser()
-            .then(
-                ({ data: { user } }) => {
-                    if(user) void updateNotVerifiedUser(user);
-                }
-            );
+        .client
+        .auth
+        .getUser()
+        .then(
+            ({ data: { user } }) => {
+                if(user) void updateNotVerifiedUser(user);
+            }
+        );
 
         if(session && session.user) {
             void fetchLocalData();
@@ -107,12 +110,12 @@ export const useSession = () => {
     const refreshSession = async () => {
         const { error } =
             await supabaseConnector
-                .client
-                .auth
-                .refreshSession();
+            .client
+            .auth
+            .refreshSession();
 
         if(error) console.debug("refreshError", error);
-    }
+    };
 
     return {
         session,
@@ -124,7 +127,7 @@ export const useSession = () => {
         notVerifiedUser,
         fetchNotVerifiedUser,
         updateNotVerifiedUser
-    }
-}
+    };
+};
 
 export type UseSessionReturnType = ReturnType<typeof useSession>

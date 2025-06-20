@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity, StyleSheet, ViewStyle } from "react-native";
+import { StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { ICON_NAMES } from "../../constants/index.ts";
 import Button from "../Button/Button.ts";
@@ -7,13 +7,13 @@ import Image from "../Image.tsx";
 import { Color, ImageSource } from "../../types/index.ts";
 
 interface AvatarImageProps {
-    source: ImageSource
-    avatarSize?: number
-    borderColor?: Color
-    style?: ViewStyle
-    onPress?: () => void
-    badgeIcon?: ImageSource
-    onPressBadge?: () => void
+    source: ImageSource;
+    avatarSize?: number;
+    borderColor?: Color;
+    style?: ViewStyle;
+    onPress?: () => void;
+    badgeIcon?: ImageSource;
+    onPressBadge?: () => void;
 }
 
 const AvatarImage: React.FC<AvatarImageProps> = ({
@@ -41,10 +41,10 @@ const AvatarImage: React.FC<AvatarImageProps> = ({
             {
                 onPressBadge &&
                 <Button.Icon
-                    icon={ ICON_NAMES.swap }
-                    iconSize={ avatarSize / 6 }
-                    style={ styles.badge }
-                    onPress={ onPressBadge }
+                   icon={ ICON_NAMES.swap }
+                   iconSize={ avatarSize / 6 }
+                   style={ styles.badge }
+                   onPress={ onPressBadge }
                 />
             }
             <Image
@@ -53,8 +53,8 @@ const AvatarImage: React.FC<AvatarImageProps> = ({
                 imageStyle={ styles.image }
             />
         </TouchableOpacity>
-    )
-}
+    );
+};
 
 const useStyles = (
     avatarSize: number,
@@ -64,7 +64,7 @@ const useStyles = (
     return StyleSheet.create({
         container: {
             width: avatarSize,
-            height: avatarSize,
+            height: avatarSize
         },
         image: {
             width: avatarSize,
@@ -72,15 +72,15 @@ const useStyles = (
             resizeMode: "cover",
             borderRadius: avatarSize / 2,
             borderWidth,
-            borderColor,
+            borderColor
         },
         badge: {
             position: "absolute",
             right: avatarSize / 12,
             bottom: avatarSize / 20,
-            zIndex: 1,
+            zIndex: 1
         }
-    })
-}
+    });
+};
 
 export default AvatarImage;

@@ -6,7 +6,7 @@ const getImageState = (path?: string, buffer?: ArrayBuffer) => {
     return {
         path,
         image: encode(buffer)
-    }
-}
+    };
+};
 
 export default getImageState;

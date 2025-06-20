@@ -1,16 +1,16 @@
-import { AbstractAttachmentQueue, AttachmentRecord, AttachmentState } from '@powersync/attachments';
-import * as FileSystem from 'expo-file-system';
-import { BaseConfig } from '../../../constants/index.ts';
-import { CAR_TABLE, USER_TABLE } from './AppSchema.ts';
-import { getUUID } from '../../utils/uuid.ts';
-import { ImageType } from '../../utils/pickImage.ts';
-import { encode } from 'base64-arraybuffer';
+import { AbstractAttachmentQueue, AttachmentRecord, AttachmentState } from "@powersync/attachments";
+import * as FileSystem from "expo-file-system";
+import { BaseConfig } from "../../../constants/index.ts";
+import { CAR_TABLE, USER_TABLE } from "./AppSchema.ts";
+import { getUUID } from "../../utils/uuid.ts";
+import { ImageType } from "../../utils/pickImage.ts";
+import { encode } from "base64-arraybuffer";
 
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
 
     async init() {
-        if (!BaseConfig.SUPABASE_BUCKET) {
-            console.debug('No Supabase bucket configured, skip setting up PhotoAttachmentQueue watches');
+        if(!BaseConfig.SUPABASE_BUCKET) {
+            console.debug("No Supabase bucket configured, skip setting up PhotoAttachmentQueue watches");
             // Disable sync interval to prevent errors from trying to sync to a non-existent bucket
             this.options.syncInterval = 0;
             return;
@@ -26,11 +26,15 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
     // }
 
     onAttachmentIdsChange(onUpdate: (ids: string[]) => void): void {
-        console.log(this.table, "taxxx")
+        console.log(this.table, "taxxx");
         const imgSQL = `
-            SELECT image as image FROM ${CAR_TABLE} WHERE image IS NOT NULL
+            SELECT image as image
+            FROM ${ CAR_TABLE }
+            WHERE image IS NOT NULL
             UNION ALL
-            SELECT avatarImage as image FROM ${USER_TABLE} WHERE avatarImage IS NOT NULL
+            SELECT avatarImage as image
+            FROM ${ USER_TABLE }
+            WHERE avatarImage IS NOT NULL
         `;
         // UNION-nal lehet meg tobb tablat hozza irni es onnan is kiszedni ha lesz
 
@@ -39,9 +43,10 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
                 async (result) => {
                     return onUpdate(
                         result.rows?._array.map(
-                                (r) => r.image
+                            (r) => r.image
                         ) ?? []
-                    )}
+                    );
+                }
         });
     }
 
@@ -49,35 +54,35 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
         const fileID = getUUID();
 
         return {
-            id: record?.id || `${fileID}.jpg`,
-            filename: record?.id || `${fileID}.jpg`,
+            id: record?.id || `${ fileID }.jpg`,
+            filename: record?.id || `${ fileID }.jpg`,
             media_type: "image/jpeg",
             state: AttachmentState.QUEUED_SYNC,
             ...record,
-            local_uri: this.getLocalFilePathSuffix(record?.id || `${fileID}.jpg`),
+            local_uri: this.getLocalFilePathSuffix(record?.id || `${ fileID }.jpg`)
         };
     }
 
     async saveFile(image: ImageType, storagePath?: string): Promise<AttachmentRecord> {
         storagePath =
             storagePath
-                ? storagePath[storagePath.length-1] !== "/"
-                    ? `${storagePath}/`
-                    : storagePath
-                : "";
-        const filename = `${storagePath}${image.id}.${image.fileExtension}`;
+            ? storagePath[storagePath.length - 1] !== "/"
+              ? `${ storagePath }/`
+              : storagePath
+            : "";
+        const filename = `${ storagePath }${ image.id }.${ image.fileExtension }`;
 
         const attachmentRecord = await this.newAttachmentRecord({
             id: filename,
             media_type: image.mediaType,
-            state: AttachmentState.QUEUED_UPLOAD,
+            state: AttachmentState.QUEUED_UPLOAD
         });
 
         const localURI = this.getLocalUri(attachmentRecord.local_uri || this.getLocalFilePathSuffix(filename));
         await this.storage.writeFile(localURI, encode(image.buffer), { encoding: FileSystem.EncodingType.Base64 });
 
         const fileInfo = await FileSystem.getInfoAsync(localURI);
-        if (fileInfo.exists) {
+        if(fileInfo.exists) {
             attachmentRecord.size = fileInfo.size;
         }
 
@@ -85,22 +90,22 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
     }
 
     async getFile(filename: string): Promise<ArrayBuffer | null> {
-        const localURI = `${this.storageDirectory}/${filename}`;
+        const localURI = `${ this.storageDirectory }/${ filename }`;
 
         let attachmentRecord = await this.record(filename);
-        if (!attachmentRecord) {
+        if(!attachmentRecord) {
             attachmentRecord = await this.newAttachmentRecord({
                 id: filename,
-                state: AttachmentState.QUEUED_DOWNLOAD,
-            })
+                state: AttachmentState.QUEUED_DOWNLOAD
+            });
 
             await this.saveToQueue(attachmentRecord);
         }
 
         const { exists } = await FileSystem.getInfoAsync(localURI);
         if(!exists) {
-            const directoryPath = localURI.substring(0, localURI.lastIndexOf('/') + 1);
-            if(!await this.storage.fileExists(directoryPath)){
+            const directoryPath = localURI.substring(0, localURI.lastIndexOf("/") + 1);
+            if(!await this.storage.fileExists(directoryPath)) {
                 await this.storage.makeDir(directoryPath);
             }
 

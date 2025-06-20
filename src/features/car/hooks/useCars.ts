@@ -13,7 +13,7 @@ const useCars = () => {
         cars,
         loading,
         getCar
-    }
-}
+    };
+};
 
 export default useCars;

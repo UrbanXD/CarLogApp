@@ -20,7 +20,7 @@ const NewCarForm: React.FC = () => {
             trigger={ trigger }
             resetField={ resetField }
         />
-    )
-}
+    );
+};
 
 export default NewCarForm;

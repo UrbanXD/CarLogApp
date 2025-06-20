@@ -9,6 +9,6 @@ const BottomSheetBackdrop: React.FC<any> = (props) =>
         opacity={ 0.6 }
         { ...props }
         style={ [props.style, { backgroundColor: COLORS.black }] }
-    />
+    />;
 
 export default BottomSheetBackdrop;

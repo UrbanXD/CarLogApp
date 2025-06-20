@@ -20,7 +20,7 @@ const CarModelStep: React.FC<StepProps> = ({
     });
 
     useEffect(() => {
-        if (selectedBrandName.current !== selectedBrandNameValue && resetField){
+        if(selectedBrandName.current !== selectedBrandNameValue && resetField) {
             resetField("model", { keepError: true });
             selectedBrandName.current = selectedBrandNameValue;
         }
@@ -49,7 +49,7 @@ const CarModelStep: React.FC<StepProps> = ({
                 disabledText={ "Először válassza ki az autó márkáját!" }
             />
         </Input.Group>
-    )
-}
+    );
+};
 
 export default CarModelStep;

@@ -6,20 +6,21 @@ import Button from "../Button/Button.ts";
 import { View } from "react-native";
 
 interface EditFormProps extends UseCustomFormProps {
-    stepIndex: number
+    stepIndex: number;
 }
 
 const EditForm: React.FC<EditFormProps> = ({
     stepIndex,
     steps,
-    reset = () => {},
+    reset = () => {
+    },
     submitHandler
 }) => {
     const handleSave =
         async () => await submitHandler(stepIndex);
 
     return (
-        <View style={{ flex: 1, gap: SEPARATOR_SIZES.normal }}>
+        <View style={ { flex: 1, gap: SEPARATOR_SIZES.normal } }>
             <FlatList
                 data={ [] }
                 renderItem={ () => <></> }
@@ -37,12 +38,12 @@ const EditForm: React.FC<EditFormProps> = ({
                 <Button.Text
                     text="Mentés"
                     onPress={ handleSave }
-                    style={{ flex: 0.9 }}
+                    style={ { flex: 0.9 } }
                     loadingIndicator
                 />
             </Button.Row>
         </View>
-    )
-}
+    );
+};
 
 export default EditForm;

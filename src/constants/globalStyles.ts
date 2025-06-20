@@ -12,7 +12,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
     },
     scrollViewContentContainer: {
         flexGrow: 1,
-        gap: SEPARATOR_SIZES.normal,
+        gap: SEPARATOR_SIZES.normal
     },
     formContainer: {
         flex: 1,
@@ -39,14 +39,14 @@ export const GLOBAL_STYLE = StyleSheet.create({
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.p1,
         letterSpacing: FONT_SIZES.p1 * 0.05,
-        color: COLORS.white,
+        color: COLORS.white
     },
     containerText: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
         lineHeight: FONT_SIZES.p2 * 1.2,
         letterSpacing: FONT_SIZES.p2 * 0.05,
-        color: COLORS.gray1,
+        color: COLORS.gray1
     },
     rowContainer: {
         flexDirection: "row",
@@ -61,6 +61,6 @@ export const GLOBAL_STYLE = StyleSheet.create({
     columnContainer: {
         flex: 1,
         justifyContent: "center",
-        alignItems: "center",
+        alignItems: "center"
     }
 });

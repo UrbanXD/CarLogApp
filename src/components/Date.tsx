@@ -4,10 +4,10 @@ import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface DateProps {
-    dateTitle: string
-    dateUpperSubtitle?: string
-    dateUnderSubtitle?: string
-    flexDirection?: "row" | "column"
+    dateTitle: string;
+    dateUpperSubtitle?: string;
+    dateUnderSubtitle?: string;
+    flexDirection?: "row" | "column";
 }
 
 const Date: React.FC<DateProps> = ({
@@ -31,13 +31,13 @@ const Date: React.FC<DateProps> = ({
             </Text>
             {
                 dateUnderSubtitle &&
-                    <Text style={ styles.dateSubtitleText }>
-                        { dateUnderSubtitle }
-                    </Text>
+                <Text style={ styles.dateSubtitleText }>
+                    { dateUnderSubtitle }
+                </Text>
             }
         </View>
-    )
-}
+    );
+};
 
 const useStyles = (flexDirection: "row" | "column") =>
     StyleSheet.create({
@@ -60,6 +60,6 @@ const useStyles = (flexDirection: "row" | "column") =>
             letterSpacing: FONT_SIZES.p2 * 0.035,
             color: COLORS.gray1
         }
-    })
+    });
 
 export default Date;

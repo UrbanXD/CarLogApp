@@ -16,19 +16,19 @@ const useGarage = () => {
 
     const openNewCarForm = () => openBottomSheet(CarCreateBottomSheet);
 
-    const openCarProfile= (id: string) => {
+    const openCarProfile = (id: string) => {
         router.push({
             pathname: "(edit)/car",
             params: { id }
         });
-    }
+    };
 
     return {
         cars: carCarouselElements,
         loading,
         openNewCarForm,
-        openCarProfile,
-    }
-}
+        openCarProfile
+    };
+};
 
 export default useGarage;

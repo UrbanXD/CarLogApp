@@ -12,7 +12,7 @@ const user = new Table({
     lastname: column.text,
     avatarImage: column.text,
     avatarColor: column.text
-})
+});
 
 const car = new Table({
     id: column.text,
@@ -27,7 +27,7 @@ const car = new Table({
     fuelTankSize: column.integer,
     image: column.text,
     createdAt: column.text
-})
+});
 
 const service = new Table({
     id: column.text,
@@ -39,7 +39,7 @@ const service = new Table({
     works: column.text,
     mechanic: column.text,
     comment: column.text
-})
+});
 
 export const AppSchema = new Schema({
     car,
@@ -48,7 +48,7 @@ export const AppSchema = new Schema({
     attachments: new AttachmentTable()
 });
 
-export type DatabaseType     = (typeof AppSchema)["types"];
-export type UserTableType    = DatabaseType["user"];
-export type CarTableType     = DatabaseType["car"];
+export type DatabaseType = (typeof AppSchema)["types"];
+export type UserTableType = DatabaseType["user"];
+export type CarTableType = DatabaseType["car"];
 export type ServiceTableType = DatabaseType["service"];

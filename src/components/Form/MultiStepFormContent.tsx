@@ -22,7 +22,7 @@ const MultiStepFormContent: React.FC = () => {
             currentStep={ currentStep }
             visibleHeight={ contentVisibleHeight }
         />
-    )
-}
+    );
+};
 
 export default MultiStepFormContent;

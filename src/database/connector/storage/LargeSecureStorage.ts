@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as SecureStore from 'expo-secure-store';
-import * as aesjs from 'aes-js';
-import 'react-native-get-random-values';
+import * as SecureStore from "expo-secure-store";
+import * as aesjs from "aes-js";
+import "react-native-get-random-values";
 
 class LargeSecureStore {
     private async _encrypt(key: string, value: string) {
@@ -17,7 +17,7 @@ class LargeSecureStore {
 
     private async _decrypt(key: string, value: string) {
         const encryptionKeyHex = await SecureStore.getItemAsync(key);
-        if (!encryptionKeyHex) {
+        if(!encryptionKeyHex) {
             return encryptionKeyHex;
         }
 
@@ -29,7 +29,9 @@ class LargeSecureStore {
 
     async getItem(key: string) {
         const encrypted = await AsyncStorage.getItem(key);
-        if (!encrypted) { return encrypted; }
+        if(!encrypted) {
+            return encrypted;
+        }
 
         return await this._decrypt(key, encrypted);
     }

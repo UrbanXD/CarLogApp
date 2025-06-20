@@ -1,14 +1,14 @@
 import React from "react";
-import { ColorValue, StyleSheet, View, Text } from "react-native";
+import { ColorValue, StyleSheet, Text, View } from "react-native";
 import { COLORS } from "../constants/index.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { Color } from "../types/index.ts";
 
 interface TextDividerProps {
-    title: string
-    color?: Color
-    lineHeight?: number
-    marginVertical?: number
+    title: string;
+    color?: Color;
+    lineHeight?: number;
+    marginVertical?: number;
 }
 
 const TextDivider: React.FC<TextDividerProps> = ({
@@ -21,14 +21,14 @@ const TextDivider: React.FC<TextDividerProps> = ({
 
     return (
         <View style={ styles.container }>
-            <View style={ styles.line } />
+            <View style={ styles.line }/>
             <Text style={ styles.text }>
                 { title }
             </Text>
-            <View style={ styles.line } />
+            <View style={ styles.line }/>
         </View>
-    )
-}
+    );
+};
 
 const useStyles = (color: ColorValue, height: number, marginVertical: number) =>
     StyleSheet.create({
@@ -49,6 +49,6 @@ const useStyles = (color: ColorValue, height: number, marginVertical: number) =>
             // textTransform: "uppercase",
             color: color
         }
-    })
+    });
 
 export default TextDivider;

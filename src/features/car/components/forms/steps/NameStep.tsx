@@ -14,6 +14,6 @@ const NameStep: React.FC<StepProps> = ({
         placeholder="AA-0000-BB"
         icon={ ICON_NAMES.nametag }
         isInBottomSheet
-    />
+    />;
 
 export default NameStep;

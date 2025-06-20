@@ -7,15 +7,15 @@ import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index
 import { useUserManagement } from "../../hooks/useUserManagement.ts";
 
 export type HandleVerificationOtpType =
-    (errorCode?: string) => ( Promise<void> | void )
+    (errorCode?: string) => (Promise<void> | void)
 
 interface VerifyOTPProps {
-    type: EmailOtpType
-    email: string
-    otpLength?: number
-    title?: string
-    subtitle?: string
-    handleVerification: HandleVerificationOtpType
+    type: EmailOtpType;
+    email: string;
+    otpLength?: number;
+    title?: string;
+    subtitle?: string;
+    handleVerification: HandleVerificationOtpType;
 }
 
 const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
@@ -24,14 +24,15 @@ const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
     otpLength = 6,
     title,
     subtitle,
-    handleVerification,
+    handleVerification
 }) => {
     const { verifyOTP, resendOTP } = useUserManagement();
 
     const defaultSubtitle = () =>
         <Text style={ styles.subtitleText }>
-            Ehhez használja azt a kódódot amely a(z) <Text style={ styles.subtitleEmailText }>{ email }</Text> címre került kiküldésre.
-        </Text>
+            Ehhez használja azt a kódódot amely a(z) <Text style={ styles.subtitleEmailText }>{ email }</Text> címre
+            került kiküldésre.
+        </Text>;
 
     const onSubmit = async (token: string) => {
         try {
@@ -42,15 +43,15 @@ const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
             });
 
             await handleVerification();
-        } catch (error: AuthApiError | any) {
+        } catch(error: AuthApiError | any) {
             await handleVerification(error.code || "otp_error");
         }
-    }
+    };
 
     const resend = async () =>
         await resendOTP({
             type: "signup",
-            email: email,
+            email: email
         });
 
     return (
@@ -64,10 +65,10 @@ const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
                 }
                 {
                     !subtitle
-                        ?   defaultSubtitle()
-                        :   <Text style={ styles.subtitleText }>
-                                { subtitle }
-                            </Text>
+                    ? defaultSubtitle()
+                    : <Text style={ styles.subtitleText }>
+                        { subtitle }
+                    </Text>
                 }
             </View>
             <Input.OTP
@@ -84,12 +85,12 @@ const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
                 <Text style={ styles.didntReceivedCodeLinkText } onPress={ resend }>Újra küldés</Text>
             </Text>
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     pageContainer: {
-        gap: SEPARATOR_SIZES.normal,
+        gap: SEPARATOR_SIZES.normal
     },
     titleContainer: {
         gap: SEPARATOR_SIZES.lightSmall

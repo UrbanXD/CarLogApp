@@ -3,12 +3,12 @@ import { Database } from "../../../../database/connector/Database.ts";
 
 export const deleteCar = createAsyncThunk(
     "deleteCar",
-    async (args: { database: Database, carID: string }, { rejectWithValue })=> {
+    async (args: { database: Database, carID: string }, { rejectWithValue }) => {
         try {
             const {
                 database: { attachmentQueue, storage, carDAO },
                 carID
-            } = args
+            } = args;
 
             const car = await carDAO.getCar(carID);
             if(car.image && attachmentQueue) {
@@ -20,9 +20,9 @@ export const deleteCar = createAsyncThunk(
             await carDAO.deleteCar(carID);
 
             return { id: car.id };
-        } catch (e) {
+        } catch(e) {
             console.log(e);
             return rejectWithValue("");
         }
     }
-)
+);

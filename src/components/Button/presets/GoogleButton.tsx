@@ -16,5 +16,5 @@ export const GoogleButton: React.FC = () => {
             iconLeft={ require("../../../assets/images/google_logo.png") }
             onPress={ googleAuth }
         />
-    )
-}
+    );
+};

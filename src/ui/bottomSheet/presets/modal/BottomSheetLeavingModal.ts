@@ -10,4 +10,4 @@ export const BottomSheetLeavingModal = (reopenBottomSheet: () => void, dismissBo
         acceptText: "Űrlap bezárása",
         dismiss: reopenBottomSheet
     } as AlertModalProps;
-}
+};

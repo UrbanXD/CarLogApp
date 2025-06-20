@@ -5,14 +5,14 @@ import { CarDto } from "../types/index.ts";
 import { toCarEntity } from "../mapper/index.ts";
 
 interface EditCarArgs {
-    database: Database
-    oldCar: CarDto
-    newCar: EditCarFormFieldType
+    database: Database;
+    oldCar: CarDto;
+    newCar: EditCarFormFieldType;
 }
 
 export const editCar = createAsyncThunk(
     "editCar",
-    async (args: EditCarArgs, { rejectWithValue })=> {
+    async (args: EditCarArgs, { rejectWithValue }) => {
         const {
             database: { carDAO, supabaseConnector, attachmentQueue },
             oldCar,
@@ -33,13 +33,13 @@ export const editCar = createAsyncThunk(
                 ...newCar,
                 image: image ? image.filename : oldCar.image ? oldCar.image : null
             };
-            const car= toCarEntity(carDto);
+            const car = toCarEntity(carDto);
             await carDAO.editCar(car);
 
             return carDto;
-        } catch (e) {
+        } catch(e) {
             console.log(e);
             return rejectWithValue("");
         }
     }
-)
+);

@@ -24,6 +24,6 @@ const OdometerStep: React.FC<StepProps> = ({
             isHorizontal
             isCarousel={ false }
         />
-    </Input.Group>
+    </Input.Group>;
 
 export default OdometerStep;

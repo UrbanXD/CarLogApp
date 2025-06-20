@@ -6,9 +6,9 @@ import { store } from "../../database/redux/store.ts";
 const Page: React.FC = () => {
     return (
         <Provider store={ store }>
-            <ServiceLogScreen />
+            <ServiceLogScreen/>
         </Provider>
-    )
-}
+    );
+};
 
 export default Page;

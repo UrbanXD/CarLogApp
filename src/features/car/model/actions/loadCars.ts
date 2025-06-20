@@ -13,7 +13,7 @@ export const loadCars = createAsyncThunk(
             const cars = await carDAO.getCars();
 
             return toCarDtoArray(cars, attachmentQueue);
-        } catch (e) {
+        } catch(e) {
             console.log(e);
             return rejectWithValue("");
         }

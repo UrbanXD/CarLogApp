@@ -8,23 +8,23 @@ import Alert from "../components/Alert.tsx";
 import { AddToastFunction, OpenModalFunction } from "../types/index.ts";
 
 interface AlertProviderValue {
-    addToast: AddToastFunction
-    removeToast: (id: string) => void
-    openModal: OpenModalFunction
-    closeModal: () => void
+    addToast: AddToastFunction;
+    removeToast: (id: string) => void;
+    openModal: OpenModalFunction;
+    closeModal: () => void;
 }
 
 const AlertContext =
     createContext<AlertProviderValue | null>(null);
 
 interface AlertProviderProps {
-    children: ReactElement | null
+    children: ReactElement | null;
 }
 
 export const AlertProvider: React.FC<AlertProviderProps> = ({
     children
 }) => {
-    const [toasts, setToasts] = React.useState<Array<AlertToastProps & {id: string}>>([]);
+    const [toasts, setToasts] = React.useState<Array<AlertToastProps & { id: string }>>([]);
     const [modal, setModal] = React.useState<AlertModalProps | null>(null);
 
     const addToast = useCallback((props: AlertToastProps) =>
@@ -43,7 +43,7 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({
 
     const openModal = useCallback(
         (props: AlertModalProps) =>
-                setModal(props)
+            setModal(props)
         , []);
 
     const acceptModal = useCallback(() => {
@@ -52,8 +52,8 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({
                 prevModal.accept();
             }
             return null;
-        })
-    }, [modal])
+        });
+    }, [modal]);
 
     const closeModal = useCallback(() => {
         setModal(prevModal => {
@@ -79,7 +79,7 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({
             <View style={ styles.toastContainer }>
                 {
                     toasts.map(
-                        toast=>
+                        toast =>
                             <Alert.Toast
                                 key={ toast.id }
                                 title={ toast.title }
@@ -93,29 +93,29 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({
             {
                 modal &&
                 <>
-                    <TouchableOpacity
-                        style={ styles.modalOverlay }
-                        activeOpacity={ 1 }
-                        onPress={ closeModal }
-                    />
-                    <View style={ styles.modalContainer }>
-                        <Alert.Modal
-                            icon={ modal.icon }
-                            title={ modal.title }
-                            body={ modal.body }
-                            color={ modal.color }
-                            accept={ acceptModal }
-                            acceptText={ modal.acceptText }
-                            dismiss={ closeModal }
-                            dismissText={ modal.dismissText }
-                        />
-                    </View>
+                   <TouchableOpacity
+                      style={ styles.modalOverlay }
+                      activeOpacity={ 1 }
+                      onPress={ closeModal }
+                   />
+                   <View style={ styles.modalContainer }>
+                      <Alert.Modal
+                         icon={ modal.icon }
+                         title={ modal.title }
+                         body={ modal.body }
+                         color={ modal.color }
+                         accept={ acceptModal }
+                         acceptText={ modal.acceptText }
+                         dismiss={ closeModal }
+                         dismissText={ modal.dismissText }
+                      />
+                   </View>
                 </>
             }
             { children }
         </AlertContext.Provider>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     toastContainer: {
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
         width: "80%",
         alignSelf: "center",
         gap: SEPARATOR_SIZES.lightSmall,
-        zIndex: 1,
+        zIndex: 1
     },
     modalOverlay: {
         position: "absolute",
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     modalContainer: {
         position: "absolute",
         alignSelf: "center",
-        width: "90%",
+        width: "90%"
     }
 });
 

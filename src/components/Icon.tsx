@@ -7,12 +7,12 @@ import { COLORS } from "../constants/index.ts";
 import { Color, ImageSource } from "../types/index.ts";
 
 interface IconProps {
-    icon: ImageSource
-    size?: number
-    color?: Color
-    backgroundColor?: Color
-    style?: ViewStyle
-    onPress?: () => void
+    icon: ImageSource;
+    size?: number;
+    color?: Color;
+    backgroundColor?: Color;
+    style?: ViewStyle;
+    onPress?: () => void;
 }
 
 const Icon: React.FC<IconProps> = ({
@@ -33,19 +33,19 @@ const Icon: React.FC<IconProps> = ({
         >
             {
                 typeof icon === "string"
-                    ?   <MaterialIcon
-                            name={ icon }
-                            size={ size }
-                            color={ color }
-                        />
-                    :   <Image
-                            source={ icon }
-                            style={ styles.imageIcon }
-                        />
+                ? <MaterialIcon
+                    name={ icon }
+                    size={ size }
+                    color={ color }
+                />
+                : <Image
+                    source={ icon }
+                    style={ styles.imageIcon }
+                />
             }
         </TouchableOpacity>
-    )
-}
+    );
+};
 
 const useStyles = (size: number, backgroundColor: ColorValue | string) =>
     StyleSheet.create({
@@ -55,7 +55,7 @@ const useStyles = (size: number, backgroundColor: ColorValue | string) =>
             justifyContent: "center",
             alignItems: "center",
             backgroundColor,
-            borderRadius: 100,
+            borderRadius: 100
         },
         imageIcon: {
             alignSelf: "center",
@@ -63,6 +63,6 @@ const useStyles = (size: number, backgroundColor: ColorValue | string) =>
             height: size,
             backgroundColor
         }
-    })
+    });
 
 export default Icon;

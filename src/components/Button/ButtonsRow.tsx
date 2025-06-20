@@ -1,10 +1,10 @@
 import React, { ReactNode } from "react";
-import { View, StyleSheet, ViewStyle } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import { SEPARATOR_SIZES } from "../../constants/index.ts";
 
 interface ButtonsRowProps {
-    style?: ViewStyle
-    children: ReactNode
+    style?: ViewStyle;
+    children: ReactNode;
 }
 
 const ButtonsRow: React.FC<ButtonsRowProps> = ({
@@ -15,8 +15,8 @@ const ButtonsRow: React.FC<ButtonsRowProps> = ({
         <View style={ [styles.container, style] }>
             { children }
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -25,6 +25,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         gap: SEPARATOR_SIZES.small
     }
-})
+});
 
 export default ButtonsRow;

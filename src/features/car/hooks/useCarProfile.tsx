@@ -4,7 +4,7 @@ import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetCont
 import { useDatabase } from "../../../database/connector/Database.ts";
 import { deleteCar } from "../model/actions/deleteCar.ts";
 import { CarEditBottomSheet } from "../presets/bottomSheet/index.ts";
-import {useAppDispatch} from "../../../hooks/index.ts";
+import { useAppDispatch } from "../../../hooks/index.ts";
 
 const useCarProfile = (carID: string) => {
     const dispatch = useAppDispatch();
@@ -17,27 +17,27 @@ const useCarProfile = (carID: string) => {
 
     const handleDeleteCar = () => {
         openModal({
-            title: `A(z) ${car.name} nevű autó törlése`,
+            title: `A(z) ${ car.name } nevű autó törlése`,
             body: `Az autó kitörlése egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
             acceptText: "Törlés",
             accept: () => {
                 dispatch(deleteCar({ database, carID: car.id }));
-            },
-        })
-    }
+            }
+        });
+    };
 
     const openEditCarStep = (stepIndex: number, height: string = "50%") =>
         openBottomSheet(CarEditBottomSheet({
             car,
             stepIndex,
             height
-        }))
+        }));
 
     return {
         car,
         handleDeleteCar,
         openEditCarStep
     };
-}
+};
 
 export default useCarProfile;

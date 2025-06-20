@@ -13,5 +13,5 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         >
             { children }
         </AuthContext.Provider>
-    )
-}
+    );
+};

@@ -1,7 +1,7 @@
-import { RenderComponent} from "./RenderComponent.ts";
+import { RenderComponent } from "./RenderComponent.ts";
 import { ToastMessages } from "../ui/alert/types/index.ts";
 import { ReactNode } from "react";
-import {Control, UseFormGetValues, UseFormResetField} from "react-hook-form";
+import { Control, UseFormGetValues, UseFormResetField } from "react-hook-form";
 
 export type Step = {
     title: string
@@ -18,7 +18,7 @@ export type ResultStep = {
 }
 
 export interface StepProps {
-    control: Control<any>
-    resetField?: UseFormResetField<any | undefined>
-    getValues?: UseFormGetValues<any | undefined>
+    control: Control<any>;
+    resetField?: UseFormResetField<any | undefined>;
+    getValues?: UseFormGetValues<any | undefined>;
 }

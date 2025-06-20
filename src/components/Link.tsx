@@ -23,14 +23,14 @@ const Link: React.FC<LinkProps> = ({
             {
                 icon &&
                 <Icon
-                    icon={ icon }
-                    size={ styles.linkText.fontSize * 1.35 }
-                    color={ styles.linkText.color }
+                   icon={ icon }
+                   size={ styles.linkText.fontSize * 1.35 }
+                   color={ styles.linkText.color }
                 />
             }
         </TouchableOpacity>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     linkContainer: {
@@ -41,8 +41,8 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
         textAlign: "center",
-        color: COLORS.fuelYellow,
-    },
-})
+        color: COLORS.fuelYellow
+    }
+});
 
 export default Link;

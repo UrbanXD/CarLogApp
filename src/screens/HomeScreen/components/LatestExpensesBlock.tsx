@@ -23,7 +23,7 @@ const LatestExpensesBlock: React.FC = () => {
                 icon={ ICON_NAMES.rightArrowHead }
             />
         </View>
-    )
-}
+    );
+};
 
 export default LatestExpensesBlock;

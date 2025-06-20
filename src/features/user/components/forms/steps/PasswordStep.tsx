@@ -24,4 +24,4 @@ export const PasswordStep: React.FC<StepProps> = ({ control }) =>
             isSecure
             isInBottomSheet
         />
-    </Input.Group>
+    </Input.Group>;

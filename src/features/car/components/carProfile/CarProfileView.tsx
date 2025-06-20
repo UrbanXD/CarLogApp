@@ -18,9 +18,9 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { CarDto } from "../../model/types/index.ts";
 
 interface CarProfileViewProps {
-    car: CarDto
-    handleDeleteCar?: () => void
-    openEditCarStep?: (stepIndex: number, bottomSheetHeight?: string) => void
+    car: CarDto;
+    handleDeleteCar?: () => void;
+    openEditCarStep?: (stepIndex: number, bottomSheetHeight?: string) => void;
 }
 
 const CarProfileView: React.FC<CarProfileViewProps> = ({
@@ -82,16 +82,19 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                     <Text style={ styles.carInfoTitleText }>Évjárat</Text>
                     <Text style={ styles.carInfoText }>2025</Text>
                 </View>
-                <Button.Row style={{ marginTop: SEPARATOR_SIZES.lightSmall, justifyContent: handleDeleteCar ? "space-between" : "center" }}>
+                <Button.Row style={ {
+                    marginTop: SEPARATOR_SIZES.lightSmall,
+                    justifyContent: handleDeleteCar ? "space-between" : "center"
+                } }>
                     {
                         handleDeleteCar &&
                         <Button.Icon
-                            icon={ ICON_NAMES.trashCan }
-                            iconSize={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
-                            backgroundColor={ COLORS.googleRed }
-                            iconColor={ COLORS.black }
-                            height={ FONT_SIZES.p2 * 2 }
-                            onPress={ handleDeleteCar }
+                           icon={ ICON_NAMES.trashCan }
+                           iconSize={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
+                           backgroundColor={ COLORS.googleRed }
+                           iconColor={ COLORS.black }
+                           height={ FONT_SIZES.p2 * 2 }
+                           onPress={ handleDeleteCar }
                         />
                     }
                     <Button.Text
@@ -100,8 +103,8 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                         fontSize={ FONT_SIZES.p2 }
                         height={ FONT_SIZES.p2 * 2 }
                         backgroundColor="transparent"
-                        style={{ flex: 0.75, borderColor: COLORS.gray1, borderWidth: 2.5 }}
-                        onPress={() => openEditCarStep(CAR_FORM_STEPS.CarModelStep)}
+                        style={ { flex: 0.75, borderColor: COLORS.gray1, borderWidth: 2.5 } }
+                        onPress={ () => openEditCarStep(CAR_FORM_STEPS.CarModelStep) }
                     />
                 </Button.Row>
             </View>
@@ -118,13 +121,13 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                 openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.FuelStep, "65%") }
             />
         </ScrollView>
-    </View>
+    </View>;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: "column",
-        gap: SEPARATOR_SIZES.small,
+        gap: SEPARATOR_SIZES.small
     },
     contentContainer: {
         ...GLOBAL_STYLE.scrollViewContentContainer, //flexGrow: 1
@@ -135,12 +138,12 @@ const styles = StyleSheet.create({
         height: hp(25),
         justifyContent: "center",
         gap: SEPARATOR_SIZES.small,
-        overflow: "hidden",
+        overflow: "hidden"
     },
     editImageIconContainer: {
         flex: 1,
         justifyContent: "flex-end",
-        padding: SEPARATOR_SIZES.lightSmall,
+        padding: SEPARATOR_SIZES.lightSmall
     },
     editImageIcon: {
         alignSelf: "flex-end"
@@ -170,7 +173,7 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.05,
-        color: COLORS.gray1,
+        color: COLORS.gray1
     },
     carInfoText: {
         fontFamily: "Gilroy-Heavy",

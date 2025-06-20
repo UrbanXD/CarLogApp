@@ -9,4 +9,4 @@ export const FONT_SIZES = {
     h2: hp(3.5),
     h1: hp(5),
     title: wp(21.5)
-}
+};

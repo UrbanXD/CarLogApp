@@ -21,4 +21,4 @@ export const NameStep: React.FC<StepProps> = ({ control }) =>
             placeholder="János"
             isInBottomSheet
         />
-    </Input.Group>
+    </Input.Group>;

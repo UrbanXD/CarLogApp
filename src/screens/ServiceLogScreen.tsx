@@ -23,7 +23,7 @@ const ServiceLogScreen: React.FC = () => {
             price: 1000,
             currencyText: "din"
         }
-    ]
+    ];
 
     return (
         <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, styles.pageContainer] }>
@@ -33,7 +33,7 @@ const ServiceLogScreen: React.FC = () => {
             >
                 <View style={ [GLOBAL_STYLE.contentContainer, { height: hp(60), justifyContent: "space-between" }] }>
                     <View>
-                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                        <View style={ { flexDirection: "row", alignItems: "center", justifyContent: "space-between" } }>
                             <Text style={ GLOBAL_STYLE.containerTitleText }>
                                 Szervízkönyv
                             </Text>
@@ -41,7 +41,7 @@ const ServiceLogScreen: React.FC = () => {
                                 2024
                             </Text>
                         </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <View style={ { flexDirection: "row", justifyContent: "space-between" } }>
                             <Text style={ GLOBAL_STYLE.containerText }>
                                 Search
                             </Text>
@@ -50,10 +50,13 @@ const ServiceLogScreen: React.FC = () => {
                             </Text>
                         </View>
                     </View>
-                    <Divider />
+                    <Divider/>
                     <ScrollView
                         showsVerticalScrollIndicator={ false }
-                        contentContainerStyle={ [GLOBAL_STYLE.scrollViewContentContainer, { gap: GLOBAL_STYLE.contentContainer.gap }] }
+                        contentContainerStyle={ [
+                            GLOBAL_STYLE.scrollViewContentContainer,
+                            { gap: GLOBAL_STYLE.contentContainer.gap }
+                        ] }
                     >
                         {
                             logs.map((log, index) => {
@@ -63,20 +66,22 @@ const ServiceLogScreen: React.FC = () => {
                                             <Text style={ [GLOBAL_STYLE.containerTitleText] }>
                                                 { log.dateText }
                                             </Text>
-                                            <Text style={ [GLOBAL_STYLE.containerText, styles.kilometerText ]}>
+                                            <Text style={ [GLOBAL_STYLE.containerText, styles.kilometerText] }>
                                                 { formatNumber(log.km) } km
                                             </Text>
                                         </View>
                                         <View style={ GLOBAL_STYLE.columnContainer }>
-                                            <Text numberOfLines={ 2 } style={ [GLOBAL_STYLE.containerText, styles.descriptionText] }>
+                                            <Text numberOfLines={ 2 }
+                                                  style={ [GLOBAL_STYLE.containerText, styles.descriptionText] }>
                                                 { log.description }
                                             </Text>
-                                            <Text numberOfLines={ 1 } style={ [GLOBAL_STYLE.containerText, styles.priceText] }>
+                                            <Text numberOfLines={ 1 }
+                                                  style={ [GLOBAL_STYLE.containerText, styles.priceText] }>
                                                 { formatNumber(log.price) } { log.currencyText }
                                             </Text>
                                         </View>
                                     </View>
-                                )
+                                );
                             })
                         }
                     </ScrollView>
@@ -84,8 +89,8 @@ const ServiceLogScreen: React.FC = () => {
             </ScrollView>
         </SafeAreaView>
 
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     pageContainer: {
@@ -94,11 +99,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 0
     },
     rowContainer: {
-        height: hp(11),
+        height: hp(11)
     },
     kilometerText: {
         fontSize: FONT_SIZES.p4,
-        textAlign: "center",
+        textAlign: "center"
     },
     descriptionText: {
         fontFamily: "Gilroy-Heavy",
@@ -110,6 +115,6 @@ const styles = StyleSheet.create({
         textAlign: "center",
         letterSpacing: Platform.OS === "android" ? 0 : 0.4
     }
-})
+});
 
 export default ServiceLogScreen;

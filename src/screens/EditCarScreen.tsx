@@ -9,10 +9,10 @@ const EditCarScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={ styles.pageContainer }>
-            <CarProfile.ById carId={ localSearchParams.id as string } />
+            <CarProfile.ById carId={ localSearchParams.id as string }/>
         </SafeAreaView>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     pageContainer: {
@@ -20,6 +20,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: DEFAULT_SEPARATOR,
         paddingBottom: SEPARATOR_SIZES.small
     }
-})
+});
 
 export default EditCarScreen;

@@ -18,12 +18,12 @@ const InputTitle: React.FC<InputTitleProps> = ({
             <View>
                 <Text style={ styles.inputNameText }>
                     {
-                        `${title} `
+                        `${ title } `
                     }
                     {
                         optional &&
                         <Text style={ styles.optionalText }>
-                            (opcionális)
+                           (opcionális)
                         </Text>
                     }
                 </Text>
@@ -35,8 +35,8 @@ const InputTitle: React.FC<InputTitleProps> = ({
                 </Text>
             }
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     inputNameText: {
@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
         color: COLORS.gray2
     },
     inputInfoText: {
-        ...GLOBAL_STYLE.containerText,
+        ...GLOBAL_STYLE.containerText
     }
-})
+});
 
 export default InputTitle;

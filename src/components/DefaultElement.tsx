@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, ViewStyle, Text, ActivityIndicator } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View, ViewStyle } from "react-native";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import Icon from "./Icon";
 import { hexToRgba } from "../utils/colors/hexToRgba";
@@ -7,10 +7,10 @@ import { ImageSource } from "../types/index.ts";
 
 interface DefaultElementProps {
     loading?: boolean;
-    icon?: ImageSource
-    text?: string
-    loadingText?: string
-    style?: ViewStyle
+    icon?: ImageSource;
+    text?: string;
+    loadingText?: string;
+    style?: ViewStyle;
 }
 
 const DefaultElement: React.FC<DefaultElementProps> = ({
@@ -24,30 +24,30 @@ const DefaultElement: React.FC<DefaultElementProps> = ({
         <View style={ [styles.container, style] }>
             {
                 loading
-                    ?   <ActivityIndicator
-                            size={ FONT_SIZES.title }
-                            color={ COLORS.gray3 }
-                        />
-                    :   <Icon
-                            icon={ icon }
-                            size={ FONT_SIZES.title }
-                            color={ COLORS.gray3 }
-                        />
+                ? <ActivityIndicator
+                    size={ FONT_SIZES.title }
+                    color={ COLORS.gray3 }
+                />
+                : <Icon
+                    icon={ icon }
+                    size={ FONT_SIZES.title }
+                    color={ COLORS.gray3 }
+                />
             }
             {
                 loading
-                    ? loadingText &&
-                        <Text style={ styles.text }>
-                            { loadingText }
-                        </Text>
-                    : text &&
-                        <Text style={ styles.text }>
-                            { text }
-                        </Text>
+                ? loadingText &&
+                  <Text style={ styles.text }>
+                      { loadingText }
+                  </Text>
+                : text &&
+                  <Text style={ styles.text }>
+                      { text }
+                  </Text>
             }
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -71,6 +71,6 @@ const styles = StyleSheet.create({
         color: COLORS.gray2,
         textAlign: "center"
     }
-})
+});
 
 export default DefaultElement;

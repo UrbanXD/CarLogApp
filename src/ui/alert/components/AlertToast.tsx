@@ -1,11 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import {
+    ALERT_COLORS,
+    ALERT_ICONS,
+    ALERT_TITLES,
+    COLORS,
+    FONT_SIZES,
+    SEPARATOR_SIZES
+} from "../../../constants/index.ts";
 import Icon from "../../../components/Icon.tsx";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming} from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { AlertType } from "../types/index.ts";
-import { ALERT_TITLES, ALERT_COLORS, ALERT_ICONS } from "../../../constants/index.ts";
 
 export interface AlertToastProps {
     type?: AlertType,
@@ -47,7 +53,7 @@ const AlertToast: React.FC<AlertToastProps> = ({
         intervalRef.current = setInterval(() => {
             setRemovable(true);
         }, duration + config.duration);
-    }
+    };
 
     const startAnimation = useCallback(() => {
         interval();
@@ -60,7 +66,7 @@ const AlertToast: React.FC<AlertToastProps> = ({
             0,
             config
         );
-    }, [])
+    }, []);
 
     const endAnimation = () => {
         opacity.value = withTiming(
@@ -70,13 +76,13 @@ const AlertToast: React.FC<AlertToastProps> = ({
         x.value = withTiming(
             width / 2,
             config
-        )
-    }
+        );
+    };
 
     const dismissWithPress = () => {
         setRemovable(true);
         clearInterval(intervalRef.current);
-    }
+    };
 
     useEffect(() => {
         startAnimation();
@@ -85,10 +91,10 @@ const AlertToast: React.FC<AlertToastProps> = ({
     }, []);
 
     useEffect(() => {
-        if (removable) {
+        if(removable) {
             endAnimation();
             const timeout = setTimeout(() => {
-                if(close){
+                if(close) {
                     close();
                 }
             }, config.duration);
@@ -108,7 +114,7 @@ const AlertToast: React.FC<AlertToastProps> = ({
                     size={ height / 1.5 }
                     icon={ ALERT_ICONS[type] }
                     color={ ALERT_COLORS[type] }
-                    style={{ alignSelf: "center" }}
+                    style={ { alignSelf: "center" } }
                 />
                 <View style={ styles.contentContainer }>
                     <Text
@@ -120,8 +126,8 @@ const AlertToast: React.FC<AlertToastProps> = ({
                     {
                         body &&
                         <Text
-                            numberOfLines={ 2 }
-                            style={ styles.text }
+                           numberOfLines={ 2 }
+                           style={ styles.text }
                         >
                             { body }
                         </Text>
@@ -129,8 +135,8 @@ const AlertToast: React.FC<AlertToastProps> = ({
                 </View>
             </TouchableOpacity>
         </Animated.View>
-    )
-}
+    );
+};
 
 const useStyles = (type: AlertType, height: number) =>
     StyleSheet.create({
@@ -144,25 +150,25 @@ const useStyles = (type: AlertType, height: number) =>
             paddingVertical: SEPARATOR_SIZES.lightSmall,
             paddingHorizontal: SEPARATOR_SIZES.small,
             flexDirection: "row",
-            gap: SEPARATOR_SIZES.lightSmall,
+            gap: SEPARATOR_SIZES.lightSmall
         },
         contentContainer: {
             flex: 1,
             flexDirection: "column",
-            justifyContent: "center",
+            justifyContent: "center"
         },
         titleText: {
             fontFamily: "Gilroy-Heavy",
             fontSize: FONT_SIZES.p2,
             letterSpacing: FONT_SIZES.p2 * 0.05,
-            color: COLORS.white,
+            color: COLORS.white
         },
         text: {
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p4,
             letterSpacing: FONT_SIZES.p4 * 0.05,
-            color: COLORS.gray1,
+            color: COLORS.gray1
         }
-    })
+    });
 
 export default React.memo(AlertToast);

@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { StyleSheet, View} from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../constants/index.ts";
 
 interface InputGroupProps {
@@ -13,13 +13,13 @@ const InputGroup: React.FC<InputGroupProps> = ({
         <View style={ styles.container }>
             { children }
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
         gap: SEPARATOR_SIZES.small
     }
-})
+});
 
 export default InputGroup;

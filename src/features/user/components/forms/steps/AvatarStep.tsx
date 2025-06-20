@@ -9,4 +9,4 @@ export const AvatarStep: React.FC<StepProps> = ({
         control={ control }
         fieldName="avatarImage"
         fieldNameText="Profilkép"
-    />
+    />;

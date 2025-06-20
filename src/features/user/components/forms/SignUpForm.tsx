@@ -29,7 +29,7 @@ const SignUpForm: React.FC = () => {
             trigger={ trigger }
             resetField={ resetField }
         />
-    )
-}
+    );
+};
 
 export default SignUpForm;

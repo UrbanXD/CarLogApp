@@ -7,7 +7,7 @@ import { COLORS, FONT_SIZES, GLOBAL_STYLE, ICON_FONT_SIZE_SCALE, ICON_NAMES } fr
 import { router } from "expo-router";
 
 interface SecondaryHeaderProps {
-    title?: string
+    title?: string;
 }
 
 const SecondaryHeader: React.FC<SecondaryHeaderProps> = ({
@@ -40,7 +40,7 @@ const SecondaryHeader: React.FC<SecondaryHeaderProps> = ({
                 }
             </View>
         </View>
-    )
-}
+    );
+};
 
 export default SecondaryHeader;

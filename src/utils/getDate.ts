@@ -1,6 +1,6 @@
 export const getToday = () => {
     return new Date();
-}
+};
 
 export const getDate = () => {
     const today = getToday();
@@ -10,8 +10,8 @@ export const getDate = () => {
     const day = today.getDate();
 
     return `${ year }.${ addLeadingZero(month) }.${ addLeadingZero(day) }`;
-}
+};
 
 export const addLeadingZero = (data: string | number, length: number = 2) => {
-    return String(data).padStart(length, '0');
-}
+    return String(data).padStart(length, "0");
+};

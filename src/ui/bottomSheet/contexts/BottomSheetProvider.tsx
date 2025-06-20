@@ -8,7 +8,7 @@ import { BottomSheetContext, BottomSheetType, OpenBottomSheetArgs } from "./Bott
 import { BottomSheetLeavingModal } from "../presets/modal/index.ts";
 
 interface BottomSheetProviderProps {
-    children: ReactNode | null
+    children: ReactNode | null;
 }
 
 export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
@@ -32,7 +32,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         if(index < 0) return null;
 
         return bottomSheets[index];
-    }, [bottomSheets])
+    }, [bottomSheets]);
 
     const openBottomSheet = useCallback((args: OpenBottomSheetArgs) => {
         if(!bottomSheetOpenable) return;
@@ -75,7 +75,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
             prevState.map(bottomSheet => bottomSheet.ref.current?.dismiss());
 
             return new Array<BottomSheetType>();
-        })
+        });
     }, []);
 
     const reopenBottomSheet = useCallback(() => {
@@ -83,7 +83,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         if(!bottomSheet) return;
 
         bottomSheet.ref.current?.snapToIndex(0);
-    }, [getCurrentBottomSheet])
+    }, [getCurrentBottomSheet]);
 
     const onChangeSnapPoint = useCallback((index: number) => {
         const bottomSheet = getCurrentBottomSheet();
@@ -103,7 +103,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         openBottomSheet,
         closeBottomSheet,
         dismissBottomSheet,
-        dismissAllBottomSheet,
+        dismissAllBottomSheet
     }), [openBottomSheet, closeBottomSheet, dismissBottomSheet, dismissAllBottomSheet]);
 
     return (
@@ -121,7 +121,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
                         enableContentPanningGesture
                         enableDismissOnClose
                         enableOverDrag={ false }
-                        backdropComponent={ () => <BottomSheetBackdrop /> }
+                        backdropComponent={ () => <BottomSheetBackdrop/> }
                         onChange={ onChangeSnapPoint }
                         { ...props }
                         snapPoints={ props.snapPoints || ["100%"] }
@@ -129,5 +129,5 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
                 ))
             }
         </BottomSheetContext.Provider>
-    )
-}
+    );
+};

@@ -1,6 +1,6 @@
 import { Control } from "react-hook-form";
 import { EmailStep, NameStep, PasswordStep } from "../components/forms/steps/index.ts";
-import {AvatarStep} from "../components/forms/steps/AvatarStep.tsx";
+import { AvatarStep } from "../components/forms/steps/AvatarStep.tsx";
 
 export enum EDIT_USER_FORM_STEPS {
     EmailStep,
@@ -29,4 +29,4 @@ export const useEditUserSteps = (
             <AvatarStep
                 control={ control }
             />
-    ]
+    ];

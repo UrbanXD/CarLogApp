@@ -8,13 +8,13 @@ import { EmailStep } from "./EmailStep.tsx";
 import { StepProps } from "../../../../../types/index.ts";
 
 export const SignUpFirstStep: React.FC<StepProps> = ({
-    control,
+    control
 }) => {
     const { next } = useMultiStepForm();
 
     return (
         <Input.Group>
-            <EmailStep control={ control } />
+            <EmailStep control={ control }/>
             <Button.Text
                 text="Következő"
                 iconRight={ ICON_NAMES.rightArrowHead }
@@ -26,7 +26,7 @@ export const SignUpFirstStep: React.FC<StepProps> = ({
                 lineHeight={ 1 }
                 marginVertical={ GLOBAL_STYLE.formContainer.gap }
             />
-            <Button.Google />
+            <Button.Google/>
         </Input.Group>
-    )
-}
+    );
+};

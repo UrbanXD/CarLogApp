@@ -6,11 +6,11 @@ import { StyleSheet, View, ViewStyle } from "react-native";
 import { Color } from "../../types/index.ts";
 
 interface AvatarSkeletonProps {
-    avatarSize?: number
-    color?: Color
-    backgroundColor?: Color
-    borderColor?: Color
-    style?: ViewStyle
+    avatarSize?: number;
+    color?: Color;
+    backgroundColor?: Color;
+    borderColor?: Color;
+    style?: ViewStyle;
 }
 
 const AvatarSkeleton: React.FC<AvatarSkeletonProps> = ({
@@ -21,19 +21,18 @@ const AvatarSkeleton: React.FC<AvatarSkeletonProps> = ({
     style
 }) => {
     const BORDER_WIDTH = hp(1);
-    const styles =
-        useStyles(
-            borderColor ? avatarSize + BORDER_WIDTH : avatarSize,
-            color,
-            backgroundColor,
-            borderColor,
-            borderColor ? BORDER_WIDTH : 0
-        );
+    const styles = useStyles(
+        borderColor ? avatarSize + BORDER_WIDTH : avatarSize,
+        color,
+        backgroundColor,
+        borderColor,
+        borderColor ? BORDER_WIDTH : 0
+    );
 
     return (
-        <View style={ [styles.container, style] } />
-    )
-}
+        <View style={ [styles.container, style] }/>
+    );
+};
 
 const useStyles = (
     avatarSize: number,
@@ -54,6 +53,6 @@ const useStyles = (
             borderColor
         }
     });
-}
+};
 
 export default AvatarSkeleton;

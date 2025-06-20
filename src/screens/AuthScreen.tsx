@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { ImageBackground, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants/index.ts";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button/Button";
 import Divider from "../components/Divider";
@@ -24,11 +24,11 @@ const AuthScreen: React.FC = () => {
         () => openBottomSheet(SignInBottomSheet);
 
 
-    const openVerification = useCallback( () => {
+    const openVerification = useCallback(() => {
         if(notVerifiedUser && notVerifiedUser.email) {
             openUserVerification(notVerifiedUser.email);
         }
-    }, [notVerifiedUser])
+    }, [notVerifiedUser]);
 
     const styles = useStyles(top);
 
@@ -39,12 +39,12 @@ const AuthScreen: React.FC = () => {
                 style={ styles.imageContainer }
             >
                 <LinearGradient
-                    locations={ [ 0, 0.35, 0.85 ] }
-                    colors={[
+                    locations={ [0, 0.35, 0.85] }
+                    colors={ [
                         "transparent",
                         "rgba(0,0,0,0.25)",
                         GLOBAL_STYLE.pageContainer.backgroundColor
-                    ]}
+                    ] }
                     style={ styles.imageGradientOverlay }
                 />
             </ImageBackground>
@@ -80,32 +80,32 @@ const AuthScreen: React.FC = () => {
             {
                 !session && notVerifiedUser &&
                 <View style={ styles.verificationContainer }>
-                    <Button.Icon
-                        icon={ "email-seal-outline" }
-                        onPress={ openVerification }
-                        style={ styles.verificationIcon }
-                    />
-                    <Text
-                        onPress={ openVerification }
-                        style={ styles.verificationText }
-                    >
-                        Hitelesítés{"\n"}folytatása
-                    </Text>
+                   <Button.Icon
+                      icon={ "email-seal-outline" }
+                      onPress={ openVerification }
+                      style={ styles.verificationIcon }
+                   />
+                   <Text
+                      onPress={ openVerification }
+                      style={ styles.verificationText }
+                   >
+                      Hitelesítés{ "\n" }folytatása
+                   </Text>
                 </View>
             }
         </SafeAreaView>
-    )
-}
+    );
+};
 
 const useStyles = (top: number) =>
     StyleSheet.create({
         pageContainer: {
             ...GLOBAL_STYLE.pageContainer,
             paddingBottom: DEFAULT_SEPARATOR,
-            paddingVertical: 0,
+            paddingVertical: 0
         },
         imageContainer: {
-            flex: 0.85,
+            flex: 0.85
 
         },
         imageGradientOverlay: {
@@ -118,11 +118,11 @@ const useStyles = (top: number) =>
             justifyContent: "space-between",
             backgroundColor: "transparent",
             paddingHorizontal: DEFAULT_SEPARATOR,
-            paddingBottom: GLOBAL_STYLE.pageContainer.paddingBottom,
+            paddingBottom: GLOBAL_STYLE.pageContainer.paddingBottom
         },
         titleContainer: {
             top: -SEPARATOR_SIZES.lightLarge,
-            gap: SEPARATOR_SIZES.mediumSmall,
+            gap: SEPARATOR_SIZES.mediumSmall
         },
         title: {
             zIndex: 1,
@@ -131,7 +131,7 @@ const useStyles = (top: number) =>
             color: COLORS.white,
             fontSize: FONT_SIZES.title,
             fontFamily: "Gilroy-Heavy",
-            textTransform: "uppercase",
+            textTransform: "uppercase"
         },
         titleEffect: {
             zIndex: 0,
@@ -140,7 +140,7 @@ const useStyles = (top: number) =>
             textShadowOffset: { height: 0, width: 0 },
             textShadowColor: COLORS.white,
             textShadowRadius: 1,
-            textAlign: "center",
+            textAlign: "center"
         },
         subtitle: {
             alignSelf: "center",
@@ -154,26 +154,26 @@ const useStyles = (top: number) =>
             flexDirection: "column",
             gap: SEPARATOR_SIZES.normal
         },
-        underButtonText:{
+        underButtonText: {
             color: COLORS.white,
             alignSelf: "center",
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p2,
             letterSpacing: FONT_SIZES.p2 * 0.05,
             lineHeight: FONT_SIZES.p2 * 1.25,
-            textAlign: "center",
+            textAlign: "center"
         },
         linkText: {
             color: COLORS.fuelYellow,
             textDecorationLine: "underline",
             fontSize: FONT_SIZES.p1,
             lineHeight: FONT_SIZES.p1 * 1.25,
-            letterSpacing: FONT_SIZES.p1 * 0.05,
+            letterSpacing: FONT_SIZES.p1 * 0.05
         },
         verificationContainer: {
             position: "absolute",
             top: top * 1.5,
-            right: GLOBAL_STYLE.contentContainer.paddingHorizontal,
+            right: GLOBAL_STYLE.contentContainer.paddingHorizontal
         },
         verificationIcon: {
             borderColor: COLORS.gray4,
@@ -184,8 +184,8 @@ const useStyles = (top: number) =>
             fontSize: FONT_SIZES.p3,
             color: COLORS.white,
             textShadowColor: COLORS.black,
-            textShadowRadius: 15,
+            textShadowRadius: 15
         }
-    })
+    });
 
 export default AuthScreen;

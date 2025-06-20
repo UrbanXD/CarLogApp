@@ -8,7 +8,7 @@ const ImageStep: React.FC<StepProps> = ({
     <InputImagePicker
         control={ control }
         fieldName="image"
-        fieldNameText={"Autó profilkép"}
-    />
+        fieldNameText={ "Autó profilkép" }
+    />;
 
 export default ImageStep;

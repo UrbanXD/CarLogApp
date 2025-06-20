@@ -4,6 +4,6 @@ import Modal from "./AlertModal.tsx";
 const Alert = {
     Toast,
     Modal
-}
+};
 
 export default Alert;

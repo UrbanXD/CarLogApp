@@ -28,5 +28,5 @@ export const OtpVerificationBottomSheet: OtpVerificationBottomSheetType = ({
                 handleVerification={ handleVerification }
             />,
         enableDismissOnClose: true
-    }
-}
+    };
+};

@@ -22,7 +22,7 @@ export const getToastMessage: (
                 error.message.match(/\d+/);
 
             let seconds: number = 60;
-            if (secondsMatch) seconds = parseInt(secondsMatch[0], 10);
+            if(secondsMatch) seconds = parseInt(secondsMatch[0], 10);
 
             message = String(seconds);
         }
@@ -33,4 +33,4 @@ export const getToastMessage: (
 
     const getToast = messages[defaultErrorCode] || messages.error;
     return getToast ? getToast() : { type: "error", body: "Váratlan hiba lépett fel!" };
-}
+};

@@ -15,5 +15,5 @@ export const toUserDto = async (user?: UserTableType, attachmentQueue?: PhotoAtt
         lastname: user.lastname,
         avatarColor: user.avatarColor,
         userAvatar: userAvatar
-    }
-}
+    };
+};

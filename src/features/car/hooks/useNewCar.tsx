@@ -1,4 +1,4 @@
-import { useAddCarFormProps, AddCarFormFieldType } from "../schemas/carSchema.ts";
+import { AddCarFormFieldType, useAddCarFormProps } from "../schemas/carSchema.ts";
 import { useAlert } from "../../../ui/alert/contexts/AlertProvider.tsx";
 import { useForm } from "react-hook-form";
 import useCarSteps from "./useCarSteps.tsx";
@@ -30,11 +30,11 @@ const useNewCarForm = () => {
                 reset();
                 dismissAllBottomSheet();
                 addToast(CarCreateToast.success());
-            } catch (e){
+            } catch(e) {
                 console.log(e);
                 addToast(CarCreateToast.error());
             }
-        })
+        });
 
     return {
         control,
@@ -42,7 +42,7 @@ const useNewCarForm = () => {
         trigger,
         resetField,
         steps: useCarSteps(control, resetField, getValues)
-    }
-}
+    };
+};
 
 export default useNewCarForm;

@@ -1,20 +1,20 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
 import Icon from "../Icon";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE } from "../../constants/index.ts";
 import { Color, ImageSource } from "../../types/index.ts";
 
 interface IconButtonProps {
-    icon: ImageSource
-    iconSize?: number
-    iconColor?: Color
-    backgroundColor?: Color
-    width?: number
-    height?: number
-    style?: ViewStyle
-    inverse?: boolean
-    disabled?: boolean
-    onPress: () => void
+    icon: ImageSource;
+    iconSize?: number;
+    iconColor?: Color;
+    backgroundColor?: Color;
+    width?: number;
+    height?: number;
+    style?: ViewStyle;
+    inverse?: boolean;
+    disabled?: boolean;
+    onPress: () => void;
 }
 
 export const IconButton: React.FC<IconButtonProps> = ({
@@ -48,14 +48,14 @@ export const IconButton: React.FC<IconButtonProps> = ({
                 color={ styles.buttonContainer.color }
             />
         </TouchableOpacity>
-    )
-}
+    );
+};
 
 export const useButtonStyles = (
     primaryColor: Color,
     secondaryColor: Color,
     width: number,
-    height: number,
+    height: number
 ) =>
     StyleSheet.create({
         buttonContainer: {
@@ -66,8 +66,8 @@ export const useButtonStyles = (
             height: height,
             backgroundColor: primaryColor,
             color: secondaryColor,
-            borderRadius: height / 2,
+            borderRadius: height / 2
         }
-    })
+    });
 
 export default IconButton;

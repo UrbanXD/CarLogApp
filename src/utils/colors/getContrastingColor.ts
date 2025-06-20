@@ -14,9 +14,9 @@ const getContrastingColor = (inputColor: Color, light: Color, dark: Color) => {
         }
 
         return light;
-    } catch (e: any) {
+    } catch(e: any) {
         return light;
     }
-}
+};
 
 export default getContrastingColor;

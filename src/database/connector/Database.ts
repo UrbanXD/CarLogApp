@@ -8,7 +8,7 @@ import { PhotoAttachmentQueue } from "./powersync/PhotoAttachmentQueue.ts";
 import { AttachmentRecord } from "@powersync/attachments";
 import { UserDAO } from "../../features/user/model/dao/UserDAO.ts";
 import { CarDAO } from "../../features/car/model/dao/CarDAO.ts";
-import { BaseConfig } from "../../constants/baseConfig.ts";
+import { BaseConfig } from "../../constants/index.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
@@ -30,19 +30,19 @@ export class Database {
         this.supabaseConnector = new SupabaseConnector(this.powersync);
         this.storage = this.supabaseConnector.storage;
 
-        if(BaseConfig.SUPABASE_BUCKET){
+        if(BaseConfig.SUPABASE_BUCKET) {
             this.attachmentQueue = new PhotoAttachmentQueue({
                 powersync: this.powersync,
                 storage: this.storage,
                 onDownloadError: async (attachment: AttachmentRecord, exception: any) => {
-                    if (exception.toString() === 'StorageApiError: Object not found') {
+                    if(exception.toString() === "StorageApiError: Object not found") {
                         return { retry: false };
                     }
 
                     return { retry: true };
                 },
                 onUploadError: async (attachment: AttachmentRecord, exception: any) => {
-                    console.log("attachment upload hiba", exception)
+                    console.log("attachment upload hiba", exception);
                     return { retry: false };
                 }
             });
@@ -50,14 +50,14 @@ export class Database {
     }
 
     get userDAO(): UserDAO {
-        if (!this._userDAO) {
+        if(!this._userDAO) {
             this._userDAO = new UserDAO(this);
         }
         return this._userDAO;
     }
 
     get carDAO(): CarDAO {
-        if (!this._carDAO) {
+        if(!this._carDAO) {
             this._carDAO = new CarDAO(this.db);
         }
         return this._carDAO;
@@ -67,7 +67,7 @@ export class Database {
         await this.powersync.init();
         await this.powersync.connect(this.supabaseConnector);
 
-        if(this.attachmentQueue){
+        if(this.attachmentQueue) {
             await this.attachmentQueue.init();
         }
     }

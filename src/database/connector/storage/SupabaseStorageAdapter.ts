@@ -1,15 +1,16 @@
-import { SupabaseClient } from '@supabase/supabase-js';
-import { decode } from 'base64-arraybuffer';
-import * as FileSystem from 'expo-file-system';
-import { BaseConfig } from '../../../constants/index.ts';
-import { StorageAdapter } from '@powersync/attachments';
+import { SupabaseClient } from "@supabase/supabase-js";
+import { decode } from "base64-arraybuffer";
+import * as FileSystem from "expo-file-system";
+import { BaseConfig } from "../../../constants/index.ts";
+import { StorageAdapter } from "@powersync/attachments";
 
 export interface SupabaseStorageAdapterOptions {
     client: SupabaseClient;
 }
 
 export class SupabaseStorageAdapter implements StorageAdapter {
-    constructor(private options: SupabaseStorageAdapterOptions) {}
+    constructor(private options: SupabaseStorageAdapterOptions) {
+    }
 
     async uploadFile(
         filename: string,
@@ -18,31 +19,31 @@ export class SupabaseStorageAdapter implements StorageAdapter {
             mediaType?: string;
         }
     ): Promise<void> {
-        if (!BaseConfig.SUPABASE_BUCKET) {
-            throw new Error('Supabase bucket not configured in AppConfig.ts');
+        if(!BaseConfig.SUPABASE_BUCKET) {
+            throw new Error("Supabase bucket not configured in AppConfig.ts");
         }
 
-        const { mediaType = 'text/plain' } = options ?? {};
+        const { mediaType = "text/plain" } = options ?? {};
 
         const res =
             await this.options.client.storage
-                .from(BaseConfig.SUPABASE_BUCKET)
-                .upload(filename, data, { contentType: mediaType });
+            .from(BaseConfig.SUPABASE_BUCKET)
+            .upload(filename, data, { contentType: mediaType });
 
-        if (res.error) throw res.error;
+        if(res.error) throw res.error;
     }
 
     async downloadFile(filePath: string) {
-        if (!BaseConfig.SUPABASE_BUCKET) {
-            throw new Error('Supabase bucket not configured in AppConfig.ts');
+        if(!BaseConfig.SUPABASE_BUCKET) {
+            throw new Error("Supabase bucket not configured in AppConfig.ts");
         }
 
         const { data, error } =
             await this.options.client.storage
-                .from(BaseConfig.SUPABASE_BUCKET)
-                .download(filePath);
+            .from(BaseConfig.SUPABASE_BUCKET)
+            .download(filePath);
 
-        if (error) throw error;
+        if(error) throw error;
 
         return data as Blob;
     }
@@ -56,8 +57,8 @@ export class SupabaseStorageAdapter implements StorageAdapter {
     ): Promise<void> {
         const { encoding = FileSystem.EncodingType.UTF8 } = options ?? {};
 
-        const directoryPath = fileURI.substring(0, fileURI.lastIndexOf('/') + 1);
-        if(!await this.fileExists(directoryPath)){
+        const directoryPath = fileURI.substring(0, fileURI.lastIndexOf("/") + 1);
+        if(!await this.fileExists(directoryPath)) {
             await this.makeDir(directoryPath);
         }
 
@@ -71,13 +72,13 @@ export class SupabaseStorageAdapter implements StorageAdapter {
         const { encoding = FileSystem.EncodingType.UTF8 } = options ?? {};
         const { exists } = await FileSystem.getInfoAsync(fileURI);
 
-        if (!exists) {
-            throw new Error(`File does not exist: ${fileURI}`);
+        if(!exists) {
+            throw new Error(`File does not exist: ${ fileURI }`);
         }
 
         const fileContent = await FileSystem.readAsStringAsync(fileURI, options);
 
-        if (encoding === FileSystem.EncodingType.Base64) {
+        if(encoding === FileSystem.EncodingType.Base64) {
             return this.base64ToArrayBuffer(fileContent);
         }
 
@@ -85,19 +86,19 @@ export class SupabaseStorageAdapter implements StorageAdapter {
     }
 
     async deleteFile(uri: string, options?: { filename?: string }): Promise<void> {
-        if (await this.fileExists(uri)) {
+        if(await this.fileExists(uri)) {
             await FileSystem.deleteAsync(uri);
         }
 
         const { filename } = options ?? {};
-        if (!filename) return;
+        if(!filename) return;
 
-        if (!BaseConfig.SUPABASE_BUCKET) {
-            throw new Error('Supabase bucket not configured in AppConfig.ts');
+        if(!BaseConfig.SUPABASE_BUCKET) {
+            throw new Error("Supabase bucket not configured in AppConfig.ts");
         }
 
         const { data, error } = await this.options.client.storage.from(BaseConfig.SUPABASE_BUCKET).remove([filename]);
-        if (error) throw error;
+        if(error) throw error;
     }
 
     async fileExists(fileURI: string): Promise<boolean> {
@@ -109,7 +110,7 @@ export class SupabaseStorageAdapter implements StorageAdapter {
     async makeDir(uri: string): Promise<void> {
         const { exists } = await FileSystem.getInfoAsync(uri);
 
-        if (!exists) {
+        if(!exists) {
             await FileSystem.makeDirectoryAsync(uri, { intermediates: true });
         }
     }

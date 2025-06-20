@@ -7,23 +7,23 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Picker, { PickerDataType } from "./Picker.tsx";
 
 export interface InputPickerDataType extends PickerDataType {
-    value?: string
+    value?: string;
 }
 
 interface InputPickerProps {
-    data: Array<InputPickerDataType>
-    control: Control<any>
-    fieldName: string
-    fieldNameText?: string
-    fieldInfoText?: string
-    icon?: string
-    placeholder?: string
-    isInBottomSheet?: boolean
-    isHorizontal?: boolean
-    isCarousel?: boolean
-    withSearchbar?: boolean
-    disabled?: boolean
-    disabledText?: string
+    data: Array<InputPickerDataType>;
+    control: Control<any>;
+    fieldName: string;
+    fieldNameText?: string;
+    fieldInfoText?: string;
+    icon?: string;
+    placeholder?: string;
+    isInBottomSheet?: boolean;
+    isHorizontal?: boolean;
+    isCarousel?: boolean;
+    withSearchbar?: boolean;
+    disabled?: boolean;
+    disabledText?: string;
 }
 
 const InputPicker: React.FC<InputPickerProps> = ({
@@ -50,7 +50,7 @@ const InputPicker: React.FC<InputPickerProps> = ({
 
     useEffect(() => {
         setIsDataAdjusted(true);
-    },[adjustedData]);
+    }, [adjustedData]);
 
     useEffect(() => {
         const updatedData =
@@ -66,8 +66,8 @@ const InputPicker: React.FC<InputPickerProps> = ({
     useEffect(() => {
         if(allData.length <= 0) return;
 
-        if (searchTerm.length <= 2) {
-            if (!previousShortTerm) {
+        if(searchTerm.length <= 2) {
+            if(!previousShortTerm) {
                 setAdjustedData(allData);
                 setPreviousShortTerm(true);
             }
@@ -92,9 +92,9 @@ const InputPicker: React.FC<InputPickerProps> = ({
         } = args;
 
         useEffect(() => {
-            if (value && value !== "") {
+            if(value && value !== "") {
                 const item = adjustedData.find(item => item?.value === value);
-                if (item && item.id !== selectedItemID) {
+                if(item && item.id !== selectedItemID) {
                     setSelectedItemID(item?.id || item?.value || "");
                 }
             }
@@ -102,40 +102,40 @@ const InputPicker: React.FC<InputPickerProps> = ({
 
         return (
             isDataAdjusted
-                ?   <Picker
-                        data={ adjustedData }
-                        error = { error?.message }
-                        searchTerm={ searchTerm }
-                        setSearchTerm={
-                            withSearchbar
-                                ? ((value) => setSearchTerm(value))
-                                : undefined
-                        }
-                        selectedItemID={ selectedItemID }
-                        onSelect={
-                            (id: string) => {
-                                setSelectedItemID(id);
-                                onChange(adjustedData.find(item => item.id === id)?.value?.toString());
-                            }
-                        }
-                        isDropdown={ !isHorizontal }
-                        isHorizontal={ isHorizontal }
-                        isCarousel={ isCarousel }
-                        dropDownInfoType="input"
-                        disabled={ disabled }
-                        disabledText={ disabledText }
-                    />
-                :   <></>
-        )
-    }
+            ? <Picker
+                data={ adjustedData }
+                error={ error?.message }
+                searchTerm={ searchTerm }
+                setSearchTerm={
+                    withSearchbar
+                    ? ((value) => setSearchTerm(value))
+                    : undefined
+                }
+                selectedItemID={ selectedItemID }
+                onSelect={
+                    (id: string) => {
+                        setSelectedItemID(id);
+                        onChange(adjustedData.find(item => item.id === id)?.value?.toString());
+                    }
+                }
+                isDropdown={ !isHorizontal }
+                isHorizontal={ isHorizontal }
+                isCarousel={ isCarousel }
+                dropDownInfoType="input"
+                disabled={ disabled }
+                disabledText={ disabledText }
+            />
+            : <></>
+        );
+    };
 
     return (
         <View style={ styles.inputContainer }>
             {
                 fieldNameText &&
                 <InputTitle
-                    title={ fieldNameText }
-                    subtitle={ fieldInfoText }
+                   title={ fieldNameText }
+                   subtitle={ fieldInfoText }
                 />
             }
             <Controller
@@ -144,13 +144,13 @@ const InputPicker: React.FC<InputPickerProps> = ({
                 render={ render }
             />
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: "column",
-        gap: SEPARATOR_SIZES.lightSmall,
+        gap: SEPARATOR_SIZES.lightSmall
     },
     formFieldContainer: {
         minHeight: hp(6),
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     },
     formFieldIconContainer: {
         flex: 0.2,
-        alignItems: "center",
+        alignItems: "center"
     },
     textInput: {
         flex: 1,
@@ -187,6 +187,6 @@ const styles = StyleSheet.create({
         letterSpacing: hp(1.85) * 0.05,
         color: COLORS.redLight
     }
-})
+});
 
 export default InputPicker;

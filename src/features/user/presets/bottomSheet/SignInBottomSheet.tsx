@@ -4,7 +4,7 @@ import SignInForm from "../../components/forms/SignInForm.tsx";
 
 export const SignInBottomSheet: OpenBottomSheetArgs = {
     title: "Bejelentkezés",
-    content: <SignInForm />,
+    content: <SignInForm/>,
     snapPoints: ["90%"],
     enableDismissOnClose: false
-}
+};

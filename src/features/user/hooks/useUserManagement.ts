@@ -2,7 +2,7 @@ import { useDatabase } from "../../../database/connector/Database.ts";
 import { useAlert } from "../../../ui/alert/contexts/AlertProvider.tsx";
 import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { BaseConfig } from "../../../constants/index.ts";
+import { AVATAR_COLOR, BaseConfig } from "../../../constants/index.ts";
 import { HandleVerificationOtpType } from "../components/forms/VerifyOtpForm.tsx";
 import { getToastMessage } from "../../../ui/alert/utils/getToastMessage.ts";
 import {
@@ -16,14 +16,7 @@ import {
     SignUpToast
 } from "../presets/toast/index.ts";
 import { OtpVerificationBottomSheet } from "../presets/bottomSheet/index.ts";
-import {
-    AuthError,
-    GenerateLinkParams,
-    Provider,
-    ResendParams,
-    VerifyEmailOtpParams
-} from "@supabase/supabase-js";
-import { AVATAR_COLOR } from "../../../constants/index.ts";
+import { AuthError, GenerateLinkParams, Provider, ResendParams, VerifyEmailOtpParams } from "@supabase/supabase-js";
 import { router } from "expo-router";
 import { SignInFormFieldType, SignUpFormFieldType } from "../schemas/userSchema.tsx";
 import { useAuth } from "../../../contexts/Auth/AuthContext.ts";
@@ -35,7 +28,10 @@ import { getPathFromImageType } from "../../../utils/getPathFromImageType.ts";
 export type SignUpFunction = (user: SignUpFormFieldType) => Promise<void>
 export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
 export type ChangeEmailFunction = (newEmail: string) => Promise<void>
-export type ChangeUserMetadataFunction = (newUser: Partial<UserTableType> | null, toastMessages: ToastMessages) => Promise<void>
+export type ChangeUserMetadataFunction = (
+    newUser: Partial<UserTableType> | null,
+    toastMessages: ToastMessages
+) => Promise<void>
 export type ResetPasswordFunction = (newPassword: string) => Promise<void>
 
 export const useUserManagement = () => {
@@ -65,7 +61,7 @@ export const useUserManagement = () => {
 
                 addToast(SignUpToast.success());
                 dismissAllBottomSheet();
-            }
+            };
 
         openBottomSheet(
             OtpVerificationBottomSheet({
@@ -75,7 +71,7 @@ export const useUserManagement = () => {
                 handleVerification: handleSignUpVerification
             })
         );
-    }
+    };
 
     const signUp: SignUpFunction = async (user) => {
         try {
@@ -92,11 +88,11 @@ export const useUserManagement = () => {
                 error: emailError
             } =
                 await supabaseConnector
-                    .client
-                    .rpc(
-                        "email_exists",
-                        { email_address: email }
-                    );
+                .client
+                .rpc(
+                    "email_exists",
+                    { email_address: email }
+                );
 
             if(emailError) throw emailError;
             if(emailExists) throw { code: "email_exists" } as AuthError;
@@ -107,19 +103,19 @@ export const useUserManagement = () => {
                 },
                 error
             } = await supabaseConnector
-                    .client
-                    .auth
-                    .signUp({
-                        email,
-                        password,
-                        options: {
-                            data: {
-                                firstname,
-                                lastname,
-                                avatarColor: AVATAR_COLOR[Math.floor(Math.random() * AVATAR_COLOR.length)],
-                            }
-                        }
-                    });
+            .client
+            .auth
+            .signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        firstname,
+                        lastname,
+                        avatarColor: AVATAR_COLOR[Math.floor(Math.random() * AVATAR_COLOR.length)]
+                    }
+                }
+            });
 
             if(error) throw error;
 
@@ -133,10 +129,10 @@ export const useUserManagement = () => {
                     firstname: newUser.user_metadata.firstname,
                     lastname: newUser.user_metadata.lastname,
                     avatarColor: newUser.user_metadata.avatarColor,
-                    avatarImage: newUser.user_metadata.avatarImage,
+                    avatarImage: newUser.user_metadata.avatarImage
                 });
             }
-        } catch (error) {
+        } catch(error) {
             addToast(
                 getToastMessage({
                     messages: SignUpToast,
@@ -144,7 +140,7 @@ export const useUserManagement = () => {
                 })
             );
         }
-    }
+    };
 
     const googleAuth = async () => {
         try {
@@ -154,20 +150,20 @@ export const useUserManagement = () => {
 
             const { data: alreadyRegistered } =
                 await supabaseConnector
-                    .client
-                    .rpc(
-                        "email_exists",
-                        { email_address: googleData.user.email }
-                    );
+                .client
+                .rpc(
+                    "email_exists",
+                    { email_address: googleData.user.email }
+                );
 
             const { data: { user }, error } =
                 await supabaseConnector
-                    .client
-                    .auth
-                    .signInWithIdToken({
-                        provider: "google",
-                        token: googleData.idToken
-                    });
+                .client
+                .auth
+                .signInWithIdToken({
+                    provider: "google",
+                    token: googleData.idToken
+                });
 
             if(error) throw error;
             if(!user) throw { code: "user_not_found" };
@@ -190,7 +186,7 @@ export const useUserManagement = () => {
 
             addToast(SignUpToast.success());
             dismissAllBottomSheet();
-        } catch (error) {
+        } catch(error) {
             addToast(
                 getToastMessage({
                     messages: GoogleAuthToast,
@@ -198,17 +194,17 @@ export const useUserManagement = () => {
                 })
             );
         }
-    }
+    };
 
     const signIn: SignInFunction = async (user) => {
         try {
             const { error } =
                 await supabaseConnector
-                    .client
-                    .auth
-                    .signInWithPassword(user);
+                .client
+                .auth
+                .signInWithPassword(user);
 
-            if (error) {
+            if(error) {
                 if(error.code === "email_not_confirmed") {
                     return openUserVerification(user.email);
                 }
@@ -218,7 +214,7 @@ export const useUserManagement = () => {
 
             addToast(SignInToast.success());
             dismissAllBottomSheet();
-        } catch (error) {
+        } catch(error) {
             addToast(
                 getToastMessage({
                     messages: SignInToast,
@@ -226,22 +222,22 @@ export const useUserManagement = () => {
                 })
             );
         }
-    }
+    };
 
     const signOut = async (disabledToast: boolean = false) => {
         try {
             const { error } =
                 await supabaseConnector
-                    .client
-                    .auth
-                    .signOut();
+                .client
+                .auth
+                .signOut();
 
             if(error) throw error;
 
             router.replace("/backToRootIndex");
             if(!disabledToast) addToast(SignOutToast.success());
             await database.disconnect();
-        } catch (error) {
+        } catch(error) {
             if(error instanceof AuthError && !disabledToast) {
                 return addToast(
                     getToastMessage({
@@ -252,7 +248,7 @@ export const useUserManagement = () => {
             }
             // ha nem AuthError akkor sikeres a kijelentkezes, de mashol hiba tortent (pl: powersync)
         }
-    }
+    };
 
     const changeEmail: ChangeEmailFunction = async (
         newEmail
@@ -263,11 +259,11 @@ export const useUserManagement = () => {
 
             const { error } =
                 await supabaseConnector
-                    .client
-                    .auth
-                    .updateUser({
-                        email: newEmail
-                    });
+                .client
+                .auth
+                .updateUser({
+                    email: newEmail
+                });
 
             if(error) throw error;
 
@@ -296,7 +292,7 @@ export const useUserManagement = () => {
                             addToast(ChangeEmailToast.success());
                             dismissAllBottomSheet();
                             await signOut(true);
-                        }
+                        };
 
                     openBottomSheet(
                         OtpVerificationBottomSheet({
@@ -305,8 +301,8 @@ export const useUserManagement = () => {
                             email: newEmail,
                             handleVerification: handleNewEmailVerification
                         })
-                    )
-                }
+                    );
+                };
 
             openBottomSheet(
                 OtpVerificationBottomSheet({
@@ -316,7 +312,7 @@ export const useUserManagement = () => {
                     handleVerification: handleCurrentEmailVerification
                 })
             );
-        } catch (error) {
+        } catch(error) {
             addToast(
                 getToastMessage({
                     messages: ChangeEmailToast,
@@ -324,7 +320,7 @@ export const useUserManagement = () => {
                 })
             );
         }
-    }
+    };
 
     const changeUserMetadata: ChangeUserMetadataFunction = async (
         newUser,
@@ -335,7 +331,7 @@ export const useUserManagement = () => {
             if(newUser?.avatarImage && user?.avatarImage !== getPathFromImageType(newUser.avatarImage, user?.id)) {
                 try {
 
-                } catch (_) {
+                } catch(_) {
 
                 }
                 const newAvatarImage = await attachmentQueue.saveFile(newUser.avatarImage, user.id);
@@ -352,8 +348,8 @@ export const useUserManagement = () => {
 
             addToast(toastMessages.success());
             dismissAllBottomSheet();
-        } catch (error) {
-            console.log(error)
+        } catch(error) {
+            console.log(error);
             addToast(
                 getToastMessage({
                     messages: toastMessages,
@@ -361,7 +357,7 @@ export const useUserManagement = () => {
                 })
             );
         }
-    }
+    };
 
     const addPasswordToOAuthUser: ResetPasswordFunction = async (
         newPassword
@@ -372,17 +368,17 @@ export const useUserManagement = () => {
 
             const { error } =
                 await supabaseConnector
-                    .client
-                    .auth
-                    .updateUser({
-                        password: newPassword
-                    });
+                .client
+                .auth
+                .updateUser({
+                    password: newPassword
+                });
 
             if(error) throw error;
 
-            addToast(AddPasswordToast.success())
+            addToast(AddPasswordToast.success());
             await refreshSession();
-        } catch (error) {
+        } catch(error) {
             addToast(
                 getToastMessage({
                     messages: AddPasswordToast,
@@ -390,7 +386,7 @@ export const useUserManagement = () => {
                 })
             );
         }
-    }
+    };
 
     const resetPassword: ResetPasswordFunction = async (
         newPassword
@@ -401,9 +397,9 @@ export const useUserManagement = () => {
 
             const { error } =
                 await supabaseConnector
-                    .client
-                    .auth
-                    .resetPasswordForEmail(session.user.email);
+                .client
+                .auth
+                .resetPasswordForEmail(session.user.email);
 
             if(error) throw error;
 
@@ -420,13 +416,13 @@ export const useUserManagement = () => {
 
                     const { error } =
                         await supabaseConnector
-                            .client
-                            .auth
-                            .updateUser(
-                                {
-                                    password: newPassword
-                                }
-                            );
+                        .client
+                        .auth
+                        .updateUser(
+                            {
+                                password: newPassword
+                            }
+                        );
 
                     if(error && error.code !== "same_password") {
                         return addToast(
@@ -440,7 +436,7 @@ export const useUserManagement = () => {
                     addToast(ResetPasswordToast.success());
                     dismissAllBottomSheet();
                     await signOut(true);
-                }
+                };
 
             openBottomSheet(
                 OtpVerificationBottomSheet({
@@ -450,7 +446,7 @@ export const useUserManagement = () => {
                     handleVerification: handleResetPasswordVerification
                 })
             );
-        } catch (error){
+        } catch(error) {
             addToast(
                 getToastMessage({
                     messages: ResetPasswordToast,
@@ -458,32 +454,32 @@ export const useUserManagement = () => {
                 })
             );
         }
-    }
+    };
 
     const deleteUserProfile = async () => {
-        if(session?.user){
+        if(session?.user) {
             try {
                 if(!session) throw { code: "session_not_found" };
                 if(!session.user.email) throw { code: "email_not_found" };
 
                 const emailParams: GenerateLinkParams = {
                     type: "magiclink",
-                    email: session.user.email,
-                }
+                    email: session.user.email
+                };
 
                 const { error } =
                     await supabaseConnector
-                        .client
-                        .functions
-                        .invoke(
-                            "generate-email",
-                            {
-                                method: "POST",
-                                body: JSON.stringify(emailParams)
-                            }
-                        );
+                    .client
+                    .functions
+                    .invoke(
+                        "generate-email",
+                        {
+                            method: "POST",
+                            body: JSON.stringify(emailParams)
+                        }
+                    );
 
-                if (error) throw error;
+                if(error) throw error;
 
                 const handleDeleteUserVerification: HandleVerificationOtpType =
                     async (errorCode) => {
@@ -498,22 +494,22 @@ export const useUserManagement = () => {
 
                         const { error } =
                             await supabaseConnector
-                                .client
-                                .functions
-                                .invoke(
-                                    "delete-user",
-                                    {
-                                        method: "DELETE",
-                                        body: JSON.stringify({ id: session.user.id })
-                                    }
-                                );
+                            .client
+                            .functions
+                            .invoke(
+                                "delete-user",
+                                {
+                                    method: "DELETE",
+                                    body: JSON.stringify({ id: session.user.id })
+                                }
+                            );
 
                         if(error) throw error;
 
                         addToast(DeleteUserToast.success());
                         dismissAllBottomSheet();
                         await signOut(true);
-                    }
+                    };
 
                 openBottomSheet(
                     OtpVerificationBottomSheet({
@@ -523,7 +519,7 @@ export const useUserManagement = () => {
                         handleVerification: handleDeleteUserVerification
                     })
                 );
-            } catch (error) {
+            } catch(error) {
                 addToast(
                     getToastMessage({
                         messages: DeleteUserToast,
@@ -532,34 +528,34 @@ export const useUserManagement = () => {
                 );
             }
         }
-    }
+    };
 
     const verifyOTP = async (args: VerifyEmailOtpParams) => {
         const { data, error } =
             await supabaseConnector
-                .client
-                .auth
-                .verifyOtp(args);
+            .client
+            .auth
+            .verifyOtp(args);
 
         if(error) throw error;
 
         if(data.session) {
             await supabaseConnector
-                .client
-                .auth
-                .setSession(data.session);
+            .client
+            .auth
+            .setSession(data.session);
         }
-    }
+    };
 
-    const resendOTP = async (args: ResendParams)=> {
+    const resendOTP = async (args: ResendParams) => {
         const { error } =
             await supabaseConnector
-                .client
-                .auth
-                .resend(args);
+            .client
+            .auth
+            .resend(args);
 
         if(error) throw error;
-    }
+    };
 
     const linkIdentity = async (provider: Provider) => {
         try {
@@ -569,10 +565,10 @@ export const useUserManagement = () => {
             if(userProviders.includes(provider)) throw { code: "identity_already_exists" } as AuthError;
 
             // nincs megvalositva meg Supabaseben (native flowra) az identity hozzarendeles, igy automatic linking lesz ujra beloginoltatassal (de mas emailre nem rakhato)
-        } catch (error) {
+        } catch(error) {
             console.log("linkIdentity error: ", error);
         }
-    }
+    };
 
     return {
         signUp,
@@ -588,5 +584,5 @@ export const useUserManagement = () => {
         verifyOTP,
         resendOTP,
         linkIdentity
-    }
-}
+    };
+};

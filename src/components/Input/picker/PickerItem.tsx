@@ -4,29 +4,30 @@ import { COLORS, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../cons
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface PickerItemProps {
-    onPress: () => void
-    title: string
-    subtitle?: string
-    icon?: ImageSourcePropType
-    selected: boolean
+    onPress: () => void;
+    title: string;
+    subtitle?: string;
+    icon?: ImageSourcePropType;
+    selected: boolean;
 }
 
 const PickerItem: React.FC<PickerItemProps> = ({
-   onPress,
-   title,
-   subtitle,
-   icon,
-   selected
+    onPress,
+    title,
+    subtitle,
+    icon,
+    selected
 }) => {
     return (
-        <TouchableOpacity onPress={ onPress } style={ [styles.itemContainer, selected && styles.selectedItemContainer] }>
+        <TouchableOpacity onPress={ onPress }
+                          style={ [styles.itemContainer, selected && styles.selectedItemContainer] }>
             {
                 icon &&
                 <View style={ styles.iconContainer }>
-                    <Image
-                        source={ icon }
-                        style={ styles.icon }
-                    />
+                   <Image
+                      source={ icon }
+                      style={ styles.icon }
+                   />
                 </View>
             }
             <View style={ styles.textContainer }>
@@ -42,13 +43,13 @@ const PickerItem: React.FC<PickerItemProps> = ({
             </View>
             {
                 icon &&
-                <View style={ styles.iconContainer } />
+                <View style={ styles.iconContainer }/>
             }
         </TouchableOpacity>
-    )
-}
+    );
+};
 
-const styles= StyleSheet.create({
+const styles = StyleSheet.create({
     itemContainer: {
         justifyContent: "center",
         alignItems: "center",
@@ -63,7 +64,7 @@ const styles= StyleSheet.create({
     },
     iconContainer: {
         flex: 0.25,
-        alignItems: "center",
+        alignItems: "center"
     },
     icon: {
         alignSelf: "center",
@@ -79,14 +80,14 @@ const styles= StyleSheet.create({
         ...GLOBAL_STYLE.containerTitleText,
         fontSize: GLOBAL_STYLE.containerTitleText.fontSize * 0.7,
         letterSpacing: GLOBAL_STYLE.containerTitleText.letterSpacing * 0.7,
-        textAlign: "center",
+        textAlign: "center"
     },
     subtitleText: {
         ...GLOBAL_STYLE.containerText,
         fontSize: GLOBAL_STYLE.containerText.fontSize * 0.8,
         letterSpacing: GLOBAL_STYLE.containerText.letterSpacing * 0.8,
-        textAlign: "center",
+        textAlign: "center"
     }
-})
+});
 
 export default React.memo(PickerItem);

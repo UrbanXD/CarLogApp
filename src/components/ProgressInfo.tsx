@@ -1,20 +1,28 @@
 import React from "react";
 import { SharedValue } from "react-native-reanimated";
-import { View, Text as TextRN, StyleSheet } from "react-native";
-import { Canvas, Skia, Path, Text, SkFont } from "@shopify/react-native-skia";
+import { StyleSheet, Text as TextRN, View } from "react-native";
+import { Canvas, Path, SkFont, Skia, Text } from "@shopify/react-native-skia";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
 
 interface ProgressInfoProps {
-    radius: number
-    strokeWidth: number
-    end: SharedValue<number>
-    font: SkFont
-    statusText: string
-    stepTitle: string
-    stepSubtitle?: string
+    radius: number;
+    strokeWidth: number;
+    end: SharedValue<number>;
+    font: SkFont;
+    statusText: string;
+    stepTitle: string;
+    stepSubtitle?: string;
 }
 
-const ProgressInfo: React.FC<ProgressInfoProps> = ({ radius, strokeWidth, end, font, statusText, stepTitle, stepSubtitle }) => {
+const ProgressInfo: React.FC<ProgressInfoProps> = ({
+    radius,
+    strokeWidth,
+    end,
+    font,
+    statusText,
+    stepTitle,
+    stepSubtitle
+}) => {
     const innerRadius = radius - strokeWidth / 2;
     const m = Skia.Matrix();
     m.translate(radius, radius);
@@ -31,7 +39,7 @@ const ProgressInfo: React.FC<ProgressInfoProps> = ({ radius, strokeWidth, end, f
     return (
         <View style={ styles.container }>
             <View style={ styles.circularProgressBarContainer }>
-                <Canvas style={{ flex: 1 }}>
+                <Canvas style={ { flex: 1 } }>
                     <Path
                         path={ path }
                         strokeWidth={ strokeWidth }
@@ -67,14 +75,14 @@ const ProgressInfo: React.FC<ProgressInfoProps> = ({ radius, strokeWidth, end, f
                 </TextRN>
                 {
                     stepSubtitle &&
-                        <TextRN style={ styles.subtitle }>
-                            { stepSubtitle }
-                        </TextRN>
+                    <TextRN style={ styles.subtitle }>
+                        { stepSubtitle }
+                    </TextRN>
                 }
             </View>
         </View>
-    )
-}
+    );
+};
 
 const useStyles = (radius: number) =>
     StyleSheet.create({
@@ -85,7 +93,7 @@ const useStyles = (radius: number) =>
         },
         circularProgressBarContainer: {
             width: radius * 2,
-            height: radius * 2,
+            height: radius * 2
         },
         titleContainer: {
             flex: 1,
@@ -102,6 +110,6 @@ const useStyles = (radius: number) =>
             fontFamily: "Gilroy-Medium",
             color: COLORS.gray1
         }
-    })
+    });
 
 export default ProgressInfo;

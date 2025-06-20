@@ -1,4 +1,4 @@
-import { askMediaLibraryPermission } from "./getPermissions.ts"
+import { askMediaLibraryPermission } from "./getPermissions.ts";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import { decode } from "base64-arraybuffer";
@@ -6,10 +6,10 @@ import { getFileExtension } from "../database/utils/getFileExtension.ts";
 import { getUUID } from "../database/utils/uuid.ts";
 
 export interface ImageType {
-    id: string
-    buffer: ArrayBuffer
-    fileExtension: string
-    mediaType: string
+    id: string;
+    buffer: ArrayBuffer;
+    fileExtension: string;
+    mediaType: string;
 }
 
 export const pickImage = async (options?: ImagePicker.ImagePickerOptions): Promise<Array<ImageType> | null> => {
@@ -35,7 +35,7 @@ export const pickImage = async (options?: ImagePicker.ImagePickerOptions): Promi
                     id: getUUID(),
                     buffer: decode(base64),
                     fileExtension: fileExtension === "jpeg" ? "jpg" : fileExtension,
-                    mediaType: img.mimeType ?? "image/jpeg",
+                    mediaType: img.mimeType ?? "image/jpeg"
                 };
             })
         );
@@ -46,4 +46,4 @@ export const pickImage = async (options?: ImagePicker.ImagePickerOptions): Promi
     }
 
     return null;
-}
+};

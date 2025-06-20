@@ -2,7 +2,7 @@ import React, { Context, createContext, useContext } from "react";
 import { SharedValue, useSharedValue } from "react-native-reanimated";
 
 interface ScreenScrollViewProviderValue {
-    offset: SharedValue<number>
+    offset: SharedValue<number>;
 }
 
 const ScreenScrollViewContext =
@@ -19,14 +19,14 @@ export const ScreenScrollViewProvider: React.FC<ScreenScrollViewProviderProps> =
 
     return (
         <ScreenScrollViewContext.Provider
-            value={{
+            value={ {
                 offset
-            }}
+            } }
         >
             { children }
         </ScreenScrollViewContext.Provider>
-    )
-}
+    );
+};
 
 export const useScreenScrollView = () =>
     useContext<ScreenScrollViewProviderValue>(
