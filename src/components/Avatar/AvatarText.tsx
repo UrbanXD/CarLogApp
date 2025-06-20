@@ -46,14 +46,14 @@ const AvatarText: React.FC<AvatarTextProps> = ({
         >
             {
                 onPressBadge &&
-                <Button.Icon
-                   icon={ ICON_NAMES.add }
-                   iconSize={ avatarSize / 6 }
-                   style={ styles.badge }
-                   backgroundColor={ color }
-                   iconColor={ backgroundColor }
-                   onPress={ onPressBadge }
-                />
+               <Button.Icon
+                  icon={ ICON_NAMES.add }
+                  iconSize={ avatarSize / 6 }
+                  style={ styles.badge }
+                  backgroundColor={ color }
+                  iconColor={ backgroundColor }
+                  onPress={ onPressBadge }
+               />
             }
             <Text
                 style={ styles.labelText }

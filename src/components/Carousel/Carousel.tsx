@@ -56,12 +56,12 @@ const Carousel: React.FC<CarouselProps> = ({
                     <React.Fragment key={ index }>
                         {
                             index === 0 &&
-                            <View style={ { width: SPACER } }/>
+                           <View style={ { width: SPACER } }/>
                         }
                         { renderItem(item, index, ITEM_SIZE, x) }
                         {
                             index === data.length - 1 &&
-                            <View style={ { width: SPACER } }/>
+                           <View style={ { width: SPACER } }/>
                         }
                     </React.Fragment>
             }

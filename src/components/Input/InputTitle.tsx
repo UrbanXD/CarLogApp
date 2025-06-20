@@ -22,17 +22,17 @@ const InputTitle: React.FC<InputTitleProps> = ({
                     }
                     {
                         optional &&
-                        <Text style={ styles.optionalText }>
-                           (opcionális)
-                        </Text>
+                       <Text style={ styles.optionalText }>
+                          (opcionális)
+                       </Text>
                     }
                 </Text>
             </View>
             {
                 subtitle &&
-                <Text style={ styles.inputInfoText }>
-                    { subtitle }
-                </Text>
+               <Text style={ styles.inputInfoText }>
+                   { subtitle }
+               </Text>
             }
         </View>
     );

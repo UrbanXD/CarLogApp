@@ -88,14 +88,14 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                 } }>
                     {
                         handleDeleteCar &&
-                        <Button.Icon
-                           icon={ ICON_NAMES.trashCan }
-                           iconSize={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
-                           backgroundColor={ COLORS.googleRed }
-                           iconColor={ COLORS.black }
-                           height={ FONT_SIZES.p2 * 2 }
-                           onPress={ handleDeleteCar }
-                        />
+                       <Button.Icon
+                          icon={ ICON_NAMES.trashCan }
+                          iconSize={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
+                          backgroundColor={ COLORS.googleRed }
+                          iconColor={ COLORS.black }
+                          height={ FONT_SIZES.p2 * 2 }
+                          onPress={ handleDeleteCar }
+                       />
                     }
                     <Button.Text
                         text="Módosítás"

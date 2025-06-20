@@ -32,10 +32,10 @@ const InputText: React.FC<InputTextProps> = ({
         <View style={ { flexDirection: "column", gap: SEPARATOR_SIZES.lightSmall } }>
             {
                 fieldNameText &&
-                <InputTitle
-                   title={ fieldNameText }
-                   subtitle={ fieldInfoText }
-                />
+               <InputTitle
+                  title={ fieldNameText }
+                  subtitle={ fieldInfoText }
+               />
             }
             {
                 <Controller

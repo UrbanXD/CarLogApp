@@ -23,12 +23,12 @@ const PickerItem: React.FC<PickerItemProps> = ({
                           style={ [styles.itemContainer, selected && styles.selectedItemContainer] }>
             {
                 icon &&
-                <View style={ styles.iconContainer }>
-                   <Image
-                      source={ icon }
-                      style={ styles.icon }
-                   />
-                </View>
+               <View style={ styles.iconContainer }>
+                  <Image
+                     source={ icon }
+                     style={ styles.icon }
+                  />
+               </View>
             }
             <View style={ styles.textContainer }>
                 <Text style={ styles.titleText }>
@@ -36,14 +36,14 @@ const PickerItem: React.FC<PickerItemProps> = ({
                 </Text>
                 {
                     subtitle &&
-                    <Text style={ styles.subtitleText }>
-                        { subtitle }
-                    </Text>
+                   <Text style={ styles.subtitleText }>
+                       { subtitle }
+                   </Text>
                 }
             </View>
             {
                 icon &&
-                <View style={ styles.iconContainer }/>
+               <View style={ styles.iconContainer }/>
             }
         </TouchableOpacity>
     );

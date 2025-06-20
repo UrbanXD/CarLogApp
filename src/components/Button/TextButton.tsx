@@ -72,48 +72,48 @@ const TextButton: React.FC<TextButtonProps> = ({
         >
             {
                 loadingIndicator && isLoading &&
-                <ActivityIndicator
-                   size={
-                       Platform.OS === "ios"
-                       ? "large"
-                       : styles.buttonContainer.height - SEPARATOR_SIZES.lightSmall
-                   }
-                   color={ !inverse ? textColor : backgroundColor }
-                />
+               <ActivityIndicator
+                  size={
+                      Platform.OS === "ios"
+                      ? "large"
+                      : styles.buttonContainer.height - SEPARATOR_SIZES.lightSmall
+                  }
+                  color={ !inverse ? textColor : backgroundColor }
+               />
             }
             {
                 text && ((loadingIndicator && !isLoading) || !loadingIndicator) &&
-                <>
-                    {
-                        (iconLeft || iconRight) &&
-                        <View style={ styles.sideSpacerContainer }>
-                            {
-                                iconLeft &&
-                                <Icon
-                                   icon={ iconLeft }
-                                   size={ fontSize * ICON_FONT_SIZE_SCALE * 0.85 }
-                                   color={ styles.buttonContainer.color }
-                                />
-                            }
-                        </View>
-                    }
-                   <Text numberOfLines={ 2 } style={ [styles.buttonText, textStyle] }>
-                       { text }
-                   </Text>
-                    {
-                        (iconLeft || iconRight) &&
-                        <View style={ styles.sideSpacerContainer }>
-                            {
-                                iconRight &&
-                                <Icon
-                                   icon={ iconRight }
-                                   size={ fontSize * ICON_FONT_SIZE_SCALE * 0.85 }
-                                   color={ styles.buttonContainer.color }
-                                />
-                            }
-                        </View>
-                    }
-                </>
+               <>
+                   {
+                       (iconLeft || iconRight) &&
+                      <View style={ styles.sideSpacerContainer }>
+                          {
+                              iconLeft &&
+                             <Icon
+                                icon={ iconLeft }
+                                size={ fontSize * ICON_FONT_SIZE_SCALE * 0.85 }
+                                color={ styles.buttonContainer.color }
+                             />
+                          }
+                      </View>
+                   }
+                  <Text numberOfLines={ 2 } style={ [styles.buttonText, textStyle] }>
+                      { text }
+                  </Text>
+                   {
+                       (iconLeft || iconRight) &&
+                      <View style={ styles.sideSpacerContainer }>
+                          {
+                              iconRight &&
+                             <Icon
+                                icon={ iconRight }
+                                size={ fontSize * ICON_FONT_SIZE_SCALE * 0.85 }
+                                color={ styles.buttonContainer.color }
+                             />
+                          }
+                      </View>
+                   }
+               </>
             }
         </TouchableOpacity>
     );

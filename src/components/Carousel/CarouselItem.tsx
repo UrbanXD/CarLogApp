@@ -59,9 +59,9 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                         </Text>
                         {
                             renderTopActionButton &&
-                            <View style={ styles.actionContainer }>
-                                { renderTopActionButton() }
-                            </View>
+                           <View style={ styles.actionContainer }>
+                               { renderTopActionButton() }
+                           </View>
                         }
                     </View>
                     <View style={ styles.bottomContainer }>
@@ -75,9 +75,9 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                         </View>
                         {
                             renderBottomActionButton &&
-                            <View style={ styles.actionContainer }>
-                                { renderBottomActionButton() }
-                            </View>
+                           <View style={ styles.actionContainer }>
+                               { renderBottomActionButton() }
+                           </View>
                         }
                     </View>
                 </Image>

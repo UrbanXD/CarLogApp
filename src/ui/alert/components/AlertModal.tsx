@@ -35,28 +35,28 @@ const AlertModal: React.FC<AlertModalProps> = ({
         <View style={ styles.container }>
             {
                 icon &&
-                <View style={ styles.iconContainer }>
-                   <Icon
-                      icon={ icon }
-                      size={ iconSize }
-                      backgroundColor={ color }
-                      style={ styles.icon }
-                   />
-                </View>
+               <View style={ styles.iconContainer }>
+                  <Icon
+                     icon={ icon }
+                     size={ iconSize }
+                     backgroundColor={ color }
+                     style={ styles.icon }
+                  />
+               </View>
             }
             <View style={ styles.contentContainer }>
                 <View style={ styles.textContainer }>
                     {
                         title &&
-                        <Text style={ styles.titleText }>
-                            { title }
-                        </Text>
+                       <Text style={ styles.titleText }>
+                           { title }
+                       </Text>
                     }
                     {
                         body &&
-                        <Text style={ styles.text }>
-                            { body }
-                        </Text>
+                       <Text style={ styles.text }>
+                           { body }
+                       </Text>
                     }
                 </View>
                 <View style={ styles.buttonContainer }>

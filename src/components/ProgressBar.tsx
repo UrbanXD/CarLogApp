@@ -28,7 +28,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
                             <View key={ step } style={ styles.timelineContainer }>
                                 {
                                     !isLastStep &&
-                                    <View style={ [styles.line, isVertical && styles.verticalLine] }/>
+                                   <View style={ [styles.line, isVertical && styles.verticalLine] }/>
                                 }
                                 <View
                                     style={ [

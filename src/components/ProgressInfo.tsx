@@ -75,9 +75,9 @@ const ProgressInfo: React.FC<ProgressInfoProps> = ({
                 </TextRN>
                 {
                     stepSubtitle &&
-                    <TextRN style={ styles.subtitle }>
-                        { stepSubtitle }
-                    </TextRN>
+                   <TextRN style={ styles.subtitle }>
+                       { stepSubtitle }
+                   </TextRN>
                 }
             </View>
         </View>

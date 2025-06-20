@@ -151,21 +151,21 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
             <View style={ styles.inputContainer }>
                 {
                     fieldNameText &&
-                    <InputTitle
-                       title={ fieldNameText }
-                       subtitle={ fieldInfoText }
-                       optional
-                    />
+                   <InputTitle
+                      title={ fieldNameText }
+                      subtitle={ fieldInfoText }
+                      optional
+                   />
                 }
                 {
                     !multipleSelection &&
-                    <>
-                       <Image
-                          source={ selectedImage }
-                          imageStyle={ [styles.chosenImage, { height: size.height * 1.25 }] }
-                       />
-                       <InputTitle title="Kiválasztható képek"/>
-                    </>
+                   <>
+                      <Image
+                         source={ selectedImage }
+                         imageStyle={ [styles.chosenImage, { height: size.height * 1.25 }] }
+                      />
+                      <InputTitle title="Kiválasztható képek"/>
+                   </>
                 }
                 <View style={ styles.secondRowContainer }>
                     <View style={ styles.uploadButtonContainer }>

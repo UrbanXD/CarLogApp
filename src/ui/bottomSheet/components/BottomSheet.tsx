@@ -41,12 +41,12 @@ const BottomSheet = forwardRef<BottomSheetModal, BottomSheetProps>((props, ref) 
         <BottomSheetView style={ styles.container }>
             {
                 title &&
-                <View>
-                    { closeButton }
-                   <Text style={ styles.titleText }>
-                       { title }
-                   </Text>
-                </View>
+               <View>
+                   { closeButton }
+                  <Text style={ styles.titleText }>
+                      { title }
+                  </Text>
+               </View>
             }
             <BottomSheetContext.Provider value={ useBottomSheet() }>
                 { content }

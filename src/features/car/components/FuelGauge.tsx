@@ -31,16 +31,16 @@ const FuelGauge: React.FC<FuelGaugeProps> = ({
                 </Text>
                 {
                     openEditForm &&
-                    <Button.Icon
-                       icon={ ICON_NAMES.pencil }
-                       iconSize={ FONT_SIZES.h3 }
-                       iconColor={ COLORS.gray1 }
-                       width={ FONT_SIZES.h3 }
-                       height={ FONT_SIZES.h3 }
-                       style={ { alignSelf: "flex-end" } }
-                       backgroundColor="transparent"
-                       onPress={ openEditForm }
-                    />
+                   <Button.Icon
+                      icon={ ICON_NAMES.pencil }
+                      iconSize={ FONT_SIZES.h3 }
+                      iconColor={ COLORS.gray1 }
+                      width={ FONT_SIZES.h3 }
+                      height={ FONT_SIZES.h3 }
+                      style={ { alignSelf: "flex-end" } }
+                      backgroundColor="transparent"
+                      onPress={ openEditForm }
+                   />
                 }
             </View>
             <View style={ styles.progressBar }>

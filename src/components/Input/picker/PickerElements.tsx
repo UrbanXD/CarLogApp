@@ -58,7 +58,7 @@ const PickerElements: React.FC<PickerElementsProps> = ({
             />
             {
                 isHorizontal && isCarousel && arg.index === (data.length - 1) &&
-                <View style={ styles.separator }/>
+               <View style={ styles.separator }/>
             }
         </React.Fragment>;
 
@@ -98,21 +98,21 @@ const PickerElements: React.FC<PickerElementsProps> = ({
         ] }>
             {
                 !setSearchTerm && isDropdown &&
-                <Icon
-                   icon={ ICON_NAMES.close }
-                   size={ FONT_SIZES.p1 }
-                   color={ COLORS.white }
-                   style={ { alignSelf: "center" } }
-                   onPress={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
-                />
+               <Icon
+                  icon={ ICON_NAMES.close }
+                  size={ FONT_SIZES.p1 }
+                  color={ COLORS.white }
+                  style={ { alignSelf: "center" } }
+                  onPress={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
+               />
             }
             {
                 setSearchTerm &&
-                <SearchBar
-                   term={ searchTerm }
-                   onTextChange={ (value) => setSearchTerm(value) }
-                   onClose={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
-                />
+               <SearchBar
+                  term={ searchTerm }
+                  onTextChange={ (value) => setSearchTerm(value) }
+                  onClose={ () => setIsDropdownContentVisible(!isDropdownContentVisible) }
+               />
             }
             {
                 isCarousel

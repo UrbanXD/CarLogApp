@@ -40,11 +40,11 @@ export const PickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
         >
             {
                 icon &&
-                <Icon
-                   icon={ icon }
-                   size={ styles.titleText.fontSize * 2 }
-                   color={ COLORS.white }
-                />
+               <Icon
+                  icon={ icon }
+                  size={ styles.titleText.fontSize * 2 }
+                  color={ COLORS.white }
+               />
             }
             <View>
                 <Text style={ styles.titleText } numberOfLines={ 1 }>
@@ -52,9 +52,9 @@ export const PickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
                 </Text>
                 {
                     subtitle &&
-                    <Text style={ styles.subtitleText } numberOfLines={ 1 }>
-                        { subtitle }
-                    </Text>
+                   <Text style={ styles.subtitleText } numberOfLines={ 1 }>
+                       { subtitle }
+                   </Text>
                 }
             </View>
             <Icon

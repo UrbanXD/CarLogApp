@@ -59,9 +59,9 @@ const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
             <View style={ styles.titleContainer }>
                 {
                     title &&
-                    <Text style={ styles.titleText }>
-                        { title }
-                    </Text>
+                   <Text style={ styles.titleText }>
+                       { title }
+                   </Text>
                 }
                 {
                     !subtitle

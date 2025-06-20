@@ -79,19 +79,19 @@ const AuthScreen: React.FC = () => {
             </View>
             {
                 !session && notVerifiedUser &&
-                <View style={ styles.verificationContainer }>
-                   <Button.Icon
-                      icon={ "email-seal-outline" }
-                      onPress={ openVerification }
-                      style={ styles.verificationIcon }
-                   />
-                   <Text
-                      onPress={ openVerification }
-                      style={ styles.verificationText }
-                   >
-                      Hitelesítés{ "\n" }folytatása
-                   </Text>
-                </View>
+               <View style={ styles.verificationContainer }>
+                  <Button.Icon
+                     icon={ "email-seal-outline" }
+                     onPress={ openVerification }
+                     style={ styles.verificationIcon }
+                  />
+                  <Text
+                     onPress={ openVerification }
+                     style={ styles.verificationText }
+                  >
+                     Hitelesítés{ "\n" }folytatása
+                  </Text>
+               </View>
             }
         </SafeAreaView>
     );

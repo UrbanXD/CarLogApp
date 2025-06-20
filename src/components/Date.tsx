@@ -22,18 +22,18 @@ const Date: React.FC<DateProps> = ({
         <View style={ styles.container }>
             {
                 dateUpperSubtitle &&
-                <Text style={ styles.dateSubtitleText }>
-                    { dateUpperSubtitle }
-                </Text>
+               <Text style={ styles.dateSubtitleText }>
+                   { dateUpperSubtitle }
+               </Text>
             }
             <Text style={ styles.dateTitleText }>
                 { dateTitle }
             </Text>
             {
                 dateUnderSubtitle &&
-                <Text style={ styles.dateSubtitleText }>
-                    { dateUnderSubtitle }
-                </Text>
+               <Text style={ styles.dateSubtitleText }>
+                   { dateUnderSubtitle }
+               </Text>
             }
         </View>
     );

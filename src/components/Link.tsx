@@ -16,17 +16,17 @@ const Link: React.FC<LinkProps> = ({
         <TouchableOpacity style={ styles.linkContainer }>
             {
                 text &&
-                <Text style={ styles.linkText }>
-                    { text }
-                </Text>
+               <Text style={ styles.linkText }>
+                   { text }
+               </Text>
             }
             {
                 icon &&
-                <Icon
-                   icon={ icon }
-                   size={ styles.linkText.fontSize * 1.35 }
-                   color={ styles.linkText.color }
-                />
+               <Icon
+                  icon={ icon }
+                  size={ styles.linkText.fontSize * 1.35 }
+                  color={ styles.linkText.color }
+               />
             }
         </TouchableOpacity>
     );

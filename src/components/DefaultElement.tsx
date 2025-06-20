@@ -37,13 +37,13 @@ const DefaultElement: React.FC<DefaultElementProps> = ({
             {
                 loading
                 ? loadingText &&
-                  <Text style={ styles.text }>
-                      { loadingText }
-                  </Text>
+                   <Text style={ styles.text }>
+                       { loadingText }
+                   </Text>
                 : text &&
-                  <Text style={ styles.text }>
-                      { text }
-                  </Text>
+                   <Text style={ styles.text }>
+                       { text }
+                   </Text>
             }
         </View>
     );

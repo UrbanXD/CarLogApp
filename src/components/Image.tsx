@@ -53,17 +53,17 @@ const Image: React.FC<ImageProps> = ({
             }
             {
                 children &&
-                <View style={ styles.contentContainer }>
-                    {
-                        overlay && !imageError &&
-                        <LinearGradient
-                           locations={ [0, 0.85] }
-                           colors={ [hexToRgba(COLORS.black, 0.15), hexToRgba(COLORS.black, 0.90)] }
-                           style={ styles.imageOverlay }
-                        />
-                    }
-                    { children }
-                </View>
+               <View style={ styles.contentContainer }>
+                   {
+                       overlay && !imageError &&
+                      <LinearGradient
+                         locations={ [0, 0.85] }
+                         colors={ [hexToRgba(COLORS.black, 0.15), hexToRgba(COLORS.black, 0.90)] }
+                         style={ styles.imageOverlay }
+                      />
+                   }
+                   { children }
+               </View>
             }
         </>
     );

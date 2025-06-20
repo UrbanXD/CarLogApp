@@ -7,17 +7,16 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Provider } from "react-redux";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { StatusBar } from "expo-status-bar";
-import MainHeader from "../components/Navigation/Header/MainHeader";
 import { BottomSheetProvider } from "../ui/bottomSheet/contexts/BottomSheetProvider.tsx";
 import { PortalProvider } from "@gorhom/portal";
 import Compactor from "../components/Compactor";
 import { AlertProvider } from "../ui/alert/contexts/AlertProvider.tsx";
-import SecondaryHeader from "../components/Navigation/Header/SecondaryHeader";
 import { ScreenScrollViewProvider } from "../contexts/ScreenScrollViewProvider.tsx";
 import { AuthProvider } from "../contexts/Auth/AuthProvider.tsx";
 import { useDatabase } from "../database/connector/Database.ts";
 import { DatabaseProvider } from "../contexts/DatabaseProvider.tsx";
 import { store } from "../database/redux/store.ts";
+import Header from "../components/Navigation/Header/Header.tsx";
 
 const Layout: React.FC = () => {
     const database = useDatabase();
@@ -46,19 +45,19 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="(main)"
                 options={ {
-                    header: () => <MainHeader/>
+                    header: () => <Header.Primary/>
                 } }
             />
             <Stack.Screen
                 name="(profile)/user"
                 options={ {
-                    header: () => <SecondaryHeader title="Profil"/>
+                    header: () => <Header.Secondary title="Profil"/>
                 } }
             />
             <Stack.Screen
                 name="(edit)/car"
                 options={ {
-                    header: () => <SecondaryHeader title="Autó Adatlap"/>
+                    header: () => <Header.Secondary title="Autó Adatlap"/>
                 } }
             />
         </Stack>

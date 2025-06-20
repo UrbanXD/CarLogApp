@@ -31,17 +31,17 @@ const MultiStepFormProgressInfo: React.FC = () => {
         <>
             {
                 ((!isFirstStep && !isLastStep) || (isFirstStep && isFirstCount) || (isLastStep && isLastCount)) &&
-                <ProgressInfo
-                   radius={ hp(6) }
-                   strokeWidth={ hp(1.25) }
-                   end={ end }
-                   font={ font }
-                   statusText={ `${ realStepsCount } / ${ currentStepText }` }
-                   stepTitle={ steps[currentStep]?.title || "" }
-                   stepSubtitle={ steps[currentStep + 1]?.title !== undefined
-                                  ? `Következik: ${ steps[currentStep + 1].title }`
-                                  : undefined }
-                />
+               <ProgressInfo
+                  radius={ hp(6) }
+                  strokeWidth={ hp(1.25) }
+                  end={ end }
+                  font={ font }
+                  statusText={ `${ realStepsCount } / ${ currentStepText }` }
+                  stepTitle={ steps[currentStep]?.title || "" }
+                  stepSubtitle={ steps[currentStep + 1]?.title !== undefined
+                                 ? `Következik: ${ steps[currentStep + 1].title }`
+                                 : undefined }
+               />
             }
         </>
     );

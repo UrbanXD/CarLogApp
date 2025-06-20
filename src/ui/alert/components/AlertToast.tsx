@@ -125,12 +125,12 @@ const AlertToast: React.FC<AlertToastProps> = ({
                     </Text>
                     {
                         body &&
-                        <Text
-                           numberOfLines={ 2 }
-                           style={ styles.text }
-                        >
-                            { body }
-                        </Text>
+                       <Text
+                          numberOfLines={ 2 }
+                          style={ styles.text }
+                       >
+                           { body }
+                       </Text>
                     }
                 </View>
             </TouchableOpacity>

@@ -53,13 +53,13 @@ const TextInput: React.FC<TextInputProps> = ({
                 ] }>
                 {
                     icon &&
-                    <View style={ styles.formFieldIconContainer }>
-                       <Icon
-                          icon={ icon }
-                          size={ hp(4.5) }
-                          color={ styles.textInput.color }
-                       />
-                    </View>
+                   <View style={ styles.formFieldIconContainer }>
+                      <Icon
+                         icon={ icon }
+                         size={ hp(4.5) }
+                         color={ styles.textInput.color }
+                      />
+                   </View>
                 }
                 <TextInputRN
                     placeholder={ placeholder }
@@ -75,33 +75,33 @@ const TextInput: React.FC<TextInputProps> = ({
                 />
                 {
                     isSecure &&
-                    <View style={ styles.formFieldIconContainer }>
-                       <Icon
-                          icon={ secure ? ICON_NAMES.eyeOff : ICON_NAMES.eye }
-                          size={ hp(3.25) }
-                          color={ ICON_COLORS.default }
-                          onPress={ changeSecure }
-                       />
-                    </View>
+                   <View style={ styles.formFieldIconContainer }>
+                      <Icon
+                         icon={ secure ? ICON_NAMES.eyeOff : ICON_NAMES.eye }
+                         size={ hp(3.25) }
+                         color={ ICON_COLORS.default }
+                         onPress={ changeSecure }
+                      />
+                   </View>
                 }
                 {
                     actionIcon &&
-                    <View style={ styles.formFieldIconContainer }>
-                       <Icon
-                          icon={ actionIcon }
-                          size={ hp(4.5) }
-                          color={ ICON_COLORS.default }
-                           // style={{ alignSelf: "center" }}
-                          onPress={ onAction }
-                       />
-                    </View>
+                   <View style={ styles.formFieldIconContainer }>
+                      <Icon
+                         icon={ actionIcon }
+                         size={ hp(4.5) }
+                         color={ ICON_COLORS.default }
+                          // style={{ alignSelf: "center" }}
+                         onPress={ onAction }
+                      />
+                   </View>
                 }
             </View>
             {
                 error &&
-                <Text style={ styles.errorText }>
-                    { error }
-                </Text>
+               <Text style={ styles.errorText }>
+                   { error }
+               </Text>
             }
         </>
     );

@@ -92,25 +92,25 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({
             </View>
             {
                 modal &&
-                <>
-                   <TouchableOpacity
-                      style={ styles.modalOverlay }
-                      activeOpacity={ 1 }
-                      onPress={ closeModal }
-                   />
-                   <View style={ styles.modalContainer }>
-                      <Alert.Modal
-                         icon={ modal.icon }
-                         title={ modal.title }
-                         body={ modal.body }
-                         color={ modal.color }
-                         accept={ acceptModal }
-                         acceptText={ modal.acceptText }
-                         dismiss={ closeModal }
-                         dismissText={ modal.dismissText }
-                      />
-                   </View>
-                </>
+               <>
+                  <TouchableOpacity
+                     style={ styles.modalOverlay }
+                     activeOpacity={ 1 }
+                     onPress={ closeModal }
+                  />
+                  <View style={ styles.modalContainer }>
+                     <Alert.Modal
+                        icon={ modal.icon }
+                        title={ modal.title }
+                        body={ modal.body }
+                        color={ modal.color }
+                        accept={ acceptModal }
+                        acceptText={ modal.acceptText }
+                        dismiss={ closeModal }
+                        dismissText={ modal.dismissText }
+                     />
+                  </View>
+               </>
             }
             { children }
         </AlertContext.Provider>

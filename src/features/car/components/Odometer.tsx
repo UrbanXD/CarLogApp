@@ -30,15 +30,15 @@ const Odometer: React.FC<OdometerProps> = ({
                 <Text style={ styles.titleText }>Kilóméteróra ({ measurement })</Text>
                 {
                     openEditForm &&
-                    <Button.Icon
-                       icon={ ICON_NAMES.pencil }
-                       iconSize={ FONT_SIZES.h3 }
-                       iconColor={ COLORS.gray1 }
-                       width={ FONT_SIZES.h3 }
-                       height={ FONT_SIZES.h3 }
-                       backgroundColor="transparent"
-                       onPress={ openEditForm }
-                    />
+                   <Button.Icon
+                      icon={ ICON_NAMES.pencil }
+                      iconSize={ FONT_SIZES.h3 }
+                      iconColor={ COLORS.gray1 }
+                      width={ FONT_SIZES.h3 }
+                      height={ FONT_SIZES.h3 }
+                      backgroundColor="transparent"
+                      onPress={ openEditForm }
+                   />
                 }
             </View>
             <View

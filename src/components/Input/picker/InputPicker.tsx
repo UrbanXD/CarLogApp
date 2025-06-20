@@ -133,10 +133,10 @@ const InputPicker: React.FC<InputPickerProps> = ({
         <View style={ styles.inputContainer }>
             {
                 fieldNameText &&
-                <InputTitle
-                   title={ fieldNameText }
-                   subtitle={ fieldInfoText }
-                />
+               <InputTitle
+                  title={ fieldNameText }
+                  subtitle={ fieldInfoText }
+               />
             }
             <Controller
                 control={ control }
