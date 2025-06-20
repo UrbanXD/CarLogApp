@@ -2,7 +2,6 @@ import { AbstractPowerSyncDatabase, PowerSyncDatabase } from "@powersync/react-n
 import { AppSchema, DatabaseType } from "./powersync/AppSchema.ts";
 import { SupabaseConnector } from "./SupabaseConnector.ts";
 import { Kysely, wrapPowerSyncWithKysely } from "@powersync/kysely-driver";
-import { Context, createContext, useContext } from "react";
 import { SupabaseStorageAdapter } from "./storage/SupabaseStorageAdapter.ts";
 import { PhotoAttachmentQueue } from "./powersync/PhotoAttachmentQueue.ts";
 import { AttachmentRecord } from "@powersync/attachments";
@@ -76,7 +75,3 @@ export class Database {
         await this.powersync.disconnectAndClear();
     }
 }
-
-const database = new Database();
-export const DatabaseContext = createContext(database);
-export const useDatabase = () => useContext<Database>(DatabaseContext as Context<Database>);

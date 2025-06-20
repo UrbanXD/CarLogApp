@@ -11,10 +11,10 @@ import { BottomSheetProvider } from "../ui/bottomSheet/contexts/BottomSheetProvi
 import { PortalProvider } from "@gorhom/portal";
 import Compactor from "../components/Compactor";
 import { AlertProvider } from "../ui/alert/contexts/AlertProvider.tsx";
-import { ScreenScrollViewProvider } from "../contexts/ScreenScrollViewProvider.tsx";
-import { AuthProvider } from "../contexts/Auth/AuthProvider.tsx";
-import { useDatabase } from "../database/connector/Database.ts";
-import { DatabaseProvider } from "../contexts/DatabaseProvider.tsx";
+import { ScreenScrollViewProvider } from "../contexts/screenScrollView/ScreenScrollViewProvider.tsx";
+import { AuthProvider } from "../contexts/auth/AuthProvider.tsx";
+import { useDatabase } from "../contexts/database/DatabaseContext.ts";
+import { DatabaseProvider } from "../contexts/database/DatabaseProvider.tsx";
 import { store } from "../database/redux/store.ts";
 import Header from "../components/Navigation/Header/Header.tsx";
 

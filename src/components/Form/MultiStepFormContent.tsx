@@ -1,5 +1,5 @@
 import React from "react";
-import { useMultiStepForm } from "../../contexts/MultiStepFormProvider.tsx";
+import { useMultiStepForm } from "../../contexts/multiStepForm/MultiStepFormContext.ts";
 import OnBoardingView from "../OnBoardingView.tsx";
 import { RenderComponent } from "../../../../../types/index.ts";
 

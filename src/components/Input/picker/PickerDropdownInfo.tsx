@@ -3,7 +3,7 @@ import { COLORS, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../cons
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import TextInput from "../text/TextInput.tsx";
 import Icon from "../../Icon.tsx";
-import { useAlert } from "../../../ui/alert/contexts/AlertProvider.tsx";
+import { useAlert } from "../../../ui/alert/contexts/AlertContext.ts";
 import { PickerDisabledToast } from "../../../ui/alert/presets/toast/index.ts";
 
 interface PickerDropdownInfoProps {

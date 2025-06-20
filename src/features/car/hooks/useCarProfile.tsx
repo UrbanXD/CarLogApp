@@ -1,7 +1,7 @@
-import { useAlert } from "../../../ui/alert/contexts/AlertProvider.tsx";
+import { useAlert } from "../../../ui/alert/contexts/AlertContext.ts";
 import useCars from "./useCars.ts";
 import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
-import { useDatabase } from "../../../database/connector/Database.ts";
+import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { deleteCar } from "../model/actions/deleteCar.ts";
 import { CarEditBottomSheet } from "../presets/bottomSheet/index.ts";
 import { useAppDispatch } from "../../../hooks/index.ts";

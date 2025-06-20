@@ -2,11 +2,11 @@ import React from "react";
 import EditForm from "../../../../components/Form/EditForm.tsx";
 import { useAppDispatch } from "../../../../hooks/index.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
-import { useAlert } from "../../../../ui/alert/contexts/AlertProvider.tsx";
+import { useAlert } from "../../../../ui/alert/contexts/AlertContext.ts";
 import { useForm } from "react-hook-form";
 import { EditCarFormFieldType, useEditCarFormProps } from "../../schemas/carSchema.ts";
 import useCarSteps from "../../hooks/useCarSteps.tsx";
-import { useDatabase } from "../../../../database/connector/Database.ts";
+import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { editCar } from "../../model/actions/editCar.ts";
 import { CarDto } from "../../model/types/index.ts";
 

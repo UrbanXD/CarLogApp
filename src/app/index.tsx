@@ -3,7 +3,7 @@ import { Redirect } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import AuthScreen from "../screens/AuthScreen";
 import { useBottomSheet } from "../ui/bottomSheet/contexts/BottomSheetContext.ts";
-import { useAuth } from "../contexts/Auth/AuthContext.ts";
+import { useAuth } from "../contexts/auth/AuthContext.ts";
 import { useFonts } from "expo-font";
 
 SplashScreen.preventAutoHideAsync();

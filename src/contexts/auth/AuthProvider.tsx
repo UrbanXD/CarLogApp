@@ -1,17 +1,20 @@
-import { useEffect, useState } from "react";
+import React, { ProviderProps, useEffect, useState } from "react";
+import { AuthContext } from "./AuthContext.ts";
+import { useAppDispatch, useAppSelector } from "../../hooks/index.ts";
+import { useDatabase } from "../database/DatabaseContext.ts";
+import { getUser, isUserLoading } from "../../features/user/model/selectors/index.ts";
 import { Session, User } from "@supabase/supabase-js";
-import { loadUser } from "../features/user/model/actions/loadUser.ts";
-import { useAppDispatch, useAppSelector } from "./index.ts";
+import { UserTableType } from "../../database/connector/powersync/AppSchema.ts";
+import { ImageType } from "../../utils/pickImage.ts";
+import { updateUser } from "../../features/user/model/actions/updateUser.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { BaseConfig } from "../constants/index.ts";
-import { useDatabase } from "../contexts/database/DatabaseContext.ts";
-import { UserTableType } from "../database/connector/powersync/AppSchema.ts";
-import { ImageType } from "../utils/pickImage.ts";
-import { loadCars } from "../features/car/model/actions/loadCars.ts";
-import { updateUser } from "../features/user/model/actions/updateUser.ts";
-import { getUser, isUserLoading } from "../features/user/model/selectors/index.ts";
+import { BaseConfig } from "../../constants/index.ts";
+import { loadUser } from "../../features/user/model/actions/loadUser.ts";
+import { loadCars } from "../../features/car/model/actions/loadCars.ts";
 
-export const useSession = () => {
+export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
+    children
+}) => {
     const dispatch = useAppDispatch();
     const database = useDatabase();
     const { supabaseConnector } = database;
@@ -117,17 +120,21 @@ export const useSession = () => {
         if(error) console.debug("refreshError", error);
     };
 
-    return {
-        session,
-        sessionLoading,
-        refreshSession,
-        user,
-        setUser,
-        userLoading,
-        notVerifiedUser,
-        fetchNotVerifiedUser,
-        updateNotVerifiedUser
-    };
+    return (
+        <AuthContext.Provider
+            value={ {
+                session,
+                sessionLoading,
+                refreshSession,
+                user,
+                setUser,
+                userLoading,
+                notVerifiedUser,
+                fetchNotVerifiedUser,
+                updateNotVerifiedUser
+            } }
+        >
+            { children }
+        </AuthContext.Provider>
+    );
 };
-
-export type UseSessionReturnType = ReturnType<typeof useSession>

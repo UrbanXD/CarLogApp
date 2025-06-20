@@ -7,7 +7,7 @@ import Divider from "../../../components/Divider";
 import LatestExpensesBlock from "./LatestExpensesBlock";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { ScreenScrollView } from "../../../components/ScreenScrollView.tsx";
-import { useAuth } from "../../../contexts/Auth/AuthContext.ts";
+import { useAuth } from "../../../contexts/auth/AuthContext.ts";
 
 const HomeScreen: React.FC = () => {
     const { user } = useAuth();

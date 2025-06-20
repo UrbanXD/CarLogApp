@@ -16,7 +16,7 @@ import { EditUserBottomSheet } from "../features/user/presets/bottomSheet/index.
 import { EDIT_USER_FORM_STEPS } from "../features/user/hooks/useEditUserSteps.tsx";
 import Avatar from "../components/Avatar/Avatar.ts";
 import { getLabelByName } from "../utils/getLabelByName.ts";
-import { useAuth } from "../contexts/Auth/AuthContext.ts";
+import { useAuth } from "../contexts/auth/AuthContext.ts";
 import { useUserManagement } from "../features/user/hooks/useUserManagement.ts";
 import { Redirect } from "expo-router";
 

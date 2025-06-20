@@ -1,6 +1,6 @@
 import React from "react";
 import { Control, UseFormResetField, UseFormTrigger } from "react-hook-form";
-import { MultiStepFormProvider } from "../../contexts/MultiStepFormProvider.tsx";
+import { MultiStepFormProvider } from "../../contexts/multiStepForm/MultiStepFormProvider.tsx";
 import MultiStepFormProgressInfo from "./MultiStepFormProgressInfo.tsx";
 import MultiStepFormContent from "./MultiStepFormContent.tsx";
 import MultiStepFormButtons from "./MultiStepFormButtons.tsx";

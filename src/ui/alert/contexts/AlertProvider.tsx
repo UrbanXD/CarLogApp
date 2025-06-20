@@ -1,21 +1,11 @@
-import React, { Context, createContext, ReactElement, useCallback, useContext, useMemo } from "react";
+import React, { ReactElement, useCallback, useMemo } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { COLORS, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
 import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
 import { AlertToastProps } from "../components/AlertToast.tsx";
 import { AlertModalProps } from "../components/AlertModal.tsx";
 import Alert from "../components/Alert.tsx";
-import { AddToastFunction, OpenModalFunction } from "../types/index.ts";
-
-interface AlertProviderValue {
-    addToast: AddToastFunction;
-    removeToast: (id: string) => void;
-    openModal: OpenModalFunction;
-    closeModal: () => void;
-}
-
-const AlertContext =
-    createContext<AlertProviderValue | null>(null);
+import { AlertContext } from "./AlertContext.ts";
 
 interface AlertProviderProps {
     children: ReactElement | null;
@@ -140,8 +130,3 @@ const styles = StyleSheet.create({
         width: "90%"
     }
 });
-
-export const useAlert = () =>
-    useContext<AlertProviderValue>(
-        AlertContext as Context<AlertProviderValue>
-    );

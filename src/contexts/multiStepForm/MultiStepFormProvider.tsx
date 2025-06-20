@@ -1,28 +1,8 @@
-import React, { Context, createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { Control, SubmitHandler, UseFormResetField, UseFormTrigger } from "react-hook-form";
+import React, { ReactNode, useEffect, useState } from "react";
+import { Control, UseFormResetField, UseFormTrigger } from "react-hook-form";
 import { Keyboard } from "react-native";
-import { ResultStep, Steps } from "../types/index.ts";
-
-interface MultiStepFormProviderValue {
-    steps: Steps;
-    control: Control<any>;
-    submitHandler: SubmitHandler<any>;
-    trigger: UseFormTrigger<any>;
-    resetField?: UseFormResetField<any>;
-    currentStep: number;
-    currentStepText: string;
-    realStepsCount: number;
-    isFirstCount: boolean;
-    isLastCount: boolean;
-    isFirstStep: boolean;
-    isLastStep: boolean;
-    goTo: (index: number) => void;
-    next: () => void;
-    back: () => void;
-    contentVisibleHeight?: number;
-}
-
-const MultiStepFormContext = createContext<MultiStepFormProviderValue | null>(null);
+import { ResultStep, Steps } from "../../types/index.ts";
+import { MultiStepFormContext } from "./MultiStepFormContext.ts";
 
 interface MultiStepFormProviderProps {
     children: ReactNode | null;
@@ -92,28 +72,28 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
 
     const getRealStepsCount = () => (formSteps.length - (!isFirstCount ? 1 : 0) - (!!resultStep ? 1 : 0));
 
-    return (<MultiStepFormContext.Provider
-        value={ {
-            steps: formSteps,
-            control,
-            submitHandler,
-            trigger,
-            resetField,
-            currentStep,
-            currentStepText: getCurrentStepText(),
-            realStepsCount: getRealStepsCount(),
-            isFirstCount,
-            isLastCount: !resultStep,
-            isFirstStep: isFirstStep(),
-            isLastStep: isLastStep(),
-            goTo,
-            next,
-            back,
-            contentVisibleHeight: contentVisibleAreaHeight
-        } }
-    >
-        { children }
-    </MultiStepFormContext.Provider>);
+    return (
+        <MultiStepFormContext.Provider
+            value={ {
+                steps: formSteps,
+                control,
+                submitHandler,
+                trigger,
+                resetField,
+                currentStep,
+                currentStepText: getCurrentStepText(),
+                realStepsCount: getRealStepsCount(),
+                isFirstCount,
+                isLastCount: !resultStep,
+                isFirstStep: isFirstStep(),
+                isLastStep: isLastStep(),
+                goTo,
+                next,
+                back,
+                contentVisibleHeight: contentVisibleAreaHeight
+            } }
+        >
+            { children }
+        </MultiStepFormContext.Provider>
+    );
 };
-
-export const useMultiStepForm = () => useContext<MultiStepFormProviderValue>(MultiStepFormContext as Context<MultiStepFormProviderValue>);

@@ -1,5 +1,5 @@
 import React from "react";
-import { useMultiStepForm } from "../../contexts/MultiStepFormProvider.tsx";
+import { useMultiStepForm } from "../../contexts/multiStepForm/MultiStepFormContext.ts";
 import { StyleSheet, View } from "react-native";
 import Button from "../Button/Button.ts";
 import { SEPARATOR_SIZES } from "../../constants/index.ts";

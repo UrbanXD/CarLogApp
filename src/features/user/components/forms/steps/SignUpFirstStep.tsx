@@ -3,7 +3,7 @@ import Input from "../../../../../components/Input/Input.ts";
 import { COLORS, GLOBAL_STYLE, ICON_NAMES } from "../../../../../constants/index.ts";
 import Button from "../../../../../components/Button/Button.ts";
 import TextDivider from "../../../../../components/TextDivider.tsx";
-import { useMultiStepForm } from "../../../../../contexts/MultiStepFormProvider.tsx";
+import { useMultiStepForm } from "../../../../../contexts/multiStepForm/MultiStepFormContext.ts";
 import { EmailStep } from "./EmailStep.tsx";
 import { StepProps } from "../../../../../types/index.ts";
 

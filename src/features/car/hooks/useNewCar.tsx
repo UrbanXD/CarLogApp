@@ -1,10 +1,10 @@
 import { AddCarFormFieldType, useAddCarFormProps } from "../schemas/carSchema.ts";
-import { useAlert } from "../../../ui/alert/contexts/AlertProvider.tsx";
+import { useAlert } from "../../../ui/alert/contexts/AlertContext.ts";
 import { useForm } from "react-hook-form";
 import useCarSteps from "./useCarSteps.tsx";
 import { CarCreateToast } from "../presets/toast/index.ts";
 import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
-import { useDatabase } from "../../../database/connector/Database.ts";
+import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { store } from "../../../database/redux/store.ts";
 import { addCar } from "../model/actions/addCar.ts";
 

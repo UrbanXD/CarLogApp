@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useMultiStepForm } from "../../contexts/MultiStepFormProvider.tsx";
+import { useMultiStepForm } from "../../contexts/multiStepForm/MultiStepFormContext.ts";
 import { useSharedValue, withTiming } from "react-native-reanimated";
 import { useFont } from "@shopify/react-native-skia";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";

@@ -5,7 +5,7 @@ import Picker from "../../Input/picker/Picker.tsx";
 import Avatar from "../../Avatar/Avatar.ts";
 import { router } from "expo-router";
 import { getLabelByName } from "../../../utils/getLabelByName.ts";
-import { useAuth } from "../../../contexts/Auth/AuthContext.ts";
+import { useAuth } from "../../../contexts/auth/AuthContext.ts";
 import { loadSelectedCar } from "../../../features/car/model/actions/loadSelectedCar.ts";
 import { selectCar } from "../../../features/car/model/actions/selectCar.ts";
 import { store } from "../../../database/redux/store.ts";

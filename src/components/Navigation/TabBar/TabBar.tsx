@@ -4,7 +4,7 @@ import TabBarIcon from "./TabBarIcon.tsx";
 import Animated, { Extrapolation, interpolate, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { COLORS, FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { useScreenScrollView } from "../../../contexts/ScreenScrollViewProvider.tsx";
+import { useScreenScrollView } from "../../../contexts/screenScrollView/ScreenScrollViewContext.ts";
 
 interface TabBarProps {
     tabBarStyle?: ViewStyle,

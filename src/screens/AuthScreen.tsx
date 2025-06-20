@@ -8,7 +8,7 @@ import Divider from "../components/Divider";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomSheet } from "../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { SignInBottomSheet, SignUpBottomSheet } from "../features/user/presets/bottomSheet/index.ts";
-import { useAuth } from "../contexts/Auth/AuthContext.ts";
+import { useAuth } from "../contexts/auth/AuthContext.ts";
 import { useUserManagement } from "../features/user/hooks/useUserManagement.ts";
 
 const AuthScreen: React.FC = () => {

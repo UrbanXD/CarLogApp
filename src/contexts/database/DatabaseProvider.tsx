@@ -1,6 +1,6 @@
 import React, { ReactNode, useMemo } from "react";
 import { PowerSyncContext } from "@powersync/react-native";
-import { useDatabase } from "../database/connector/Database.ts";
+import { useDatabase } from "./DatabaseContext.ts";
 
 interface PowerSyncProviderProps {
     children: ReactNode | null;
@@ -8,9 +8,7 @@ interface PowerSyncProviderProps {
 
 export const DatabaseProvider: React.FC<PowerSyncProviderProps> = ({ children }) => {
     const { powersync } = useDatabase();
-    const db = useMemo(() => {
-        return powersync;
-    }, []);
+    const db = useMemo(() => powersync, []);
 
     return (
         <PowerSyncContext.Provider
