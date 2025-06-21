@@ -1,10 +1,10 @@
 import React from "react";
 import IconButton from "../IconButton";
-import { ICON_NAMES } from "../../../constants/constants";
+import { ICON_NAMES } from "../../../constants/index.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface MultistepFormBackButtonProps {
-    onPress: () => void
+    onPress: () => void;
 }
 
 export const MultistepFormBackButton: React.FC<MultistepFormBackButtonProps> = ({
@@ -15,4 +15,4 @@ export const MultistepFormBackButton: React.FC<MultistepFormBackButtonProps> = (
         width={ hp(6) }
         height={ hp(6) }
         onPress={ onPress }
-    />
+    />;

@@ -1,1 +1,1 @@
-export { default } from "../../screens/HomeScreen/components/HomeScreen.tsx"
+export { default } from "../../screens/HomeScreen/components/HomeScreen.tsx";

@@ -1,13 +1,13 @@
 import React from "react";
 
-interface ComponentsProps<P>{
-    Component: React.FC<P>
-    props?: P
+interface ComponentsProps<P> {
+    Component: React.FC<P>;
+    props?: P;
 }
 
 interface CompactorProps {
-    components: Array<ComponentsProps<any>>
-    children?: React.ReactNode
+    components: Array<ComponentsProps<any>>;
+    children?: React.ReactNode;
 
 }
 
@@ -22,8 +22,9 @@ const Compactor: React.FC<CompactorProps> = ({
                     <Component { ...props }>
                         { children }
                     </Component>
-            , children)
+                , children
+            )
         }
-    </>
+    </>;
 
 export default Compactor;

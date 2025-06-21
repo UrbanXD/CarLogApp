@@ -1,4 +1,4 @@
-import React, {ReactElement, useEffect, useRef} from "react";
+import React, { ReactElement, useEffect, useRef } from "react";
 import { ImageSourcePropType, useWindowDimensions, View } from "react-native";
 import Animated, { SharedValue, useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
@@ -13,12 +13,12 @@ export interface CarouselItemType {
 }
 
 export interface CarouselProps {
-    data: Array<any>
-    renderItem: (item: any, index: number, size: number, x: SharedValue<number>) => ReactElement
-    renderDefaultItem?: (size: number, spacerWidth: number) => ReactElement
-    contentWidth?: number
-    itemSizePercentage?: number
-    spacer?: number
+    data: Array<any>;
+    renderItem: (item: any, index: number, size: number, x: SharedValue<number>) => ReactElement;
+    renderDefaultItem?: (size: number, spacerWidth: number) => ReactElement;
+    contentWidth?: number;
+    itemSizePercentage?: number;
+    spacer?: number;
 }
 
 const Carousel: React.FC<CarouselProps> = ({
@@ -29,22 +29,22 @@ const Carousel: React.FC<CarouselProps> = ({
     itemSizePercentage = 0.8,
     spacer
 }) => {
-    const AnimatedFlatList = Animated.createAnimatedComponent(FlatList)
+    const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
     const flatlistRef = useRef<FlatList>(null);
 
-    const width =  contentWidth ?? useWindowDimensions().width;
+    const width = contentWidth ?? useWindowDimensions().width;
     const ITEM_SIZE = width * itemSizePercentage;
     const SPACER = spacer ?? (width - ITEM_SIZE) / 2;
 
-    const x    = useSharedValue(0);
+    const x = useSharedValue(0);
     const onScroll = useAnimatedScrollHandler({
         onScroll: event => {
             x.value = event.contentOffset.x;
-        },
+        }
     }, []);
 
     useEffect(() => {
-        flatlistRef.current?.scrollToOffset({ animated: false, offset:x.value })
+        flatlistRef.current?.scrollToOffset({ animated: false, offset: x.value });
     }, [data]);
 
     return (
@@ -56,12 +56,12 @@ const Carousel: React.FC<CarouselProps> = ({
                     <React.Fragment key={ index }>
                         {
                             index === 0 &&
-                                <View style={{ width: SPACER }} />
+                           <View style={ { width: SPACER } }/>
                         }
                         { renderItem(item, index, ITEM_SIZE, x) }
                         {
                             index === data.length - 1 &&
-                                <View style={{ width: SPACER }} />
+                           <View style={ { width: SPACER } }/>
                         }
                     </React.Fragment>
             }
@@ -77,12 +77,12 @@ const Carousel: React.FC<CarouselProps> = ({
             bounces={ false }
             bouncesZoom={ false }
             renderToHardwareTextureAndroid
-            contentContainerStyle={{
+            contentContainerStyle={ {
                 overflow: "hidden",
                 flexGrow: 1
-            }}
+            } }
         />
-    )
+    );
 };
 
 export default Carousel;

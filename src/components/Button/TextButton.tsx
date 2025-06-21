@@ -1,33 +1,42 @@
 import React from "react";
-import { ActivityIndicator, ColorValue, ImageSourcePropType, Platform, StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native";
+import {
+    ActivityIndicator,
+    Platform,
+    StyleSheet,
+    Text,
+    TextStyle,
+    TouchableOpacity,
+    View,
+    ViewStyle
+} from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/constants";
-import { Colors } from "../../constants/colors/Colors.ts";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
 import Icon from "../Icon";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
+import { Color, ImageSource } from "../../types/index.ts";
 
 interface TextButtonProps {
-    text?: string
-    fontSize?: number
-    textColor?: ColorValue
-    backgroundColor?: ColorValue
-    width?: number
-    height?: number
-    iconLeft?: ImageSourcePropType | string
-    iconRight?: ImageSourcePropType | string
-    textStyle?: StyleProp<TextStyle>
-    style?: StyleProp<ViewStyle>
-    inverse?: boolean
-    disabled?: boolean
-    loadingIndicator?: boolean
-    onPress: () => void
+    text?: string;
+    fontSize?: number;
+    textColor?: Color;
+    backgroundColor?: Color;
+    width?: number;
+    height?: number;
+    iconLeft?: ImageSource;
+    iconRight?: ImageSource;
+    textStyle?: TextStyle;
+    style?: ViewStyle;
+    inverse?: boolean;
+    disabled?: boolean;
+    loadingIndicator?: boolean;
+    onPress: () => void;
 }
 
 const TextButton: React.FC<TextButtonProps> = ({
     text,
     fontSize = FONT_SIZES.h3,
-    backgroundColor = Colors.fuelYellow,
-    textColor = getContrastingColor(backgroundColor, Colors.white, Colors.black),
+    backgroundColor = COLORS.fuelYellow,
+    textColor = getContrastingColor(backgroundColor, COLORS.white, COLORS.black),
     height = hp(6),
     width,
     iconLeft,
@@ -53,7 +62,7 @@ const TextButton: React.FC<TextButtonProps> = ({
         setIsLoading(true);
         await onPress();
         setIsLoading(false);
-    }
+    };
 
     return (
         <TouchableOpacity
@@ -63,57 +72,57 @@ const TextButton: React.FC<TextButtonProps> = ({
         >
             {
                 loadingIndicator && isLoading &&
-                <ActivityIndicator
-                    size={
-                        Platform.OS === "ios"
-                            ? "large"
-                            : styles.buttonContainer.height - SEPARATOR_SIZES.lightSmall
-                    }
-                    color={ !inverse ? textColor : backgroundColor }
-                />
+               <ActivityIndicator
+                  size={
+                      Platform.OS === "ios"
+                      ? "large"
+                      : styles.buttonContainer.height - SEPARATOR_SIZES.lightSmall
+                  }
+                  color={ !inverse ? textColor : backgroundColor }
+               />
             }
             {
                 text && ((loadingIndicator && !isLoading) || !loadingIndicator) &&
-                <>
-                    {
-                        (iconLeft || iconRight) &&
-                        <View style={ styles.sideSpacerContainer }>
-                            {
-                                iconLeft &&
-                                <Icon
-                                    icon={ iconLeft }
-                                    size={ fontSize * ICON_FONT_SIZE_SCALE * 0.85 }
-                                    color={ styles.buttonContainer.color }
-                                />
-                            }
-                        </View>
-                    }
-                    <Text numberOfLines={ 2 } style={ [styles.buttonText, textStyle] } >
-                        { text }
-                    </Text>
-                    {
-                        (iconLeft || iconRight) &&
-                        <View style={ styles.sideSpacerContainer }>
-                            {
-                                iconRight &&
-                                <Icon
-                                    icon={ iconRight }
-                                    size={ fontSize * ICON_FONT_SIZE_SCALE * 0.85 }
-                                    color={ styles.buttonContainer.color }
-                                />
-                            }
-                        </View>
-                    }
-                </>
+               <>
+                   {
+                       (iconLeft || iconRight) &&
+                      <View style={ styles.sideSpacerContainer }>
+                          {
+                              iconLeft &&
+                             <Icon
+                                icon={ iconLeft }
+                                size={ fontSize * ICON_FONT_SIZE_SCALE * 0.85 }
+                                color={ styles.buttonContainer.color }
+                             />
+                          }
+                      </View>
+                   }
+                  <Text numberOfLines={ 2 } style={ [styles.buttonText, textStyle] }>
+                      { text }
+                  </Text>
+                   {
+                       (iconLeft || iconRight) &&
+                      <View style={ styles.sideSpacerContainer }>
+                          {
+                              iconRight &&
+                             <Icon
+                                icon={ iconRight }
+                                size={ fontSize * ICON_FONT_SIZE_SCALE * 0.85 }
+                                color={ styles.buttonContainer.color }
+                             />
+                          }
+                      </View>
+                   }
+               </>
             }
         </TouchableOpacity>
-    )
-}
+    );
+};
 
 export const useButtonStyles = (
-    primaryColor: ColorValue,
-    secondaryColor: ColorValue,
-    width: number | undefined ,
+    primaryColor: Color,
+    secondaryColor: Color,
+    width: number | undefined,
     height: number,
     fontSize: number
 ) =>
@@ -146,8 +155,8 @@ export const useButtonStyles = (
             flex: 0.15,
             height: "100%",
             justifyContent: "center",
-            alignItems: "center",
+            alignItems: "center"
         }
-    })
+    });
 
 export default TextButton;

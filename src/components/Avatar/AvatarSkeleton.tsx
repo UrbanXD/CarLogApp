@@ -1,47 +1,45 @@
 import React from "react";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { Colors } from "../../constants/colors/index.ts";
+import { COLORS } from "../../constants/index.ts";
 import getContrastingColor from "../../utils/colors/getContrastingColor.ts";
-import { ColorValue, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
+import { Color } from "../../types/index.ts";
 
 interface AvatarSkeletonProps {
-    avatarSize?: number
-    color?: ColorValue
-    backgroundColor?: ColorValue | string
-    borderColor?: ColorValue | string
-    style?: StyleProp<ViewStyle>
+    avatarSize?: number;
+    color?: Color;
+    backgroundColor?: Color;
+    borderColor?: Color;
+    style?: ViewStyle;
 }
 
 const AvatarSkeleton: React.FC<AvatarSkeletonProps> = ({
     avatarSize = hp(5),
-    backgroundColor = Colors.black5,
-    color = getContrastingColor(backgroundColor, Colors.white, Colors.black),
+    backgroundColor = COLORS.black5,
+    color = getContrastingColor(backgroundColor, COLORS.white, COLORS.black),
     borderColor,
     style
 }) => {
     const BORDER_WIDTH = hp(1);
-    const styles =
-        useStyles(
-            borderColor ? avatarSize + BORDER_WIDTH : avatarSize,
-            color,
-            backgroundColor,
-            borderColor,
-            borderColor ? BORDER_WIDTH : 0
-        );
+    const styles = useStyles(
+        borderColor ? avatarSize + BORDER_WIDTH : avatarSize,
+        color,
+        backgroundColor,
+        borderColor,
+        borderColor ? BORDER_WIDTH : 0
+    );
 
     return (
-        <View
-            style={ [styles.container, style] }
-        />
-    )
-}
+        <View style={ [styles.container, style] }/>
+    );
+};
 
 const useStyles = (
     avatarSize: number,
-    color: ColorValue | string,
-    backgroundColor: ColorValue | string,
-    borderColor?: ColorValue | string,
-    borderWidth?: number,
+    color: Color,
+    backgroundColor: Color,
+    borderColor?: Color,
+    borderWidth?: number
 ) => {
     return StyleSheet.create({
         container: {
@@ -55,6 +53,6 @@ const useStyles = (
             borderColor
         }
     });
-}
+};
 
 export default AvatarSkeleton;

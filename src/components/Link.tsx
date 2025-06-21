@@ -1,7 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import { FONT_SIZES } from "../constants/constants";
-import { Colors } from "../constants/colors/Colors.ts";
+import { COLORS, FONT_SIZES } from "../constants/index.ts";
 import Icon from "./Icon";
 
 interface LinkProps {
@@ -17,21 +16,21 @@ const Link: React.FC<LinkProps> = ({
         <TouchableOpacity style={ styles.linkContainer }>
             {
                 text &&
-                <Text style={ styles.linkText }>
-                    { text }
-                </Text>
+               <Text style={ styles.linkText }>
+                   { text }
+               </Text>
             }
             {
                 icon &&
-                <Icon
-                    icon={ icon }
-                    size={ styles.linkText.fontSize * 1.35 }
-                    color={ styles.linkText.color }
-                />
+               <Icon
+                  icon={ icon }
+                  size={ styles.linkText.fontSize * 1.35 }
+                  color={ styles.linkText.color }
+               />
             }
         </TouchableOpacity>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     linkContainer: {
@@ -42,8 +41,8 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
         textAlign: "center",
-        color: Colors.fuelYellow,
-    },
-})
+        color: COLORS.fuelYellow
+    }
+});
 
 export default Link;

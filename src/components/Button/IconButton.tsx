@@ -1,28 +1,27 @@
 import React from "react";
-import { ColorValue, ImageSourcePropType, StyleProp, StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { Colors } from "../../constants/colors/Colors.ts";
+import { StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
 import Icon from "../Icon";
-import { FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/constants";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE } from "../../constants/index.ts";
+import { Color, ImageSource } from "../../types/index.ts";
 
 interface IconButtonProps {
-    icon: ImageSourcePropType | string
-    iconSize?: number
-    iconColor?: ColorValue
-    backgroundColor?: ColorValue
-    width?: number
-    height?: number
-    style?: StyleProp<ViewStyle>
-    inverse?: boolean
-    disabled?: boolean
-    onPress: () => void
+    icon: ImageSource;
+    iconSize?: number;
+    iconColor?: Color;
+    backgroundColor?: Color;
+    width?: number;
+    height?: number;
+    style?: ViewStyle;
+    inverse?: boolean;
+    disabled?: boolean;
+    onPress: () => void;
 }
 
 export const IconButton: React.FC<IconButtonProps> = ({
     icon,
     iconSize = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE,
-    iconColor = Colors.black,
-    backgroundColor = Colors.fuelYellow,
+    iconColor = COLORS.black,
+    backgroundColor = COLORS.fuelYellow,
     width = iconSize * 1.5,
     height = iconSize * 1.5,
     style,
@@ -49,14 +48,14 @@ export const IconButton: React.FC<IconButtonProps> = ({
                 color={ styles.buttonContainer.color }
             />
         </TouchableOpacity>
-    )
-}
+    );
+};
 
 export const useButtonStyles = (
-    primaryColor: ColorValue,
-    secondaryColor: ColorValue,
+    primaryColor: Color,
+    secondaryColor: Color,
     width: number,
-    height: number,
+    height: number
 ) =>
     StyleSheet.create({
         buttonContainer: {
@@ -67,8 +66,8 @@ export const useButtonStyles = (
             height: height,
             backgroundColor: primaryColor,
             color: secondaryColor,
-            borderRadius: height / 2,
+            borderRadius: height / 2
         }
-    })
+    });
 
 export default IconButton;

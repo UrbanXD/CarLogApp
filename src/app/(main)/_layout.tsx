@@ -1,63 +1,63 @@
-import { Tabs } from 'expo-router';
+import { Tabs } from "expo-router";
 import React from "react";
-import { ICON_NAMES } from "../../constants/constants";
-import TabBar from "../../features/Navigation/components/TabBar/TabBar";
+import { ICON_NAMES } from "../../constants/index.ts";
+import TabBar from "../../components/Navigation/TabBar/TabBar";
 
 const TabLayout: React.FC = () => {
     return (
         <Tabs
             tabBar={ (props) => <TabBar { ...props } /> }
-            screenOptions={{
+            screenOptions={ {
                 headerShown: false,
                 animation: "none"
-            }}
+            } }
         >
             <Tabs.Screen
                 name="index"
-                options={{
+                options={ {
                     title: "Főoldal",
                     tabBarIcon: () =>
                         JSON.stringify({
                             "inactive": ICON_NAMES.homeOutline,
                             "active": ICON_NAMES.home
                         })
-                }}
+                } }
             />
             <Tabs.Screen
                 name="workbook"
-                options={{
+                options={ {
                     title: "Munkakönyv",
                     tabBarIcon: () =>
                         JSON.stringify({
                             "inactive": ICON_NAMES.notebookOutline,
                             "active": ICON_NAMES.notebook
                         })
-                }}
+                } }
             />
             <Tabs.Screen
                 name="service_log"
-                options={{
+                options={ {
                     title: "Szervízkönyv",
                     tabBarIcon: () =>
                         JSON.stringify({
                             "inactive": ICON_NAMES.serviceOutline,
                             "active": ICON_NAMES.service
                         })
-                }}
+                } }
             />
             <Tabs.Screen
                 name="expenses"
-                options={{
+                options={ {
                     title: "Pénzügyek",
                     tabBarIcon: () =>
                         JSON.stringify({
                             "inactive": ICON_NAMES.expensesOutline,
                             "active": ICON_NAMES.expenses
                         })
-                }}
+                } }
             />
         </Tabs>
     );
-}
+};
 
 export default TabLayout;
