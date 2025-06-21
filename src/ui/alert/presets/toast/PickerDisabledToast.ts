@@ -1,4 +1,4 @@
-import { ToastMessage, ToastMessages } from "../../types/index.ts";
+import { ToastMessage, ToastMessages } from "../../model/types/index.ts";
 
 const warning: ToastMessage = (disabledText?: string) => {
     return {

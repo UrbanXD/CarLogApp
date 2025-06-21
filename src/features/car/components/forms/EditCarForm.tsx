@@ -2,13 +2,13 @@ import React from "react";
 import EditForm from "../../../../components/Form/EditForm.tsx";
 import { useAppDispatch } from "../../../../hooks/index.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
-import { useAlert } from "../../../../ui/alert/contexts/AlertContext.ts";
 import { useForm } from "react-hook-form";
 import { EditCarFormFieldType, useEditCarFormProps } from "../../schemas/carSchema.ts";
 import useCarSteps from "../../hooks/useCarSteps.tsx";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { editCar } from "../../model/actions/editCar.ts";
 import { CarDto } from "../../model/types/index.ts";
+import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 
 export interface EditCarFormProps {
     car: CarDto;
@@ -22,7 +22,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
     const dispatch = useAppDispatch();
     const database = useDatabase();
     const { dismissBottomSheet } = useBottomSheet();
-    const { addToast } = useAlert();
+    const { openToast } = useAlert();
 
     const editCarFormFieldType: EditCarFormFieldType = {
         ...car,
@@ -48,7 +48,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
 
                 const step = steps[stepIndex ?? 0];
                 if(steps[stepIndex] && step.editToastMessages) {
-                    addToast(step.editToastMessages.success());
+                    openToast(step.editToastMessages.success());
                 }
                 dismissBottomSheet();
             } catch(e) {

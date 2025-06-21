@@ -10,13 +10,14 @@ import { StatusBar } from "expo-status-bar";
 import { BottomSheetProvider } from "../ui/bottomSheet/contexts/BottomSheetProvider.tsx";
 import { PortalProvider } from "@gorhom/portal";
 import Compactor from "../components/Compactor";
-import { AlertProvider } from "../ui/alert/contexts/AlertProvider.tsx";
 import { ScreenScrollViewProvider } from "../contexts/screenScrollView/ScreenScrollViewProvider.tsx";
 import { AuthProvider } from "../contexts/auth/AuthProvider.tsx";
 import { useDatabase } from "../contexts/database/DatabaseContext.ts";
 import { DatabaseProvider } from "../contexts/database/DatabaseProvider.tsx";
 import { store } from "../database/redux/store.ts";
 import Header from "../components/Navigation/Header/Header.tsx";
+import ToastManager from "../ui/alert/components/ToastManager.tsx";
+import ModalManager from "../ui/alert/components/ModalManager.tsx";
 
 const Layout: React.FC = () => {
     const database = useDatabase();
@@ -74,7 +75,8 @@ const RootLayout: React.FC = () =>
             { Component: PortalProvider },
             { Component: GestureHandlerRootView, props: { style: { flex: 1 } } },
             { Component: AuthProvider },
-            { Component: AlertProvider },
+            { Component: ToastManager },
+            { Component: ModalManager },
             { Component: BottomSheetModalProvider },
             { Component: BottomSheetProvider }
         ] }>

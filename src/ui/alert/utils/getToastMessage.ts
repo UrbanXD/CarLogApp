@@ -1,5 +1,5 @@
 import { AlertToastProps } from "../components/AlertToast.tsx";
-import { ToastMessages } from "../types/index.ts";
+import { ToastMessages } from "../model/types/index.ts";
 
 export const getToastMessage: (
     args: {

@@ -1,11 +1,11 @@
 import React, { createRef, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useAlert } from "../../alert/contexts/AlertContext.ts";
 import BottomSheetBackdrop from "../components/BottomSheetBackdrop.tsx";
 import BottomSheet from "../components/BottomSheet.tsx";
 import { KeyboardController } from "react-native-keyboard-controller";
 import { BottomSheetContext, BottomSheetType, OpenBottomSheetArgs } from "./BottomSheetContext.ts";
 import { BottomSheetLeavingModal } from "../presets/modal/index.ts";
+import { useAlert } from "../../alert/hooks/useAlert.ts";
 
 interface BottomSheetProviderProps {
     children: ReactNode | null;

@@ -1,5 +1,5 @@
 import { RenderComponent } from "./RenderComponent.ts";
-import { ToastMessages } from "../ui/alert/types/index.ts";
+import { ToastMessages } from "../ui/alert/model/types/index.ts";
 import { ReactNode } from "react";
 import { Control, UseFormGetValues, UseFormResetField } from "react-hook-form";
 

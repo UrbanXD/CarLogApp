@@ -1,38 +1,31 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import {
-    ALERT_COLORS,
-    ALERT_ICONS,
-    ALERT_TITLES,
-    COLORS,
-    FONT_SIZES,
-    SEPARATOR_SIZES
-} from "../../../constants/index.ts";
+import { ALERT_COLORS, ALERT_ICONS, COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import Icon from "../../../components/Icon.tsx";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { AlertType } from "../types/index.ts";
+import { AlertType, Toast } from "../model/types/index.ts";
+import { useAlert } from "../hooks/useAlert.ts";
 
-export interface AlertToastProps {
-    type?: AlertType,
-    title?: string,
-    body?: string,
-    duration?: number,
-    close?: () => void
-}
+export type AlertToastProps = {
+    toast: Toast
+};
 
-const AlertToast: React.FC<AlertToastProps> = ({
-    type = "info",
-    title = ALERT_TITLES[type],
-    body,
-    duration = 4000,
-    close
-}) => {
+const AlertToast: React.FC<AlertToastProps> = ({ toast }) => {
+    const {
+        id,
+        type,
+        title,
+        body,
+        duration
+    } = toast;
+    const { closeToast } = useAlert();
+
     const { width } = useWindowDimensions();
 
     const opacity = useSharedValue(0.5);
     const x = useSharedValue(-width / 2);
-    const height = !body ? hp(8) : hp(10);
+    const height = useMemo(() => (!body ? hp(8) : hp(10)), [body]);
     const [removable, setRemovable] = useState(false);
 
     const intervalRef = useRef<NodeJS.Timeout>();
@@ -93,11 +86,7 @@ const AlertToast: React.FC<AlertToastProps> = ({
     useEffect(() => {
         if(removable) {
             endAnimation();
-            const timeout = setTimeout(() => {
-                if(close) {
-                    close();
-                }
-            }, config.duration);
+            const timeout = setTimeout(() => closeToast(id), config.duration);
 
             return () => clearTimeout(timeout);
         }

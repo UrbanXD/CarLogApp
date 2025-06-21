@@ -1,5 +1,4 @@
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
-import { useAlert } from "../../../ui/alert/contexts/AlertContext.ts";
 import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { AVATAR_COLOR, BaseConfig } from "../../../constants/index.ts";
@@ -21,9 +20,10 @@ import { router } from "expo-router";
 import { SignInFormFieldType, SignUpFormFieldType } from "../schemas/userSchema.tsx";
 import { useAuth } from "../../../contexts/auth/AuthContext.ts";
 import { UserTableType } from "../../database/connector/powersync/AppSchema.ts";
-import { ToastMessages } from "../../../ui/alert/types/index.ts";
+import { ToastMessages } from "../../../ui/alert/model/types/index.ts";
 import getImageState from "../../../database/utils/getImageState.ts";
 import { getPathFromImageType } from "../../../utils/getPathFromImageType.ts";
+import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 
 export type SignUpFunction = (user: SignUpFormFieldType) => Promise<void>
 export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
@@ -38,7 +38,7 @@ export const useUserManagement = () => {
     const database = useDatabase();
     const { supabaseConnector, attachmentQueue, userDAO } = database;
     const { session, user, setUser, updateNotVerifiedUser, refreshSession } = useAuth();
-    const { addToast } = useAlert();
+    const { openToast } = useAlert();
     const { openBottomSheet, dismissAllBottomSheet } = useBottomSheet();
 
     GoogleSignin.configure({
@@ -50,7 +50,7 @@ export const useUserManagement = () => {
         const handleSignUpVerification: HandleVerificationOtpType =
             async (errorCode) => {
                 if(errorCode) {
-                    return addToast(
+                    return openToast(
                         getToastMessage({
                             messages: SignUpToast,
                             error: { code: errorCode },
@@ -59,7 +59,7 @@ export const useUserManagement = () => {
                     );
                 }
 
-                addToast(SignUpToast.success());
+                openToast(SignUpToast.success());
                 dismissAllBottomSheet();
             };
 
@@ -133,7 +133,7 @@ export const useUserManagement = () => {
                 });
             }
         } catch(error) {
-            addToast(
+            openToast(
                 getToastMessage({
                     messages: SignUpToast,
                     error
@@ -170,7 +170,7 @@ export const useUserManagement = () => {
 
             // login tortent igy a nevet ne mentsuk le
             if(alreadyRegistered) {
-                addToast(SignInToast.success());
+                openToast(SignInToast.success());
                 return dismissAllBottomSheet();
             }
 
@@ -184,10 +184,10 @@ export const useUserManagement = () => {
                 avatarImage: null
             });
 
-            addToast(SignUpToast.success());
+            openToast(SignUpToast.success());
             dismissAllBottomSheet();
         } catch(error) {
-            addToast(
+            openToast(
                 getToastMessage({
                     messages: GoogleAuthToast,
                     error
@@ -212,10 +212,10 @@ export const useUserManagement = () => {
                 throw error;
             }
 
-            addToast(SignInToast.success());
+            openToast(SignInToast.success());
             dismissAllBottomSheet();
         } catch(error) {
-            addToast(
+            openToast(
                 getToastMessage({
                     messages: SignInToast,
                     error
@@ -235,11 +235,11 @@ export const useUserManagement = () => {
             if(error) throw error;
 
             router.replace("/backToRootIndex");
-            if(!disabledToast) addToast(SignOutToast.success());
+            if(!disabledToast) openToast(SignOutToast.success());
             await database.disconnect();
         } catch(error) {
             if(error instanceof AuthError && !disabledToast) {
-                return addToast(
+                return openToast(
                     getToastMessage({
                         messages: SignOutToast,
                         error
@@ -270,7 +270,7 @@ export const useUserManagement = () => {
             const handleCurrentEmailVerification: HandleVerificationOtpType =
                 async (errorCode) => {
                     if(errorCode) {
-                        return addToast(
+                        return openToast(
                             getToastMessage({
                                 messages: ChangeEmailToast,
                                 error: { code: errorCode }
@@ -281,7 +281,7 @@ export const useUserManagement = () => {
                     const handleNewEmailVerification: HandleVerificationOtpType =
                         async (errorCode) => {
                             if(errorCode) {
-                                return addToast(
+                                return openToast(
                                     getToastMessage({
                                         messages: ChangeEmailToast,
                                         error: { code: errorCode }
@@ -289,7 +289,7 @@ export const useUserManagement = () => {
                                 );
                             }
 
-                            addToast(ChangeEmailToast.success());
+                            openToast(ChangeEmailToast.success());
                             dismissAllBottomSheet();
                             await signOut(true);
                         };
@@ -313,7 +313,7 @@ export const useUserManagement = () => {
                 })
             );
         } catch(error) {
-            addToast(
+            openToast(
                 getToastMessage({
                     messages: ChangeEmailToast,
                     error
@@ -346,11 +346,11 @@ export const useUserManagement = () => {
 
             setUser(updatedUser, newUserAvatar);
 
-            addToast(toastMessages.success());
+            openToast(toastMessages.success());
             dismissAllBottomSheet();
         } catch(error) {
             console.log(error);
-            addToast(
+            openToast(
                 getToastMessage({
                     messages: toastMessages,
                     error
@@ -376,10 +376,10 @@ export const useUserManagement = () => {
 
             if(error) throw error;
 
-            addToast(AddPasswordToast.success());
+            openToast(AddPasswordToast.success());
             await refreshSession();
         } catch(error) {
-            addToast(
+            openToast(
                 getToastMessage({
                     messages: AddPasswordToast,
                     error
@@ -406,7 +406,7 @@ export const useUserManagement = () => {
             const handleResetPasswordVerification: HandleVerificationOtpType =
                 async (errorCode) => {
                     if(errorCode) {
-                        return addToast(
+                        return openToast(
                             getToastMessage({
                                 messages: ResetPasswordToast,
                                 error: { code: errorCode }
@@ -425,7 +425,7 @@ export const useUserManagement = () => {
                         );
 
                     if(error && error.code !== "same_password") {
-                        return addToast(
+                        return openToast(
                             getToastMessage({
                                 messages: ResetPasswordToast,
                                 error
@@ -433,7 +433,7 @@ export const useUserManagement = () => {
                         );
                     }
 
-                    addToast(ResetPasswordToast.success());
+                    openToast(ResetPasswordToast.success());
                     dismissAllBottomSheet();
                     await signOut(true);
                 };
@@ -447,7 +447,7 @@ export const useUserManagement = () => {
                 })
             );
         } catch(error) {
-            addToast(
+            openToast(
                 getToastMessage({
                     messages: ResetPasswordToast,
                     error
@@ -484,7 +484,7 @@ export const useUserManagement = () => {
                 const handleDeleteUserVerification: HandleVerificationOtpType =
                     async (errorCode) => {
                         if(errorCode) {
-                            return addToast(
+                            return openToast(
                                 getToastMessage({
                                     messages: DeleteUserToast,
                                     error: { code: errorCode }
@@ -506,7 +506,7 @@ export const useUserManagement = () => {
 
                         if(error) throw error;
 
-                        addToast(DeleteUserToast.success());
+                        openToast(DeleteUserToast.success());
                         dismissAllBottomSheet();
                         await signOut(true);
                     };
@@ -520,7 +520,7 @@ export const useUserManagement = () => {
                     })
                 );
             } catch(error) {
-                addToast(
+                openToast(
                     getToastMessage({
                         messages: DeleteUserToast,
                         error

@@ -1,17 +1,17 @@
 import { AddCarFormFieldType, useAddCarFormProps } from "../schemas/carSchema.ts";
-import { useAlert } from "../../../ui/alert/contexts/AlertContext.ts";
 import { useForm } from "react-hook-form";
 import useCarSteps from "./useCarSteps.tsx";
-import { CarCreateToast } from "../presets/toast/index.ts";
 import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { store } from "../../../database/redux/store.ts";
 import { addCar } from "../model/actions/addCar.ts";
+import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
+import { CarCreateToast } from "../presets/toast/index.ts";
 
 const useNewCarForm = () => {
     const database = useDatabase();
     const { dismissAllBottomSheet } = useBottomSheet();
-    const { addToast } = useAlert();
+    const { openToast } = useAlert();
 
     const {
         control,
@@ -29,10 +29,10 @@ const useNewCarForm = () => {
 
                 reset();
                 dismissAllBottomSheet();
-                addToast(CarCreateToast.success());
+                openToast(CarCreateToast.success());
             } catch(e) {
                 console.log(e);
-                addToast(CarCreateToast.error());
+                openToast(CarCreateToast.error());
             }
         });
 
