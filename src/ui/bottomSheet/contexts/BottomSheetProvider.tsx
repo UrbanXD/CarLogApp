@@ -1,4 +1,4 @@
-import React, { createRef, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import React, { createRef, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import BottomSheetBackdrop from "../components/BottomSheetBackdrop.tsx";
 import BottomSheet from "../components/BottomSheet.tsx";
@@ -18,6 +18,13 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
 
     const [bottomSheets, setBottomSheets] = useState<Array<BottomSheetType>>([]);
     const [bottomSheetOpenable, setBottomSheetOpenable] = useState<boolean>(true);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if(timeoutRef.current) clearTimeout(timeoutRef.current);
+        };
+    }, []);
 
     useEffect(() => {
         const bottomSheet = getCurrentBottomSheet();
@@ -26,6 +33,8 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         bottomSheet.ref.current?.present();
         bottomSheet.ref.current?.snapToIndex(0);
     }, [bottomSheets]);
+
+    const newRef = useMemo(() => createRef<BottomSheetModal>(), []);
 
     const getCurrentBottomSheet = useCallback(() => {
         const index = bottomSheets.length - 1;
@@ -39,7 +48,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         setBottomSheetOpenable(false);
 
         const newBottomSheet: BottomSheetType = {
-            ref: createRef<BottomSheetModal>(),
+            ref: newRef,
             props: args,
             manuallyClosed: false,
             forceClose: false
@@ -47,7 +56,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
 
         setBottomSheets(prevState => {
             if(prevState.length >= 1) prevState[prevState.length - 1].manuallyClosed = true; // stack behaviour = "switch", bezarja, viszont jelezni kell, hogy manualisan tortent
-            setTimeout(() => setBottomSheetOpenable(true), 500);
+            timeoutRef.current = setTimeout(() => setBottomSheetOpenable(true), 500);
 
             return [...prevState, newBottomSheet];
         });
@@ -72,7 +81,7 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
 
     const dismissAllBottomSheet = useCallback(() => {
         setBottomSheets(prevState => {
-            prevState.map(bottomSheet => bottomSheet.ref.current?.dismiss());
+            prevState.forEach(sheet => sheet.ref.current?.dismiss());
 
             return new Array<BottomSheetType>();
         });
@@ -106,6 +115,8 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
         dismissAllBottomSheet
     }), [openBottomSheet, closeBottomSheet, dismissBottomSheet, dismissAllBottomSheet]);
 
+    const RenderBackdrop = (props: any) => <BottomSheetBackdrop { ...props } />;
+
     return (
         <BottomSheetContext.Provider
             value={ contextValue }
@@ -121,10 +132,15 @@ export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
                         enableContentPanningGesture
                         enableDismissOnClose
                         enableOverDrag={ false }
-                        backdropComponent={ () => <BottomSheetBackdrop/> }
+                        backdropComponent={ RenderBackdrop }
                         onChange={ onChangeSnapPoint }
                         { ...props }
                         snapPoints={ props.snapPoints || ["100%"] }
+                        keyboardBehavior="interactive"
+                        keyboardBlurBehavior="restore"
+                        android_keyboardInputMode="adjustPan"
+                        stackBehavior="switch"
+                        enableDynamicSizing={ false }
                     />
                 ))
             }

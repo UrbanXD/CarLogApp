@@ -17,7 +17,7 @@ const alertSlice = createSlice({
             const index = state.toasts.findIndex(toast => toast.id === action.payload);
             if(index === -1) return;
 
-            state.toasts.splice(index, 1); // módosítja in-place a tömböt
+            state.toasts.splice(index, 1);
         },
         openModal: (state, action: PayloadAction<Modal>) => {
             state.modal = action.payload;

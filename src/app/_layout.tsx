@@ -8,7 +8,6 @@ import { Provider } from "react-redux";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { StatusBar } from "expo-status-bar";
 import { BottomSheetProvider } from "../ui/bottomSheet/contexts/BottomSheetProvider.tsx";
-import { PortalProvider } from "@gorhom/portal";
 import Compactor from "../components/Compactor";
 import { ScreenScrollViewProvider } from "../contexts/screenScrollView/ScreenScrollViewProvider.tsx";
 import { AuthProvider } from "../contexts/auth/AuthProvider.tsx";
@@ -72,7 +71,6 @@ const RootLayout: React.FC = () =>
             { Component: SafeAreaProvider },
             { Component: KeyboardProvider },
             { Component: ScreenScrollViewProvider },
-            { Component: PortalProvider },
             { Component: GestureHandlerRootView, props: { style: { flex: 1 } } },
             { Component: AuthProvider },
             { Component: ToastManager },
