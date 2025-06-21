@@ -1,6 +1,7 @@
 import EditCarForm, { EditCarFormProps } from "../../components/forms/EditCarForm.tsx";
 import React from "react";
-import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
+
+import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/types/index.ts";
 
 type CarEditBottomSheetArgs = EditCarFormProps & { height: string };
 

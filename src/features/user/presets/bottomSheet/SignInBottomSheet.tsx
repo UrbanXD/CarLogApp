@@ -1,6 +1,6 @@
 import React from "react";
-import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import SignInForm from "../../components/forms/SignInForm.tsx";
+import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/types/index.ts";
 
 export const SignInBottomSheet: OpenBottomSheetArgs = {
     title: "Bejelentkezés",

@@ -3,9 +3,10 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import BottomSheetBackdrop from "../components/BottomSheetBackdrop.tsx";
 import BottomSheet from "../components/BottomSheet.tsx";
 import { KeyboardController } from "react-native-keyboard-controller";
-import { BottomSheetContext, BottomSheetType, OpenBottomSheetArgs } from "./BottomSheetContext.ts";
+import { BottomSheetContext } from "./BottomSheetContext.ts";
 import { BottomSheetLeavingModal } from "../presets/modal/index.ts";
 import { useAlert } from "../../alert/hooks/useAlert.ts";
+import { BottomSheetType, OpenBottomSheetArgs } from "../types/index.ts";
 
 interface BottomSheetProviderProps {
     children: ReactNode | null;

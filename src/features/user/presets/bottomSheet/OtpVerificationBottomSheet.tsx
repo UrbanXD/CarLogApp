@@ -1,7 +1,7 @@
 import React from "react";
-import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import VerifyOtpForm, { HandleVerificationOtpType } from "../../components/forms/VerifyOtpForm.tsx";
 import { EmailOtpType } from "@supabase/supabase-js";
+import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/types/index.ts";
 
 type OtpVerificationBottomSheetArgs = {
     type: EmailOtpType

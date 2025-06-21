@@ -1,19 +1,5 @@
-import { Context, createContext, ReactNode, RefObject, useContext } from "react";
-import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-
-export type BottomSheetType = {
-    ref: RefObject<BottomSheetModal>
-    props: OpenBottomSheetArgs
-    manuallyClosed: boolean
-    forceClose: boolean
-}
-
-export interface OpenBottomSheetArgs extends Partial<BottomSheetModalProps> {
-    title?: string,
-    content: ReactNode,
-    closeButton?: ReactNode
-}
+import { Context, createContext, useContext } from "react";
+import { OpenBottomSheetArgs } from "../types/index.ts";
 
 interface BottomSheetProviderValue {
     openBottomSheet: (args: OpenBottomSheetArgs) => void;

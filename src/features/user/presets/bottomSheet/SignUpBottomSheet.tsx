@@ -1,6 +1,6 @@
 import React from "react";
-import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import SignUpForm from "../../components/forms/SignUpForm.tsx";
+import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/types/index.ts";
 
 export const SignUpBottomSheet: OpenBottomSheetArgs = {
     title: "Felhasználó létrehozás",

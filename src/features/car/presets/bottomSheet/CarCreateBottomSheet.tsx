@@ -1,6 +1,6 @@
-import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import NewCarForm from "../../components/forms/NewCarForm.tsx";
 import React from "react";
+import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/types/index.ts";
 
 export const CarCreateBottomSheet: OpenBottomSheetArgs = {
     title: "Új Autó",

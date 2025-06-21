@@ -1,6 +1,6 @@
-import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import React from "react";
 import { EditUserForm, EditUserFormProps } from "../../components/forms/EditUserForm.tsx";
+import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/types/index.ts";
 
 type EditUserBottomSheetType = (args: EditUserFormProps) => OpenBottomSheetArgs
 
