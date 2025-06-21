@@ -8,10 +8,11 @@ const carFormSchema = z
     brand: zPickerRequired,
     model: zPickerRequired,
     odometerMeasurement: zPickerRequired,
-    odometerValue: zNumber,
+    odometerValue: zNumber(),
     fuelType: zPickerRequired,
     fuelMeasurement: zPickerRequired,
-    fuelTankSize: zNumber,
+    fuelTankSize: zNumber(),
+    fuelValue: zNumber(),
     image: zImage.optional()
 });
 

@@ -16,6 +16,14 @@ const FuelStep: React.FC<StepProps> = ({
             icon={ ICON_NAMES.odometer }
             numeric
         />
+        <Input.Text
+            control={ control }
+            fieldName="fuelValue"
+            fieldNameText="Tartály tartalma"
+            placeholder="000.000.000"
+            icon={ ICON_NAMES.odometer }
+            numeri
+        />
         <Input.Picker
             data={ FUEL_TYPES }
             control={ control }

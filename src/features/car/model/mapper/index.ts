@@ -19,6 +19,7 @@ export const toCarDto = async (car?: CarTableType, attachmentQueue?: PhotoAttach
         fuelType: car.fuelType,
         fuelMeasurement: car.fuelMeasurement,
         fuelTankSize: car.fuelTankSize,
+        fuelValue: car.fuelValue,
         image: carImage,
         createdAt: car.createdAt
     };

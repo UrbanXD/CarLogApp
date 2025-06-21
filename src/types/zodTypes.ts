@@ -2,7 +2,7 @@ import { z } from "zod";
 import { ImageType } from "../utils/pickImage.ts";
 import { ColorValue } from "react-native";
 
-export const zNumber = z
+export const zNumber = (minValue?: number = 0) => z
 .preprocess(
     (value: any) => value ? value.toString() : "",
     z
@@ -16,8 +16,8 @@ export const zNumber = z
         { message: "Kérem adjon meg egy számot." }
     )
     .refine(
-        (value) => value > 0,
-        { message: "A számnak nullától nagyobbnak kell lennie." }
+        (value) => value > minValue,
+        { message: `A számnak nagyobbnak kell lennie mint ${ minValue }.` }
     )
 );
 

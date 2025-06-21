@@ -25,6 +25,7 @@ const car = new Table({
     fuelType: column.text,
     fuelMeasurement: column.text,
     fuelTankSize: column.integer,
+    fuelValue: column.integer,
     image: column.text,
     createdAt: column.text
 });

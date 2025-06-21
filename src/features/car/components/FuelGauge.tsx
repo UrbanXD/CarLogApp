@@ -19,6 +19,7 @@ const FuelGauge: React.FC<FuelGaugeProps> = ({
     measurement,
     openEditForm
 }) => {
+    if(!value || value <= 0) value = 0;
     const percent = Math.max(Math.min((value / tankSize) * 100, 100), 0);
     const styles = useStyles(percent, value.toString().length + measurement.length + 1);
 
