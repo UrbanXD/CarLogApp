@@ -28,6 +28,28 @@ const InputText: React.FC<InputTextProps> = ({
     isSecure = false,
     isEditable = true
 }) => {
+
+    const renderControllerInputField = (args: ControllerRenderArgs) => {
+        const { field: { value, onChange }, fieldState: { error } } = args;
+
+        useEffect(() => {
+            if(value) onChange(value.toString());
+        }, []);
+
+        return (
+            <TextInput
+                setValue={ onChange }
+                value={ value ? value.toString() : "" }
+                icon={ icon }
+                placeholder={ placeholder }
+                error={ error?.message }
+                numeric={ numeric }
+                isSecure={ isSecure }
+                isEditable={ isEditable }
+            />
+        );
+    };
+
     return (
         <View style={ { flexDirection: "column", gap: SEPARATOR_SIZES.lightSmall } }>
             {
@@ -41,27 +63,7 @@ const InputText: React.FC<InputTextProps> = ({
                 <Controller
                     control={ control }
                     name={ fieldName }
-                    render={ (args: ControllerRenderArgs) => {
-                        const { field: { value, onChange }, fieldState: { error } } = args;
-
-                        useEffect(() => {
-                            if(value) onChange(value.toString());
-                        }, []);
-
-                        return (
-                            <TextInput
-                                setValue={ onChange }
-                                value={ value ? value.toString() : "" }
-                                icon={ icon }
-                                placeholder={ placeholder }
-                                error={ error?.message }
-                                numeric={ numeric }
-                                isSecure={ isSecure }
-                                isEditable={ isEditable }
-                            />
-                        );
-                    }
-                    }
+                    render={ renderControllerInputField }
                 />
             }
         </View>
