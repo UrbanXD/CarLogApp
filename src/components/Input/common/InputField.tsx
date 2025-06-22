@@ -4,6 +4,7 @@ import { ControllerRenderArgs, SEPARATOR_SIZES } from "../../../constants/index.
 import InputTitle from "./InputTitle.tsx";
 import { StyleSheet, View } from "react-native";
 import { InputFieldProvider } from "../../../contexts/inputField/InputFieldProvider.tsx";
+import InputError from "./InputError.tsx";
 
 interface InputFieldProps {
     control: Control<any>;
@@ -24,12 +25,13 @@ const InputField: React.FC<InputFieldProps> = ({
         return (
             <InputFieldProvider value={ args }>
                 { children }
+                <InputError/>
             </InputFieldProvider>
         );
     };
 
     return (
-        <View style={ { flexDirection: "column", gap: SEPARATOR_SIZES.lightSmall } }>
+        <View style={ styles.container }>
             {
                 fieldNameText &&
                <InputTitle

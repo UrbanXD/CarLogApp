@@ -1,6 +1,6 @@
 import Button from "../../Button/Button.ts";
 import { pickImage } from "../../../utils/pickImage.ts";
-import { ImageSourcePropType, StyleSheet, Text, View } from "react-native";
+import { ImageSourcePropType, StyleSheet, View } from "react-native";
 import { encode } from "base64-arraybuffer";
 import { Control, Controller } from "react-hook-form";
 import React, { useCallback, useEffect, useState } from "react";
@@ -216,9 +216,6 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                             renderDefaultItem={ () => <DefaultElement/> }
                         />
                     </View>
-                    {
-                        error ? <Text style={ { color: "green" } }>{ error.message }</Text> : <></>
-                    }
                 </View>
             </View>
         );

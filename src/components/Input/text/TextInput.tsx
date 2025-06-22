@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput as TextInputRN, View } from "react-native";
+import { StyleSheet, TextInput as TextInputRN, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, ICON_COLORS, ICON_NAMES } from "../../../constants/index.ts";
 import Icon from "../../Icon.tsx";
@@ -30,8 +30,8 @@ const TextInput: React.FC<TextInputProps> = ({
     isEditable
 }) => {
     const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
-    const inputFieldContext = useInputFieldContext();
 
+    const inputFieldContext = useInputFieldContext();
     const fieldValue = inputFieldContext?.field?.value || value;
     const onChange = inputFieldContext?.field?.onChange;
     const error = inputFieldContext?.fieldState?.error;
@@ -53,66 +53,58 @@ const TextInput: React.FC<TextInputProps> = ({
     }, [focused, shouldHandleKeyboardEvents]);
 
     return (
-        <>
-            <View
-                style={ [
-                    styles.formFieldContainer,
-                    focused && styles.activeFormFieldContainer,
-                    !!error && styles.errorFormFieldContainer
-                ] }>
-                {
-                    icon &&
-                   <View style={ styles.formFieldIconContainer }>
-                      <Icon
-                         icon={ icon }
-                         size={ hp(4.5) }
-                         color={ styles.textInput.color }
-                      />
-                   </View>
-                }
-                <TextInputRN
-                    placeholder={ placeholder }
-                    style={ styles.textInput }
-                    placeholderTextColor={ styles.placeholderText.color }
-                    value={ fieldValue }
-                    keyboardType={ numeric ? "numeric" : "default" }
-                    secureTextEntry={ secure }
-                    onChangeText={ updateFieldValue }
-                    onBlur={ onBlur }
-                    onFocus={ onFocus }
-                    editable={ isEditable }
-                />
-                {
-                    isSecure &&
-                   <View style={ styles.formFieldIconContainer }>
-                      <Icon
-                         icon={ secure ? ICON_NAMES.eyeOff : ICON_NAMES.eye }
-                         size={ hp(3.25) }
-                         color={ ICON_COLORS.default }
-                         onPress={ changeSecure }
-                      />
-                   </View>
-                }
-                {
-                    actionIcon &&
-                   <View style={ styles.formFieldIconContainer }>
-                      <Icon
-                         icon={ actionIcon }
-                         size={ hp(4.5) }
-                         color={ ICON_COLORS.default }
-                          // style={{ alignSelf: "center" }}
-                         onPress={ onAction }
-                      />
-                   </View>
-                }
-            </View>
+        <View
+            style={ [
+                styles.formFieldContainer,
+                focused && styles.activeFormFieldContainer,
+                !!error && styles.errorFormFieldContainer
+            ] }>
             {
-                error &&
-               <Text style={ styles.errorText }>
-                   { error }
-               </Text>
+                icon &&
+               <View style={ styles.formFieldIconContainer }>
+                  <Icon
+                     icon={ icon }
+                     size={ hp(4.5) }
+                     color={ styles.textInput.color }
+                  />
+               </View>
             }
-        </>
+            <TextInputRN
+                placeholder={ placeholder }
+                style={ styles.textInput }
+                placeholderTextColor={ styles.placeholderText.color }
+                value={ fieldValue }
+                keyboardType={ numeric ? "numeric" : "default" }
+                secureTextEntry={ secure }
+                onChangeText={ updateFieldValue }
+                onBlur={ onBlur }
+                onFocus={ onFocus }
+                editable={ isEditable }
+            />
+            {
+                isSecure &&
+               <View style={ styles.formFieldIconContainer }>
+                  <Icon
+                     icon={ secure ? ICON_NAMES.eyeOff : ICON_NAMES.eye }
+                     size={ hp(3.25) }
+                     color={ ICON_COLORS.default }
+                     onPress={ changeSecure }
+                  />
+               </View>
+            }
+            {
+                actionIcon &&
+               <View style={ styles.formFieldIconContainer }>
+                  <Icon
+                     icon={ actionIcon }
+                     size={ hp(4.5) }
+                     color={ ICON_COLORS.default }
+                      // style={{ alignSelf: "center" }}
+                     onPress={ onAction }
+                  />
+               </View>
+            }
+        </View>
     );
 };
 
@@ -147,13 +139,6 @@ const styles = StyleSheet.create({
     },
     placeholderText: {
         color: COLORS.gray2
-    },
-    errorText: {
-        paddingLeft: hp(2),
-        fontFamily: "Gilroy-Medium",
-        fontSize: hp(1.85),
-        letterSpacing: hp(1.85) * 0.05,
-        color: COLORS.redLight
     }
 });
 
