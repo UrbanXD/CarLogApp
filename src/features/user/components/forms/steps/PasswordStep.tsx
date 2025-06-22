@@ -5,23 +5,26 @@ import { StepProps } from "../../../../../types/index.ts";
 
 export const PasswordStep: React.FC<StepProps> = ({ control }) =>
     <Input.Group>
-        <Input.Text
+        <Input.Field
             control={ control }
             fieldName="password"
             fieldNameText="Jelszó"
-            icon={ ICON_NAMES.password }
-            placeholder="*****"
-            isSecure
-            isInBottomSheet
-
-        />
-        <Input.Text
+        >
+            <Input.Text
+                icon={ ICON_NAMES.password }
+                placeholder="*****"
+                isSecure
+            />
+        </Input.Field>
+        <Input.Field
             control={ control }
             fieldName="rpassword"
             fieldNameText="Jelszó újra"
-            icon={ ICON_NAMES.password }
-            placeholder="*****"
-            isSecure
-            isInBottomSheet
-        />
+        >
+            <Input.Text
+                icon={ ICON_NAMES.password }
+                placeholder="*****"
+                isSecure
+            />
+        </Input.Field>
     </Input.Group>;

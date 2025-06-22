@@ -1,10 +1,10 @@
 import React from "react";
 import { COLORS, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import TextInput from "../text/TextInput.tsx";
 import Icon from "../../Icon.tsx";
 import { PickerDisabledToast } from "../../../ui/alert/presets/toast/index.ts";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
+import Input from "../Input.ts";
 
 interface PickerDropdownInfoProps {
     toggleDropdown?: () => void
@@ -88,13 +88,13 @@ export const InputPickerDropdownInfo: React.FC<PickerDropdownInfoProps> = ({
             onPress={ !disabled ? toggleDropdown : openWarning }
         >
             <View style={ GLOBAL_STYLE.formContainer }>
-                <TextInput
+                <Input.Text
                     value={ title }
-                    isEditable={ false }
+                    placeholder={ placeholder }
                     icon={ icon }
                     actionIcon={ isHorizontal ? ICON_NAMES.rightArrowHead : ICON_NAMES.downArrowHead }
-                    placeholder={ placeholder }
-                    error={ error }
+                    isEditable={ false }
+                    // error />
                 />
             </View>
         </TouchableOpacity>

@@ -24,21 +24,27 @@ const SignInForm: React.FC = () => {
 
     return (
         <Form>
-            <Input.Text
+            <Input.Field
                 control={ control }
                 fieldName="email"
                 fieldNameText="Email cím"
-                icon={ ICON_NAMES.email }
-                placeholder="Email"
-            />
-            <Input.Text
+            >
+                <Input.Text
+                    icon={ ICON_NAMES.email }
+                    placeholder="Email"
+                />
+            </Input.Field>
+            <Input.Field
                 control={ control }
                 fieldName="password"
                 fieldNameText="Jelszó"
-                icon={ ICON_NAMES.password }
-                placeholder="Jelszó"
-                isSecure
-            />
+            >
+                <Input.Text
+                    icon={ ICON_NAMES.password }
+                    placeholder="Jelszó"
+                    isSecure
+                />
+            </Input.Field>
             <Text style={ GLOBAL_STYLE.formLinkText }>
                 Elfelejtette jelszavát?
             </Text>

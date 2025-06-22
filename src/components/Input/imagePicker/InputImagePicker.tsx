@@ -9,7 +9,7 @@ import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../../Carousel/CarouselItem.tsx";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, ControllerRenderArgs, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import InputTitle from "../InputTitle.tsx";
+import InputTitle from "../common/InputTitle.tsx";
 import DefaultElement from "../../DefaultElement.tsx";
 import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
 import Image from "../../Image.tsx";

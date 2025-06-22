@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ICON_NAMES } from "../constants/index.ts";
-import TextInput from "./Input/text/TextInput";
+import Input from "./Input/Input.ts";
 
 interface SearchBarProps {
     onTextChange: (value: any) => void;
@@ -15,16 +15,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
     const [value, setValue] = useState(term);
 
+    const updateValue = () => {
+        onTextChange(value);
+        setValue(value);
+    };
+
     return (
-        <TextInput
+        <Input.Text
             value={ value }
-            setValue={ (text: string) => {
-                setValue(text);
-                onTextChange(text);
-            } }
+            setValue={ updateValue }
             actionIcon={ ICON_NAMES.close }
             onAction={ onClose }
-            icon={ ICON_NAMES.search }
         />
     );
 };

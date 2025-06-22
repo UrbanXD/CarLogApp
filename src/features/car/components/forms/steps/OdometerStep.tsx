@@ -8,14 +8,17 @@ const OdometerStep: React.FC<StepProps> = ({
     control
 }) =>
     <Input.Group>
-        <Input.Text
+        <Input.Field
             control={ control }
             fieldName="odometerValue"
             fieldNameText="Kilóméteróra állás"
-            placeholder="000.000.000"
-            icon={ ICON_NAMES.odometer }
-            numeric
-        />
+        >
+            <Input.Text
+                icon={ ICON_NAMES.odometer }
+                placeholder="100000"
+                numeric
+            />
+        </Input.Field>
         <Input.Picker
             data={ ODOMETER_MEASUREMENTS }
             control={ control }

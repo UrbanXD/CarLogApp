@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Control, Controller } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
-import InputTitle from "../InputTitle.tsx";
+import InputTitle from "../common/InputTitle.tsx";
 import { COLORS, ControllerRenderArgs, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Picker, { PickerDataType } from "./Picker.tsx";

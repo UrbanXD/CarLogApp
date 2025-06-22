@@ -4,6 +4,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, ICON_COLORS, ICON_NAMES } from "../../../constants/index.ts";
 import Icon from "../../Icon.tsx";
 import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
+import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 
 interface TextInputProps {
     value?: string;
@@ -12,7 +13,6 @@ interface TextInputProps {
     actionIcon?: string;
     onAction?: () => void;
     placeholder?: string;
-    error?: string;
     numeric?: boolean;
     isSecure?: boolean;
     isEditable?: boolean;
@@ -25,12 +25,21 @@ const TextInput: React.FC<TextInputProps> = ({
     actionIcon,
     onAction,
     placeholder,
-    error,
     numeric,
     isSecure,
     isEditable
 }) => {
     const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
+    const inputFieldContext = useInputFieldContext();
+
+    const fieldValue = inputFieldContext?.field?.value || value;
+    const onChange = inputFieldContext?.field?.onChange;
+    const error = inputFieldContext?.fieldState?.error;
+
+    const updateFieldValue = (value: string) => {
+        if(onChange) onChange(value);
+        if(setValue) setValue(value);
+    };
 
     const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(isSecure);
@@ -65,10 +74,10 @@ const TextInput: React.FC<TextInputProps> = ({
                     placeholder={ placeholder }
                     style={ styles.textInput }
                     placeholderTextColor={ styles.placeholderText.color }
-                    value={ value }
+                    value={ fieldValue }
                     keyboardType={ numeric ? "numeric" : "default" }
                     secureTextEntry={ secure }
-                    onChangeText={ setValue }
+                    onChangeText={ updateFieldValue }
                     onBlur={ onBlur }
                     onFocus={ onFocus }
                     editable={ isEditable }

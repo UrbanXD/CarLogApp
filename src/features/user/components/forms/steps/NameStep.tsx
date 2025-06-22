@@ -5,20 +5,24 @@ import { StepProps } from "../../../../../types/index.ts";
 
 export const NameStep: React.FC<StepProps> = ({ control }) =>
     <Input.Group>
-        <Input.Text
+        <Input.Field
             control={ control }
             fieldName="lastname"
             fieldNameText="Vezetéknév"
-            icon={ ICON_NAMES.user }
-            placeholder="Kovács"
-            isInBottomSheet
-        />
-        <Input.Text
+        >
+            <Input.Text
+                icon={ ICON_NAMES.user }
+                placeholder="Kovács"
+            />
+        </ Input.Field>
+        <Input.Field
             control={ control }
             fieldName="firstname"
             fieldNameText="Keresztnév"
-            icon={ ICON_NAMES.user }
-            placeholder="János"
-            isInBottomSheet
-        />
+        >
+            <Input.Text
+                icon={ ICON_NAMES.user }
+                placeholder="János"
+            />
+        </Input.Field>
     </Input.Group>;

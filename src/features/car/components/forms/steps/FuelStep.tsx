@@ -8,22 +8,27 @@ const FuelStep: React.FC<StepProps> = ({
     control
 }) =>
     <Input.Group>
-        <Input.Text
+        <Input.Field
             control={ control }
             fieldName="fuelTankSize"
             fieldNameText="Tartály mérete"
-            placeholder="000.000.000"
-            icon={ ICON_NAMES.odometer }
-            numeric
-        />
-        <Input.Text
+        >
+            <Input.Text
+                icon={ ICON_NAMES.odometer }
+                placeholder={ "2000" }
+                numeric
+            />
+        </Input.Field>
+        <Input.Field
             control={ control }
             fieldName="fuelValue"
             fieldNameText="Tartály tartalma"
-            placeholder="000.000.000"
-            icon={ ICON_NAMES.odometer }
-            numeri
-        />
+        >
+            <Input.Slider
+                minValue={ 0 }
+                maxValue={ 100 }
+            />
+        </Input.Field>
         <Input.Picker
             data={ FUEL_TYPES }
             control={ control }
