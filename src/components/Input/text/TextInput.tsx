@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { StyleSheet, TextInput as TextInputRN, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, ICON_COLORS, ICON_NAMES } from "../../../constants/index.ts";
 import Icon from "../../Icon.tsx";
-import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 
-interface TextInputProps {
+export interface TextInputProps {
     value?: string;
     setValue?: (text: string) => void;
     icon?: string;
@@ -14,8 +13,9 @@ interface TextInputProps {
     onAction?: () => void;
     placeholder?: string;
     numeric?: boolean;
-    isSecure?: boolean;
-    isEditable?: boolean;
+    secure?: boolean;
+    editable?: boolean;
+    alwaysFocused?: boolean; // csak design szempont
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -26,10 +26,11 @@ const TextInput: React.FC<TextInputProps> = ({
     onAction,
     placeholder,
     numeric,
-    isSecure,
-    isEditable
+    secure: isSecure,
+    editable,
+    alwaysFocused
 }) => {
-    const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
+    // const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
 
     const inputFieldContext = useInputFieldContext();
     const fieldValue = inputFieldContext?.field?.value || value;
@@ -44,19 +45,19 @@ const TextInput: React.FC<TextInputProps> = ({
     const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(isSecure);
 
-    const changeSecure = () => setSecure(!secure);
+    const changeSecure = () => setSecure(prevState => !prevState);
     const onFocus = () => setFocused(true);
     const onBlur = () => setFocused(false);
 
-    useEffect(() => {
-        shouldHandleKeyboardEvents.value = focused;
-    }, [focused, shouldHandleKeyboardEvents]);
+    // useEffect(() => {
+    //     shouldHandleKeyboardEvents.value = focused;
+    // }, [focused, shouldHandleKeyboardEvents]);
 
     return (
         <View
             style={ [
                 styles.formFieldContainer,
-                focused && styles.activeFormFieldContainer,
+                (focused || alwaysFocused) && styles.activeFormFieldContainer,
                 !!error && styles.errorFormFieldContainer
             ] }>
             {
@@ -79,7 +80,7 @@ const TextInput: React.FC<TextInputProps> = ({
                 onChangeText={ updateFieldValue }
                 onBlur={ onBlur }
                 onFocus={ onFocus }
-                editable={ isEditable }
+                editable={ editable }
             />
             {
                 isSecure &&
@@ -118,14 +119,14 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.gray5,
         paddingHorizontal: hp(1.5),
         borderRadius: 20,
+        borderWidth: 1,
+        borderColor: COLORS.gray5,
         overflow: "hidden"
     },
     activeFormFieldContainer: {
-        borderWidth: 1,
-        borderColor: COLORS.gray1
+        borderColor: COLORS.gray2
     },
     errorFormFieldContainer: {
-        borderWidth: 1,
         borderColor: COLORS.redLight
     },
     formFieldIconContainer: {

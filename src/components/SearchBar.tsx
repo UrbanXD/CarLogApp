@@ -1,31 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ICON_NAMES } from "../constants/index.ts";
 import Input from "./Input/Input.ts";
+import { TextInputProps } from "./Input/text/TextInput.tsx";
 
 interface SearchBarProps {
-    onTextChange: (value: any) => void;
+    setTerm: (value: string) => void;
     term?: string;
-    onClose?: () => void;
+    textInputProps?: TextInputProps;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
-    onTextChange,
+    setTerm,
     term = "",
-    onClose
+    textInputProps
 }) => {
     const [value, setValue] = useState(term);
 
-    const updateValue = () => {
-        onTextChange(value);
-        setValue(value);
-    };
+    const placeholder = textInputProps?.placeholder ?? "Keresés...";
+
+    useEffect(() => {
+        setTerm(value);
+    }, [value]);
+
 
     return (
         <Input.Text
             value={ value }
-            setValue={ updateValue }
-            actionIcon={ ICON_NAMES.close }
-            onAction={ onClose }
+            setValue={ setValue }
+            { ...textInputProps }
+            icon={ ICON_NAMES.search }
+            placeholder={ placeholder }
         />
     );
 };
