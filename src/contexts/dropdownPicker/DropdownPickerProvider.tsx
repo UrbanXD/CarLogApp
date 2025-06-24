@@ -1,9 +1,9 @@
-import React, { ProviderProps, useEffect, useState } from "react";
-import { usePicker } from "../../hooks/usePicker.ts";
+import React, { ProviderProps, useCallback, useEffect, useState } from "react";
 import { PickerElement } from "../../components/Input/picker/PickerItem.tsx";
 import { DropdownPickerContext } from "./DropdownPickerContext.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { PickerDisabledToast } from "../../ui/alert/presets/toast/index.ts";
+import { usePicker } from "../../hooks/usePicker.ts";
 
 export interface DropdownPickerProviderProps {
     elements: Array<PickerElement>;
@@ -42,12 +42,20 @@ export const DropdownPickerProvider: React.FC<ProviderProps<DropdownPickerProvid
     const [showElements, setShowElements] = useState<boolean>(!!alwaysShowElements);
     const [searchTerm, setSearchTerm] = useState("");
 
-
-    useEffect(() => {
+    const filterElements = useCallback(() => {
         if(searchTerm.length <= 2) return setFilteredElements(elements);
 
         setFilteredElements(elements.filter(element => element.title?.toLowerCase()
         .includes(searchTerm.toLowerCase())));
+    }, [elements, searchTerm]);
+
+    useEffect(() => {
+        setFilteredElements(elements);
+        filterElements();
+    }, [elements]);
+
+    useEffect(() => {
+        filterElements();
     }, [searchTerm]);
 
     const toggleDropdown = () => {

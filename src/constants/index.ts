@@ -1,6 +1,5 @@
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { ControllerFieldState, ControllerRenderProps, UseFormStateReturn } from "react-hook-form";
-import { InputPickerDataType } from "../components/Input/picker/InputPicker";
 
 export * from "./baseConfig.ts";
 export * from "./colors.ts";
@@ -54,22 +53,3 @@ export const GET_CARS = () => {
 };
 
 export const CARS = GET_CARS();
-
-export const DATA_TRANSFORM_TO_PICKER_DATA = (
-    data: any,
-    titleSelector?: string,
-    subtitleSelector?: string,
-    valueSelector?: string
-) => {
-    const picker_data = [] as Array<InputPickerDataType>;
-
-    data
-    .map((item: any) => {
-        picker_data.push({
-            title: titleSelector ? item[titleSelector] : item,
-            subtitle: subtitleSelector && item[subtitleSelector],
-            value: valueSelector && item[valueSelector]
-        });
-    });
-    return picker_data;
-};

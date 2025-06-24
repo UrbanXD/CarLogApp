@@ -1,6 +1,6 @@
 import React from "react";
 import CarProfileView from "./CarProfileView.tsx";
-import { CarTableType } from "../../../Database/connector/powersync/AppSchema.ts";
+import { CarTableType } from "../../../../database/connector/powersync/AppSchema.ts";
 
 interface CarProfileByObjProps {
     car: CarTableType;

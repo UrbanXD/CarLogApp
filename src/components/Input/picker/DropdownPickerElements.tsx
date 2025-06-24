@@ -7,21 +7,17 @@ import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } f
 import { StyleSheet, Text } from "react-native";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 
-interface DropdownPickerElementsProps {
-    horizontal?: boolean;
-}
-
-const DropdownPickerElements: React.FC<DropdownPickerElementsProps> = ({
-    horizontal
-}) => {
+const DropdownPickerElements: React.FC = () => {
     const flatListRef = useRef<FlatList>(null);
     const {
         elements,
         selectedElement,
         showElements,
         onSelect,
+        horizontal,
         toggleDropdown
     } = useDropdownPickerContext();
+
     const display = useSharedValue(showElements ? 1 : 0);
 
     const MAX_HEIGHT = heightPercentageToDP(29.5); // max magasság pixelben
@@ -44,10 +40,10 @@ const DropdownPickerElements: React.FC<DropdownPickerElementsProps> = ({
         }, 100);
     }, [showElements]);
 
-    const selectElement = (id: string) => {
+    const selectElement = useCallback((id: string) => {
         onSelect(id);
         toggleDropdown();
-    };
+    }, [onSelect, toggleDropdown]);
 
     const renderItem = useCallback((arg: { item: PickerElement, index: number }) => {
         return (
@@ -58,7 +54,7 @@ const DropdownPickerElements: React.FC<DropdownPickerElementsProps> = ({
                 selected={ arg.item.id === selectedElement?.id }
             />
         );
-    }, [selectedElement]);
+    }, [selectedElement, selectElement]);
 
     const renderListEmptyComponent = useCallback(() => {
         return (

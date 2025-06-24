@@ -24,7 +24,9 @@ const InputField: React.FC<InputFieldProps> = ({
     const renderControllerInput = (args: ControllerRenderArgs) => {
         return (
             <InputFieldProvider value={ args }>
-                { children }
+                <View>
+                    { children }
+                </View>
                 <InputError/>
             </InputFieldProvider>
         );

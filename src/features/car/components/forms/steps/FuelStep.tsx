@@ -3,6 +3,7 @@ import Input from "../../../../../components/Input/Input.ts";
 import { ICON_NAMES } from "../../../../../constants/index.ts";
 import { FUEL_MEASUREMENTS, FUEL_TYPES } from "../../../constants/index.ts";
 import { StepProps } from "../../../../../types/index.ts";
+import { generatePickerElements } from "../../../../../utils/generatePickerElements.ts";
 
 const FuelStep: React.FC<StepProps> = ({
     control
@@ -29,22 +30,20 @@ const FuelStep: React.FC<StepProps> = ({
                 maxValue={ 100 }
             />
         </Input.Field>
-        <Input.Picker
-            data={ FUEL_TYPES }
+        <Input.Field
             control={ control }
             fieldName="fuelType"
             fieldNameText="Típus"
-            isHorizontal
-            isCarousel={ false }
-        />
-        <Input.Picker
-            data={ FUEL_MEASUREMENTS }
+        >
+            <Input.Picker.Simple elements={ generatePickerElements(FUEL_TYPES) }/>
+        </Input.Field>
+        <Input.Field
             control={ control }
             fieldName="fuelMeasurement"
             fieldNameText="Mértékegység"
-            isHorizontal
-            isCarousel={ false }
-        />
+        >
+            <Input.Picker.Simple elements={ generatePickerElements(FUEL_MEASUREMENTS) }/>
+        </Input.Field>
     </Input.Group>;
 
 export default FuelStep;

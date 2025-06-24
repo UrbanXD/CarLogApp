@@ -3,24 +3,30 @@ import React from "react";
 import { COLORS, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
-interface PickerItemProps {
+export type PickerElement = {
+    id: string
+    value: string
+    title?: string
+    subtitle?: string
+    icon?: ImageSourcePropType
+}
+
+interface PickerElementProps {
+    element: PickerElement;
     onPress: () => void;
-    title: string;
-    subtitle?: string;
-    icon?: ImageSourcePropType;
     selected: boolean;
 }
 
-const PickerItem: React.FC<PickerItemProps> = ({
+const PickerItem: React.FC<PickerElementProps> = ({
+    element: { value, title = value, subtitle, icon },
     onPress,
-    title,
-    subtitle,
-    icon,
     selected
 }) => {
     return (
-        <TouchableOpacity onPress={ onPress }
-                          style={ [styles.itemContainer, selected && styles.selectedItemContainer] }>
+        <TouchableOpacity
+            onPress={ onPress }
+            style={ [styles.itemContainer, selected && styles.selectedItemContainer] }
+        >
             {
                 icon &&
                <View style={ styles.iconContainer }>
@@ -54,12 +60,13 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: COLORS.gray4,
-        minHeight: hp(6),
+        minHeight: hp(5.5),
         borderRadius: 15,
-        paddingHorizontal: SEPARATOR_SIZES.small
+        borderWidth: 1.5,
+        borderColor: COLORS.gray4,
+        paddingHorizontal: SEPARATOR_SIZES.lightSmall
     },
     selectedItemContainer: {
-        borderWidth: 1.5,
         borderColor: COLORS.gray1
     },
     iconContainer: {

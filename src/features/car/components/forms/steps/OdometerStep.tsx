@@ -3,6 +3,7 @@ import Input from "../../../../../components/Input/Input.ts";
 import { ICON_NAMES } from "../../../../../constants/index.ts";
 import { ODOMETER_MEASUREMENTS } from "../../../constants/index.ts";
 import { StepProps } from "../../../../../types/index.ts";
+import { generatePickerElements } from "../../../../../utils/generatePickerElements.ts";
 
 const OdometerStep: React.FC<StepProps> = ({
     control
@@ -19,14 +20,13 @@ const OdometerStep: React.FC<StepProps> = ({
                 numeric
             />
         </Input.Field>
-        <Input.Picker
-            data={ ODOMETER_MEASUREMENTS }
+        <Input.Field
             control={ control }
             fieldName="odometerMeasurement"
             fieldNameText="Mértékegység"
-            isHorizontal
-            isCarousel={ false }
-        />
+        >
+            <Input.Picker.Simple elements={ generatePickerElements(ODOMETER_MEASUREMENTS) }/>
+        </Input.Field>
     </Input.Group>;
 
 export default OdometerStep;
