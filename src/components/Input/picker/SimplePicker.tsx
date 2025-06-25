@@ -13,7 +13,7 @@ const SimplePicker: React.FC<SimplePickerProps> = ({
     elements,
     setValue
 }) => {
-    const { selectedElement, onSelect } = usePicker(elements, setValue);
+    const { selectedElement, onSelect } = usePicker({ elements, setValue });
 
     const renderElement = (element: PickerElement, index: number) =>
         <PickerItem

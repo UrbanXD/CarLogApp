@@ -7,6 +7,7 @@ import { usePicker } from "../../hooks/usePicker.ts";
 
 export interface DropdownPickerProviderProps {
     elements: Array<PickerElement>;
+    defaultSelectedElementId?: string;
     setValue?: (value: string) => void;
     onDropdownToggle?: (show: boolean) => void;
     icon?: string;
@@ -23,6 +24,7 @@ export const DropdownPickerProvider: React.FC<ProviderProps<DropdownPickerProvid
     children,
     value: {
         elements,
+        defaultSelectedElementId,
         setValue,
         onDropdownToggle,
         icon,
@@ -35,7 +37,7 @@ export const DropdownPickerProvider: React.FC<ProviderProps<DropdownPickerProvid
         alwaysShowInput = true
     }
 }) => {
-    const { selectedElement, onSelect } = usePicker(elements, setValue);
+    const { selectedElement, onSelect } = usePicker({ elements, defaultSelectedElementId, setValue });
     const { openToast } = useAlert();
 
     const [filteredElements, setFilteredElements] = useState(elements);
@@ -58,15 +60,15 @@ export const DropdownPickerProvider: React.FC<ProviderProps<DropdownPickerProvid
         filterElements();
     }, [searchTerm]);
 
+    useEffect(() => {
+        if(onDropdownToggle) onDropdownToggle(showElements);
+    }, [showElements]);
+
     const toggleDropdown = () => {
         if(disabled) return openToast(PickerDisabledToast.warning(disabledText));
         if(!!alwaysShowElements) return;
 
-        setShowElements(prevState => {
-            if(onDropdownToggle) onDropdownToggle(!prevState);
-
-            return !prevState;
-        });
+        setShowElements(prevState => !prevState);
     };
 
     return (

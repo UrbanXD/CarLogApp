@@ -2,15 +2,21 @@ import { useCallback, useEffect, useState } from "react";
 import { useInputFieldContext } from "../contexts/inputField/InputFieldContext.ts";
 import { PickerElement } from "../components/Input/picker/PickerItem.tsx";
 
-export const usePicker = (elements: Array<PickerElement>, setValue?: (value: string) => void) => {
-    const [selectedElement, setSelectedElement] = useState<PickerElement | null>(null);
-    const inputFieldContext = useInputFieldContext();
-    const onChange = inputFieldContext?.field?.onChange;
+type UsePickerArgs = {
+    elements: Array<PickerElement>
+    defaultSelectedElementId?: string
+    setValue: (value: string) => void
+}
 
+export const usePicker = ({ elements, defaultSelectedElementId, setValue }: UsePickerArgs) => {
     const findElement = useCallback(
         (id: string) => elements.find(element => element.id === id),
         [elements]
     );
+
+    const [selectedElement, setSelectedElement] = useState<PickerElement | null>(findElement(defaultSelectedElementId));
+    const inputFieldContext = useInputFieldContext();
+    const onChange = inputFieldContext?.field?.onChange;
 
     const onSelect = useCallback((id: string) => {
         const element = findElement(id);

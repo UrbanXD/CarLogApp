@@ -6,6 +6,7 @@ import Icon from "../../Icon.tsx";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 
 export interface TextInputProps {
+    type?: "primary" | "secondary";
     value?: string;
     setValue?: (text: string) => void;
     icon?: string;
@@ -15,10 +16,12 @@ export interface TextInputProps {
     numeric?: boolean;
     secure?: boolean;
     editable?: boolean;
+    multiline?: boolean;
     alwaysFocused?: boolean; // csak design szempont
 }
 
 const TextInput: React.FC<TextInputProps> = ({
+    type = "primary",
     value,
     setValue,
     icon,
@@ -28,6 +31,7 @@ const TextInput: React.FC<TextInputProps> = ({
     numeric,
     secure: isSecure,
     editable,
+    multiline,
     alwaysFocused
 }) => {
     // const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
@@ -57,6 +61,7 @@ const TextInput: React.FC<TextInputProps> = ({
         <View
             style={ [
                 styles.formFieldContainer,
+                type === "primary" && styles.primaryFormFieldContainer,
                 (focused || alwaysFocused) && styles.activeFormFieldContainer,
                 !!error && styles.errorFormFieldContainer
             ] }>
@@ -75,6 +80,7 @@ const TextInput: React.FC<TextInputProps> = ({
                 style={ styles.textInput }
                 placeholderTextColor={ styles.placeholderText.color }
                 value={ fieldValue }
+                multiline={ multiline }
                 keyboardType={ numeric ? "numeric" : "default" }
                 secureTextEntry={ secure }
                 onChangeText={ updateFieldValue }
@@ -100,7 +106,6 @@ const TextInput: React.FC<TextInputProps> = ({
                      icon={ actionIcon }
                      size={ hp(4.5) }
                      color={ ICON_COLORS.default }
-                      // style={{ alignSelf: "center" }}
                      onPress={ onAction }
                   />
                </View>
@@ -116,12 +121,14 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: hp(1.5),
+        overflow: "hidden"
+    },
+    primaryFormFieldContainer: {
         backgroundColor: COLORS.gray5,
         paddingHorizontal: hp(1.5),
         borderRadius: 20,
         borderWidth: 1,
-        borderColor: COLORS.gray5,
-        overflow: "hidden"
+        borderColor: COLORS.gray5
     },
     activeFormFieldContainer: {
         borderColor: COLORS.gray2

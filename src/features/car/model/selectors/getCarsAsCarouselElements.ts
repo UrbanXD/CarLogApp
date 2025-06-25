@@ -1,12 +1,13 @@
 import { RootState } from "../../../../database/redux/index.ts";
 import { createSelector } from "@reduxjs/toolkit";
-import { PickerDataType } from "../../../../components/Input/picker/Picker.tsx";
+import { PickerElement } from "../../../../components/Input/picker/PickerItem.tsx";
 
-export const getCarsAsCarouselElements = () => createSelector(
+export const getCarsAsPickerElements = () => createSelector(
     [(state: RootState) => state.cars.cars],
-    (cars): Array<PickerDataType> => cars.map(car => ({
+    (cars): Array<PickerElement> => cars.map(car => ({
         id: car.id,
         title: car.name,
-        subtitle: `${ car.brand }, ${ car.model }`
+        subtitle: `${ car.brand }, ${ car.model }`,
+        value: car.id
     }))
 );
