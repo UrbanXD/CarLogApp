@@ -1,9 +1,10 @@
-import React, { ProviderProps, useCallback, useEffect, useState } from "react";
+import React, { ProviderProps, useCallback, useEffect, useMemo, useState } from "react";
 import { PickerElement } from "../../components/Input/picker/PickerItem.tsx";
 import { DropdownPickerContext } from "./DropdownPickerContext.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { PickerDisabledToast } from "../../ui/alert/presets/toast/index.ts";
 import { usePicker } from "../../hooks/usePicker.ts";
+import { debounce } from "es-toolkit";
 
 export interface DropdownPickerProviderProps {
     elements: Array<PickerElement>;
@@ -45,20 +46,16 @@ export const DropdownPickerProvider: React.FC<ProviderProps<DropdownPickerProvid
     const [searchTerm, setSearchTerm] = useState("");
 
     const filterElements = useCallback(() => {
-        if(searchTerm.length <= 2) return setFilteredElements(elements);
-
         setFilteredElements(elements.filter(element => element.title?.toLowerCase()
         .includes(searchTerm.toLowerCase())));
     }, [elements, searchTerm]);
 
-    useEffect(() => {
-        setFilteredElements(elements);
-        filterElements();
-    }, [elements]);
+    const debouncedFilter = useMemo(() => debounce(filterElements, 350), [filterElements]);
 
     useEffect(() => {
-        filterElements();
-    }, [searchTerm]);
+        debouncedFilter();
+        return () => debouncedFilter.cancel();
+    }, [elements, searchTerm]);
 
     useEffect(() => {
         if(onDropdownToggle) onDropdownToggle(showElements);
