@@ -24,6 +24,7 @@ const PickerItem: React.FC<PickerElementProps> = ({
     return (
         <TouchableOpacity
             onPress={ onPress }
+            disabled={ selected }
             style={ [styles.itemContainer, selected && styles.selectedItemContainer] }
         >
             {

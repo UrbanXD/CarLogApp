@@ -30,6 +30,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             { ...textInputProps }
             icon={ ICON_NAMES.search }
             placeholder={ placeholder }
+            allowInputFieldContext={ false }
         />
     );
 };

@@ -44,20 +44,13 @@ const PrimaryHeader: React.FC = () => {
                     !carsLoading &&
                    <Input.Picker.Dropdown
                       elements={ cars }
-                      defaultSelectedElementId={ "ben" }
+                      defaultSelectedElementId={ selectedCarId }
+                      setValue={ onCarSelect }
                       horizontal
                       icon={ ICON_NAMES.car }
                       inputPlaceholder="Válasszon autót"
                       onDropdownToggle={ (value) => setIsDropdownVisible(value) }
                    />
-                    // <Picker
-                    //    data={ [] }
-                    //    selectedItemId={ selectedCarId }
-                    //    isDropdown={ true }
-                    //    onDropdownToggle={ setIsDropdownVisible }
-                    //    onSelect={ onCarSelect }
-                    //    placeholder={ "Válasszon autót" }
-                    // />
                 }
             </View>
             {

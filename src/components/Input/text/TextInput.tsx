@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, TextInput as TextInputRN, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, ICON_COLORS, ICON_NAMES } from "../../../constants/index.ts";
 import Icon from "../../Icon.tsx";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
+import { useSafeBottomSheetInternal } from "../../../hooks/useSafeBottomSheetInternal.ts";
 
 export interface TextInputProps {
     type?: "primary" | "secondary";
@@ -18,6 +19,7 @@ export interface TextInputProps {
     editable?: boolean;
     multiline?: boolean;
     alwaysFocused?: boolean; // csak design szempont
+    allowInputFieldContext?: boolean;
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -32,11 +34,13 @@ const TextInput: React.FC<TextInputProps> = ({
     secure: isSecure,
     editable,
     multiline,
-    alwaysFocused
+    alwaysFocused,
+    allowInputFieldContext = true
 }) => {
-    // const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
+    const bottomSheetInternal = useSafeBottomSheetInternal();
+    const shouldHandleKeyboardEvents = bottomSheetInternal?.shouldHandleKeyboardEvents;
 
-    const inputFieldContext = useInputFieldContext();
+    const inputFieldContext = allowInputFieldContext ? useInputFieldContext() : null;
     const fieldValue = inputFieldContext?.field?.value || value;
     const onChange = inputFieldContext?.field?.onChange;
     const error = inputFieldContext?.fieldState?.error;
@@ -53,9 +57,9 @@ const TextInput: React.FC<TextInputProps> = ({
     const onFocus = () => setFocused(true);
     const onBlur = () => setFocused(false);
 
-    // useEffect(() => {
-    //     shouldHandleKeyboardEvents.value = focused;
-    // }, [focused, shouldHandleKeyboardEvents]);
+    useEffect(() => {
+        if(shouldHandleKeyboardEvents) shouldHandleKeyboardEvents.value = focused;
+    }, [focused, shouldHandleKeyboardEvents]);
 
     return (
         <View
@@ -89,7 +93,7 @@ const TextInput: React.FC<TextInputProps> = ({
                 editable={ editable }
             />
             {
-                isSecure &&
+                secure &&
                <View style={ styles.formFieldIconContainer }>
                   <Icon
                      icon={ secure ? ICON_NAMES.eyeOff : ICON_NAMES.eye }

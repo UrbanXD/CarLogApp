@@ -14,7 +14,9 @@ export const usePicker = ({ elements, defaultSelectedElementId, setValue }: UseP
         [elements]
     );
 
-    const [selectedElement, setSelectedElement] = useState<PickerElement | null>(findElement(defaultSelectedElementId));
+    const [selectedElement, setSelectedElement] = useState<PickerElement | undefined>(
+        findElement(defaultSelectedElementId)
+    );
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field?.onChange;
 
@@ -31,8 +33,7 @@ export const usePicker = ({ elements, defaultSelectedElementId, setValue }: UseP
         if(!selectedElement) return;
 
         const element = findElement(selectedElement.id);
-        if(!element) return setSelectedElement(null);
-
+        setSelectedElement(element);
         onSelect(element.id);
     }, [elements, onSelect]);
 
