@@ -3,13 +3,14 @@ import {
     Dimensions,
     GestureResponderEvent,
     LayoutChangeEvent,
+    Pressable,
     StyleSheet,
     Text,
-    TouchableOpacity,
+    TouchableWithoutFeedback,
     View
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import Animated, { interpolate, runOnJS, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
@@ -37,21 +38,24 @@ const Slider: React.FC<SliderProps> = ({
     const percent = useSharedValue(0);
     const tooltipLayout = useSharedValue<{ width: number, height: number }>({ width: 0, height: 0 });
 
-    const calculatePercent = () => {
-        percent.value = Math.round(Math.max(
-            Math.min((thumbOffset.value / (trackWidth.value - SLIDER_HANDLE_WIDTH)) * 100, 100),
-            0
-        ));
+    const calculatePercent = (offset: number) => {
+        const percentValue = Math.round(
+            Math.max(
+                0,
+                Math.min(100, (offset / (trackWidth.value - SLIDER_HANDLE_WIDTH)) * 100)
+            )
+        );
+        percent.value = percentValue;
 
-        let updatedValue = percent.value;
-        if(maxValue) updatedValue = Math.round(minValue + (maxValue - minValue) * (percent.value / 100));
+        let updatedValue = percentValue;
+        if(maxValue) updatedValue = Math.round(minValue + (maxValue - minValue) * (percentValue / 100));
 
         setInputValue(updatedValue);
     };
 
-    const updateValue = () => {
-        if(setValue) setValue(updatedValue);
-        if(onChange) onChange(updatedValue);
+    const updateValue = (newValue: number) => {
+        if(setValue) setValue(newValue);
+        if(onChange) onChange(newValue);
     };
 
     const pan = Gesture.Pan()
@@ -60,25 +64,30 @@ const Slider: React.FC<SliderProps> = ({
             trackWidth.value - SLIDER_HANDLE_WIDTH,
             Math.max(0, thumbOffset.value + event.changeX)
         );
-        runOnJS(calculatePercent)();
+        runOnJS(calculatePercent)(thumbOffset.value);
     })
     .onEnd(_event => {
-        runOnJS(updateValue)();
+        runOnJS(updateValue)(1);
     });
 
     const sliderBarStyle = useAnimatedStyle(() => {
         return {
-            width: `${ percent.value }%`
+            width: interpolate(percent.value, [0, 100], [0, trackWidth.value - SLIDER_HANDLE_WIDTH]) // a handle width-je kivonasra kerul, hogy ne loghasson tul
         };
     });
 
     const tooltipContainerStyle = useAnimatedStyle(() => {
+        const handleX = interpolate(
+            percent.value,
+            [0, 100],
+            [0, trackWidth.value - 1.75 * SLIDER_HANDLE_WIDTH]
+        );
+
         return {
+            left: handleX + (SLIDER_HANDLE_WIDTH / 2) - (tooltipLayout.value.width / 2),
             width: tooltipLayout.value.width,
             transform: [
-                { translateY: -1 * (SLIDER_HANDLE_HEIGHT / 2 + 2 * tooltipLayout.value.height + SEPARATOR_SIZES.lightSmall) },
-                // { translateY: -1 * (tooltipLayout.value.height + 37.5) },
-                { translateX: (-SLIDER_HANDLE_WIDTH + tooltipLayout.value.width) / 2 }
+                { translateY: -tooltipLayout.value.height - SLIDER_HANDLE_HEIGHT - SEPARATOR_SIZES.lightSmall * 1.25 }
             ]
         };
     });
@@ -92,8 +101,22 @@ const Slider: React.FC<SliderProps> = ({
         };
     });
 
+    const sliderHandleStyle = useAnimatedStyle(() => {
+        return {
+            transform: [
+                {
+                    translateX: interpolate(
+                        percent.value,
+                        [0, 100],
+                        [0, trackWidth.value - 1.75 * SLIDER_HANDLE_WIDTH]
+                    )
+                }
+            ]
+        };
+    });
+
     const onTrackLayout = (event: LayoutChangeEvent) => {
-        trackWidth.set(event.nativeEvent.layout.width);
+        trackWidth.set(event.nativeEvent.layout.width + SLIDER_INNER_HANDLE_WIDTH);
     };
 
     const onTooltipTextLayout = (event: LayoutChangeEvent) => {
@@ -104,36 +127,49 @@ const Slider: React.FC<SliderProps> = ({
 
 
     const onTrackPress = (event: GestureResponderEvent) => {
-        thumbOffset.value = Math.max(0, event.nativeEvent.locationX - SLIDER_HANDLE_WIDTH / 2);
-        setTimeout(calculatePercent, 100);
-        setTimeout(updateValue, 200);
+        let offset = Math.min(
+            trackWidth.value - SLIDER_HANDLE_WIDTH,
+            Math.max(0, event.nativeEvent.locationX)
+        );
+        thumbOffset.value = offset;
+
+        calculatePercent(offset);
+        updateValue(3);
     };
 
     return (
         <View style={ styles.container }>
             <Text style={ styles.steps.text }>{ minValue }</Text>
             <View style={ styles.slider }>
-                <TouchableOpacity
+                <Pressable
                     style={ styles.slider.track }
                     onLayout={ onTrackLayout }
                     onPress={ onTrackPress }
                 >
-                    <Animated.View style={ [styles.slider.bar, sliderBarStyle] }>
-                        <Animated.View style={ [styles.slider.tooltip, tooltipContainerStyle] }>
-                            <Animated.View
-                                style={ [styles.slider.tooltip.bottomTriangle, tooltipContainerTriangleStyle] }/>
-                            <Text
-                                onLayout={ onTooltipTextLayout }
-                                style={ styles.slider.tooltip.text }
-                            >
-                                { inputValue }
-                            </Text>
-                        </Animated.View>
-                        <GestureDetector gesture={ pan }>
-                            <Animated.View style={ styles.slider.handle }/>
-                        </GestureDetector>
-                    </Animated.View>
-                </TouchableOpacity>
+                    <Animated.View style={ [styles.slider.bar, sliderBarStyle] }/>
+                    <TouchableWithoutFeedback>
+                        <View style={ { position: "absolute", top: 0 } }>
+                            <Animated.View style={ [styles.slider.tooltip, tooltipContainerStyle] }>
+                                <Animated.View
+                                    style={ [styles.slider.tooltip.bottomTriangle, tooltipContainerTriangleStyle] }
+                                />
+                                <Text
+                                    onLayout={ onTooltipTextLayout }
+                                    style={ styles.slider.tooltip.text }
+                                >
+                                    { inputValue }
+                                </Text>
+                            </Animated.View>
+                        </View>
+                    </TouchableWithoutFeedback>
+                    <GestureDetector gesture={ pan }>
+                        <TouchableWithoutFeedback>
+                            <Animated.View style={ [styles.slider.handle, sliderHandleStyle] }>
+                                <View style={ styles.slider.handle.innerHandle }/>
+                            </Animated.View>
+                        </TouchableWithoutFeedback>
+                    </GestureDetector>
+                </Pressable>
             </View>
             <Text style={ styles.steps.text }>{ maxValue }</Text>
         </View>
@@ -141,8 +177,10 @@ const Slider: React.FC<SliderProps> = ({
 };
 
 const SLIDER_TRACK_HEIGHT = heightPercentageToDP(0.75);
-const SLIDER_HANDLE_HEIGHT = heightPercentageToDP(1.5);
-const SLIDER_HANDLE_WIDTH = heightPercentageToDP(1.5);
+const SLIDER_HANDLE_HEIGHT = heightPercentageToDP(3.5);
+const SLIDER_HANDLE_WIDTH = heightPercentageToDP(3.5);
+const SLIDER_INNER_HANDLE_HEIGHT = SLIDER_HANDLE_HEIGHT / 1.35;
+const SLIDER_INNER_HANDLE_WIDTH = SLIDER_HANDLE_WIDTH / 1.35;
 
 const styles = StyleSheet.create({
     container: {
@@ -153,6 +191,7 @@ const styles = StyleSheet.create({
     },
     slider: {
         flex: 1,
+        position: "relative",
         minHeight: SLIDER_HANDLE_HEIGHT,
         justifyContent: "center",
 
@@ -165,28 +204,33 @@ const styles = StyleSheet.create({
         },
 
         bar: {
-            position: "relative",
+            position: "absolute",
+            bottom: 0,
             height: "100%",
-            minWidth: SLIDER_HANDLE_WIDTH,
             backgroundColor: COLORS.gray1,
             borderRadius: 25
         },
 
         handle: {
+            position: "absolute",
             width: SLIDER_HANDLE_WIDTH,
             height: SLIDER_HANDLE_HEIGHT,
-            backgroundColor: COLORS.gray1,
-            alignSelf: "flex-end",
+            backgroundColor: COLORS.gray3,
+            justifyContent: "center",
+            alignItems: "center",
             borderRadius: 50,
-            transform: [
-                { translateY: (SLIDER_TRACK_HEIGHT - SLIDER_HANDLE_HEIGHT) / 2 }
-            ],
-            zIndex: 5
+            zIndex: 5,
+
+            innerHandle: {
+                width: SLIDER_INNER_HANDLE_WIDTH,
+                height: SLIDER_INNER_HANDLE_HEIGHT,
+                backgroundColor: COLORS.gray1,
+                borderRadius: 50
+            }
         },
 
         tooltip: {
             position: "absolute",
-            alignSelf: "flex-end",
             alignItems: "center",
             justifyContent: "center",
             backgroundColor: COLORS.gray3,
