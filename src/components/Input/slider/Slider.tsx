@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Dimensions,
     GestureResponderEvent,
@@ -12,22 +12,70 @@ import {
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { interpolate, runOnJS, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
-import { heightPercentageToDP } from "react-native-responsive-screen";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { Color } from "../../../types/index.ts";
 
 interface SliderProps {
     value?: number;
     setValue?: (value: number) => void;
     minValue?: number;
     maxValue?: number;
+    style?: Partial<SliderStyle>;
+}
+
+type SliderStyle = {
+    trackHeight: number
+    trackColor: Color
+    barColor: Color
+    handleHeight: number
+    handleWidth: number
+    handleColor: Color
+    innerHandleWidth: number
+    innerHandleHeight: number
+    innerHandleColor: Color
+    tooltipColor: Color
+    valuesTextColor: Color
+    showsBoundingValues?: boolean
 }
 
 const Slider: React.FC<SliderProps> = ({
     minValue = 0,
     maxValue,
     value = minValue,
-    setValue
+    setValue,
+    style = {}
 }) => {
+    const {
+        trackHeight = hp(0.75),
+        trackColor = COLORS.gray3,
+        barColor = COLORS.gray1,
+        handleHeight = hp(3.5),
+        handleWidth = hp(3.5),
+        handleColor = trackColor,
+        innerHandleHeight = handleHeight / 1.35,
+        innerHandleWidth = handleWidth / 1.35,
+        innerHandleColor = barColor,
+        tooltipColor = handleColor,
+        valuesTextColor = COLORS.white,
+        showsBoundingValues = true
+    } = style;
+
+    const styles = useStyles({
+        trackHeight,
+        trackColor,
+        barColor,
+        handleHeight,
+        handleWidth,
+        handleColor,
+        innerHandleHeight,
+        innerHandleWidth,
+        innerHandleColor,
+        tooltipColor,
+        valuesTextColor
+    });
+
+    const [panning, setPanning] = useState(false);
     const [inputValue, setInputValue] = useState(value);
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field?.onChange;
@@ -38,11 +86,18 @@ const Slider: React.FC<SliderProps> = ({
     const percent = useSharedValue(0);
     const tooltipLayout = useSharedValue<{ width: number, height: number }>({ width: 0, height: 0 });
 
-    const calculatePercent = (offset: number) => {
+    useEffect(() => {
+        if(panning) return;
+
+        if(setValue) setValue(inputValue);
+        if(onChange) onChange(inputValue);
+    }, [inputValue, panning]);
+
+    const calculateValue = (offset: number, callback?: (value: number) => void) => {
         const percentValue = Math.round(
             Math.max(
                 0,
-                Math.min(100, (offset / (trackWidth.value - SLIDER_HANDLE_WIDTH)) * 100)
+                Math.min(100, (offset / (trackWidth.value - handleWidth)) * 100)
             )
         );
         percent.value = percentValue;
@@ -53,26 +108,44 @@ const Slider: React.FC<SliderProps> = ({
         setInputValue(updatedValue);
     };
 
-    const updateValue = (newValue: number) => {
-        if(setValue) setValue(newValue);
-        if(onChange) onChange(newValue);
-    };
-
     const pan = Gesture.Pan()
+    .onStart(_event => {
+        runOnJS(setPanning)(true);
+    })
     .onChange((event) => {
         thumbOffset.value = Math.min(
-            trackWidth.value - SLIDER_HANDLE_WIDTH,
+            trackWidth.value - handleWidth,
             Math.max(0, thumbOffset.value + event.changeX)
         );
-        runOnJS(calculatePercent)(thumbOffset.value);
+        runOnJS(calculateValue)(thumbOffset.value);
     })
     .onEnd(_event => {
-        runOnJS(updateValue)(1);
+        runOnJS(setPanning)(false);
     });
+
+    const onTrackLayout = (event: LayoutChangeEvent) => {
+        trackWidth.set(event.nativeEvent.layout.width + innerHandleWidth);
+    };
+
+    const onTooltipTextLayout = (event: LayoutChangeEvent) => {
+        const width = event.nativeEvent.layout.width + 2 * SEPARATOR_SIZES.lightSmall;
+        const height = event.nativeEvent.layout.height;
+        tooltipLayout.set({ width, height });
+    };
+
+    const onTrackPress = (event: GestureResponderEvent) => {
+        let offset = Math.min(
+            trackWidth.value - handleWidth,
+            Math.max(0, event.nativeEvent.locationX)
+        );
+        thumbOffset.value = offset;
+
+        calculateValue(offset);
+    };
 
     const sliderBarStyle = useAnimatedStyle(() => {
         return {
-            width: interpolate(percent.value, [0, 100], [0, trackWidth.value - SLIDER_HANDLE_WIDTH]) // a handle width-je kivonasra kerul, hogy ne loghasson tul
+            width: interpolate(percent.value, [0, 100], [0, trackWidth.value - handleWidth]) // a handle width-je kivonasra kerul, hogy ne loghasson tul
         };
     });
 
@@ -80,14 +153,14 @@ const Slider: React.FC<SliderProps> = ({
         const handleX = interpolate(
             percent.value,
             [0, 100],
-            [0, trackWidth.value - 1.75 * SLIDER_HANDLE_WIDTH]
+            [0, trackWidth.value - 1.75 * handleWidth]
         );
 
         return {
-            left: handleX + (SLIDER_HANDLE_WIDTH / 2) - (tooltipLayout.value.width / 2),
+            left: handleX + (handleWidth / 2) - (tooltipLayout.value.width / 2),
             width: tooltipLayout.value.width,
             transform: [
-                { translateY: -tooltipLayout.value.height - SLIDER_HANDLE_HEIGHT - SEPARATOR_SIZES.lightSmall * 1.25 }
+                { translateY: -tooltipLayout.value.height - handleHeight - SEPARATOR_SIZES.lightSmall * 1.25 }
             ]
         };
     });
@@ -108,38 +181,16 @@ const Slider: React.FC<SliderProps> = ({
                     translateX: interpolate(
                         percent.value,
                         [0, 100],
-                        [0, trackWidth.value - 1.75 * SLIDER_HANDLE_WIDTH]
+                        [0, trackWidth.value - 1.75 * handleWidth]
                     )
                 }
             ]
         };
     });
 
-    const onTrackLayout = (event: LayoutChangeEvent) => {
-        trackWidth.set(event.nativeEvent.layout.width + SLIDER_INNER_HANDLE_WIDTH);
-    };
-
-    const onTooltipTextLayout = (event: LayoutChangeEvent) => {
-        const width = event.nativeEvent.layout.width + 2 * SEPARATOR_SIZES.lightSmall;
-        const height = event.nativeEvent.layout.height;
-        tooltipLayout.set({ width, height });
-    };
-
-
-    const onTrackPress = (event: GestureResponderEvent) => {
-        let offset = Math.min(
-            trackWidth.value - SLIDER_HANDLE_WIDTH,
-            Math.max(0, event.nativeEvent.locationX)
-        );
-        thumbOffset.value = offset;
-
-        calculatePercent(offset);
-        updateValue(3);
-    };
-
     return (
         <View style={ styles.container }>
-            <Text style={ styles.steps.text }>{ minValue }</Text>
+            { showsBoundingValues && <Text style={ styles.steps.text }>{ minValue }</Text> }
             <View style={ styles.slider }>
                 <Pressable
                     style={ styles.slider.track }
@@ -171,18 +222,24 @@ const Slider: React.FC<SliderProps> = ({
                     </GestureDetector>
                 </Pressable>
             </View>
-            <Text style={ styles.steps.text }>{ maxValue }</Text>
+            { showsBoundingValues && <Text style={ styles.steps.text }>{ maxValue }</Text> }
         </View>
     );
 };
 
-const SLIDER_TRACK_HEIGHT = heightPercentageToDP(0.75);
-const SLIDER_HANDLE_HEIGHT = heightPercentageToDP(3.5);
-const SLIDER_HANDLE_WIDTH = heightPercentageToDP(3.5);
-const SLIDER_INNER_HANDLE_HEIGHT = SLIDER_HANDLE_HEIGHT / 1.35;
-const SLIDER_INNER_HANDLE_WIDTH = SLIDER_HANDLE_WIDTH / 1.35;
-
-const styles = StyleSheet.create({
+const useStyles = ({
+    trackHeight,
+    trackColor,
+    barColor,
+    tooltipColor,
+    handleHeight,
+    handleWidth,
+    handleColor,
+    innerHandleHeight,
+    innerHandleWidth,
+    innerHandleColor,
+    valuesTextColor
+}: SliderStyle) => StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: "row",
@@ -192,14 +249,14 @@ const styles = StyleSheet.create({
     slider: {
         flex: 1,
         position: "relative",
-        minHeight: SLIDER_HANDLE_HEIGHT,
+        minHeight: handleHeight,
         justifyContent: "center",
 
         track: {
             position: "relative",
-            height: SLIDER_TRACK_HEIGHT,
+            height: trackHeight,
             justifyContent: "center",
-            backgroundColor: COLORS.gray3,
+            backgroundColor: trackColor,
             borderRadius: 25
         },
 
@@ -207,24 +264,24 @@ const styles = StyleSheet.create({
             position: "absolute",
             bottom: 0,
             height: "100%",
-            backgroundColor: COLORS.gray1,
+            backgroundColor: barColor,
             borderRadius: 25
         },
 
         handle: {
             position: "absolute",
-            width: SLIDER_HANDLE_WIDTH,
-            height: SLIDER_HANDLE_HEIGHT,
-            backgroundColor: COLORS.gray3,
+            width: handleWidth,
+            height: handleHeight,
+            backgroundColor: handleColor,
             justifyContent: "center",
             alignItems: "center",
             borderRadius: 50,
             zIndex: 5,
 
             innerHandle: {
-                width: SLIDER_INNER_HANDLE_WIDTH,
-                height: SLIDER_INNER_HANDLE_HEIGHT,
-                backgroundColor: COLORS.gray1,
+                width: innerHandleWidth,
+                height: innerHandleHeight,
+                backgroundColor: innerHandleColor,
                 borderRadius: 50
             }
         },
@@ -233,7 +290,7 @@ const styles = StyleSheet.create({
             position: "absolute",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: COLORS.gray3,
+            backgroundColor: tooltipColor,
             paddingVertical: SEPARATOR_SIZES.lightSmall,
             borderRadius: 7.5,
 
@@ -248,14 +305,14 @@ const styles = StyleSheet.create({
                 borderBottomWidth: 16,
                 borderLeftColor: "transparent",
                 borderRightColor: "transparent",
-                borderBottomColor: COLORS.gray3
+                borderBottomColor: tooltipColor
             },
 
             text: {
                 fontFamily: "Gilroy-Medium",
                 fontWeight: "bold",
                 fontSize: FONT_SIZES.p4,
-                color: COLORS.white
+                color: valuesTextColor
             }
         }
     },
@@ -268,7 +325,7 @@ const styles = StyleSheet.create({
             fontFamily: "Gilroy-Medium",
             fontWeight: "bold",
             fontSize: FONT_SIZES.p4,
-            color: COLORS.white
+            color: valuesTextColor
         }
     }
 });
