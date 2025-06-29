@@ -60,7 +60,7 @@ const Slider: React.FC<SliderProps> = ({
         valuesTextColor = COLORS.white,
         showsBoundingValues = true
     } = style;
-    const toolbarTriangleHeight = 16;
+    const tooltipBottomTriangleHeight = 16;
     const [tooltipLayout, setTooltipLayout] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
 
     const styles = useStyles({
@@ -75,7 +75,7 @@ const Slider: React.FC<SliderProps> = ({
         innerHandleColor,
         tooltipColor,
         tooltipLayout,
-        tooltipBottomTriangleHeight: toolbarTriangleHeight,
+        tooltipBottomTriangleHeight,
         valuesTextColor
     });
 
@@ -132,7 +132,7 @@ const Slider: React.FC<SliderProps> = ({
 
     const onTooltipTextLayout = (event: LayoutChangeEvent) => {
         const width = event.nativeEvent.layout.width + 2 * SEPARATOR_SIZES.lightSmall;
-        const height = event.nativeEvent.layout.height + 2 * SEPARATOR_SIZES.lightSmall + toolbarTriangleHeight;
+        const height = event.nativeEvent.layout.height + 2 * SEPARATOR_SIZES.lightSmall + tooltipBottomTriangleHeight;
         setTooltipLayout({ width, height });
     };
 
