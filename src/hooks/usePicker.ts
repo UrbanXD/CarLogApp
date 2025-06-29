@@ -31,11 +31,13 @@ export const usePicker = ({ elements, defaultSelectedElementId, setValue }: UseP
 
     useEffect(() => {
         if(!selectedElement) return;
-
         const element = findElement(selectedElement.id);
+
+        if(onChange) onChange(element?.value ?? "");
+        if(setValue) setValue(element?.value ?? "");
+
         setSelectedElement(element);
-        onSelect(element.id);
-    }, [elements, onSelect]);
+    }, [elements]);
 
     return { selectedElement, onSelect };
 };
