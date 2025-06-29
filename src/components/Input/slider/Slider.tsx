@@ -61,6 +61,7 @@ const Slider: React.FC<SliderProps> = ({
         showsBoundingValues = true
     } = style;
     const toolbarTriangleHeight = 16;
+    const [tooltipLayout, setTooltipLayout] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
 
     const styles = useStyles({
         trackHeight,
@@ -73,6 +74,8 @@ const Slider: React.FC<SliderProps> = ({
         innerHandleWidth,
         innerHandleColor,
         tooltipColor,
+        tooltipLayout,
+        tooltipBottomTriangleHeight: toolbarTriangleHeight,
         valuesTextColor
     });
 
@@ -85,7 +88,6 @@ const Slider: React.FC<SliderProps> = ({
     const trackWidth = useSharedValue(Dimensions.get("window").width);
     const thumbOffset = useSharedValue(0);
     const percent = useSharedValue(0);
-    const tooltipLayout = useSharedValue<{ width: number, height: number }>({ width: 0, height: 0 });
 
     useEffect(() => {
         if(panning) return;
@@ -130,8 +132,8 @@ const Slider: React.FC<SliderProps> = ({
 
     const onTooltipTextLayout = (event: LayoutChangeEvent) => {
         const width = event.nativeEvent.layout.width + 2 * SEPARATOR_SIZES.lightSmall;
-        const height = event.nativeEvent.layout.height;
-        tooltipLayout.set({ width, height });
+        const height = event.nativeEvent.layout.height + 2 * SEPARATOR_SIZES.lightSmall + toolbarTriangleHeight;
+        setTooltipLayout({ width, height });
     };
 
     const onTrackPress = (event: GestureResponderEvent) => {
@@ -146,7 +148,11 @@ const Slider: React.FC<SliderProps> = ({
 
     const sliderBarStyle = useAnimatedStyle(() => {
         return {
-            width: interpolate(percent.value, [0, 100], [0, trackWidth.value - handleWidth]) // a handle width-je kivonasra kerul, hogy ne loghasson tul
+            width: interpolate(
+                percent.value,
+                [0, 100],
+                [0, trackWidth.value - handleWidth] // a handle width-je kivonasra kerul, hogy ne loghasson tul
+            )
         };
     });
 
@@ -158,20 +164,7 @@ const Slider: React.FC<SliderProps> = ({
         );
 
         return {
-            left: handleX + (handleWidth / 2) - (tooltipLayout.value.width / 2),
-            width: tooltipLayout.value.width,
-            transform: [
-                { translateY: trackHeight - tooltipLayout.value.height * 2 - toolbarTriangleHeight - handleHeight / 2 }
-            ]
-        };
-    });
-
-    const tooltipContainerTriangleStyle = useAnimatedStyle(() => {
-        return {
-            transform: [
-                { rotateX: "180deg" },
-                { translateY: -tooltipLayout.value.height }
-            ]
+            left: handleX + (handleWidth / 2) - (tooltipLayout.width / 2)
         };
     });
 
@@ -202,9 +195,7 @@ const Slider: React.FC<SliderProps> = ({
                     <TouchableWithoutFeedback>
                         <View style={ { position: "absolute", top: 0 } }>
                             <Animated.View style={ [styles.slider.tooltip, tooltipContainerStyle] }>
-                                <Animated.View
-                                    style={ [styles.slider.tooltip.bottomTriangle, tooltipContainerTriangleStyle] }
-                                />
+                                <Animated.View style={ styles.slider.tooltip.bottomTriangle }/>
                                 <Text
                                     onLayout={ onTooltipTextLayout }
                                     style={ styles.slider.tooltip.text }
@@ -228,10 +219,19 @@ const Slider: React.FC<SliderProps> = ({
     );
 };
 
+type UseStylesArg =
+    Omit<SliderStyle, "showsBoundingValues"> &
+    {
+        tooltipBottomTriangleHeight: number,
+        tooltipLayout: { width: number, height: number }
+    }
+
 const useStyles = ({
     trackHeight,
     trackColor,
     barColor,
+    tooltipLayout,
+    tooltipBottomTriangleHeight,
     tooltipColor,
     handleHeight,
     handleWidth,
@@ -240,12 +240,13 @@ const useStyles = ({
     innerHandleWidth,
     innerHandleColor,
     valuesTextColor
-}: SliderStyle) => StyleSheet.create({
+}: UseStylesArg) => StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: "row",
         gap: SEPARATOR_SIZES.lightSmall,
-        alignItems: "center"
+        alignItems: "center",
+        marginTop: tooltipLayout.height
     },
     slider: {
         flex: 1,
@@ -288,12 +289,16 @@ const useStyles = ({
         },
 
         tooltip: {
-            // position: "absolute",
+            position: "absolute",
             alignItems: "center",
             justifyContent: "center",
+            width: tooltipLayout.width,
             backgroundColor: tooltipColor,
             paddingVertical: SEPARATOR_SIZES.lightSmall,
             borderRadius: 7.5,
+            transform: [
+                { translateY: trackHeight - tooltipLayout.height - handleHeight / 2 }
+            ],
 
             bottomTriangle: {
                 position: "absolute",
@@ -303,10 +308,14 @@ const useStyles = ({
                 borderStyle: "solid",
                 borderLeftWidth: 8,
                 borderRightWidth: 8,
-                borderBottomWidth: 16,
+                borderBottomWidth: tooltipBottomTriangleHeight,
                 borderLeftColor: "transparent",
                 borderRightColor: "transparent",
-                borderBottomColor: tooltipColor
+                borderBottomColor: tooltipColor,
+                transform: [
+                    { rotateX: "180deg" },
+                    { translateY: -tooltipLayout.height + 2 * SEPARATOR_SIZES.lightSmall + tooltipBottomTriangleHeight }
+                ]
             },
 
             text: {
