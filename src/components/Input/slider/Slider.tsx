@@ -47,7 +47,7 @@ const Slider: React.FC<SliderProps> = ({
     style = {}
 }) => {
     const {
-        trackHeight = hp(0.75),
+        trackHeight = hp(1),
         trackColor = COLORS.gray3,
         barColor = COLORS.gray1,
         handleHeight = hp(3.5),
@@ -60,6 +60,7 @@ const Slider: React.FC<SliderProps> = ({
         valuesTextColor = COLORS.white,
         showsBoundingValues = true
     } = style;
+    const toolbarTriangleHeight = 16;
 
     const styles = useStyles({
         trackHeight,
@@ -93,7 +94,7 @@ const Slider: React.FC<SliderProps> = ({
         if(onChange) onChange(inputValue);
     }, [inputValue, panning]);
 
-    const calculateValue = (offset: number, callback?: (value: number) => void) => {
+    const calculateValue = (offset: number) => {
         const percentValue = Math.round(
             Math.max(
                 0,
@@ -160,7 +161,7 @@ const Slider: React.FC<SliderProps> = ({
             left: handleX + (handleWidth / 2) - (tooltipLayout.value.width / 2),
             width: tooltipLayout.value.width,
             transform: [
-                { translateY: -tooltipLayout.value.height - handleHeight - SEPARATOR_SIZES.lightSmall * 1.25 }
+                { translateY: trackHeight - tooltipLayout.value.height * 2 - toolbarTriangleHeight - handleHeight / 2 }
             ]
         };
     });
@@ -287,7 +288,7 @@ const useStyles = ({
         },
 
         tooltip: {
-            position: "absolute",
+            // position: "absolute",
             alignItems: "center",
             justifyContent: "center",
             backgroundColor: tooltipColor,
