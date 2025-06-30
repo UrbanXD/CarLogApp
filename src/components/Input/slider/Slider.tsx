@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-    Dimensions,
     GestureResponderEvent,
     LayoutChangeEvent,
     Pressable,
@@ -53,11 +52,11 @@ const Slider: React.FC<SliderProps> = ({
         barColor = COLORS.gray1,
         handleHeight = hp(3.5),
         handleWidth = hp(3.5),
-        handleColor = trackColor,
-        innerHandleHeight = handleHeight / 1.35,
-        innerHandleWidth = handleWidth / 1.35,
-        innerHandleColor = barColor,
-        tooltipColor = handleColor,
+        handleColor = barColor,
+        innerHandleHeight = handleHeight * 0.875,
+        innerHandleWidth = handleWidth * 0.875,
+        innerHandleColor = trackColor,
+        tooltipColor = trackColor,
         valuesTextColor = COLORS.white,
         showsBoundingValues = true,
         showsTooltip = true
@@ -87,7 +86,7 @@ const Slider: React.FC<SliderProps> = ({
     const onChange = inputFieldContext?.field?.onChange;
     const error = inputFieldContext?.fieldState?.error;
 
-    const trackWidth = useSharedValue(Dimensions.get("window").width);
+    const trackWidth = useSharedValue(0);
     const thumbOffset = useSharedValue(0);
     const percent = useSharedValue(0);
 
@@ -129,7 +128,7 @@ const Slider: React.FC<SliderProps> = ({
     });
 
     const onTrackLayout = (event: LayoutChangeEvent) => {
-        trackWidth.set(event.nativeEvent.layout.width + innerHandleWidth);
+        trackWidth.set(event.nativeEvent.layout.width);
     };
 
     const onTooltipTextLayout = (event: LayoutChangeEvent) => {
@@ -153,22 +152,21 @@ const Slider: React.FC<SliderProps> = ({
             width: interpolate(
                 percent.value,
                 [0, 100],
-                [0, trackWidth.value - handleWidth] // a handle width-je kivonasra kerul, hogy ne loghasson tul
+                [0, trackWidth.value]
             )
         };
     });
 
     const tooltipContainerStyle = useAnimatedStyle(() => {
         if(!showsTooltip) return {};
-
         const handleX = interpolate(
             percent.value,
             [0, 100],
-            [0, trackWidth.value - 1.75 * handleWidth]
+            [handleWidth / 2, trackWidth.value - handleWidth / 2]
         );
 
         return {
-            left: handleX + (handleWidth / 2) - (tooltipLayout.width / 2)
+            left: handleX - tooltipLayout.width / 2
         };
     });
 
@@ -179,7 +177,7 @@ const Slider: React.FC<SliderProps> = ({
                     translateX: interpolate(
                         percent.value,
                         [0, 100],
-                        [0, trackWidth.value - 1.75 * handleWidth]
+                        [0, trackWidth.value - handleWidth]
                     )
                 }
             ]
