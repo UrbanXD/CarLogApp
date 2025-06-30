@@ -37,6 +37,7 @@ type SliderStyle = {
     tooltipColor: Color
     valuesTextColor: Color
     showsBoundingValues?: boolean
+    showsTooltip?: boolean
 }
 
 const Slider: React.FC<SliderProps> = ({
@@ -58,7 +59,8 @@ const Slider: React.FC<SliderProps> = ({
         innerHandleColor = barColor,
         tooltipColor = handleColor,
         valuesTextColor = COLORS.white,
-        showsBoundingValues = true
+        showsBoundingValues = true,
+        showsTooltip = true
     } = style;
     const tooltipBottomTriangleHeight = 16;
     const [tooltipLayout, setTooltipLayout] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
@@ -90,9 +92,9 @@ const Slider: React.FC<SliderProps> = ({
     const percent = useSharedValue(0);
 
     useEffect(() => {
+        if(setValue) setValue(inputValue);
         if(panning) return;
 
-        if(setValue) setValue(inputValue);
         if(onChange) onChange(inputValue);
     }, [inputValue, panning]);
 
@@ -157,6 +159,8 @@ const Slider: React.FC<SliderProps> = ({
     });
 
     const tooltipContainerStyle = useAnimatedStyle(() => {
+        if(!showsTooltip) return {};
+
         const handleX = interpolate(
             percent.value,
             [0, 100],
@@ -192,19 +196,22 @@ const Slider: React.FC<SliderProps> = ({
                     onPress={ onTrackPress }
                 >
                     <Animated.View style={ [styles.slider.bar, sliderBarStyle] }/>
-                    <TouchableWithoutFeedback>
-                        <View style={ { position: "absolute", top: 0 } }>
-                            <Animated.View style={ [styles.slider.tooltip, tooltipContainerStyle] }>
+                    {
+                        showsTooltip &&
+                       <TouchableWithoutFeedback>
+                          <View style={ { position: "absolute", top: 0 } }>
+                             <Animated.View style={ [styles.slider.tooltip, tooltipContainerStyle] }>
                                 <Animated.View style={ styles.slider.tooltip.bottomTriangle }/>
                                 <Text
-                                    onLayout={ onTooltipTextLayout }
-                                    style={ styles.slider.tooltip.text }
+                                   onLayout={ onTooltipTextLayout }
+                                   style={ styles.slider.tooltip.text }
                                 >
                                     { inputValue }
                                 </Text>
-                            </Animated.View>
-                        </View>
-                    </TouchableWithoutFeedback>
+                             </Animated.View>
+                          </View>
+                       </TouchableWithoutFeedback>
+                    }
                     <GestureDetector gesture={ pan }>
                         <TouchableWithoutFeedback>
                             <Animated.View style={ [styles.slider.handle, sliderHandleStyle] }>
@@ -220,7 +227,7 @@ const Slider: React.FC<SliderProps> = ({
 };
 
 type UseStylesArg =
-    Omit<SliderStyle, "showsBoundingValues"> &
+    Omit<SliderStyle, "showsBoundingValues" | "showsTooltip"> &
     {
         tooltipBottomTriangleHeight: number,
         tooltipLayout: { width: number, height: number }
