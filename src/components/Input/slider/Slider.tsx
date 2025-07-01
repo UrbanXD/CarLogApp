@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
     GestureResponderEvent,
     LayoutChangeEvent,
@@ -8,25 +8,38 @@ import {
     TouchableWithoutFeedback,
     View
 } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, { interpolate, runOnJS, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import { Gesture, GestureDetector, GestureUpdateEvent } from "react-native-gesture-handler";
+import Animated, {
+    interpolate,
+    runOnJS,
+    useAnimatedReaction,
+    useAnimatedStyle,
+    useSharedValue
+} from "react-native-reanimated";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { Color } from "../../../types/index.ts";
+import type {
+    PanGestureHandlerEventPayload
+} from "react-native-gesture-handler/src/handlers/GestureHandlerEventPayload.ts";
+import { PanGestureChangeEventPayload } from "react-native-gesture-handler/src/handlers/gestures/panGesture.ts";
 
 interface SliderProps {
     value?: number;
     setValue?: (value: number) => void;
     minValue?: number;
     maxValue?: number;
+    measurement?: string;
     style?: Partial<SliderStyle>;
 }
 
 type SliderStyle = {
+    borderRadius: number
     trackHeight: number
     trackColor: Color
     barColor: Color
+    minBarWidth: number
     handleHeight: number
     handleWidth: number
     handleColor: Color
@@ -34,9 +47,12 @@ type SliderStyle = {
     innerHandleHeight: number
     innerHandleColor: Color
     tooltipColor: Color
-    valuesTextColor: Color
-    showsBoundingValues?: boolean
-    showsTooltip?: boolean
+    valueTextColor: Color
+    boundingValuesTextColor: Color
+    showsBoundingValues: boolean
+    showsTooltip: boolean
+    showsHandle: boolean
+    innerTooltip: boolean
 }
 
 const Slider: React.FC<SliderProps> = ({
@@ -44,9 +60,11 @@ const Slider: React.FC<SliderProps> = ({
     maxValue,
     value = minValue,
     setValue,
+    measurement,
     style = {}
 }) => {
     const {
+        borderRadius = 25,
         trackHeight = hp(1),
         trackColor = COLORS.gray3,
         barColor = COLORS.gray1,
@@ -57,17 +75,23 @@ const Slider: React.FC<SliderProps> = ({
         innerHandleWidth = handleWidth * 0.875,
         innerHandleColor = trackColor,
         tooltipColor = trackColor,
-        valuesTextColor = COLORS.white,
+        valueTextColor = COLORS.white,
+        boundingValuesTextColor = COLORS.gray1,
         showsBoundingValues = true,
-        showsTooltip = true
+        showsTooltip = true,
+        showsHandle = true,
+        innerTooltip
     } = style;
+    const minBarWidth = SEPARATOR_SIZES.lightSmall; // csak akkora ha nincs handle
     const tooltipBottomTriangleHeight = 16;
     const [tooltipLayout, setTooltipLayout] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
 
     const styles = useStyles({
+        borderRadius,
         trackHeight,
         trackColor,
         barColor,
+        minBarWidth,
         handleHeight,
         handleWidth,
         handleColor,
@@ -77,11 +101,11 @@ const Slider: React.FC<SliderProps> = ({
         tooltipColor,
         tooltipLayout,
         tooltipBottomTriangleHeight,
-        valuesTextColor
+        valueTextColor,
+        boundingValuesTextColor,
+        showsHandle
     });
 
-    const [panning, setPanning] = useState(false);
-    const [inputValue, setInputValue] = useState(value);
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field?.onChange;
     const error = inputFieldContext?.fieldState?.error;
@@ -89,43 +113,49 @@ const Slider: React.FC<SliderProps> = ({
     const trackWidth = useSharedValue(0);
     const thumbOffset = useSharedValue(0);
     const percent = useSharedValue(0);
+    const inputValue = useSharedValue(value);
+    const [tooltipText, setTooltipText] = useState(`${ inputValue }`);
 
-    useEffect(() => {
-        if(setValue) setValue(inputValue);
-        if(panning) return;
+    useAnimatedReaction(
+        () => inputValue.value,
+        (newVal) => {
+            let text = newVal.toString();
+            if(measurement) text += ` ${ measurement }`;
+            runOnJS(setTooltipText)(text);
+        }
+    );
 
-        if(onChange) onChange(inputValue);
-    }, [inputValue, panning]);
+    const calculateValue = useCallback((offset: number) => {
+        "worklet";
+        const newPercent = Math.max(0, Math.min(100, (offset / (trackWidth.value - handleWidth)) * 100));
+        percent.value = newPercent;
 
-    const calculateValue = (offset: number) => {
-        const percentValue = Math.round(
-            Math.max(
-                0,
-                Math.min(100, (offset / (trackWidth.value - handleWidth)) * 100)
-            )
-        );
-        percent.value = percentValue;
+        const value = Math.round(minValue + ((maxValue - minValue) * (newPercent / 100)));
+        inputValue.value = value;
 
-        let updatedValue = percentValue;
-        if(maxValue) updatedValue = Math.round(minValue + (maxValue - minValue) * (percentValue / 100));
+        return value;
+    }, [trackWidth]);
 
-        setInputValue(updatedValue);
+    const updateInputFieldValue = useCallback((value: number) => {
+        "worklet";
+        if(setValue) runOnJS(setValue)(value);
+        if(onChange) runOnJS(onChange)(value);
+    }, []);
+
+    const panOnChange = (event: GestureUpdateEvent<PanGestureHandlerEventPayload & PanGestureChangeEventPayload>) => {
+        "worklet";
+        thumbOffset.value = Math.min(trackWidth.value - handleWidth, Math.max(0, thumbOffset.value + event.changeX));
+
+        calculateValue(thumbOffset.value);
     };
 
-    const pan = Gesture.Pan()
-    .onStart(_event => {
-        runOnJS(setPanning)(true);
-    })
-    .onChange((event) => {
-        thumbOffset.value = Math.min(
-            trackWidth.value - handleWidth,
-            Math.max(0, thumbOffset.value + event.changeX)
-        );
-        runOnJS(calculateValue)(thumbOffset.value);
-    })
-    .onEnd(_event => {
-        runOnJS(setPanning)(false);
-    });
+    const panOnEnd = () => {
+        "worklet";
+        updateInputFieldValue(inputValue.value);
+    };
+
+    const barPan = Gesture.Pan().enabled(!showsHandle).onChange(panOnChange).onEnd(panOnEnd);
+    const handlePan = Gesture.Pan().enabled(showsHandle).onChange(panOnChange).onEnd(panOnEnd);
 
     const onTrackLayout = (event: LayoutChangeEvent) => {
         trackWidth.set(event.nativeEvent.layout.width);
@@ -133,18 +163,21 @@ const Slider: React.FC<SliderProps> = ({
 
     const onTooltipTextLayout = (event: LayoutChangeEvent) => {
         const width = event.nativeEvent.layout.width + 2 * SEPARATOR_SIZES.lightSmall;
-        const height = event.nativeEvent.layout.height + 2 * SEPARATOR_SIZES.lightSmall + tooltipBottomTriangleHeight;
+        const height = event.nativeEvent.layout.height + 2 * SEPARATOR_SIZES.lightSmall + (innerTooltip
+                                                                                           ? 0
+                                                                                           : tooltipBottomTriangleHeight);
+
         setTooltipLayout({ width, height });
     };
 
     const onTrackPress = (event: GestureResponderEvent) => {
         let offset = Math.min(
             trackWidth.value - handleWidth,
-            Math.max(0, event.nativeEvent.locationX)
+            Math.max(0, event.nativeEvent.locationX - (showsHandle ? handleWidth / 2 : 0))
         );
         thumbOffset.value = offset;
 
-        calculateValue(offset);
+        updateInputFieldValue(calculateValue(offset));
     };
 
     const sliderBarStyle = useAnimatedStyle(() => {
@@ -154,19 +187,6 @@ const Slider: React.FC<SliderProps> = ({
                 [0, 100],
                 [0, trackWidth.value]
             )
-        };
-    });
-
-    const tooltipContainerStyle = useAnimatedStyle(() => {
-        if(!showsTooltip) return {};
-        const handleX = interpolate(
-            percent.value,
-            [0, 100],
-            [handleWidth / 2, trackWidth.value - handleWidth / 2]
-        );
-
-        return {
-            left: handleX - tooltipLayout.width / 2
         };
     });
 
@@ -184,42 +204,140 @@ const Slider: React.FC<SliderProps> = ({
         };
     });
 
+    const tooltipContainerStyle = useAnimatedStyle(() => {
+        if(!showsTooltip) return {};
+
+        const handleBound = showsHandle ? handleWidth / 2 : 0;
+        const handleX = interpolate(
+            percent.value,
+            [0, 100],
+            [handleBound, trackWidth.value - handleBound]
+        );
+
+        const toolbarX = handleX - (!innerTooltip ? tooltipLayout.width / 2 : 0);
+        let left = toolbarX;
+        const borderRadius = 7.5;
+        let borderTopRightRadius = borderRadius;
+        let borderBottomRightRadius = borderRadius;
+        let borderTopLeftRadius = borderRadius;
+        let borderBottomLeftRadius = borderRadius;
+
+        if(!innerTooltip) {
+            if(toolbarX + tooltipLayout.width / 2 >= trackWidth.value - tooltipLayout.width) {
+                left -= tooltipLayout.width / 2 - tooltipBottomTriangleHeight / 2;
+            } else if(toolbarX - tooltipLayout.width / 2 <= 0) {
+                left += tooltipLayout.width / 2 - tooltipBottomTriangleHeight / 2;
+            }
+        } else {
+            if(toolbarX - tooltipLayout.width > 0) {
+                left -= tooltipLayout.width;
+                borderTopRightRadius = 0;
+                borderBottomRightRadius = 0;
+            } else {
+                borderTopLeftRadius = 0;
+                borderBottomLeftRadius = 0;
+            }
+        }
+
+        let translateY = -tooltipLayout.height;
+        if(innerTooltip) translateY = trackHeight / 2 - tooltipLayout.height / 2;
+
+        return {
+            left: Math.min(Math.max(minBarWidth, left), trackWidth.value - tooltipLayout.width),
+            transform: [
+                { translateY }
+            ],
+            borderTopRightRadius,
+            borderBottomRightRadius,
+            borderTopLeftRadius,
+            borderBottomLeftRadius,
+            zIndex: 100
+        };
+    });
+
+    const tooltipBottomTriangleStyle = useAnimatedStyle(() => {
+        if(!showsTooltip || innerTooltip) return {};
+
+        const handleBound = showsHandle ? handleWidth / 2 : 0;
+        const handleX = interpolate(
+            percent.value,
+            [0, 100],
+            [handleBound, trackWidth.value - handleBound]
+        );
+
+        const toolbarX = handleX - tooltipLayout.width / 2;
+        let left = undefined;
+        if(toolbarX + tooltipLayout.width / 2 >= trackWidth.value - tooltipLayout.width) {
+            left = tooltipLayout.width + tooltipLayout.width / 6;
+        } else if(toolbarX - tooltipLayout.width / 2 <= 0) {
+            left = 0;
+        }
+
+        return {
+            left: Math.max(
+                0,
+                Math.min(left, tooltipLayout.width - tooltipBottomTriangleHeight)
+            ),
+            transform: [
+                { rotateX: "180deg" },
+                { translateY: -tooltipLayout.height + 2 * SEPARATOR_SIZES.lightSmall + tooltipBottomTriangleHeight }
+            ]
+        };
+    });
+
     return (
         <View style={ styles.container }>
-            { showsBoundingValues && <Text style={ styles.steps.text }>{ minValue }</Text> }
             <View style={ styles.slider }>
+                <View style={ styles.tag }/>
+                <View style={ [styles.tag, { left: "50%" }] }/>
+                <View style={ [styles.tag, { left: "75%" }] }/>
                 <Pressable
                     style={ styles.slider.track }
                     onLayout={ onTrackLayout }
                     onPress={ onTrackPress }
                 >
-                    <Animated.View style={ [styles.slider.bar, sliderBarStyle] }/>
+                    <GestureDetector gesture={ barPan }>
+                        <Animated.View style={ [styles.slider.bar, sliderBarStyle] }/>
+                    </GestureDetector>
                     {
                         showsTooltip &&
                        <TouchableWithoutFeedback>
                           <View style={ { position: "absolute", top: 0 } }>
                              <Animated.View style={ [styles.slider.tooltip, tooltipContainerStyle] }>
-                                <Animated.View style={ styles.slider.tooltip.bottomTriangle }/>
+                                 {
+                                     !innerTooltip &&
+                                    <Animated.View
+                                       style={ [styles.slider.tooltip.bottomTriangle, tooltipBottomTriangleStyle] }/>
+                                 }
                                 <Text
                                    onLayout={ onTooltipTextLayout }
                                    style={ styles.slider.tooltip.text }
                                 >
-                                    { inputValue }
+                                    { tooltipText }
                                 </Text>
                              </Animated.View>
                           </View>
                        </TouchableWithoutFeedback>
                     }
-                    <GestureDetector gesture={ pan }>
-                        <TouchableWithoutFeedback>
-                            <Animated.View style={ [styles.slider.handle, sliderHandleStyle] }>
+                    {
+                        showsHandle &&
+                       <GestureDetector gesture={ handlePan }>
+                          <TouchableWithoutFeedback>
+                             <Animated.View style={ [styles.slider.handle, sliderHandleStyle] }>
                                 <View style={ styles.slider.handle.innerHandle }/>
-                            </Animated.View>
-                        </TouchableWithoutFeedback>
-                    </GestureDetector>
+                             </Animated.View>
+                          </TouchableWithoutFeedback>
+                       </GestureDetector>
+                    }
                 </Pressable>
             </View>
-            { showsBoundingValues && <Text style={ styles.steps.text }>{ maxValue }</Text> }
+            {
+                !showsBoundingValues &&
+               <View style={ styles.boundingValues }>
+                  <Text style={ styles.boundingValues.text }>{ minValue } { measurement }</Text>
+                  <Text style={ styles.boundingValues.text }>{ maxValue } { measurement }</Text>
+               </View>
+            }
         </View>
     );
 };
@@ -232,9 +350,11 @@ type UseStylesArg =
     }
 
 const useStyles = ({
+    borderRadius,
     trackHeight,
     trackColor,
     barColor,
+    minBarWidth,
     tooltipLayout,
     tooltipBottomTriangleHeight,
     tooltipColor,
@@ -244,17 +364,41 @@ const useStyles = ({
     innerHandleHeight,
     innerHandleWidth,
     innerHandleColor,
-    valuesTextColor
+    valueTextColor,
+    boundingValuesTextColor,
+    showsHandle
 }: UseStylesArg) => StyleSheet.create({
     container: {
-        flex: 1,
-        flexDirection: "row",
-        gap: SEPARATOR_SIZES.lightSmall,
+        gap: SEPARATOR_SIZES.lightSmall / 3,
         alignItems: "center",
         marginTop: tooltipLayout.height
     },
+
+    boundingValues: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        gap: SEPARATOR_SIZES.lightSmall,
+        width: "100%",
+
+        text: {
+            fontFamily: "Gilroy-Medium",
+            fontSize: FONT_SIZES.p4,
+            color: boundingValuesTextColor
+        }
+    },
+
+    tag: {
+        position: "absolute",
+        left: "25%",
+        width: 5,
+        height: trackHeight,
+        backgroundColor: COLORS.black,
+        zIndex: 1
+    },
+
     slider: {
         flex: 1,
+        width: "100%",
         position: "relative",
         minHeight: handleHeight,
         justifyContent: "center",
@@ -264,15 +408,16 @@ const useStyles = ({
             height: trackHeight,
             justifyContent: "center",
             backgroundColor: trackColor,
-            borderRadius: 25
+            borderRadius: borderRadius
         },
 
         bar: {
             position: "absolute",
             bottom: 0,
             height: "100%",
+            minWidth: !showsHandle ? minBarWidth : 0,
             backgroundColor: barColor,
-            borderRadius: 25
+            borderRadius: borderRadius
         },
 
         handle: {
@@ -300,10 +445,7 @@ const useStyles = ({
             width: tooltipLayout.width,
             backgroundColor: tooltipColor,
             paddingVertical: SEPARATOR_SIZES.lightSmall,
-            borderRadius: 7.5,
-            transform: [
-                { translateY: trackHeight - tooltipLayout.height - handleHeight / 2 }
-            ],
+            zIndex: 60,
 
             bottomTriangle: {
                 position: "absolute",
@@ -316,31 +458,15 @@ const useStyles = ({
                 borderBottomWidth: tooltipBottomTriangleHeight,
                 borderLeftColor: "transparent",
                 borderRightColor: "transparent",
-                borderBottomColor: tooltipColor,
-                transform: [
-                    { rotateX: "180deg" },
-                    { translateY: -tooltipLayout.height + 2 * SEPARATOR_SIZES.lightSmall + tooltipBottomTriangleHeight }
-                ]
+                borderBottomColor: tooltipColor
             },
 
             text: {
                 fontFamily: "Gilroy-Medium",
                 fontWeight: "bold",
                 fontSize: FONT_SIZES.p4,
-                color: valuesTextColor
+                color: valueTextColor
             }
-        }
-    },
-    steps: {
-        flex: 1,
-        flexDirection: "row",
-        justifyContent: "space-between",
-
-        text: {
-            fontFamily: "Gilroy-Medium",
-            fontWeight: "bold",
-            fontSize: FONT_SIZES.p4,
-            color: valuesTextColor
         }
     }
 });
