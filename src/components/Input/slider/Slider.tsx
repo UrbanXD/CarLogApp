@@ -229,7 +229,7 @@ const Slider: React.FC<SliderProps> = ({
                 left += tooltipLayout.width / 2 - tooltipBottomTriangleHeight / 2;
             }
         } else {
-            if(toolbarX - tooltipLayout.width > 0) {
+            if(toolbarX - tooltipLayout.width * 1.25 > 0) {
                 left -= tooltipLayout.width;
                 borderTopRightRadius = 0;
                 borderBottomRightRadius = 0;
@@ -242,8 +242,9 @@ const Slider: React.FC<SliderProps> = ({
         let translateY = -tooltipLayout.height;
         if(innerTooltip) translateY = trackHeight / 2 - tooltipLayout.height / 2;
 
+        let minLeft = innerTooltip ? minBarWidth : 0;
         return {
-            left: Math.min(Math.max(minBarWidth, left), trackWidth.value - tooltipLayout.width),
+            left: Math.min(Math.max(minLeft, left), trackWidth.value - tooltipLayout.width),
             transform: [
                 { translateY }
             ],
