@@ -130,8 +130,12 @@ const Slider: React.FC<SliderProps> = ({
 
     const calculateValue = useCallback((offset: number) => {
         "worklet";
-        const newPercent = Math.max(0, Math.min(100, (offset / (trackWidth.value - handleWidth)) * 100));
+        const newPercent = Math.max(
+            0,
+            Math.min(100, (offset / (trackWidth.value - (showsHandle ? handleWidth : 0))) * 100)
+        );
         percent.value = newPercent;
+
 
         const value = Math.round(minValue + ((maxValue - minValue) * (newPercent / 100)));
         inputValue.value = value;
@@ -160,6 +164,7 @@ const Slider: React.FC<SliderProps> = ({
         () => Gesture.Pan().enabled(!showsHandle && !disabled).onChange(panOnChange).onEnd(panOnEnd),
         [showsHandle]
     );
+
     const handlePan = useMemo(
         () => Gesture.Pan().enabled(showsHandle && !disabled).onChange(panOnChange).onEnd(panOnEnd),
         [showsHandle]
@@ -181,7 +186,7 @@ const Slider: React.FC<SliderProps> = ({
 
     const onTrackPress = (event: GestureResponderEvent) => {
         let offset = Math.min(
-            trackWidth.value - handleWidth,
+            trackWidth.value - (showsHandle ? handleWidth : 0),
             Math.max(0, event.nativeEvent.locationX - (showsHandle ? handleWidth / 2 : 0))
         );
         thumbOffset.value = offset;
@@ -263,7 +268,11 @@ const Slider: React.FC<SliderProps> = ({
             }
         }
 
-        let translateY = -tooltipLayout.height - handleHeight / 2 + tooltipBottomTriangleHeight / 2;
+        let translateY =
+            -tooltipLayout.height
+            - (showsHandle ? handleHeight / 2 : SEPARATOR_SIZES.lightSmall / 2)
+            + tooltipBottomTriangleHeight / 2;
+
         if(innerTooltip) translateY = trackHeight / 2 - tooltipLayout.height / 2;
 
         let minLeft = innerTooltip ? minBarWidth : 0;
@@ -296,10 +305,7 @@ const Slider: React.FC<SliderProps> = ({
         }
 
         return {
-            left: Math.max(
-                0,
-                Math.min(left, tooltipLayout.width - tooltipBottomTriangleHeight)
-            ),
+            left: Math.max(0, Math.min(left, tooltipLayout.width - tooltipBottomTriangleHeight)),
             transform: [
                 { rotateX: "180deg" },
                 { translateY: -tooltipLayout.height + 2 * SEPARATOR_SIZES.lightSmall + tooltipBottomTriangleHeight }
@@ -355,7 +361,7 @@ const Slider: React.FC<SliderProps> = ({
                 </Pressable>
             </View>
             {
-                !showsBoundingValues &&
+                showsBoundingValues &&
                <View style={ styles.boundingValues }>
                   <Text style={ styles.boundingValues.text }>{ minValue } { measurement }</Text>
                   <Text style={ styles.boundingValues.text }>{ maxValue } { measurement }</Text>
@@ -391,7 +397,6 @@ const useStyles = ({
     showsHandle
 }: UseStylesArg) => StyleSheet.create({
     container: {
-        gap: SEPARATOR_SIZES.lightSmall / 3,
         alignItems: "center",
         marginTop: tooltipLayout.height
     },
