@@ -33,6 +33,7 @@ interface SliderProps {
     maxValue?: number;
     measurement?: string;
     disabled?: boolean;
+    tapToSeek?: boolean;
     style?: Partial<SliderStyle>;
 }
 
@@ -54,6 +55,7 @@ type SliderStyle = {
     showsBoundingValues: boolean
     showsTooltip: boolean
     showsHandle: boolean
+    showsTag: boolean
     innerTooltip: boolean
 }
 
@@ -64,6 +66,7 @@ const Slider: React.FC<SliderProps> = ({
     setValue,
     measurement,
     disabled,
+    tapToSeek = true,
     style = {} as SliderStyle
 }) => {
     const {
@@ -83,6 +86,7 @@ const Slider: React.FC<SliderProps> = ({
         showsBoundingValues = true,
         showsTooltip = true,
         showsHandle = true,
+        showsTag = false,
         innerTooltip
     } = style;
 
@@ -320,11 +324,16 @@ const Slider: React.FC<SliderProps> = ({
                     style={ styles.slider.track }
                     onLayout={ onTrackLayout }
                     onPress={ onTrackPress }
-                    disabled={ disabled }
+                    disabled={ (disabled || !tapToSeek) }
                 >
-                    <View style={ styles.tag } pointerEvents="none"/>
-                    <View style={ [styles.tag, { left: "50%" }] } pointerEvents="none"/>
-                    <View style={ [styles.tag, { left: "75%" }] } pointerEvents="none"/>
+                    {
+                        showsTag &&
+                       <>
+                          <View style={ styles.tag } pointerEvents="none"/>
+                          <View style={ [styles.tag, { left: "50%" }] } pointerEvents="none"/>
+                          <View style={ [styles.tag, { left: "75%" }] } pointerEvents="none"/>
+                       </>
+                    }
                     <GestureDetector gesture={ barPan }>
                         <Animated.View style={ [styles.slider.bar, sliderBarStyle] }/>
                     </GestureDetector>
