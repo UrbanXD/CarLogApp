@@ -11,6 +11,7 @@ import {
 import { Gesture, GestureDetector, GestureUpdateEvent } from "react-native-gesture-handler";
 import Animated, {
     interpolate,
+    interpolateColor,
     runOnJS,
     useAnimatedReaction,
     useAnimatedStyle,
@@ -31,6 +32,7 @@ interface SliderProps {
     minValue?: number;
     maxValue?: number;
     measurement?: string;
+    disabled?: boolean;
     style?: Partial<SliderStyle>;
 }
 
@@ -38,7 +40,7 @@ type SliderStyle = {
     borderRadius: number
     trackHeight: number
     trackColor: Color
-    barColor: Color
+    barColor: Color | Array<{ color: Color, percent: number }>
     minBarWidth: number
     handleHeight: number
     handleWidth: number
@@ -61,16 +63,17 @@ const Slider: React.FC<SliderProps> = ({
     value = minValue,
     setValue,
     measurement,
-    style = {}
+    disabled,
+    style = {} as SliderStyle
 }) => {
     const {
         borderRadius = 25,
         trackHeight = hp(1),
         trackColor = COLORS.gray3,
-        barColor = COLORS.gray1,
+        barColor = COLORS.gray1 as SliderStyle["barColor"],
         handleHeight = hp(3.5),
         handleWidth = hp(3.5),
-        handleColor = barColor,
+        handleColor = COLORS.gray1,
         innerHandleHeight = handleHeight * 0.875,
         innerHandleWidth = handleWidth * 0.875,
         innerHandleColor = trackColor,
@@ -82,6 +85,7 @@ const Slider: React.FC<SliderProps> = ({
         showsHandle = true,
         innerTooltip
     } = style;
+
     const minBarWidth = SEPARATOR_SIZES.lightSmall; // csak akkora ha nincs handle
     const tooltipBottomTriangleHeight = 16;
     const [tooltipLayout, setTooltipLayout] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
@@ -90,7 +94,6 @@ const Slider: React.FC<SliderProps> = ({
         borderRadius,
         trackHeight,
         trackColor,
-        barColor,
         minBarWidth,
         handleHeight,
         handleWidth,
@@ -104,7 +107,7 @@ const Slider: React.FC<SliderProps> = ({
         valueTextColor,
         boundingValuesTextColor,
         showsHandle
-    }), [trackColor, showsHandle, tooltipLayout]);
+    }), [trackColor, showsHandle, tooltipLayout, handleHeight]);
 
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field?.onChange;
@@ -154,11 +157,11 @@ const Slider: React.FC<SliderProps> = ({
     };
 
     const barPan = useMemo(
-        () => Gesture.Pan().enabled(!showsHandle).onChange(panOnChange).onEnd(panOnEnd),
+        () => Gesture.Pan().enabled(!showsHandle && !disabled).onChange(panOnChange).onEnd(panOnEnd),
         [showsHandle]
     );
     const handlePan = useMemo(
-        () => Gesture.Pan().enabled(showsHandle).onChange(panOnChange).onEnd(panOnEnd),
+        () => Gesture.Pan().enabled(showsHandle && !disabled).onChange(panOnChange).onEnd(panOnEnd),
         [showsHandle]
     );
 
@@ -168,9 +171,10 @@ const Slider: React.FC<SliderProps> = ({
 
     const onTooltipTextLayout = (event: LayoutChangeEvent) => {
         const width = event.nativeEvent.layout.width + 2 * SEPARATOR_SIZES.lightSmall;
-        const height = event.nativeEvent.layout.height + 2 * SEPARATOR_SIZES.lightSmall + (innerTooltip
-                                                                                           ? 0
-                                                                                           : tooltipBottomTriangleHeight);
+        const height =
+            event.nativeEvent.layout.height +
+            2 * SEPARATOR_SIZES.lightSmall +
+            (innerTooltip ? 0 : tooltipBottomTriangleHeight);
 
         setTooltipLayout({ width, height });
     };
@@ -186,13 +190,28 @@ const Slider: React.FC<SliderProps> = ({
     };
 
     const sliderBarStyle = useAnimatedStyle(() => {
-        return {
-            width: interpolate(
-                percent.value,
-                [0, 100],
-                [0, trackWidth.value]
-            )
-        };
+        const width = interpolate(
+            percent.value,
+            [0, 100],
+            [0, trackWidth.value]
+        );
+
+        let backgroundColor;
+        if(Array.isArray(barColor)) {
+            const inputRange: Array<number> = [];
+            const outputRange: Array<Color> = [];
+
+            barColor.map(element => {
+                inputRange.push(element.percent);
+                outputRange.push(element.color);
+            });
+
+            backgroundColor = interpolateColor(percent.value, inputRange, outputRange);
+        } else {
+            backgroundColor = barColor;
+        }
+
+        return { width, backgroundColor };
     });
 
     const sliderHandleStyle = useAnimatedStyle(() => {
@@ -244,20 +263,17 @@ const Slider: React.FC<SliderProps> = ({
             }
         }
 
-        let translateY = -tooltipLayout.height;
+        let translateY = -tooltipLayout.height - handleHeight / 2 + tooltipBottomTriangleHeight / 2;
         if(innerTooltip) translateY = trackHeight / 2 - tooltipLayout.height / 2;
 
         let minLeft = innerTooltip ? minBarWidth : 0;
         return {
             left: Math.min(Math.max(minLeft, left), trackWidth.value - tooltipLayout.width),
-            transform: [
-                { translateY }
-            ],
+            transform: [{ translateY }],
             borderTopRightRadius,
             borderBottomRightRadius,
             borderTopLeftRadius,
-            borderBottomLeftRadius,
-            zIndex: 100
+            borderBottomLeftRadius
         };
     });
 
@@ -294,21 +310,22 @@ const Slider: React.FC<SliderProps> = ({
     return (
         <View style={ styles.container }>
             <View style={ styles.slider }>
-                <View style={ styles.tag }/>
-                <View style={ [styles.tag, { left: "50%" }] }/>
-                <View style={ [styles.tag, { left: "75%" }] }/>
                 <Pressable
                     style={ styles.slider.track }
                     onLayout={ onTrackLayout }
                     onPress={ onTrackPress }
+                    disabled={ disabled }
                 >
+                    <View style={ styles.tag } pointerEvents="none"/>
+                    <View style={ [styles.tag, { left: "50%" }] } pointerEvents="none"/>
+                    <View style={ [styles.tag, { left: "75%" }] } pointerEvents="none"/>
                     <GestureDetector gesture={ barPan }>
                         <Animated.View style={ [styles.slider.bar, sliderBarStyle] }/>
                     </GestureDetector>
                     {
                         showsTooltip &&
                        <TouchableWithoutFeedback disabled={ innerTooltip }>
-                          <View style={ { position: "absolute", top: 0 } }>
+                          <View style={ { position: "absolute", top: 0, zIndex: 1 } } pointerEvents="none">
                              <Animated.View style={ [styles.slider.tooltip, tooltipContainerStyle] }>
                                  {
                                      !innerTooltip &&
@@ -349,7 +366,7 @@ const Slider: React.FC<SliderProps> = ({
 };
 
 type UseStylesArg =
-    Omit<SliderStyle, "showsBoundingValues" | "showsTooltip"> &
+    Omit<SliderStyle, "showsBoundingValues" | "showsTooltip" | "barColor"> &
     {
         tooltipBottomTriangleHeight: number,
         tooltipLayout: { width: number, height: number }
@@ -359,7 +376,6 @@ const useStyles = ({
     borderRadius,
     trackHeight,
     trackColor,
-    barColor,
     minBarWidth,
     tooltipLayout,
     tooltipBottomTriangleHeight,
@@ -422,7 +438,6 @@ const useStyles = ({
             bottom: 0,
             height: "100%",
             minWidth: !showsHandle ? minBarWidth : 0,
-            backgroundColor: barColor,
             borderRadius: borderRadius
         },
 
@@ -451,7 +466,6 @@ const useStyles = ({
             width: tooltipLayout.width,
             backgroundColor: tooltipColor,
             paddingVertical: SEPARATOR_SIZES.lightSmall,
-            zIndex: 60,
 
             bottomTriangle: {
                 position: "absolute",
