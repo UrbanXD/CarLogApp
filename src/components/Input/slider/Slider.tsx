@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
     GestureResponderEvent,
     LayoutChangeEvent,
@@ -86,7 +86,7 @@ const Slider: React.FC<SliderProps> = ({
     const tooltipBottomTriangleHeight = 16;
     const [tooltipLayout, setTooltipLayout] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
 
-    const styles = useStyles({
+    const styles = useMemo(() => useStyles({
         borderRadius,
         trackHeight,
         trackColor,
@@ -104,7 +104,7 @@ const Slider: React.FC<SliderProps> = ({
         valueTextColor,
         boundingValuesTextColor,
         showsHandle
-    });
+    }), [trackColor, showsHandle, tooltipLayout]);
 
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field?.onChange;
@@ -145,7 +145,6 @@ const Slider: React.FC<SliderProps> = ({
     const panOnChange = (event: GestureUpdateEvent<PanGestureHandlerEventPayload & PanGestureChangeEventPayload>) => {
         "worklet";
         thumbOffset.value = Math.min(trackWidth.value - handleWidth, Math.max(0, thumbOffset.value + event.changeX));
-
         calculateValue(thumbOffset.value);
     };
 
@@ -154,8 +153,14 @@ const Slider: React.FC<SliderProps> = ({
         updateInputFieldValue(inputValue.value);
     };
 
-    const barPan = Gesture.Pan().enabled(!showsHandle).onChange(panOnChange).onEnd(panOnEnd);
-    const handlePan = Gesture.Pan().enabled(showsHandle).onChange(panOnChange).onEnd(panOnEnd);
+    const barPan = useMemo(
+        () => Gesture.Pan().enabled(!showsHandle).onChange(panOnChange).onEnd(panOnEnd),
+        [showsHandle]
+    );
+    const handlePan = useMemo(
+        () => Gesture.Pan().enabled(showsHandle).onChange(panOnChange).onEnd(panOnEnd),
+        [showsHandle]
+    );
 
     const onTrackLayout = (event: LayoutChangeEvent) => {
         trackWidth.set(event.nativeEvent.layout.width);
@@ -302,7 +307,7 @@ const Slider: React.FC<SliderProps> = ({
                     </GestureDetector>
                     {
                         showsTooltip &&
-                       <TouchableWithoutFeedback>
+                       <TouchableWithoutFeedback disabled={ innerTooltip }>
                           <View style={ { position: "absolute", top: 0 } }>
                              <Animated.View style={ [styles.slider.tooltip, tooltipContainerStyle] }>
                                  {
