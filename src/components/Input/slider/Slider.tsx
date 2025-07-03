@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import {
+    Dimensions,
     GestureResponderEvent,
     LayoutChangeEvent,
     Pressable,
@@ -8,7 +9,7 @@ import {
     TouchableWithoutFeedback,
     View
 } from "react-native";
-import { Gesture, GestureDetector, GestureUpdateEvent } from "react-native-gesture-handler";
+import { Gesture, GestureDetector, GestureStateChangeEvent, GestureUpdateEvent } from "react-native-gesture-handler";
 import Animated, {
     interpolate,
     interpolateColor,
@@ -69,6 +70,7 @@ const Slider: React.FC<SliderProps> = ({
     tapToSeek = true,
     style = {} as SliderStyle
 }) => {
+    const windowWidth = Dimensions.get("window").width;
     const {
         borderRadius = 25,
         trackHeight = hp(1),
@@ -87,10 +89,11 @@ const Slider: React.FC<SliderProps> = ({
         showsTooltip = true,
         showsHandle = true,
         showsTag = false,
-        innerTooltip
+        innerTooltip = false
     } = style;
 
     const minBarWidth = SEPARATOR_SIZES.lightSmall; // csak akkora ha nincs handle
+    const enableTrackPressOnTooltip = innerTooltip;
     const tooltipBottomTriangleHeight = 16;
     const [tooltipLayout, setTooltipLayout] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
 
@@ -117,6 +120,7 @@ const Slider: React.FC<SliderProps> = ({
     const onChange = inputFieldContext?.field?.onChange;
     const error = inputFieldContext?.fieldState?.error;
 
+    const panEndedWithoutProblem = useSharedValue(false);
     const trackWidth = useSharedValue(0);
     const thumbOffset = useSharedValue(0);
     const percent = useSharedValue(0);
@@ -141,7 +145,7 @@ const Slider: React.FC<SliderProps> = ({
         percent.value = newPercent;
 
 
-        const value = Math.round(minValue + ((maxValue - minValue) * (newPercent / 100)));
+        const value = Math.floor(minValue + ((maxValue - minValue) * (newPercent / 100)));
         inputValue.value = value;
 
         return value;
@@ -153,29 +157,73 @@ const Slider: React.FC<SliderProps> = ({
         if(onChange) runOnJS(onChange)(value);
     }, []);
 
+    const onTrackPress = (event: GestureResponderEvent) => {
+        let offset = Math.min(
+            trackWidth.value - (showsHandle ? handleWidth : 0),
+            Math.max(0, event.nativeEvent.locationX - (showsHandle ? handleWidth / 2 : 0))
+        );
+        thumbOffset.value = offset;
+
+        updateInputFieldValue(calculateValue(offset));
+    };
+
     const panOnChange = (event: GestureUpdateEvent<PanGestureHandlerEventPayload & PanGestureChangeEventPayload>) => {
         "worklet";
-        thumbOffset.value = Math.min(trackWidth.value - handleWidth, Math.max(0, thumbOffset.value + event.changeX));
+        thumbOffset.value = Math.min(
+            trackWidth.value - (showsHandle ? handleHeight : 0),
+            Math.max(0, thumbOffset.value + event.changeX)
+        );
         calculateValue(thumbOffset.value);
     };
 
     const panOnEnd = () => {
         "worklet";
+        panEndedWithoutProblem.value = true;
         updateInputFieldValue(inputValue.value);
     };
 
+    const panOnFinalize = (event: GestureStateChangeEvent<PanGestureHandlerEventPayload>) => {
+        "worklet";
+        if(panEndedWithoutProblem.value || !enableTrackPressOnTooltip) return panEndedWithoutProblem.value = false;
+
+        const e: GestureResponderEvent = {
+            nativeEvent: {
+                locationX: event.absoluteX - (windowWidth - trackWidth.value) / 2
+            }
+        };
+        runOnJS(onTrackPress)(e);
+    };
+
     const barPan = useMemo(
-        () => Gesture.Pan().enabled(!showsHandle && !disabled).onChange(panOnChange).onEnd(panOnEnd),
+        () => Gesture.Pan()
+        .enabled(!showsHandle && !disabled)
+        .minDistance(1)
+        .onChange(panOnChange)
+        .onEnd(panOnEnd)
+        .onFinalize(panOnFinalize),
         [showsHandle]
     );
 
+    const tooltipPan = useMemo(
+        () => Gesture.Pan()
+        .enabled(showsTooltip && !disabled)
+        .minDistance(1)
+        .onChange(panOnChange)
+        .onEnd(panOnEnd)
+        .onFinalize(panOnFinalize),
+        [showsTooltip]
+    );
+
     const handlePan = useMemo(
-        () => Gesture.Pan().enabled(showsHandle && !disabled).onChange(panOnChange).onEnd(panOnEnd),
+        () => Gesture.Pan()
+        .enabled(showsHandle && !disabled)
+        .onChange(panOnChange)
+        .onEnd(panOnEnd),
         [showsHandle]
     );
 
     const onTrackLayout = (event: LayoutChangeEvent) => {
-        trackWidth.set(event.nativeEvent.layout.width);
+        trackWidth.set(event.nativeEvent.layout.width - 2); //2 * track borderWidth
     };
 
     const onTooltipTextLayout = (event: LayoutChangeEvent) => {
@@ -186,16 +234,6 @@ const Slider: React.FC<SliderProps> = ({
             (innerTooltip ? 0 : tooltipBottomTriangleHeight);
 
         setTooltipLayout({ width, height });
-    };
-
-    const onTrackPress = (event: GestureResponderEvent) => {
-        let offset = Math.min(
-            trackWidth.value - (showsHandle ? handleWidth : 0),
-            Math.max(0, event.nativeEvent.locationX - (showsHandle ? handleWidth / 2 : 0))
-        );
-        thumbOffset.value = offset;
-
-        updateInputFieldValue(calculateValue(offset));
     };
 
     const sliderBarStyle = useAnimatedStyle(() => {
@@ -248,7 +286,7 @@ const Slider: React.FC<SliderProps> = ({
         );
 
         const toolbarX = handleX - (!innerTooltip ? tooltipLayout.width / 2 : 0);
-        let left = toolbarX;
+        let left = toolbarX + 1; // track borderwidth / 2
         const borderRadius = 7.5;
         let borderTopRightRadius = borderRadius;
         let borderBottomRightRadius = borderRadius;
@@ -272,12 +310,9 @@ const Slider: React.FC<SliderProps> = ({
             }
         }
 
-        let translateY =
-            -tooltipLayout.height
-            - (showsHandle ? handleHeight / 2 : SEPARATOR_SIZES.lightSmall / 2)
-            + tooltipBottomTriangleHeight / 2;
+        let translateY = -tooltipLayout.height / 2 - SEPARATOR_SIZES.lightSmall - (showsHandle ? handleHeight / 3 : 0);
 
-        if(innerTooltip) translateY = trackHeight / 2 - tooltipLayout.height / 2;
+        if(innerTooltip) translateY = 0;
 
         let minLeft = innerTooltip ? minBarWidth : 0;
         return {
@@ -320,8 +355,27 @@ const Slider: React.FC<SliderProps> = ({
     return (
         <View style={ styles.container }>
             <View style={ styles.slider }>
+                {
+                    showsTooltip &&
+                   <GestureDetector gesture={ tooltipPan }>
+                      <Animated.View style={ [styles.slider.tooltip, tooltipContainerStyle] }>
+                          {
+                              !innerTooltip &&
+                             <Animated.View
+                                style={ [styles.slider.tooltip.bottomTriangle, tooltipBottomTriangleStyle] }
+                             />
+                          }
+                         <Text
+                            onLayout={ onTooltipTextLayout }
+                            style={ styles.slider.tooltip.text }
+                         >
+                             { tooltipText }
+                         </Text>
+                      </Animated.View>
+                   </GestureDetector>
+                }
                 <Pressable
-                    style={ styles.slider.track }
+                    style={ [styles.slider.track, error && styles.slider.track.error] }
                     onLayout={ onTrackLayout }
                     onPress={ onTrackPress }
                     disabled={ (disabled || !tapToSeek) }
@@ -337,26 +391,6 @@ const Slider: React.FC<SliderProps> = ({
                     <GestureDetector gesture={ barPan }>
                         <Animated.View style={ [styles.slider.bar, sliderBarStyle] }/>
                     </GestureDetector>
-                    {
-                        showsTooltip &&
-                       <TouchableWithoutFeedback disabled={ innerTooltip }>
-                          <View style={ { position: "absolute", top: 0, zIndex: 1 } } pointerEvents="none">
-                             <Animated.View style={ [styles.slider.tooltip, tooltipContainerStyle] }>
-                                 {
-                                     !innerTooltip &&
-                                    <Animated.View
-                                       style={ [styles.slider.tooltip.bottomTriangle, tooltipBottomTriangleStyle] }/>
-                                 }
-                                <Text
-                                   onLayout={ onTooltipTextLayout }
-                                   style={ styles.slider.tooltip.text }
-                                >
-                                    { tooltipText }
-                                </Text>
-                             </Animated.View>
-                          </View>
-                       </TouchableWithoutFeedback>
-                    }
                     {
                         showsHandle &&
                        <GestureDetector gesture={ handlePan }>
@@ -444,7 +478,13 @@ const useStyles = ({
             height: trackHeight,
             justifyContent: "center",
             backgroundColor: trackColor,
-            borderRadius: borderRadius
+            borderRadius: borderRadius,
+            borderColor: COLORS.gray1,
+            borderWidth: 1,
+
+            error: {
+                borderColor: COLORS.redLight
+            }
         },
 
         bar: {
@@ -475,6 +515,7 @@ const useStyles = ({
 
         tooltip: {
             position: "absolute",
+            zIndex: 1,
             alignItems: "center",
             justifyContent: "center",
             width: tooltipLayout.width,
@@ -505,4 +546,4 @@ const useStyles = ({
     }
 });
 
-export default Slider;
+export default React.memo(Slider);
