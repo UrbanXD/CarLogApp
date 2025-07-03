@@ -42,6 +42,7 @@ type SliderStyle = {
     borderRadius: number
     trackHeight: number
     trackColor: Color
+    trackBorderWidth: number
     barColor: Color | Array<{ color: Color, percent: number }>
     minBarWidth: number
     handleHeight: number
@@ -75,6 +76,7 @@ const Slider: React.FC<SliderProps> = ({
         borderRadius = 25,
         trackHeight = hp(1),
         trackColor = COLORS.gray3,
+        trackBorderWidth = 1,
         barColor = COLORS.gray1 as SliderStyle["barColor"],
         handleHeight = hp(3.5),
         handleWidth = hp(3.5),
@@ -101,6 +103,7 @@ const Slider: React.FC<SliderProps> = ({
         borderRadius,
         trackHeight,
         trackColor,
+        trackBorderWidth,
         minBarWidth,
         handleHeight,
         handleWidth,
@@ -113,7 +116,9 @@ const Slider: React.FC<SliderProps> = ({
         tooltipBottomTriangleHeight,
         valueTextColor,
         boundingValuesTextColor,
-        showsHandle
+        showsHandle,
+        showsTooltip,
+        innerTooltip
     }), [trackColor, showsHandle, tooltipLayout, handleHeight]);
 
     const inputFieldContext = useInputFieldContext();
@@ -223,10 +228,12 @@ const Slider: React.FC<SliderProps> = ({
     );
 
     const onTrackLayout = (event: LayoutChangeEvent) => {
-        trackWidth.set(event.nativeEvent.layout.width - 2); //2 * track borderWidth
+        trackWidth.set(event.nativeEvent.layout.width - 2 * trackBorderWidth);
     };
 
     const onTooltipTextLayout = (event: LayoutChangeEvent) => {
+        if(!showsTooltip) setTooltipLayout({ width: 0, height: 0 });
+
         const width = event.nativeEvent.layout.width + 2 * SEPARATOR_SIZES.lightSmall;
         const height =
             event.nativeEvent.layout.height +
@@ -286,7 +293,7 @@ const Slider: React.FC<SliderProps> = ({
         );
 
         const toolbarX = handleX - (!innerTooltip ? tooltipLayout.width / 2 : 0);
-        let left = toolbarX + 1; // track borderwidth / 2
+        let left = toolbarX + trackBorderWidth;
         const borderRadius = 7.5;
         let borderTopRightRadius = borderRadius;
         let borderBottomRightRadius = borderRadius;
@@ -415,7 +422,7 @@ const Slider: React.FC<SliderProps> = ({
 };
 
 type UseStylesArg =
-    Omit<SliderStyle, "showsBoundingValues" | "showsTooltip" | "barColor"> &
+    Omit<SliderStyle, "showsBoundingValues" | "barColor"> &
     {
         tooltipBottomTriangleHeight: number,
         tooltipLayout: { width: number, height: number }
@@ -425,6 +432,7 @@ const useStyles = ({
     borderRadius,
     trackHeight,
     trackColor,
+    trackBorderWidth,
     minBarWidth,
     tooltipLayout,
     tooltipBottomTriangleHeight,
@@ -437,11 +445,13 @@ const useStyles = ({
     innerHandleColor,
     valueTextColor,
     boundingValuesTextColor,
-    showsHandle
+    showsHandle,
+    showsTooltip,
+    innerTooltip
 }: UseStylesArg) => StyleSheet.create({
     container: {
         alignItems: "center",
-        marginTop: tooltipLayout.height
+        marginTop: showsTooltip && !innerTooltip ? tooltipLayout.height : 0
     },
 
     boundingValues: {
@@ -480,7 +490,7 @@ const useStyles = ({
             backgroundColor: trackColor,
             borderRadius: borderRadius,
             borderColor: COLORS.gray1,
-            borderWidth: 1,
+            borderWidth: trackBorderWidth,
 
             error: {
                 borderColor: COLORS.redLight
