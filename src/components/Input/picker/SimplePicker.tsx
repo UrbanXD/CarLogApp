@@ -19,8 +19,8 @@ const SimplePicker: React.FC<SimplePickerProps> = ({
         <PickerItem
             key={ index }
             element={ element }
-            onPress={ () => onSelect(element.id) }
-            selected={ element.id === selectedElement?.id }
+            onPress={ () => onSelect(element.value) }
+            selected={ element.value === selectedElement?.value }
         />;
 
     return (

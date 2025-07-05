@@ -46,7 +46,7 @@ const DropdownPickerElements: React.FC = () => {
         display.value = withTiming(showElements ? 1 : 0, animationConfig);
         if(!showElements) return;
 
-        const selectedItemIndex = elements.findIndex(element => element.id === selectedElement?.id);
+        const selectedItemIndex = elements.findIndex(element => element.value === selectedElement?.value);
         if(selectedItemIndex === -1) return;
 
         setTimeout(() => {
@@ -54,8 +54,8 @@ const DropdownPickerElements: React.FC = () => {
         }, 100);
     }, [showElements]);
 
-    const selectElement = useCallback((id: string) => {
-        onSelect(id);
+    const selectElement = useCallback((value: string) => {
+        onSelect(value);
         toggleDropdown();
     }, [onSelect, toggleDropdown]);
 
@@ -64,8 +64,8 @@ const DropdownPickerElements: React.FC = () => {
             <PickerItem
                 key={ arg.index }
                 element={ arg.item }
-                onPress={ () => selectElement(arg.item.id) }
-                selected={ arg.item.id === selectedElement?.id }
+                onPress={ () => selectElement(arg.item.value) }
+                selected={ arg.item.value === selectedElement?.value }
             />
         );
     }, [selectedElement, selectElement]);
@@ -76,7 +76,7 @@ const DropdownPickerElements: React.FC = () => {
         );
     }, []);
 
-    const keyExtractor = (item: PickerElement) => item.id;
+    const keyExtractor = (item: PickerElement) => item.value;
 
     const onScrollToIndexFailed = (info: any) => {
         setTimeout(() => {

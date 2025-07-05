@@ -3,7 +3,6 @@ import React from "react";
 import { COLORS, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 
 export type PickerElement = {
-    id: string
     value: string
     title?: string
     subtitle?: string

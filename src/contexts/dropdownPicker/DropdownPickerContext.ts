@@ -1,10 +1,10 @@
-import { createContext, useContext } from "react";
+import { Context, createContext, useContext } from "react";
 import { PickerElement } from "../../components/Input/picker/PickerItem.tsx";
 
 type DropdownPickerContextValue = {
     elements: Array<PickerElement>
     selectedElement?: PickerElement
-    onSelect: (id: string) => void
+    onSelect: (value: string) => void
     toggleDropdown: () => void
     searchTerm: string
     setSearchTerm: (searchTerm: string) => void
