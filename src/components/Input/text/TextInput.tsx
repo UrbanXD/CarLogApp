@@ -31,7 +31,7 @@ const TextInput: React.FC<TextInputProps> = ({
     onAction,
     placeholder,
     numeric,
-    secure: isSecure,
+    secure: isSecure = false,
     editable,
     multiline,
     alwaysFocused,
@@ -41,14 +41,9 @@ const TextInput: React.FC<TextInputProps> = ({
     const shouldHandleKeyboardEvents = bottomSheetInternal?.shouldHandleKeyboardEvents;
 
     const inputFieldContext = allowInputFieldContext ? useInputFieldContext() : null;
-    const fieldValue = inputFieldContext?.field?.value || value;
+    const fieldValue = inputFieldContext?.field?.value || value || "";
     const onChange = inputFieldContext?.field?.onChange;
     const error = inputFieldContext?.fieldState?.error;
-
-    const updateFieldValue = (value: string) => {
-        if(onChange) onChange(value);
-        if(setValue) setValue(value);
-    };
 
     const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(isSecure);
@@ -56,6 +51,11 @@ const TextInput: React.FC<TextInputProps> = ({
     const changeSecure = () => setSecure(prevState => !prevState);
     const onFocus = () => setFocused(true);
     const onBlur = () => setFocused(false);
+
+    const updateFieldValue = (value: string) => {
+        if(onChange) onChange(value);
+        if(setValue) setValue(value);
+    };
 
     useEffect(() => {
         if(shouldHandleKeyboardEvents) shouldHandleKeyboardEvents.value = focused;
@@ -83,7 +83,7 @@ const TextInput: React.FC<TextInputProps> = ({
                 placeholder={ placeholder }
                 style={ styles.textInput }
                 placeholderTextColor={ styles.placeholderText.color }
-                value={ fieldValue }
+                value={ fieldValue.toString() }
                 multiline={ multiline }
                 keyboardType={ numeric ? "numeric" : "default" }
                 secureTextEntry={ secure }
@@ -93,7 +93,7 @@ const TextInput: React.FC<TextInputProps> = ({
                 editable={ editable }
             />
             {
-                secure &&
+                isSecure &&
                <View style={ styles.formFieldIconContainer }>
                   <Icon
                      icon={ secure ? ICON_NAMES.eyeOff : ICON_NAMES.eye }

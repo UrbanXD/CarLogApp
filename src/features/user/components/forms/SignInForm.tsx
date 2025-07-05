@@ -42,7 +42,7 @@ const SignInForm: React.FC = () => {
                 <Input.Text
                     icon={ ICON_NAMES.password }
                     placeholder="Jelszó"
-                    isSecure
+                    secure
                 />
             </Input.Field>
             <Text style={ GLOBAL_STYLE.formLinkText }>
