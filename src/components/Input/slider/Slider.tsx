@@ -1,19 +1,21 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-    Dimensions,
     GestureResponderEvent,
     LayoutChangeEvent,
     Pressable,
     StyleSheet,
     Text,
+    TextInput,
     TouchableWithoutFeedback,
     View
 } from "react-native";
-import { Gesture, GestureDetector, GestureStateChangeEvent, GestureUpdateEvent } from "react-native-gesture-handler";
+import { Gesture, GestureDetector, GestureUpdateEvent } from "react-native-gesture-handler";
 import Animated, {
     interpolate,
     interpolateColor,
     runOnJS,
+    runOnUI,
+    useAnimatedProps,
     useAnimatedReaction,
     useAnimatedStyle,
     useSharedValue
@@ -26,6 +28,8 @@ import type {
     PanGestureHandlerEventPayload
 } from "react-native-gesture-handler/src/handlers/GestureHandlerEventPayload.ts";
 import { PanGestureChangeEventPayload } from "react-native-gesture-handler/src/handlers/gestures/panGesture.ts";
+
+const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 interface SliderProps {
     value?: number;
@@ -71,12 +75,11 @@ const Slider: React.FC<SliderProps> = ({
     tapToSeek = true,
     style = {} as SliderStyle
 }) => {
-    const windowWidth = Dimensions.get("window").width;
     const {
         borderRadius = 25,
         trackHeight = hp(1),
         trackColor = COLORS.gray3,
-        trackBorderWidth = 1,
+        trackBorderWidth = 0,
         barColor = COLORS.gray1 as SliderStyle["barColor"],
         handleHeight = hp(3.5),
         handleWidth = hp(3.5),
@@ -93,130 +96,121 @@ const Slider: React.FC<SliderProps> = ({
         showsTag = false,
         innerTooltip = false
     } = style;
-
-    const minBarWidth = SEPARATOR_SIZES.lightSmall; // csak akkora ha nincs handle
-    const enableTrackPressOnTooltip = innerTooltip;
+    const minBarWidth = SEPARATOR_SIZES.lightSmall; // csak akkor ha nincs handle
     const tooltipBottomTriangleHeight = 16;
     const [tooltipLayout, setTooltipLayout] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
-
-    const styles = useMemo(() => useStyles({
-        borderRadius,
-        trackHeight,
-        trackColor,
-        trackBorderWidth,
-        minBarWidth,
-        handleHeight,
-        handleWidth,
-        handleColor,
-        innerHandleHeight,
-        innerHandleWidth,
-        innerHandleColor,
-        tooltipColor,
-        tooltipLayout,
-        tooltipBottomTriangleHeight,
-        valueTextColor,
-        boundingValuesTextColor,
-        showsHandle,
-        showsTooltip,
-        innerTooltip
-    }), [trackColor, showsHandle, tooltipLayout, handleHeight]);
 
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field?.onChange;
     const error = inputFieldContext?.fieldState?.error;
 
-    const panEndedWithoutProblem = useSharedValue(false);
     const trackWidth = useSharedValue(0);
     const thumbOffset = useSharedValue(0);
     const percent = useSharedValue(0);
-    const inputValue = useSharedValue(value);
-    const [tooltipText, setTooltipText] = useState(`${ inputValue }`);
+    const inputValue = useSharedValue(0);
+    const bounds = useSharedValue({ min: minValue, max: maxValue });
+    const [trackLayoutReady, setTrackLayoutReady] = useState(false);
+
+    const setInputValue = () => {
+        "worklet";
+        inputValue.value = Math.floor(bounds.value.min + ((bounds.value.max - bounds.value.min) * (percent.value / 100)));
+    };
+
+    const calculatePercentByValue = () => {
+        "worklet";
+        percent.value = Math.max(
+            0,
+            Math.min(100, (inputValue.value - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
+        );
+    };
+
+    const calculatePercentByOffset = () => {
+        "worklet";
+        percent.value = Math.max(
+            0,
+            Math.min(100, (thumbOffset.value / (trackWidth.value - (showsHandle ? handleWidth : 0))) * 100)
+        );
+    };
+
+    const calculateOffsetByPercent = () => {
+        "worklet";
+        calculatePercentByValue();
+
+        thumbOffset.value = percent.value * (trackWidth.value - (showsHandle ? handleWidth : 0)) / 100;
+
+        setInputValue();
+    };
+
+    const calculateOffsetByTapPosition = (locationX: number) => {
+        "worklet";
+        thumbOffset.value = Math.min(
+            trackWidth.value - (showsHandle ? handleWidth : 0),
+            Math.max(0, locationX - (showsHandle ? handleWidth / 2 : 0))
+        );
+
+        calculatePercentByOffset();
+
+        setInputValue();
+    };
+
+    const calculateOffsetByPanning = (changeX: number) => {
+        "worklet";
+        thumbOffset.value = Math.min(
+            trackWidth.value - (showsHandle ? handleHeight : 0),
+            Math.max(0, thumbOffset.value + changeX)
+        );
+    };
+
+    useEffect(() => {
+        if(!trackLayoutReady) return;
+
+        inputValue.value = inputFieldContext?.field.value || value;
+        runOnUI(calculateOffsetByPercent)();
+    }, [trackLayoutReady, inputFieldContext?.field.value, value]);
+
+    useEffect(() => {
+        if(bounds.value.min === minValue && bounds.value.max === maxValue) return;
+
+        bounds.value = { min: minValue, max: maxValue };
+    }, [maxValue, minValue]);
 
     useAnimatedReaction(
-        () => inputValue.value,
-        (newVal) => {
-            let text = newVal.toString();
-            if(measurement) text += ` ${ measurement }`;
-            runOnJS(setTooltipText)(text);
+        () => bounds.value,
+        (newBounds, prevBounds) => {
+            if(newBounds.min === prevBounds?.min && newBounds.max === prevBounds?.max) return;
+
+            calculateOffsetByPercent();
         }
     );
 
-    const calculateValue = useCallback((offset: number) => {
-        "worklet";
-        const newPercent = Math.max(
-            0,
-            Math.min(100, (offset / (trackWidth.value - (showsHandle ? handleWidth : 0))) * 100)
-        );
-        percent.value = newPercent;
-
-
-        const value = Math.floor(minValue + ((maxValue - minValue) * (newPercent / 100)));
-        inputValue.value = value;
-
-        return value;
-    }, [trackWidth]);
-
-    const updateInputFieldValue = useCallback((value: number) => {
-        "worklet";
-        if(setValue) runOnJS(setValue)(value);
-        if(onChange) runOnJS(onChange)(value);
-    }, []);
+    useAnimatedReaction(
+        () => trackWidth.value,
+        (newWidth) => runOnJS(setTrackLayoutReady)(newWidth > 0)
+    );
 
     const onTrackPress = (event: GestureResponderEvent) => {
-        let offset = Math.min(
-            trackWidth.value - (showsHandle ? handleWidth : 0),
-            Math.max(0, event.nativeEvent.locationX - (showsHandle ? handleWidth / 2 : 0))
-        );
-        thumbOffset.value = offset;
-
-        updateInputFieldValue(calculateValue(offset));
+        runOnUI(calculateOffsetByTapPosition)(event.nativeEvent.locationX);
     };
 
     const panOnChange = (event: GestureUpdateEvent<PanGestureHandlerEventPayload & PanGestureChangeEventPayload>) => {
         "worklet";
-        thumbOffset.value = Math.min(
-            trackWidth.value - (showsHandle ? handleHeight : 0),
-            Math.max(0, thumbOffset.value + event.changeX)
-        );
-        calculateValue(thumbOffset.value);
+        calculateOffsetByPanning(event.changeX);
+        calculatePercentByOffset();
+        setInputValue();
     };
 
     const panOnEnd = () => {
         "worklet";
-        panEndedWithoutProblem.value = true;
-        updateInputFieldValue(inputValue.value);
-    };
-
-    const panOnFinalize = (event: GestureStateChangeEvent<PanGestureHandlerEventPayload>) => {
-        "worklet";
-        if(panEndedWithoutProblem.value || !enableTrackPressOnTooltip) return panEndedWithoutProblem.value = false;
-
-        const e: GestureResponderEvent = {
-            nativeEvent: {
-                locationX: event.absoluteX - (windowWidth - trackWidth.value) / 2
-            }
-        };
-        runOnJS(onTrackPress)(e);
+        if(setValue) runOnJS(setValue)(value);
+        if(onChange) runOnJS(onChange)(value);
     };
 
     const barPan = useMemo(
         () => Gesture.Pan()
         .enabled(!showsHandle && !disabled)
-        .minDistance(1)
         .onChange(panOnChange)
-        .onEnd(panOnEnd)
-        .onFinalize(panOnFinalize),
+        .onEnd(panOnEnd),
         [showsHandle]
-    );
-
-    const tooltipPan = useMemo(
-        () => Gesture.Pan()
-        .enabled(showsTooltip && !disabled)
-        .minDistance(1)
-        .onChange(panOnChange)
-        .onEnd(panOnEnd)
-        .onFinalize(panOnFinalize),
-        [showsTooltip]
     );
 
     const handlePan = useMemo(
@@ -228,7 +222,7 @@ const Slider: React.FC<SliderProps> = ({
     );
 
     const onTrackLayout = (event: LayoutChangeEvent) => {
-        trackWidth.set(event.nativeEvent.layout.width - 2 * trackBorderWidth);
+        trackWidth.value = (event.nativeEvent.layout.width - 2 * trackBorderWidth);
     };
 
     const onTooltipTextLayout = (event: LayoutChangeEvent) => {
@@ -240,6 +234,7 @@ const Slider: React.FC<SliderProps> = ({
             2 * SEPARATOR_SIZES.lightSmall +
             (innerTooltip ? 0 : tooltipBottomTriangleHeight);
 
+        if(tooltipLayout.width === width && tooltipLayout.height === height) return;
         setTooltipLayout({ width, height });
     };
 
@@ -323,6 +318,7 @@ const Slider: React.FC<SliderProps> = ({
 
         let minLeft = innerTooltip ? minBarWidth : 0;
         return {
+            minWidth: tooltipLayout.width,
             left: Math.min(Math.max(minLeft, left), trackWidth.value - tooltipLayout.width),
             transform: [{ translateY }],
             borderTopRightRadius,
@@ -359,27 +355,61 @@ const Slider: React.FC<SliderProps> = ({
         };
     });
 
+    const styles = useMemo(() => useStyles({
+        borderRadius,
+        trackHeight,
+        trackColor,
+        trackBorderWidth,
+        minBarWidth,
+        handleHeight,
+        handleWidth,
+        handleColor,
+        innerHandleHeight,
+        innerHandleWidth,
+        innerHandleColor,
+        tooltipColor,
+        tooltipLayout,
+        tooltipBottomTriangleHeight,
+        valueTextColor,
+        boundingValuesTextColor,
+        showsHandle,
+        showsTooltip,
+        innerTooltip
+    }), [trackColor, showsHandle, tooltipLayout, handleHeight]);
+
+    const animatedTooltipProps = useAnimatedProps(() => {
+        let text = inputValue.value.toString();
+        if(measurement) text += ` ${ measurement }`;
+        // if(setValue) runOnJS(setValue)(newValue);
+
+        return {
+            text: text,
+            defaultValue: text
+        };
+    });
+
     return (
         <View style={ styles.container }>
             <View style={ styles.slider }>
                 {
                     showsTooltip &&
-                   <GestureDetector gesture={ tooltipPan }>
-                      <Animated.View style={ [styles.slider.tooltip, tooltipContainerStyle] }>
-                          {
-                              !innerTooltip &&
-                             <Animated.View
-                                style={ [styles.slider.tooltip.bottomTriangle, tooltipBottomTriangleStyle] }
-                             />
-                          }
-                         <Text
-                            onLayout={ onTooltipTextLayout }
-                            style={ styles.slider.tooltip.text }
-                         >
-                             { tooltipText }
-                         </Text>
-                      </Animated.View>
-                   </GestureDetector>
+                   <Animated.View
+                      style={ [styles.slider.tooltip, tooltipContainerStyle] }
+                      pointerEvents="none"
+                   >
+                       {
+                           !innerTooltip &&
+                          <Animated.View
+                             style={ [styles.slider.tooltip.bottomTriangle, tooltipBottomTriangleStyle] }
+                          />
+                       }
+                      <AnimatedTextInput
+                         animatedProps={ animatedTooltipProps }
+                         editable={ false }
+                         style={ styles.slider.tooltip.text }
+                         onLayout={ onTooltipTextLayout }
+                      />
+                   </Animated.View>
                 }
                 <Pressable
                     style={ [styles.slider.track, error && styles.slider.track.error] }
@@ -414,6 +444,12 @@ const Slider: React.FC<SliderProps> = ({
                 showsBoundingValues &&
                <View style={ styles.boundingValues }>
                   <Text style={ styles.boundingValues.text }>{ minValue } { measurement }</Text>
+                  <View style={ styles.boundingValues.centerContainer }>
+                     <AnimatedTextInput
+                        animatedProps={ animatedTooltipProps }
+                        style={ styles.boundingValues.centerContainer.text }
+                     />
+                  </View>
                   <Text style={ styles.boundingValues.text }>{ maxValue } { measurement }</Text>
                </View>
             }
@@ -459,6 +495,20 @@ const useStyles = ({
         justifyContent: "space-between",
         gap: SEPARATOR_SIZES.lightSmall,
         width: "100%",
+
+        centerContainer: {
+            position: "absolute",
+            left: 0,
+            right: 0,
+            alignItems: "center",
+
+            text: {
+                fontFamily: "Gilroy-Heavy",
+                fontSize: FONT_SIZES.p4,
+                color: boundingValuesTextColor,
+                textAlign: "center"
+            }
+        },
 
         text: {
             fontFamily: "Gilroy-Medium",
@@ -528,7 +578,6 @@ const useStyles = ({
             zIndex: 1,
             alignItems: "center",
             justifyContent: "center",
-            width: tooltipLayout.width,
             backgroundColor: tooltipColor,
             paddingVertical: SEPARATOR_SIZES.lightSmall,
 
@@ -550,7 +599,8 @@ const useStyles = ({
                 fontFamily: "Gilroy-Medium",
                 fontWeight: "bold",
                 fontSize: FONT_SIZES.p4,
-                color: valueTextColor
+                color: valueTextColor,
+                textAlign: "center"
             }
         }
     }
