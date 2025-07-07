@@ -28,7 +28,6 @@ const FuelGauge: React.FC<FuelGaugeProps> = ({
     }, [value]);
 
     let percent = Math.max(Math.min((value / tankSize) * 100, 100), 0);
-    let styles = useStyles(percent, value.toString().length + measurement.length + 1);
 
     return (
         <View style={ styles.container }>
@@ -55,7 +54,9 @@ const FuelGauge: React.FC<FuelGaugeProps> = ({
                 minValue={ 0 }
                 maxValue={ tankSize }
                 measurement={ measurement }
+                value={ value1 }
                 setValue={ setValue }
+                tooltipAsInputField
                 style={ {
                     showsHandle: false,
                     showsTag: true,
@@ -76,7 +77,7 @@ const FuelGauge: React.FC<FuelGaugeProps> = ({
     );
 };
 
-const useStyles = (fuelPercent: number, fuelValueLength: number) => StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         gap: SEPARATOR_SIZES.lightSmall
     },

@@ -42,7 +42,7 @@ interface SliderProps {
     measurement?: string;
     disabled?: boolean;
     tapToSeek?: boolean;
-    changeValueWithTooltip?: boolean;
+    tooltipAsInputField?: boolean;
     style?: Partial<SliderStyle>;
 }
 
