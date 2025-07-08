@@ -6,7 +6,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Provider } from "react-redux";
 import { KeyboardProvider } from "react-native-keyboard-controller";
-import { StatusBar } from "expo-status-bar";
 import { BottomSheetProvider } from "../ui/bottomSheet/contexts/BottomSheetProvider.tsx";
 import Compactor from "../components/Compactor";
 import { ScreenScrollViewProvider } from "../contexts/screenScrollView/ScreenScrollViewProvider.tsx";
@@ -35,9 +34,6 @@ const Layout: React.FC = () => {
         >
             <Stack.Screen
                 name="index"
-                options={ {
-                    header: () => <StatusBar translucent={ true }/>
-                } }
             />
             <Stack.Screen
                 name="backToRootIndex"
@@ -45,7 +41,8 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="(main)"
                 options={ {
-                    header: () => <Header.Primary/>
+                    header: () => <Header.Primary/>,
+                    animation: "fade_from_bottom"
                 } }
             />
             <Stack.Screen

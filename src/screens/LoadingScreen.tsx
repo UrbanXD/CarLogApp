@@ -1,12 +1,14 @@
 import React, { useEffect } from "react";
-import { Href } from "expo-router";
-import { StatusBar, StyleSheet, View } from "react-native";
-import { COLORS } from "../constants/index.ts";
+import { Href, router } from "expo-router";
+import { StatusBar, StyleSheet, Text, View } from "react-native";
+import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
 import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import Animated, {
     Easing,
+    runOnJS,
+    runOnUI,
     useAnimatedProps,
     useAnimatedReaction,
     useAnimatedStyle,
@@ -14,10 +16,9 @@ import Animated, {
     withRepeat,
     withTiming
 } from "react-native-reanimated";
-import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons";
+import BounceDot from "../components/BounceDot.tsx";
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
-const AnimatedIcon = Animated.createAnimatedComponent(MaterialIcon);
 
 type LoadingScreenProps = {
     loaded: boolean
@@ -26,15 +27,8 @@ type LoadingScreenProps = {
 
 const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => {
     const { top } = useSafeAreaInsets();
-    const CAR_WIDTH = (564 / 3) / 1.35;
-    const carOffset = useSharedValue(-CAR_WIDTH); // 0% - 100%
-    const roadOffset = useSharedValue(0);
-    const wheelRotation = useSharedValue(0);
-    const engineStart = useSharedValue(0);
-    const hasEntered = useSharedValue(false);
-    const isLoaded = useSharedValue(false);
 
-    const ENGINE_START_ANIMATION_DURATION = 1500;
+    const ANIMATION_CONTAINER_WIDTH = widthPercentageToDP(100) - 2 * DEFAULT_SEPARATOR;
 
     const ROAD_WIDTH = widthPercentageToDP(40);
     const ROAD_HEIGHT = heightPercentageToDP(1);
@@ -43,24 +37,17 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => 
     const ROAD_STROKE_DASH = [20, 5];
     const ROAD_STROKE_DASH_VALUE = ROAD_STROKE_DASH[0] + ROAD_STROKE_DASH[1];
 
-    const WHEEL_ANIMATION_DURATION = ROAD_ANIMATION_DURATION;
-    const CAR_ANIMATION_DURATION = 1250;
+    const CAR_WIDTH = (564 / 3) / 1.35;
     const CAR_HEIGHT = (188 / 3) / 1.35;
     const RIM_SIZE = CAR_WIDTH / 8;
+    const WHEEL_ANIMATION_DURATION = ROAD_ANIMATION_DURATION * 1.35;
+    const CAR_ANIMATION_DURATION = WHEEL_ANIMATION_DURATION;
 
-    const startAnimation = () => {
-        engineStart.value = withTiming(
-            1,
-            { duration: ENGINE_START_ANIMATION_DURATION },
-            (finished) => {
-                if(!finished) return;
-
-                roadAnimation();
-                carEnterAnimation();
-                wheelAnimation();
-            }
-        );
-    };
+    const carOffset = useSharedValue(-CAR_WIDTH);
+    const roadOffset = useSharedValue(0);
+    const wheelRotation = useSharedValue(0);
+    const hasEntered = useSharedValue(false);
+    const isLoaded = useSharedValue(false);
 
     const roadAnimation = () => {
         "worklet";
@@ -72,31 +59,25 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => 
             -1
         );
     };
-    const xd = widthPercentageToDP(75);
-
-    const carExitAnimation = () => {
-        "worklet";
-        carOffset.value = withTiming(
-            xd + CAR_WIDTH,
-            { duration: CAR_ANIMATION_DURATION, easing: Easing.linear }
-        );
-    };
-
-    useAnimatedReaction(
-        () => hasEntered.value && isLoaded.value,
-        (shouldRunExit) => {
-            if(shouldRunExit) carExitAnimation();
-        },
-        []
-    );
 
     const carEnterAnimation = () => {
         "worklet";
         carOffset.value = withTiming(
-            (xd - CAR_WIDTH) / 2,
+            (ANIMATION_CONTAINER_WIDTH - CAR_WIDTH) / 2,
             { duration: CAR_ANIMATION_DURATION, easing: Easing.linear },
             (finished) => {
                 if(finished) hasEntered.value = true;
+            }
+        );
+    };
+
+    const carExitAnimation = () => {
+        "worklet";
+        carOffset.value = withTiming(
+            ANIMATION_CONTAINER_WIDTH,
+            { duration: CAR_ANIMATION_DURATION, easing: Easing.linear },
+            (finished) => {
+                if(finished) runOnJS(router.replace)(redirectTo);
             }
         );
     };
@@ -112,8 +93,18 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => 
         );
     };
 
+    useAnimatedReaction(
+        () => hasEntered.value && isLoaded.value,
+        (shouldRunExit) => {
+            if(shouldRunExit) carExitAnimation();
+        },
+        []
+    );
+
     useEffect(() => {
-        startAnimation();
+        runOnUI(roadAnimation)();
+        runOnUI(carEnterAnimation)();
+        runOnUI(wheelAnimation)();
     }, []);
 
     useEffect(() => {
@@ -138,18 +129,12 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => 
         };
     });
 
-    const styles = useStyles(top, CAR_WIDTH, CAR_HEIGHT, RIM_SIZE);
+    const styles = useStyles(top, ANIMATION_CONTAINER_WIDTH, CAR_WIDTH, CAR_HEIGHT, RIM_SIZE);
 
     return (
-        // loaded
-        // ? <Redirect href={ redirectTo }/>
-        // :
         <View style={ styles.container }>
             <StatusBar barStyle="light-content" backgroundColor={ styles.container.backgroundColor }/>
-            <View style={ [
-                styles.loadingContainer
-            ] }
-            >
+            <View style={ styles.loadingContainer }>
                 <Animated.View style={ [styles.car, carStyle] }>
                     <Animated.Image
                         source={ require("../assets/images/kocsi.png") }
@@ -192,20 +177,33 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => 
                     </Svg>
                 </View>
             </View>
+            <View style={ styles.loadingTextContainer }>
+                <Text style={ styles.loadingTextContainer.text }>Betöltés</Text>
+                <BounceDot delay={ 0 }/>
+                <BounceDot delay={ 200 }/>
+                <BounceDot delay={ 400 }/>
+            </View>
         </View>
     );
 };
 
-const useStyles = (top: number, carWidth: number, carHeight: number, rimSize: number) => StyleSheet.create({
+const useStyles = (
+    top: number,
+    animationContainerWidth: number,
+    carWidth: number,
+    carHeight: number,
+    rimSize: number
+) => StyleSheet.create({
     container: {
         flex: 1,
-        marginTop: top,
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: COLORS.black2
+        gap: SEPARATOR_SIZES.lightSmall,
+        backgroundColor: COLORS.black2,
+        marginTop: top
     },
     loadingContainer: {
-        width: widthPercentageToDP(75),
+        width: animationContainerWidth,
         height: carHeight + heightPercentageToDP(1),
         gap: heightPercentageToDP(0.35),
         overflow: "hidden"
@@ -227,8 +225,16 @@ const useStyles = (top: number, carWidth: number, carHeight: number, rimSize: nu
             width: rimSize,
             height: rimSize
         }
-    }
+    },
+    loadingTextContainer: {
+        flexDirection: "row",
 
+        text: {
+            fontFamily: "Gilroy-Heavy",
+            fontSize: FONT_SIZES.p1,
+            color: COLORS.gray1
+        }
+    }
 });
 
 export default LoadingScreen;
