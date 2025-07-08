@@ -204,8 +204,8 @@ const useStyles = (
     },
     loadingContainer: {
         width: animationContainerWidth,
-        height: carHeight + heightPercentageToDP(1),
-        gap: heightPercentageToDP(0.35),
+        height: carHeight + hp(1),
+        gap: hp(0.35),
         overflow: "hidden"
     },
     car: {
