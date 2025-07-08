@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Href, router } from "expo-router";
 import { StatusBar, StyleSheet, Text, View } from "react-native";
 import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
-import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import Animated, {
@@ -28,10 +28,10 @@ type LoadingScreenProps = {
 const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => {
     const { top } = useSafeAreaInsets();
 
-    const ANIMATION_CONTAINER_WIDTH = widthPercentageToDP(100) - 2 * DEFAULT_SEPARATOR;
+    const ANIMATION_CONTAINER_WIDTH = wp(100) - 2 * DEFAULT_SEPARATOR;
 
-    const ROAD_WIDTH = widthPercentageToDP(40);
-    const ROAD_HEIGHT = heightPercentageToDP(1);
+    const ROAD_WIDTH = wp(40);
+    const ROAD_HEIGHT = hp(1);
     const ROAD_ASPECT_RATIO = ROAD_WIDTH / ROAD_HEIGHT;
     const ROAD_ANIMATION_DURATION = 1000;
     const ROAD_STROKE_DASH = [20, 5];
@@ -168,7 +168,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => 
                     >
                         <AnimatedPath
                             d={ `M0,0 L${ ROAD_WIDTH },0` }
-                            strokeWidth={ heightPercentageToDP(0.20) }
+                            strokeWidth={ hp(0.20) }
                             strokeDasharray={ `${ ROAD_STROKE_DASH[0] },${ ROAD_STROKE_DASH[1] }` }
                             animatedProps={ roadAnimatedProps }
                             stroke={ COLORS.white }
