@@ -1,15 +1,17 @@
 import React, { useCallback } from "react";
-import { ImageBackground, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants/index.ts";
-import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { widthPercentageToDP } from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button/Button";
-import Divider from "../components/Divider";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomSheet } from "../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { SignInBottomSheet, SignUpBottomSheet } from "../features/user/presets/bottomSheet/index.ts";
 import { useAuth } from "../contexts/auth/AuthContext.ts";
 import { useUserManagement } from "../features/user/hooks/useUserManagement.ts";
+import Animated, { FadeIn, SlideInRight } from "react-native-reanimated";
+import Title from "../components/Title.tsx";
+import Divider from "../components/Divider.tsx";
 
 const AuthScreen: React.FC = () => {
     const { top } = useSafeAreaInsets();
@@ -34,10 +36,13 @@ const AuthScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={ styles.pageContainer }>
-            <ImageBackground
-                source={ require("../assets/images/home2.jpg") }
-                style={ styles.imageContainer }
-            >
+            <View style={ styles.imageContainer }>
+                <Animated.Image
+                    entering={ FadeIn.duration(300) }
+                    source={ require("../assets/images/home2.jpg") }
+                    style={ { width: "100%", height: "100%" } }
+                    resizeMode="cover"
+                />
                 <LinearGradient
                     locations={ [0, 0.35, 0.85] }
                     colors={ [
@@ -45,22 +50,22 @@ const AuthScreen: React.FC = () => {
                         "rgba(0,0,0,0.25)",
                         GLOBAL_STYLE.pageContainer.backgroundColor
                     ] }
-                    style={ styles.imageGradientOverlay }
+                    style={ StyleSheet.absoluteFillObject }
                 />
-            </ImageBackground>
+            </View>
             <View style={ styles.contentContainer }>
                 <View style={ styles.titleContainer }>
-                    <Text style={ styles.title }>Carlog</Text>
-                    <Text style={ [styles.title, styles.titleEffect] }>Carlog</Text>
-                    <Text style={ [styles.title, styles.titleEffect, { top: hp(2.5), zIndex: -1 }] }>Carlog</Text>
-                    <Divider
-                        size={ wp(70) }
-                        thickness={ 2 }
-                        color={ COLORS.fuelYellow }
-                    />
-                    <Text style={ styles.subtitle }>Kezelje nálunk autóit</Text>
+                    <Title text="Carlog"/>
+                    <Animated.View entering={ FadeIn.duration(300) } style={ styles.titleContainer.info }>
+                        <Divider
+                            size={ widthPercentageToDP(50) }
+                            thickness={ 2 }
+                            color={ COLORS.gray2 }
+                        />
+                        <Text style={ styles.subtitle }>Kezelje nálunk autóit</Text>
+                    </Animated.View>
                 </View>
-                <View style={ styles.actionContainer }>
+                <Animated.View entering={ FadeIn.duration(300) } style={ styles.actionContainer }>
                     <Button.Text
                         text="Regisztráció"
                         onPress={ openSignUp }
@@ -75,11 +80,11 @@ const AuthScreen: React.FC = () => {
                             Jelentkezz be
                         </Text>
                     </Text>
-                </View>
+                </Animated.View>
             </View>
             {
                 !session && notVerifiedUser &&
-               <View style={ styles.verificationContainer }>
+               <Animated.View entering={ SlideInRight.duration(500) } style={ styles.verificationContainer }>
                   <Button.Icon
                      icon={ "email-seal-outline" }
                      onPress={ openVerification }
@@ -91,7 +96,7 @@ const AuthScreen: React.FC = () => {
                   >
                      Hitelesítés{ "\n" }folytatása
                   </Text>
-               </View>
+               </Animated.View>
             }
         </SafeAreaView>
     );
@@ -100,12 +105,13 @@ const AuthScreen: React.FC = () => {
 const useStyles = (top: number) =>
     StyleSheet.create({
         pageContainer: {
-            ...GLOBAL_STYLE.pageContainer,
-            paddingBottom: DEFAULT_SEPARATOR,
-            paddingVertical: 0
+            flex: 1,
+            backgroundColor: COLORS.black2
         },
         imageContainer: {
-            flex: 0.85
+            flex: 1,
+            overflow: "hidden",
+            position: "relative"
 
         },
         imageGradientOverlay: {
@@ -117,34 +123,20 @@ const useStyles = (top: number) =>
             flexDirection: "column",
             justifyContent: "space-between",
             backgroundColor: "transparent",
-            paddingHorizontal: DEFAULT_SEPARATOR,
-            paddingBottom: GLOBAL_STYLE.pageContainer.paddingBottom
+            paddingHorizontal: DEFAULT_SEPARATOR
         },
         titleContainer: {
+            flex: 1,
             top: -SEPARATOR_SIZES.lightLarge,
-            gap: SEPARATOR_SIZES.mediumSmall
-        },
-        title: {
-            zIndex: 1,
-            top: hp(FONT_SIZES.title / -12),
-            alignSelf: "center",
-            color: COLORS.white,
-            fontSize: FONT_SIZES.title,
-            fontFamily: "Gilroy-Heavy",
-            textTransform: "uppercase"
-        },
-        titleEffect: {
-            zIndex: 0,
-            position: "absolute", top: -hp(2.5),
-            color: GLOBAL_STYLE.pageContainer.backgroundColor,
-            textShadowOffset: { height: 0, width: 0 },
-            textShadowColor: COLORS.white,
-            textShadowRadius: 1,
-            textAlign: "center"
+            gap: SEPARATOR_SIZES.mediumSmall,
+
+            info: {
+                gap: SEPARATOR_SIZES.mediumSmall - 3
+            }
         },
         subtitle: {
             alignSelf: "center",
-            color: COLORS.gray2,
+            color: COLORS.gray1,
             fontSize: FONT_SIZES.p1,
             fontFamily: "Gilroy-Medium",
             textTransform: "uppercase",
@@ -152,7 +144,8 @@ const useStyles = (top: number) =>
         },
         actionContainer: {
             flexDirection: "column",
-            gap: SEPARATOR_SIZES.normal
+            gap: SEPARATOR_SIZES.normal,
+            marginBottom: DEFAULT_SEPARATOR
         },
         underButtonText: {
             color: COLORS.white,
