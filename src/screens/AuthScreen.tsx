@@ -10,14 +10,16 @@ import { SignInBottomSheet, SignUpBottomSheet } from "../features/user/presets/b
 import { useAuth } from "../contexts/auth/AuthContext.ts";
 import { useUserManagement } from "../features/user/hooks/useUserManagement.ts";
 import Animated, { FadeIn, SlideInRight } from "react-native-reanimated";
-import Title from "../components/Title.tsx";
 import Divider from "../components/Divider.tsx";
+import CarlogTitle from "../components/CarlogTitle.tsx";
 
 const AuthScreen: React.FC = () => {
     const { top } = useSafeAreaInsets();
     const { openBottomSheet } = useBottomSheet();
     const { session, notVerifiedUser } = useAuth();
     const { openUserVerification } = useUserManagement();
+
+    const ENTERING_ANIMATION_DURATION = 300;
 
     const openSignUp =
         () => openBottomSheet(SignUpBottomSheet);
@@ -38,7 +40,7 @@ const AuthScreen: React.FC = () => {
         <SafeAreaView style={ styles.pageContainer }>
             <View style={ styles.imageContainer }>
                 <Animated.Image
-                    entering={ FadeIn.duration(300) }
+                    entering={ FadeIn.duration(ENTERING_ANIMATION_DURATION) }
                     source={ require("../assets/images/home2.jpg") }
                     style={ { width: "100%", height: "100%" } }
                     resizeMode="cover"
@@ -55,8 +57,11 @@ const AuthScreen: React.FC = () => {
             </View>
             <View style={ styles.contentContainer }>
                 <View style={ styles.titleContainer }>
-                    <Title text="Carlog"/>
-                    <Animated.View entering={ FadeIn.duration(300) } style={ styles.titleContainer.info }>
+                    <CarlogTitle animated={ false }/>
+                    <Animated.View
+                        entering={ FadeIn.duration(ENTERING_ANIMATION_DURATION) }
+                        style={ styles.titleContainer.info }
+                    >
                         <Divider
                             size={ widthPercentageToDP(50) }
                             thickness={ 2 }
@@ -65,7 +70,10 @@ const AuthScreen: React.FC = () => {
                         <Text style={ styles.subtitle }>Kezelje nálunk autóit</Text>
                     </Animated.View>
                 </View>
-                <Animated.View entering={ FadeIn.duration(300) } style={ styles.actionContainer }>
+                <Animated.View
+                    entering={ FadeIn.duration(ENTERING_ANIMATION_DURATION) }
+                    style={ styles.actionContainer }
+                >
                     <Button.Text
                         text="Regisztráció"
                         onPress={ openSignUp }
@@ -84,7 +92,8 @@ const AuthScreen: React.FC = () => {
             </View>
             {
                 !session && notVerifiedUser &&
-               <Animated.View entering={ SlideInRight.duration(500) } style={ styles.verificationContainer }>
+               <Animated.View entering={ SlideInRight.duration(ENTERING_ANIMATION_DURATION * 1.5) }
+                              style={ styles.verificationContainer }>
                   <Button.Icon
                      icon={ "email-seal-outline" }
                      onPress={ openVerification }
@@ -131,7 +140,7 @@ const useStyles = (top: number) =>
             gap: SEPARATOR_SIZES.mediumSmall,
 
             info: {
-                gap: SEPARATOR_SIZES.mediumSmall - 3
+                gap: SEPARATOR_SIZES.mediumSmall
             }
         },
         subtitle: {

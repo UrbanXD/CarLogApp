@@ -2,7 +2,7 @@ import React from "react";
 import { SafeAreaView, StyleSheet, View } from "react-native";
 import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../constants/index.ts";
 import { Href } from "expo-router";
-import Title from "../components/Title.tsx";
+import CarlogTitle from "../components/CarlogTitle.tsx";
 
 type AnimatedSplashScreenProps = {
     loaded: boolean,
@@ -14,8 +14,7 @@ const AnimatedSplashScreen: React.FC<AnimatedSplashScreenProps> = ({ loaded, red
         <SafeAreaView style={ styles.container }>
             <View style={ { flex: 1 } }/>
             <View style={ styles.titleContainer }>
-                <Title
-                    text="Carlog"
+                <CarlogTitle
                     loaded={ loaded }
                     redirectTo={ redirectTo }
                     animated
