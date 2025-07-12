@@ -1,32 +1,24 @@
 import React from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
-import { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { COLORS, DEFAULT_SEPARATOR } from "../constants/index.ts";
 import AnimatedStrokePath from "./svg/AnimatedStrokePath.tsx";
-import Svg from "react-native-svg";
 import { AnimatedSvg } from "./AnimatedComponents/index.ts";
-import { router } from "expo-router";
 
 type TitleProps = {
-    redirectTo?: string
-    loaded?: boolean
     animated?: boolean
+    onAnimationFinished?: () => void
 }
 
 const CarlogTitle: React.FC<TitleProps> = ({
-    text,
-    redirectTo,
-    loaded,
-    animated
+    animated = true,
+    onAnimationFinished
 }) => {
-    const translateYTextEffect1 = useSharedValue(0);
-    const translateYTextEffect2 = useSharedValue(0);
-
     // CARLOG - SVG PATH
     const VIEW_BOX_WIDTH = 144;
     const VIEW_BOX_HEIGHT = 27;
-    const WIDTH = Dimensions.get("window").width - 2 * DEFAULT_SEPARATOR;
-    const HEIGHT = (VIEW_BOX_HEIGHT / VIEW_BOX_WIDTH) * WIDTH;
+    const WIDTH = Math.min(450, Dimensions.get("window").width - 2 * DEFAULT_SEPARATOR); // maxWidth = 400
+    const HEIGHT = (VIEW_BOX_HEIGHT / VIEW_BOX_WIDTH) * WIDTH + 12;
     const PATHS = [
         "M14.076 26.576C10.26 26.576 7.128 25.316 4.644 22.796C2.124 20.276 0.9 17.144 0.9 13.4C0.9 9.656 2.124 6.524 4.644 4.004C7.128 1.484 10.26 0.223999 14.076 0.223999C16.38 0.223999 18.54 0.799998 20.52 1.88C22.464 2.996 24.012 4.472 25.128 6.344L18.864 9.944C18.432 9.152 17.82 8.504 16.956 8C16.092 7.532 15.12 7.28 14.076 7.28C12.276 7.28 10.836 7.856 9.756 9.008C8.64 10.16 8.1 11.636 8.1 13.4C8.1 15.2 8.64 16.64 9.756 17.792C10.836 18.944 12.276 19.52 14.076 19.52C15.156 19.52 16.092 19.304 16.956 18.8C17.82 18.332 18.432 17.684 18.864 16.82L25.128 20.42C24.012 22.328 22.464 23.84 20.52 24.92C18.54 26.036 16.38 26.576 14.076 26.576Z",
         "M41.5167 26L40.6527 22.76H33.3807L32.5167 26H24.7767L32.8047 0.799998H41.2287L49.2567 26H41.5167ZM34.9287 17H39.1047L37.0167 9.26L34.9287 17Z",
@@ -36,14 +28,17 @@ const CarlogTitle: React.FC<TitleProps> = ({
         "M143.365 11.132V14.12C143.365 17.72 142.177 20.708 139.873 23.048C137.569 25.424 134.509 26.576 130.765 26.576C126.805 26.576 123.601 25.352 121.117 22.832C118.597 20.312 117.373 17.18 117.373 13.436C117.373 9.692 118.597 6.56 121.117 4.04C123.601 1.52 126.733 0.223999 130.477 0.223999C132.817 0.223999 134.977 0.763999 136.921 1.808C138.865 2.888 140.413 4.292 141.565 6.092L135.445 9.584C134.437 8.072 132.817 7.28 130.621 7.28C128.821 7.28 127.345 7.856 126.229 9.008C125.113 10.16 124.573 11.672 124.573 13.472C124.573 15.2 125.077 16.712 126.121 18.008C127.129 19.304 128.749 19.916 130.909 19.916C133.393 19.916 135.049 19.052 135.913 17.252H130.549V11.132H143.365Z"
     ];
 
-    const DELAY_TEXT_EFFECT = 1200;
     const DURATION_TEXT_EFFECT_1 = 300;
     const DURATION_TEXT_EFFECT_2 = 2 * DURATION_TEXT_EFFECT_1;
-    const GOAL_Y_TRANSLATE_TEXT_EFFECT_1 = HEIGHT / 1.6;
+    const GOAL_Y_TRANSLATE_TEXT_EFFECT_1 = HEIGHT / 1.75;
     const GOAL_Y_TRANSLATE_TEXT_EFFECT_2 = 2 * GOAL_Y_TRANSLATE_TEXT_EFFECT_1;
 
-    const CONTAINER_TOP = -GOAL_Y_TRANSLATE_TEXT_EFFECT_1;
-    const CONTAINER_HEIGHT = HEIGHT + GOAL_Y_TRANSLATE_TEXT_EFFECT_2 + CONTAINER_TOP;
+    const CONTAINER_HEIGHT = HEIGHT + GOAL_Y_TRANSLATE_TEXT_EFFECT_2 + VIEW_BOX_HEIGHT;
+    const CONTAINER_DEFAULT_TRANSLATE_X = (WIDTH / 2) - (VIEW_BOX_WIDTH / 4);
+
+    const translateYTextEffect1 = useSharedValue(0);
+    const translateYTextEffect2 = useSharedValue(0);
+    const containerTranslateX = useSharedValue(CONTAINER_DEFAULT_TRANSLATE_X);
 
     const startTextEffectAnimation = () => {
         "worklet";
@@ -58,16 +53,31 @@ const CarlogTitle: React.FC<TitleProps> = ({
             GOAL_Y_TRANSLATE_TEXT_EFFECT_2,
             { duration: DURATION_TEXT_EFFECT_2 },
             finished => {
-                if(finished && redirectTo) runOnJS(router.replace)(redirectTo);
+                if(finished && onAnimationFinished) onAnimationFinished();
             }
         );
     };
+
+    const onLetterAnimationProgress = (letterVisibleWidth: number) => {
+        "worklet";
+        if(!animated) return;
+        containerTranslateX.value = Math.max(0, containerTranslateX.value - letterVisibleWidth / 2);
+    };
+
+    const primaryTextContainerStyle = useAnimatedStyle(() => {
+        const translateX = animated ? containerTranslateX.value : 0;
+
+        return {
+            transform: [{ translateX }]
+        };
+    });
 
     const textEffect1Style = useAnimatedStyle(() => {
         const translateY = animated ? translateYTextEffect1.value : GOAL_Y_TRANSLATE_TEXT_EFFECT_1;
 
         return {
             transform: [{ translateY }],
+            display: translateY === 0 ? "none" : "flex",
             zIndex: 0
         };
     });
@@ -77,6 +87,7 @@ const CarlogTitle: React.FC<TitleProps> = ({
 
         return {
             transform: [{ translateY }],
+            display: translateY === 0 ? "none" : "flex",
             zIndex: -1
         };
     });
@@ -84,28 +95,31 @@ const CarlogTitle: React.FC<TitleProps> = ({
     return (
         <View style={ {
             height: CONTAINER_HEIGHT,
-            top: CONTAINER_TOP
+            width: WIDTH,
+            alignSelf: "center",
+            transform: [{ translateY: -VIEW_BOX_HEIGHT }]
         } }>
-            <Svg
+            <AnimatedSvg
                 width={ WIDTH }
                 height={ HEIGHT }
                 viewBox={ `0 0 ${ VIEW_BOX_WIDTH } ${ VIEW_BOX_HEIGHT }` }
-                style={ [styles.text] }
+                style={ [styles.text, primaryTextContainerStyle] }
             >
                 {
                     PATHS.map((path, index) => (
                         <AnimatedStrokePath
                             key={ index }
-                            delay={ 50 * index }
-                            disabled={ !animated }
+                            delay={ 150 * index }
+                            disabled={ !animated || index === 0 }
                             onAnimateFinish={ (PATHS.length - 1 === index) ? startTextEffectAnimation : undefined }
+                            onAnimationProgress={ onLetterAnimationProgress }
                             pathProps={ {
                                 d: path
                             } }
                         />
                     ))
                 }
-            </Svg>
+            </AnimatedSvg>
             <AnimatedSvg
                 width={ WIDTH }
                 height={ HEIGHT }

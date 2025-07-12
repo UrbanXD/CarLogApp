@@ -10,11 +10,6 @@
     "androidStatusBar": {
       "translucent": true
     },
-    "splash": {
-      "image": "./src/assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
       "supportsTablet": true
     },
@@ -32,7 +27,16 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./src/assets/C.png",
+          "resizeMode": "contain",
+          "imageWidth": 74,
+          "backgroundColor": "#242424"
+        }
+      ]
     ],
     "extra": {
       "router": {
