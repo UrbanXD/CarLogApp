@@ -1,10 +1,6 @@
-import React, { useEffect } from "react";
-import { Href, router } from "expo-router";
-import { StatusBar, StyleSheet, Text, View } from "react-native";
-import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
-import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Svg, { Path } from "react-native-svg";
+import React, { useEffect, useState } from "react";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../constants/index.ts";
 import Animated, {
     Easing,
     runOnJS,
@@ -16,35 +12,32 @@ import Animated, {
     withRepeat,
     withTiming
 } from "react-native-reanimated";
-import BounceDot from "../components/BounceDot.tsx";
+import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
+import BounceDot from "./BounceDot.tsx";
+import { AnimatedPath, AnimatedSvg } from "../AnimatedComponents/index.ts";
 
-const AnimatedPath = Animated.createAnimatedComponent(Path);
-
-type LoadingScreenProps = {
+type CarLoadingIndicatorProps = {
     loaded: boolean
-    redirectTo: Href
 }
 
-const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => {
-    const { top } = useSafeAreaInsets();
-
-    const ANIMATION_CONTAINER_WIDTH = wp(100) - 2 * DEFAULT_SEPARATOR;
-
-    const ROAD_WIDTH = wp(40);
-    const ROAD_HEIGHT = hp(1);
-    const ROAD_ASPECT_RATIO = ROAD_WIDTH / ROAD_HEIGHT;
+const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({ loaded }) => {
+    const ROAD_HEIGHT = hp(0.35);
     const ROAD_ANIMATION_DURATION = 1000;
     const ROAD_STROKE_DASH = [20, 5];
     const ROAD_STROKE_DASH_VALUE = ROAD_STROKE_DASH[0] + ROAD_STROKE_DASH[1];
 
-    const CAR_WIDTH = (564 / 3) / 1.35;
-    const CAR_HEIGHT = (188 / 3) / 1.35;
+    const CAR_WIDTH = (564 / 3) / 1.45;
+    const CAR_HEIGHT = (188 / 3) / 1.45;
     const RIM_SIZE = CAR_WIDTH / 8;
     const WHEEL_ANIMATION_DURATION = ROAD_ANIMATION_DURATION * 1.35;
-    const CAR_ANIMATION_DURATION = WHEEL_ANIMATION_DURATION;
+    const CAR_ANIMATION_DURATION = WHEEL_ANIMATION_DURATION * 1.15;
 
-    const carOffset = useSharedValue(-CAR_WIDTH);
+    const [roadPathD, setRoadPathD] = useState("");
+    const [roadViewBox, setRoadViewBox] = useState("");
+
+    const roadWidth = useSharedValue(0);
     const roadOffset = useSharedValue(0);
+    const carOffset = useSharedValue(-CAR_WIDTH); // vlahogy a roadWidthhel megoldani mert igy nem kivulrol jon ha nagy az ut
     const wheelRotation = useSharedValue(0);
     const hasEntered = useSharedValue(false);
     const isLoaded = useSharedValue(false);
@@ -63,7 +56,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => 
     const carEnterAnimation = () => {
         "worklet";
         carOffset.value = withTiming(
-            (ANIMATION_CONTAINER_WIDTH - CAR_WIDTH) / 2,
+            (roadWidth.value - CAR_WIDTH) / 2,
             { duration: CAR_ANIMATION_DURATION, easing: Easing.linear },
             (finished) => {
                 if(finished) hasEntered.value = true;
@@ -74,11 +67,8 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => 
     const carExitAnimation = () => {
         "worklet";
         carOffset.value = withTiming(
-            ANIMATION_CONTAINER_WIDTH,
-            { duration: CAR_ANIMATION_DURATION, easing: Easing.linear },
-            (finished) => {
-                if(finished) runOnJS(router.replace)(redirectTo);
-            }
+            roadWidth.value,
+            { duration: CAR_ANIMATION_DURATION, easing: Easing.linear }
         );
     };
 
@@ -94,6 +84,17 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => 
     };
 
     useAnimatedReaction(
+        () => roadWidth.value,
+        (roadWidthValue) => {
+            const newRoadPathD = `M0,${ ROAD_HEIGHT / 2 } L${ roadWidthValue },${ ROAD_HEIGHT / 2 }`;
+            runOnJS(setRoadPathD)(newRoadPathD);
+
+            const newRoadViewBox = `0 0 ${ roadWidth.value } ${ ROAD_HEIGHT }`;
+            runOnJS(setRoadViewBox)(newRoadViewBox);
+        }
+    );
+
+    useAnimatedReaction(
         () => hasEntered.value && isLoaded.value,
         (shouldRunExit) => {
             if(shouldRunExit) carExitAnimation();
@@ -102,18 +103,41 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => 
     );
 
     useEffect(() => {
-        runOnUI(roadAnimation)();
-        runOnUI(carEnterAnimation)();
-        runOnUI(wheelAnimation)();
-    }, []);
-
-    useEffect(() => {
         if(loaded) isLoaded.value = true;
     }, [loaded]);
+
+    const startAnimation = () => {
+        "worklet";
+        roadAnimation();
+        carEnterAnimation();
+        wheelAnimation();
+    };
+
+    const onContainerLayout = (event: LayoutChangeEvent) => {
+        const newWidth = event.nativeEvent.layout.width;
+        if(newWidth === roadWidth.value) return;
+
+        roadWidth.value = newWidth;
+        if(newWidth !== 0) runOnUI(startAnimation)();
+    };
+
+    const roadSvgAnimatedProps = useAnimatedProps(() => {
+        return {
+            width: roadWidth.value,
+            height: ROAD_HEIGHT
+        };
+    });
 
     const roadAnimatedProps = useAnimatedProps(() => {
         return {
             strokeDashoffset: roadOffset.value
+        };
+    });
+
+    const loadingContainerStyle = useAnimatedStyle(() => {
+        return {
+            width: roadWidth.value,
+            height: CAR_HEIGHT + ROAD_HEIGHT
         };
     });
 
@@ -129,20 +153,19 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => 
         };
     });
 
-    const styles = useStyles(top, ANIMATION_CONTAINER_WIDTH, CAR_WIDTH, CAR_HEIGHT, RIM_SIZE);
+    const styles = useStyles(CAR_WIDTH, CAR_HEIGHT, RIM_SIZE);
 
     return (
-        <View style={ styles.container }>
-            <StatusBar barStyle="light-content" backgroundColor={ styles.container.backgroundColor }/>
-            <View style={ styles.loadingContainer }>
+        <View style={ styles.container } onLayout={ onContainerLayout }>
+            <Animated.View style={ [styles.loadingContainer, loadingContainerStyle] }>
                 <Animated.View style={ [styles.car, carStyle] }>
                     <Animated.Image
-                        source={ require("../assets/images/kocsi.png") }
+                        source={ require("../../assets/images/kocsi.png") }
                         resizeMode="stretch"
                         style={ styles.car.body }
                     />
                     <Animated.Image
-                        source={ require("../assets/images/felni.png") }
+                        source={ require("../../assets/images/felni.png") }
                         resizeMode="contain"
                         style={ [
                             styles.car.rim,
@@ -151,7 +174,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => 
                         ] }
                     />
                     <Animated.Image
-                        source={ require("../assets/images/felni.png") }
+                        source={ require("../../assets/images/felni.png") }
                         resizeMode="contain"
                         style={ [
                             styles.car.rim,
@@ -160,23 +183,17 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => 
                         ] }
                     />
                 </Animated.View>
-                <View style={ { aspectRatio: ROAD_ASPECT_RATIO } }>
-                    <Svg
-                        width="100%"
-                        height="100%"
-                        viewBox={ `0 0 ${ ROAD_WIDTH } ${ ROAD_HEIGHT }` }
-                    >
-                        <AnimatedPath
-                            d={ `M0,0 L${ ROAD_WIDTH },0` }
-                            strokeWidth={ hp(0.20) }
-                            strokeDasharray={ `${ ROAD_STROKE_DASH[0] },${ ROAD_STROKE_DASH[1] }` }
-                            animatedProps={ roadAnimatedProps }
-                            stroke={ COLORS.white }
-                            fill="none"
-                        />
-                    </Svg>
-                </View>
-            </View>
+                <AnimatedSvg animatedProps={ roadSvgAnimatedProps } viewBox={ roadViewBox }>
+                    <AnimatedPath
+                        d={ roadPathD }
+                        animatedProps={ roadAnimatedProps }
+                        strokeWidth={ ROAD_HEIGHT }
+                        strokeDasharray={ ROAD_STROKE_DASH }
+                        stroke={ COLORS.white }
+                        fill="none"
+                    />
+                </AnimatedSvg>
+            </Animated.View>
             <View style={ styles.loadingTextContainer }>
                 <Text style={ styles.loadingTextContainer.text }>Betöltés</Text>
                 <BounceDot delay={ 0 }/>
@@ -188,25 +205,19 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ loaded, redirectTo }) => 
 };
 
 const useStyles = (
-    top: number,
-    animationContainerWidth: number,
     carWidth: number,
     carHeight: number,
     rimSize: number
 ) => StyleSheet.create({
     container: {
-        flex: 1,
-        alignItems: "center",
+        width: "100%",
+        height: "100%",
         justifyContent: "center",
-        gap: SEPARATOR_SIZES.lightSmall,
-        backgroundColor: COLORS.black2,
-        marginTop: top
+        alignItems: "center",
+        gap: SEPARATOR_SIZES.lightSmall
     },
     loadingContainer: {
-        width: animationContainerWidth,
-        height: carHeight + hp(1),
-        gap: hp(0.35),
-        overflow: "hidden"
+        gap: hp(0.35)
     },
     car: {
         position: "relative",
@@ -237,4 +248,4 @@ const useStyles = (
     }
 });
 
-export default LoadingScreen;
+export default React.memo(CarLoadingIndicator);

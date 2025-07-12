@@ -8,7 +8,7 @@ import Animated, {
     withTiming
 } from "react-native-reanimated";
 import { StyleSheet, TextStyle } from "react-native";
-import { COLORS, FONT_SIZES } from "../constants/index.ts";
+import { COLORS, FONT_SIZES } from "../../constants/index.ts";
 
 type BounceDotProps = {
     delay?: number,
