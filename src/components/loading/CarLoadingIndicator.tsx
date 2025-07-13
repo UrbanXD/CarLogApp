@@ -17,19 +17,25 @@ import BounceDot from "./BounceDot.tsx";
 import { AnimatedPath, AnimatedSvg } from "../AnimatedComponents/index.ts";
 
 type CarLoadingIndicatorProps = {
-    loaded: boolean
+    loaded: boolean,
+    loadingText?: string
+    onAnimationFinished?: () => void
 }
 
-const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({ loaded }) => {
-    const ROAD_HEIGHT = hp(0.35);
+const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({
+    loaded,
+    loadingText = "Betöltés",
+    onAnimationFinished
+}) => {
+    const ROAD_HEIGHT = hp(0.25);
     const ROAD_ANIMATION_DURATION = 1000;
     const ROAD_STROKE_DASH = [20, 5];
     const ROAD_STROKE_DASH_VALUE = ROAD_STROKE_DASH[0] + ROAD_STROKE_DASH[1];
 
-    const CAR_WIDTH = (564 / 3) / 1.45;
-    const CAR_HEIGHT = (188 / 3) / 1.45;
+    const CAR_WIDTH = (564 / 3) / 1.5;
+    const CAR_HEIGHT = (188 / 3) / 1.5;
     const RIM_SIZE = CAR_WIDTH / 8;
-    const WHEEL_ANIMATION_DURATION = ROAD_ANIMATION_DURATION * 1.35;
+    const WHEEL_ANIMATION_DURATION = ROAD_ANIMATION_DURATION * 1.5;
     const CAR_ANIMATION_DURATION = WHEEL_ANIMATION_DURATION * 1.15;
 
     const [roadPathD, setRoadPathD] = useState("");
@@ -68,7 +74,10 @@ const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({ loaded }) => 
         "worklet";
         carOffset.value = withTiming(
             roadWidth.value,
-            { duration: CAR_ANIMATION_DURATION, easing: Easing.linear }
+            { duration: CAR_ANIMATION_DURATION, easing: Easing.linear },
+            finished => {
+                if(finished && onAnimationFinished) runOnJS(onAnimationFinished)();
+            }
         );
     };
 
@@ -137,7 +146,7 @@ const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({ loaded }) => 
     const loadingContainerStyle = useAnimatedStyle(() => {
         return {
             width: roadWidth.value,
-            height: CAR_HEIGHT + ROAD_HEIGHT
+            height: CAR_HEIGHT + ROAD_HEIGHT * 2
         };
     });
 
@@ -195,7 +204,7 @@ const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({ loaded }) => 
                 </AnimatedSvg>
             </Animated.View>
             <View style={ styles.loadingTextContainer }>
-                <Text style={ styles.loadingTextContainer.text }>Betöltés</Text>
+                <Text style={ styles.loadingTextContainer.text }>{ loadingText }</Text>
                 <BounceDot delay={ 0 }/>
                 <BounceDot delay={ 200 }/>
                 <BounceDot delay={ 400 }/>
@@ -217,7 +226,8 @@ const useStyles = (
         gap: SEPARATOR_SIZES.lightSmall
     },
     loadingContainer: {
-        gap: hp(0.35)
+        gap: hp(0.35),
+        overflow: "hidden"
     },
     car: {
         position: "relative",
