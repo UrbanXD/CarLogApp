@@ -169,12 +169,12 @@ const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({
             <Animated.View style={ [styles.loadingContainer, loadingContainerStyle] }>
                 <Animated.View style={ [styles.car, carStyle] }>
                     <Animated.Image
-                        source={ require("../../assets/images/kocsi.png") }
+                        source={ require("../../assets/images/car_body.png") }
                         resizeMode="stretch"
                         style={ styles.car.body }
                     />
                     <Animated.Image
-                        source={ require("../../assets/images/felni.png") }
+                        source={ require("../../assets/images/rim.png") }
                         resizeMode="contain"
                         style={ [
                             styles.car.rim,
@@ -183,7 +183,7 @@ const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({
                         ] }
                     />
                     <Animated.Image
-                        source={ require("../../assets/images/felni.png") }
+                        source={ require("../../assets/images/rim.png") }
                         resizeMode="contain"
                         style={ [
                             styles.car.rim,
