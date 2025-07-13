@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
-import { Redirect } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import AuthScreen from "../screens/AuthScreen";
 import { useBottomSheet } from "../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useAuth } from "../contexts/auth/AuthContext.ts";
 import { useFonts } from "expo-font";
+import AnimatedSplashScreen from "../screens/AnimatedSplashScreen.tsx";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -21,7 +20,7 @@ const App: React.FC = () => {
 
 
     useEffect(() => {
-        if(fontsLoaded && !sessionLoading || fontsLoadError) {
+        if((fontsLoaded || fontsLoadError) && !sessionLoading) {
             SplashScreen.hideAsync();
         }
     }, [fontsLoaded, fontsLoadError, sessionLoading]);
@@ -30,10 +29,13 @@ const App: React.FC = () => {
         if(session) dismissAllBottomSheet();
     }, [session]);
 
+    if(!fontsLoaded) return null;
+
     return (
-        !(session && session.user)
-        ? <AuthScreen/>
-        : <Redirect href="/(main)"/>
+        <AnimatedSplashScreen
+            loaded={ !sessionLoading }
+            redirectTo={ session && session.user ? "/(main)" : "/auth" }
+        />
     );
 };
 

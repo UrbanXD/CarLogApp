@@ -6,7 +6,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Provider } from "react-redux";
 import { KeyboardProvider } from "react-native-keyboard-controller";
-import { StatusBar } from "expo-status-bar";
 import { BottomSheetProvider } from "../ui/bottomSheet/contexts/BottomSheetProvider.tsx";
 import Compactor from "../components/Compactor";
 import { ScreenScrollViewProvider } from "../contexts/screenScrollView/ScreenScrollViewProvider.tsx";
@@ -17,6 +16,7 @@ import { store } from "../database/redux/store.ts";
 import Header from "../components/Navigation/Header/Header.tsx";
 import ToastManager from "../ui/alert/components/ToastManager.tsx";
 import ModalManager from "../ui/alert/components/ModalManager.tsx";
+import { StatusBar } from "react-native";
 
 const Layout: React.FC = () => {
     const database = useDatabase();
@@ -30,22 +30,31 @@ const Layout: React.FC = () => {
             screenOptions={ {
                 header: () => <></>,
                 animation: "slide_from_right",
-                statusBarAnimation: "slide"
+                statusBarAnimation: "slide",
+                contentStyle: { backgroundColor: "#242424" }
             } }
         >
             <Stack.Screen
                 name="index"
                 options={ {
-                    header: () => <StatusBar translucent={ true }/>
+                    header: () => <StatusBar backgroundColor="transparent" barStyle="light-content" translucent/>
                 } }
             />
             <Stack.Screen
                 name="backToRootIndex"
             />
             <Stack.Screen
+                name="auth"
+                options={ {
+                    header: () => <StatusBar backgroundColor="transparent" translucent/>,
+                    animation: "none"
+                } }
+            />
+            <Stack.Screen
                 name="(main)"
                 options={ {
-                    header: () => <Header.Primary/>
+                    header: () => <Header.Primary/>,
+                    animation: "none"
                 } }
             />
             <Stack.Screen

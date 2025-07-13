@@ -1,9 +1,11 @@
-import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View, ViewStyle } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, Text, View, ViewStyle } from "react-native";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import Icon from "./Icon";
 import { hexToRgba } from "../utils/colors/hexToRgba";
 import { ImageSource } from "../types/index.ts";
+import CarLoadingIndicator from "./loading/CarLoadingIndicator.tsx";
+import Animated, { FadeInLeft } from "react-native-reanimated";
 
 interface DefaultElementProps {
     loading?: boolean;
@@ -17,33 +19,38 @@ const DefaultElement: React.FC<DefaultElementProps> = ({
     loading = false,
     icon = ICON_NAMES.image,
     text,
-    loadingText = "Adatok betöltése...",
+    loadingText = "Adatok betöltése",
     style
 }) => {
+    const [loadingAnimationFinished, setLoadingAnimationFinished] = useState(!loading);
+
     return (
         <View style={ [styles.container, style] }>
             {
-                loading
-                ? <ActivityIndicator
-                    size={ FONT_SIZES.title }
-                    color={ COLORS.gray3 }
+                !loadingAnimationFinished
+                ? <CarLoadingIndicator
+                    loaded={ !loading } Min
+                    loadingText={ loadingText }
+                    onAnimationFinished={ () => setLoadingAnimationFinished(true) }
                 />
-                : <Icon
-                    icon={ icon }
-                    size={ FONT_SIZES.title }
-                    color={ COLORS.gray3 }
-                />
-            }
-            {
-                loading
-                ? loadingText &&
-                   <Text style={ styles.text }>
-                       { loadingText }
-                   </Text>
-                : text &&
-                   <Text style={ styles.text }>
-                       { text }
-                   </Text>
+                : <Animated.View
+                    style={ { alignItems: "center" } }
+                    entering={
+                        loading !== loadingAnimationFinished
+                        ? undefined
+                        : FadeInLeft.duration(300)
+                    }
+                >
+                    <Icon
+                        icon={ icon }
+                        size={ FONT_SIZES.title }
+                        color={ COLORS.gray3 }
+                    />
+                    {
+                        text &&
+                       <Text style={ styles.text }>{ text }</Text>
+                    }
+                </Animated.View>
             }
         </View>
     );
@@ -61,7 +68,8 @@ const styles = StyleSheet.create({
         borderWidth: 0.5,
         borderRadius: 38,
         borderColor: COLORS.gray5,
-        paddingHorizontal: SEPARATOR_SIZES.small
+        paddingHorizontal: SEPARATOR_SIZES.small,
+        overflow: "hidden"
     },
     text: {
         fontFamily: "Gilroy-Medium",
