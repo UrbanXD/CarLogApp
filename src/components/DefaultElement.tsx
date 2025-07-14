@@ -29,7 +29,7 @@ const DefaultElement: React.FC<DefaultElementProps> = ({
             {
                 !loadingAnimationFinished
                 ? <CarLoadingIndicator
-                    loaded={ !loading } Min
+                    loaded={ !loading }
                     loadingText={ loadingText }
                     onAnimationFinished={ () => setLoadingAnimationFinished(true) }
                 />
