@@ -6,7 +6,6 @@ import MultiStepFormContent from "./MultiStepFormContent.tsx";
 import MultiStepFormButtons from "./MultiStepFormButtons.tsx";
 import { LayoutChangeEvent, StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../constants/index.ts";
-import { FlatList } from "react-native-gesture-handler";
 import { ResultStep, Steps } from "../../types/index.ts";
 
 
@@ -48,15 +47,7 @@ const MultiStepForm: React.FC<MultiStepFormProps> = ({
         >
             <View style={ styles.container }>
                 <MultiStepFormProgressInfo/>
-                <FlatList
-                    data={ [] }
-                    onLayout={ handleLayout }
-                    renderItem={ () => <></> }
-                    ListEmptyComponent={
-                        <MultiStepFormContent/>
-                    }
-                    showsVerticalScrollIndicator={ false }
-                />
+                <MultiStepFormContent/>
                 <MultiStepFormButtons/>
             </View>
         </MultiStepFormProvider>

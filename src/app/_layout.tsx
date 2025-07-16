@@ -51,6 +51,24 @@ const Layout: React.FC = () => {
                 } }
             />
             <Stack.Screen
+                name="bottomSheet/createCar"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="bottomSheet/editCar"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
                 name="(main)"
                 options={ {
                     header: () => <Header.Primary/>,

@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { FlatList } from "react-native-gesture-handler";
-import { StyleSheet, useWindowDimensions, View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import { DEFAULT_SEPARATOR } from "../constants/index.ts";
 import { RenderComponent } from "../types/index.ts";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 
 interface OnBoardingViewProps {
     steps: RenderComponent;
@@ -17,44 +18,34 @@ const OnBoardingView: React.FC<OnBoardingViewProps> = ({
 }) => {
     const scrollViewRef = useRef<FlatList>(null);
 
-    const width = useWindowDimensions().width;
+    const width = useWindowDimensions().width - 2 * DEFAULT_SEPARATOR;
+
     useEffect(() => {
         scrollViewRef.current?.scrollToOffset({ offset: currentStep * width, animated: true });
     }, [scrollViewRef, currentStep, width]);
 
-    const styles = StyleSheet.create({
-        container: {
-            flexDirection: "row",
-            gap: 2 * DEFAULT_SEPARATOR
-        },
-        stepContainer: {
-            width: width - 2 * DEFAULT_SEPARATOR // - 2*gap
-        }
-    });
+    const renderSteps = useCallback(() => (
+        <View style={ { flexDirection: "row" } }>
+            {
+                steps.map((step, index) =>
+                    <View
+                        key={ index }
+                        style={ { width } }
+                    >
+                        <BottomSheetScrollView showsVerticalScrollIndicator={ false }>
+                            { step() }
+                        </BottomSheetScrollView>
+                    </View>
+                )
+            }
+        </View>
+    ), [currentStep, steps, visibleHeight]);
 
     return (
         <FlatList
             data={ [] }
             renderItem={ () => <></> }
-            ListEmptyComponent={
-                <View style={ styles.container }>
-                    {
-                        steps.map(
-                            (step, index) =>
-                                <View
-                                    key={ index }
-                                    style={ [
-                                        styles.stepContainer, {
-                                            height: visibleHeight && currentStep !== index ? visibleHeight : "100%"
-                                        }
-                                    ] }
-                                >
-                                    { step() }
-                                </View>
-                        )
-                    }
-                </View>
-            }
+            ListEmptyComponent={ renderSteps() }
             ref={ scrollViewRef }
             scrollEnabled={ false }
             horizontal

@@ -5,7 +5,7 @@ import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } 
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { BottomSheetContext, useBottomSheet } from "../contexts/BottomSheetContext.ts";
+import BottomSheetBackdrop from "./BottomSheetBackdrop.tsx";
 
 interface BottomSheetProps extends Partial<BottomSheetModalProps> {
     title?: string;
@@ -27,10 +27,19 @@ const BottomSheet = forwardRef<BottomSheetModal, BottomSheetProps>((props, ref) 
     return (
         <BottomSheetModal
             ref={ ref }
+            index={ 0 }
+            enableHandlePanningGesture
+            enableContentPanningGesture
+            enableDismissOnClose
+            enableOverDrag
+            keyboardBehavior="interactive"
+            keyboardBlurBehavior="restore"
+            android_keyboardInputMode="adjustPan"
             { ...restProps }
             topInset={ top }
             backgroundStyle={ styles.containerBackground }
             handleIndicatorStyle={ styles.line }
+            backdropComponent={ (props) => <BottomSheetBackdrop { ...props } /> }
         >
             <BottomSheetView style={ styles.container }>
                 {
@@ -42,19 +51,26 @@ const BottomSheet = forwardRef<BottomSheetModal, BottomSheetProps>((props, ref) 
                       </Text>
                    </View>
                 }
-                <BottomSheetContext.Provider value={ useBottomSheet() }>
-                    { content }
-                </BottomSheetContext.Provider>
+                { content }
             </BottomSheetView>
-        </BottomSheetModal>);
+        </BottomSheetModal>
+    );
 });
 
 const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: number) => StyleSheet.create({
     container: {
-        flex: 1, gap: DEFAULT_SEPARATOR, paddingHorizontal: DEFAULT_SEPARATOR, paddingBottom: DEFAULT_SEPARATOR
+        flex: 1,
+        height: "100%",
+        gap: DEFAULT_SEPARATOR,
+        paddingHorizontal: DEFAULT_SEPARATOR,
+        paddingBottom: SEPARATOR_SIZES.lightSmall
     },
     containerBackground: {
-        backgroundColor: COLORS.black,
+        backgroundColor: COLORS.black2,
+        borderColor: COLORS.gray4,
+        borderTopWidth: !isFullScreen ? 0.75 : 0,
+        borderLeftWidth: !isFullScreen ? 0.5 : 0,
+        borderRightWidth: !isFullScreen ? 0.5 : 0,
         borderTopLeftRadius: !isFullScreen ? 55 : 0,
         borderTopRightRadius: !isFullScreen ? 55 : 0
     },
@@ -63,12 +79,14 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
         marginTop: SEPARATOR_SIZES.small,
         marginBottom: SEPARATOR_SIZES.lightSmall,
         width: hp(15),
-        height: isHandlePanningGesture ? hp(0.65) : 0,
+        // height: isHandlePanningGesture ? hp(0.65) : 0,
         backgroundColor: COLORS.white2,
         borderRadius: 35
     },
     titleText: {
-        ...GLOBAL_STYLE.containerTitleText, fontSize: FONT_SIZES.h2, textAlign: "center"
+        ...GLOBAL_STYLE.containerTitleText,
+        fontSize: FONT_SIZES.h2,
+        textAlign: "center"
     }
 });
 
