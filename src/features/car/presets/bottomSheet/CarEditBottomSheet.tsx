@@ -1,25 +1,37 @@
+import React, { useCallback, useRef } from "react";
 import EditCarForm, { EditCarFormProps } from "../../components/forms/EditCarForm.tsx";
-import React from "react";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { heightPercentageToDP } from "react-native-responsive-screen";
+import { router, useFocusEffect } from "expo-router";
+import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
 
-import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/types/index.ts";
+type EditCarBottomSheetProps = EditCarFormProps;
 
-type CarEditBottomSheetArgs = EditCarFormProps & { height: string };
+const EditCarBottomSheet: React.FC<EditCarBottomSheetProps> = ({ car, stepIndex }) => {
+    const bottomSheetRef = useRef<BottomSheetModal>(null);
 
-type CarEditBottomSheet = (args: CarEditBottomSheetArgs) => OpenBottomSheetArgs;
+    const CONTENT = <EditCarForm car={ car } stepIndex={ stepIndex }/>;
+    const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
 
-export const CarEditBottomSheet: CarEditBottomSheet = ({
-    car,
-    stepIndex,
-    height
-}) => {
-    return {
-        content:
-            <EditCarForm
-                car={ car }
-                stepIndex={ stepIndex }
-            />,
-        snapPoints: [height],
-        enableDismissOnClose: false
+    useFocusEffect(useCallback(() => {
+        bottomSheetRef.current.present();
 
-    };
+        return () => bottomSheetRef.current?.close();
+    }, []));
+
+    const onBottomSheetDismiss = () => router.dismiss();
+
+    return (
+        <BottomSheet
+            ref={ bottomSheetRef }
+            content={ CONTENT }
+            maxDynamicContentSize={ MAX_DYNAMIC_CONTENT_SIZE }
+            enableDynamicSizing
+            enableOverDrag={ false }
+            // enableDismissOnClose={ false }
+            onDismiss={ onBottomSheetDismiss }
+        />
+    );
 };
+
+export default EditCarBottomSheet;

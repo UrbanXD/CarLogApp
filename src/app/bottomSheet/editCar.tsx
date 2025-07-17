@@ -1,34 +1,15 @@
-import React, { useCallback, useRef } from "react";
-import { heightPercentageToDP } from "react-native-responsive-screen";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { router, useFocusEffect } from "expo-router";
-import BottomSheet from "../../ui/bottomSheet/components/BottomSheet.tsx";
-import EditCarForm from "../../features/car/components/forms/EditCarForm.tsx";
+import React from "react";
+import { useLocalSearchParams } from "expo-router";
+import EditCarBottomSheet from "../../features/car/presets/bottomSheet/CarEditBottomSheet.tsx";
+import useCars from "../../features/car/hooks/useCars.ts";
 
 const Page: React.FC = () => {
-    const bottomSheetRef = useRef<BottomSheetModal>(null);
+    const { carId, stepIndex } = useLocalSearchParams<{ carId: string, stepIndex: number }>();
+    const { getCar } = useCars();
 
-    const CONTENT = <EditCarForm car={ { name: "aeff" } } stepIndex={ 0 }/>;
-    const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
-
-    useFocusEffect(useCallback(() => {
-        bottomSheetRef.current.present();
-
-        return () => bottomSheetRef.current?.close();
-    }, []));
-
-    const onBottomSheetDismiss = () => router.dismiss();
-
+    const car = getCar(carId);
     return (
-        <BottomSheet
-            ref={ bottomSheetRef }
-            content={ CONTENT }
-            maxDynamicContentSize={ MAX_DYNAMIC_CONTENT_SIZE }
-            enableDynamicSizing
-            enableOverDrag={ false }
-            // enableDismissOnClose={ false }
-            onDismiss={ onBottomSheetDismiss }
-        />
+        <EditCarBottomSheet car={ car } stepIndex={ stepIndex }/>
     );
 };
 

@@ -17,16 +17,16 @@ import FuelGauge from "../FuelGauge.tsx";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { CarDto } from "../../model/types/index.ts";
 
-interface CarProfileViewProps {
-    car: CarDto;
-    handleDeleteCar?: () => void;
-    openEditCarStep?: (stepIndex: number, bottomSheetHeight?: string) => void;
+type CarProfileViewProps = {
+    car: CarDto
+    openEditCarStep: (stepIndex: number) => void
+    handleDeleteCar?: () => void
 }
 
 const CarProfileView: React.FC<CarProfileViewProps> = ({
     car,
-    handleDeleteCar,
-    openEditCarStep
+    openEditCarStep,
+    handleDeleteCar
 }) =>
     <View style={ styles.container }>
         <ScrollView
@@ -48,7 +48,7 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                             height={ FONT_SIZES.h2 }
                             style={ styles.editImageIcon }
                             backgroundColor="transparent"
-                            onPress={ () => openEditCarStep(CAR_FORM_STEPS.ImageStep, "72.5%") }
+                            onPress={ () => openEditCarStep(CAR_FORM_STEPS.ImageStep) }
                         />
                     </View>
                 </Image>
@@ -63,7 +63,7 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                         width={ FONT_SIZES.h3 }
                         height={ FONT_SIZES.h3 }
                         backgroundColor="transparent"
-                        onPress={ () => openEditCarStep(CAR_FORM_STEPS.NameStep, "40%") }
+                        onPress={ () => openEditCarStep(CAR_FORM_STEPS.NameStep) }
                     />
                 </View>
                 <Divider
@@ -118,7 +118,7 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                 tankSize={ car.fuelTankSize }
                 fuelType={ car.fuelType }
                 measurement={ car.fuelMeasurement }
-                openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.FuelStep, "65%") }
+                openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.FuelStep) }
             />
         </ScrollView>
     </View>;
