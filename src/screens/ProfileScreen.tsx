@@ -21,8 +21,8 @@ import { useUserManagement } from "../features/user/hooks/useUserManagement.ts";
 import { Redirect } from "expo-router";
 
 const ProfileScreen: React.FC = () => {
-    const { session, user } = useAuth();
-    const { signOut, deleteUserProfile } = useUserManagement();
+    const { session, user, signOut } = useAuth();
+    const { deleteUserProfile } = useUserManagement();
     const { openBottomSheet } = useBottomSheet();
 
     if(!user) return Redirect({ href: "backToRootIndex" });

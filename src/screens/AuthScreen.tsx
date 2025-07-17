@@ -5,33 +5,27 @@ import { widthPercentageToDP } from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button/Button";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useBottomSheet } from "../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { SignInBottomSheet, SignUpBottomSheet } from "../features/user/presets/bottomSheet/index.ts";
 import { useAuth } from "../contexts/auth/AuthContext.ts";
-import { useUserManagement } from "../features/user/hooks/useUserManagement.ts";
 import Animated, { FadeIn, SlideInRight } from "react-native-reanimated";
 import Divider from "../components/Divider.tsx";
 import CarlogTitle from "../components/CarlogTitle.tsx";
+import { router } from "expo-router";
+import { useSignUp } from "../features/user/hooks/useSignUp.ts";
 
 const AuthScreen: React.FC = () => {
     const { top } = useSafeAreaInsets();
-    const { openBottomSheet } = useBottomSheet();
     const { session, notVerifiedUser } = useAuth();
-    const { openUserVerification } = useUserManagement();
+    const { openUserVerification } = useSignUp();
 
     const ENTERING_ANIMATION_DURATION = 300;
 
-    const openSignUp =
-        () => openBottomSheet(SignUpBottomSheet);
-
-    const openSignIn =
-        () => openBottomSheet(SignInBottomSheet);
+    const openSignUp = () => router.push("bottomSheet/signUp");
+    const openSignIn = () => router.push("bottomSheet/signIn");
 
 
     const openVerification = useCallback(() => {
-        if(notVerifiedUser && notVerifiedUser.email) {
-            openUserVerification(notVerifiedUser.email);
-        }
+        if(notVerifiedUser && notVerifiedUser.email) openUserVerification(notVerifiedUser.email);
     }, [notVerifiedUser]);
 
     const styles = useStyles(top);

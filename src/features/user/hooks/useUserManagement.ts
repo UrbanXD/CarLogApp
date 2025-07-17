@@ -1,166 +1,24 @@
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
-import { AVATAR_COLOR } from "../../../constants/index.ts";
-import { HandleVerificationOtpType } from "../components/forms/VerifyOtpForm.tsx";
 import { getToastMessage } from "../../../ui/alert/utils/getToastMessage.ts";
-import {
-    AddPasswordToast,
-    ChangeEmailToast,
-    DeleteUserToast,
-    ResetPasswordToast,
-    SignOutToast,
-    SignUpToast
-} from "../presets/toast/index.ts";
+import { AddPasswordToast, ChangeEmailToast, DeleteUserToast, ResetPasswordToast } from "../presets/toast/index.ts";
 import { OtpVerificationBottomSheet } from "../presets/bottomSheet/index.ts";
 import { AuthError, GenerateLinkParams, Provider, ResendParams, VerifyEmailOtpParams } from "@supabase/supabase-js";
 import { router } from "expo-router";
-import { SignUpFormFieldType } from "../schemas/userSchema.tsx";
 import { useAuth } from "../../../contexts/auth/AuthContext.ts";
 import { UserTableType } from "../../database/connector/powersync/AppSchema.ts";
 import { ToastMessages } from "../../../ui/alert/model/types/index.ts";
 import getImageState from "../../../database/utils/getImageState.ts";
 import { getPathFromImageType } from "../../../utils/getPathFromImageType.ts";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
-
-export type SignUpFunction = (user: SignUpFormFieldType) => Promise<void>
-export type ChangeEmailFunction = (newEmail: string) => Promise<void>
-export type ChangeUserMetadataFunction = (
-    newUser: Partial<UserTableType> | null,
-    toastMessages: ToastMessages
-) => Promise<void>
-export type ResetPasswordFunction = (newPassword: string) => Promise<void>
+import { OtpVerificationHandlerType } from "../../../app/bottomSheet/otpVerification.tsx";
 
 export const useUserManagement = () => {
     const database = useDatabase();
     const { supabaseConnector, attachmentQueue, userDAO } = database;
-    const { session, user, setUser, updateNotVerifiedUser, refreshSession } = useAuth();
+    const { session, user, setUser, refreshSession } = useAuth();
     const { openToast } = useAlert();
-    // const { openBottomSheet, dismissAllBottomSheet } = useBottomSheet();
 
-    const openUserVerification = (email: string) => {
-        const handleSignUpVerification: HandleVerificationOtpType =
-            async (errorCode) => {
-                if(errorCode) {
-                    return openToast(
-                        getToastMessage({
-                            messages: SignUpToast,
-                            error: { code: errorCode },
-                            defaultErrorCode: "otp_error"
-                        })
-                    );
-                }
-
-                openToast(SignUpToast.success());
-                dismissAllBottomSheet();
-            };
-
-        openBottomSheet(
-            OtpVerificationBottomSheet({
-                type: "signup",
-                title: "Email cím hitelesítés",
-                email,
-                handleVerification: handleSignUpVerification
-            })
-        );
-    };
-
-    const signUp: SignUpFunction = async (user) => {
-        try {
-            const {
-                email,
-                password,
-                firstname,
-                lastname
-            } = user;
-
-            // mivel van email hitelesites, igy a supabase nem dob hibat, ha mar letezo emaillel regisztral
-            const {
-                data: emailExists,
-                error: emailError
-            } =
-                await supabaseConnector
-                .client
-                .rpc(
-                    "email_exists",
-                    { email_address: email }
-                );
-
-            if(emailError) throw emailError;
-            if(emailExists) throw { code: "email_exists" } as AuthError;
-
-            const {
-                data: {
-                    user: newUser
-                },
-                error
-            } = await supabaseConnector
-            .client
-            .auth
-            .signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        firstname,
-                        lastname,
-                        avatarColor: AVATAR_COLOR[Math.floor(Math.random() * AVATAR_COLOR.length)]
-                    }
-                }
-            });
-
-            if(error) throw error;
-
-            void updateNotVerifiedUser(newUser);
-
-            if(newUser?.email) {
-                openUserVerification(newUser.email);
-                await userDAO.insertUser({
-                    id: newUser.id,
-                    email: newUser.email,
-                    firstname: newUser.user_metadata.firstname,
-                    lastname: newUser.user_metadata.lastname,
-                    avatarColor: newUser.user_metadata.avatarColor,
-                    avatarImage: newUser.user_metadata.avatarImage
-                });
-            }
-        } catch(error) {
-            openToast(
-                getToastMessage({
-                    messages: SignUpToast,
-                    error
-                })
-            );
-        }
-    };
-
-    const signOut = async (disabledToast: boolean = false) => {
-        try {
-            const { error } =
-                await supabaseConnector
-                .client
-                .auth
-                .signOut();
-
-            if(error) throw error;
-
-            router.replace("/backToRootIndex");
-            if(!disabledToast) openToast(SignOutToast.success());
-            await database.disconnect();
-        } catch(error) {
-            if(error instanceof AuthError && !disabledToast) {
-                return openToast(
-                    getToastMessage({
-                        messages: SignOutToast,
-                        error
-                    })
-                );
-            }
-            // ha nem AuthError akkor sikeres a kijelentkezes, de mashol hiba tortent (pl: powersync)
-        }
-    };
-
-    const changeEmail: ChangeEmailFunction = async (
-        newEmail
-    ) => {
+    const changeEmail = async (newEmail: string) => {
         try {
             if(!session) throw { code: "session_not_found" };
             if(!session.user.email) throw { code: "email_not_found" };
@@ -169,57 +27,20 @@ export const useUserManagement = () => {
                 await supabaseConnector
                 .client
                 .auth
-                .updateUser({
-                    email: newEmail
-                });
+                .updateUser({ email: newEmail });
 
             if(error) throw error;
 
-            const handleCurrentEmailVerification: HandleVerificationOtpType =
-                async (errorCode) => {
-                    if(errorCode) {
-                        return openToast(
-                            getToastMessage({
-                                messages: ChangeEmailToast,
-                                error: { code: errorCode }
-                            })
-                        );
-                    }
-
-                    const handleNewEmailVerification: HandleVerificationOtpType =
-                        async (errorCode) => {
-                            if(errorCode) {
-                                return openToast(
-                                    getToastMessage({
-                                        messages: ChangeEmailToast,
-                                        error: { code: errorCode }
-                                    })
-                                );
-                            }
-
-                            openToast(ChangeEmailToast.success());
-                            dismissAllBottomSheet();
-                            await signOut(true);
-                        };
-
-                    openBottomSheet(
-                        OtpVerificationBottomSheet({
-                            type: "email_change",
-                            title: "Új email cím hitelesítés",
-                            email: newEmail,
-                            handleVerification: handleNewEmailVerification
-                        })
-                    );
-                };
-
-            openBottomSheet(
-                OtpVerificationBottomSheet({
+            router.push({
+                pathname: "bottomSheet/otpVerification",
+                params: {
                     type: "email_change",
-                    title: "Email módosítási kérelem hitelesítés",
+                    title: "Email módosítási kérelem hitelesítés PLS",
                     email: session.user.email,
-                    handleVerification: handleCurrentEmailVerification
-                })
-            );
+                    newEmail,
+                    handlerType: OtpVerificationHandlerType.CurrentEmailChange
+                }
+            });
         } catch(error) {
             openToast(
                 getToastMessage({
@@ -230,18 +51,10 @@ export const useUserManagement = () => {
         }
     };
 
-    const changeUserMetadata: ChangeUserMetadataFunction = async (
-        newUser,
-        toastMessages
-    ) => {
+    const changeUserMetadata = async (newUser: Partial<UserTableType> | null, toastMessages: ToastMessages) => {
         try {
             let newUserAvatar = user.userAvatar;
             if(newUser?.avatarImage && user?.avatarImage !== getPathFromImageType(newUser.avatarImage, user?.id)) {
-                try {
-
-                } catch(_) {
-
-                }
                 const newAvatarImage = await attachmentQueue.saveFile(newUser.avatarImage, user.id);
                 newUserAvatar = getImageState(newAvatarImage.filename, newUser.avatarImage.buffer);
             }
@@ -255,7 +68,7 @@ export const useUserManagement = () => {
             setUser(updatedUser, newUserAvatar);
 
             openToast(toastMessages.success());
-            dismissAllBottomSheet();
+            router.dismissTo("(profile)/user");
         } catch(error) {
             console.log(error);
             openToast(
@@ -267,9 +80,7 @@ export const useUserManagement = () => {
         }
     };
 
-    const addPasswordToOAuthUser: ResetPasswordFunction = async (
-        newPassword
-    ) => {
+    const addPasswordToOAuthUser = async (newPassword: string) => {
         try {
             if(!session) throw { code: "session_not_found" } as AuthError;
             if(session.user.user_metadata.has_password) throw { code: "has_password" };
@@ -278,9 +89,7 @@ export const useUserManagement = () => {
                 await supabaseConnector
                 .client
                 .auth
-                .updateUser({
-                    password: newPassword
-                });
+                .updateUser({ password: newPassword });
 
             if(error) throw error;
 
@@ -296,9 +105,7 @@ export const useUserManagement = () => {
         }
     };
 
-    const resetPassword: ResetPasswordFunction = async (
-        newPassword
-    ) => {
+    const resetPassword = async (newPassword: string) => {
         try {
             if(!session) throw { code: "session_not_found" };
             if(!session.user.email) throw { code: "email_not_found" };
@@ -311,49 +118,16 @@ export const useUserManagement = () => {
 
             if(error) throw error;
 
-            const handleResetPasswordVerification: HandleVerificationOtpType =
-                async (errorCode) => {
-                    if(errorCode) {
-                        return openToast(
-                            getToastMessage({
-                                messages: ResetPasswordToast,
-                                error: { code: errorCode }
-                            })
-                        );
-                    }
-
-                    const { error } =
-                        await supabaseConnector
-                        .client
-                        .auth
-                        .updateUser(
-                            {
-                                password: newPassword
-                            }
-                        );
-
-                    if(error && error.code !== "same_password") {
-                        return openToast(
-                            getToastMessage({
-                                messages: ResetPasswordToast,
-                                error
-                            })
-                        );
-                    }
-
-                    openToast(ResetPasswordToast.success());
-                    dismissAllBottomSheet();
-                    await signOut(true);
-                };
-
-            openBottomSheet(
-                OtpVerificationBottomSheet({
+            router.push({
+                pathname: "bottomSheet/otpVerification",
+                params: {
                     type: "recovery",
                     title: "Jelszó módosítása",
+                    newPassword,
                     email: session.user.email,
-                    handleVerification: handleResetPasswordVerification
-                })
-            );
+                    handlerType: OtpVerificationHandlerType.PasswordReset
+                }
+            });
         } catch(error) {
             openToast(
                 getToastMessage({
@@ -389,44 +163,16 @@ export const useUserManagement = () => {
 
                 if(error) throw error;
 
-                const handleDeleteUserVerification: HandleVerificationOtpType =
-                    async (errorCode) => {
-                        if(errorCode) {
-                            return openToast(
-                                getToastMessage({
-                                    messages: DeleteUserToast,
-                                    error: { code: errorCode }
-                                })
-                            );
-                        }
-
-                        const { error } =
-                            await supabaseConnector
-                            .client
-                            .functions
-                            .invoke(
-                                "delete-user",
-                                {
-                                    method: "DELETE",
-                                    body: JSON.stringify({ id: session.user.id })
-                                }
-                            );
-
-                        if(error) throw error;
-
-                        openToast(DeleteUserToast.success());
-                        dismissAllBottomSheet();
-                        await signOut(true);
-                    };
-
-                openBottomSheet(
-                    OtpVerificationBottomSheet({
+                router.push({
+                    pathname: "bottomSheet/otpVerification",
+                    params: {
                         type: "magiclink", // magiclink viselkedik ugy mint ha torlest verifyolna *mivel supabasebe nincs implementalva ez meg*
                         title: "Fiók törlése",
                         email: emailParams.email,
-                        handleVerification: handleDeleteUserVerification
-                    })
-                );
+                        userId: session.user.id,
+                        handlerType: OtpVerificationHandlerType.UserDelete
+                    }
+                });
             } catch(error) {
                 openToast(
                     getToastMessage({
@@ -479,9 +225,6 @@ export const useUserManagement = () => {
     };
 
     return {
-        signUp,
-        signOut,
-        openUserVerification,
         changeEmail,
         changeUserMetadata,
         resetPassword,
