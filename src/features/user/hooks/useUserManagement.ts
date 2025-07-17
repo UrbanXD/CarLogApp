@@ -1,15 +1,12 @@
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { AVATAR_COLOR, BaseConfig } from "../../../constants/index.ts";
+import { AVATAR_COLOR } from "../../../constants/index.ts";
 import { HandleVerificationOtpType } from "../components/forms/VerifyOtpForm.tsx";
 import { getToastMessage } from "../../../ui/alert/utils/getToastMessage.ts";
 import {
     AddPasswordToast,
     ChangeEmailToast,
     DeleteUserToast,
-    GoogleAuthToast,
     ResetPasswordToast,
-    SignInToast,
     SignOutToast,
     SignUpToast
 } from "../presets/toast/index.ts";
@@ -37,12 +34,7 @@ export const useUserManagement = () => {
     const { supabaseConnector, attachmentQueue, userDAO } = database;
     const { session, user, setUser, updateNotVerifiedUser, refreshSession } = useAuth();
     const { openToast } = useAlert();
-    const { openBottomSheet, dismissAllBottomSheet } = useBottomSheet();
-
-    GoogleSignin.configure({
-        scopes: ["https://www.googleapis.com/auth/userinfo.profile"],
-        webClientId: BaseConfig.GOOGLE_WEBCLIENTID
-    });
+    // const { openBottomSheet, dismissAllBottomSheet } = useBottomSheet();
 
     const openUserVerification = (email: string) => {
         const handleSignUpVerification: HandleVerificationOtpType =
@@ -134,60 +126,6 @@ export const useUserManagement = () => {
             openToast(
                 getToastMessage({
                     messages: SignUpToast,
-                    error
-                })
-            );
-        }
-    };
-
-    const googleAuth = async () => {
-        try {
-            await GoogleSignin.hasPlayServices();
-            const { data: googleData } = await GoogleSignin.signIn();
-            if(!googleData?.idToken) throw { code: "token_missing" };
-
-            const { data: alreadyRegistered } =
-                await supabaseConnector
-                .client
-                .rpc(
-                    "email_exists",
-                    { email_address: googleData.user.email }
-                );
-
-            const { data: { user }, error } =
-                await supabaseConnector
-                .client
-                .auth
-                .signInWithIdToken({
-                    provider: "google",
-                    token: googleData.idToken
-                });
-
-            if(error) throw error;
-            if(!user) throw { code: "user_not_found" };
-
-            // login tortent igy a nevet ne mentsuk le
-            if(alreadyRegistered) {
-                openToast(SignInToast.success());
-                return dismissAllBottomSheet();
-            }
-
-            // uj fiok kerult letrehozasra, mentsuk le a nevet a felhasznalonak
-            await userDAO.insertUser({
-                id: user.id,
-                email: user.email,
-                firstname: googleData.user.givenName || "",
-                lastname: googleData.user.familyName || "",
-                avatarColor: AVATAR_COLOR[Math.floor(Math.random() * AVATAR_COLOR.length)],
-                avatarImage: null
-            });
-
-            openToast(SignUpToast.success());
-            dismissAllBottomSheet();
-        } catch(error) {
-            openToast(
-                getToastMessage({
-                    messages: GoogleAuthToast,
                     error
                 })
             );
@@ -543,7 +481,6 @@ export const useUserManagement = () => {
     return {
         signUp,
         signOut,
-        googleAuth,
         openUserVerification,
         changeEmail,
         changeUserMetadata,
