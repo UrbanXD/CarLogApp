@@ -1,5 +1,4 @@
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
-import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { AVATAR_COLOR, BaseConfig } from "../../../constants/index.ts";
 import { HandleVerificationOtpType } from "../components/forms/VerifyOtpForm.tsx";
@@ -17,7 +16,7 @@ import {
 import { OtpVerificationBottomSheet } from "../presets/bottomSheet/index.ts";
 import { AuthError, GenerateLinkParams, Provider, ResendParams, VerifyEmailOtpParams } from "@supabase/supabase-js";
 import { router } from "expo-router";
-import { SignInFormFieldType, SignUpFormFieldType } from "../schemas/userSchema.tsx";
+import { SignUpFormFieldType } from "../schemas/userSchema.tsx";
 import { useAuth } from "../../../contexts/auth/AuthContext.ts";
 import { UserTableType } from "../../database/connector/powersync/AppSchema.ts";
 import { ToastMessages } from "../../../ui/alert/model/types/index.ts";
@@ -26,7 +25,6 @@ import { getPathFromImageType } from "../../../utils/getPathFromImageType.ts";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 
 export type SignUpFunction = (user: SignUpFormFieldType) => Promise<void>
-export type SignInFunction = (user: SignInFormFieldType) => Promise<void>
 export type ChangeEmailFunction = (newEmail: string) => Promise<void>
 export type ChangeUserMetadataFunction = (
     newUser: Partial<UserTableType> | null,
@@ -190,34 +188,6 @@ export const useUserManagement = () => {
             openToast(
                 getToastMessage({
                     messages: GoogleAuthToast,
-                    error
-                })
-            );
-        }
-    };
-
-    const signIn: SignInFunction = async (user) => {
-        try {
-            const { error } =
-                await supabaseConnector
-                .client
-                .auth
-                .signInWithPassword(user);
-
-            if(error) {
-                if(error.code === "email_not_confirmed") {
-                    return openUserVerification(user.email);
-                }
-
-                throw error;
-            }
-
-            openToast(SignInToast.success());
-            dismissAllBottomSheet();
-        } catch(error) {
-            openToast(
-                getToastMessage({
-                    messages: SignInToast,
                     error
                 })
             );
@@ -572,7 +542,6 @@ export const useUserManagement = () => {
 
     return {
         signUp,
-        signIn,
         signOut,
         googleAuth,
         openUserVerification,

@@ -14,15 +14,12 @@ interface BottomSheetProps extends Partial<BottomSheetModalProps> {
 }
 
 const BottomSheet = forwardRef<BottomSheetModal, BottomSheetProps>((props, ref) => {
-    const {
-        title, content, closeButton, ...restProps
-    } = props;
-
-    const { snapPoints, enableHandlePanningGesture } = restProps;
+    const { title, content, closeButton, ...restProps } = props;
+    const { snapPoints, enableHandlePanningGesture, enableDynamicSizing } = restProps;
 
     const { top } = useSafeAreaInsets();
-    const snaps = snapPoints as Array<string | number> || ["100%"];
-    const styles = useStyles(snaps[0] === "100%", !!enableHandlePanningGesture, top);
+    const snaps = snapPoints as Array<string | number> || [];
+    const styles = useStyles(snaps[0] === "100%", !!enableHandlePanningGesture, top, !!enableDynamicSizing);
 
     return (
         <BottomSheetModal
@@ -57,10 +54,15 @@ const BottomSheet = forwardRef<BottomSheetModal, BottomSheetProps>((props, ref) 
     );
 });
 
-const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: number) => StyleSheet.create({
+const useStyles = (
+    isFullScreen: boolean,
+    isHandlePanningGesture: boolean,
+    top: number,
+    enableDynamicSizing: number
+) => StyleSheet.create({
     container: {
         flex: 1,
-        height: "100%",
+        height: enableDynamicSizing ? undefined : "100%",
         gap: DEFAULT_SEPARATOR,
         paddingHorizontal: DEFAULT_SEPARATOR,
         paddingBottom: SEPARATOR_SIZES.lightSmall
@@ -79,7 +81,6 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
         marginTop: SEPARATOR_SIZES.small,
         marginBottom: SEPARATOR_SIZES.lightSmall,
         width: hp(15),
-        // height: isHandlePanningGesture ? hp(0.65) : 0,
         backgroundColor: COLORS.white2,
         borderRadius: 35
     },

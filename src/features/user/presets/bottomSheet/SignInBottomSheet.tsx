@@ -1,10 +1,34 @@
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import SignInForm from "../../components/forms/SignInForm.tsx";
-import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/types/index.ts";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { router, useFocusEffect } from "expo-router";
+import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
 
-export const SignInBottomSheet: OpenBottomSheetArgs = {
-    title: "Bejelentkezés",
-    content: <SignInForm/>,
-    snapPoints: ["90%"],
-    enableDismissOnClose: false
+const SignInBottomSheet: React.FC = () => {
+    const bottomSheetRef = useRef<BottomSheetModal>(null);
+
+    const TITLE = "Bejelentkezés";
+    const CONTENT = <SignInForm/>;
+
+    useFocusEffect(useCallback(() => {
+        bottomSheetRef.current.present();
+
+        return () => bottomSheetRef.current?.close();
+    }, []));
+
+    const onBottomSheetDismiss = () => router.dismiss();
+
+    return (
+        <BottomSheet
+            ref={ bottomSheetRef }
+            title={ TITLE }
+            content={ CONTENT }
+            enableDynamicSizing
+            enableOverDrag={ false }
+            // enableDismissOnClose={ false }
+            onDismiss={ onBottomSheetDismiss }
+        />
+    );
 };
+
+export default SignInBottomSheet;
