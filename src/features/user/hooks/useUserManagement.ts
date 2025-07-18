@@ -5,15 +5,19 @@ import { OtpVerificationBottomSheet } from "../presets/bottomSheet/index.ts";
 import { AuthError, GenerateLinkParams, Provider, ResendParams, VerifyEmailOtpParams } from "@supabase/supabase-js";
 import { router } from "expo-router";
 import { useAuth } from "../../../contexts/auth/AuthContext.ts";
-import { UserTableType } from "../../database/connector/powersync/AppSchema.ts";
 import { ToastMessages } from "../../../ui/alert/model/types/index.ts";
 import getImageState from "../../../database/utils/getImageState.ts";
 import { getPathFromImageType } from "../../../utils/getPathFromImageType.ts";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 import { OtpVerificationHandlerType } from "../../../app/bottomSheet/otpVerification.tsx";
+import { useAppDispatch } from "../../../hooks/index.ts";
+import { editUser } from "../model/actions/editUser.ts";
+import { Image } from "../../../types/index.ts";
+import { EditUserFormFieldType } from "../schemas/userSchema.tsx";
 
 export const useUserManagement = () => {
     const database = useDatabase();
+    const dispatch = useAppDispatch();
     const { supabaseConnector, attachmentQueue, userDAO } = database;
     const { session, user, setUser, refreshSession } = useAuth();
     const { openToast } = useAlert();
@@ -51,21 +55,15 @@ export const useUserManagement = () => {
         }
     };
 
-    const changeUserMetadata = async (newUser: Partial<UserTableType> | null, toastMessages: ToastMessages) => {
+    const changeUserMetadata = async (newUser: EditUserFormFieldType | null, toastMessages: ToastMessages) => {
         try {
-            let newUserAvatar = user.userAvatar;
-            if(newUser?.avatarImage && user?.avatarImage !== getPathFromImageType(newUser.avatarImage, user?.id)) {
+            let newUserAvatar: Image | null = user?.userAvatar ?? null;
+            if(newUser?.avatarImage && user?.userAvatar?.path !== getPathFromImageType(newUser.avatarImage, user?.id)) {
                 const newAvatarImage = await attachmentQueue.saveFile(newUser.avatarImage, user.id);
                 newUserAvatar = getImageState(newAvatarImage.filename, newUser.avatarImage.buffer);
             }
 
-            const updatedUser = await userDAO.updateUser({
-                ...user,
-                ...newUser,
-                avatarImage: newUserAvatar ? newUserAvatar.path : null
-            });
-
-            setUser(updatedUser, newUserAvatar);
+            await dispatch(editUser({ database, newUser, newAvatar: newUserAvatar }));
 
             openToast(toastMessages.success());
             router.dismissTo("(profile)/user");

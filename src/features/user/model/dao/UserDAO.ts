@@ -17,7 +17,7 @@ export class UserDAO {
         .selectFrom(USER_TABLE)
         .selectAll()
         .where("id", "=", userId)
-        .executeTakeFirstOrThrow() as unknown as UserTableType;
+        .executeTakeFirstOrThrow() as UserTableType;
     }
 
     async insertUser(user: UserTableType) {
@@ -33,7 +33,7 @@ export class UserDAO {
         }
     }
 
-    async updateUser(user: UserTableType) {
+    async editUser(user: UserTableType) {
         await this.db
         .updateTable(USER_TABLE)
         .set(user)

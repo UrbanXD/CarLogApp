@@ -1,8 +1,8 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Database } from "../../../../database/connector/Database.ts";
 import { UserTableType } from "../../../../database/connector/powersync/AppSchema.ts";
 import { toUserDto } from "../mapper/index.ts";
 import { UserDto } from "../types/user.ts";
+import { createAsyncThunkWithTypes } from "../../../../database/redux/createAsyncThunkWithTypes.ts";
 
 interface LoadUserArgs {
     database: Database;
@@ -15,7 +15,7 @@ interface AsyncThunkConfig {
 }
 
 export const loadUser =
-    createAsyncThunk<UserDto, LoadUserArgs, AsyncThunkConfig>(
+    createAsyncThunkWithTypes<UserDto, LoadUserArgs, AsyncThunkConfig>(
         "user/load",
         async (args, { rejectWithValue }) => {
             const {
@@ -25,7 +25,7 @@ export const loadUser =
             } = args;
 
             try {
-                const user: UserTableType = await userDAO.getUser(userId);
+                const user = await userDAO.getUser(userId);
 
                 return await toUserDto(user, attachmentQueue);
             } catch(_) {

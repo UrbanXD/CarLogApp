@@ -4,7 +4,7 @@ import EditCarBottomSheet from "../../features/car/presets/bottomSheet/CarEditBo
 import useCars from "../../features/car/hooks/useCars.ts";
 
 const Page: React.FC = () => {
-    const { carId, stepIndex } = useLocalSearchParams<{ carId: string, stepIndex: number }>();
+    const { carId, stepIndex } = useLocalSearchParams();
     const { getCar } = useCars();
 
     const car = getCar(carId);

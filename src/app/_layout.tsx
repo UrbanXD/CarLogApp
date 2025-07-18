@@ -96,6 +96,15 @@ const Layout: React.FC = () => {
                 } }
             />
             <Stack.Screen
+                name="bottomSheet/editUser"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
                 name="(main)"
                 options={ {
                     header: () => <Header.Primary/>,

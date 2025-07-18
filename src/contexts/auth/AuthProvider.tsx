@@ -5,8 +5,6 @@ import { useDatabase } from "../database/DatabaseContext.ts";
 import { getUser, isUserLoading } from "../../features/user/model/selectors/index.ts";
 import { AuthError, Session, User } from "@supabase/supabase-js";
 import { UserTableType } from "../../database/connector/powersync/AppSchema.ts";
-import { ImageType } from "../../utils/pickImage.ts";
-import { updateUser } from "../../features/user/model/actions/updateUser.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BaseConfig } from "../../constants/index.ts";
 import { loadUser } from "../../features/user/model/actions/loadUser.ts";
@@ -55,10 +53,6 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             }
             // ha nem AuthError akkor sikeres a kijelentkezes, de mashol hiba tortent (pl: powersync)
         }
-    };
-
-    const setUser = (newUser: UserTableType | null, newAvatar?: ImageType | null) => {
-        dispatch(updateUser({ database, newUser, newAvatar }));
     };
 
     const fetchNotVerifiedUser = async () => {
@@ -159,7 +153,6 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 refreshSession,
                 signOut,
                 user,
-                setUser,
                 userLoading,
                 notVerifiedUser,
                 fetchNotVerifiedUser,

@@ -12,13 +12,12 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Divider from "../components/Divider.tsx";
 import Button from "../components/Button/Button.ts";
 import { useBottomSheet } from "../ui/bottomSheet/contexts/BottomSheetContext.ts";
-import { EditUserBottomSheet } from "../features/user/presets/bottomSheet/index.ts";
 import { EDIT_USER_FORM_STEPS } from "../features/user/hooks/useEditUserSteps.tsx";
 import Avatar from "../components/Avatar/Avatar.ts";
 import { getLabelByName } from "../utils/getLabelByName.ts";
 import { useAuth } from "../contexts/auth/AuthContext.ts";
 import { useUserManagement } from "../features/user/hooks/useUserManagement.ts";
-import { Redirect } from "expo-router";
+import { Redirect, router } from "expo-router";
 
 const ProfileScreen: React.FC = () => {
     const { session, user, signOut } = useAuth();
@@ -31,17 +30,10 @@ const ProfileScreen: React.FC = () => {
 
     const openEditUser =
         (stepIndex: number, passwordReset: boolean = true) =>
-            openBottomSheet(
-                EditUserBottomSheet({
-                    user: {
-                        email: user.email ?? undefined,
-                        firstname: user.firstname ?? undefined,
-                        lastname: user.lastname ?? undefined
-                    },
-                    passwordReset,
-                    stepIndex
-                })
-            );
+            router.push({
+                pathname: "bottomSheet/editUser",
+                params: { passwordReset, stepIndex }
+            });
 
     const openChangeName =
         () => openEditUser(EDIT_USER_FORM_STEPS.NameStep);
