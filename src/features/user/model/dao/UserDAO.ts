@@ -1,15 +1,11 @@
 import { Kysely } from "@powersync/kysely-driver";
 import { DatabaseType, USER_TABLE, UserTableType } from "../../../../database/connector/powersync/AppSchema.ts";
-import { SupabaseConnector } from "../../../../database/connector/SupabaseConnector.ts";
-import { Database } from "../../../../database/connector/Database.ts";
 
 export class UserDAO {
     db: Kysely<DatabaseType>;
-    supabaseConnector: SupabaseConnector;
 
-    constructor(database: Database) {
-        this.db = database.db;
-        this.supabaseConnector = database.supabaseConnector;
+    constructor(db: Kysely<DatabaseType>) {
+        this.db = db;
     }
 
     async getUser(userId: string) {
