@@ -1,19 +1,18 @@
 import React from "react";
 import SignUpForm from "../../components/forms/SignUpForm.tsx";
 import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
-import { heightPercentageToDP } from "react-native-responsive-screen";
 
 const SignUpBottomSheet: React.FC = () => {
-    const TITLE = "Felhasználó létrehozás";
+    const TITLE = "Regisztráció";
     const CONTENT = <SignUpForm/>;
-    const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
+    const SNAP_POINTS = ["62.5%"];
 
     return (
         <BottomSheet
             title={ TITLE }
             content={ CONTENT }
-            enableDynamicSizing
-            maxDynamicContentSize={ MAX_DYNAMIC_CONTENT_SIZE }
+            snapPoints={ SNAP_POINTS }
+            enableDynamicSizing={ false }
             enableOverDrag={ false }
             enableDismissOnClose={ false }
         />

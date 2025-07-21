@@ -138,7 +138,7 @@ const useStyles = (
         height: enableDynamicSizing ? undefined : "100%",
         gap: DEFAULT_SEPARATOR,
         paddingHorizontal: DEFAULT_SEPARATOR,
-        paddingBottom: SEPARATOR_SIZES.lightSmall
+        paddingBottom: SEPARATOR_SIZES.small
     },
     containerBackground: {
         backgroundColor: COLORS.black2,

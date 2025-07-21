@@ -6,8 +6,8 @@ import { RenderComponent } from "../types/index.ts";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 
 type OnBoardingViewProps = {
-    steps: RenderComponent;
-    currentStep?: number;
+    steps: RenderComponent
+    currentStep?: number
 }
 
 const OnBoardingView: React.FC<OnBoardingViewProps> = ({

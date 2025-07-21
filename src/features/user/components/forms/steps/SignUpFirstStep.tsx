@@ -1,6 +1,6 @@
 import React from "react";
 import Input from "../../../../../components/Input/Input.ts";
-import { COLORS, GLOBAL_STYLE, ICON_NAMES } from "../../../../../constants/index.ts";
+import { COLORS, GLOBAL_STYLE } from "../../../../../constants/index.ts";
 import Button from "../../../../../components/Button/Button.ts";
 import TextDivider from "../../../../../components/TextDivider.tsx";
 import { useMultiStepForm } from "../../../../../contexts/multiStepForm/MultiStepFormContext.ts";
@@ -15,11 +15,7 @@ export const SignUpFirstStep: React.FC<StepProps> = ({
     return (
         <Input.Group>
             <EmailStep control={ control }/>
-            <Button.Text
-                text="Következő"
-                iconRight={ ICON_NAMES.rightArrowHead }
-                onPress={ next }
-            />
+            <Button.MultistepFormNext onPress={ next }/>
             <TextDivider
                 title="vagy"
                 color={ COLORS.gray1 }

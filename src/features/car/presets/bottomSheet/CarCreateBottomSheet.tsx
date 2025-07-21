@@ -5,7 +5,7 @@ import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
 const CreateCarBottomSheet: React.FC = () => {
     const TITLE = "Autó létrehozás";
     const CONTENT = <NewCarForm/>;
-    const SNAP_POINTS = ["85%"];
+    const SNAP_POINTS = ["90%"];
 
     return (
         <BottomSheet
