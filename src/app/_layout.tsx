@@ -6,7 +6,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Provider } from "react-redux";
 import { KeyboardProvider } from "react-native-keyboard-controller";
-import { BottomSheetProvider } from "../ui/bottomSheet/contexts/BottomSheetProvider.tsx";
 import Compactor from "../components/Compactor";
 import { ScreenScrollViewProvider } from "../contexts/screenScrollView/ScreenScrollViewProvider.tsx";
 import { AuthProvider } from "../contexts/auth/AuthProvider.tsx";
@@ -138,8 +137,7 @@ const RootLayout: React.FC = () =>
             { Component: AuthProvider },
             { Component: ToastManager },
             { Component: ModalManager },
-            { Component: BottomSheetModalProvider },
-            { Component: BottomSheetProvider }
+            { Component: BottomSheetModalProvider }
         ] }>
             <Layout/>
         </Compactor>

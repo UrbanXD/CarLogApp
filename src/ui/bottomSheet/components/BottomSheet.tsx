@@ -2,15 +2,15 @@ import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react
 import { StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
+import { BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BottomSheetBackdrop from "./BottomSheetBackdrop.tsx";
 import { router, useFocusEffect, useNavigation } from "expo-router";
 import { KeyboardController } from "react-native-keyboard-controller";
 import { BottomSheetLeavingModal } from "../presets/modal/index.ts";
 import { useAlert } from "../../alert/hooks/useAlert.ts";
 import { BottomSheetProvider } from "../contexts/BottomSheetProvider.tsx";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface BottomSheetProps extends Partial<BottomSheetModalProps> {
     title?: string;
@@ -21,7 +21,7 @@ interface BottomSheetProps extends Partial<BottomSheetModalProps> {
 const BottomSheet: React.FC<BottomSheetProps> = ({
     title, content, closeButton, ...restProps
 }) => {
-    const { top } = useSafeAreaInsets();
+    const { top, bottom } = useSafeAreaInsets();
     const { openModal } = useAlert();
     const navigation = useNavigation();
 
@@ -36,7 +36,6 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
 
     useEffect(() => {
         navigation.addListener("beforeRemove", () => {
-            bottomSheetRef.current.forceClose();
             bottomSheetRef.current.dismiss();
         });
     }, []);
@@ -70,7 +69,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     const dismissBottomSheet = useCallback((dismissPreviousSheets = false) => {
         forceClosed.current = true;
         KeyboardController.dismiss();
-        bottomSheetRef.current?.close();
+        bottomSheetRef.current?.dismiss();
 
         if(!dismissPreviousSheets && router.canDismiss()) return router.dismiss();
 
@@ -93,18 +92,19 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         openModal(BottomSheetLeavingModal(reopenBottomSheet, dismissBottomSheet));
     }, [reopenBottomSheet, dismissBottomSheet]);
 
-    const renderBackdrop = useMemo(() => (props: any) => <BottomSheetBackdrop { ...props } />);
+    const renderBackdrop = useMemo(() => (props: BottomSheetBackdropProps) => <BottomSheetBackdrop { ...props }/>);
 
-    const styles = useStyles(snapPoints?.[0] === "100%", !!enableHandlePanningGesture, top, !!enableDynamicSizing);
+    const styles = useStyles(snapPoints?.[0] === "100%", !!enableHandlePanningGesture, !!enableDynamicSizing);
 
     return (
         <BottomSheetModal
             ref={ bottomSheetRef }
             { ...restProps }
+            topInset={ top }
+            bottomInset={ bottom }
             keyboardBehavior="interactive"
             keyboardBlurBehavior="restore"
             android_keyboardInputMode="adjustPan"
-            topInset={ top }
             backgroundStyle={ styles.containerBackground }
             handleIndicatorStyle={ styles.line }
             backdropComponent={ renderBackdrop }
@@ -131,7 +131,6 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
 const useStyles = (
     isFullScreen: boolean,
     isHandlePanningGesture: boolean,
-    top: number,
     enableDynamicSizing: number
 ) => StyleSheet.create({
     container: {
