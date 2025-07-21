@@ -5,16 +5,14 @@ import { DEFAULT_SEPARATOR } from "../constants/index.ts";
 import { RenderComponent } from "../types/index.ts";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 
-interface OnBoardingViewProps {
+type OnBoardingViewProps = {
     steps: RenderComponent;
     currentStep?: number;
-    visibleHeight?: number;
 }
 
 const OnBoardingView: React.FC<OnBoardingViewProps> = ({
     steps,
-    currentStep = 0,
-    visibleHeight
+    currentStep = 0
 }) => {
     const scrollViewRef = useRef<FlatList>(null);
 
@@ -39,7 +37,7 @@ const OnBoardingView: React.FC<OnBoardingViewProps> = ({
                 )
             }
         </View>
-    ), [currentStep, steps, visibleHeight]);
+    ), [currentStep, steps]);
 
     return (
         <FlatList
