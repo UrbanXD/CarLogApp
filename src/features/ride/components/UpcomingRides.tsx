@@ -9,7 +9,6 @@ import { EditRideFormFieldType, editRideUseFormProps } from "../schemas/editRide
 import InputText from "../../../components/Input/text/InputText.tsx";
 import ProgressBar from "../../../components/ProgressBar.tsx";
 import Icon from "../../../components/Icon.tsx";
-import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 
 type RideType = {
     carUID: string
@@ -31,7 +30,6 @@ interface UpcomingRidesProps {
 }
 
 const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
-    const { openBottomSheet } = useBottomSheet();
 
     return (
         <View style={ styles.container }>
@@ -65,16 +63,7 @@ const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
                                 icon={ ICON_NAMES.info }
                                 size={ FONT_SIZES.h2 }
                                 color={ COLORS.white }
-                                onPress={
-                                    () => {
-                                        console.log("xdd");
-                                        openBottomSheet({
-                                            title: "Edit Ride",
-                                            content: <EditRideForm ride={ ride }/>,
-                                            snapPoints: ["85%"]
-                                        });
-                                    }
-                                }
+                                onPress={ () => { /*open bottom sheet*/ } }
                             />
                         </View>
                     </View>

@@ -4,11 +4,13 @@ import { SignInToast } from "../presets/toast/index.ts";
 import { getToastMessage } from "../../../ui/alert/utils/getToastMessage.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
+import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 
 export const useSignIn = () => {
     const database = useDatabase();
     const { supabaseConnector } = database;
     const { openToast } = useAlert();
+    const { dismissBottomSheet } = useBottomSheet();
 
     const signIn = async (user: SignInFormFieldType) => {
         try {
@@ -26,7 +28,11 @@ export const useSignIn = () => {
                 throw error;
             }
 
-            router.dismissTo("auth");
+            if(dismissBottomSheet) {
+                dismissBottomSheet();
+            } else {
+                router.dismissTo("auth");
+            }
             openToast(SignInToast.success());
         } catch(error) {
             openToast(

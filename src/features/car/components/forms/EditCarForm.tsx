@@ -8,7 +8,7 @@ import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { editCar } from "../../model/actions/editCar.ts";
 import { CarDto } from "../../model/types/index.ts";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
-import { router } from "expo-router";
+import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 
 export interface EditCarFormProps {
     car: CarDto;
@@ -22,6 +22,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
     const dispatch = useAppDispatch();
     const database = useDatabase();
     const { openToast } = useAlert();
+    const { dismissBottomSheet } = useBottomSheet();
 
     const editCarFormFieldType: EditCarFormFieldType = {
         ...car,
@@ -49,7 +50,8 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
                 if(steps[stepIndex] && step.editToastMessages) {
                     openToast(step.editToastMessages.success());
                 }
-                router.dismiss();
+
+                if(dismissBottomSheet) dismissBottomSheet(true);
             } catch(e) {
                 console.error("Hiba a submitHandler-ben:", e);
             }

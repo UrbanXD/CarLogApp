@@ -11,7 +11,6 @@ import {
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Divider from "../components/Divider.tsx";
 import Button from "../components/Button/Button.ts";
-import { useBottomSheet } from "../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { EDIT_USER_FORM_STEPS } from "../features/user/hooks/useEditUserSteps.tsx";
 import Avatar from "../components/Avatar/Avatar.ts";
 import { getLabelByName } from "../utils/getLabelByName.ts";
@@ -22,7 +21,6 @@ import { Redirect, router } from "expo-router";
 const ProfileScreen: React.FC = () => {
     const { session, user, signOut } = useAuth();
     const { deleteUserProfile } = useUserManagement();
-    const { openBottomSheet } = useBottomSheet();
 
     if(!user) return Redirect({ href: "backToRootIndex" });
     const name = `${ user.lastname } ${ user.firstname }`;
