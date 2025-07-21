@@ -37,6 +37,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     useEffect(() => {
         navigation.addListener("beforeRemove", () => {
             bottomSheetRef.current.forceClose();
+            bottomSheetRef.current.dismiss();
         });
     }, []);
 
