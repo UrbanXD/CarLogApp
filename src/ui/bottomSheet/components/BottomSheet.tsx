@@ -45,7 +45,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         stackOfRouterLength.current = stackOfRoutes?.length ?? 0;
 
         if(stackOfRouterLength.current !== 0) {
-            bottomSheetRef.current.present();
+            bottomSheetRef.current?.present();
         }
 
         return () => {
