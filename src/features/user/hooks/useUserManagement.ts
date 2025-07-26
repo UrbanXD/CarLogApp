@@ -19,7 +19,7 @@ export const useUserManagement = () => {
     const database = useDatabase();
     const dispatch = useAppDispatch();
     const { supabaseConnector, attachmentQueue, userDAO } = database;
-    const { session, user, setUser, refreshSession } = useAuth();
+    const { session, user, refreshSession } = useAuth();
     const { openToast } = useAlert();
 
     const changeEmail = async (newEmail: string) => {
@@ -39,7 +39,7 @@ export const useUserManagement = () => {
                 pathname: "bottomSheet/otpVerification",
                 params: {
                     type: "email_change",
-                    title: "Email módosítási kérelem hitelesítés PLS",
+                    title: "Email módosítási kérelem hitelesítés",
                     email: session.user.email,
                     newEmail,
                     handlerType: OtpVerificationHandlerType.CurrentEmailChange
@@ -68,7 +68,6 @@ export const useUserManagement = () => {
             openToast(toastMessages.success());
             router.dismissTo("(profile)/user");
         } catch(error) {
-            console.log(error);
             openToast(
                 getToastMessage({
                     messages: toastMessages,

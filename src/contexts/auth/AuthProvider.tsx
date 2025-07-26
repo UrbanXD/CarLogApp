@@ -39,7 +39,9 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
 
             if(error) throw error;
 
-            router.replace("/backToRootIndex");
+            router.dismissAll();
+            router.push("/backToRootIndex");
+
             if(!disabledToast) openToast(SignOutToast.success());
             await database.disconnect();
         } catch(error) {

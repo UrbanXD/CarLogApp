@@ -24,7 +24,8 @@ export const useOtpVerificationHandler = () => {
             }
 
             openToast(SignUpToast.success());
-            router.dismissTo("auth");
+            router.dismissAll();
+            router.push("/auth");//authoz lehet vissza kell idk
         };
 
     const handleNewEmailVerification: HandleVerificationOtpType =
@@ -53,8 +54,7 @@ export const useOtpVerificationHandler = () => {
                 );
             }
 
-            await router.dismiss();
-            router.push({
+            router.replace({
                 pathname: "bottomSheet/otpVerification",
                 params: {
                     type: "email_change",

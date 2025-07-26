@@ -5,14 +5,14 @@ import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } 
 import { BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
 import BottomSheetBackdrop from "./BottomSheetBackdrop.tsx";
-import { router, useFocusEffect, useNavigation } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import { KeyboardController } from "react-native-keyboard-controller";
 import { BottomSheetLeavingModal } from "../presets/modal/index.ts";
 import { useAlert } from "../../alert/hooks/useAlert.ts";
 import { BottomSheetProvider } from "../contexts/BottomSheetProvider.tsx";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-interface BottomSheetProps extends Partial<BottomSheetModalProps> {
+export interface BottomSheetProps extends Partial<BottomSheetModalProps> {
     title?: string;
     content: ReactNode;
     closeButton?: ReactNode;
@@ -26,7 +26,6 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     const navigation = useNavigation();
 
     const bottomSheetRef = useRef<BottomSheetModal>(null);
-    const stackOfRouterLength = useRef(0);
     const manuallyClosed = useRef(false);
     const forceClosed = useRef(false);
 
@@ -35,32 +34,24 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     const isBottomSheet = (pathname?: string) => !!pathname?.startsWith("bottomSheet");
 
     useEffect(() => {
-        navigation.addListener("beforeRemove", () => {
-            bottomSheetRef.current.dismiss();
-        });
-    }, []);
+        if(navigation.isFocused()) return bottomSheetRef.current?.present();
 
-    useFocusEffect(useCallback(() => {
         const stackOfRoutes = navigation.getState()?.routes;
-        stackOfRouterLength.current = stackOfRoutes?.length ?? 0;
+        const newStackPathname = stackOfRoutes?.[stackOfRoutes?.length - 1]?.name;
 
-        if(stackOfRouterLength.current !== 0) {
-            bottomSheetRef.current?.present();
+        if(isBottomSheet(newStackPathname)) {
+            manuallyClosed.current = true;
+            bottomSheetRef.current?.forceClose();
         }
 
-        return () => {
-            const stackOfRoutes = navigation.getState()?.routes;
-            const newStackLength = stackOfRoutes?.length;
-            const newStackPathname = stackOfRoutes?.[newStackLength - 1].name;
+    }, [navigation.isFocused()]);
 
-            if(isBottomSheet(newStackPathname) && newStackLength > stackOfRouterLength.current) {
-                manuallyClosed.current = true;
-            }
-
+    useEffect(() => {
+        return navigation.addListener("beforeRemove", (_event) => {
+            forceClosed.current = true;
             KeyboardController.dismiss();
-            bottomSheetRef.current?.close();
-        };
-    }));
+        });
+    }, []);
 
     const reopenBottomSheet = useCallback(() => {
         bottomSheetRef.current.expand();
@@ -72,19 +63,19 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         bottomSheetRef.current?.dismiss();
 
         if(!dismissPreviousSheets && router.canDismiss()) return router.dismiss();
-
         const stackOfRoutes = [...(navigation.getState()?.routes ?? [])];
-        if(stackOfRoutes.length === 0) return router.replace("backToIndex");
+        if(stackOfRoutes.length - 1 <= 0) return router.replace("backToRootIndex");
 
         while(stackOfRoutes.length > 0) {
             const route = stackOfRoutes.pop();
             if(!route) continue;
-            if(!route.name.startsWith("bottomSheet/")) router.dismissTo(route.name);
+            if(!route.name.startsWith("bottomSheet/") && router.canDismiss()) router.dismissTo(route.name);
         }
     }, [navigation]);
 
     const onChangeSnapPoint = useCallback((index: number) => {
         if(index !== -1) return; // nincs bezarva
+
         if(manuallyClosed.current) return manuallyClosed.current = false;
         if(forceClosed.current) return;
         if(enableDismissOnClose) return dismissBottomSheet();
@@ -120,6 +111,17 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                       </Text>
                    </View>
                 }
+                {/*<Button title={ "xd" } onPress={ () => router.push("bottomSheet/signUp") }></Button>*/ }
+                {/*<Button title={ "title" } onPress={ () => router.push("bottomSheet/signIn") }></Button>*/ }
+                {/*<Button title={ "test" } onPress={ () => {*/ }
+                {/*    console.log(navigation.getState()?.routes);*/ }
+                {/*    try {*/ }
+                {/*        router.dismissAll();*/ }
+                {/*    } catch(e) {*/ }
+                {/*        console.error("anyad ,", e, " apad");*/ }
+                {/*    }*/ }
+                {/*    router.push("/auth");*/ }
+                {/*} }/>*/ }
                 <BottomSheetProvider contextValue={ { dismissBottomSheet } }>
                     { content }
                 </BottomSheetProvider>

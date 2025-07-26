@@ -59,7 +59,7 @@ export const useGoogleAuth = () => {
             });
 
             openToast(SignUpToast.success());
-            return router.dismissTo("auth");
+            router.dismissTo("auth");
         } catch(error) {
             openToast(
                 getToastMessage({

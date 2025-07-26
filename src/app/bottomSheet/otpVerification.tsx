@@ -40,7 +40,7 @@ const Page: React.FC = () => {
         handleUserDeleteVerification
     } = useOtpVerificationHandler();
 
-    let handleVerification = () => { console.log("defa"); };
+    let handleVerification = () => {};
     switch(Number(handlerType)) {
         case OtpVerificationHandlerType.SignUp:
             handleVerification = handleSignUpVerification;

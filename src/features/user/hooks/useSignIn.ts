@@ -28,11 +28,7 @@ export const useSignIn = () => {
                 throw error;
             }
 
-            if(dismissBottomSheet) {
-                dismissBottomSheet();
-            } else {
-                router.dismissTo("auth");
-            }
+            router.dismissTo("auth");
             openToast(SignInToast.success());
         } catch(error) {
             openToast(
