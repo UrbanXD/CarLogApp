@@ -50,7 +50,7 @@ export class Database {
 
     get userDAO(): UserDAO {
         if(!this._userDAO) {
-            this._userDAO = new UserDAO(this);
+            this._userDAO = new UserDAO(this.db);
         }
         return this._userDAO;
     }

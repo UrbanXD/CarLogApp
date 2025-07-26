@@ -17,13 +17,13 @@ export class UserDAO {
     }
 
     async insertUser(user: UserTableType) {
-        await this.db
-        .insertInto(USER_TABLE)
-        .values(user)
-        .execute();
-
         try {
-            return await this.getUser(user.id);
+            await this.db
+            .insertInto(USER_TABLE)
+            .values(user)
+            .execute();
+
+            return user;
         } catch(e) {
             return null;
         }
