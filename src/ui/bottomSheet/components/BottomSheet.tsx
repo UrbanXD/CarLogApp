@@ -111,17 +111,6 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                       </Text>
                    </View>
                 }
-                {/*<Button title={ "xd" } onPress={ () => router.push("bottomSheet/signUp") }></Button>*/ }
-                {/*<Button title={ "title" } onPress={ () => router.push("bottomSheet/signIn") }></Button>*/ }
-                {/*<Button title={ "test" } onPress={ () => {*/ }
-                {/*    console.log(navigation.getState()?.routes);*/ }
-                {/*    try {*/ }
-                {/*        router.dismissAll();*/ }
-                {/*    } catch(e) {*/ }
-                {/*        console.error("anyad ,", e, " apad");*/ }
-                {/*    }*/ }
-                {/*    router.push("/auth");*/ }
-                {/*} }/>*/ }
                 <BottomSheetProvider contextValue={ { dismissBottomSheet } }>
                     { content }
                 </BottomSheetProvider>
