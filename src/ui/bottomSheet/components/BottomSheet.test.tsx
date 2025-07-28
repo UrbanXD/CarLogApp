@@ -1,14 +1,18 @@
 import React from "react";
 import { Text } from "react-native";
-import { renderRouter, screen } from "expo-router/testing-library";
-import { act } from "@testing-library/react-native";
+import { act, fireEvent } from "@testing-library/react-native";
 import BottomSheet, { BottomSheetProps } from "./BottomSheet.tsx";
-import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
 import { router } from "expo-router";
+import { renderRouterWithRedux } from "../../../utils/tests/renderWithRedux.tsx";
+import { screen } from "expo-router/testing-library";
+import * as alertSlice from "../../alert/model/slice/index.ts";
+import ModalManager from "../../alert/components/modal/ModalManager.tsx";
 
-const mockStore = configureStore([]);
-let defaultStore = mockStore({});
+jest.mock("@react-native-google-signin/google-signin", () => {
+    return {
+        GoogleSignin: jest.fn()
+    };
+});
 
 const mockPresentBottomSheet = jest.fn();
 const mockDismissBottomSheet = jest.fn();
@@ -39,33 +43,30 @@ jest.mock("@gorhom/bottom-sheet", () => {
     };
 });
 
-const renderTestBottomSheet = (props?: BottomSheetProps, store = defaultStore) => (
-    <Provider store={ store }>
+const renderBottomSheet = (props?: BottomSheetProps) => (
+    <ModalManager>
         <BottomSheet
             title="Test Sheet Title"
             content={ <Text>Content</Text> }
             snapPoints={ ["50%"] }
             { ...props }
         />
-    </Provider>
+    </ModalManager>
 );
 
 describe("BottomSheet", () => {
     beforeEach(() => {
         jest.clearAllMocks();
         jest.clearAllTimers();
-        defaultStore = mockStore([]);
     });
 
-    it("renders title, content, and presents automatically", async () => {
-        const MockBottomSheetComponent = jest.fn(() => renderTestBottomSheet());
-
-        const { queryByTestId, queryByText } = renderRouter(
+    it("automatically presents the bottom sheet with title and content", async () => {
+        const { queryByTestId, queryByText } = renderRouterWithRedux(
             {
-                "default": jest.fn(() => <></>),
-                "bottomSheet/test": MockBottomSheetComponent
+                "default": () => <></>,
+                "bottomSheet/test": renderBottomSheet
             },
-            { initialUrl: "default" }
+            "default"
         );
 
         act(() => {
@@ -80,25 +81,17 @@ describe("BottomSheet", () => {
         expect(queryByTestId("BottomSheetView")).toBeTruthy();
     });
 
-    it("when enableDismissOnClose is true, closing a bottom sheet dismiss the sheet and router screen", async () => {
-        const MockBottomSheetComponent = jest.fn(() =>
-            renderTestBottomSheet({
-                enableDismissOnClose: true
-            })
-        );
-
-        const { queryByText } = renderRouter(
+    it("dismisses the bottom sheet and navigates back when enableDismissOnClose is true", async () => {
+        const { queryByText } = renderRouterWithRedux(
             {
-                "default": jest.fn(() => <></>),
-                "bottomSheet/test1": MockBottomSheetComponent
+                "default": () => <></>,
+                "bottomSheet/test": () => renderBottomSheet({ enableDismissOnClose: true })
             },
-            {
-                initialUrl: "/default"
-            }
+            "default"
         );
 
         act(() => {
-            router.push("/bottomSheet/test1"); //open bottomSheet
+            router.push("/bottomSheet/test"); //open bottomSheet
         });
 
         act(() => {
@@ -106,40 +99,90 @@ describe("BottomSheet", () => {
         });
 
         expect(mockDismissBottomSheet).toHaveBeenCalled();
-        expect(screen).toHavePathname("/default"); //visszakerult-e az alap oldalra
-        expect(queryByText("Test Sheet Title")).toBeFalsy(); //valoban eltunt-e a sheet
+        expect(screen).toHavePathname("/default"); // get back to default screen (bottom sheet closed)
+        expect(queryByText("Test Sheet Title")).toBeFalsy(); //sheet content dismissed correctly
     });
 
-    it(
-        "when enableDismissOnClose is false, closing a bottom sheet not dismisses it and stay at the current route",
-        async () => {
-            const MockBottomSheetComponent = jest.fn(() =>
-                renderTestBottomSheet({
-                    enableDismissOnClose: false
-                })
-            );
+    it("does not dismiss the bottom sheet or navigate away when enableDismissOnClose is false", async () => {
+        const { queryByText } = renderRouterWithRedux(
+            {
+                "default": () => <></>,
+                "bottomSheet/test": () => renderBottomSheet({ enableDismissOnClose: false })
+            },
+            "default"
+        );
 
-            const { queryByText } = renderRouter(
-                {
-                    "default": jest.fn(() => <></>),
-                    "bottomSheet/test1": MockBottomSheetComponent
-                },
-                {
-                    initialUrl: "/default"
-                }
-            );
+        const openModalSpy = jest.spyOn(alertSlice, "openModal");
 
-            act(() => {
-                router.push("/bottomSheet/test1"); //open bottomSheet
-            });
+        act(() => {
+            router.push("/bottomSheet/test"); //open bottomSheet
+        });
 
-            act(() => {
-                bottomSheetModalProps?.onChange?.(-1); //close bottomSheet
-            });
+        act(() => {
+            bottomSheetModalProps?.onChange?.(-1); //close bottomSheet
+        });
 
-            expect(queryByText("Test Sheet Title")).toBeTruthy(); // sheet closed but content is still alive
-            expect(screen).toHavePathname("/bottomSheet/test1"); // stayed at bottom sheet route
-            // expect(openModal).toHaveBeenCalled();
-        }
-    );
+        expect(queryByText("Test Sheet Title")).toBeTruthy(); // sheet closed but content is still alive
+        expect(screen).toHavePathname("/bottomSheet/test"); // stayed at bottom sheet route
+        expect(openModalSpy).toHaveBeenCalled();
+    });
+
+    it("reopens the bottom sheet when the leaving modal is declined via button", () => {
+        const { queryByText } = renderRouterWithRedux(
+            {
+                "default": () => <></>,
+                "bottomSheet/test": () => renderBottomSheet({ enableDismissOnClose: false })
+            },
+            "default"
+        );
+
+        const openModalSpy = jest.spyOn(alertSlice, "openModal");
+
+        act(() => {
+            router.push("/bottomSheet/test"); //open bottomSheet
+        });
+
+        act(() => {
+            bottomSheetModalProps?.onChange?.(-1); //close bottomSheet
+        });
+
+        expect(openModalSpy).toHaveBeenCalled();
+
+        act(() => {
+            fireEvent.press(queryByText("Mégse"));
+        });
+
+        expect(mockExpandBottomSheet).toHaveBeenCalled();
+        expect(queryByText("Test Sheet Title")).toBeTruthy();
+    });
+
+    it("dismisses and removes the bottom sheet when the leaving modal is accepted via button", () => {
+        const { queryByText } = renderRouterWithRedux(
+            {
+                "default": () => <></>,
+                "bottomSheet/test": () => renderBottomSheet({ enableDismissOnClose: false })
+            },
+            "default"
+        );
+
+        const openModalSpy = jest.spyOn(alertSlice, "openModal");
+
+        act(() => {
+            router.push("/bottomSheet/test"); //open bottomSheet
+        });
+
+        act(() => {
+            bottomSheetModalProps?.onChange?.(-1); //close bottomSheet
+        });
+
+        expect(openModalSpy).toHaveBeenCalled();
+
+        act(() => {
+            fireEvent.press(queryByText("Űrlap bezárása"));
+        });
+
+        expect(mockDismissBottomSheet).toHaveBeenCalled();
+        expect(screen).toHavePathname("/default"); // get back to default screen (bottom sheet closed)
+        expect(queryByText("Test Sheet Title")).toBeFalsy(); //sheet content dismissed correctly
+    });
 });

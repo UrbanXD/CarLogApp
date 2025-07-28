@@ -13,8 +13,8 @@ import { useDatabase } from "../contexts/database/DatabaseContext.ts";
 import { DatabaseProvider } from "../contexts/database/DatabaseProvider.tsx";
 import { store } from "../database/redux/store.ts";
 import Header from "../components/Navigation/Header/Header.tsx";
-import ToastManager from "../ui/alert/components/ToastManager.tsx";
-import ModalManager from "../ui/alert/components/ModalManager.tsx";
+import ToastManager from "../ui/alert/components/toast/ToastManager.tsx";
+import ModalManager from "../ui/alert/components/modal/ModalManager.tsx";
 import { StatusBar } from "react-native";
 
 const Layout: React.FC = () => {

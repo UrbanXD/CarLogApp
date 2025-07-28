@@ -1,10 +1,10 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../../constants/index.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import Icon from "../../../components/Icon.tsx";
-import Button from "../../../components/Button/Button.ts";
-import { Color } from "../../../types/index.ts";
+import Icon from "../../../../components/Icon.tsx";
+import Button from "../../../../components/Button/Button.ts";
+import { Color } from "../../../../types/index.ts";
 
 export interface AlertModalProps {
     icon?: string;
@@ -32,7 +32,7 @@ const AlertModal: React.FC<AlertModalProps> = ({
     const styles = useStyles(iconSize);
 
     return (
-        <View style={ styles.container }>
+        <View testID="Modal" style={ styles.container }>
             {
                 icon &&
                <View style={ styles.iconContainer }>

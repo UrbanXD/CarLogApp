@@ -8,6 +8,11 @@ jest.mock("@react-native-async-storage/async-storage", () =>
 
 jest.mock("react-native-keyboard-controller", () => require("react-native-keyboard-controller/jest"));
 
+jest.mock("expo-font", () => ({
+    useFonts: () => [true],
+    isLoaded: () => true
+}));
+
 jest.mock("@powersync/react-native", () => {
     class MockTable {
         constructor(schema) {
@@ -34,7 +39,6 @@ jest.mock("@powersync/react-native", () => {
             registerTablesChangedHook: jest.fn(),
             open: jest.fn(),
             close: jest.fn()
-            // amit még a tesztek igényelnek
         })),
         AbstractPowerSyncDatabase: jest.fn()
     };
