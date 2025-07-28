@@ -18,12 +18,8 @@ type MultiStepFormContextValue = {
     goTo: (index: number) => void
     next: () => void
     back: () => void
-    contentVisibleHeight?: number
 }
 
 export const MultiStepFormContext = createContext<MultiStepFormContextValue | null>(null);
 
-export const useMultiStepForm = () =>
-    useContext<MultiStepFormContextValue>(
-        MultiStepFormContext as Context<MultiStepFormContextValue>
-    );
+export const useMultiStepForm = () => useContext<MultiStepFormContextValue>(MultiStepFormContext as Context<MultiStepFormContextValue>);

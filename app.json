@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "carlog",
-    "icon": "./src/assets/icon.png",
+    "icon": "./src/assets/adaptive-icon.png",
     "userInterfaceStyle": "automatic",
     "androidStatusBar": {
       "translucent": true
@@ -35,6 +35,20 @@
           "resizeMode": "contain",
           "imageWidth": 74,
           "backgroundColor": "#242424"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0",
+            "kotlinVersion": "2.0.21"
+          },
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
         }
       ]
     ],

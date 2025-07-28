@@ -3,19 +3,22 @@ import { AuthContext } from "./AuthContext.ts";
 import { useAppDispatch, useAppSelector } from "../../hooks/index.ts";
 import { useDatabase } from "../database/DatabaseContext.ts";
 import { getUser, isUserLoading } from "../../features/user/model/selectors/index.ts";
-import { Session, User } from "@supabase/supabase-js";
+import { AuthError, Session, User } from "@supabase/supabase-js";
 import { UserTableType } from "../../database/connector/powersync/AppSchema.ts";
-import { ImageType } from "../../utils/pickImage.ts";
-import { updateUser } from "../../features/user/model/actions/updateUser.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BaseConfig } from "../../constants/index.ts";
 import { loadUser } from "../../features/user/model/actions/loadUser.ts";
 import { loadCars } from "../../features/car/model/actions/loadCars.ts";
+import { router } from "expo-router";
+import { SignOutToast } from "../../features/user/presets/toast/index.ts";
+import { getToastMessage } from "../../ui/alert/utils/getToastMessage.ts";
+import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 
 export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     children
 }) => {
     const dispatch = useAppDispatch();
+    const { openToast } = useAlert();
     const database = useDatabase();
     const { supabaseConnector } = database;
 
@@ -26,8 +29,32 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     const [session, setSession] = useState<Session | null>(null);
     const [sessionLoading, setSessionLoading] = useState<boolean>(true);
 
-    const setUser = (newUser: UserTableType | null, newAvatar?: ImageType | null) => {
-        dispatch(updateUser({ database, newUser, newAvatar }));
+    const signOut = async (disabledToast: boolean = false) => {
+        try {
+            const { error } =
+                await supabaseConnector
+                .client
+                .auth
+                .signOut();
+
+            if(error) throw error;
+
+            router.dismissAll();
+            router.push("/backToRootIndex");
+
+            if(!disabledToast) openToast(SignOutToast.success());
+            await database.disconnect();
+        } catch(error) {
+            if(error instanceof AuthError && !disabledToast) {
+                return openToast(
+                    getToastMessage({
+                        messages: SignOutToast,
+                        error
+                    })
+                );
+            }
+            // ha nem AuthError akkor sikeres a kijelentkezes, de mashol hiba tortent (pl: powersync)
+        }
     };
 
     const fetchNotVerifiedUser = async () => {
@@ -126,8 +153,8 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 session,
                 sessionLoading,
                 refreshSession,
+                signOut,
                 user,
-                setUser,
                 userLoading,
                 notVerifiedUser,
                 fetchNotVerifiedUser,

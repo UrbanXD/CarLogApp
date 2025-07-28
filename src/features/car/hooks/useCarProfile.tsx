@@ -1,16 +1,14 @@
 import useCars from "./useCars.ts";
-import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
-import { CarEditBottomSheet } from "../presets/bottomSheet/index.ts";
 import { useAppDispatch } from "../../../hooks/index.ts";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 import { deleteCar } from "../model/actions/deleteCar.ts";
+import { router } from "expo-router";
 
 const useCarProfile = (carID: string) => {
     const dispatch = useAppDispatch();
     const database = useDatabase();
     const { openModal } = useAlert();
-    const { openBottomSheet } = useBottomSheet();
     const { getCar } = useCars();
 
     const car = getCar(carID);
@@ -26,17 +24,14 @@ const useCarProfile = (carID: string) => {
         });
     };
 
-    const openEditCarStep = (stepIndex: number, height: string = "50%") =>
-        openBottomSheet(CarEditBottomSheet({
-            car,
-            stepIndex,
-            height
-        }));
+    const openEditCarStepBottomSheet = (stepIndex: number) => {
+        router.push({ pathname: "bottomSheet/editCar", params: { carId: car.id, stepIndex } });
+    };
 
     return {
         car,
         handleDeleteCar,
-        openEditCarStep
+        openEditCarStepBottomSheet
     };
 };
 

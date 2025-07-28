@@ -1,36 +1,105 @@
-import React, { forwardRef, ReactNode } from "react";
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
+import { BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
+import BottomSheetBackdrop from "./BottomSheetBackdrop.tsx";
+import { router, useNavigation } from "expo-router";
+import { KeyboardController } from "react-native-keyboard-controller";
+import { BottomSheetLeavingModal } from "../presets/modal/index.ts";
+import { useAlert } from "../../alert/hooks/useAlert.ts";
+import { BottomSheetProvider } from "../contexts/BottomSheetProvider.tsx";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { BottomSheetContext, useBottomSheet } from "../contexts/BottomSheetContext.ts";
 
-interface BottomSheetProps extends Partial<BottomSheetModalProps> {
+export interface BottomSheetProps extends Partial<BottomSheetModalProps> {
     title?: string;
     content: ReactNode;
     closeButton?: ReactNode;
 }
 
-const BottomSheet = forwardRef<BottomSheetModal, BottomSheetProps>((props, ref) => {
-    const {
-        title, content, closeButton, ...restProps
-    } = props;
+const BottomSheet: React.FC<BottomSheetProps> = ({
+    title, content, closeButton, ...restProps
+}) => {
+    const { top, bottom } = useSafeAreaInsets();
+    const { openModal } = useAlert();
+    const navigation = useNavigation();
 
-    const { snapPoints, enableHandlePanningGesture } = restProps;
+    const bottomSheetRef = useRef<BottomSheetModal>(null);
+    const manuallyClosed = useRef(false);
+    const forceClosed = useRef(false);
 
-    const { top } = useSafeAreaInsets();
-    const snaps = snapPoints as Array<string | number> || ["100%"];
-    const styles = useStyles(snaps[0] === "100%", !!enableHandlePanningGesture, top);
+    const { snapPoints, enableHandlePanningGesture, enableDynamicSizing, enableDismissOnClose } = restProps;
+
+    const isBottomSheet = (pathname?: string) => !!pathname?.startsWith("bottomSheet");
+
+    useEffect(() => {
+        if(navigation.isFocused()) return bottomSheetRef.current?.present();
+
+        const stackOfRoutes = navigation.getState()?.routes;
+        const newStackPathname = stackOfRoutes?.[stackOfRoutes?.length - 1]?.name;
+
+        if(isBottomSheet(newStackPathname)) {
+            manuallyClosed.current = true;
+            bottomSheetRef.current?.forceClose();
+        }
+
+    }, [navigation.isFocused()]);
+
+    useEffect(() => {
+        return navigation.addListener("beforeRemove", (_event) => {
+            forceClosed.current = true;
+            KeyboardController.dismiss();
+        });
+    }, []);
+
+    const reopenBottomSheet = useCallback(() => {
+        bottomSheetRef.current.expand();
+    }, []);
+
+    const dismissBottomSheet = useCallback((dismissPreviousSheets = false) => {
+        forceClosed.current = true;
+        KeyboardController.dismiss();
+        bottomSheetRef.current?.dismiss();
+
+        if(!dismissPreviousSheets && router.canDismiss()) return router.dismiss();
+        const stackOfRoutes = [...(navigation.getState()?.routes ?? [])];
+        if(stackOfRoutes.length - 1 <= 0) return router.replace("backToRootIndex");
+
+        while(stackOfRoutes.length > 0) {
+            const route = stackOfRoutes.pop();
+            if(!route) continue;
+            if(!route.name.startsWith("bottomSheet/") && router.canDismiss()) router.dismissTo(route.name);
+        }
+    }, [navigation]);
+
+    const onChangeSnapPoint = useCallback((index: number) => {
+        if(index !== -1) return; // nincs bezarva
+
+        if(manuallyClosed.current) return manuallyClosed.current = false;
+        if(forceClosed.current) return;
+        if(enableDismissOnClose) return dismissBottomSheet();
+
+        openModal(BottomSheetLeavingModal(reopenBottomSheet, dismissBottomSheet));
+    }, [reopenBottomSheet, dismissBottomSheet]);
+
+    const renderBackdrop = useMemo(() => (props: BottomSheetBackdropProps) => <BottomSheetBackdrop { ...props }/>);
+
+    const styles = useStyles(snapPoints?.[0] === "100%", !!enableHandlePanningGesture, !!enableDynamicSizing);
 
     return (
         <BottomSheetModal
-            ref={ ref }
+            ref={ bottomSheetRef }
             { ...restProps }
             topInset={ top }
+            bottomInset={ bottom }
+            keyboardBehavior="interactive"
+            keyboardBlurBehavior="restore"
+            android_keyboardInputMode="adjustPan"
             backgroundStyle={ styles.containerBackground }
             handleIndicatorStyle={ styles.line }
+            backdropComponent={ renderBackdrop }
+            onChange={ onChangeSnapPoint }
         >
             <BottomSheetView style={ styles.container }>
                 {
@@ -42,19 +111,32 @@ const BottomSheet = forwardRef<BottomSheetModal, BottomSheetProps>((props, ref) 
                       </Text>
                    </View>
                 }
-                <BottomSheetContext.Provider value={ useBottomSheet() }>
+                <BottomSheetProvider contextValue={ { dismissBottomSheet } }>
                     { content }
-                </BottomSheetContext.Provider>
+                </BottomSheetProvider>
             </BottomSheetView>
-        </BottomSheetModal>);
-});
+        </BottomSheetModal>
+    );
+};
 
-const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: number) => StyleSheet.create({
+const useStyles = (
+    isFullScreen: boolean,
+    isHandlePanningGesture: boolean,
+    enableDynamicSizing: number
+) => StyleSheet.create({
     container: {
-        flex: 1, gap: DEFAULT_SEPARATOR, paddingHorizontal: DEFAULT_SEPARATOR, paddingBottom: DEFAULT_SEPARATOR
+        flex: 1,
+        height: enableDynamicSizing ? undefined : "100%",
+        gap: DEFAULT_SEPARATOR,
+        paddingHorizontal: DEFAULT_SEPARATOR,
+        paddingBottom: SEPARATOR_SIZES.small
     },
     containerBackground: {
-        backgroundColor: COLORS.black,
+        backgroundColor: COLORS.black2,
+        borderColor: COLORS.gray4,
+        borderTopWidth: !isFullScreen ? 0.75 : 0,
+        borderLeftWidth: !isFullScreen ? 0.5 : 0,
+        borderRightWidth: !isFullScreen ? 0.5 : 0,
         borderTopLeftRadius: !isFullScreen ? 55 : 0,
         borderTopRightRadius: !isFullScreen ? 55 : 0
     },
@@ -63,12 +145,13 @@ const useStyles = (isFullScreen: boolean, isHandlePanningGesture: boolean, top: 
         marginTop: SEPARATOR_SIZES.small,
         marginBottom: SEPARATOR_SIZES.lightSmall,
         width: hp(15),
-        height: isHandlePanningGesture ? hp(0.65) : 0,
         backgroundColor: COLORS.white2,
         borderRadius: 35
     },
     titleText: {
-        ...GLOBAL_STYLE.containerTitleText, fontSize: FONT_SIZES.h2, textAlign: "center"
+        ...GLOBAL_STYLE.containerTitleText,
+        fontSize: FONT_SIZES.h2,
+        textAlign: "center"
     }
 });
 

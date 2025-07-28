@@ -1,12 +1,12 @@
 import React, { ReactNode } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { useAppSelector } from "../../../hooks/index.ts";
-import { getModal } from "../model/selectors/index.ts";
-import Alert from "./Alert.tsx";
-import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
-import { COLORS } from "../../../constants/index.ts";
-import { closeModal } from "../model/slice/index.ts";
-import { useAlert } from "../hooks/useAlert.ts";
+import { useAppSelector } from "../../../../hooks/index.ts";
+import { getModal } from "../../model/selectors/index.ts";
+import Alert from "../Alert.tsx";
+import { hexToRgba } from "../../../../utils/colors/hexToRgba.ts";
+import { COLORS } from "../../../../constants/index.ts";
+import { closeModal } from "../../model/slice/index.ts";
+import { useAlert } from "../../hooks/useAlert.ts";
 
 type ModalManagerProps = {
     children: ReactNode | null;
@@ -33,7 +33,7 @@ const ModalManager: React.FC<ModalManagerProps> = ({
     };
 
     return (
-        <>
+        <View testID="ModalManager">
             {
                 modal &&
                <>
@@ -42,7 +42,7 @@ const ModalManager: React.FC<ModalManagerProps> = ({
                      activeOpacity={ 1 }
                      onPress={ closeModal }
                   />
-                  <View style={ styles.modalContainer }>
+                  <View testID="ModalContainer" style={ styles.modalContainer }>
                      <Alert.Modal
                         icon={ modal.icon }
                         title={ modal.title }
@@ -59,7 +59,7 @@ const ModalManager: React.FC<ModalManagerProps> = ({
             {
                 children
             }
-        </>
+        </View>
     );
 };
 

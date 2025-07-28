@@ -1,7 +1,7 @@
 import { UserState } from "../types/user.ts";
 import { createSlice } from "@reduxjs/toolkit";
 import { loadUser } from "../actions/loadUser.ts";
-import { updateUser } from "../actions/updateUser.ts";
+import { editUser } from "../actions/editUser.ts";
 
 const initialState: UserState = {
     isLoading: false,
@@ -25,7 +25,7 @@ const userSlice = createSlice({
             state.isLoading = false;
             state.user = action.payload;
         })
-        .addCase(updateUser.fulfilled, (state, action) => {
+        .addCase(editUser.fulfilled, (state, action) => {
             state.user = action.payload.user;
         });
     }

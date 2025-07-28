@@ -1,17 +1,9 @@
 import { Context, createContext, useContext } from "react";
-import { OpenBottomSheetArgs } from "../types/index.ts";
 
-interface BottomSheetProviderValue {
-    openBottomSheet: (args: OpenBottomSheetArgs) => void;
-    closeBottomSheet: () => void;
-    dismissBottomSheet: () => void;
-    dismissAllBottomSheet: () => void;
+export type BottomSheetProviderValue = {
+    dismissBottomSheet?: (dismissPreviousSheets?: boolean) => void
 }
 
-export const BottomSheetContext =
-    createContext<BottomSheetProviderValue | null>(null);
+export const BottomSheetContext = createContext<BottomSheetProviderValue>({});
 
-export const useBottomSheet = () =>
-    useContext<BottomSheetProviderValue>(
-        BottomSheetContext as Context<BottomSheetProviderValue>
-    );
+export const useBottomSheet = () => useContext<BottomSheetProviderValue>(BottomSheetContext as Context<BottomSheetProviderValue>);

@@ -6,7 +6,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Provider } from "react-redux";
 import { KeyboardProvider } from "react-native-keyboard-controller";
-import { BottomSheetProvider } from "../ui/bottomSheet/contexts/BottomSheetProvider.tsx";
 import Compactor from "../components/Compactor";
 import { ScreenScrollViewProvider } from "../contexts/screenScrollView/ScreenScrollViewProvider.tsx";
 import { AuthProvider } from "../contexts/auth/AuthProvider.tsx";
@@ -14,8 +13,8 @@ import { useDatabase } from "../contexts/database/DatabaseContext.ts";
 import { DatabaseProvider } from "../contexts/database/DatabaseProvider.tsx";
 import { store } from "../database/redux/store.ts";
 import Header from "../components/Navigation/Header/Header.tsx";
-import ToastManager from "../ui/alert/components/ToastManager.tsx";
-import ModalManager from "../ui/alert/components/ModalManager.tsx";
+import ToastManager from "../ui/alert/components/toast/ToastManager.tsx";
+import ModalManager from "../ui/alert/components/modal/ModalManager.tsx";
 import { StatusBar } from "react-native";
 
 const Layout: React.FC = () => {
@@ -48,6 +47,60 @@ const Layout: React.FC = () => {
                 options={ {
                     header: () => <StatusBar backgroundColor="transparent" translucent/>,
                     animation: "none"
+                } }
+            />
+            <Stack.Screen
+                name="bottomSheet/createCar"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="bottomSheet/editCar"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="bottomSheet/signIn"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="bottomSheet/signUp"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="bottomSheet/otpVerification"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="bottomSheet/editUser"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
                 } }
             />
             <Stack.Screen
@@ -84,8 +137,7 @@ const RootLayout: React.FC = () =>
             { Component: AuthProvider },
             { Component: ToastManager },
             { Component: ModalManager },
-            { Component: BottomSheetModalProvider },
-            { Component: BottomSheetProvider }
+            { Component: BottomSheetModalProvider }
         ] }>
             <Layout/>
         </Compactor>

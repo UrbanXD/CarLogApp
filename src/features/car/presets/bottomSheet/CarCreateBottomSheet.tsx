@@ -1,11 +1,22 @@
 import NewCarForm from "../../components/forms/NewCarForm.tsx";
 import React from "react";
-import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/types/index.ts";
+import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
 
-export const CarCreateBottomSheet: OpenBottomSheetArgs = {
-    title: "Új Autó",
-    content: <NewCarForm/>,
-    snapPoints: ["85%"],
-    enableOverDrag: false,
-    enableDismissOnClose: false
+const CreateCarBottomSheet: React.FC = () => {
+    const TITLE = "Autó létrehozás";
+    const CONTENT = <NewCarForm/>;
+    const SNAP_POINTS = ["90%"];
+
+    return (
+        <BottomSheet
+            title={ TITLE }
+            content={ CONTENT }
+            snapPoints={ SNAP_POINTS }
+            enableDismissOnClose={ false }
+            enableDynamicSizing={ false }
+            enableOverDrag={ false }
+        />
+    );
 };
+
+export default CreateCarBottomSheet;

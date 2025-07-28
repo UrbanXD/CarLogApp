@@ -1,25 +1,23 @@
-import EditCarForm, { EditCarFormProps } from "../../components/forms/EditCarForm.tsx";
 import React from "react";
+import EditCarForm, { EditCarFormProps } from "../../components/forms/EditCarForm.tsx";
+import { heightPercentageToDP } from "react-native-responsive-screen";
+import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
 
-import { OpenBottomSheetArgs } from "../../../../ui/bottomSheet/types/index.ts";
+type EditCarBottomSheetProps = EditCarFormProps;
 
-type CarEditBottomSheetArgs = EditCarFormProps & { height: string };
+const EditCarBottomSheet: React.FC<EditCarBottomSheetProps> = ({ car, stepIndex }) => {
+    const CONTENT = <EditCarForm car={ car } stepIndex={ stepIndex }/>;
+    const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
 
-type CarEditBottomSheet = (args: CarEditBottomSheetArgs) => OpenBottomSheetArgs;
-
-export const CarEditBottomSheet: CarEditBottomSheet = ({
-    car,
-    stepIndex,
-    height
-}) => {
-    return {
-        content:
-            <EditCarForm
-                car={ car }
-                stepIndex={ stepIndex }
-            />,
-        snapPoints: [height],
-        enableDismissOnClose: false
-
-    };
+    return (
+        <BottomSheet
+            content={ CONTENT }
+            maxDynamicContentSize={ MAX_DYNAMIC_CONTENT_SIZE }
+            enableDynamicSizing
+            enableDismissOnClose={ false }
+            enableOverDrag={ false }
+        />
+    );
 };
+
+export default EditCarBottomSheet;
