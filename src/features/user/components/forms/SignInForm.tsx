@@ -7,20 +7,16 @@ import TextDivider from "../../../../components/TextDivider.tsx";
 import Form from "../../../../components/Form/Form.tsx";
 import { useForm } from "react-hook-form";
 import { SignInFormFieldType, useSignInFormProps } from "../../schemas/userSchema.tsx";
-import { useUserManagement } from "../../hooks/useUserManagement.ts";
+import { useSignIn } from "../../hooks/useSignIn.ts";
 
 const SignInForm: React.FC = () => {
     const {
         control,
         handleSubmit
     } = useForm<SignInFormFieldType>(useSignInFormProps);
-    const { signIn } = useUserManagement();
 
-    const submitHandler =
-        handleSubmit(
-            async (user: SignInFormFieldType) =>
-                await signIn(user)
-        );
+    const { signIn } = useSignIn();
+    const submitHandler = handleSubmit(signIn);
 
     return (
         <Form>

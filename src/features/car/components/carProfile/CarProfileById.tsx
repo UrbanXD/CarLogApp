@@ -10,14 +10,14 @@ const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId }) => {
     const {
         car,
         handleDeleteCar,
-        openEditCarStep
+        openEditCarStepBottomSheet
     } = useCarProfile(carId);
 
     return (
         <CarProfileView
             car={ car }
             handleDeleteCar={ handleDeleteCar }
-            openEditCarStep={ openEditCarStep }
+            openEditCarStep={ openEditCarStepBottomSheet }
         />
     );
 };

@@ -8,6 +8,7 @@ type AuthContextValue = {
     session: Session | null
     sessionLoading: boolean
     refreshSession: () => Promise<void>
+    signOut: (disabledToast?: boolean) => Promise<void>
     user: UserDto | null
     setUser: (user: UserTableType | null, newAvatar?: ImageType | null) => void
     userLoading: boolean

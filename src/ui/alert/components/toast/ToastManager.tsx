@@ -1,11 +1,11 @@
 import React, { ReactNode } from "react";
-import { useAppSelector } from "../../../hooks/index.ts";
-import { getToasts } from "../model/selectors/index.ts";
+import { useAppSelector } from "../../../../hooks/index.ts";
+import { getToasts } from "../../model/selectors/index.ts";
 import { StyleSheet, View } from "react-native";
-import { SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
+import { SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../../constants/index.ts";
 import AlertToast from "./AlertToast.tsx";
 import { shallowEqual } from "react-redux";
-import { Toast } from "../model/types/index.ts";
+import { Toast } from "../../model/types/index.ts";
 
 type ToastManagerProps = {
     children: ReactNode | null;
@@ -18,7 +18,7 @@ const ToastManager: React.FC<ToastManagerProps> = ({
 
     return (
         <>
-            <View style={ styles.container }>
+            <View testID="ToastManager" style={ styles.container }>
                 {
                     toasts.map(toast => <AlertToast key={ toast.id } toast={ toast }/>)
                 }

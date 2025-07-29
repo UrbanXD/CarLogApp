@@ -1,8 +1,8 @@
 import React from "react";
-import { BottomSheetBackdrop as Backdrop } from "@gorhom/bottom-sheet";
+import { BottomSheetBackdrop as Backdrop, BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
 import { COLORS } from "../../../constants/index.ts";
 
-const BottomSheetBackdrop: React.FC<any> = (props) =>
+const BottomSheetBackdrop: React.FC<BottomSheetBackdropProps> = (props) =>
     <Backdrop
         appearsOnIndex={ 0 }
         disappearsOnIndex={ -1 }

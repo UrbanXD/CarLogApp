@@ -1,5 +1,5 @@
-import Toast from "./AlertToast.tsx";
-import Modal from "./AlertModal.tsx";
+import Toast from "./toast/AlertToast.tsx";
+import Modal from "./modal/AlertModal.tsx";
 
 const Alert = {
     Toast,

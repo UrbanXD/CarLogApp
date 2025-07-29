@@ -1,9 +1,4 @@
-import { AlertToastProps } from "../../components/AlertToast.tsx";
-import { AlertModalProps } from "../../components/AlertModal.tsx";
 import { ErrorCode } from "@supabase/auth-js/src/lib/error-codes.ts";
-
-export type AddToastFunction = (args: AlertToastProps) => void;
-export type OpenModalFunction = (args: AlertModalProps) => void;
 
 export type AlertType =
     "success" |

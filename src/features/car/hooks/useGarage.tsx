@@ -1,10 +1,7 @@
 import { router } from "expo-router";
 import useCars from "./useCars.ts";
-import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
-import { CarCreateBottomSheet } from "../presets/bottomSheet/index.ts";
 
 const useGarage = () => {
-    const { openBottomSheet } = useBottomSheet();
     const { cars, loading } = useCars();
     const carCarouselElements = cars.map(car => ({
         id: car.id,
@@ -14,7 +11,7 @@ const useGarage = () => {
         body: car.model
     }));
 
-    const openNewCarForm = () => openBottomSheet(CarCreateBottomSheet);
+    const openNewCarForm = () => router.push("bottomSheet/createCar");
 
     const openCarProfile = (id: string) => {
         router.push({

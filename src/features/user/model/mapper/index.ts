@@ -17,3 +17,14 @@ export const toUserDto = async (user?: UserTableType, attachmentQueue?: PhotoAtt
         userAvatar: userAvatar
     };
 };
+
+export const toUserEntity = (userDto: UserDto): UserTableType => {
+    return {
+        id: userDto.id,
+        email: userDto.email,
+        firstname: userDto.firstname,
+        lastname: userDto.lastname,
+        avatarColor: userDto.avatarColor,
+        avatarImage: userDto.userAvatar?.path ?? null
+    };
+};

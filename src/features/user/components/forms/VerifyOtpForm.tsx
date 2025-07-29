@@ -6,8 +6,7 @@ import Divider from "../../../../components/Divider.tsx";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { useUserManagement } from "../../hooks/useUserManagement.ts";
 
-export type HandleVerificationOtpType =
-    (errorCode?: string) => (Promise<void> | void)
+export type HandleVerificationOtpType = (errorCode?: string) => (Promise<void> | void)
 
 interface VerifyOTPProps {
     type: EmailOtpType;

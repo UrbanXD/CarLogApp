@@ -27,10 +27,12 @@ const MultiStepFormProgressInfo: React.FC = () => {
     const font = useFont(require("../../assets/fonts/Gilroy-Heavy.otf"), hp(3));
     if(!font) return <></>;
 
+    const showsProgressInfo = ((!isFirstStep && !isLastStep) || (isFirstStep && isFirstCount) || (isLastStep && isLastCount));
+
     return (
         <>
             {
-                ((!isFirstStep && !isLastStep) || (isFirstStep && isFirstCount) || (isLastStep && isLastCount)) &&
+                showsProgressInfo &&
                <ProgressInfo
                   radius={ hp(6) }
                   strokeWidth={ hp(1.25) }

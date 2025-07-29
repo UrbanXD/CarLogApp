@@ -1,16 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { ALERT_COLORS, ALERT_ICONS, COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import Icon from "../../../components/Icon.tsx";
+import { ALERT_COLORS, ALERT_ICONS, COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import Icon from "../../../../components/Icon.tsx";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { AlertType, Toast } from "../model/types/index.ts";
-import { useAlert } from "../hooks/useAlert.ts";
+import { AlertType, Toast } from "../../model/types/index.ts";
+import { useAlert } from "../../hooks/useAlert.ts";
 
 export type AlertToastProps = {
     toast: Toast
 };
-
+export const ALERT_SLIDE_DURATION = 450;
 const AlertToast: React.FC<AlertToastProps> = ({ toast }) => {
     const {
         id,
@@ -28,7 +28,7 @@ const AlertToast: React.FC<AlertToastProps> = ({ toast }) => {
     const height = useMemo(() => (!body ? hp(8) : hp(10)), [body]);
     const [removable, setRemovable] = useState(false);
 
-    const intervalRef = useRef<NodeJS.Timeout>();
+    const timoutRef = useRef<NodeJS.Timeout>();
 
     const styles = useStyles(type, height);
     const animatedStyle = useAnimatedStyle(() => {
@@ -38,63 +38,56 @@ const AlertToast: React.FC<AlertToastProps> = ({ toast }) => {
         };
     });
 
-    const config = {
-        duration: 450
-    };
-
-    const interval = () => {
-        intervalRef.current = setInterval(() => {
-            setRemovable(true);
-        }, duration + config.duration);
-    };
-
     const startAnimation = useCallback(() => {
-        interval();
+        timoutRef.current = setTimeout(() => {
+            setRemovable(true);
+        }, duration + ALERT_SLIDE_DURATION);
 
         opacity.value = withTiming(
             1,
-            config
+            { duration: ALERT_SLIDE_DURATION }
         );
         x.value = withTiming(
             0,
-            config
+            { duration: ALERT_SLIDE_DURATION }
         );
     }, []);
 
     const endAnimation = () => {
         opacity.value = withTiming(
             0,
-            config
+            { duration: ALERT_SLIDE_DURATION }
         );
         x.value = withTiming(
             width / 2,
-            config
+            { duration: ALERT_SLIDE_DURATION }
         );
     };
 
     const dismissWithPress = () => {
         setRemovable(true);
-        clearInterval(intervalRef.current);
+        clearTimeout(timoutRef.current);
     };
 
     useEffect(() => {
         startAnimation();
 
-        return () => clearInterval(intervalRef.current);
+        return () => clearTimeout(timoutRef.current);
     }, []);
 
     useEffect(() => {
         if(removable) {
             endAnimation();
-            const timeout = setTimeout(() => closeToast(id), config.duration);
+            const timeout = setTimeout(() => closeToast(id), ALERT_SLIDE_DURATION);
 
             return () => clearTimeout(timeout);
         }
     }, [removable]);
 
     return (
-        <Animated.View style={ animatedStyle }>
+        <Animated.View testID="ToastContainer" style={ animatedStyle }>
             <TouchableOpacity
+                testID="Toast"
                 style={ styles.container }
                 activeOpacity={ 1 }
                 onPress={ dismissWithPress }

@@ -1,17 +1,18 @@
 import { AddCarFormFieldType, useAddCarFormProps } from "../schemas/carSchema.ts";
 import { useForm } from "react-hook-form";
 import useCarSteps from "./useCarSteps.tsx";
-import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
-import { store } from "../../../database/redux/store.ts";
 import { addCar } from "../model/actions/addCar.ts";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 import { CarCreateToast } from "../presets/toast/index.ts";
+import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
+import { useAppDispatch } from "../../../hooks/index.ts";
 
 const useNewCarForm = () => {
     const database = useDatabase();
-    const { dismissAllBottomSheet } = useBottomSheet();
+    const dispatch = useAppDispatch();
     const { openToast } = useAlert();
+    const { dismissBottomSheet } = useBottomSheet();
 
     const {
         control,
@@ -25,10 +26,10 @@ const useNewCarForm = () => {
     const submitHandler =
         handleSubmit(async (newCar: AddCarFormFieldType) => {
             try {
-                await store.dispatch(addCar({ database, car: newCar }));
+                await dispatch(addCar({ database, car: newCar }));
 
                 reset();
-                dismissAllBottomSheet();
+                if(dismissBottomSheet) dismissBottomSheet(true);
                 openToast(CarCreateToast.success());
             } catch(e) {
                 console.log(e);

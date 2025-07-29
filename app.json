@@ -5,15 +5,10 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "carlog",
-    "icon": "./src/assets/icon.png",
+    "icon": "./src/assets/adaptive-icon.png",
     "userInterfaceStyle": "automatic",
     "androidStatusBar": {
       "translucent": true
-    },
-    "splash": {
-      "image": "./src/assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true
@@ -32,7 +27,30 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./src/assets/C.png",
+          "resizeMode": "contain",
+          "imageWidth": 74,
+          "backgroundColor": "#242424"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0",
+            "kotlinVersion": "2.0.21"
+          },
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
+        }
+      ]
     ],
     "extra": {
       "router": {

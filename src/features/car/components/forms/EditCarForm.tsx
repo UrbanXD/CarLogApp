@@ -1,7 +1,6 @@
 import React from "react";
 import EditForm from "../../../../components/Form/EditForm.tsx";
 import { useAppDispatch } from "../../../../hooks/index.ts";
-import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useForm } from "react-hook-form";
 import { EditCarFormFieldType, useEditCarFormProps } from "../../schemas/carSchema.ts";
 import useCarSteps from "../../hooks/useCarSteps.tsx";
@@ -9,6 +8,7 @@ import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { editCar } from "../../model/actions/editCar.ts";
 import { CarDto } from "../../model/types/index.ts";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
+import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 
 export interface EditCarFormProps {
     car: CarDto;
@@ -21,8 +21,8 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
 }) => {
     const dispatch = useAppDispatch();
     const database = useDatabase();
-    const { dismissBottomSheet } = useBottomSheet();
     const { openToast } = useAlert();
+    const { dismissBottomSheet } = useBottomSheet();
 
     const editCarFormFieldType: EditCarFormFieldType = {
         ...car,
@@ -50,7 +50,8 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
                 if(steps[stepIndex] && step.editToastMessages) {
                     openToast(step.editToastMessages.success());
                 }
-                dismissBottomSheet();
+
+                if(dismissBottomSheet) dismissBottomSheet(true);
             } catch(e) {
                 console.error("Hiba a submitHandler-ben:", e);
             }
