@@ -5,7 +5,6 @@ import { getModal } from "../../model/selectors/index.ts";
 import Alert from "../Alert.tsx";
 import { hexToRgba } from "../../../../utils/colors/hexToRgba.ts";
 import { COLORS } from "../../../../constants/index.ts";
-import { closeModal } from "../../model/slice/index.ts";
 import { useAlert } from "../../hooks/useAlert.ts";
 
 type ModalManagerProps = {
@@ -18,52 +17,61 @@ const ModalManager: React.FC<ModalManagerProps> = ({
     const modal = useAppSelector(getModal);
     const { dismissModal } = useAlert();
 
-    const closeModal3 = () => {
+    const closeModal = () => {
         if(!modal) return;
 
         if(modal?.dismissAction) modal.dismissAction();
         dismissModal();
     };
 
-    const acceptModal3 = () => {
+    const acceptModal = () => {
         if(!modal) return;
 
         if(modal?.acceptAction) modal.acceptAction();
         dismissModal();
     };
-
     return (
-        <View testID="ModalManager">
-            {
-                modal &&
-               <>
-                  <TouchableOpacity
-                     style={ styles.modalOverlay }
-                     activeOpacity={ 1 }
-                     onPress={ closeModal }
-                  />
-                  <View testID="ModalContainer" style={ styles.modalContainer }>
-                     <Alert.Modal
-                        icon={ modal.icon }
-                        title={ modal.title }
-                        body={ modal.body }
-                        color={ modal.color }
-                        accept={ acceptModal3 }
-                        acceptText={ modal.acceptText }
-                        dismiss={ closeModal3 }
-                        dismissText={ modal.dismissText }
-                     />
-                  </View>
-               </>
-            }
+        <>
+            <View
+                testID="ModalManager"
+                style={ styles.managerContainer }
+                pointerEvents="box-none"
+            >
+                {
+                    modal &&
+                   <>
+                      <TouchableOpacity
+                         style={ styles.modalOverlay }
+                         activeOpacity={ 1 }
+                         onPress={ closeModal }
+                      />
+                      <View testID="ModalContainer" style={ styles.modalContainer }>
+                         <Alert.Modal
+                            icon={ modal.icon }
+                            title={ modal.title }
+                            body={ modal.body }
+                            color={ modal.color }
+                            accept={ acceptModal }
+                            acceptText={ modal.acceptText }
+                            dismiss={ closeModal }
+                            dismissText={ modal.dismissText }
+                         />
+                      </View>
+                   </>
+                }
+            </View>
             {
                 children
             }
-        </View>
+        </>
     );
 };
 
 const styles = StyleSheet.create({
+    managerContainer: {
+        ...StyleSheet.absoluteFillObject,
+        zIndex: 1
+    },
     modalOverlay: {
         position: "absolute",
         width: "100%",
@@ -75,7 +83,8 @@ const styles = StyleSheet.create({
     modalContainer: {
         position: "absolute",
         alignSelf: "center",
-        width: "90%"
+        width: "90%",
+        zIndex: 2
     }
 });
 
