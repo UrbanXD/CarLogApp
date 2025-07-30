@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FlatList } from "react-native-gesture-handler";
 import { useWindowDimensions, View } from "react-native";
 import { DEFAULT_SEPARATOR } from "../constants/index.ts";
@@ -16,44 +16,37 @@ const OnBoardingView: React.FC<OnBoardingViewProps> = ({
 }) => {
     const scrollViewRef = useRef<FlatList>(null);
 
+    const [highestStep, setHighestStep] = useState(0);
+
     const width = useWindowDimensions().width - 2 * DEFAULT_SEPARATOR;
 
     useEffect(() => {
         scrollViewRef.current?.scrollToOffset({ offset: currentStep * width, animated: true });
     }, [scrollViewRef, currentStep, width]);
 
-    const renderSteps = useCallback(() => (
-        <View style={ { flexDirection: "row" } }>
-            {
-                steps.map((step, index) =>
-                    <View
-                        key={ index }
-                        style={ { width } }
-                    >
-                        <BottomSheetScrollView showsVerticalScrollIndicator={ false }>
-                            { step() }
-                        </BottomSheetScrollView>
-                    </View>
-                )
-            }
-        </View>
-    ), [currentStep, steps]);
+    useEffect(() => {
+        if(currentStep > highestStep) setHighestStep(currentStep); // to prerender the next item
+    }, [currentStep]);
 
     return (
         <FlatList
-            data={ [] }
-            renderItem={ () => <></> }
-            ListEmptyComponent={ renderSteps() }
-            ref={ scrollViewRef }
-            scrollEnabled={ false }
+            data={ steps }
             horizontal
+            pagingEnabled
+            ref={ scrollViewRef }
+            renderItem={ ({ item, index }) => (
+                <View style={ { width } }>
+                    <BottomSheetScrollView showsVerticalScrollIndicator={ false }>
+                        { index <= highestStep ? item() : <></> }
+                    </BottomSheetScrollView>
+                </View>
+            ) }
+            keyExtractor={ (_, index) => index.toString() }
             snapToInterval={ width }
-            showsHorizontalScrollIndicator={ false }
-            showsVerticalScrollIndicator={ false }
             decelerationRate="fast"
+            scrollEnabled={ false }
             bounces={ false }
-            bouncesZoom={ false }
-            renderToHardwareTextureAndroid
+            showsHorizontalScrollIndicator={ false }
         />
     );
 };
