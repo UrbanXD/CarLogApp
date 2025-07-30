@@ -80,10 +80,10 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                     <Text style={ styles.carInfoTitleText }>Model</Text>
                     <Text style={ styles.carInfoText }>{ car.model }</Text>
                 </View>
-                <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoTitleText }>Évjárat</Text>
-                    <Text style={ styles.carInfoText }>2025</Text>
-                </View>
+                {/*<View style={ styles.carInfoRow }>*/ }
+                {/*    <Text style={ styles.carInfoTitleText }>Évjárat</Text>*/ }
+                {/*    <Text style={ styles.carInfoText }>2025</Text>*/ }
+                {/*</View>*/ }
                 <Button.Row style={ {
                     marginTop: SEPARATOR_SIZES.lightSmall,
                     justifyContent: handleDeleteCar ? "space-between" : "center"

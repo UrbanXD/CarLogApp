@@ -1,15 +1,20 @@
 import React from "react";
 import { SafeAreaView, StyleSheet } from "react-native";
 import { DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants/index.ts";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import CarProfile from "../features/car/components/carProfile/CarProfile.ts";
 
 const EditCarScreen: React.FC = () => {
-    const localSearchParams = useLocalSearchParams();
+    const { id } = useLocalSearchParams();
+
+    if(!id) {
+        if(router.canGoBack()) return router.back();
+        router.replace("(main)/index");
+    }
 
     return (
         <SafeAreaView style={ styles.pageContainer }>
-            <CarProfile.ById carId={ localSearchParams.id as string } fuelSliderDisabled/>
+            <CarProfile.ById carId={ id } fuelSliderDisabled/>
         </SafeAreaView>
     );
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import useCarProfile from "../../hooks/useCarProfile.tsx";
 import CarProfileView from "./CarProfileView.tsx";
+import { router } from "expo-router";
 
 type CarProfileByIdProps = {
     carId: string
@@ -13,6 +14,11 @@ const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId, fuelSliderDisabl
         handleDeleteCar,
         openEditCarStepBottomSheet
     } = useCarProfile(carId);
+
+    if(!car) {
+        if(router.canGoBack()) return router.back();
+        return router.replace("(main)/index");
+    }
 
     return (
         <CarProfileView
