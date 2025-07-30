@@ -5,9 +5,7 @@ import { FUEL_MEASUREMENTS, FUEL_TYPES } from "../../../constants/index.ts";
 import { StepProps } from "../../../../../types/index.ts";
 import { generatePickerElements } from "../../../../../utils/generatePickerElements.ts";
 
-const FuelStep: React.FC<StepProps> = ({
-    control
-}) =>
+const FuelStep: React.FC<StepProps> = ({ control }) =>
     <Input.Group>
         <Input.Field
             control={ control }
@@ -16,18 +14,8 @@ const FuelStep: React.FC<StepProps> = ({
         >
             <Input.Text
                 icon={ ICON_NAMES.odometer }
-                placeholder={ "2000" }
+                placeholder={ "250" }
                 numeric
-            />
-        </Input.Field>
-        <Input.Field
-            control={ control }
-            fieldName="fuelValue"
-            fieldNameText="Tartály tartalma"
-        >
-            <Input.Slider
-                minValue={ 0 }
-                maxValue={ 100 }
             />
         </Input.Field>
         <Input.Field

@@ -50,7 +50,7 @@ const useCarSteps = (
             },
             {
                 title: "Üzemanyag",
-                fields: ["fuelType", "fuelMeasurement", "fuelTankSize", "fuelValue"],
+                fields: ["fuelType", "fuelMeasurement", "fuelTankSize"],
                 render: () =>
                     <FuelStep control={ control }/>,
                 editToastMessages: CarEditNameToast

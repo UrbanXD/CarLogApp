@@ -31,6 +31,7 @@ export const useAddCarFormProps = () => {
         fuelType: "",
         fuelMeasurement: "",
         fuelTankSize: NaN,
+        fuelValue: 0,
         image: null
     };
 
