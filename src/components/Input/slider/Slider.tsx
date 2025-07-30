@@ -31,6 +31,7 @@ import type {
     PanGestureHandlerEventPayload
 } from "react-native-gesture-handler/src/handlers/GestureHandlerEventPayload.ts";
 import { PanGestureChangeEventPayload } from "react-native-gesture-handler/src/handlers/gestures/panGesture.ts";
+import { addMeasurementToValue } from "../../../utils/addMeasurementToValue.ts";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
@@ -81,6 +82,8 @@ const Slider: React.FC<SliderProps> = ({
     style = {} as SliderStyle
 }) => {
     const tooltipInputRef = useAnimatedRef();
+
+    const [currentValue, setCurrentValue] = useState(value);
 
     const {
         borderRadius = 25,
@@ -161,6 +164,11 @@ const Slider: React.FC<SliderProps> = ({
         calculatePercentByOffset();
 
         setInputValue();
+
+        // for set input controller value
+        if(setValue) runOnJS(setValue)(inputValue.value);
+        if(onChange) runOnJS(onChange)(inputValue.value);
+        runOnJS(setCurrentValue)(inputValue.value);
     };
 
     const calculateOffsetByPanning = (changeX: number) => {
@@ -219,8 +227,9 @@ const Slider: React.FC<SliderProps> = ({
 
     const panOnEnd = () => {
         "worklet";
-        if(setValue) runOnJS(setValue)(value);
-        if(onChange) runOnJS(onChange)(value);
+        if(setValue) runOnJS(setValue)(inputValue.value);
+        if(onChange) runOnJS(onChange)(inputValue.value);
+        runOnJS(setCurrentValue)(inputValue.value);
     };
 
     const barPan = useMemo(
@@ -282,7 +291,7 @@ const Slider: React.FC<SliderProps> = ({
             [0, trackWidth.value]
         );
 
-        let backgroundColor;
+        let backgroundColor = barColor;
         if(Array.isArray(barColor)) {
             const inputRange: Array<number> = [];
             const outputRange: Array<Color> = [];
@@ -293,8 +302,6 @@ const Slider: React.FC<SliderProps> = ({
             });
 
             backgroundColor = interpolateColor(percent.value, inputRange, outputRange);
-        } else {
-            backgroundColor = barColor;
         }
 
         return { width, backgroundColor };
@@ -428,10 +435,7 @@ const Slider: React.FC<SliderProps> = ({
         if(measurement) text += ` ${ measurement }`;
         if(setValue) runOnJS(setValue)(inputValue.value);
 
-        return {
-            text: text,
-            defaultValue: text
-        };
+        return { text };
     });
 
     return (
@@ -452,6 +456,7 @@ const Slider: React.FC<SliderProps> = ({
                          <View pointerEvents="none">
                             <AnimatedTextInput
                                ref={ tooltipInputRef }
+                               defaultValue={ addMeasurementToValue(currentValue, measurement) }
                                editable={ tooltipAsInputField }
                                animatedProps={ animatedTooltipProps }
                                keyboardType="numeric"
