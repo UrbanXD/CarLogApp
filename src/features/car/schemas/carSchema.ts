@@ -12,7 +12,7 @@ const carFormSchema = z
     fuelType: zPickerRequired,
     fuelMeasurement: zPickerRequired,
     fuelTankSize: zNumber(),
-    fuelValue: zNumber(),
+    fuelValue: zNumber(0),
     image: zImage.optional()
 });
 
