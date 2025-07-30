@@ -20,12 +20,14 @@ import { CarDto } from "../../model/types/index.ts";
 type CarProfileViewProps = {
     car: CarDto
     openEditCarStep: (stepIndex: number) => void
+    fuelSliderDisabled?: boolean
     handleDeleteCar?: () => void
 }
 
 const CarProfileView: React.FC<CarProfileViewProps> = ({
     car,
     openEditCarStep,
+    fuelSliderDisabled = false,
     handleDeleteCar
 }) =>
     <View style={ styles.container }>
@@ -118,6 +120,7 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                 tankSize={ car.fuelTankSize }
                 fuelType={ car.fuelType }
                 measurement={ car.fuelMeasurement }
+                disabled={ fuelSliderDisabled }
                 openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.FuelStep) }
             />
         </ScrollView>

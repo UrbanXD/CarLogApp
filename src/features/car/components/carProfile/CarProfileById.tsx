@@ -2,11 +2,12 @@ import React from "react";
 import useCarProfile from "../../hooks/useCarProfile.tsx";
 import CarProfileView from "./CarProfileView.tsx";
 
-interface CarProfileByIdProps {
-    carId: string;
+type CarProfileByIdProps = {
+    carId: string
+    fuelSliderDisabled?: boolean
 }
 
-const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId }) => {
+const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId, fuelSliderDisabled = false }) => {
     const {
         car,
         handleDeleteCar,
@@ -17,6 +18,7 @@ const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId }) => {
         <CarProfileView
             car={ car }
             handleDeleteCar={ handleDeleteCar }
+            fuelSliderDisabled={ fuelSliderDisabled }
             openEditCarStep={ openEditCarStepBottomSheet }
         />
     );

@@ -5,11 +5,13 @@ import { CarTableType } from "../../../../database/connector/powersync/AppSchema
 type CarProfileByObjProps = {
     car: CarTableType
     goTo?: (stepIndex: number) => void
+    fuelSliderDisabled?: boolean
 }
 
 const CarProfileByObj: React.FC<CarProfileByObjProps> = ({
     car,
-    goTo
+    goTo,
+    fuelSliderDisabled = false
 }) => {
     const openEditCarStep = (stepIndex: number) => {
         goTo(stepIndex);
@@ -19,6 +21,7 @@ const CarProfileByObj: React.FC<CarProfileByObjProps> = ({
         <CarProfileView
             car={ car }
             openEditCarStep={ openEditCarStep }
+            fuelSliderDisabled={ fuelSliderDisabled }
         />
     );
 };

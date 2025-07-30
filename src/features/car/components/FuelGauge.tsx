@@ -1,33 +1,37 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import Button from "../../../components/Button/Button.ts";
 import Input from "../../../components/Input/Input.ts";
 
-interface FuelGaugeProps {
-    value: number;
-    tankSize: number;
-    fuelType: string;
-    measurement: string;
-    openEditForm?: () => void;
+type FuelGaugeProps = {
+    value: number
+    tankSize: number
+    fuelType: string
+    measurement: string
+    disabled?: boolean
+    openEditForm?: () => void
 }
 
 const FuelGauge: React.FC<FuelGaugeProps> = ({
-    value: value1,
+    value,
     tankSize,
     fuelType,
     measurement,
+    disabled = false,
     openEditForm
 }) => {
-    if(!value1 || value1 <= 0) value1 = 0;
-    const [value, setValue] = React.useState<number>(value1);
-    useEffect(() => {
-        percent = Math.max(0, Math.min((value / tankSize) * 100, 100));
-        styles = useStyles(percent, value.toString().length + measurement.length + 1);
-    }, [value]);
+    const [fuelValue, setFuelValue] = useState(value ?? 0);
+    const [percent, setPercent] = useState(0);
 
-    let percent = Math.max(Math.min((value / tankSize) * 100, 100), 0);
+    useEffect(() => {
+        setPercent(calculatePercent(0, tankSize, fuelValue));
+    }, [fuelValue, tankSize]);
+
+    const calculatePercent = (min: number, max: number, value: number) => {
+        return Math.max(0, Math.min(100, (value / tankSize) * 100));
+    };
 
     return (
         <View style={ styles.container }>
@@ -54,9 +58,9 @@ const FuelGauge: React.FC<FuelGaugeProps> = ({
                 minValue={ 0 }
                 maxValue={ tankSize }
                 measurement={ measurement }
-                value={ value1 }
-                setValue={ setValue }
-                tooltipAsInputField
+                value={ value ?? 0 }
+                setValue={ setFuelValue }
+                disabled={ disabled }
                 style={ {
                     showsHandle: false,
                     showsTag: true,

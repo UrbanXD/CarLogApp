@@ -9,7 +9,7 @@ const EditCarScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={ styles.pageContainer }>
-            <CarProfile.ById carId={ localSearchParams.id as string }/>
+            <CarProfile.ById carId={ localSearchParams.id as string } fuelSliderDisabled/>
         </SafeAreaView>
     );
 };
