@@ -85,6 +85,10 @@ const Slider: React.FC<SliderProps> = ({
 
     const [currentValue, setCurrentValue] = useState(value);
 
+    useEffect(() => {
+        setCurrentValue(value);
+    }, [value]);
+
     const {
         borderRadius = 25,
         trackHeight = hp(1),
@@ -182,9 +186,9 @@ const Slider: React.FC<SliderProps> = ({
     useEffect(() => {
         if(!trackLayoutReady) return;
 
-        inputValue.value = inputFieldContext?.field.value || value;
+        inputValue.value = inputFieldContext?.field?.value ?? value;
         runOnUI(calculateOffsetByPercent)();
-    }, [trackLayoutReady, inputFieldContext?.field.value, value]);
+    }, [trackLayoutReady]);
 
     useEffect(() => {
         const subscription = Keyboard.addListener("keyboardDidHide", () => {
