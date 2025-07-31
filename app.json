@@ -7,7 +7,6 @@
     "scheme": "carlog",
     "icon": "./src/assets/adaptive-icon.png",
     "userInterfaceStyle": "automatic",
-    "edgeToEdgeEnabled": true,
     "androidStatusBar": {
       "translucent": true
     },
@@ -49,6 +48,15 @@
           },
           "ios": {
             "deploymentTarget": "15.1"
+          }
+        }
+      ],
+      [
+        "react-native-edge-to-edge",
+        {
+          "android": {
+            "parentTheme": "Default",
+            "enforceNavigationBarContrast": false
           }
         }
       ]

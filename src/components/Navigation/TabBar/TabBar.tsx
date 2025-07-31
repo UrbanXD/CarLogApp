@@ -5,6 +5,7 @@ import Animated, { Extrapolation, interpolate, useAnimatedStyle, withTiming } fr
 import { COLORS, FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { useScreenScrollView } from "../../../contexts/screenScrollView/ScreenScrollViewContext.ts";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface TabBarProps {
     tabBarStyle?: ViewStyle,
@@ -20,6 +21,7 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
 }) => {
     const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView);
     const { offset } = useScreenScrollView();
+    const { bottom } = useSafeAreaInsets();
 
     const TAB_BAR_WIDTH = Dimensions.get("screen").width;
     const TAB_WIDTH = TAB_BAR_WIDTH / state.routes.length;
@@ -57,7 +59,7 @@ const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
         };
     });
     return (
-        <AnimatedSafeAreaView style={ [styles.container, tabBarStyle, animatedStyle] }>
+        <AnimatedSafeAreaView style={ [styles.container, { bottom }, tabBarStyle, animatedStyle] }>
             <Animated.View style={ [styles.slidingElementContainer, { width: TAB_WIDTH }, slideAnimationStyle] }>
                 <View style={ styles.slidingElement }/>
             </Animated.View>

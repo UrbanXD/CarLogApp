@@ -1,8 +1,9 @@
 import React from "react";
-import { SafeAreaView, ViewStyle } from "react-native";
+import { View, ViewStyle } from "react-native";
 import { GLOBAL_STYLE, SIMPLE_TABBAR_HEIGHT } from "../constants/index.ts";
 import Animated, { useAnimatedScrollHandler, useSharedValue, withTiming } from "react-native-reanimated";
 import { useScreenScrollView } from "../contexts/screenScrollView/ScreenScrollViewContext.ts";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ScreenScrollViewProps {
     style?: ViewStyle,
@@ -13,6 +14,7 @@ export const ScreenScrollView: React.FC<ScreenScrollViewProps> = ({
     style,
     children
 }) => {
+    const { bottom } = useSafeAreaInsets();
     const { offset } = useScreenScrollView();
     const prevOffset = useSharedValue(0);
     const SCROLL_BOUNCE_THRESHOLD = 0.25;
@@ -34,7 +36,11 @@ export const ScreenScrollView: React.FC<ScreenScrollViewProps> = ({
     }, []);
 
     return (
-        <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, style] }>
+        <View style={ [
+            GLOBAL_STYLE.pageContainer,
+            style,
+            { paddingBottom: bottom + GLOBAL_STYLE.pageContainer.paddingBottom }
+        ] }>
             <Animated.ScrollView
                 onScroll={ onScroll }
                 showsVerticalScrollIndicator={ false }
@@ -43,6 +49,6 @@ export const ScreenScrollView: React.FC<ScreenScrollViewProps> = ({
             >
                 { children }
             </Animated.ScrollView>
-        </SafeAreaView>
+        </View>
     );
 };

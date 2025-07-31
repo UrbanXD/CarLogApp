@@ -1,5 +1,6 @@
 import React from "react";
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import {
     COLORS,
     DEFAULT_SEPARATOR,
@@ -21,6 +22,7 @@ import { Redirect, router } from "expo-router";
 const ProfileScreen: React.FC = () => {
     const { session, user, signOut } = useAuth();
     const { deleteUserProfile } = useUserManagement();
+    const { bottom } = useSafeAreaInsets();
 
     if(!user) return Redirect({ href: "backToRootIndex" });
     const name = `${ user.lastname } ${ user.firstname }`;
@@ -43,6 +45,8 @@ const ProfileScreen: React.FC = () => {
         () => openEditUser(EDIT_USER_FORM_STEPS.EmailStep);
     const openChangeAvatar =
         () => openEditUser(EDIT_USER_FORM_STEPS.AvatarStep);
+
+    const styles = useStyles(bottom);
 
     return (
         <SafeAreaView style={ styles.pageContainer }>
@@ -148,7 +152,7 @@ const ProfileScreen: React.FC = () => {
     );
 };
 
-const styles = StyleSheet.create({
+const useStyles = (bottom: number) => StyleSheet.create({
     pageContainer: {
         ...GLOBAL_STYLE.pageContainer
     },
@@ -161,7 +165,7 @@ const styles = StyleSheet.create({
         gap: DEFAULT_SEPARATOR,
         backgroundColor: COLORS.black5,
         paddingHorizontal: DEFAULT_SEPARATOR,
-        paddingBottom: DEFAULT_SEPARATOR,
+        paddingBottom: DEFAULT_SEPARATOR + bottom,
         borderTopStartRadius: 40,
         borderTopEndRadius: 40,
         shadowColor: COLORS.black5,

@@ -15,9 +15,8 @@ import { store } from "../database/redux/store.ts";
 import Header from "../components/Navigation/Header/Header.tsx";
 import ToastManager from "../ui/alert/components/toast/ToastManager.tsx";
 import ModalManager from "../ui/alert/components/modal/ModalManager.tsx";
-import { StatusBar } from "expo-status-bar";
-import * as NavigationBar from "expo-navigation-bar";
 import * as SystemUI from "expo-system-ui";
+import { SystemBars } from "react-native-edge-to-edge";
 import { GLOBAL_STYLE } from "../constants/index.ts";
 
 
@@ -26,33 +25,24 @@ const Layout: React.FC = () => {
 
     useEffect(() => {
         SystemUI.setBackgroundColorAsync(GLOBAL_STYLE.pageContainer.backgroundColor);
-        NavigationBar.setPositionAsync("absolute");
-        NavigationBar.setButtonStyleAsync("light");
         database.init();
     }, []);
 
     return (
         <Stack
             screenOptions={ {
-                header: () => <></>,
+                header: () => <SystemBars style="light" hidden={ false }/>,
                 animation: "slide_from_right",
                 statusBarAnimation: "slide",
                 contentStyle: { backgroundColor: GLOBAL_STYLE.pageContainer.backgroundColor }
             } }
         >
-            <Stack.Screen
-                name="index"
-                options={ {
-                    header: () => <StatusBar backgroundColor="transparent" style="light" translucent/>
-                } }
-            />
-            <Stack.Screen
-                name="backToRootIndex"
-            />
+            <Stack.Screen name="index"/>
+            <Stack.Screen name="backToRootIndex"/>
             <Stack.Screen
                 name="auth"
                 options={ {
-                    header: () => <StatusBar style="dark" backgroundColor="transparent" translucent/>,
+                    header: () => <SystemBars style={ { statusBar: "dark", navigationBar: "light" } }/>,
                     animation: "none"
                 } }
             />
