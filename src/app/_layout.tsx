@@ -16,6 +16,7 @@ import Header from "../components/Navigation/Header/Header.tsx";
 import ToastManager from "../ui/alert/components/toast/ToastManager.tsx";
 import ModalManager from "../ui/alert/components/modal/ModalManager.tsx";
 import { StatusBar } from "expo-status-bar";
+import * as NavigationBar from "expo-navigation-bar";
 import * as SystemUI from "expo-system-ui";
 import { GLOBAL_STYLE } from "../constants/index.ts";
 
@@ -24,10 +25,11 @@ const Layout: React.FC = () => {
     const database = useDatabase();
 
     useEffect(() => {
+        SystemUI.setBackgroundColorAsync(GLOBAL_STYLE.pageContainer.backgroundColor);
+        NavigationBar.setPositionAsync("absolute");
+        NavigationBar.setButtonStyleAsync("light");
         database.init();
     }, []);
-
-    SystemUI.setBackgroundColorAsync(GLOBAL_STYLE.pageContainer.backgroundColor);
 
     return (
         <Stack
@@ -50,7 +52,7 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="auth"
                 options={ {
-                    header: () => <StatusBar backgroundColor="transparent" translucent/>,
+                    header: () => <StatusBar style="dark" backgroundColor="transparent" translucent/>,
                     animation: "none"
                 } }
             />

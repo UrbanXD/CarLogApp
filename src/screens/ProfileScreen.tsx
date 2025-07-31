@@ -55,7 +55,7 @@ const ProfileScreen: React.FC = () => {
                             avatarSize={ hp(20) }
                             borderColor={ COLORS.black5 }
                             style={ styles.profileImage }
-                            onPressBadge={ () => "" }
+                            onPressBadge={ openChangeAvatar }
                         />
                         : <Avatar.Text
                             label={ getLabelByName(name) }
@@ -63,7 +63,7 @@ const ProfileScreen: React.FC = () => {
                             backgroundColor={ avatarColor ?? undefined }
                             borderColor={ COLORS.black5 }
                             style={ styles.profileImage }
-                            onPressBadge={ () => "" }
+                            onPressBadge={ openChangeAvatar }
                         />
                     }
                     <View style={ styles.textContainer }>
@@ -79,36 +79,25 @@ const ProfileScreen: React.FC = () => {
                     <Button.Text
                         iconLeft={ ICON_NAMES.settings }
                         iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Beállítások"
+                        text="Személyes adatok"
                         textStyle={ { textAlign: "left" } }
                         onPress={ openChangeName }
                         backgroundColor="transparent"
                         fontSize={ FONT_SIZES.p1 }
                         loadingIndicator
                     />
-                    <Divider/>
-                    <Button.Text
-                        iconLeft={ ICON_NAMES.settings }
-                        iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Avatar"
-                        textStyle={ { textAlign: "left" } }
-                        onPress={ openChangeAvatar }
-                        backgroundColor="transparent"
-                        fontSize={ FONT_SIZES.p1 }
-                        loadingIndicator
-                    />
-                    <Divider/>
-                    <Button.Text
-                        iconLeft={ ICON_NAMES.user }
-                        iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Identity link"
-                        textStyle={ { textAlign: "left" } }
-                        onPress={ () => {
-                        } }
-                        backgroundColor="transparent"
-                        fontSize={ FONT_SIZES.p1 }
-                        loadingIndicator
-                    />
+                    {/*<Divider/>*/ }
+                    {/*<Button.Text*/ }
+                    {/*    iconLeft={ ICON_NAMES.user }*/ }
+                    {/*    iconRight={ ICON_NAMES.rightArrowHead }*/ }
+                    {/*    text="Identity link"*/ }
+                    {/*    textStyle={ { textAlign: "left" } }*/ }
+                    {/*    onPress={ () => {*/ }
+                    {/*    } }*/ }
+                    {/*    backgroundColor="transparent"*/ }
+                    {/*    fontSize={ FONT_SIZES.p1 }*/ }
+                    {/*    loadingIndicator*/ }
+                    {/*/>*/ }
                     <Divider/>
                     <Button.Text
                         iconLeft={ ICON_NAMES.email }
@@ -207,7 +196,7 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     actionButtonsContainer: {
-        top: -hp(4.5)
+        top: -hp(10) //4.5
     }
 });
 

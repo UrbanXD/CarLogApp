@@ -3,14 +3,14 @@ import { ToastMessage, ToastMessages } from "../../../../ui/alert/model/types/in
 const success: ToastMessage = () => {
     return {
         type: "success",
-        title: "Autó azonosítója módosítva!"
+        title: "Sikeres módosítás!"
     };
 };
 
 const error: ToastMessage = () => {
     return {
         type: "error",
-        body: "Váratlan hiba lépett fel az autó azonosítójának módosítása közben!"
+        body: "Váratlan hiba lépett fel módosítás közben!"
     };
 };
 

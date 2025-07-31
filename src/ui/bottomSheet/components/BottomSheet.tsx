@@ -1,12 +1,12 @@
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
 import BottomSheetBackdrop from "./BottomSheetBackdrop.tsx";
 import { router, useNavigation } from "expo-router";
-import { KeyboardAvoidingView, KeyboardController } from "react-native-keyboard-controller";
+import { KeyboardController } from "react-native-keyboard-controller";
 import { BottomSheetLeavingModal } from "../presets/modal/index.ts";
 import { useAlert } from "../../alert/hooks/useAlert.ts";
 import { BottomSheetProvider } from "../contexts/BottomSheetProvider.tsx";
@@ -22,7 +22,6 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     title, content, closeButton, ...restProps
 }) => {
     const { top, bottom } = useSafeAreaInsets();
-    console.log(top, bottom);
     const { openModal } = useAlert();
     const navigation = useNavigation();
 
@@ -94,7 +93,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
             { ...restProps }
             topInset={ top }
             bottomInset={ bottom }
-            keyboardBehavior={ Platform.OS === "ios" ? "interactive" : "fillParent" }
+            keyboardBehavior="interactive"
             keyboardBlurBehavior="restore"
             android_keyboardInputMode="adjustPan"
             enableBlurKeyboardOnGesture
@@ -114,9 +113,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                    </View>
                 }
                 <BottomSheetProvider contextValue={ { dismissBottomSheet } }>
-                    <KeyboardAvoidingView style={ { flex: 1 } }>
-                        { content }
-                    </KeyboardAvoidingView>
+                    { content }
                 </BottomSheetProvider>
             </BottomSheetView>
         </BottomSheetModal>
