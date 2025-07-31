@@ -15,7 +15,10 @@ import { store } from "../database/redux/store.ts";
 import Header from "../components/Navigation/Header/Header.tsx";
 import ToastManager from "../ui/alert/components/toast/ToastManager.tsx";
 import ModalManager from "../ui/alert/components/modal/ModalManager.tsx";
-import { StatusBar } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import * as SystemUI from "expo-system-ui";
+import { GLOBAL_STYLE } from "../constants/index.ts";
+
 
 const Layout: React.FC = () => {
     const database = useDatabase();
@@ -24,19 +27,21 @@ const Layout: React.FC = () => {
         database.init();
     }, []);
 
+    SystemUI.setBackgroundColorAsync(GLOBAL_STYLE.pageContainer.backgroundColor);
+
     return (
         <Stack
             screenOptions={ {
                 header: () => <></>,
                 animation: "slide_from_right",
                 statusBarAnimation: "slide",
-                contentStyle: { backgroundColor: "#242424" }
+                contentStyle: { backgroundColor: GLOBAL_STYLE.pageContainer.backgroundColor }
             } }
         >
             <Stack.Screen
                 name="index"
                 options={ {
-                    header: () => <StatusBar backgroundColor="transparent" barStyle="light-content" translucent/>
+                    header: () => <StatusBar backgroundColor="transparent" style="light" translucent/>
                 } }
             />
             <Stack.Screen

@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
-import { StatusBar, StyleSheet, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, View } from "react-native";
 import { DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -13,10 +14,7 @@ const HeaderView: React.FC<HeaderViewProps> = ({ children }) => {
 
     return (
         <View style={ styles.wrapper }>
-            <StatusBar
-                barStyle="light-content"
-                backgroundColor={ GLOBAL_STYLE.pageContainer.backgroundColor }
-            />
+            <StatusBar style={ "light" }/>
             <View style={ styles.barContainer }>
                 { children }
             </View>

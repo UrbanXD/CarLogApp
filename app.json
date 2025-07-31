@@ -7,6 +7,7 @@
     "scheme": "carlog",
     "icon": "./src/assets/adaptive-icon.png",
     "userInterfaceStyle": "automatic",
+    "edgeToEdgeEnabled": true,
     "androidStatusBar": {
       "translucent": true
     },
