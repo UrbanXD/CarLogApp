@@ -20,7 +20,9 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     const dispatch = useAppDispatch();
     const { openToast } = useAlert();
     const database = useDatabase();
-    const { supabaseConnector } = database;
+    const { supabaseConnector, powersync } = database;
+
+    const [initialSync, setInitialSync] = useState(true);
 
     const user = useAppSelector(getUser);
     const userLoading = useAppSelector(isUserLoading);
@@ -134,6 +136,15 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
 
         if(session && session.user) {
             void fetchLocalData();
+
+            return powersync.registerListener({
+                statusChanged: status => {
+                    if(status.hasSynced && initialSync) {
+                        setInitialSync(false);
+                        void fetchLocalData();
+                    }
+                }
+            });
         }
     }, [session]);
 
