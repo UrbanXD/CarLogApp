@@ -1,31 +1,63 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../constants/index.ts";
-import PickerItem, { PickerElement } from "./PickerItem.tsx";
-import { usePicker } from "../../../hooks/usePicker.ts";
+import PickerItem, { PickerItemType } from "./PickerItem.tsx";
+import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 
-interface SimplePickerProps {
-    elements: Array<PickerElement>;
-    setValue?: (value: string) => void;
+type SimplePickerProps = {
+    items: Array<PickerItemType>
+    defaultValue?: string
+    setValue?: (value: string) => void
 }
 
 const SimplePicker: React.FC<SimplePickerProps> = ({
-    elements,
+    items,
+    defaultValue,
     setValue
 }) => {
-    const { selectedElement, onSelect } = usePicker({ elements, setValue });
+    const inputFieldContext = useInputFieldContext();
+    const onChange = inputFieldContext?.field?.onChange;
 
-    const renderElement = (element: PickerElement, index: number) =>
+    const findItemByValue = useCallback(
+        (value: string) => items.find(item => item.value === value),
+        [items]
+    );
+
+    const [selectedItem, setSelectedItem] = useState<PickerItemType | undefined>(
+        findItemByValue(inputFieldContext?.field.value ?? defaultValue)
+    );
+
+    const onSelect = useCallback((value: string) => {
+        const item = findItemByValue(value);
+        if(!item) return;
+
+        if(onChange) onChange(item.value);
+        if(setValue) setValue(item.value);
+        setSelectedItem(item);
+    }, [items, setValue, onChange, findItemByValue]);
+
+    useEffect(() => {
+        if(!selectedItem) return;
+        const item = findItemByValue(selectedItem.value);
+
+        if(onChange) onChange(item?.value ?? "");
+        if(setValue) setValue(item?.value ?? "");
+
+        setSelectedItem(item);
+    }, [items]);
+
+    const renderItem = useCallback((item: PickerItemType, index: number) => (
         <PickerItem
             key={ index }
-            element={ element }
-            onPress={ () => onSelect(element.value) }
-            selected={ element.value === selectedElement?.value }
-        />;
+            item={ item }
+            onPress={ () => onSelect(item.value) }
+            selected={ item.value === selectedItem?.value }
+        />
+    ), [selectedItem]);
 
     return (
         <View style={ styles.container }>
-            { elements.map(renderElement) }
+            { items.map(renderItem) }
         </View>
     );
 };

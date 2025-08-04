@@ -2,57 +2,55 @@ import { Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } 
 import React from "react";
 import { COLORS, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 
-export type PickerElement = {
+export type PickerItemType = {
     value: string
     title?: string
     subtitle?: string
     icon?: ImageSourcePropType
 }
 
-interface PickerElementProps {
-    element: PickerElement;
-    onPress: () => void;
-    selected: boolean;
+type PickerItemProps = {
+    item: PickerItemType
+    onPress: () => void
+    selected: boolean
 }
 
-const PickerItem: React.FC<PickerElementProps> = ({
-    element: { value, title = value, subtitle, icon },
+const PickerItem: React.FC<PickerItemProps> = ({
+    item: { value, title = value, subtitle, icon },
     onPress,
     selected
-}) => {
-    return (
-        <TouchableOpacity
-            onPress={ onPress }
-            disabled={ selected }
-            style={ [styles.itemContainer, selected && styles.selectedItemContainer] }
-        >
+}) => (
+    <TouchableOpacity
+        onPress={ onPress }
+        disabled={ selected }
+        style={ [styles.itemContainer, selected && styles.selectedItemContainer] }
+    >
+        {
+            icon &&
+           <View style={ styles.iconContainer }>
+              <Image
+                 source={ icon }
+                 style={ styles.icon }
+              />
+           </View>
+        }
+        <View style={ styles.textContainer }>
+            <Text style={ styles.titleText }>
+                { title }
+            </Text>
             {
-                icon &&
-               <View style={ styles.iconContainer }>
-                  <Image
-                     source={ icon }
-                     style={ styles.icon }
-                  />
-               </View>
+                subtitle &&
+               <Text style={ styles.subtitleText }>
+                   { subtitle }
+               </Text>
             }
-            <View style={ styles.textContainer }>
-                <Text style={ styles.titleText }>
-                    { title }
-                </Text>
-                {
-                    subtitle &&
-                   <Text style={ styles.subtitleText }>
-                       { subtitle }
-                   </Text>
-                }
-            </View>
-            {
-                icon &&
-               <View style={ styles.iconContainer }/>
-            }
-        </TouchableOpacity>
-    );
-};
+        </View>
+        {
+            icon &&
+           <View style={ styles.iconContainer }/>
+        }
+    </TouchableOpacity>
+);
 
 const styles = StyleSheet.create({
     itemContainer: {

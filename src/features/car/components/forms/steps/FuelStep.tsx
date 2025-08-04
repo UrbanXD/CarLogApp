@@ -3,7 +3,7 @@ import Input from "../../../../../components/Input/Input.ts";
 import { ICON_NAMES } from "../../../../../constants/index.ts";
 import { FUEL_MEASUREMENTS, FUEL_TYPES } from "../../../constants/index.ts";
 import { StepProps } from "../../../../../types/index.ts";
-import { generatePickerElements } from "../../../../../utils/generatePickerElements.ts";
+import { generatePickerItems } from "../../../../../utils/toPickerItems.ts";
 
 const FuelStep: React.FC<StepProps> = ({ control }) =>
     <Input.Group>
@@ -23,14 +23,14 @@ const FuelStep: React.FC<StepProps> = ({ control }) =>
             fieldName="fuelType"
             fieldNameText="Típus"
         >
-            <Input.Picker.Simple elements={ generatePickerElements(FUEL_TYPES) }/>
+            <Input.Picker.Simple items={ generatePickerItems(FUEL_TYPES) }/>
         </Input.Field>
         <Input.Field
             control={ control }
             fieldName="fuelMeasurement"
             fieldNameText="Mértékegység"
         >
-            <Input.Picker.Simple elements={ generatePickerElements(FUEL_MEASUREMENTS) }/>
+            <Input.Picker.Simple items={ generatePickerItems(FUEL_MEASUREMENTS) }/>
         </Input.Field>
     </Input.Group>;
 

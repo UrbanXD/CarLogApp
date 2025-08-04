@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { ICON_NAMES, SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
+import { SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
 import Avatar from "../../Avatar/Avatar.ts";
 import { router } from "expo-router";
 import { getLabelByName } from "../../../utils/getLabelByName.ts";
@@ -12,7 +12,6 @@ import { getCarsAsPickerElements, isLoading } from "../../../features/car/model/
 import { useAppSelector } from "../../../hooks/index.ts";
 import { getSelectedCarId } from "../../../features/car/model/selectors/getSelectedCarId.ts";
 import HeaderView from "./HeaderView.tsx";
-import Input from "../../Input/Input.ts";
 
 const PrimaryHeader: React.FC = () => {
     const { user, userLoading } = useAuth();
@@ -40,18 +39,18 @@ const PrimaryHeader: React.FC = () => {
     return (
         <HeaderView>
             <View style={ { flex: 1 } }>
-                {
-                    !carsLoading &&
-                   <Input.Picker.Dropdown
-                      elements={ cars }
-                      defaultSelectedElementId={ selectedCarId }
-                      setValue={ onCarSelect }
-                      horizontal
-                      icon={ ICON_NAMES.car }
-                      inputPlaceholder="Válasszon autót"
-                      onDropdownToggle={ (value) => setIsDropdownVisible(value) }
-                   />
-                }
+                {/*{*/ }
+                {/*    !carsLoading &&*/ }
+                {/*   <Input.Picker.Dropdown*/ }
+                {/*      data={ cars }*/ }
+                {/*      defaultSelectedElementId={ selectedCarId }*/ }
+                {/*      setValue={ onCarSelect }*/ }
+                {/*      horizontal*/ }
+                {/*      icon={ ICON_NAMES.car }*/ }
+                {/*      inputPlaceholder="Válasszon autót"*/ }
+                {/*      onDropdownToggle={ (value) => setIsDropdownVisible(value) }*/ }
+                {/*   />*/ }
+                {/*}*/ }
             </View>
             {
                 !isDropdownVisible && (

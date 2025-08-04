@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList, ScrollView } from "react-native-gesture-handler";
 import { useWindowDimensions, View } from "react-native";
 import { DEFAULT_SEPARATOR } from "../constants/index.ts";
 import { RenderComponent } from "../types/index.ts";
-import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 
 type OnBoardingViewProps = {
     steps: RenderComponent
@@ -36,9 +35,9 @@ const OnBoardingView: React.FC<OnBoardingViewProps> = ({
             ref={ scrollViewRef }
             renderItem={ ({ item, index }) => (
                 <View style={ { width } }>
-                    <BottomSheetScrollView showsVerticalScrollIndicator={ false }>
+                    <ScrollView showsVerticalScrollIndicator={ false }>
                         { index <= highestStep ? item() : <></> }
-                    </BottomSheetScrollView>
+                    </ScrollView>
                 </View>
             ) }
             keyExtractor={ (_, index) => index.toString() }

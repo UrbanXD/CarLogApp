@@ -1,19 +1,18 @@
 import { Context, createContext, useContext } from "react";
-import { PickerElement } from "../../components/Input/picker/PickerItem.tsx";
+import { PickerItemType } from "../../components/Input/picker/PickerItem.tsx";
 
 type DropdownPickerContextValue = {
-    elements: Array<PickerElement>
-    selectedElement?: PickerElement
+    items: Array<PickerItemType>
+    fetchByScrolling: () => void | null
+    selectedItem?: PickerItemType
     onSelect: (value: string) => void
     toggleDropdown: () => void
     searchTerm: string
     setSearchTerm: (searchTerm: string) => void
-    icon?: string
-    inputPlaceholder?: string
-    searchBarPlaceholder?: string
+    itemsFiltered: boolean
+    setItemsFiltered: (itemsFiltered: boolean) => void
     disabled: boolean
-    horizontal: boolean
-    showElements: boolean
+    showItems: boolean
     alwaysShowInput: boolean
 }
 

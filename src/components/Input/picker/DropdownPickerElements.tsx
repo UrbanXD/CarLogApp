@@ -1,109 +1,143 @@
-import React, { useCallback, useEffect, useRef } from "react";
-import { FlatList } from "react-native-gesture-handler";
-import PickerItem, { PickerElement } from "./PickerItem.tsx";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import PickerItem, { PickerItemType } from "./PickerItem.tsx";
 import { COLORS, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { useDropdownPickerContext } from "../../../contexts/dropdownPicker/DropdownPickerContext.ts";
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP } from "react-native-responsive-screen";
+import { BottomSheetFlashList, useBottomSheetInternal } from "@gorhom/bottom-sheet";
+import { FlashList } from "@shopify/flash-list";
+import {
+    BottomSheetFlashListProps
+} from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetScrollable/BottomSheetFlashList";
 
 const DropdownPickerElements: React.FC = () => {
-    const flatListRef = useRef<FlatList>(null);
+    const flashListRef = useRef<FlashList>(null);
     const {
-        elements,
-        selectedElement,
-        showElements,
+        items,
+        fetchByScrolling,
+        selectedItem,
+        itemsFiltered,
+        setItemsFiltered,
+        showItems,
         onSelect,
-        horizontal,
         toggleDropdown
     } = useDropdownPickerContext();
+    const bottomSheet = useBottomSheetInternal(true);
+    const isInsideBottomSheet = !!bottomSheet;
 
-    const display = useSharedValue(showElements ? 1 : 0);
+    const display = useSharedValue(showItems ? 1 : 0);
 
     const MAX_HEIGHT = heightPercentageToDP(29.5);
-    const animationConfig = {
-        duration: 350
-    };
+    const animationConfig = { duration: 350 };
 
     const animatedStyle = useAnimatedStyle(() => {
-        const interpolatedValue = interpolate(display.value, [0, 1], [0, !horizontal ? MAX_HEIGHT : 1]);
-        const opacity = interpolate(display.value, [0, 1], [0.35, 1]);
-
-        if(!horizontal) return {
-            height: interpolatedValue,
-            opacity
-        };
+        const height = interpolate(display.value, [0, 1], [0, MAX_HEIGHT]);
+        const opacity = interpolate(display.value, [0, 1], [0, 1]);
 
         return {
-            flex: interpolatedValue,
-            width: interpolatedValue === 0 && 0,
-            height: interpolatedValue === 0 ? 0 : "100%",
+            height,
             opacity
         };
     });
 
     useEffect(() => {
-        display.value = withTiming(showElements ? 1 : 0, animationConfig);
-        if(!showElements) return;
+        display.value = withTiming(showItems ? 1 : 0, animationConfig);
+        if(!showItems) return;
 
-        const selectedItemIndex = elements.findIndex(element => element.value === selectedElement?.value);
+        const selectedItemIndex = items.findIndex(item => item.value === selectedItem?.value);
         if(selectedItemIndex === -1) return;
 
         setTimeout(() => {
-            flatListRef.current?.scrollToIndex({ index: selectedItemIndex, animated: true });
+            flashListRef.current?.scrollToIndex({ index: selectedItemIndex, animated: true });
         }, 100);
-    }, [showElements]);
+    }, [showItems]);
 
-    const selectElement = useCallback((value: string) => {
+    useEffect(() => {
+        if(!itemsFiltered) return;
+
+        setItemsFiltered(false);
+        flashListRef.current?.scrollToOffset({ offset: 0, animated: false });
+    }, [items]);
+
+    const selectItem = useCallback((value: string) => {
         onSelect(value);
         toggleDropdown();
     }, [onSelect, toggleDropdown]);
 
-    const renderItem = useCallback((arg: { item: PickerElement, index: number }) => {
-        return (
+    const renderItem = useCallback(
+        (arg: { extraData?: string, item: PickerItemType, index: number }) => (
             <PickerItem
-                key={ arg.index }
-                element={ arg.item }
-                onPress={ () => selectElement(arg.item.value) }
-                selected={ arg.item.value === selectedElement?.value }
+                item={ arg.item }
+                onPress={ () => selectItem(arg.item.value) }
+                selected={ arg.item.value === arg?.extraData }
             />
-        );
-    }, [selectedElement, selectElement]);
+        ),
+        [selectItem]
+    );
 
-    const renderListEmptyComponent = useCallback(() => {
-        return (
-            <Text style={ styles.notFoundText }>Nem található elem...</Text>
-        );
-    }, []);
+    const renderSeparatorComponent = useCallback(() => <View style={ { height: SEPARATOR_SIZES.small } }/>, []);
 
-    const keyExtractor = (item: PickerElement) => item.value;
+    const renderListEmptyComponent = useCallback(
+        () => <Text style={ styles.notFoundText }>Nem található elem...</Text>,
+        []
+    );
+
+    const onEndReached = useCallback(() => {
+        if(itemsFiltered || !fetchByScrolling) return;
+        fetchByScrolling();
+    }, [itemsFiltered, fetchByScrolling]);
+
+    const keyExtractor = useCallback(
+        (item: PickerItemType, index: number) => `${ item.value }-${ index.toString() }`,
+        []
+    );
 
     const onScrollToIndexFailed = (info: any) => {
         setTimeout(() => {
-            flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
+            flashListRef.current?.scrollToIndex({ index: info.index, animated: true });
         }, 100);
     };
 
-    // if(!showElements && horizontal) {
-    //     return (
-    //         <></>
-    //     );
-    // }
+    const flashListConfig: BottomSheetFlashListProps = useMemo(() => ({
+        ref: flashListRef,
+        data: items,
+        renderItem,
+        extraData: selectedItem?.value,
+        estimatedItemSize: 66,
+        ItemSeparatorComponent: renderSeparatorComponent,
+        ListEmptyComponent: renderListEmptyComponent,
+        onEndReached,
+        onEndReachedThreshold: 0.5,
+        maxToRenderPerBatch: 50,
+        initialNumToRender: 50,
+        keyboardDismissMode: "on-drag",
+        keyExtractor,
+        nestedScrollEnabled: true,
+        onScrollToIndexFailed,
+        showsHorizontalScrollIndicator: false,
+        showsVerticalScrollIndicator: false
+    }), [
+        items,
+        renderItem,
+        renderSeparatorComponent,
+        renderListEmptyComponent,
+        selectItem,
+        onEndReached,
+        keyExtractor,
+        onScrollToIndexFailed
+    ]);
 
     return (
-        <Animated.View style={ [animatedStyle, styles.container, horizontal && styles.horizontalContainer] }>
-            <FlatList
-                ref={ flatListRef }
-                data={ elements }
-                renderItem={ renderItem }
-                ListEmptyComponent={ renderListEmptyComponent }
-                keyExtractor={ keyExtractor }
-                onScrollToIndexFailed={ onScrollToIndexFailed }
-                horizontal={ horizontal }
-                showsHorizontalScrollIndicator={ false }
-                showsVerticalScrollIndicator={ false }
-                contentContainerStyle={ [styles.elementsContainer, horizontal && styles.horizontalElementsContainer] }
-            />
+        <Animated.View style={ [animatedStyle, styles.container] }>
+            <View style={ styles.container.flashListWrapper }>
+                {
+                    isInsideBottomSheet
+                    ? <BottomSheetFlashList { ...flashListConfig }/>
+                    : <FlashList { ...flashListConfig } />
+
+                }
+            </View>
         </Animated.View>
     );
 };
@@ -112,24 +146,18 @@ const styles = StyleSheet.create({
     container: {
         flex: 0.01,
         overflow: "hidden",
+        backgroundColor: COLORS.gray5,
         marginHorizontal: SEPARATOR_SIZES.mediumSmall,
-        borderBottomLeftRadius: 25,
-        borderBottomRightRadius: 25
-    },
-    horizontalContainer: {
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0
-    },
-    elementsContainer: {
-        flexGrow: 1,
-        gap: SEPARATOR_SIZES.small,
         paddingVertical: SEPARATOR_SIZES.small,
         paddingHorizontal: SEPARATOR_SIZES.lightSmall,
-        backgroundColor: COLORS.gray5
-    },
-    horizontalElementsContainer: {
-        backgroundColor: "transparent",
-        paddingVertical: 0
+        borderBottomLeftRadius: 25,
+        borderBottomRightRadius: 25,
+
+        flashListWrapper: {
+            minHeight: 2, //for satisfies flashList minHeight (at least 2px)
+            height: "100%",
+            width: "100%"
+        }
     },
     notFoundText: {
         ...GLOBAL_STYLE.containerText,
