@@ -4,7 +4,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, ICON_COLORS, ICON_NAMES } from "../../../constants/index.ts";
 import Icon from "../../Icon.tsx";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
-import { useSafeBottomSheetInternal } from "../../../hooks/useSafeBottomSheetInternal.ts";
+import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
 
 export interface TextInputProps {
     type?: "primary" | "secondary";
@@ -37,11 +37,11 @@ const TextInput: React.FC<TextInputProps> = ({
     alwaysFocused,
     allowInputFieldContext = true
 }) => {
-    const bottomSheetInternal = useSafeBottomSheetInternal();
+    const bottomSheetInternal = useBottomSheetInternal(true);
     const shouldHandleKeyboardEvents = bottomSheetInternal?.shouldHandleKeyboardEvents;
 
     const inputFieldContext = allowInputFieldContext ? useInputFieldContext() : null;
-    const fieldValue = inputFieldContext?.field?.value || value || "";
+    const fieldValue = value || inputFieldContext?.field?.value || "";
     const onChange = inputFieldContext?.field?.onChange;
     const error = inputFieldContext?.fieldState?.error;
 
