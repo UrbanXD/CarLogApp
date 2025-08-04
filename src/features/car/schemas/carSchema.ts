@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 const carFormSchema = z
 .object({
     name: z.string().min(2, "2 karakter legyen min").max(20, "20 karakter legyen max"),
-    brand: zPickerRequired,
-    model: zPickerRequired,
+    brandId: zPickerRequired,
+    modelId: zPickerRequired,
     odometerMeasurement: zPickerRequired,
     odometerValue: zNumber(),
     fuelType: zPickerRequired,
@@ -25,8 +25,8 @@ export type EditCarFormFieldType = z.infer<typeof editCarFormSchema>;
 export const useAddCarFormProps = () => {
     const defaultValues: AddCarFormFieldType = {
         name: "",
-        brand: "",
-        model: "",
+        brandId: "",
+        modelId: "",
         odometerValue: NaN,
         fuelType: "",
         fuelMeasurement: "",

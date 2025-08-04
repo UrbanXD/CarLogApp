@@ -26,10 +26,15 @@ export const addCar = createAsyncThunk(
                 image = await attachmentQueue.saveFile(car.image, userID);
             }
 
+            const brand = await carDAO.getCarBrandById(car.brandId);
+            const model = await carDAO.getCarModelById(car.modelId);
+
             const newCarTableRow: CarTableType = {
                 ...car,
                 id: getUUID(),
                 owner: userID,
+                brand,
+                model,
                 image: image ? image.filename : null,
                 createdAt: Date.now().toString()
             };

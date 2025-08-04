@@ -1,55 +1,59 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useWatch } from "react-hook-form";
 import Input from "../../../../../components/Input/Input.ts";
-import { StepProps } from "../../../../../types/index.ts";
-import { CARS, ICON_NAMES } from "../../../../../constants/index.ts";
-import { transformToPickerElements } from "../../../../../utils/generatePickerElements.ts";
+import { Paginator, StepProps } from "../../../../../types/index.ts";
+import { ICON_NAMES } from "../../../../../constants/index.ts";
+import { toPickerItems } from "../../../../../utils/toPickerItems.ts";
+import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
+import { CarBrandTableType, CarModelTableType } from "../../../../../database/connector/powersync/AppSchema.ts";
 
 const CarModelStep: React.FC<StepProps> = ({
     control,
     resetField
 }) => {
+    const { carDAO } = useDatabase();
+
     const [isBrandSelected, setIsBrandSelected] = useState(false);
-    const selectedBrandName = useRef<string>("");
-    const selectedBrandNameValue = useWatch({
+    const selectedBrandId = useWatch({
         control,
-        name: "brand"
+        name: "brandId"
     });
 
-    const brands = useMemo(() => transformToPickerElements(Object.keys(CARS)), []);
-    const models = useMemo(
-        () => transformToPickerElements(CARS[selectedBrandNameValue] || [], "name"),
-        [selectedBrandNameValue]
-    );
+    const fetchBrands = async (paginator: Paginator) => {
+        const brands = await carDAO.getCarBrands(paginator);
+        return toPickerItems<CarBrandTableType>(brands, { value: "id", title: "name" });
+    };
+
+    const fetchModels = useCallback(async (paginator: Paginator) => {
+        const models = await carDAO.getCarModels(selectedBrandId, paginator);
+        return toPickerItems<CarModelTableType>(models, { value: "id", title: "name" });
+    }, [selectedBrandId]);
 
     useEffect(() => {
-        if(selectedBrandName.current !== selectedBrandNameValue && resetField) {
-            resetField("model", { keepError: true });
-            selectedBrandName.current = selectedBrandNameValue;
-        }
+        if(resetField) resetField("modelId", { keepError: true, keepDirty: true });
 
-        setIsBrandSelected(selectedBrandNameValue !== "");
-    }, [selectedBrandNameValue, resetField]);
+        setIsBrandSelected(selectedBrandId && selectedBrandId !== "");
+    }, [selectedBrandId]);
 
     return (
         <Input.Group>
             <Input.Field
                 control={ control }
-                fieldName="brand"
+                fieldName="brandId"
                 fieldNameText="Márka"
             >
                 <Input.Picker.Dropdown
-                    elements={ brands }
+                    fetchData={ fetchBrands }
                     icon={ ICON_NAMES.car }
                 />
             </Input.Field>
             <Input.Field
                 control={ control }
-                fieldName="model"
+                fieldName="modelId"
                 fieldNameText="Modell"
             >
                 <Input.Picker.Dropdown
-                    elements={ models }
+                    fetchData={ fetchModels }
                     icon={ ICON_NAMES.car }
                     disabled={ !isBrandSelected }
                     disabledText="Először válassza ki az autó márkáját!"
