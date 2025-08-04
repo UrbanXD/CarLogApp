@@ -7,3 +7,11 @@ export type Image = {
     path: string
     image: string
 }
+
+export type Paginator = {
+    searchTerm?: string,
+    pagination: {
+        page: number,
+        perPage?: number
+    }
+}

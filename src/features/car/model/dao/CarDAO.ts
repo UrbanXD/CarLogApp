@@ -1,5 +1,14 @@
-import { Kysely } from "@powersync/kysely-driver";
-import { CAR_TABLE, CarTableType, DatabaseType } from "../../../../database/connector/powersync/AppSchema.ts";
+import { Kysely, sql } from "@powersync/kysely-driver";
+import {
+    CAR_BRAND_TABLE,
+    CAR_MODEL_TABLE,
+    CAR_TABLE,
+    CarBrandTableType,
+    CarModelTableType,
+    CarTableType,
+    DatabaseType
+} from "../../../../database/connector/powersync/AppSchema.ts";
+import { Paginator } from "../../../../types/index.ts";
 
 export class CarDAO {
     db: Kysely<DatabaseType>;
@@ -56,5 +65,133 @@ export class CarDAO {
         .executeTakeFirstOrThrow();
 
         return carID;
+    }
+
+    async getCarBrands(paginator?: Paginator) {
+        if(!paginator) {
+            return await this.db
+            .selectFrom(CAR_BRAND_TABLE)
+            .selectAll()
+            .orderBy("name", "asc")
+            .execute() as unknown as Array<CarBrandTableType>;
+        }
+
+        const {
+            searchTerm, pagination: {
+                page,
+                perPage = 15
+            }
+        } = paginator;
+
+        let query = this.db
+        .selectFrom(CAR_BRAND_TABLE)
+        .selectAll()
+        .orderBy("name", "asc")
+        .limit(perPage)
+        .offset(page * perPage);
+
+        if(searchTerm) query = query.where(sql`lower(name)`, "like", `%${ searchTerm.toLowerCase() }%`);
+
+        return await query.execute() as unknown as Array<CarBrandTableType>;
+    }
+
+    async getCarBrandById(brandId: string) {
+        return await this.db
+        .selectFrom(CAR_BRAND_TABLE)
+        .selectAll()
+        .where("id", "=", brandId)
+        .execute() as unknown as CarBrandTableType;
+    }
+
+    async updateCarBrands(carBrands: Array<CarBrandTableType>) {
+        await this.db
+        .deleteFrom(CAR_BRAND_TABLE)
+        .execute();
+
+        await this.db
+        .insertInto(CAR_BRAND_TABLE)
+        .values(carBrands)
+        .execute();
+    }
+
+    async getCarModels(brandId: string, paginator?: Paginator) {
+        if(!paginator) {
+            return await this.db
+            .selectFrom(CAR_MODEL_TABLE)
+            .selectAll()
+            .where("brand", "=", brandId)
+            .orderBy("name", "asc")
+            .execute() as unknown as Array<CarModelTableType>;
+        }
+
+        const {
+            searchTerm, pagination: {
+                page,
+                perPage = 15
+            }
+        } = paginator;
+
+        let query = this.db
+        .selectFrom(CAR_MODEL_TABLE)
+        .selectAll()
+        .where("brand", "=", brandId)
+        .orderBy("name", "asc")
+        .limit(perPage)
+        .offset(page * perPage);
+
+        if(searchTerm) query = query.where(sql`lower(name)`, "like", `%${ searchTerm.toLowerCase() }%`);
+
+        return await query.execute() as unknown as Array<CarModelTableType>;
+    }
+
+    async getCarModelById(modelId: string) {
+        return await this.db
+        .selectFrom(CAR_MODEL_TABLE)
+        .selectAll()
+        .where("id", "=", modelId)
+        .execute() as unknown as CarModelTableType;
+    }
+
+    async updateCarModels(carModels: Array<CarModelTableType>) {
+        await this.db
+        .deleteFrom(CAR_MODEL_TABLE)
+        .execute();
+
+        const CHUNK_SIZE = 1000;
+        const chunks = [];
+        for(let i = 0; i < carModels.length; i += CHUNK_SIZE) {
+            chunks.push(carModels.slice(i, i + CHUNK_SIZE));
+        }
+
+        for(const chunk of chunks) {
+            try {
+                await this.db
+                .insertInto(CAR_MODEL_TABLE)
+                .values(chunk)
+                .execute();
+            } catch(e) {
+                console.error("Car Model Chunk Insert Error: ", e);
+            }
+        }
+    }
+
+    async clear() {
+        await this.db.deleteFrom(CAR_MODEL_TABLE).execute();
+        await this.db.deleteFrom(CAR_BRAND_TABLE).execute();
+    }
+
+    async areCarBrandsAndModelsExists() {
+        const brandsCount = await this.db
+        .selectFrom(CAR_BRAND_TABLE)
+        .select(eb => eb.fn.countAll<number>().as("count"))
+        .executeTakeFirst();
+
+        const modelsCount = await this.db
+        .selectFrom(CAR_MODEL_TABLE)
+        .select(eb => eb.fn.countAll<number>().as("count"))
+        .executeTakeFirst();
+
+
+        return brandsCount.count > 0 && modelsCount.count > 0;
     }
 }

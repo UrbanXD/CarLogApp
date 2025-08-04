@@ -1,10 +1,10 @@
-import React, { ProviderProps, useEffect, useState } from "react";
+import React, { ProviderProps, useEffect, useRef, useState } from "react";
 import { AuthContext } from "./AuthContext.ts";
 import { useAppDispatch, useAppSelector } from "../../hooks/index.ts";
 import { useDatabase } from "../database/DatabaseContext.ts";
 import { getUser, isUserLoading } from "../../features/user/model/selectors/index.ts";
 import { AuthError, Session, User } from "@supabase/supabase-js";
-import { UserTableType } from "../../database/connector/powersync/AppSchema.ts";
+import { CarBrandTableType, CarModelTableType, UserTableType } from "../../database/connector/powersync/AppSchema.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BaseConfig } from "../../constants/index.ts";
 import { loadUser } from "../../features/user/model/actions/loadUser.ts";
@@ -13,6 +13,7 @@ import { router } from "expo-router";
 import { SignOutToast } from "../../features/user/presets/toast/index.ts";
 import { getToastMessage } from "../../ui/alert/utils/getToastMessage.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
+import { getUUID } from "../../database/utils/uuid.ts";
 
 export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     children
@@ -20,9 +21,10 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     const dispatch = useAppDispatch();
     const { openToast } = useAlert();
     const database = useDatabase();
-    const { supabaseConnector, powersync } = database;
+    const { supabaseConnector, powersync, carDAO } = database;
 
-    const [initialSync, setInitialSync] = useState(true);
+    const carBrandsAndModelsLoaded = useRef(false);
+    const initialSync = useRef(true);
 
     const user = useAppSelector(getUser);
     const userLoading = useAppSelector(isUserLoading);
@@ -79,6 +81,41 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         }
     };
 
+    const initialLoadCarBrands = async () => {
+        if(await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_CAR_BRANDS_VERSION) === BaseConfig.CAR_BRANDS_VERSION && await carDAO.areCarBrandsAndModelsExists()) return;
+
+        import("../../assets/cars.json").then(async carBrandsData => {
+            const carBrands: Array<CarBrandTableType> = [];
+            const carModels: Array<CarModelTableType> = [];
+
+            carBrandsData.default.map(rawBrand => {
+                if(!rawBrand?.models || rawBrand.models.length === 0) return;
+
+                const brand: CarBrandTableType = { id: getUUID(), name: rawBrand.brand };
+                carBrands.push(brand);
+                rawBrand.models.map(rawModel => {
+                    const endYear = rawModel.years.endYear !== "" ? Number(rawModel.years.endYear) : null;
+                    const model: CarModelTableType = {
+                        id: getUUID(),
+                        brand: brand.id,
+                        name: rawModel.name,
+                        startYear: Number(rawModel.years.startYear),
+                        endYear
+                    };
+                    carModels.push(model);
+                });
+            });
+
+            await carDAO.updateCarBrands(carBrands);
+            await carDAO.updateCarModels(carModels);
+
+            if(await carDAO.areCarBrandsAndModelsExists()) AsyncStorage.setItem(
+                BaseConfig.LOCAL_STORAGE_KEY_CAR_BRANDS_VERSION,
+                BaseConfig.CAR_BRANDS_VERSION
+            );
+        });
+    };
+
     // adatok betoltese local db-bol
     const fetchLocalData = async () => {
         if(!session || !session.user) return;
@@ -105,19 +142,12 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         supabaseConnector
         .client
         .auth
-        .getSession()
-        .then(
-            ({ data: { session } }) => {
-                setSession(session);
-                setSessionLoading(false);
-            }
-        );
-
-        supabaseConnector
-        .client
-        .auth
         .onAuthStateChange(
-            (_event, session) => setSession(session)
+            (_event, session) => {
+                setSession(session);
+                if(sessionLoading) setSessionLoading(false);
+                if(session?.user.id === notVerifiedUser?.id) setNotVerifiedUser(null);
+            }
         );
 
         void fetchNotVerifiedUser();
@@ -136,11 +166,15 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
 
         if(session && session.user) {
             void fetchLocalData();
+            if(!carBrandsAndModelsLoaded.current) {
+                carBrandsAndModelsLoaded.current = true;
+                void initialLoadCarBrands();
+            }
 
             return powersync.registerListener({
                 statusChanged: status => {
-                    if(status.hasSynced && initialSync) {
-                        setInitialSync(false);
+                    if(status.hasSynced && initialSync.current) {
+                        initialSync.current = false;
                         void fetchLocalData();
                     }
                 }
