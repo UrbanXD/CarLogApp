@@ -6,7 +6,15 @@ import {
     DropdownPickerProviderProps
 } from "../../../contexts/dropdownPicker/DropdownPickerProvider.tsx";
 import { PickerItemType } from "./PickerItem.tsx";
-import { Paginator } from "../../../types/index.ts";
+
+type DropdownPickerFetchDataArgs = {
+    page?: number
+    cursorValue?: string | number
+    cursorDirection?: "prev" | "next"
+    searchTerm?: string
+}
+
+export type DropdownPickerFetchData = (args: DropdownPickerFetchDataArgs) => Promise<Array<PickerItemType>>;
 
 type StaticDropdownPickerProps = {
     /** This is for static datas, when no pagination needed **/
@@ -16,8 +24,8 @@ type StaticDropdownPickerProps = {
 
 type DynamicDropdownPickerProps = {
     /** The fetchData function is for manage pagination in the dropdown picker **/
-    fetchData: (paginator: Paginator | Partial<Paginator>) => Promise<Array<PickerItemType>>;
-    data?: never;
+    fetchData: DropdownPickerFetchData
+    data?: never
 }
 type CommonDropdownPickerProps = {
     /** At first render this item will be selected by default **/
