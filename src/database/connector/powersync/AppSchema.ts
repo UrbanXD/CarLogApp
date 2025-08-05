@@ -46,12 +46,12 @@ const service = new Table({
 
 /* LOCAL ONLY TABLES */
 const carBrand = new Table({
-    id: column.text,
+    id: column.integer,
     name: column.text
 }, { localOnly: true });
 
 const carModel = new Table({
-    id: column.text,
+    id: column.integer,
     brand: column.text, // foreign key
     name: column.text,
     startYear: column.integer,

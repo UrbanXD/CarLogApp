@@ -13,7 +13,6 @@ import { router } from "expo-router";
 import { SignOutToast } from "../../features/user/presets/toast/index.ts";
 import { getToastMessage } from "../../ui/alert/utils/getToastMessage.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
-import { getUUID } from "../../database/utils/uuid.ts";
 
 export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     children
@@ -88,19 +87,23 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             const carBrands: Array<CarBrandTableType> = [];
             const carModels: Array<CarModelTableType> = [];
 
+            let brandId = 0;
+            let modelId = 0;
             carBrandsData.default.map(rawBrand => {
                 if(!rawBrand?.models || rawBrand.models.length === 0) return;
+                brandId++;
 
-                const brand: CarBrandTableType = { id: getUUID(), name: rawBrand.brand };
+                const brand: CarBrandTableType = { id: brandId, name: rawBrand.brand };
                 carBrands.push(brand);
                 rawBrand.models.map(rawModel => {
-                    const endYear = rawModel.years.endYear !== "" ? Number(rawModel.years.endYear) : null;
+                    modelId++;
+
                     const model: CarModelTableType = {
-                        id: getUUID(),
+                        id: modelId,
                         brand: brand.id,
                         name: rawModel.name,
                         startYear: Number(rawModel.years.startYear),
-                        endYear
+                        endYear: rawModel.years.endYear !== "" ? Number(rawModel.years.endYear) : null
                     };
                     carModels.push(model);
                 });
@@ -109,6 +112,28 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             await carDAO.updateCarBrands(carBrands);
             await carDAO.updateCarModels(carModels);
 
+            /*Mikor searchel van lekeve a paget ugy kaphatom meg, hogy (SELECT COUNT(*) FROM models WHERE name like "%abarth%) / PER_PAGE es ezt kerekiteni es meg van a page*/
+            try {
+                const start = Date.now();
+                const result = await carDAO.getCarModels(
+                    2,
+                    {
+                        pagination: {
+                            cursor: {
+                                // direction: "next",
+                                value: "",
+                                fieldName: "name"
+                            }, perPage: 30, order: { by: "name", direction: "asc" }
+                        }
+                    }
+                );
+                const end = Date.now();
+                result.map(e => console.log(e));
+                console.log(`lol took ${ end - start } ms, ${ result.length }`);
+
+            } catch(e) {
+                console.log(e);
+            }
             if(await carDAO.areCarBrandsAndModelsExists()) AsyncStorage.setItem(
                 BaseConfig.LOCAL_STORAGE_KEY_CAR_BRANDS_VERSION,
                 BaseConfig.CAR_BRANDS_VERSION
