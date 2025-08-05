@@ -9,6 +9,7 @@ import {
     DatabaseType
 } from "../../../../database/connector/powersync/AppSchema.ts";
 import { Paginator } from "../../../../types/index.ts";
+import { paginate } from "../../../../database/utils/paginate.ts";
 
 export class CarDAO {
     db: Kysely<DatabaseType>;
@@ -67,30 +68,13 @@ export class CarDAO {
         return carID;
     }
 
-    async getCarBrands(paginator?: Paginator) {
-        if(!paginator) {
-            return await this.db
-            .selectFrom(CAR_BRAND_TABLE)
-            .selectAll()
-            .orderBy("name", "asc")
-            .execute() as unknown as Array<CarBrandTableType>;
-        }
-
-        const {
-            searchTerm, pagination: {
-                page,
-                perPage = 15
-            }
-        } = paginator;
-
+    async getCarBrands(paginator?: Paginator<CarBrandTableType>) {
         let query = this.db
         .selectFrom(CAR_BRAND_TABLE)
         .selectAll()
-        .orderBy("name", "asc")
-        .limit(perPage)
-        .offset(page * perPage);
+        .orderBy(sql`lower(name)`, "asc");
 
-        if(searchTerm) query = query.where(sql`lower(name)`, "like", `%${ searchTerm.toLowerCase() }%`);
+        if(paginator) query = paginate<CarBrandTableType>(this.db, CAR_BRAND_TABLE, paginator);
 
         return await query.execute() as unknown as Array<CarBrandTableType>;
     }
@@ -114,34 +98,15 @@ export class CarDAO {
         .execute();
     }
 
-    async getCarModels(brandId: string, paginator?: Paginator) {
-        if(!paginator) {
-            return await this.db
-            .selectFrom(CAR_MODEL_TABLE)
-            .selectAll()
-            .where("brand", "=", brandId)
-            .orderBy("name", "asc")
-            .execute() as unknown as Array<CarModelTableType>;
-        }
-
-        const {
-            searchTerm, pagination: {
-                page,
-                perPage = 15
-            }
-        } = paginator;
-
-        let query = this.db
+    async getCarModels(brandId: number | string, paginator?: Paginator<CarModelTableType>) {
+        let query = await this.db
         .selectFrom(CAR_MODEL_TABLE)
         .selectAll()
-        .where("brand", "=", brandId)
-        .orderBy("name", "asc")
-        .limit(perPage)
-        .offset(page * perPage);
+        .orderBy(sql`lower(name)`, "asc");
 
-        if(searchTerm) query = query.where(sql`lower(name)`, "like", `%${ searchTerm.toLowerCase() }%`);
+        if(paginator) query = paginate<CarModelTableType>(this.db, CAR_MODEL_TABLE, paginator);
 
-        return await query.execute() as unknown as Array<CarModelTableType>;
+        return await query.where("brand", "=", brandId).execute() as unknown as Array<CarModelTableType>;
     }
 
     async getCarModelById(modelId: string) {
