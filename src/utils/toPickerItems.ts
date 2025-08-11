@@ -9,14 +9,12 @@ export const generatePickerItems = (items: Array<RawPickerElement> | Array<Picke
     }));
 };
 
-export const toPickerItems = <T>(
-    data: Array<T>,
-    selectors: {
-        value?: keyof T,
-        title?: keyof T,
-        subtitle?: keyof T
-    }
-) => {
+export type ToPickerItemsSelectors<Data> = { [Key in keyof PickerItemType]?: keyof Data }
+
+export const toPickerItems = <Data>(
+    data: Array<Data>,
+    selectors: ToPickerItemsSelectors<Data>
+): Array<PickerItemType> => {
     const pickerItems: Array<PickerItemType> = [];
 
     data.map((item, index) => {
@@ -40,5 +38,6 @@ export const toPickerItems = <T>(
             subtitle
         });
     });
+
     return pickerItems;
 };

@@ -1,4 +1,4 @@
-import { Kysely, sql } from "@powersync/kysely-driver";
+import { Kysely } from "@powersync/kysely-driver";
 import {
     CAR_BRAND_TABLE,
     CAR_MODEL_TABLE,
@@ -8,8 +8,6 @@ import {
     CarTableType,
     DatabaseType
 } from "../../../../database/connector/powersync/AppSchema.ts";
-import { Paginator } from "../../../../types/index.ts";
-import { paginate } from "../../../../database/utils/paginate.ts";
 
 export class CarDAO {
     db: Kysely<DatabaseType>;
@@ -46,7 +44,6 @@ export class CarDAO {
         } catch(e) {
             return null;
         }
-
     }
 
     async editCar(car: CarTableType) {
@@ -68,17 +65,6 @@ export class CarDAO {
         return carID;
     }
 
-    async getCarBrands(paginator?: Paginator<CarBrandTableType>) {
-        let query = this.db
-        .selectFrom(CAR_BRAND_TABLE)
-        .selectAll()
-        .orderBy(sql`lower(name)`, "asc");
-
-        if(paginator) query = paginate<CarBrandTableType>(this.db, CAR_BRAND_TABLE, paginator);
-
-        return await query.execute() as unknown as Array<CarBrandTableType>;
-    }
-
     async getCarBrandById(brandId: string) {
         return await this.db
         .selectFrom(CAR_BRAND_TABLE)
@@ -96,17 +82,6 @@ export class CarDAO {
         .insertInto(CAR_BRAND_TABLE)
         .values(carBrands)
         .execute();
-    }
-
-    async getCarModels(brandId: number | string, paginator?: Paginator<CarModelTableType>) {
-        let query = await this.db
-        .selectFrom(CAR_MODEL_TABLE)
-        .selectAll()
-        .orderBy(sql`lower(name)`, "asc");
-
-        if(paginator) query = paginate<CarModelTableType>(this.db, CAR_MODEL_TABLE, paginator);
-
-        return await query.where("brand", "=", brandId).execute() as unknown as Array<CarModelTableType>;
     }
 
     async getCarModelById(modelId: string) {
@@ -138,11 +113,6 @@ export class CarDAO {
                 console.error("Car Model Chunk Insert Error: ", e);
             }
         }
-    }
-
-    async clear() {
-        await this.db.deleteFrom(CAR_MODEL_TABLE).execute();
-        await this.db.deleteFrom(CAR_BRAND_TABLE).execute();
     }
 
     async areCarBrandsAndModelsExists() {
