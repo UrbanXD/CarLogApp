@@ -86,16 +86,21 @@ function DropdownPickerElements() {
     const renderListEmptyComponent = useCallback(
         () => (
             <>
-                <PickerItem
-                    item={ selectedItem }
-                    onPress={ () => {} }
-                    selected={ true }
-                />
-                <Divider size={ "95%" } color={ COLORS.gray1 } margin={ SEPARATOR_SIZES.small }/>
+                {
+                    selectedItem &&
+                   <>
+                      <PickerItem
+                         item={ selectedItem }
+                         onPress={ () => {} }
+                         selected={ true }
+                      />
+                      <Divider size={ "95%" } color={ COLORS.gray1 } margin={ SEPARATOR_SIZES.small }/>
+                   </>
+                }
                 <Text style={ styles.notFoundText }>Nem található elem...</Text>
             </>
         ),
-        []
+        [selectedItem]
     );
 
     const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
