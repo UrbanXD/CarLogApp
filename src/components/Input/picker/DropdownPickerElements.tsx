@@ -6,6 +6,7 @@ import Animated, { interpolate, runOnJS, useAnimatedStyle, useSharedValue, withT
 import { NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { FlashList, FlashListRef } from "@shopify/flash-list";
+import Divider from "../../Divider.tsx";
 
 /**
  *  Renders the list of picker items within a dropdown picker.
@@ -83,7 +84,17 @@ function DropdownPickerElements() {
     );
 
     const renderListEmptyComponent = useCallback(
-        () => <Text style={ styles.notFoundText }>Nem található elem...</Text>,
+        () => (
+            <>
+                <PickerItem
+                    item={ selectedItem }
+                    onPress={ () => {} }
+                    selected={ true }
+                />
+                <Divider size={ "95%" } color={ COLORS.gray1 } margin={ SEPARATOR_SIZES.small }/>
+                <Text style={ styles.notFoundText }>Nem található elem...</Text>
+            </>
+        ),
         []
     );
 
@@ -154,6 +165,10 @@ function DropdownPickerElements() {
         });
     });
 
+    const data = selectedItem
+                 ? [selectedItem, ...items.filter(item => item.value !== selectedItem.value)]
+                 : items;
+
     return (
         <Animated.View style={ [animatedStyle, styles.container] }>
             {
@@ -168,9 +183,7 @@ function DropdownPickerElements() {
             }
             <FlashList
                 ref={ flashListRef }
-                data={ selectedItem
-                       ? [selectedItem, ...items.filter(item => item.value !== selectedItem.value)]
-                       : items }
+                data={ data.length === 1 && selectedItem ? [] : data }
                 renderItem={ renderItem }
                 maintainVisibleContentPosition={ { disabled: true } }
                 drawDistance={ heightPercentageToDP(100) }
@@ -206,7 +219,8 @@ const styles = StyleSheet.create({
         ...GLOBAL_STYLE.containerText,
         flexGrow: 1,
         textAlign: "center",
-        textAlignVertical: "center"
+        textAlignVertical: "center",
+        lineHeight: GLOBAL_STYLE.containerText.fontSize
     }
 });
 
