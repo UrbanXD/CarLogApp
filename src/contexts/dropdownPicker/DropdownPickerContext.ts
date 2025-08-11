@@ -3,14 +3,13 @@ import { PickerItemType } from "../../components/Input/picker/PickerItem.tsx";
 
 type DropdownPickerContextValue = {
     items: Array<PickerItemType>
-    fetchByScrolling: () => void | null
+    fetchByScrolling: ((direction?: "next" | "prev") => void) | null
+    fetchingEnabled: boolean
     selectedItem?: PickerItemType
     onSelect: (value: string) => void
     toggleDropdown: () => void
     searchTerm: string
     setSearchTerm: (searchTerm: string) => void
-    itemsFiltered: boolean
-    setItemsFiltered: (itemsFiltered: boolean) => void
     disabled: boolean
     showItems: boolean
     alwaysShowInput: boolean

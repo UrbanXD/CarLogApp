@@ -5,58 +5,53 @@ import {
     DropdownPickerProvider,
     DropdownPickerProviderProps
 } from "../../../contexts/dropdownPicker/DropdownPickerProvider.tsx";
-import { PickerItemType } from "./PickerItem.tsx";
+import { Paginator } from "../../../database/paginator/AbstractPaginator.ts";
+import { DatabaseType } from "../../../database/connector/powersync/AppSchema.ts";
+import { ToPickerItemsSelectors } from "../../../utils/toPickerItems.ts";
 
-type DropdownPickerFetchDataArgs = {
-    page?: number
-    cursorValue?: string | number
-    cursorDirection?: "prev" | "next"
-    searchTerm?: string
+type StaticDropdownPickerProps<Data> = {
+    /** Used when the dropdown has static data and no pagination is required */
+    data: Array<Data>
+    paginator?: never
 }
 
-export type DropdownPickerFetchData = (args: DropdownPickerFetchDataArgs) => Promise<Array<PickerItemType>>;
-
-type StaticDropdownPickerProps = {
-    /** This is for static datas, when no pagination needed **/
-    data: Array<PickerItemType>
-    fetchData?: never
-}
-
-type DynamicDropdownPickerProps = {
-    /** The fetchData function is for manage pagination in the dropdown picker **/
-    fetchData: DropdownPickerFetchData
+type DynamicDropdownPickerProps<Data, DB> = {
+    /** Used when the dropdown fetches data with pagination */
+    paginator: Paginator<Data, DB>
     data?: never
 }
-type CommonDropdownPickerProps = {
-    /** At first render this item will be selected by default **/
+type CommonDropdownPickerProps<Data> = {
+    /** Defines which fields to use for transforming raw data into picker items */
+    dataTransformSelectors: ToPickerItemsSelectors<Data>
+    /** The value that will be selected by default on first render */
     defaultSelectedValue?: string
-    /** Callback function for set the selected value outside of dropdown **/
+    /** Callback function for set the selected value outside the dropdown picker **/
     setValue?: (value: string) => void
-    /** Callback function for checks if dropdown toggle happend **/
+    /** Callback triggered when the dropdown is toggled */
     onDropdownToggle?: (show: boolean) => void
-    /** If disabled=true means that we cant open the list of elements **/
+    /** When true, the dropdown is disabled and cannot be opened */
     disabled?: boolean
-    /** If the dropdown picker is disabled then a toast alert appears with this message **/
+    /** Message shown in a toast when trying to open a disabled dropdown */
     disabledText?: string
-    /** If alwaysShowItems=true the list of the items always visible, that means toggleDropdown is do nothing**/
+    /** When true, the item list is always visible and cannot be toggled */
     alwaysShowItems?: boolean
-    /** If alwaysShowInputController=true the input controller is always visible **/
+    /** When true, the input controller is always visible */
     alwaysShowInput?: boolean
 }
 
-export type DropdownPickerProps =
-    (StaticDropdownPickerProps | DynamicDropdownPickerProps)
-    & CommonDropdownPickerProps
+export type DropdownPickerProps<Data, DB> =
+    (StaticDropdownPickerProps<Data> | DynamicDropdownPickerProps<Data, DB>)
+    & CommonDropdownPickerProps<Data>
     & DropdownPickerControllerProps;
 
-const DropdownPicker: React.FC<DropdownPickerProps> = ({
+const DropdownPicker = <Data, DB = DatabaseType, >({
     icon,
     searchBarPlaceholder,
     inputPlaceholder,
     ...restProps
-}) => {
+}: DropdownPickerProps<Data, DB>) => {
     return (
-        <DropdownPickerProvider value={ restProps }>
+        <DropdownPickerProvider<Data, DB> { ...restProps }>
             <DropdownPickerController
                 icon={ icon }
                 searchBarPlaceholder={ searchBarPlaceholder }

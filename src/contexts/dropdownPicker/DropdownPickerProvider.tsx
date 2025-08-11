@@ -1,4 +1,4 @@
-import React, { ProviderProps, useCallback, useEffect, useMemo, useState } from "react";
+import React, { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import { PickerItemType } from "../../components/Input/picker/PickerItem.tsx";
 import { DropdownPickerContext } from "./DropdownPickerContext.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
@@ -8,38 +8,39 @@ import { useInputFieldContext } from "../inputField/InputFieldContext.ts";
 import { DropdownPickerProps } from "../../components/Input/picker/DropdownPicker.tsx";
 import { DropdownPickerControllerProps } from "../../components/Input/picker/DropdownPickerController.tsx";
 import { ControllerRenderArgs } from "../../constants/index.ts";
+import { toPickerItems } from "../../utils/toPickerItems.ts";
 
-type DropdownPickerProviderProps = Omit<DropdownPickerProps, DropdownPickerControllerProps>
+type DropdownPickerProviderProps<Data, DB> =
+    { children: ReactElement }
+    & Omit<DropdownPickerProps<Data, DB>, DropdownPickerControllerProps>
 
-export const DropdownPickerProvider: React.FC<ProviderProps<DropdownPickerProviderProps>> = ({
+export function DropdownPickerProvider<Data, DB>({
     children,
-    value: {
-        data,
-        fetchData,
-        defaultSelectedValue = "af",
-        setValue,
-        onDropdownToggle,
-        disabled,
-        disabledText,
-        alwaysShowItems,
-        alwaysShowInput = true
-    }
-}) => {
+    data,
+    paginator,
+    dataTransformSelectors,
+    defaultSelectedValue = "af",
+    setValue,
+    onDropdownToggle,
+    disabled,
+    disabledText,
+    alwaysShowItems,
+    alwaysShowInput = true
+}: DropdownPickerProviderProps<Data, DB>) {
     const IS_STATIC = !!data;
-    const PER_PAGE = 50;
 
     const { openToast } = useAlert();
     const {
         field: { onChange, value: inputFieldValue },
         fieldState: { isDirty: inputFieldDirty }
-    } = useInputFieldContext() ?? {} as ControllerRenderArgs;
+    } = useInputFieldContext() ?? { field: {}, fieldState: {} } as ControllerRenderArgs;
+
+    const [initialLoadCompleted, setInitialLoadCompleted] = useState(false);
 
     const [items, setItems] = useState<Array<PickerItemType>>([]);
-    const [page, setPage] = useState(0);
     const [selectedItem, setSelectedItem] = useState<PickerItemType | null>(null);
     const [showItems, setShowItems] = useState<boolean>(!!alwaysShowItems);
     const [searchTerm, setSearchTerm] = useState("");
-    const [itemsFiltered, setItemsFiltered] = useState(false);
 
     const findItemByValue = useCallback((items: Array<PickerItemType>, value?: string) => {
         return items.find(item => item.value === value);
@@ -55,28 +56,10 @@ export const DropdownPickerProvider: React.FC<ProviderProps<DropdownPickerProvid
     }, [findItemByValue, items]);
 
     const fetchBySearching = useCallback(() => {
-        setPage(_ => {
-            const nextPage = 0; //back to first page
-
-            setItemsFiltered(true);
-            const search = searchTerm.length > 0 ? searchTerm : undefined;
-
-            fetchData({ searchTerm: search, pagination: { page: nextPage, perPage: PER_PAGE } })
-            .then(result => setItems(
-                prevState => {
-                    const newState = [
-                        ...prevState.filter(item => result.includes(item))
-                    ];
-                    return [
-                        ...newState,
-                        ...result.filter(resultItem => !newState.includes(resultItem))
-                    ];
-                }
-            ));
-
-            return nextPage;
+        paginator?.filter(searchTerm).then(result => {
+            setItems(toPickerItems<Data>(result, dataTransformSelectors));
         });
-    }, [fetchData, searchTerm]);
+    }, [searchTerm, paginator]);
 
     const staticSearching = useCallback(() => {
         if(!IS_STATIC || !data) return;
@@ -85,25 +68,32 @@ export const DropdownPickerProvider: React.FC<ProviderProps<DropdownPickerProvid
         setItems(data.filter(item => item.title?.toLowerCase().includes(searchTerm.toLowerCase())));
     }, [IS_STATIC, data, searchTerm]);
 
-    const fetchByScrolling = useCallback(() => {
-        setPage(prevPage => {
-            const nextPage = prevPage + 1;
+    const fetchByScrolling = useCallback(async (direction: "next" | "prev" = "next") => {
+        if(!initialLoadCompleted || !paginator) return;
 
-            const search = searchTerm.length > 0 ? searchTerm : undefined;
+        let rawResult: Array<Data> | null = [];
+        switch(direction) {
+            case "next":
+                rawResult = await paginator.next(searchTerm);
+                break;
+            case "prev":
+                rawResult = await paginator.previous(searchTerm);
+                break;
+        }
 
-            fetchData({ searchTerm: search, pagination: { page: nextPage, perPage: PER_PAGE } })
-            .then(result => setItems(prevState => {
-                const allNewItems = [...prevState, ...result];
-                return allNewItems.filter((
-                    item,
-                    index,
-                    self
-                ) => index === self.findIndex(i => i.value === item.value));
-            }));
+        if(!rawResult || rawResult.length === 0) return;
 
-            return nextPage;
+        setItems(prevState => {
+            switch(direction) {
+                case "next":
+                    return [...prevState, ...toPickerItems<Data>(rawResult, dataTransformSelectors)];
+                case "prev":
+                    return [...toPickerItems<Data>(rawResult, dataTransformSelectors), ...prevState];
+                default:
+                    return [...prevState];
+            }
         });
-    }, [fetchData, page, searchTerm]);
+    }, [searchTerm, initialLoadCompleted, paginator]);
 
     const debouncedFilter = useMemo(
         () => debounce(IS_STATIC ? staticSearching : fetchBySearching, 350),
@@ -111,26 +101,34 @@ export const DropdownPickerProvider: React.FC<ProviderProps<DropdownPickerProvid
     );
 
     useEffect(() => {
-        if(IS_STATIC && data) {
-            setItems(data);
-            if(data.length <= 0) return;
+        if(!data && !paginator) throw new Error("DropdownPicker did not get Data nor Paginator");
 
-            const defaultItem = findItemByValue(data, defaultSelectedValue);
+        if(IS_STATIC && data) {
+            const transformedData = toPickerItems<Data>(data, dataTransformSelectors);
+            setItems(transformedData);
+            setInitialLoadCompleted(true);
+            if(transformedData.length === 0) return;
+
+            const defaultItem = findItemByValue(transformedData, defaultSelectedValue);
             if(defaultItem) setSelectedItem(defaultItem);
+            return;
         }
 
-        fetchData({ pagination: { page, perPage: PER_PAGE } })
-        .then(result => {
-            setItems(result);
-            if(result.length <= 0) return;
+        if(paginator) {
+            paginator.initial().then(result => {
+                const transformedData = toPickerItems<Data>(result, dataTransformSelectors);
+                setItems(transformedData);
+                setInitialLoadCompleted(true);
+                if(transformedData.length === 0) return;
 
-            /*itt gond les, hogy ha nincs benne az elso X-be akkor baj so meg kell valositani amajd*/
-            const defaultItem = findItemByValue(result, defaultSelectedValue);
-            if(defaultItem) setSelectedItem(defaultItem);
-        });
-    }, [fetchData]);
+                const defaultItem = findItemByValue(transformedData, defaultSelectedValue);
+                if(defaultItem) setSelectedItem(defaultItem);
+            });
+        }
+    }, []);
 
     useEffect(() => {
+        if(!initialLoadCompleted) return;
         debouncedFilter();
         return () => debouncedFilter.cancel();
     }, [searchTerm]);
@@ -156,13 +154,12 @@ export const DropdownPickerProvider: React.FC<ProviderProps<DropdownPickerProvid
             value={ {
                 items,
                 fetchByScrolling: IS_STATIC ? null : fetchByScrolling,
+                fetchingEnabled: IS_STATIC ? false : initialLoadCompleted,
                 selectedItem,
                 onSelect,
                 toggleDropdown,
                 searchTerm,
                 setSearchTerm,
-                itemsFiltered,
-                setItemsFiltered,
                 disabled,
                 showItems,
                 alwaysShowInput
