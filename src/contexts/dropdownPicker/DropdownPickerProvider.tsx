@@ -8,25 +8,25 @@ import { useInputFieldContext } from "../inputField/InputFieldContext.ts";
 import { DropdownPickerProps } from "../../components/Input/picker/DropdownPicker.tsx";
 import { DropdownPickerControllerProps } from "../../components/Input/picker/DropdownPickerController.tsx";
 import { ControllerRenderArgs } from "../../constants/index.ts";
-import { toPickerItems } from "../../utils/toPickerItems.ts";
+import { toPickerItem, toPickerItems } from "../../utils/toPickerItems.ts";
 
-type DropdownPickerProviderProps<Data, DB> =
+type DropdownPickerProviderProps<Item, DB> =
     { children: ReactElement }
-    & Omit<DropdownPickerProps<Data, DB>, DropdownPickerControllerProps>
+    & Omit<DropdownPickerProps<Item, DB>, DropdownPickerControllerProps>
 
-export function DropdownPickerProvider<Data, DB>({
+export function DropdownPickerProvider<Item, DB>({
     children,
     data,
     paginator,
     dataTransformSelectors,
-    defaultSelectedValue = "af",
+    defaultSelectedItem,
     setValue,
     onDropdownToggle,
     disabled,
     disabledText,
     alwaysShowItems,
     alwaysShowInput = true
-}: DropdownPickerProviderProps<Data, DB>) {
+}: DropdownPickerProviderProps<Item, DB>) {
     const IS_STATIC = !!data;
 
     const { openToast } = useAlert();
@@ -36,7 +36,6 @@ export function DropdownPickerProvider<Data, DB>({
     } = useInputFieldContext() ?? { field: {}, fieldState: {} } as ControllerRenderArgs;
 
     const [initialLoadCompleted, setInitialLoadCompleted] = useState(false);
-
     const [items, setItems] = useState<Array<PickerItemType>>([]);
     const [selectedItem, setSelectedItem] = useState<PickerItemType | null>(null);
     const [showItems, setShowItems] = useState<boolean>(!!alwaysShowItems);
@@ -57,7 +56,7 @@ export function DropdownPickerProvider<Data, DB>({
 
     const fetchBySearching = useCallback(() => {
         paginator?.filter(searchTerm).then(result => {
-            setItems(toPickerItems<Data>(result, dataTransformSelectors));
+            setItems(toPickerItems<Item>(result, dataTransformSelectors));
         });
     }, [searchTerm, paginator]);
 
@@ -71,7 +70,7 @@ export function DropdownPickerProvider<Data, DB>({
     const fetchByScrolling = useCallback(async (direction: "next" | "prev" = "next") => {
         if(!initialLoadCompleted || !paginator) return;
 
-        let rawResult: Array<Data> | null = [];
+        let rawResult: Array<Item> | null = [];
         switch(direction) {
             case "next":
                 rawResult = await paginator.next(searchTerm);
@@ -86,9 +85,9 @@ export function DropdownPickerProvider<Data, DB>({
         setItems(prevState => {
             switch(direction) {
                 case "next":
-                    return [...prevState, ...toPickerItems<Data>(rawResult, dataTransformSelectors)];
+                    return [...prevState, ...toPickerItems<Item>(rawResult, dataTransformSelectors)];
                 case "prev":
-                    return [...toPickerItems<Data>(rawResult, dataTransformSelectors), ...prevState];
+                    return [...toPickerItems<Item>(rawResult, dataTransformSelectors), ...prevState];
                 default:
                     return [...prevState];
             }
@@ -101,28 +100,25 @@ export function DropdownPickerProvider<Data, DB>({
     );
 
     useEffect(() => {
+        if(!defaultSelectedItem) return;
+
+        setSelectedItem(toPickerItem<Item>(defaultSelectedItem, dataTransformSelectors));
+    }, [defaultSelectedItem]);
+
+    useEffect(() => {
         if(!data && !paginator) throw new Error("DropdownPicker did not get Data nor Paginator");
 
         if(IS_STATIC && data) {
-            const transformedData = toPickerItems<Data>(data, dataTransformSelectors);
+            const transformedData = toPickerItems<Item>(data, dataTransformSelectors);
             setItems(transformedData);
             setInitialLoadCompleted(true);
-            if(transformedData.length === 0) return;
-
-            const defaultItem = findItemByValue(transformedData, defaultSelectedValue);
-            if(defaultItem) setSelectedItem(defaultItem);
-            return;
         }
 
         if(paginator) {
             paginator.initial().then(result => {
-                const transformedData = toPickerItems<Data>(result, dataTransformSelectors);
+                const transformedData = toPickerItems<Item>(result, dataTransformSelectors);
                 setItems(transformedData);
                 setInitialLoadCompleted(true);
-                if(transformedData.length === 0) return;
-
-                const defaultItem = findItemByValue(transformedData, defaultSelectedValue);
-                if(defaultItem) setSelectedItem(defaultItem);
             });
         }
     }, []);

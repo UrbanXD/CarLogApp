@@ -9,22 +9,22 @@ import { Paginator } from "../../../database/paginator/AbstractPaginator.ts";
 import { DatabaseType } from "../../../database/connector/powersync/AppSchema.ts";
 import { ToPickerItemsSelectors } from "../../../utils/toPickerItems.ts";
 
-type StaticDropdownPickerProps<Data> = {
+type StaticDropdownPickerProps<Item> = {
     /** Used when the dropdown has static data and no pagination is required */
-    data: Array<Data>
+    data: Array<Item>
     paginator?: never
 }
 
-type DynamicDropdownPickerProps<Data, DB> = {
+type DynamicDropdownPickerProps<Item, DB> = {
     /** Used when the dropdown fetches data with pagination */
-    paginator: Paginator<Data, DB>
+    paginator: Paginator<Item, DB>
     data?: never
 }
-type CommonDropdownPickerProps<Data> = {
+type CommonDropdownPickerProps<Item> = {
     /** Defines which fields to use for transforming raw data into picker items */
-    dataTransformSelectors: ToPickerItemsSelectors<Data>
-    /** The value that will be selected by default on first render */
-    defaultSelectedValue?: string
+    dataTransformSelectors: ToPickerItemsSelectors<Item>
+    /** The item that will be selected by default on first render */
+    defaultSelectedItem?: Item
     /** Callback function for set the selected value outside the dropdown picker **/
     setValue?: (value: string) => void
     /** Callback triggered when the dropdown is toggled */
@@ -39,19 +39,19 @@ type CommonDropdownPickerProps<Data> = {
     alwaysShowInput?: boolean
 }
 
-export type DropdownPickerProps<Data, DB> =
-    (StaticDropdownPickerProps<Data> | DynamicDropdownPickerProps<Data, DB>)
-    & CommonDropdownPickerProps<Data>
+export type DropdownPickerProps<Item, DB> =
+    (StaticDropdownPickerProps<Item> | DynamicDropdownPickerProps<Item, DB>)
+    & CommonDropdownPickerProps<Item>
     & DropdownPickerControllerProps;
 
-const DropdownPicker = <Data, DB = DatabaseType, >({
+const DropdownPicker = <Item, DB = DatabaseType, >({
     icon,
     searchBarPlaceholder,
     inputPlaceholder,
     ...restProps
-}: DropdownPickerProps<Data, DB>) => {
+}: DropdownPickerProps<Item, DB>) => {
     return (
-        <DropdownPickerProvider<Data, DB> { ...restProps }>
+        <DropdownPickerProvider<Item, DB> { ...restProps }>
             <DropdownPickerController
                 icon={ icon }
                 searchBarPlaceholder={ searchBarPlaceholder }
