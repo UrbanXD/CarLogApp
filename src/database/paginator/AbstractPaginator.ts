@@ -1,11 +1,6 @@
 import { Kysely, sql } from "@powersync/kysely-driver";
 import { ComparisonOperatorExpression, OrderByDirectionExpression, SelectQueryBuilder } from "kysely";
 
-export type Search<FieldName> = {
-    fieldName: FieldName
-    term: string
-}
-
 export type FilterCondition<TableItem, FieldName = keyof TableItem> = {
     field: FieldName
     operator: ComparisonOperatorExpression
@@ -22,6 +17,7 @@ export type OrderCondition<FieldName> = {
 export type PaginatorOptions<TableItem> = {
     filterBy?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>
     orderBy?: OrderCondition<keyof TableItem> | Array<OrderCondition<keyof TableItem>>
+    searchBy?: keyof TableItem | Array<keyof TableItem>
     perPage?: number
 }
 
@@ -32,6 +28,7 @@ export abstract class Paginator<TableItem, DB> {
     private readonly key: keyof TableItem | Array<keyof TableItem>;
     private readonly filterBy?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>;
     private readonly orderBy?: OrderCondition<keyof TableItem> | Array<OrderCondition<keyof TableItem>>;
+    private readonly searchBy?: keyof TableItem | Array<keyof TableItem>;
     protected perPage: number;
 
     protected constructor(
@@ -47,6 +44,7 @@ export abstract class Paginator<TableItem, DB> {
         this.perPage = options?.perPage ?? 15;
         this.filterBy = options?.filterBy;
         this.orderBy = options?.orderBy;
+        this.searchBy = options?.searchBy;
     }
 
     protected getBaseQuery(reverseOrder?: boolean) {
@@ -103,13 +101,18 @@ export abstract class Paginator<TableItem, DB> {
 
     protected addSearchFilter(
         query: SelectQueryBuilder<DB, TableItem, any>,
-        search?: Search<keyof TableItem>
+        searchTerm?: string
     ): SelectQueryBuilder<DB, TableItem, any> {
-        if(!search || !search.fieldName || !search.term) return query;
+        if(!searchTerm || searchTerm.length === 0) return query;
 
         return this.addFilter(
             query,
-            { field: search.fieldName, value: `%${ search.term }%`, operator: "like", toLowerCase: true }
+            {
+                field: this.searchBy,
+                value: `%${ searchTerm }%`,
+                operator: "like",
+                toLowerCase: true
+            }
         );
     }
 
@@ -131,9 +134,9 @@ export abstract class Paginator<TableItem, DB> {
         return query.orderBy(orderByField, orderDirection);
     }
 
-    async filter(search?: Search<keyof TableItem>): Promise<Array<TableItem>> {
+    async filter(searchTerm?: string): Promise<Array<TableItem>> {
         let query = this.getBaseQuery();
-        query = this.addSearchFilter(query, search);
+        query = this.addSearchFilter(query, searchTerm);
 
         return await query.execute() as unknown as Array<TableItem>;
     }
@@ -144,7 +147,7 @@ export abstract class Paginator<TableItem, DB> {
 
     abstract async initial(defaultValue?: string | number): Promise<Array<TableItem>>;
 
-    abstract async next(search?: Search<keyof TableItem>): Promise<Array<TableItem> | null>;
+    abstract async next(searchTerm?: string): Promise<Array<TableItem> | null>;
 
-    abstract async previous(search?: Search<keyof TableItem>): Promise<Array<TableItem> | null>;
+    abstract async previous(searchTerm?: string): Promise<Array<TableItem> | null>;
 }

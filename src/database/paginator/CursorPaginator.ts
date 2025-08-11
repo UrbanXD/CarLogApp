@@ -1,4 +1,4 @@
-import { Paginator, PaginatorOptions, Search } from "./AbstractPaginator.ts";
+import { Paginator, PaginatorOptions } from "./AbstractPaginator.ts";
 import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 import { Kysely } from "@powersync/kysely-driver";
 import { SelectQueryBuilder } from "kysely";
@@ -43,14 +43,13 @@ export class CursorPaginator<TableItem, DB = DatabaseType> extends Paginator<Tab
         return !!this.prevCursor;
     }
 
-    async filter(search?: Search<keyof TableItem>): Promise<Array<TableItem>> {
+    async filter(searchTerm?: string): Promise<Array<TableItem>> {
         this.prevCursor = null;
         this.nextCursor = null;
 
-        const result = await super.filter(search);
-        if(result.length === 0) return await this.initial();
+        const result = await super.filter(searchTerm);
 
-        this.nextCursor = result[result.length - 1][this.cursorFieldName];
+        if(result.length !== 0) this.nextCursor = result[result.length - 1][this.cursorFieldName];
 
         return result;
     }
@@ -92,12 +91,12 @@ export class CursorPaginator<TableItem, DB = DatabaseType> extends Paginator<Tab
         return [...prevResult, ...nextResult];
     }
 
-    async next(search?: Search<keyof TableItem>): Promise<Array<TableItem> | null> {
+    async next(searchTerm?: string): Promise<Array<TableItem> | null> {
         if(!this.hasNext()) return null;
 
         let query = super.getBaseQuery();
         query = this.addCursorFilter(query, this.nextCursor, ">");
-        query = super.addSearchFilter(query, search);
+        query = super.addSearchFilter(query, searchTerm);
         const result = await query.execute() as unknown as Array<TableItem>;
 
         if(result.length !== 0) {
@@ -113,12 +112,12 @@ export class CursorPaginator<TableItem, DB = DatabaseType> extends Paginator<Tab
         return result;
     }
 
-    async previous(search?: Search<keyof TableItem>): Promise<Array<TableItem> | null> {
+    async previous(searchTerm?: string): Promise<Array<TableItem> | null> {
         if(!this.hasPrevious()) return null;
 
         let query = this.getBaseQuery(true);
         query = this.addCursorFilter(query, this.prevCursor, "<");
-        query = super.addSearchFilter(query, search);
+        query = super.addSearchFilter(query, searchTerm);
 
         const result = (await query.execute()).reverse() as unknown as Array<TableItem>;
 

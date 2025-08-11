@@ -1,4 +1,4 @@
-import { Paginator, PaginatorOptions, Search } from "./AbstractPaginator.ts";
+import { Paginator, PaginatorOptions } from "./AbstractPaginator.ts";
 import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 import { Kysely } from "@powersync/kysely-driver";
 import { SelectQueryBuilder } from "kysely";
@@ -11,10 +11,11 @@ export class PagePaginator<TableItem, DB = DatabaseType> extends Paginator<Table
     constructor(
         database: Kysely<DB>,
         table: keyof DB,
+        key: keyof TableItem | Array<keyof TableItem>,
         settings?: PaginatorOptions<keyof TableItem> & { orderByFieldName?: keyof TableItem }
     ) {
-        super(database, table, settings);
-        this.maxPage = 30;
+        super(database, table, key, settings);
+        this.maxPage = 30; //get from db
         this.orderByFieldName = settings?.orderByFieldName;
     }
 
@@ -30,11 +31,10 @@ export class PagePaginator<TableItem, DB = DatabaseType> extends Paginator<Table
         return query.offset(this.perPage * this.page);
     }
 
-    private async fetchData(search?: Search<keyof TableItem>) {
+    private async fetchData(searchTerm?: string) {
         let query = super.getBaseQuery();
-        query = super.addOrderBy(query, this.orderByFieldName);
         query = this.addOffset(query);
-        query = super.addSearchBy(query, search);
+        query = super.addSearchFilter(query, searchTerm);
 
         return await query.execute() as unknown as Array<TableItem>;
     }
@@ -51,22 +51,23 @@ export class PagePaginator<TableItem, DB = DatabaseType> extends Paginator<Table
         //megvalositani hogy default value page-t megkeresseeeeeeee
     }
 
-    async next(search?: Search<keyof TableItem>): Promise<Array<TableItem> | null> {
+    async next(searchTerm?: string): Promise<Array<TableItem> | null> {
         if(!this.hasNext()) return null;
         this.page += 1;
 
-        return await this.fetchData();
+        return await this.fetchData(searchTerm);
     }
 
-    async previous(search?: Search<keyof TableItem>): Promise<Array<TableItem> | null> {
+    async previous(searchTerm?: string): Promise<Array<TableItem> | null> {
         if(!this.hasPrevious()) return null;
         this.page -= 1;
 
-        return await this.fetchData();
+        return await this.fetchData(searchTerm);
     }
 
 
-    async filter(search?: Search<keyof TableItem>): Promise<Array<TableItem>> {
-        return super.filter(search);
+    async filter(searchTerm?: string): Promise<Array<TableItem>> {
+        this.page = 0;
+        return super.filter(searchTerm);
     }
 }
