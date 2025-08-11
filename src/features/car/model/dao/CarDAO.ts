@@ -70,7 +70,7 @@ export class CarDAO {
         .selectFrom(CAR_BRAND_TABLE)
         .selectAll()
         .where("id", "=", brandId)
-        .execute() as unknown as CarBrandTableType;
+        .executeTakeFirst() as unknown as CarBrandTableType;
     }
 
     async updateCarBrands(carBrands: Array<CarBrandTableType>) {
@@ -89,7 +89,7 @@ export class CarDAO {
         .selectFrom(CAR_MODEL_TABLE)
         .selectAll()
         .where("id", "=", modelId)
-        .execute() as unknown as CarModelTableType;
+        .executeTakeFirst() as unknown as CarModelTableType;
     }
 
     async updateCarModels(carModels: Array<CarModelTableType>) {
