@@ -1,35 +1,133 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import PickerItem, { PickerItemType } from "./PickerItem.tsx";
 import { COLORS, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { useDropdownPickerContext } from "../../../contexts/dropdownPicker/DropdownPickerContext.ts";
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { StyleSheet, Text, View } from "react-native";
+import Animated, { interpolate, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP } from "react-native-responsive-screen";
-import { BottomSheetFlashList, useBottomSheetInternal } from "@gorhom/bottom-sheet";
-import { FlashList } from "@shopify/flash-list";
-import {
-    BottomSheetFlashListProps
-} from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetScrollable/BottomSheetFlashList";
+import { FlashList, FlashListRef } from "@shopify/flash-list";
 
-const DropdownPickerElements: React.FC = () => {
-    const flashListRef = useRef<FlashList>(null);
+/**
+ *  Renders the list of picker items within a dropdown picker.
+ *
+ * @component
+ * @returns { ReactElement } A component that lists the dropdown picker items.
+ */
+function DropdownPickerElements() {
     const {
         items,
         fetchByScrolling,
+        fetchingEnabled,
         selectedItem,
-        itemsFiltered,
-        setItemsFiltered,
+        searchTerm,
         showItems,
         onSelect,
         toggleDropdown
     } = useDropdownPickerContext();
-    const bottomSheet = useBottomSheetInternal(true);
-    const isInsideBottomSheet = !!bottomSheet;
+
+    const flashListRef = useRef<FlashListRef<PickerItemType>>(null);
+    const itemsFiltered = useRef(false);
 
     const display = useSharedValue(showItems ? 1 : 0);
+    const selectedItemDisplay = useSharedValue(0);
+    const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+    const isProgrammaticScroll = useRef(false);
+    const lastScrollPosition = useRef(0);
 
     const MAX_HEIGHT = heightPercentageToDP(29.5);
-    const animationConfig = { duration: 350 };
+    const displayAnimationConfig = { duration: 350 };
+    const selectedItemDisplayAnimationConfig = { duration: 500 };
+
+    useEffect(() => {
+        if(!showItems && selectedItem) selectedItemDisplay.value = 0;
+        if(showItems && selectedItem && lastScrollPosition.current > (flashListRef.current.getLayout(0)?.height * 1.05 ?? 0)) {
+            selectedItemDisplay.value = withTiming(1, selectedItemDisplayAnimationConfig);
+        }
+    }, [selectedItem, showItems]);
+
+    useEffect(() => {
+        display.value = withTiming(showItems ? 1 : 0, displayAnimationConfig);
+    }, [showItems]);
+
+    useEffect(() => {
+        itemsFiltered.current = true;
+    }, [searchTerm]);
+
+    useEffect(() => {
+        if(!itemsFiltered.current) return;
+
+        itemsFiltered.current = false;
+        isProgrammaticScroll.current = true;
+        flashListRef.current?.scrollToOffset({ offset: 0, animated: false });
+    }, [items]);
+
+    const selectItem = useCallback((value: string) => {
+        onSelect(value);
+        toggleDropdown();
+    }, [onSelect, toggleDropdown]);
+
+    const renderItem = useCallback(
+        (arg: { item: PickerItemType, index: number }) => (
+            <PickerItem
+                item={ arg.item }
+                onPress={ () => selectItem(arg.item.value) }
+                selected={ arg.item.value === selectedItem?.value }
+            />
+        ),
+        [selectItem, selectedItem]
+    );
+
+    const renderSeparatorComponent = useCallback(
+        () => <View style={ { height: SEPARATOR_SIZES.small } }/>,
+        []
+    );
+
+    const renderListEmptyComponent = useCallback(
+        () => <Text style={ styles.notFoundText }>Nem található elem...</Text>,
+        []
+    );
+
+    const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+        lastScrollPosition.current = event.nativeEvent.contentOffset.y;
+        const firstItemHeight = flashListRef.current.getLayout(0)?.height * 1.05 ?? 0;
+
+        if(lastScrollPosition.current > firstItemHeight) {
+            if(!isProgrammaticScroll.current) {
+                selectedItemDisplay.value = withTiming(0, selectedItemDisplayAnimationConfig);
+            }
+            isProgrammaticScroll.current = false;
+        } else {
+            selectedItemDisplay.value = 0;
+        }
+
+        if(scrollTimeout.current) clearTimeout(scrollTimeout.current);
+
+        runOnJS((y, firstItemHeight) => {
+            scrollTimeout.current = setTimeout(() => {
+                if(y <= firstItemHeight) return;
+
+                selectedItemDisplay.value = withTiming(1, selectedItemDisplayAnimationConfig);
+            }, 500);
+        })(lastScrollPosition.current, firstItemHeight);
+    };
+
+    const onStartReached = useCallback(() => {
+        if(!fetchingEnabled) return;
+
+        fetchByScrolling("prev");
+    }, [fetchingEnabled, fetchByScrolling]);
+
+    const onEndReached = useCallback(() => {
+        if(!fetchingEnabled) return;
+
+        fetchByScrolling("next");
+    }, [fetchingEnabled, fetchByScrolling]);
+
+
+    const keyExtractor = useCallback(
+        (item: PickerItemType, index: number) => `${ item.value }-${ index.toString() }`,
+        []
+    );
 
     const animatedStyle = useAnimatedStyle(() => {
         const height = interpolate(display.value, [0, 1], [0, MAX_HEIGHT]);
@@ -41,103 +139,54 @@ const DropdownPickerElements: React.FC = () => {
         };
     });
 
-    useEffect(() => {
-        display.value = withTiming(showItems ? 1 : 0, animationConfig);
-        if(!showItems) return;
-
-        const selectedItemIndex = items.findIndex(item => item.value === selectedItem?.value);
-        if(selectedItemIndex === -1) return;
-
-        setTimeout(() => {
-            flashListRef.current?.scrollToIndex({ index: selectedItemIndex, animated: true });
-        }, 100);
-    }, [showItems]);
-
-    useEffect(() => {
-        if(!itemsFiltered) return;
-
-        setItemsFiltered(false);
-        flashListRef.current?.scrollToOffset({ offset: 0, animated: false });
-    }, [items]);
-
-    const selectItem = useCallback((value: string) => {
-        onSelect(value);
-        toggleDropdown();
-    }, [onSelect, toggleDropdown]);
-
-    const renderItem = useCallback(
-        (arg: { extraData?: string, item: PickerItemType, index: number }) => (
-            <PickerItem
-                item={ arg.item }
-                onPress={ () => selectItem(arg.item.value) }
-                selected={ arg.item.value === arg?.extraData }
-            />
-        ),
-        [selectItem]
-    );
-
-    const renderSeparatorComponent = useCallback(() => <View style={ { height: SEPARATOR_SIZES.small } }/>, []);
-
-    const renderListEmptyComponent = useCallback(
-        () => <Text style={ styles.notFoundText }>Nem található elem...</Text>,
-        []
-    );
-
-    const onEndReached = useCallback(() => {
-        if(itemsFiltered || !fetchByScrolling) return;
-        fetchByScrolling();
-    }, [itemsFiltered, fetchByScrolling]);
-
-    const keyExtractor = useCallback(
-        (item: PickerItemType, index: number) => `${ item.value }-${ index.toString() }`,
-        []
-    );
-
-    const onScrollToIndexFailed = (info: any) => {
-        setTimeout(() => {
-            flashListRef.current?.scrollToIndex({ index: info.index, animated: true });
-        }, 100);
-    };
-
-    const flashListConfig: BottomSheetFlashListProps = useMemo(() => ({
-        ref: flashListRef,
-        data: items,
-        renderItem,
-        extraData: selectedItem?.value,
-        estimatedItemSize: 66,
-        ItemSeparatorComponent: renderSeparatorComponent,
-        ListEmptyComponent: renderListEmptyComponent,
-        onEndReached,
-        onEndReachedThreshold: 0.5,
-        maxToRenderPerBatch: 50,
-        initialNumToRender: 50,
-        keyboardDismissMode: "on-drag",
-        keyExtractor,
-        nestedScrollEnabled: true,
-        onScrollToIndexFailed,
-        showsHorizontalScrollIndicator: false,
-        showsVerticalScrollIndicator: false
-    }), [
-        items,
-        renderItem,
-        renderSeparatorComponent,
-        renderListEmptyComponent,
-        selectItem,
-        onEndReached,
-        keyExtractor,
-        onScrollToIndexFailed
-    ]);
+    const selectedItemStyle = useAnimatedStyle(() => {
+        const translateY = interpolate(selectedItemDisplay.value, [0, 1], [-100, 0]);
+        return ({
+            position: "absolute",
+            top: 0,
+            width: "100%",
+            alignSelf: "center",
+            paddingVertical: styles.container.paddingVertical,
+            backgroundColor: styles.container.backgroundColor,
+            zIndex: 1,
+            transform: [{ translateY }],
+            opacity: selectedItemDisplay.value
+        });
+    });
 
     return (
         <Animated.View style={ [animatedStyle, styles.container] }>
-            <View style={ styles.container.flashListWrapper }>
-                {
-                    isInsideBottomSheet
-                    ? <BottomSheetFlashList { ...flashListConfig }/>
-                    : <FlashList { ...flashListConfig } />
-
-                }
-            </View>
+            {
+                selectedItem &&
+               <Animated.View style={ selectedItemStyle }>
+                  <PickerItem
+                     item={ selectedItem }
+                     onPress={ () => {} }
+                     selected={ true }
+                  />
+               </Animated.View>
+            }
+            <FlashList
+                ref={ flashListRef }
+                data={ selectedItem
+                       ? [selectedItem, ...items.filter(item => item.value !== selectedItem.value)]
+                       : items }
+                renderItem={ renderItem }
+                maintainVisibleContentPosition={ { disabled: true } }
+                drawDistance={ heightPercentageToDP(100) }
+                keyExtractor={ keyExtractor }
+                ListEmptyComponent={ renderListEmptyComponent }
+                ItemSeparatorComponent={ renderSeparatorComponent }
+                nestedScrollEnabled
+                onScroll={ onScroll }
+                onStartReached={ onStartReached }
+                onStartReachedThreshold={ 0.5 }
+                onEndReached={ onEndReached }
+                onEndReachedThreshold={ 0.5 }
+                keyboardDismissMode="on-drag"
+                showsHorizontalScrollIndicator={ false }
+                showsVerticalScrollIndicator={ false }
+            />
         </Animated.View>
     );
 };
@@ -151,13 +200,7 @@ const styles = StyleSheet.create({
         paddingVertical: SEPARATOR_SIZES.small,
         paddingHorizontal: SEPARATOR_SIZES.lightSmall,
         borderBottomLeftRadius: 25,
-        borderBottomRightRadius: 25,
-
-        flashListWrapper: {
-            minHeight: 2, //for satisfies flashList minHeight (at least 2px)
-            height: "100%",
-            width: "100%"
-        }
+        borderBottomRightRadius: 25
     },
     notFoundText: {
         ...GLOBAL_STYLE.containerText,
