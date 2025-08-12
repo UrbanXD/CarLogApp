@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
-import { useWindowDimensions, View } from "react-native";
+import { ListRenderItemInfo, useWindowDimensions } from "react-native";
 import { DEFAULT_SEPARATOR } from "../constants/index.ts";
 import { RenderComponent } from "../types/index.ts";
 
@@ -27,22 +27,27 @@ const OnBoardingView: React.FC<OnBoardingViewProps> = ({
         if(currentStep > highestStep) setHighestStep(currentStep); // to prerender the next item
     }, [currentStep]);
 
+    const renderItem = useCallback(({ item, index }: ListRenderItemInfo<any>) => (
+        <ScrollView
+            nestedScrollEnabled
+            contentContainerStyle={ { width } }
+            showsVerticalScrollIndicator={ false }
+        >
+            { index <= highestStep ? item() : <></> }
+        </ScrollView>
+    ), [width, highestStep]);
+
     return (
         <FlatList
             data={ steps }
             horizontal
             pagingEnabled
             ref={ scrollViewRef }
-            renderItem={ ({ item, index }) => (
-                <View style={ { width } }>
-                    <ScrollView showsVerticalScrollIndicator={ false }>
-                        { index <= highestStep ? item() : <></> }
-                    </ScrollView>
-                </View>
-            ) }
+            renderItem={ renderItem }
             keyExtractor={ (_, index) => index.toString() }
             snapToInterval={ width }
             decelerationRate="fast"
+            nestedScrollEnabled
             scrollEnabled={ false }
             bounces={ false }
             showsHorizontalScrollIndicator={ false }
