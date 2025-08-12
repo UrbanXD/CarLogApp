@@ -1,38 +1,61 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useWatch } from "react-hook-form";
 import Input from "../../../../../components/Input/Input.ts";
-import { Paginator, StepProps } from "../../../../../types/index.ts";
+import { StepProps } from "../../../../../types/index.ts";
 import { ICON_NAMES } from "../../../../../constants/index.ts";
-import { toPickerItems } from "../../../../../utils/toPickerItems.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
-import { CarBrandTableType, CarModelTableType } from "../../../../../database/connector/powersync/AppSchema.ts";
+import {
+    CAR_BRAND_TABLE,
+    CAR_MODEL_TABLE,
+    CarBrandTableType,
+    CarModelTableType
+} from "../../../../../database/connector/powersync/AppSchema.ts";
+import { PaginatorFactory, PaginatorType } from "../../../../../database/paginator/PaginatorFactory.ts";
+import { ToPickerItemsSelectors } from "../../../../../utils/toPickerItems.ts";
 
 const CarModelStep: React.FC<StepProps> = ({
     control,
     resetField
 }) => {
-    const { carDAO } = useDatabase();
+    const { db } = useDatabase();
 
-    const [isBrandSelected, setIsBrandSelected] = useState(false);
     const selectedBrandId = useWatch({
         control,
         name: "brandId"
     });
 
-    const fetchBrands = async (paginator: Paginator) => {
-        const brands = await carDAO.getCarBrands(paginator);
-        return toPickerItems<CarBrandTableType>(brands, { value: "id", title: "name" });
-    };
+    const brandsPaginator = useMemo(() => PaginatorFactory.createPaginator<CarBrandTableType>(
+        PaginatorType.cursor,
+        db,
+        CAR_BRAND_TABLE,
+        "id",
+        {
+            perPage: 50,
+            orderBy: { field: "name", direction: "asc", toLowerCase: true },
+            searchBy: "name"
+        },
+        "name"
+    ), []);
 
-    const fetchModels = useCallback(async (paginator: Paginator) => {
-        const models = await carDAO.getCarModels(selectedBrandId, paginator);
-        return toPickerItems<CarModelTableType>(models, { value: "id", title: "name" });
-    }, [selectedBrandId]);
+    const modelsPaginator = useMemo(() => {
+        console.log("modalsPaginator useMemo");
+        return PaginatorFactory.createPaginator<CarModelTableType>(
+            PaginatorType.cursor,
+            db,
+            CAR_MODEL_TABLE,
+            "id",
+            {
+                perPage: 25,
+                filterBy: selectedBrandId ? { field: "brand", value: selectedBrandId, operator: "=" } : undefined,
+                orderBy: { field: "name", direction: "asc", toLowerCase: true },
+                searchBy: "name"
+            },
+            "name"
+        );
+    }, [db, selectedBrandId]);
 
     useEffect(() => {
         if(resetField) resetField("modelId", { keepError: true, keepDirty: true });
-
-        setIsBrandSelected(selectedBrandId && selectedBrandId !== "");
     }, [selectedBrandId]);
 
     return (
@@ -42,9 +65,13 @@ const CarModelStep: React.FC<StepProps> = ({
                 fieldName="brandId"
                 fieldNameText="Márka"
             >
-                <Input.Picker.Dropdown
-                    fetchData={ fetchBrands }
+                <Input.Picker.Dropdown<CarBrandTableType>
+                    paginator={ brandsPaginator }
                     icon={ ICON_NAMES.car }
+                    dataTransformSelectors={ {
+                        title: "name",
+                        value: "id"
+                    } as ToPickerItemsSelectors<CarBrandTableType> }
                 />
             </Input.Field>
             <Input.Field
@@ -53,9 +80,13 @@ const CarModelStep: React.FC<StepProps> = ({
                 fieldNameText="Modell"
             >
                 <Input.Picker.Dropdown
-                    fetchData={ fetchModels }
+                    paginator={ modelsPaginator }
                     icon={ ICON_NAMES.car }
-                    disabled={ !isBrandSelected }
+                    dataTransformSelectors={ {
+                        title: "name",
+                        value: "id"
+                    } as ToPickerItemsSelectors<CarModelTableType> }
+                    disabled={ !selectedBrandId }
                     disabledText="Először válassza ki az autó márkáját!"
                 />
             </Input.Field>
