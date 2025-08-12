@@ -116,12 +116,21 @@ export function DropdownPickerProvider<Item, DB>({
 
         if(paginator) {
             paginator.initial().then(result => {
-                const transformedData = toPickerItems<Item>(result, dataTransformSelectors);
-                setItems(transformedData);
+                setItems(toPickerItems<Item>(result, dataTransformSelectors));
                 setInitialLoadCompleted(true);
             });
         }
     }, []);
+
+    useEffect(() => {
+        if(!paginator) return;
+
+        setShowItems(false);
+
+        paginator.initial().then(result => {
+            setItems(toPickerItems<Item>(result, dataTransformSelectors));
+        });
+    }, [paginator]);
 
     useEffect(() => {
         if(!initialLoadCompleted) return;
