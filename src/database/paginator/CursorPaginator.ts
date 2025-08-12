@@ -55,6 +55,9 @@ export class CursorPaginator<TableItem, DB = DatabaseType> extends Paginator<Tab
     }
 
     async initial(defaultValue?: string | number): Promise<Array<TableItem>> {
+        this.prevCursor = null;
+        this.nextCursor = null;
+
         if(!defaultValue) {
             let query = this.getBaseQuery();
             query = super.addOrder(query, { field: this.cursorFieldName, direction: "asc", toLowerCase: true });
