@@ -162,7 +162,8 @@ function DropdownPickerElements() {
 
     const animatedStyle = useAnimatedStyle(() => ({
         height: display.value * MAX_HEIGHT,
-        opacity: display.value
+        opacity: display.value,
+        paddingVertical: display.value * SEPARATOR_SIZES.small
     }));
 
     const selectedItemStyle = useAnimatedStyle(() => {
@@ -194,6 +195,7 @@ function DropdownPickerElements() {
         ListEmptyComponent: renderListEmptyComponent,
         ItemSeparatorComponent: renderSeparatorComponent,
         nestedScrollEnabled: true,
+        decelerationRate: 0.9,
         onScroll,
         onStartReached,
         onStartReachedThreshold: 0.5,
