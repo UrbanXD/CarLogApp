@@ -2,6 +2,7 @@ import React from "react";
 import { View, ViewStyle } from "react-native";
 import { GLOBAL_STYLE, SIMPLE_TABBAR_HEIGHT } from "../constants/index.ts";
 import Animated, { useAnimatedScrollHandler, useSharedValue, withTiming } from "react-native-reanimated";
+import { ScrollView } from "react-native-gesture-handler";
 import { useScreenScrollView } from "../contexts/screenScrollView/ScreenScrollViewContext.ts";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -9,6 +10,8 @@ interface ScreenScrollViewProps {
     style?: ViewStyle,
     children?: React.ReactNode,
 }
+
+const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 export const ScreenScrollView: React.FC<ScreenScrollViewProps> = ({
     style,
@@ -41,14 +44,14 @@ export const ScreenScrollView: React.FC<ScreenScrollViewProps> = ({
             style,
             { paddingBottom: bottom + GLOBAL_STYLE.pageContainer.paddingBottom }
         ] }>
-            <Animated.ScrollView
+            <AnimatedScrollView
                 onScroll={ onScroll }
                 showsVerticalScrollIndicator={ false }
-                nestedScrollEnabled={ true }
+                nestedScrollEnabled
                 contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
             >
                 { children }
-            </Animated.ScrollView>
+            </AnimatedScrollView>
         </View>
     );
 };
