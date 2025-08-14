@@ -1,25 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, TextInput as TextInputRN, View } from "react-native";
+import { StyleSheet, TextInput as TextInputRN, TextStyle, View, ViewStyle } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, ICON_COLORS, ICON_NAMES } from "../../../constants/index.ts";
 import Icon from "../../Icon.tsx";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
 
-export interface TextInputProps {
-    type?: "primary" | "secondary";
-    value?: string;
-    setValue?: (text: string) => void;
-    icon?: string;
-    actionIcon?: string;
-    onAction?: () => void;
-    placeholder?: string;
-    numeric?: boolean;
-    secure?: boolean;
-    editable?: boolean;
-    multiline?: boolean;
-    alwaysFocused?: boolean; // csak design szempont
-    allowInputFieldContext?: boolean;
+export type TextInputProps = {
+    type?: "primary" | "secondary"
+    value?: string
+    setValue?: (text: string) => void
+    icon?: string
+    actionIcon?: string
+    onAction?: () => void
+    placeholder?: string
+    numeric?: boolean
+    secure?: boolean
+    editable?: boolean
+    multiline?: boolean
+    alwaysFocused?: boolean // csak design szempont
+    allowInputFieldContext?: boolean
+    containerStyle?: ViewStyle
+    textInputStyle?: ViewStyle & TextStyle
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -35,7 +37,9 @@ const TextInput: React.FC<TextInputProps> = ({
     editable,
     multiline,
     alwaysFocused,
-    allowInputFieldContext = true
+    allowInputFieldContext = true,
+    containerStyle,
+    textInputStyle
 }) => {
     const bottomSheetInternal = useBottomSheetInternal(true);
     const shouldHandleKeyboardEvents = bottomSheetInternal?.shouldHandleKeyboardEvents;
@@ -66,6 +70,7 @@ const TextInput: React.FC<TextInputProps> = ({
             style={ [
                 styles.formFieldContainer,
                 type === "primary" && styles.primaryFormFieldContainer,
+                containerStyle,
                 (focused || alwaysFocused) && styles.activeFormFieldContainer,
                 !!error && styles.errorFormFieldContainer
             ] }>
@@ -81,7 +86,7 @@ const TextInput: React.FC<TextInputProps> = ({
             }
             <TextInputRN
                 placeholder={ placeholder }
-                style={ styles.textInput }
+                style={ [textInputStyle, styles.textInput] }
                 placeholderTextColor={ styles.placeholderText.color }
                 value={ fieldValue.toString() }
                 multiline={ multiline }
