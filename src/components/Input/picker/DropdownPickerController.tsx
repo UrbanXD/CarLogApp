@@ -3,24 +3,19 @@ import { TouchableOpacity } from "react-native";
 import Input from "../Input.ts";
 import { ICON_NAMES } from "../../../constants/index.ts";
 import { useDropdownPickerContext } from "../../../contexts/dropdownPicker/DropdownPickerContext.ts";
-import SearchBar from "../../SearchBar.tsx";
 
 export type DropdownPickerControllerProps = {
     icon?: string
     inputPlaceholder?: string
-    searchBarPlaceholder?: string
 }
 
 const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
     icon,
-    inputPlaceholder = "Válasszon a listából",
-    searchBarPlaceholder
+    inputPlaceholder = "Válasszon a listából"
 }) => {
     const {
         selectedItem,
         toggleDropdown,
-        searchTerm,
-        setSearchTerm,
         showItems,
         alwaysShowInput
     } = useDropdownPickerContext();
@@ -35,25 +30,9 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
 
     if(!alwaysShowInput && showItems) return <></>;
 
-    if(showItems) {
-        return (
-            <SearchBar
-                term={ searchTerm }
-                setTerm={ setSearchTerm }
-                textInputProps={ {
-                    placeholder: searchBarPlaceholder,
-                    actionIcon: actionIcon,
-                    onAction: onPress,
-                    alwaysFocused: true
-                } }
-            />
-        );
-    }
-
     return (
         <TouchableOpacity
             onPress={ onPress }
-            disabled={ showItems }
             style={ { flex: 1 } }
         >
             <Input.Text
@@ -62,6 +41,7 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
                 icon={ icon }
                 actionIcon={ actionIcon }
                 editable={ false }
+                alwaysFocused={ showItems }
             />
         </TouchableOpacity>
     );

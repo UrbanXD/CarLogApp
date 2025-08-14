@@ -57,7 +57,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
                 searchBarPlaceholder={ searchBarPlaceholder }
                 inputPlaceholder={ inputPlaceholder }
             />
-            <DropdownPickerElements/>
+            <DropdownPickerElements searchBarPlaceholder={ searchBarPlaceholder }/>
         </DropdownPickerProvider>
     );
 };
