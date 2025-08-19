@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { RefObject, useEffect, useState } from "react";
 import { StyleSheet, TextInput as TextInputRN, TextStyle, View, ViewStyle } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, ICON_COLORS, ICON_NAMES } from "../../../constants/index.ts";
@@ -7,6 +7,7 @@ import { useInputFieldContext } from "../../../contexts/inputField/InputFieldCon
 import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
 
 export type TextInputProps = {
+    inputRef: RefObject<TextInputRN | null>
     type?: "primary" | "secondary"
     value?: string
     setValue?: (text: string) => void
@@ -25,6 +26,7 @@ export type TextInputProps = {
 }
 
 const TextInput: React.FC<TextInputProps> = ({
+    inputRef,
     type = "primary",
     value,
     setValue,
@@ -85,6 +87,7 @@ const TextInput: React.FC<TextInputProps> = ({
                </View>
             }
             <TextInputRN
+                ref={ inputRef }
                 placeholder={ placeholder }
                 style={ [textInputStyle, styles.textInput] }
                 placeholderTextColor={ styles.placeholderText.color }
