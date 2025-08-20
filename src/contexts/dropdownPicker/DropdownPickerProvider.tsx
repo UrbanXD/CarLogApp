@@ -129,6 +129,7 @@ export function DropdownPickerProvider<Item, DB>({
 
         paginator.initial().then(result => {
             setItems(toPickerItems<Item>(result, dataTransformSelectors));
+            setSearchTerm("");
         });
     }, [paginator]);
 
