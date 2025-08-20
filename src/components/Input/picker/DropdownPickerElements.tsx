@@ -55,7 +55,7 @@ function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElements
 
     const MAX_HEIGHT = heightPercentageToDP(29.5);
     const displayAnimationConfig = { duration: 350, easing: Easing.out(Easing.ease) };
-    const selectedItemDisplayAnimationConfig = { duration: 500, easing: Easing.inOut(Easing.quad) };
+    const searchBarDisplayAnimationConfig = { duration: 500, easing: Easing.inOut(Easing.quad) };
 
     useEffect(() => {
         itemsListDisplay.value = withTiming(showItems ? 1 : 0, displayAnimationConfig);
@@ -88,7 +88,7 @@ function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElements
         lastScrollPosition.current = event.nativeEvent.contentOffset.y;
 
         if(lastScrollPosition.current > searchBarHeight / 2) {
-            searchBarDisplay.value = withTiming(0, selectedItemDisplayAnimationConfig);
+            searchBarDisplay.value = withTiming(0, searchBarDisplayAnimationConfig);
             searchBarDividerDisplay.value = 0;
         } else {
             searchBarDisplay.value = 1;
@@ -101,8 +101,8 @@ function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElements
             scrollTimeout.current = setTimeout(() => {
                 if(lastScrollPosition.current <= searchBarHeight / 2) return;
 
-                searchBarDisplay.value = withTiming(1, selectedItemDisplayAnimationConfig);
-            }, 500);
+                searchBarDisplay.value = withTiming(1, searchBarDisplayAnimationConfig);
+            }, searchBarDisplayAnimationConfig.duration);
         })();
     }, [searchBarHeight]);
 
