@@ -48,8 +48,8 @@ function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElements
     const lastScrollPosition = useRef(0);
 
     const itemsListDisplay = useSharedValue(showItems ? 1 : 0);
-    const searchBarDisplay = useSharedValue(showItems ? 1 : 0);
-    const searchBarDividerDisplay = useSharedValue(showItems ? 1 : 0);
+    const searchBarDisplay = useSharedValue(1);
+    const searchBarDividerDisplay = useSharedValue(1);
 
     const [searchBarHeight, setSearchBarHeight] = useState(0);
 
@@ -59,7 +59,7 @@ function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElements
 
     useEffect(() => {
         itemsListDisplay.value = withTiming(showItems ? 1 : 0, displayAnimationConfig);
-        searchBarDisplay.value = showItems ? 1 : 0;
+        searchBarDividerDisplay.value = (lastScrollPosition.current <= searchBarHeight / 2) ? 1 : 0;
     }, [showItems]);
 
     useEffect(() => {
