@@ -1,6 +1,6 @@
 import React from "react";
 import DropdownPickerController, { DropdownPickerControllerProps } from "./DropdownPickerController.tsx";
-import DropdownPickerElements from "./DropdownPickerElements.tsx";
+import DropdownPickerItems from "./DropdownPickerItems.tsx";
 import {
     DropdownPickerProvider,
     DropdownPickerProviderProps
@@ -9,17 +9,16 @@ import { Paginator } from "../../../database/paginator/AbstractPaginator.ts";
 import { DatabaseType } from "../../../database/connector/powersync/AppSchema.ts";
 import { ToPickerItemsSelectors } from "../../../utils/toPickerItems.ts";
 
-type StaticDropdownPickerProps<Item> = {
-    /** Used when the dropdown has static data and no pagination is required */
-    data: Array<Item>
-    paginator?: never
-}
-
-type DynamicDropdownPickerProps<Item, DB> = {
+type ConditionalDropdownPickerProps<Item, DB> = | {
     /** Used when the dropdown fetches data with pagination */
     paginator: Paginator<Item, DB>
+    /** Used when the dropdown has static data and no pagination is required */
     data?: never
+} | {
+    paginator?: never
+    data: Array<Item>
 }
+
 type CommonDropdownPickerProps<Item> = {
     /** Defines which fields to use for transforming raw data into picker items */
     dataTransformSelectors: ToPickerItemsSelectors<Item>
@@ -37,17 +36,25 @@ type CommonDropdownPickerProps<Item> = {
     alwaysShowItems?: boolean
     /** When true, the input controller is always visible */
     alwaysShowInput?: boolean
-}
+    /** When true, the search bar will be displayed above the list */
+    searchBarEnable?: boolean
+    /** Placeholder text shown inside the search bar input */
+    searchBarPlaceholder?: string
+    /** When true, items are rendered in a masonry-style layout */
+    masonry?: boolean
+    /** Number of columns to display when using masonry layout */
+    numColumns?: number
+} & DropdownPickerControllerProps;
 
 export type DropdownPickerProps<Item, DB> =
-    (StaticDropdownPickerProps<Item> | DynamicDropdownPickerProps<Item, DB>)
-    & CommonDropdownPickerProps<Item>
-    & DropdownPickerControllerProps;
+    ConditionalDropdownPickerProps<Item, DB> & CommonDropdownPickerProps<Item>;
 
 const DropdownPicker = <Item, DB = DatabaseType, >({
     icon,
     searchBarPlaceholder,
     inputPlaceholder,
+    masonry,
+    numColumns,
     ...restProps
 }: DropdownPickerProps<Item, DB>) => {
     return (
@@ -57,7 +64,11 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
                 searchBarPlaceholder={ searchBarPlaceholder }
                 inputPlaceholder={ inputPlaceholder }
             />
-            <DropdownPickerElements searchBarPlaceholder={ searchBarPlaceholder }/>
+            <DropdownPickerItems
+                masonry={ masonry }
+                numColumns={ numColumns }
+                searchBarPlaceholder={ searchBarPlaceholder }
+            />
         </DropdownPickerProvider>
     );
 };

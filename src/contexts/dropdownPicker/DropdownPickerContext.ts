@@ -13,6 +13,7 @@ type DropdownPickerContextValue = {
     disabled: boolean
     showItems: boolean
     alwaysShowInput: boolean
+    searchBarEnable: boolean
 }
 
 export const DropdownPickerContext = createContext<DropdownPickerContextValue | null>(null);

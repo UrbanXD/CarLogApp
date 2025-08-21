@@ -25,7 +25,8 @@ export function DropdownPickerProvider<Item, DB>({
     disabled,
     disabledText,
     alwaysShowItems,
-    alwaysShowInput = true
+    alwaysShowInput = true,
+    searchBarEnable = true
 }: DropdownPickerProviderProps<Item, DB>) {
     const IS_STATIC = !!data;
 
@@ -168,7 +169,8 @@ export function DropdownPickerProvider<Item, DB>({
                 setSearchTerm,
                 disabled,
                 showItems,
-                alwaysShowInput
+                alwaysShowInput,
+                searchBarEnable
             } }
         >
             { children }

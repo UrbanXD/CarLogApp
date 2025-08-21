@@ -10,14 +10,17 @@ import Animated, {
     useSharedValue,
     withTiming
 } from "react-native-reanimated";
-import { NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from "react-native";
+import { ListRenderItemInfo, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { FlashList, FlashListProps, FlashListRef } from "@shopify/flash-list";
 import Divider from "../../Divider.tsx";
 import { BottomSheetFlashList, useBottomSheetInternal } from "@gorhom/bottom-sheet";
 import SearchBar from "../../SearchBar.tsx";
+import DropdownView from "../../dropdownView/DropdownView.tsx";
 
 type DropdownPickerElementsProps = {
+    masonry?: boolean
+    numColumns?: number
     searchBarPlaceholder?: string
 }
 
@@ -27,7 +30,7 @@ type DropdownPickerElementsProps = {
  * @component
  * @returns { ReactElement } A component that lists the dropdown picker items.
  */
-function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElementsProps) {
+function DropdownPickerItems({ masonry, numColumns, searchBarPlaceholder }: DropdownPickerElementsProps) {
     const isBottomSheet = !!useBottomSheetInternal(true);
     const {
         items,
@@ -38,27 +41,25 @@ function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElements
         showItems,
         onSelect,
         toggleDropdown,
-        setSearchTerm
+        setSearchTerm,
+        searchBarEnable
     } = useDropdownPickerContext();
 
     const flashListRef = useRef<FlashListRef<PickerItemType>>(null);
-    const listHeaderRef = useRef<Animated.View>(null);
+    const listHeaderRef = useRef<Animated.View | null>(null);
     const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
     const itemsFiltered = useRef(false);
     const lastScrollPosition = useRef(0);
 
-    const itemsListDisplay = useSharedValue(showItems ? 1 : 0);
     const searchBarDisplay = useSharedValue(1);
     const searchBarDividerDisplay = useSharedValue(1);
 
     const [searchBarHeight, setSearchBarHeight] = useState(0);
 
     const MAX_HEIGHT = heightPercentageToDP(29.5);
-    const displayAnimationConfig = { duration: 350, easing: Easing.out(Easing.ease) };
     const searchBarDisplayAnimationConfig = { duration: 500, easing: Easing.inOut(Easing.quad) };
 
     useEffect(() => {
-        itemsListDisplay.value = withTiming(showItems ? 1 : 0, displayAnimationConfig);
         searchBarDividerDisplay.value = (lastScrollPosition.current <= searchBarHeight / 2) ? 1 : 0;
     }, [showItems]);
 
@@ -74,6 +75,8 @@ function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElements
     }, [items]);
 
     useLayoutEffect(() => {
+        if(!searchBarEnable) return;
+
         listHeaderRef.current?.measure((_x, _y, _width, height, _pageX, _pageY) => {
             setSearchBarHeight(height);
         });
@@ -85,6 +88,7 @@ function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElements
     }, [onSelect, toggleDropdown]);
 
     const onScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+        if(!searchBarEnable) return;
         lastScrollPosition.current = event.nativeEvent.contentOffset.y;
 
         if(lastScrollPosition.current > searchBarHeight / 2) {
@@ -104,7 +108,7 @@ function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElements
                 searchBarDisplay.value = withTiming(1, searchBarDisplayAnimationConfig);
             }, searchBarDisplayAnimationConfig.duration);
         })();
-    }, [searchBarHeight]);
+    }, [searchBarEnable, searchBarHeight]);
 
     const onStartReached = useCallback(() => {
         if(!fetchingEnabled) return;
@@ -125,13 +129,20 @@ function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElements
     );
 
     const renderItem = useCallback(
-        (arg: { item: PickerItemType, index: number }) => (
-            <PickerItem
-                item={ arg.item }
-                onPress={ () => selectItem(arg.item.value) }
-                selected={ arg.item.value === selectedItem?.value }
-            />
-        ),
+        ({ item, index }: ListRenderItemInfo<PickerItemType>) => {
+            const gap = SEPARATOR_SIZES.lightSmall / 2;
+            const marginLeft = ((index % numColumns) / (numColumns - 1)) * gap;
+            const marginRight = gap - marginLeft;
+
+            return (
+                <PickerItem
+                    item={ item }
+                    onPress={ () => selectItem(item.value) }
+                    selected={ item.value === selectedItem?.value }
+                    style={ masonry && { marginLeft, marginRight } }
+                />
+            );
+        },
         [selectItem, selectedItem]
     );
 
@@ -145,13 +156,9 @@ function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElements
         [selectedItem]
     );
 
-    const animatedStyle = useAnimatedStyle(() => ({
-        height: itemsListDisplay.value * MAX_HEIGHT,
-        opacity: itemsListDisplay.value,
-        paddingVertical: itemsListDisplay.value * SEPARATOR_SIZES.small
-    }));
-
     const floatingSearchBarStyle = useAnimatedStyle(() => {
+        if(!searchBarEnable) return {};
+
         const translateY = interpolate(searchBarDisplay.value, [0, 1], [-100, 0]);
         return ({
             position: "absolute",
@@ -175,8 +182,10 @@ function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElements
     const flashListProps = useMemo((): FlashListProps<PickerItemType> => ({
         ref: flashListRef,
         data: items.filter(item => item.value !== selectedItem?.value),
+        masonry,
+        numColumns,
         renderItem,
-        contentContainerStyle: { paddingTop: searchBarHeight - SEPARATOR_SIZES.small },
+        contentContainerStyle: { paddingTop: searchBarEnable && searchBarHeight - SEPARATOR_SIZES.small },
         maintainVisibleContentPosition: { disabled: true },
         drawDistance: heightPercentageToDP(100),
         keyExtractor,
@@ -184,7 +193,7 @@ function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElements
         ItemSeparatorComponent: renderSeparatorComponent,
         nestedScrollEnabled: true,
         decelerationRate: 0.9,
-        onScroll,
+        onScroll: searchBarEnable ? onScroll : undefined,
         onStartReached,
         onStartReachedThreshold: 0.5,
         onEndReached,
@@ -199,41 +208,44 @@ function DropdownPickerElements({ searchBarPlaceholder }: DropdownPickerElements
         keyExtractor,
         renderListEmptyComponent,
         renderSeparatorComponent,
-        onScroll,
+        searchBarEnable,
         onScroll,
         onEndReached
     ]);
 
     return (
-        <Animated.View style={ [animatedStyle, styles.container] }>
-            <Animated.View ref={ listHeaderRef } style={ floatingSearchBarStyle }>
-                <SearchBar
-                    term={ searchTerm }
-                    setTerm={ setSearchTerm }
-                    textInputProps={ {
-                        placeholder: searchBarPlaceholder,
-                        actionIcon: ICON_NAMES.close,
-                        onAction: () => setSearchTerm(""),
-                        containerStyle: {
-                            backgroundColor: COLORS.gray4,
-                            borderRadius: 15
-                        }
-                    } }
-                />
-                <Animated.View style={ searchBarDividerStyle }>
-                    <Divider
+        <DropdownView height={ MAX_HEIGHT } expanded={ showItems } paddingVertical={ SEPARATOR_SIZES.small }>
+            {
+                searchBarEnable &&
+               <Animated.View ref={ listHeaderRef } style={ floatingSearchBarStyle }>
+                  <SearchBar
+                     term={ searchTerm }
+                     setTerm={ setSearchTerm }
+                     textInputProps={ {
+                         placeholder: searchBarPlaceholder,
+                         actionIcon: ICON_NAMES.close,
+                         onAction: () => setSearchTerm(""),
+                         containerStyle: {
+                             backgroundColor: COLORS.gray4,
+                             borderRadius: 15
+                         }
+                     } }
+                  />
+                  <Animated.View style={ searchBarDividerStyle }>
+                     <Divider
                         margin={ 0 }
                         size={ "85%" }
                         color={ COLORS.gray2 }
-                    />
-                </Animated.View>
-            </Animated.View>
+                     />
+                  </Animated.View>
+               </Animated.View>
+            }
             {
                 isBottomSheet
                 ? <BottomSheetFlashList { ...flashListProps } />
                 : <FlashList { ...flashListProps } />
             }
-        </Animated.View>
+        </DropdownView>
     );
 }
 
@@ -257,4 +269,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default DropdownPickerElements;
+export default DropdownPickerItems;

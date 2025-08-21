@@ -1,4 +1,4 @@
-import { Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
 import React from "react";
 import { COLORS, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 
@@ -13,17 +13,19 @@ type PickerItemProps = {
     item: PickerItemType
     onPress: () => void
     selected: boolean
+    style?: ViewStyle
 }
 
 const PickerItem: React.FC<PickerItemProps> = ({
     item: { value, title = value, subtitle, icon },
     onPress,
-    selected
+    selected,
+    style
 }) => (
     <TouchableOpacity
         onPress={ onPress }
         disabled={ selected }
-        style={ [styles.itemContainer, selected && styles.selectedItemContainer] }
+        style={ [styles.itemContainer, selected && styles.selectedItemContainer, style] }
     >
         {
             icon &&
