@@ -1,11 +1,11 @@
 import React from "react";
-import { Dimensions, SafeAreaView, StyleSheet, View, ViewStyle } from "react-native";
+import { Dimensions, StyleSheet, View, ViewStyle } from "react-native";
 import TabBarIcon from "./TabBarIcon.tsx";
 import Animated, { Extrapolation, interpolate, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { COLORS, FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { useScreenScrollView } from "../../../contexts/screenScrollView/ScreenScrollViewContext.ts";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface TabBarProps {
     tabBarStyle?: ViewStyle,

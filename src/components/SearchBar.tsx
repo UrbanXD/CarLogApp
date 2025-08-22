@@ -1,7 +1,6 @@
 import React from "react";
 import { ICON_NAMES } from "../constants/index.ts";
-import Input from "./Input/Input.ts";
-import { TextInputProps } from "./Input/text/TextInput.tsx";
+import TextInput, { TextInputProps } from "./Input/text/TextInput.tsx";
 
 type SearchBarProps = {
     setTerm: (value: string) => void
@@ -17,7 +16,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const placeholder = textInputProps?.placeholder ?? "Keresés...";
 
     return (
-        <Input.Text
+        <TextInput
             value={ term }
             setValue={ setTerm }
             { ...textInputProps }

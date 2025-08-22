@@ -7,7 +7,7 @@ import { useInputFieldContext } from "../../../contexts/inputField/InputFieldCon
 import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
 
 export type TextInputProps = {
-    inputRef: RefObject<TextInputRN | null>
+    inputRef?: RefObject<TextInputRN | null>
     type?: "primary" | "secondary"
     value?: string
     setValue?: (text: string) => void
