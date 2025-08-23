@@ -10,7 +10,7 @@ import {
     SEPARATOR_SIZES
 } from "../../../../constants/index.ts";
 import Button from "../../../../components/Button/Button.ts";
-import { CAR_FORM_STEPS } from "../../hooks/useCarSteps.tsx";
+import { CAR_FORM_STEPS } from "../../constants/index.ts";
 import Divider from "../../../../components/Divider.tsx";
 import Odometer from "../Odometer.tsx";
 import FuelGauge from "../FuelGauge.tsx";

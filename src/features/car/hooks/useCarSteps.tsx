@@ -8,15 +8,6 @@ import CarProfile from "../components/carProfile/CarProfile.ts";
 import { CarEditNameToast } from "../presets/toast/index.ts";
 import { ResultStep, StepProps, Steps } from "../../../../../types/index.ts";
 
-export enum CAR_FORM_STEPS {
-    NameStep,
-    CarModelStep,
-    OdometerStep,
-    FuelStep,
-    ImageStep,
-    ResultStep
-}
-
 const useCarSteps = (
     control: StepProps["control"],
     resetField: StepProps["resetField"],

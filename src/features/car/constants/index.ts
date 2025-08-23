@@ -23,3 +23,12 @@ export const FUEL_MEASUREMENTS: Array<RawPickerElement> = [
     { title: "Liter", value: "l" },
     { title: "Gallon", value: "gal" }
 ];
+
+export enum CAR_FORM_STEPS {
+    NameStep,
+    CarModelStep,
+    OdometerStep,
+    FuelStep,
+    ImageStep,
+    ResultStep
+}
