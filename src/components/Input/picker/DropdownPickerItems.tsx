@@ -1,22 +1,14 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import PickerItem, { PickerItemType } from "./PickerItem.tsx";
-import { COLORS, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { COLORS, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { useDropdownPickerContext } from "../../../contexts/dropdownPicker/DropdownPickerContext.ts";
-import Animated, {
-    Easing,
-    interpolate,
-    runOnJS,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming
-} from "react-native-reanimated";
+import Animated, { useAnimatedRef, useSharedValue } from "react-native-reanimated";
 import { ListRenderItemInfo, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from "react-native";
-import { heightPercentageToDP } from "react-native-responsive-screen";
-import { FlashList, FlashListProps, FlashListRef } from "@shopify/flash-list";
-import Divider from "../../Divider.tsx";
-import { BottomSheetFlashList, useBottomSheetInternal } from "@gorhom/bottom-sheet";
-import SearchBar from "../../SearchBar.tsx";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { FlashList, FlashListRef } from "@shopify/flash-list";
+import { useBottomSheetInternal, useBottomSheetScrollableCreator } from "@gorhom/bottom-sheet";
 import DropdownView from "../../dropdownView/DropdownView.tsx";
+import DropdownPickerSearchBar from "./DropdownPickerSearchBar.tsx";
 
 type DropdownPickerElementsProps = {
     masonry?: boolean
@@ -32,6 +24,8 @@ type DropdownPickerElementsProps = {
  */
 function DropdownPickerItems({ masonry, numColumns, searchBarPlaceholder }: DropdownPickerElementsProps) {
     const isBottomSheet = !!useBottomSheetInternal(true);
+    const BottomSheetFlashListScrollable = isBottomSheet ? useBottomSheetScrollableCreator() : undefined;
+
     const {
         items,
         fetchByScrolling,
@@ -41,27 +35,16 @@ function DropdownPickerItems({ masonry, numColumns, searchBarPlaceholder }: Drop
         showItems,
         onSelect,
         toggleDropdown,
-        setSearchTerm,
         searchBarEnable
     } = useDropdownPickerContext();
 
     const flashListRef = useRef<FlashListRef<PickerItemType>>(null);
-    const listHeaderRef = useRef<Animated.View | null>(null);
-    const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
-    const itemsFiltered = useRef(false);
-    const lastScrollPosition = useRef(0);
-
-    const searchBarDisplay = useSharedValue(1);
-    const searchBarDividerDisplay = useSharedValue(1);
+    const listHeaderRef = useAnimatedRef<Animated.View>(null);
+    const itemsFiltered = useRef(false); //this is for prevent scrolling to first element if data just fetched (not filtered)
 
     const [searchBarHeight, setSearchBarHeight] = useState(0);
 
-    const MAX_HEIGHT = heightPercentageToDP(29.5);
-    const searchBarDisplayAnimationConfig = { duration: 500, easing: Easing.inOut(Easing.quad) };
-
-    useEffect(() => {
-        searchBarDividerDisplay.value = (lastScrollPosition.current <= searchBarHeight / 2) ? 1 : 0;
-    }, [showItems]);
+    const scrollY = useSharedValue(0);
 
     useEffect(() => {
         itemsFiltered.current = true;
@@ -77,6 +60,7 @@ function DropdownPickerItems({ masonry, numColumns, searchBarPlaceholder }: Drop
     useLayoutEffect(() => {
         if(!searchBarEnable) return;
 
+        // its measure the header height at start only once
         listHeaderRef.current?.measure((_x, _y, _width, height, _pageX, _pageY) => {
             setSearchBarHeight(height);
         });
@@ -88,27 +72,11 @@ function DropdownPickerItems({ masonry, numColumns, searchBarPlaceholder }: Drop
     }, [onSelect, toggleDropdown]);
 
     const onScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+        "worklet";
         if(!searchBarEnable) return;
-        lastScrollPosition.current = event.nativeEvent.contentOffset.y;
 
-        if(lastScrollPosition.current > searchBarHeight / 2) {
-            searchBarDisplay.value = withTiming(0, searchBarDisplayAnimationConfig);
-            searchBarDividerDisplay.value = 0;
-        } else {
-            searchBarDisplay.value = 1;
-            searchBarDividerDisplay.value = 1;
-        }
-
-        if(scrollTimeout.current) clearTimeout(scrollTimeout.current);
-
-        runOnJS(() => {
-            scrollTimeout.current = setTimeout(() => {
-                if(lastScrollPosition.current <= searchBarHeight / 2) return;
-
-                searchBarDisplay.value = withTiming(1, searchBarDisplayAnimationConfig);
-            }, searchBarDisplayAnimationConfig.duration);
-        })();
-    }, [searchBarEnable, searchBarHeight]);
+        scrollY.value = event.nativeEvent.contentOffset.y;
+    }, [searchBarEnable]);
 
     const onStartReached = useCallback(() => {
         if(!fetchingEnabled) return;
@@ -124,7 +92,7 @@ function DropdownPickerItems({ masonry, numColumns, searchBarPlaceholder }: Drop
 
 
     const keyExtractor = useCallback(
-        (item: PickerItemType, index: number) => `${ item.value }-${ index.toString() }`,
+        (item: PickerItemType) => `${ item.title ?? "" }-${ item.value }`,
         []
     );
 
@@ -156,95 +124,49 @@ function DropdownPickerItems({ masonry, numColumns, searchBarPlaceholder }: Drop
         [selectedItem]
     );
 
-    const floatingSearchBarStyle = useAnimatedStyle(() => {
-        if(!searchBarEnable) return {};
-
-        const translateY = interpolate(searchBarDisplay.value, [0, 1], [-100, 0]);
-        return ({
-            position: "absolute",
-            top: 0,
-            width: "100%",
-            alignSelf: "center",
-            gap: SEPARATOR_SIZES.lightSmall,
-            paddingTop: styles.container.paddingVertical,
-            paddingBottom: SEPARATOR_SIZES.lightSmall,
-            backgroundColor: styles.container.backgroundColor,
-            zIndex: 1,
-            transform: [{ translateY }],
-            opacity: searchBarDisplay.value
-        });
-    });
-
-    const searchBarDividerStyle = useAnimatedStyle(() => ({
-        display: searchBarDividerDisplay.value === 0 ? "none" : "flex"
-    }));
-
-    const flashListProps = useMemo((): FlashListProps<PickerItemType> => ({
-        ref: flashListRef,
-        data: items.filter(item => item.value !== selectedItem?.value),
-        masonry,
-        numColumns,
-        renderItem,
-        contentContainerStyle: { paddingTop: searchBarEnable && searchBarHeight - SEPARATOR_SIZES.small },
-        maintainVisibleContentPosition: { disabled: true },
-        drawDistance: heightPercentageToDP(100),
-        keyExtractor,
-        ListEmptyComponent: renderListEmptyComponent,
-        ItemSeparatorComponent: renderSeparatorComponent,
-        nestedScrollEnabled: true,
-        decelerationRate: 0.9,
-        onScroll: searchBarEnable ? onScroll : undefined,
-        onStartReached,
-        onStartReachedThreshold: 0.5,
-        onEndReached,
-        onEndReachedThreshold: 0.5,
-        keyboardDismissMode: "on-drag",
-        showsVerticalScrollIndicator: false,
-        showsHorizontalScrollIndicator: false
-    }), [
-        flashListRef,
-        items,
-        renderItem,
-        keyExtractor,
-        renderListEmptyComponent,
-        renderSeparatorComponent,
-        searchBarEnable,
-        onScroll,
-        onEndReached
-    ]);
+    const filteredItems = useMemo(
+        () => items.filter(item => item.value !== selectedItem?.value),
+        [items, selectedItem]
+    );
 
     return (
-        <DropdownView height={ MAX_HEIGHT } expanded={ showItems } paddingVertical={ SEPARATOR_SIZES.small }>
+        <DropdownView height={ hp(29.5) } expanded={ showItems } paddingVertical={ SEPARATOR_SIZES.small }>
             {
                 searchBarEnable &&
-               <Animated.View ref={ listHeaderRef } style={ floatingSearchBarStyle }>
-                  <SearchBar
-                     term={ searchTerm }
-                     setTerm={ setSearchTerm }
-                     textInputProps={ {
-                         placeholder: searchBarPlaceholder,
-                         actionIcon: ICON_NAMES.close,
-                         onAction: () => setSearchTerm(""),
-                         containerStyle: {
-                             backgroundColor: COLORS.gray4,
-                             borderRadius: 15
-                         }
-                     } }
-                  />
-                  <Animated.View style={ searchBarDividerStyle }>
-                     <Divider
-                        margin={ 0 }
-                        size={ "85%" }
-                        color={ COLORS.gray2 }
-                     />
-                  </Animated.View>
-               </Animated.View>
+               <DropdownPickerSearchBar
+                  ref={ listHeaderRef }
+                  scrollY={ scrollY }
+                  searchBarPlaceholder={ searchBarPlaceholder }
+                  style={ {
+                      paddingTop: SEPARATOR_SIZES.small,
+                      backgroundColor: COLORS.gray5
+                  } }
+               />
             }
-            {
-                isBottomSheet
-                ? <BottomSheetFlashList { ...flashListProps } />
-                : <FlashList { ...flashListProps } />
-            }
+            <FlashList
+                ref={ flashListRef }
+                data={ filteredItems }
+                masonry={ masonry }
+                numColumns={ numColumns }
+                renderItem={ renderItem }
+                contentContainerStyle={ { paddingTop: searchBarEnable && searchBarHeight - SEPARATOR_SIZES.small } }
+                maintainVisibleContentPosition={ { disabled: true } }
+                drawDistance={ hp(100) }
+                keyExtractor={ keyExtractor }
+                ListEmptyComponent={ renderListEmptyComponent }
+                ItemSeparatorComponent={ renderSeparatorComponent }
+                nestedScrollEnabled
+                onScroll={ searchBarEnable ? onScroll : undefined }
+                scrollEventThrottle={ 16 }
+                onStartReached={ onStartReached }
+                onStartReachedThreshold={ 0.5 }
+                onEndReached={ onEndReached }
+                onEndReachedThreshold={ 0.5 }
+                keyboardDismissMode="on-drag"
+                showsVerticalScrollIndicator={ false }
+                showsHorizontalScrollIndicator={ false }
+                renderScrollComponent={ BottomSheetFlashListScrollable }
+            />
         </DropdownView>
     );
 }
