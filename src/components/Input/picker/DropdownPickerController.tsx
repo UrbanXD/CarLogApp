@@ -1,6 +1,6 @@
 import React from "react";
 import { TouchableOpacity } from "react-native";
-import Input from "../Input.ts";
+import TextInput from "../text/TextInput.tsx";
 import { ICON_NAMES } from "../../../constants/index.ts";
 import { useDropdownPickerContext } from "../../../contexts/dropdownPicker/DropdownPickerContext.ts";
 
@@ -35,7 +35,7 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
             onPress={ onPress }
             style={ { flex: 1 } }
         >
-            <Input.Text
+            <TextInput
                 value={ controllerValue }
                 placeholder={ inputPlaceholder }
                 icon={ icon }
