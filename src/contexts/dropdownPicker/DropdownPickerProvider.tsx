@@ -96,7 +96,7 @@ export function DropdownPickerProvider<Item, DB>({
     }, [searchTerm, initialLoadCompleted, paginator]);
 
     const debouncedFilter = useMemo(
-        () => debounce(IS_STATIC ? staticSearching : fetchBySearching, 350),
+        () => debounce(IS_STATIC ? staticSearching : fetchBySearching, 300),
         [staticSearching, fetchBySearching]
     );
 
@@ -109,30 +109,22 @@ export function DropdownPickerProvider<Item, DB>({
     useEffect(() => {
         if(!data && !paginator) throw new Error("DropdownPicker did not get Data nor Paginator");
 
+        if(showItems) setShowItems(false);
+        if(searchTerm !== "") setSearchTerm("");
+
         if(IS_STATIC && data) {
             const transformedData = toPickerItems<Item>(data, dataTransformSelectors);
             setItems(transformedData);
-            setInitialLoadCompleted(true);
+            if(!initialLoadCompleted) setInitialLoadCompleted(true);
         }
 
         if(paginator) {
             paginator.initial().then(result => {
                 setItems(toPickerItems<Item>(result, dataTransformSelectors));
-                setInitialLoadCompleted(true);
+                if(!initialLoadCompleted) setInitialLoadCompleted(true);
             });
         }
-    }, []);
-
-    useEffect(() => {
-        if(!paginator) return;
-
-        setShowItems(false);
-
-        paginator.initial().then(result => {
-            setItems(toPickerItems<Item>(result, dataTransformSelectors));
-            setSearchTerm("");
-        });
-    }, [paginator]);
+    }, [data, paginator]);
 
     useEffect(() => {
         if(!initialLoadCompleted) return;
