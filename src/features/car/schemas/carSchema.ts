@@ -7,6 +7,7 @@ const carFormSchema = z
     name: z.string().min(2, "2 karakter legyen min").max(20, "20 karakter legyen max"),
     brandId: zPickerRequired,
     modelId: zPickerRequired,
+    modelYear: z.string().min(4), //TODO: custom model year validation
     odometerMeasurement: zPickerRequired,
     odometerValue: zNumber(),
     fuelType: zPickerRequired,
@@ -27,6 +28,7 @@ export const useAddCarFormProps = () => {
         name: "",
         brandId: "",
         modelId: "",
+        modelYear: "",
         odometerValue: NaN,
         fuelType: "",
         fuelMeasurement: "",

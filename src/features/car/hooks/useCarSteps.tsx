@@ -24,7 +24,7 @@ const useCarSteps = (
             },
             {
                 title: "Modell",
-                fields: ["brandId", "modelId"],
+                fields: ["brandId", "modelId", "modelYear"],
                 render: () =>
                     <CarModelStep
                         control={ control }

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
 import Input from "../../../../../components/Input/Input.ts";
 import { StepProps } from "../../../../../types/index.ts";
@@ -12,17 +12,25 @@ import {
 } from "../../../../../database/connector/powersync/AppSchema.ts";
 import { PaginatorFactory, PaginatorType } from "../../../../../database/paginator/PaginatorFactory.ts";
 import { ToPickerItemsSelectors } from "../../../../../utils/toPickerItems.ts";
+import { getToday } from "../../../../../utils/getDate.ts";
 
 const CarModelStep: React.FC<StepProps> = ({
     control,
     resetField
 }) => {
-    const { db } = useDatabase();
+    const { db, carDAO } = useDatabase();
 
     const selectedBrandId = useWatch({
         control,
         name: "brandId"
     });
+
+    const selectedModelId = useWatch({
+        control,
+        name: "modelId"
+    });
+
+    const [modelYears, setModelYears] = useState<Array<string>>([]);
 
     const brandsPaginator = useMemo(() => PaginatorFactory.createPaginator<CarBrandTableType>(
         PaginatorType.cursor,
@@ -35,7 +43,7 @@ const CarModelStep: React.FC<StepProps> = ({
             searchBy: "name"
         },
         "name"
-    ), []);
+    ), [db]);
 
     const modelsPaginator = useMemo(() => {
         console.log("modalsPaginator useMemo");
@@ -55,8 +63,35 @@ const CarModelStep: React.FC<StepProps> = ({
     }, [db, selectedBrandId]);
 
     useEffect(() => {
+        const fetchYears = async () => {
+            const model = await carDAO.getCarModelById(selectedModelId);
+
+            if(!model) return;
+            const years = {
+                start: Number(model.startYear),
+                end: !model?.endYear
+                     ? getToday().getFullYear()
+                     : Number(model.endYear)
+            };
+
+            const result = Array.from(
+                { length: years.end - years.start + 1 },
+                (_, key) => (years.start + key).toString()
+            ).reverse();
+
+            setModelYears(result);
+        };
+
+        fetchYears();
+    }, [selectedModelId]);
+
+    useEffect(() => {
         if(resetField) resetField("modelId", { keepError: true, keepDirty: true });
     }, [selectedBrandId]);
+
+    useEffect(() => {
+        if(resetField) resetField("modelYear", { keepError: true, keepDirty: true });
+    }, [selectedModelId]);
 
     return (
         <Input.Group>
@@ -79,7 +114,7 @@ const CarModelStep: React.FC<StepProps> = ({
                 fieldName="modelId"
                 fieldNameText="Modell"
             >
-                <Input.Picker.Dropdown
+                <Input.Picker.Dropdown<CarModelTableType>
                     paginator={ modelsPaginator }
                     icon={ ICON_NAMES.car }
                     dataTransformSelectors={ {
@@ -88,6 +123,22 @@ const CarModelStep: React.FC<StepProps> = ({
                     } as ToPickerItemsSelectors<CarModelTableType> }
                     disabled={ !selectedBrandId }
                     disabledText="Először válassza ki az autó márkáját!"
+                />
+            </Input.Field>
+            <Input.Field
+                control={ control }
+                fieldName="modelYear"
+                fieldNameText="Évjárat"
+            >
+                <Input.Picker.Dropdown<string>
+                    data={ modelYears }
+                    dataTransformSelectors={ {} }
+                    searchBarEnable={ false }
+                    masonry
+                    numColumns={ 3 }
+                    icon={ ICON_NAMES.calendar }
+                    disabled={ !selectedModelId }
+                    disabledText="Először válassza ki az autó modelljét!"
                 />
             </Input.Field>
         </Input.Group>

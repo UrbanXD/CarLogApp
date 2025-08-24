@@ -22,6 +22,7 @@ const car = new Table({
     name: column.text,
     brand: column.text,
     model: column.text,
+    modelYear: column.text,
     odometerMeasurement: column.text,
     odometerValue: column.integer,
     fuelType: column.text,
