@@ -1,59 +1,54 @@
 import React, { useCallback, useEffect, useRef } from "react";
-import { FlatList } from "react-native-gesture-handler";
-import { useWindowDimensions, View } from "react-native";
+import { ListRenderItemInfo, useWindowDimensions } from "react-native";
 import { DEFAULT_SEPARATOR } from "../constants/index.ts";
 import { RenderComponent } from "../types/index.ts";
-import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { useBottomSheetInternal, useBottomSheetScrollableCreator } from "@gorhom/bottom-sheet";
+import { FlatList } from "react-native-gesture-handler";
+import { FlashList } from "@shopify/flash-list";
 
 type OnBoardingViewProps = {
-    steps: RenderComponent
+    steps: Array<RenderComponent>
     currentStep?: number
 }
 
-const OnBoardingView: React.FC<OnBoardingViewProps> = ({
-    steps,
-    currentStep = 0
-}) => {
-    const scrollViewRef = useRef<FlatList>(null);
+function OnBoardingView({ steps, currentStep = 0 }: OnBoardingViewProps) {
+    const isBottomSheet = !!useBottomSheetInternal(true);
+    const BottomSheetFlashListScrollable = isBottomSheet ? useBottomSheetScrollableCreator() : undefined;
+
+    const flatListRef = useRef<FlatList>(null);
 
     const width = useWindowDimensions().width - 2 * DEFAULT_SEPARATOR;
 
     useEffect(() => {
-        scrollViewRef.current?.scrollToOffset({ offset: currentStep * width, animated: true });
-    }, [scrollViewRef, currentStep, width]);
+        flatListRef.current?.scrollToOffset({ offset: currentStep * width, animated: true });
+    }, [currentStep, width]);
 
-    const renderSteps = useCallback(() => (
-        <View style={ { flexDirection: "row" } }>
-            {
-                steps.map((step, index) =>
-                    <View
-                        key={ index }
-                        style={ { width } }
-                    >
-                        <BottomSheetScrollView showsVerticalScrollIndicator={ false }>
-                            { step() }
-                        </BottomSheetScrollView>
-                    </View>
-                )
-            }
-        </View>
-    ), [currentStep, steps]);
+    const keyExtractor = useCallback((_, index: number) => index.toString(), []);
+
+    const renderStep = useCallback(({ item }: ListRenderItemInfo<RenderComponent>) => item(), []);
+
+    const renderItem = useCallback(({ item }: ListRenderItemInfo<RenderComponent>) => (
+        <FlashList
+            data={ [item] }
+            renderItem={ renderStep }
+            keyExtractor={ keyExtractor }
+            contentContainerStyle={ { width } }
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={ false }
+            renderScrollComponent={ BottomSheetFlashListScrollable }
+        />
+    ), [width, renderStep]);
 
     return (
         <FlatList
-            data={ [] }
-            renderItem={ () => <></> }
-            ListEmptyComponent={ renderSteps() }
-            ref={ scrollViewRef }
-            scrollEnabled={ false }
+            ref={ flatListRef }
+            data={ steps }
+            renderItem={ renderItem }
+            keyExtractor={ keyExtractor }
             horizontal
-            snapToInterval={ width }
+            scrollEnabled={ false }
+            nestedScrollEnabled
             showsHorizontalScrollIndicator={ false }
-            showsVerticalScrollIndicator={ false }
-            decelerationRate="fast"
-            bounces={ false }
-            bouncesZoom={ false }
-            renderToHardwareTextureAndroid
         />
     );
 };

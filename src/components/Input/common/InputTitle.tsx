@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, GLOBAL_STYLE } from "../../constants/index.ts";
+import { COLORS, FONT_SIZES, GLOBAL_STYLE } from "../../../constants/index.ts";
 
 interface InputTitleProps {
     title: string,

@@ -1,11 +1,10 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, GLOBAL_STYLE } from "../../../constants/index.ts";
+import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE } from "../../../constants/index.ts";
 import Garage from "../../../features/car/components/Garage.tsx";
 import UpcomingRidesBlock from "./UpcomingRidesBlock";
 import Divider from "../../../components/Divider";
 import LatestExpensesBlock from "./LatestExpensesBlock";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { ScreenScrollView } from "../../../components/ScreenScrollView.tsx";
 import { useAuth } from "../../../contexts/auth/AuthContext.ts";
 
@@ -22,11 +21,12 @@ const HomeScreen: React.FC = () => {
                     Vezzessen számot nálunk az autóiról!
                 </Text>
             </View>
-            <Divider
-                thickness={ 2.5 }
-                size={ wp(75) }
-                color={ COLORS.gray4 }
-            />
+            <View style={ styles.dividerContainer }>
+                <Divider
+                    thickness={ 2.5 }
+                    color={ COLORS.gray4 }
+                />
+            </View>
             <Garage/>
             <UpcomingRidesBlock/>
             <LatestExpensesBlock/>
@@ -54,6 +54,9 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.05,
         color: COLORS.gray1
+    },
+    dividerContainer: {
+        marginHorizontal: DEFAULT_SEPARATOR
     }
 });
 

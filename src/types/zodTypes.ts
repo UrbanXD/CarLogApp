@@ -2,22 +2,19 @@ import { z } from "zod";
 import { ImageType } from "../utils/pickImage.ts";
 import { ColorValue } from "react-native";
 
-export const zNumber = z
+export const zNumber = (defaultValue?: number = NaN, minValue?: number = 0) => z
 .preprocess(
-    (value: any) => value ? value.toString() : "",
+    (value: any) => value ? value.toString() : defaultValue.toString(),
     z
     .string()
-    .transform(
-        (value) =>
-            (value === "" ? NaN : Number(value))
-    )
+    .transform((value) => (Number(value)))
     .refine(
         (value) => !isNaN(value),
         { message: "Kérem adjon meg egy számot." }
     )
     .refine(
-        (value) => value > 0,
-        { message: "A számnak nullától nagyobbnak kell lennie." }
+        (value) => value >= minValue,
+        { message: `A számnak nagyobbnak vagy egyenlőnek kell lennie mint ${ minValue }.` }
     )
 );
 

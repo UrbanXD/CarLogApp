@@ -20,16 +20,22 @@ export const addCar = createAsyncThunk(
 
         try {
             const { userID } = await supabaseConnector.fetchCredentials();
+            const { brandId, modelId, ...restCar } = car;
 
             let image = null;
             if(attachmentQueue && car.image) {
                 image = await attachmentQueue.saveFile(car.image, userID);
             }
 
+            const { name: brand } = await carDAO.getCarBrandById(brandId);
+            const { name: model } = await carDAO.getCarModelById(modelId);
+
             const newCarTableRow: CarTableType = {
-                ...car,
+                ...restCar,
                 id: getUUID(),
                 owner: userID,
+                brand,
+                model,
                 image: image ? image.filename : null,
                 createdAt: Date.now().toString()
             };

@@ -6,8 +6,8 @@ const useCars = () => {
     const cars = useAppSelector(getCars);
     const loading = useAppSelector(isLoading);
 
-    const getCar = (id: string): CarDto =>
-        cars.find(car => car.id === id) || cars[0];
+    const getCar = (id: string): CarDto | undefined =>
+        cars.find(car => car.id === id);
 
     return {
         cars,

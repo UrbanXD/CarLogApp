@@ -36,7 +36,7 @@ const Garage: React.FC = () => {
                 x={ coordinate }
                 overlay
                 item={ item }
-                cardAction={ () => openCarProfile(item?.id || index.toString()) }
+                cardAction={ () => openCarProfile(item.id) }
             />;
 
     return (

@@ -1,30 +1,28 @@
-import React, { useState } from "react";
+import React from "react";
 import { ICON_NAMES } from "../constants/index.ts";
-import TextInput from "./Input/text/TextInput";
+import TextInput, { TextInputProps } from "./Input/text/TextInput.tsx";
 
-interface SearchBarProps {
-    onTextChange: (value: any) => void;
-    term?: string;
-    onClose?: () => void;
+type SearchBarProps = {
+    setTerm: (value: string) => void
+    term: string
+    textInputProps?: TextInputProps
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
-    onTextChange,
-    term = "",
-    onClose
+    setTerm,
+    term,
+    textInputProps
 }) => {
-    const [value, setValue] = useState(term);
+    const placeholder = textInputProps?.placeholder ?? "Keresés...";
 
     return (
         <TextInput
-            value={ value }
-            setValue={ (text: string) => {
-                setValue(text);
-                onTextChange(text);
-            } }
-            actionIcon={ ICON_NAMES.close }
-            onAction={ onClose }
+            value={ term }
+            setValue={ setTerm }
+            { ...textInputProps }
             icon={ ICON_NAMES.search }
+            placeholder={ placeholder }
+            allowInputFieldContext={ false }
         />
     );
 };

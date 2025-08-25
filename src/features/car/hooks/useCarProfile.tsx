@@ -14,6 +14,8 @@ const useCarProfile = (carID: string) => {
     const car = getCar(carID);
 
     const handleDeleteCar = () => {
+        if(!car) return;
+
         openModal({
             title: `A(z) ${ car.name } nevű autó törlése`,
             body: `Az autó kitörlése egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
@@ -25,6 +27,8 @@ const useCarProfile = (carID: string) => {
     };
 
     const openEditCarStepBottomSheet = (stepIndex: number) => {
+        if(!car) return;
+
         router.push({ pathname: "bottomSheet/editCar", params: { carId: car.id, stepIndex } });
     };
 

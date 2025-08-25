@@ -5,15 +5,20 @@ import { StepProps } from "../../../../../types/index.ts";
 
 const NameStep: React.FC<StepProps> = ({
     control
-}) =>
-    <Input.Text
-        control={ control }
-        fieldName="name"
-        fieldNameText="Autó azonosító"
-        fieldInfoText="Az autó elnevezése, azonosítója mely az Ön számára lehet fontos autója azonosításakor."
-        placeholder="AA-0000-BB"
-        icon={ ICON_NAMES.nametag }
-        isInBottomSheet
-    />;
+}) => {
+    return (
+        <Input.Field
+            control={ control }
+            fieldName="name"
+            fieldNameText="Autó azonosító"
+            fieldInfoText="Az autó elnevezése, azonosítója mely az Ön számára lehet fontos autója azonosításakor."
+        >
+            <Input.Text
+                icon={ ICON_NAMES.nametag }
+                placeholder="Új Autóm"
+            />
+        </Input.Field>
+    );
+};
 
 export default NameStep;

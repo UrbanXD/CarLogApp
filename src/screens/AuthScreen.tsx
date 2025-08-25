@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants/index.ts";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
@@ -14,7 +14,7 @@ import { router } from "expo-router";
 import { useSignUp } from "../features/user/hooks/useSignUp.ts";
 
 const AuthScreen: React.FC = () => {
-    const { top } = useSafeAreaInsets();
+    const { top, bottom } = useSafeAreaInsets();
     const { session, notVerifiedUser } = useAuth();
     const { openUserVerification } = useSignUp();
 
@@ -28,10 +28,10 @@ const AuthScreen: React.FC = () => {
         if(notVerifiedUser && notVerifiedUser.email) openUserVerification(notVerifiedUser.email);
     }, [notVerifiedUser]);
 
-    const styles = useStyles(top);
+    const styles = useStyles(top, bottom);
 
     return (
-        <SafeAreaView style={ styles.pageContainer }>
+        <View style={ styles.pageContainer }>
             <View style={ styles.imageContainer }>
                 <Animated.Image
                     entering={ FadeIn.duration(ENTERING_ANIMATION_DURATION) }
@@ -101,15 +101,16 @@ const AuthScreen: React.FC = () => {
                   </Text>
                </Animated.View>
             }
-        </SafeAreaView>
+        </View>
     );
 };
 
-const useStyles = (top: number) =>
+const useStyles = (top: number, bottom: number) =>
     StyleSheet.create({
         pageContainer: {
             flex: 1,
-            backgroundColor: COLORS.black2
+            backgroundColor: COLORS.black2,
+            paddingBottom: bottom
         },
         imageContainer: {
             flex: 1,

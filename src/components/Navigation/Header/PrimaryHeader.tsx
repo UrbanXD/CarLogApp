@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
-import Picker from "../../Input/picker/Picker.tsx";
 import Avatar from "../../Avatar/Avatar.ts";
 import { router } from "expo-router";
 import { getLabelByName } from "../../../utils/getLabelByName.ts";
@@ -9,7 +8,7 @@ import { useAuth } from "../../../contexts/auth/AuthContext.ts";
 import { loadSelectedCar } from "../../../features/car/model/actions/loadSelectedCar.ts";
 import { selectCar } from "../../../features/car/model/actions/selectCar.ts";
 import { store } from "../../../database/redux/store.ts";
-import { getCarsAsCarouselElements, isLoading } from "../../../features/car/model/selectors/index.ts";
+import { getCarsAsPickerElements, isLoading } from "../../../features/car/model/selectors/index.ts";
 import { useAppSelector } from "../../../hooks/index.ts";
 import { getSelectedCarId } from "../../../features/car/model/selectors/getSelectedCarId.ts";
 import HeaderView from "./HeaderView.tsx";
@@ -21,7 +20,7 @@ const PrimaryHeader: React.FC = () => {
 
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-    const cars = useAppSelector(getCarsAsCarouselElements());
+    const cars = useAppSelector(getCarsAsPickerElements());
     const carsLoading = useAppSelector(isLoading);
     const selectedCarId = useAppSelector(getSelectedCarId);
 
@@ -40,17 +39,18 @@ const PrimaryHeader: React.FC = () => {
     return (
         <HeaderView>
             <View style={ { flex: 1 } }>
-                {
-                    !carsLoading &&
-                   <Picker
-                      data={ cars }
-                      selectedItemId={ selectedCarId }
-                      isDropdown={ true }
-                      onDropdownToggle={ setIsDropdownVisible }
-                      onSelect={ onCarSelect }
-                      placeholder={ "Válasszon autót" }
-                   />
-                }
+                {/*{*/ }
+                {/*    !carsLoading &&*/ }
+                {/*   <Input.Picker.Dropdown*/ }
+                {/*      data={ cars }*/ }
+                {/*      defaultSelectedElementId={ selectedCarId }*/ }
+                {/*      setValue={ onCarSelect }*/ }
+                {/*      horizontal*/ }
+                {/*      icon={ ICON_NAMES.car }*/ }
+                {/*      inputPlaceholder="Válasszon autót"*/ }
+                {/*      onDropdownToggle={ (value) => setIsDropdownVisible(value) }*/ }
+                {/*   />*/ }
+                {/*}*/ }
             </View>
             {
                 !isDropdownVisible && (

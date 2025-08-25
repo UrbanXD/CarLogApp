@@ -1,109 +1,128 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput as TextInputRN, View } from "react-native";
+import React, { RefObject, useEffect, useState } from "react";
+import { StyleSheet, TextInput as TextInputRN, TextStyle, View, ViewStyle } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, ICON_COLORS, ICON_NAMES } from "../../../constants/index.ts";
 import Icon from "../../Icon.tsx";
+import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
 
-interface TextInputProps {
-    value?: string;
-    setValue?: (text: string) => void;
-    icon?: string;
-    actionIcon?: string;
-    onAction?: () => void;
-    placeholder?: string;
-    error?: string;
-    numeric?: boolean;
-    isSecure?: boolean;
-    isEditable?: boolean;
+export type TextInputProps = {
+    inputRef?: RefObject<TextInputRN | null>
+    type?: "primary" | "secondary"
+    value?: string
+    setValue?: (text: string) => void
+    icon?: string
+    actionIcon?: string
+    onAction?: () => void
+    placeholder?: string
+    numeric?: boolean
+    secure?: boolean
+    editable?: boolean
+    multiline?: boolean
+    alwaysFocused?: boolean // csak design szempont
+    allowInputFieldContext?: boolean
+    containerStyle?: ViewStyle
+    textInputStyle?: ViewStyle & TextStyle
 }
 
 const TextInput: React.FC<TextInputProps> = ({
+    inputRef,
+    type = "primary",
     value,
     setValue,
     icon,
     actionIcon,
     onAction,
     placeholder,
-    error,
     numeric,
-    isSecure,
-    isEditable
+    secure: isSecure = false,
+    editable,
+    multiline,
+    alwaysFocused,
+    allowInputFieldContext = true,
+    containerStyle,
+    textInputStyle
 }) => {
-    const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
+    const bottomSheetInternal = useBottomSheetInternal(true);
+    const shouldHandleKeyboardEvents = bottomSheetInternal?.shouldHandleKeyboardEvents;
+
+    const inputFieldContext = allowInputFieldContext ? useInputFieldContext() : null;
+    const fieldValue = value || inputFieldContext?.field?.value || "";
+    const onChange = inputFieldContext?.field?.onChange;
+    const error = inputFieldContext?.fieldState?.error;
 
     const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(isSecure);
 
-    const changeSecure = () => setSecure(!secure);
+    const changeSecure = () => setSecure(prevState => !prevState);
     const onFocus = () => setFocused(true);
     const onBlur = () => setFocused(false);
 
+    const updateFieldValue = (value: string) => {
+        if(onChange) onChange(value);
+        if(setValue) setValue(value);
+    };
+
     useEffect(() => {
-        shouldHandleKeyboardEvents.value = focused;
+        if(shouldHandleKeyboardEvents) shouldHandleKeyboardEvents.value = focused;
     }, [focused, shouldHandleKeyboardEvents]);
 
     return (
-        <>
-            <View
-                style={ [
-                    styles.formFieldContainer,
-                    focused && styles.activeFormFieldContainer,
-                    !!error && styles.errorFormFieldContainer
-                ] }>
-                {
-                    icon &&
-                   <View style={ styles.formFieldIconContainer }>
-                      <Icon
-                         icon={ icon }
-                         size={ hp(4.5) }
-                         color={ styles.textInput.color }
-                      />
-                   </View>
-                }
-                <TextInputRN
-                    placeholder={ placeholder }
-                    style={ styles.textInput }
-                    placeholderTextColor={ styles.placeholderText.color }
-                    value={ value }
-                    keyboardType={ numeric ? "numeric" : "default" }
-                    secureTextEntry={ secure }
-                    onChangeText={ setValue }
-                    onBlur={ onBlur }
-                    onFocus={ onFocus }
-                    editable={ isEditable }
-                />
-                {
-                    isSecure &&
-                   <View style={ styles.formFieldIconContainer }>
-                      <Icon
-                         icon={ secure ? ICON_NAMES.eyeOff : ICON_NAMES.eye }
-                         size={ hp(3.25) }
-                         color={ ICON_COLORS.default }
-                         onPress={ changeSecure }
-                      />
-                   </View>
-                }
-                {
-                    actionIcon &&
-                   <View style={ styles.formFieldIconContainer }>
-                      <Icon
-                         icon={ actionIcon }
-                         size={ hp(4.5) }
-                         color={ ICON_COLORS.default }
-                          // style={{ alignSelf: "center" }}
-                         onPress={ onAction }
-                      />
-                   </View>
-                }
-            </View>
+        <View
+            style={ [
+                styles.formFieldContainer,
+                type === "primary" && styles.primaryFormFieldContainer,
+                containerStyle,
+                (focused || alwaysFocused) && styles.activeFormFieldContainer,
+                !!error && styles.errorFormFieldContainer
+            ] }>
             {
-                error &&
-               <Text style={ styles.errorText }>
-                   { error }
-               </Text>
+                icon &&
+               <View style={ styles.formFieldIconContainer }>
+                  <Icon
+                     icon={ icon }
+                     size={ hp(4.5) }
+                     color={ styles.textInput.color }
+                  />
+               </View>
             }
-        </>
+            <TextInputRN
+                ref={ inputRef }
+                placeholder={ placeholder }
+                style={ [textInputStyle, styles.textInput] }
+                placeholderTextColor={ styles.placeholderText.color }
+                value={ fieldValue.toString() }
+                multiline={ multiline }
+                keyboardType={ numeric ? "numeric" : "default" }
+                secureTextEntry={ secure }
+                onChangeText={ updateFieldValue }
+                onBlur={ onBlur }
+                onFocus={ onFocus }
+                editable={ editable }
+            />
+            {
+                isSecure &&
+               <View style={ styles.formFieldIconContainer }>
+                  <Icon
+                     icon={ secure ? ICON_NAMES.eyeOff : ICON_NAMES.eye }
+                     size={ hp(3.25) }
+                     color={ ICON_COLORS.default }
+                     onPress={ changeSecure }
+                  />
+               </View>
+            }
+            {
+                actionIcon &&
+               <View style={ styles.formFieldIconContainer }>
+                  <Icon
+                     icon={ actionIcon }
+                     size={ hp(4.5) }
+                     color={ ICON_COLORS.default }
+                     onPress={ onAction }
+                  />
+               </View>
+            }
+        </View>
     );
 };
 
@@ -114,17 +133,19 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: hp(1.5),
+        overflow: "hidden"
+    },
+    primaryFormFieldContainer: {
         backgroundColor: COLORS.gray5,
         paddingHorizontal: hp(1.5),
         borderRadius: 20,
-        overflow: "hidden"
+        borderWidth: 1,
+        borderColor: COLORS.gray5
     },
     activeFormFieldContainer: {
-        borderWidth: 1,
-        borderColor: COLORS.gray1
+        borderColor: COLORS.gray2
     },
     errorFormFieldContainer: {
-        borderWidth: 1,
         borderColor: COLORS.redLight
     },
     formFieldIconContainer: {
@@ -138,13 +159,6 @@ const styles = StyleSheet.create({
     },
     placeholderText: {
         color: COLORS.gray2
-    },
-    errorText: {
-        paddingLeft: hp(2),
-        fontFamily: "Gilroy-Medium",
-        fontSize: hp(1.85),
-        letterSpacing: hp(1.85) * 0.05,
-        color: COLORS.redLight
     }
 });
 

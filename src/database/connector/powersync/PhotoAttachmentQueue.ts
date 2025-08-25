@@ -1,5 +1,5 @@
 import { AbstractAttachmentQueue, AttachmentRecord, AttachmentState } from "@powersync/attachments";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import { BaseConfig } from "../../../constants/index.ts";
 import { CAR_TABLE, USER_TABLE } from "./AppSchema.ts";
 import { getUUID } from "../../utils/uuid.ts";

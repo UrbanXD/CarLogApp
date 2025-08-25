@@ -6,7 +6,6 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { useForm } from "react-hook-form";
 import { getToday } from "../../../utils/getDate.ts";
 import { EditRideFormFieldType, editRideUseFormProps } from "../schemas/editRideFormSchema.ts";
-import InputText from "../../../components/Input/text/InputText.tsx";
 import ProgressBar from "../../../components/ProgressBar.tsx";
 import Icon from "../../../components/Icon.tsx";
 
@@ -108,11 +107,11 @@ const EditRideForm: React.FC<EditRideFormProps> = React.memo(({ ride }) => {
             </View>
             <View style={ styles.infoContentContainer }>
                 <View style={ { flexDirection: "row", justifyContent: "space-between" } }>
-                    <InputText
-                        control={ control }
-                        fieldName={ "carUID" }
-                        isEditable={ true }
-                    />
+                    {/*<InputText*/ }
+                    {/*    control={ control }*/ }
+                    {/*    fieldName={ "carUID" }*/ }
+                    {/*    isEditable={ true }*/ }
+                    {/*/>*/ }
                     <View style={ { backgroundColor: "blue" } }>
                         <Text style={ { color: "white" } }>Szemelyek szama { ride.client }</Text>
                     </View>

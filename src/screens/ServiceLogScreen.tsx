@@ -1,9 +1,10 @@
 import React from "react";
 import { COLORS, FONT_SIZES, GLOBAL_STYLE } from "../constants/index.ts";
-import { Platform, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { formatNumber } from "../utils/formatNumber";
 import Divider from "../components/Divider";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const ServiceLogScreen: React.FC = () => {
     const logs = [

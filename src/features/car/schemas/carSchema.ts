@@ -5,13 +5,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 const carFormSchema = z
 .object({
     name: z.string().min(2, "2 karakter legyen min").max(20, "20 karakter legyen max"),
-    brand: zPickerRequired,
-    model: zPickerRequired,
+    brandId: zPickerRequired,
+    modelId: zPickerRequired,
+    modelYear: z.string().min(4), //TODO: custom model year validation
     odometerMeasurement: zPickerRequired,
-    odometerValue: zNumber,
+    odometerValue: zNumber(),
     fuelType: zPickerRequired,
     fuelMeasurement: zPickerRequired,
-    fuelTankSize: zNumber,
+    fuelTankSize: zNumber(),
+    fuelValue: zNumber(0),
     image: zImage.optional()
 });
 
@@ -24,12 +26,14 @@ export type EditCarFormFieldType = z.infer<typeof editCarFormSchema>;
 export const useAddCarFormProps = () => {
     const defaultValues: AddCarFormFieldType = {
         name: "",
-        brand: "",
-        model: "",
+        brandId: "",
+        modelId: "",
+        modelYear: "",
         odometerValue: NaN,
         fuelType: "",
         fuelMeasurement: "",
         fuelTankSize: NaN,
+        fuelValue: 0,
         image: null
     };
 

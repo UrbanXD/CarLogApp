@@ -4,6 +4,7 @@ CREATE TABLE public.car (
     name character VARYING NULL,
     brand character VARYING NULL,
     model character VARYING NULL,
+    "modelYear" text NULL,
     image character VARYING NULL,
     "odometerMeasurement" character VARYING NULL,
     "odometerValue" bigint NULL,

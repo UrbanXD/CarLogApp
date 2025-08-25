@@ -14,11 +14,13 @@ export const toCarDto = async (car?: CarTableType, attachmentQueue?: PhotoAttach
         name: car.name,
         brand: car.brand,
         model: car.model,
+        modelYear: car.modelYear,
         odometerMeasurement: car.odometerMeasurement,
         odometerValue: car.odometerValue,
         fuelType: car.fuelType,
         fuelMeasurement: car.fuelMeasurement,
         fuelTankSize: car.fuelTankSize,
+        fuelValue: car.fuelValue,
         image: carImage,
         createdAt: car.createdAt
     };

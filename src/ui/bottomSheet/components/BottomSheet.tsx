@@ -96,6 +96,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
             keyboardBehavior="interactive"
             keyboardBlurBehavior="restore"
             android_keyboardInputMode="adjustPan"
+            enableBlurKeyboardOnGesture
             backgroundStyle={ styles.containerBackground }
             handleIndicatorStyle={ styles.line }
             backdropComponent={ renderBackdrop }

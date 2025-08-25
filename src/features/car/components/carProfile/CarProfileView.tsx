@@ -10,7 +10,7 @@ import {
     SEPARATOR_SIZES
 } from "../../../../constants/index.ts";
 import Button from "../../../../components/Button/Button.ts";
-import { CAR_FORM_STEPS } from "../../hooks/useCarSteps.tsx";
+import { CAR_FORM_STEPS } from "../../constants/index.ts";
 import Divider from "../../../../components/Divider.tsx";
 import Odometer from "../Odometer.tsx";
 import FuelGauge from "../FuelGauge.tsx";
@@ -20,12 +20,14 @@ import { CarDto } from "../../model/types/index.ts";
 type CarProfileViewProps = {
     car: CarDto
     openEditCarStep: (stepIndex: number) => void
+    fuelSliderDisabled?: boolean
     handleDeleteCar?: () => void
 }
 
 const CarProfileView: React.FC<CarProfileViewProps> = ({
     car,
     openEditCarStep,
+    fuelSliderDisabled = false,
     handleDeleteCar
 }) =>
     <View style={ styles.container }>
@@ -80,7 +82,7 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                 </View>
                 <View style={ styles.carInfoRow }>
                     <Text style={ styles.carInfoTitleText }>Évjárat</Text>
-                    <Text style={ styles.carInfoText }>2025</Text>
+                    <Text style={ styles.carInfoText }>{ car.modelYear }</Text>
                 </View>
                 <Button.Row style={ {
                     marginTop: SEPARATOR_SIZES.lightSmall,
@@ -114,10 +116,11 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                 openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.OdometerStep) }
             />
             <FuelGauge
-                value={ 0 }
+                value={ car.fuelValue }
                 tankSize={ car.fuelTankSize }
                 fuelType={ car.fuelType }
                 measurement={ car.fuelMeasurement }
+                disabled={ fuelSliderDisabled }
                 openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.FuelStep) }
             />
         </ScrollView>
