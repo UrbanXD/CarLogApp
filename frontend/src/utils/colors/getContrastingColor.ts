@@ -1,4 +1,4 @@
-import { hexToRgba, rgbaToArray } from "./hexToRgba";
+import { hexToRgba, rgbaToArray } from "./hexToRgba.ts";
 import { Color } from "../../types/index.ts";
 
 //https://24ways.org/2010/calculating-color-contrast
