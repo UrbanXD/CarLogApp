@@ -27,13 +27,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String token = jwtTokenUtil.extractToken(request);
-        System.out.println("token: " + token);
 
         if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }
-        ;
 
         try {
             if (!jwtTokenUtil.isValid(token)) return;
