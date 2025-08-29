@@ -1,4 +1,4 @@
-package com.carlog.carlog_backend.car.details.dto;
+package com.carlog.carlog_backend.car._details.dto;
 
 import lombok.Data;
 

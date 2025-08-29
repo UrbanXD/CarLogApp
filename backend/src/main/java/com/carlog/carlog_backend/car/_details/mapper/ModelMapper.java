@@ -1,7 +1,7 @@
-package com.carlog.carlog_backend.car.details.mapper;
+package com.carlog.carlog_backend.car._details.mapper;
 
-import com.carlog.carlog_backend.car.details.dto.ModelDto;
-import com.carlog.carlog_backend.car.details.entity.Model;
+import com.carlog.carlog_backend.car._details.dto.ModelDto;
+import com.carlog.carlog_backend.car._details.entity.Model;
 import com.carlog.carlog_backend.configuration.MapstructConfig;
 import org.mapstruct.Mapper;
 

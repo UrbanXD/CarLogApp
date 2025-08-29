@@ -1,8 +1,8 @@
-package com.carlog.carlog_backend.car.details.controller;
+package com.carlog.carlog_backend.car._details.controller;
 
-import com.carlog.carlog_backend.car.details.dto.ModelDto;
-import com.carlog.carlog_backend.car.details.dto.ModelRequest;
-import com.carlog.carlog_backend.car.details.service.ModelService;
+import com.carlog.carlog_backend.car._details.dto.ModelDto;
+import com.carlog.carlog_backend.car._details.dto.ModelRequest;
+import com.carlog.carlog_backend.car._details.service.ModelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

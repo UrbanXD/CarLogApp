@@ -1,4 +1,4 @@
-package com.carlog.carlog_backend.car.details.service;
+package com.carlog.carlog_backend.car._details.service;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

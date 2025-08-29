@@ -1,14 +1,14 @@
-package com.carlog.carlog_backend.car.details.service;
+package com.carlog.carlog_backend.car._details.service;
 
 import com.carlog.carlog_backend._exception_handler.exceptions.NotFoundException;
-import com.carlog.carlog_backend.car.details.dto.MakeDto;
-import com.carlog.carlog_backend.car.details.dto.ModelDto;
-import com.carlog.carlog_backend.car.details.dto.ModelRequest;
-import com.carlog.carlog_backend.car.details.entity.Make;
-import com.carlog.carlog_backend.car.details.entity.Model;
-import com.carlog.carlog_backend.car.details.mapper.MakeMapper;
-import com.carlog.carlog_backend.car.details.mapper.ModelMapper;
-import com.carlog.carlog_backend.car.details.repository.ModelRepository;
+import com.carlog.carlog_backend.car._details.dto.MakeDto;
+import com.carlog.carlog_backend.car._details.dto.ModelDto;
+import com.carlog.carlog_backend.car._details.dto.ModelRequest;
+import com.carlog.carlog_backend.car._details.entity.Make;
+import com.carlog.carlog_backend.car._details.entity.Model;
+import com.carlog.carlog_backend.car._details.mapper.MakeMapper;
+import com.carlog.carlog_backend.car._details.mapper.ModelMapper;
+import com.carlog.carlog_backend.car._details.repository.ModelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

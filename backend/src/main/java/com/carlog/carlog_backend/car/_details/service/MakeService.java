@@ -1,11 +1,11 @@
-package com.carlog.carlog_backend.car.details.service;
+package com.carlog.carlog_backend.car._details.service;
 
 import com.carlog.carlog_backend._exception_handler.exceptions.NotFoundException;
-import com.carlog.carlog_backend.car.details.dto.MakeDto;
-import com.carlog.carlog_backend.car.details.dto.MakeRequest;
-import com.carlog.carlog_backend.car.details.entity.Make;
-import com.carlog.carlog_backend.car.details.mapper.MakeMapper;
-import com.carlog.carlog_backend.car.details.repository.MakeRepository;
+import com.carlog.carlog_backend.car._details.dto.MakeDto;
+import com.carlog.carlog_backend.car._details.dto.MakeRequest;
+import com.carlog.carlog_backend.car._details.entity.Make;
+import com.carlog.carlog_backend.car._details.mapper.MakeMapper;
+import com.carlog.carlog_backend.car._details.repository.MakeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

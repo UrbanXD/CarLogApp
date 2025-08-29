@@ -1,7 +1,7 @@
-package com.carlog.carlog_backend.car.details.controller;
+package com.carlog.carlog_backend.car._details.controller;
 
-import com.carlog.carlog_backend.car.details.service.MakeService;
-import com.carlog.carlog_backend.car.details.service.ModelService;
+import com.carlog.carlog_backend.car._details.service.MakeService;
+import com.carlog.carlog_backend.car._details.service.ModelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PutMapping;

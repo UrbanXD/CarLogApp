@@ -1,6 +1,6 @@
-package com.carlog.carlog_backend.car.details.repository;
+package com.carlog.carlog_backend.car._details.repository;
 
-import com.carlog.carlog_backend.car.details.entity.Model;
+import com.carlog.carlog_backend.car._details.entity.Model;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

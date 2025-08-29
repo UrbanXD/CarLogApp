@@ -1,4 +1,4 @@
-package com.carlog.carlog_backend.car.details.entity;
+package com.carlog.carlog_backend.car._details.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
