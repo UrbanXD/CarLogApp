@@ -52,4 +52,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             response.getWriter().write("Invalid or expired JWT token.");
         }
     }
+
+    public static Session AuthenticatedUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof String) {
+            return null;
+        }
+
+        return (Session) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 }
