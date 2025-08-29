@@ -26,8 +26,8 @@ import java.util.List;
 public class SecurityConfig {
     private final String ACTUATOR = "/actuator/**";
     private final String AUTH = "/auth/**";
-    private final String MAKE = "/make/**";
-    private final String MODEL = "/model/**";
+    private final String MAKE = "/car/make/**";
+    private final String MODEL = "/car/model/**";
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
