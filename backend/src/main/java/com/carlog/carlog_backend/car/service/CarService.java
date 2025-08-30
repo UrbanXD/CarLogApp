@@ -1,5 +1,6 @@
 package com.carlog.carlog_backend.car.service;
 
+import com.carlog.carlog_backend._exception_handler.exceptions.ForbiddenException;
 import com.carlog.carlog_backend._exception_handler.exceptions.NotFoundException;
 import com.carlog.carlog_backend.car._details.entity.Model;
 import com.carlog.carlog_backend.car._details.repository.ModelRepository;
@@ -52,5 +53,35 @@ public class CarService {
 
         Car savedCar = carRepository.save(car);
         return carMapper.toCarDto(savedCar);
+    }
+
+    public CarDto updateCar(UUID id, CarRequest request) {
+        Car car = getUserCar(id);
+
+        if (request.getName() != null) car.setName(request.getName());
+        if (request.getModelId() != null) {
+            Model model = modelRepository.findById(request.getModelId()).orElseThrow(() -> new NotFoundException("Model not found"));
+            car.setModel(model);
+        }
+        if (request.getModelYear() != null) car.setModelYear(request.getModelYear());
+        if (request.getImageUrl() != null) car.setImageUrl(request.getImageUrl());
+
+        Car savedCar = carRepository.save(car);
+
+        return carMapper.toCarDto(savedCar);
+    }
+
+    public void deleteCar(UUID id) {
+        Car car = getUserCar(id);
+        carRepository.delete(car);
+    }
+
+    private Car getUserCar(UUID carId) {
+        UUID sessionUserId = Objects.requireNonNull(AuthenticatedUser()).getUserDto().getId();
+        Car car = carRepository.findById(carId).orElseThrow(() -> new NotFoundException("Car not found"));
+
+        if (!sessionUserId.equals(car.getOwnerId())) throw new ForbiddenException("This is not your car");
+
+        return car;
     }
 }
