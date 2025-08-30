@@ -4,6 +4,7 @@ import com.carlog.carlog_backend._exception_handler.exceptions.ForbiddenExceptio
 import com.carlog.carlog_backend._exception_handler.exceptions.NotFoundException;
 import com.carlog.carlog_backend.car._details.entity.Model;
 import com.carlog.carlog_backend.car._details.repository.ModelRepository;
+import com.carlog.carlog_backend.car._odometer.entity.Odometer;
 import com.carlog.carlog_backend.car.dto.CarDto;
 import com.carlog.carlog_backend.car.dto.CarRequest;
 import com.carlog.carlog_backend.car.entity.Car;
@@ -44,12 +45,19 @@ public class CarService {
         Model model = modelRepository.findById(request.getModelId()).orElseThrow(() -> new NotFoundException("Model not found"));
 
         Car car = new Car();
+        Odometer odometer = new Odometer();
+
         car.setOwnerId(ownerId);
         car.setName(request.getName());
         car.setModel(model);
         car.setModelYear(request.getModelYear());
+        car.setOdometer(odometer);
         car.setImageUrl(request.getImageUrl());
         car.setCreatedAt(Instant.now());
+
+        odometer.setCar(car);
+        odometer.setValue(request.getOdometer().getValue());
+        odometer.setMeasurement(request.getOdometer().getMeasurement());
 
         Car savedCar = carRepository.save(car);
         return carMapper.toCarDto(savedCar);

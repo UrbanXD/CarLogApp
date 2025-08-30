@@ -1,6 +1,7 @@
 package com.carlog.carlog_backend.car.entity;
 
 import com.carlog.carlog_backend.car._details.entity.Model;
+import com.carlog.carlog_backend.car._odometer.entity.Odometer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +32,9 @@ public class Car {
 
     @Column(name = "model_year")
     private String modelYear;
+
+    @OneToOne(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Odometer odometer;
 
     @Column(name = "image_url")
     private String imageUrl;

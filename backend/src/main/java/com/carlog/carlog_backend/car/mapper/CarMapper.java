@@ -1,6 +1,7 @@
 package com.carlog.carlog_backend.car.mapper;
 
 import com.carlog.carlog_backend.car._details.mapper.MakeMapper;
+import com.carlog.carlog_backend.car._odometer.mapper.OdometerMapper;
 import com.carlog.carlog_backend.car.dto.CarDto;
 import com.carlog.carlog_backend.car.entity.Car;
 import com.carlog.carlog_backend.configuration.MapstructConfig;
@@ -10,7 +11,7 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(config = MapstructConfig.class, uses = {UserMapper.class, MakeMapper.class})
+@Mapper(config = MapstructConfig.class, uses = {UserMapper.class, MakeMapper.class, OdometerMapper.class})
 public interface CarMapper {
     @Mapping(target = "make", source = "model.make")
     @Mapping(target = "model.id", source = "model.id")
