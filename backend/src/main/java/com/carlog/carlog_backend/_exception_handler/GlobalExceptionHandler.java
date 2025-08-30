@@ -1,5 +1,6 @@
 package com.carlog.carlog_backend._exception_handler;
 
+import com.carlog.carlog_backend._exception_handler.exceptions.ForbiddenException;
 import com.carlog.carlog_backend._exception_handler.exceptions.NotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<String> handleForbiddenException(ForbiddenException e) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
                 .body(e.getMessage());
     }
 }
