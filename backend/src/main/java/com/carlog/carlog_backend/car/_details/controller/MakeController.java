@@ -3,6 +3,7 @@ package com.carlog.carlog_backend.car._details.controller;
 import com.carlog.carlog_backend.car._details.dto.MakeDto;
 import com.carlog.carlog_backend.car._details.dto.MakeRequest;
 import com.carlog.carlog_backend.car._details.service.MakeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class MakeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<MakeDto> addMake(@RequestBody MakeRequest request) {
+    public ResponseEntity<MakeDto> addMake(@Valid @RequestBody MakeRequest request) {
         MakeDto createdMake = makeService.createMake(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdMake);
     }

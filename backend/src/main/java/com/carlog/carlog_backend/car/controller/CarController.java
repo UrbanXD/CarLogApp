@@ -3,6 +3,7 @@ package com.carlog.carlog_backend.car.controller;
 import com.carlog.carlog_backend.car.dto.CarDto;
 import com.carlog.carlog_backend.car.dto.CarRequest;
 import com.carlog.carlog_backend.car.service.CarService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class CarController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<CarDto> addCar(@RequestBody CarRequest request) {
+    public ResponseEntity<CarDto> addCar(@Valid @RequestBody CarRequest request) {
         CarDto car = carService.createCar(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(car);
     }
