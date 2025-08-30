@@ -33,7 +33,6 @@ public class JwtTokenUtil {
 
     public String extractToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
-        System.out.println(header);
         return (header != null && header.startsWith("Bearer ")) ? header.substring(7) : null;
     }
 
