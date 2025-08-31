@@ -1,6 +1,7 @@
 package com.carlog.carlog_backend.car.dto;
 
 import com.carlog.carlog_backend.car._details.dto.MakeDto;
+import com.carlog.carlog_backend.car._fuel_tank.dto.FuelTankDto;
 import com.carlog.carlog_backend.car._odometer.dto.OdometerDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
@@ -20,8 +21,8 @@ public class CarDto {
     private String name;
     private MakeDto make;
     private CarModelDto model;
-    //    private FuelTankDto fuelTank;
     private OdometerDto odometer;
+    private FuelTankDto fuelTank;
     private String imageUrl;
     private Instant createdAt;
 }

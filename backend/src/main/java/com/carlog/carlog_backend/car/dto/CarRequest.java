@@ -1,7 +1,8 @@
 package com.carlog.carlog_backend.car.dto;
 
-import com.carlog.carlog_backend.car._odometer.dto.OdometerMeasurementEnum;
+import com.carlog.carlog_backend.car._fuel_tank.dto.FuelTankRequest;
 import com.carlog.carlog_backend.car._odometer.dto.OdometerRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -13,7 +14,11 @@ public class CarRequest {
     @NotNull(message = "ModelId is required")
     private Long modelId;
     private String modelYear;
-    private OdometerRequest odometer = new OdometerRequest(0L, OdometerMeasurementEnum.km);
-    //    private FuelTankRequest fuelTank
+    @Valid
+    @NotNull(message = "Odometer is required")
+    private OdometerRequest odometer;
+    @Valid
+    @NotNull(message = "FuelTank is required")
+    private FuelTankRequest fuelTank;
     private String imageUrl;
 }

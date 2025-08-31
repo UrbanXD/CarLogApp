@@ -1,6 +1,7 @@
 package com.carlog.carlog_backend.car.entity;
 
 import com.carlog.carlog_backend.car._details.entity.Model;
+import com.carlog.carlog_backend.car._fuel_tank.entity.FuelTank;
 import com.carlog.carlog_backend.car._odometer.entity.Odometer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,15 +27,18 @@ public class Car {
     @Column(nullable = false)
     private String name;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "model_id")
     private Model model;
 
     @Column(name = "model_year")
     private String modelYear;
 
-    @OneToOne(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Odometer odometer;
+
+    @OneToOne(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private FuelTank fuelTank;
 
     @Column(name = "image_url")
     private String imageUrl;
