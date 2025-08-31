@@ -27,6 +27,6 @@ public class Odometer {
     private Long value;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 6)
     private OdometerMeasurementEnum measurement;
 }
