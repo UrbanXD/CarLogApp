@@ -54,10 +54,10 @@ CREATE TABLE odometer
 CREATE TABLE fuel_tank
 (
     id          UUID       DEFAULT gen_random_uuid() PRIMARY KEY,
-    car_id      UUID UNIQUE,            -- 1-1
-    type        TEXT,
-    tankSize    BIGINT     DEFAULT 0,
-    value       BIGINT     DEFAULT 0,
-    measurement VARCHAR(6) DEFAULT 'L', --{ 'L', 'D', 'E' }
+    car_id      UUID UNIQUE            NOT NULL, -- 1-1
+    type        VARCHAR(24)            NOT NULL, --{ 'PETROL', 'DIESEL', 'LPG', 'ELECTRIC' }
+    capacity    BIGINT     DEFAULT 0   NOT NULL,
+    value       BIGINT     DEFAULT 0   NOT NULL,
+    measurement VARCHAR(3) DEFAULT 'l' NOT NULL, --{ 'l', 'gal' }
     FOREIGN KEY (car_id) REFERENCES car (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
