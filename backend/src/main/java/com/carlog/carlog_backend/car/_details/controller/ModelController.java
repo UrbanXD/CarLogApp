@@ -3,6 +3,7 @@ package com.carlog.carlog_backend.car._details.controller;
 import com.carlog.carlog_backend.car._details.dto.ModelDto;
 import com.carlog.carlog_backend.car._details.dto.ModelRequest;
 import com.carlog.carlog_backend.car._details.service.ModelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,13 +37,13 @@ public class ModelController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ModelDto> addModel(@RequestBody ModelRequest request) {
+    public ResponseEntity<ModelDto> addModel(@Valid @RequestBody ModelRequest request) {
         ModelDto createdModel = modelService.createModel(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdModel);
     }
 
     @PostMapping("/upsert")
-    public ResponseEntity<ModelDto> upsertModel(@RequestBody ModelRequest request) {
+    public ResponseEntity<ModelDto> upsertModel(@Valid @RequestBody ModelRequest request) {
         ModelDto model = modelService.upsertModel(request);
         return ResponseEntity.ok(model);
     }

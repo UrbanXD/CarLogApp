@@ -36,7 +36,7 @@ public class MakeController {
     }
 
     @PostMapping("/upsert")
-    public ResponseEntity<MakeDto> upsertMake(@RequestBody MakeRequest request) {
+    public ResponseEntity<MakeDto> upsertMake(@Valid @RequestBody MakeRequest request) {
         MakeDto make = makeService.upsertMake(request);
         return ResponseEntity.ok(make);
     }
