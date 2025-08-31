@@ -53,8 +53,9 @@ public class MakeService {
     @Transactional
     public MakeDto updateMake(Long id, MakeRequest request) {
         Make make = makeRepository.findById(id).orElseThrow(() -> new NotFoundException("Make not found"));
-        make.setName(request.getName());
-        make.setActive(request.getActive());
+
+        if (request.getName() != null) make.setName(request.getName());
+        if (request.getActive() != null) make.setActive(request.getActive());
 
         Make savedMake = makeRepository.save(make);
         return makeMapper.toMakeDto(savedMake);

@@ -80,12 +80,15 @@ public class ModelService {
     public ModelDto updateModel(Long id, ModelRequest request) {
         Model model = modelRepository.findById(id).orElseThrow(() -> new NotFoundException("Model not found"));
 
-        MakeDto makeDto = makeService.getMakeById(request.getMakeId());
-        Make make = makeMapper.toMakeEntity(makeDto);
+        if (request.getMakeId() != null) {
+            MakeDto makeDto = makeService.getMakeById(request.getMakeId());
+            Make make = makeMapper.toMakeEntity(makeDto);
 
-        model.setMake(make);
-        model.setName(request.getName());
-        model.setActive(request.getActive());
+            model.setMake(make);
+        }
+
+        if (request.getName() != null) model.setName(request.getName());
+        if (request.getActive() != null) model.setActive(request.getActive());
 
         Model savedModel = modelRepository.save(model);
         return modelMapper.toModelDto(savedModel);
