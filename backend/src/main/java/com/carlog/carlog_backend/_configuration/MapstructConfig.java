@@ -1,4 +1,4 @@
-package com.carlog.carlog_backend.configuration;
+package com.carlog.carlog_backend._configuration;
 
 import org.mapstruct.MapperConfig;
 import org.mapstruct.ReportingPolicy;

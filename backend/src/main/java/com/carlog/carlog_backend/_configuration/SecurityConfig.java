@@ -1,4 +1,4 @@
-package com.carlog.carlog_backend.configuration;
+package com.carlog.carlog_backend._configuration;
 
 import com.carlog.carlog_backend.user.auth.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;

@@ -1,6 +1,6 @@
 package com.carlog.carlog_backend.user.mapper;
 
-import com.carlog.carlog_backend.configuration.MapstructConfig;
+import com.carlog.carlog_backend._configuration.MapstructConfig;
 import com.carlog.carlog_backend.user.dto.UserDto;
 import com.carlog.carlog_backend.user.entity.User;
 import org.mapstruct.Mapper;

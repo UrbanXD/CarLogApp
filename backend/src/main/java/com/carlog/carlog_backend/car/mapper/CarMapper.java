@@ -1,11 +1,11 @@
 package com.carlog.carlog_backend.car.mapper;
 
+import com.carlog.carlog_backend._configuration.MapstructConfig;
 import com.carlog.carlog_backend.car._details.mapper.MakeMapper;
 import com.carlog.carlog_backend.car._fuel_tank.mapper.FuelTankMapper;
 import com.carlog.carlog_backend.car._odometer.mapper.OdometerMapper;
 import com.carlog.carlog_backend.car.dto.CarDto;
 import com.carlog.carlog_backend.car.entity.Car;
-import com.carlog.carlog_backend.configuration.MapstructConfig;
 import com.carlog.carlog_backend.user.mapper.UserMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
