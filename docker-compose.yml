@@ -34,6 +34,23 @@ services:
       retries: 5
       start_period: 40s
 
+  scrapperApi:
+    container_name: carlog-scrapper-api
+    image: carlog-scrapper-api
+    build: ./scrapperApi
+    ports:
+      - "9001:9001"
+    depends_on:
+      - rabbitmq
+    environment:
+      SCRAPER_API_PORT: ${SCRAPER_API_PORT}
+      SCRAPER_CAR_MAKES_URL: ${SCRAPER_CAR_MAKES_URL}
+      SCRAPER_CAR_MAKE_MODELS_BASE_URL: ${SCRAPER_CAR_MAKE_MODELS_BASE_URL}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@${RABBITMQ_HOST}:${RABBITMQ_PORT}
+      RABBITMQ_SCRAPER_CAR_MAKE_QUEUE_NAME: ${RABBITMQ_SCRAPER_CAR_MAKE_QUEUE_NAME}
+      RABBITMQ_SCRAPER_CAR_MODEL_QUEUE_NAME: ${RABBITMQ_SCRAPER_CAR_MODEL_QUEUE_NAME}
+      CHROME_EXECUTABLE_PATH: ${CHROME_EXECUTABLE_PATH}
+
   db:
     image: postgres:15
     volumes:
