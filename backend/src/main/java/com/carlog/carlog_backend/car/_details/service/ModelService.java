@@ -11,6 +11,7 @@ import com.carlog.carlog_backend.car._details.mapper.ModelMapper;
 import com.carlog.carlog_backend.car._details.repository.MakeRepository;
 import com.carlog.carlog_backend.car._details.repository.ModelRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
@@ -63,7 +64,15 @@ public class ModelService {
         Map<String, Object> body = new HashMap<>();
         body.put("makeName", make.getName());
 
-        client.post().body(body).retrieve().toBodilessEntity();
+        client
+                .post()
+                .body(body)
+                .retrieve()
+                .onStatus(
+                        (httpStatusCode -> httpStatusCode.value() == HttpStatus.NO_CONTENT.value()), // 204
+                        (_req, _res) -> makeService.deleteMake(makeId)
+                )
+                .toBodilessEntity();
     }
 
     @Transactional
