@@ -52,4 +52,10 @@ public class MakeController {
         makeService.deleteMake(id);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteAllMake() {
+        makeService.deleteAllMake();
+        return ResponseEntity.ok().build();
+    }
 }

@@ -8,12 +8,16 @@ import com.carlog.carlog_backend.car._details.entity.Make;
 import com.carlog.carlog_backend.car._details.entity.Model;
 import com.carlog.carlog_backend.car._details.mapper.MakeMapper;
 import com.carlog.carlog_backend.car._details.mapper.ModelMapper;
+import com.carlog.carlog_backend.car._details.repository.MakeRepository;
 import com.carlog.carlog_backend.car._details.repository.ModelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +26,8 @@ public class ModelService {
     private final ModelMapper modelMapper;
     private final MakeService makeService;
     private final MakeMapper makeMapper;
+    private final RestClient.Builder restClientBuilder;
+    private final MakeRepository makeRepository;
 
     @Transactional(readOnly = true)
     public List<ModelDto> getAllModel() {
@@ -45,6 +51,19 @@ public class ModelService {
         if (model == null) return false;
 
         return model.getMake().getId().equals(modelId);
+    }
+
+    public void triggerModelScraping(Long makeId) {
+        Make make = makeRepository.findById(makeId).orElseThrow(() -> new NotFoundException("Make not found"));
+
+        RestClient client = restClientBuilder
+                .baseUrl("http://localhost:9001/startModelScraping/" + makeId)
+                .build();
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("makeName", make.getName());
+
+        client.post().body(body).retrieve().toBodilessEntity();
     }
 
     @Transactional

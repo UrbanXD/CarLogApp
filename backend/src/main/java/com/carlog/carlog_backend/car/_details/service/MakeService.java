@@ -9,6 +9,7 @@ import com.carlog.carlog_backend.car._details.repository.MakeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ import java.util.List;
 public class MakeService {
     private final MakeRepository makeRepository;
     private final MakeMapper makeMapper;
+    private final RestClient.Builder restClientBuilder;
 
     @Transactional(readOnly = true)
     public List<MakeDto> getAllMake() {
@@ -27,6 +29,14 @@ public class MakeService {
     public MakeDto getMakeById(Long id) {
         Make make = makeRepository.findById(id).orElseThrow(() -> new NotFoundException("Make not found"));
         return makeMapper.toMakeDto(make);
+    }
+
+    public void triggerMakeScraping() {
+        RestClient client = restClientBuilder
+                .baseUrl("http://localhost:9001/startMakeScraping")
+                .build();
+
+        client.post().retrieve().toBodilessEntity();
     }
 
     @Transactional
@@ -71,5 +81,10 @@ public class MakeService {
         if (!makeRepository.existsById(id)) throw new NotFoundException("Make not found");
 
         makeRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteAllMake() {
+        makeRepository.deleteAll();
     }
 }

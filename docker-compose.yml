@@ -17,6 +17,14 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SCRAPER_API_PORT: ${SCRAPER_API_PORT}
+      SCRAPER_API_HOST: ${SCRAPER_API_HOST}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_SCRAPER_CAR_MAKE_QUEUE_NAME: ${RABBITMQ_SCRAPER_CAR_MAKE_QUEUE_NAME}
+      RABBITMQ_SCRAPER_CAR_MODEL_QUEUE_NAME: ${RABBITMQ_SCRAPER_CAR_MODEL_QUEUE_NAME}
     networks:
       - default
     healthcheck:
@@ -45,9 +53,31 @@ services:
       retries: 5
       start_period: 40s
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672" # AMQP
+      - "15672:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    networks:
+      - default
+    healthcheck:
+      test: "rabbitmq-diagnostics -q ping"
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
 volumes:
   db-data:
   backend-build:
+  scrapper-build:
+  rabbitmq-data:
 
 networks:
   default:
