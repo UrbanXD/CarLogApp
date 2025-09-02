@@ -3,6 +3,7 @@ export const slugify = (text: string): string => {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // remove accents (Škoda -> Skoda)
     .toLowerCase()
+    .replace(".", "")
     .replace(/[^a-z0-9]+/g, "-") // all non char or number to "-"
     .replace(/(^-|-$)+/g, ""); // remove unnecessary "-"
 };
