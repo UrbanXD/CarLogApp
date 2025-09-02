@@ -12,6 +12,7 @@ import com.carlog.carlog_backend.car._details.repository.MakeRepository;
 import com.carlog.carlog_backend.car._details.repository.ModelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
@@ -67,12 +68,13 @@ public class ModelService {
         client
                 .post()
                 .body(body)
-                .retrieve()
-                .onStatus(
-                        (httpStatusCode -> httpStatusCode.value() == HttpStatus.NO_CONTENT.value()), // 204
-                        (_req, _res) -> makeService.deleteMake(makeId)
-                )
-                .toBodilessEntity();
+                .exchange((request, response) -> {
+                    if (response.getStatusCode() == HttpStatus.NO_CONTENT || response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
+                        makeService.deleteMake(makeId);
+                    }
+
+                    return ResponseEntity.ok();
+                });
     }
 
     @Transactional
