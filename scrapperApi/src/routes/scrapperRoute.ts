@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { scrapeMakes, scrapeModels } from "../controller/makeAndModelScrapperController";
+import { scrapeMakes } from "../controller/makeController";
+import { scrapeModels } from "../controller/modelController";
 
 const router = Router();
 
-// router.get("/scrape", scrapeCars);
 router.post("/startMakeScraping", scrapeMakes);
 router.post("/startModelScraping/:makeId", scrapeModels);
 
