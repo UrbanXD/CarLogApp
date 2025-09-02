@@ -22,7 +22,6 @@ export const scrapeMakes = async (_req: Request, res: Response) => {
         );
 
         for(let i = 0; i < makeRawData.length; i++) {
-            if(i == 3) break;
             const car = makeRawData[i];
 
             const makeName = await car.$eval("a.brand_name", (el) => el.textContent.trim());
@@ -38,7 +37,7 @@ export const scrapeMakes = async (_req: Request, res: Response) => {
         }
         await channel.close();
         await connection.close();
-        res.status(201).json({ message: "Sikeres" });
+        res.sendStatus(200);
     } catch(e) {
         console.error("Error  scrap cars make route", e);
     }
