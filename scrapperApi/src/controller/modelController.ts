@@ -22,11 +22,27 @@ export const scrapeModels = async (req: Request, res: Response) => {
         for(const button of buttons) button.click();
     });
 
+    const infoTable = await page.$$("div.row.mb-4.px-2 span.sptitle");
+
+    const modelCount = await infoTable[2].evaluate(el => {
+        const count = Number(el.nextSibling?.textContent?.trim());
+        return isNaN(count) ? 0 : count;
+    });
+
+    const lastModelYear = await infoTable[1].evaluate(el => {
+        const yearText = el.nextSibling?.textContent?.trim().split("-")[1];
+        const currentYear = new Date().getFullYear();
+        const year = yearText === "" ? currentYear : Number(el.nextSibling?.textContent?.trim().split("-")?.[1]);
+        return isNaN(year) ? currentYear : year;
+    });
+
+    if(lastModelYear < 1970 || modelCount < 1) {
+        await browser.close();
+        return res.sendStatus(204);
+    }
+
     const modelsRawData = await page.$$("table[data-table-type='series'] tbody tr.list_item");
-    const { connection, channel } = await connectToAmqp(
-        CONFIG.RABBITMQ_URL,
-        CONFIG.RABBITMQ_SCRAPER_CAR_MODEL_QUEUE_NAME
-    );
+    const models: Array<Model> = [];
 
     for(const model of modelsRawData) {
         const isHistoric = await model.evaluate((el) => el.getAttribute("data-type") === "historic");
@@ -34,6 +50,9 @@ export const scrapeModels = async (req: Request, res: Response) => {
         const a = await modelInfo[0].$$("a");
 
         const modelName = await a[1].evaluate((el) => el.textContent.trim());
+
+        if(modelName === "Concept") continue;
+
         const modelYears = await modelInfo[1].evaluate((el, isHistoric) => {
             const years = el.textContent.trim().split("-");
             return {
@@ -42,22 +61,33 @@ export const scrapeModels = async (req: Request, res: Response) => {
             };
         }, isHistoric);
 
-        const data: Model = {
+        models.push({
             makeId,
             name: modelName,
             startYear: modelYears.startYear,
             endYear: modelYears.endYear
-        };
+        });
+    }
 
+    await browser.close();
+
+    if(models.length < 1) return res.sendStatus(204); // NO CONTENT
+
+    const { connection, channel } = await connectToAmqp(
+        CONFIG.RABBITMQ_URL,
+        CONFIG.RABBITMQ_SCRAPER_CAR_MODEL_QUEUE_NAME
+    );
+
+    for(const model of models) {
         channel.sendToQueue(
             CONFIG.RABBITMQ_SCRAPER_CAR_MODEL_QUEUE_NAME,
-            Buffer.from(JSON.stringify(data)),
+            Buffer.from(JSON.stringify(model)),
             { persistent: true }
         );
     }
 
-    await browser.close();
     await channel.close();
     await connection.close();
-    res.status(201).json({ message: "Sikeres" });
+
+    res.sendStatus(200); // OK
 };
