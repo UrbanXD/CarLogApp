@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
-import { useAuth } from "../contexts/auth/AuthContext.ts";
 import { useFonts } from "expo-font";
 import AnimatedSplashScreen from "../screens/AnimatedSplashScreen.tsx";
+import { useAuthNew } from "../features/auth/contexts/AuthContext.ts";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -14,20 +14,18 @@ const App: React.FC = () => {
         "DSEG7": require("../assets/fonts/DSEG7ClassicMini-Bold.ttf")
     });
 
-    const { session, sessionLoading } = useAuth();
+    const { authenticated } = useAuthNew();
 
     useEffect(() => {
-        if((fontsLoaded || fontsLoadError) && !sessionLoading) {
-            SplashScreen.hideAsync();
-        }
-    }, [fontsLoaded, fontsLoadError, sessionLoading]);
+        if((fontsLoaded || fontsLoadError) && authenticated !== null) SplashScreen.hideAsync();
+    }, [fontsLoaded, fontsLoadError, authenticated]);
 
     if(!fontsLoaded) return null;
 
     return (
         <AnimatedSplashScreen
-            loaded={ !sessionLoading }
-            redirectTo={ session && session.user ? "/(main)" : "/auth" }
+            loaded={ authenticated === null }
+            redirectTo={ authenticated ? "/(main)" : "/auth" }
         />
     );
 };

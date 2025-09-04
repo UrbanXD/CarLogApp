@@ -13,7 +13,7 @@ import { OtpVerificationHandlerType } from "../../../app/bottomSheet/otpVerifica
 import { useAppDispatch } from "../../../hooks/index.ts";
 import { editUser } from "../model/actions/editUser.ts";
 import { Image } from "../../../types/index.ts";
-import { EditUserFormFieldType } from "../schemas/userSchema.tsx";
+import { EditUserRequest } from "../schemas/editUserRequestSchema.ts";
 
 export const useUserManagement = () => {
     const database = useDatabase();
@@ -55,7 +55,7 @@ export const useUserManagement = () => {
         }
     };
 
-    const changeUserMetadata = async (newUser: EditUserFormFieldType | null, toastMessages: ToastMessages) => {
+    const changeUserMetadata = async (newUser: EditUserRequest | null, toastMessages: ToastMessages) => {
         try {
             let newUserAvatar: Image | null = user?.userAvatar ?? null;
             if(newUser?.avatarImage && user?.userAvatar?.path !== getPathFromImageType(newUser.avatarImage, user?.id)) {

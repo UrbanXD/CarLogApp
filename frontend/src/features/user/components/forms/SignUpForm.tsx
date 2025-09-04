@@ -2,17 +2,17 @@ import React from "react";
 import MultiStepForm from "../../../../components/Form/MultiStepForm.tsx";
 import { useSignUpSteps } from "../../hooks/useSignUpSteps.tsx";
 import { useForm } from "react-hook-form";
-import { SignUpFormFieldType, useSignUpFormProps } from "../../schemas/userSchema.tsx";
-import { useSignUp } from "../../hooks/useSignUp.ts";
+import { SignUpRequest, useSignUpFormProps } from "../../schemas/signUpRequestSchema.ts";
+import { useAuthNew } from "../../../auth/contexts/AuthContext.ts";
 
 const SignUpForm: React.FC = () => {
+    const { signUp } = useAuthNew();
     const {
         control,
         handleSubmit,
         trigger,
         resetField
-    } = useForm<SignUpFormFieldType>(useSignUpFormProps());
-    const { signUp } = useSignUp();
+    } = useForm<SignUpRequest>(useSignUpFormProps());
 
     const submitHandler = handleSubmit(signUp);
 

@@ -1,9 +1,9 @@
 import { Database } from "../../../../database/connector/Database.ts";
 import { UserDto, UserState } from "../types/user.ts";
 import { Image } from "../../../../types/index.ts";
-import { EditUserFormFieldType } from "../../schemas/userSchema.tsx";
 import { toUserDto, toUserEntity } from "../mapper/index.ts";
 import { createAsyncThunkWithTypes } from "../../../../database/redux/createAsyncThunkWithTypes.ts";
+import { EditUserRequest } from "../../schemas/editUserRequestSchema.ts";
 
 type EditUserReturn = {
     user: UserState["user"] | null
@@ -11,7 +11,7 @@ type EditUserReturn = {
 
 type EditUserArgs = {
     database: Database
-    newUser: EditUserFormFieldType | null
+    newUser: EditUserRequest | null
     newAvatar: Image | null
 }
 

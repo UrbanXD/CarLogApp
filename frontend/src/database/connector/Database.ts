@@ -8,10 +8,12 @@ import { AttachmentRecord } from "@powersync/attachments";
 import { UserDAO } from "../../features/user/model/dao/UserDAO.ts";
 import { CarDAO } from "../../features/car/model/dao/CarDAO.ts";
 import { BaseConfig } from "../../constants/index.ts";
+import { CarlogApi, CarlogApiClient } from "../../features/api/carlogApiClient.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
     db: Kysely<DatabaseType>;
+    carlogApi: CarlogApi;
     supabaseConnector: SupabaseConnector;
     storage: SupabaseStorageAdapter;
     attachmentQueue?: PhotoAttachmentQueue;
@@ -26,6 +28,7 @@ export class Database {
             }
         });
         this.db = wrapPowerSyncWithKysely(this.powersync);
+        this.carlogApi = CarlogApiClient();
         this.supabaseConnector = new SupabaseConnector(this.powersync);
         this.storage = this.supabaseConnector.storage;
 

@@ -6,16 +6,13 @@ import Button from "../../../../components/Button/Button.ts";
 import TextDivider from "../../../../components/TextDivider.tsx";
 import Form from "../../../../components/Form/Form.tsx";
 import { useForm } from "react-hook-form";
-import { SignInFormFieldType, useSignInFormProps } from "../../schemas/userSchema.tsx";
-import { useSignIn } from "../../hooks/useSignIn.ts";
+import { SignInRequest, useSignInFormProps } from "../../schemas/signInRequest.ts";
+import { useAuthNew } from "../../../auth/contexts/AuthContext.ts";
 
 const SignInForm: React.FC = () => {
-    const {
-        control,
-        handleSubmit
-    } = useForm<SignInFormFieldType>(useSignInFormProps);
-
-    const { signIn } = useSignIn();
+    const { signIn } = useAuthNew();
+    const { control, handleSubmit } = useForm<SignInRequest>(useSignInFormProps);
+    
     const submitHandler = handleSubmit(signIn);
 
     return (
