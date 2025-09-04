@@ -21,7 +21,7 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
 
-    public RefreshToken verifyRefreshToken(String token) {
+    public RefreshToken verifyRefreshToken(UUID token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token).orElseThrow(() -> new NotFoundException("Refresh token is invalid"));
 
         if(!isTokenExpired(refreshToken)) return refreshToken;
@@ -36,7 +36,7 @@ public class RefreshTokenService {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
         refreshToken.setExpiresAt(Instant.now().plusMillis(refreshTokenExpirationTime));
-        refreshToken.setToken(UUID.randomUUID().toString());
+        refreshToken.setToken(UUID.randomUUID());
 
         return refreshTokenRepository.save(refreshToken);
     }

@@ -2,7 +2,9 @@ package com.carlog.carlog_backend.user.dto;
 
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class RefreshTokenRequest {
-    private String refreshToken;
+    private UUID refreshToken;
 }

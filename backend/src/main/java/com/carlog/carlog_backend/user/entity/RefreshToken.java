@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -21,7 +22,7 @@ public class RefreshToken {
     private User user;
 
     @Column(nullable = false, unique = true)
-    private String token;
+    private UUID token;
 
     @Column(name = "expires_at", nullable = false)
     private Instant expiresAt;
