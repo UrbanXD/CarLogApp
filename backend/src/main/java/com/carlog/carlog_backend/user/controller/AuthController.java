@@ -2,13 +2,15 @@ package com.carlog.carlog_backend.user.controller;
 
 import com.carlog.carlog_backend.user.auth.JwtTokenUtil;
 import com.carlog.carlog_backend.user.auth.Session;
-import com.carlog.carlog_backend.user.dto.SignInRequest;
-import com.carlog.carlog_backend.user.dto.SignUpRequest;
-import com.carlog.carlog_backend.user.dto.UserDto;
+import com.carlog.carlog_backend.user.dto.*;
+import com.carlog.carlog_backend.user.entity.RefreshToken;
+import com.carlog.carlog_backend.user.repository.RefreshTokenRepository;
+import com.carlog.carlog_backend.user.service.RefreshTokenService;
 import com.carlog.carlog_backend.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +27,8 @@ public class AuthController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
+    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @GetMapping("/sessionUser")
     public ResponseEntity<UserDto> currentUser(@AuthenticationPrincipal Session session) {
@@ -36,20 +40,50 @@ public class AuthController {
     @PostMapping("/signUp")
     public ResponseEntity<UserDto> signUp(@Valid @RequestBody SignUpRequest request) {
         UserDto userDTO = userService.signUp(request);
+
         return ResponseEntity.ok(userDTO);
     }
 
     @PostMapping("/signIn")
-    public ResponseEntity<String> login(@Valid @RequestBody SignInRequest request) {
+    public ResponseEntity<TokensDto> signIn(@Valid @RequestBody SignInRequest request) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+
+        UserDetails userDetails = userService.loadUserByUsername(request.getEmail());
+        String token = jwtTokenUtil.generateToken(userDetails);
+
+        UserDto user = userService.getUserByEmail(userDetails.getUsername());
+        RefreshToken refreshToken = refreshTokenService.generateRefreshToken(user.getId());
+
+        TokensDto tokens = new TokensDto();
+        tokens.setToken(token);
+        tokens.setRefreshToken(refreshToken.getToken());
+
+        return ResponseEntity.ok(tokens);
+    }
+
+    @PostMapping("/signOut")
+    public ResponseEntity<String> signOut(@RequestBody RefreshTokenRequest request) {
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getRefreshToken()).orElseGet(null);
+
+        if (refreshToken != null) refreshTokenRepository.delete(refreshToken);
+        return ResponseEntity.ok("Signed out successfully");
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokensDto> refreshToken(@RequestBody RefreshTokenRequest request) throws BadRequestException {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-            UserDetails userDetails = userService.loadUserByUsername(request.getEmail());
+            RefreshToken refreshToken = refreshTokenService.verifyRefreshToken(request.getRefreshToken());
+
+            UserDetails userDetails = userService.loadUserByUsername(refreshToken.getUser().getEmail());
             String token = jwtTokenUtil.generateToken(userDetails);
 
-            return ResponseEntity.ok(token);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Invalid email or password", HttpStatus.UNAUTHORIZED);
-        }
+            TokensDto tokens = new TokensDto();
+            tokens.setToken(token);
+            tokens.setRefreshToken(refreshToken.getToken());
 
+            return ResponseEntity.ok(tokens);
+        } catch (Exception e) {
+            throw new BadRequestException("Invalid or Expired refresh token");
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.carlog.carlog_backend.user.service;
 
+import com.carlog.carlog_backend._exception_handler.exceptions.NotFoundException;
 import com.carlog.carlog_backend.user.auth.Session;
 import com.carlog.carlog_backend.user.dto.SignUpRequest;
 import com.carlog.carlog_backend.user.dto.UserDto;
@@ -18,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -55,8 +55,8 @@ public class UserService implements UserDetailsService {
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setFirstname(request.getFirstName());
-        user.setLastname(request.getLastName());
+        user.setFirstname(request.getFirstname());
+        user.setLastname(request.getLastname());
         user.setAvatarColor(request.getAvatarColor());
         user.setCreatedAt(Instant.now());
 
@@ -69,9 +69,14 @@ public class UserService implements UserDetailsService {
     }
 
     public UserDto getUserByID(UUID id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) throw new IllegalArgumentException("User not found.");
+        User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not founs"));
 
-        return userMapper.toUserDto(user.get());
+        return userMapper.toUserDto(user);
+    }
+
+    public UserDto getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not founs"));
+
+        return userMapper.toUserDto(user);
     }
 }
