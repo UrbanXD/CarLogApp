@@ -1,13 +1,14 @@
 import React from "react";
 import EditForm from "../../../../components/Form/EditForm.tsx";
-import { EditUserFormFieldType, useEditUserFormProps } from "../../schemas/userSchema.tsx";
+import { User } from "../../schemas/userSchema.tsx";
 import { useUserManagement } from "../../hooks/useUserManagement.ts";
 import { useForm } from "react-hook-form";
 import { EDIT_USER_FORM_STEPS, useEditUserSteps } from "../../hooks/useEditUserSteps.tsx";
 import { ChangeNameToast, SignUpToast } from "../../presets/toast/index.ts";
+import { EditUserRequest, useEditUserFormProps } from "../../schemas/editUserRequestSchema.ts";
 
 export interface EditUserFormProps {
-    user: Partial<EditUserFormFieldType>;
+    user: User;
     passwordReset?: boolean;
     stepIndex: number;
 }
@@ -28,28 +29,28 @@ export const EditUserForm: React.FC<EditUserFormProps> = ({
         control,
         handleSubmit,
         reset
-    } = useForm<Partial<EditUserFormFieldType>>(useEditUserFormProps(user));
+    } = useForm<EditUserRequest>(useEditUserFormProps(user));
 
     const submitHandler =
-        handleSubmit(async (editedUser: Partial<EditUserFormFieldType>) => {
+        handleSubmit(async (request: EditUserRequest) => {
             switch(stepIndex) {
                 case EDIT_USER_FORM_STEPS.EmailStep:
-                    if(!editedUser.email) return;
+                    if(!request.email) return;
 
-                    await changeEmail(editedUser.email);
+                    await changeEmail(request.email);
                     break;
                 case EDIT_USER_FORM_STEPS.PasswordStep:
-                    if(!editedUser.password) return;
+                    if(!request.password) return;
 
-                    if(passwordReset) return await resetPassword(editedUser.password);
+                    if(passwordReset) return await resetPassword(request.password);
 
-                    await addPasswordToOAuthUser(editedUser.password);
+                    await addPasswordToOAuthUser(request.password);
                     break;
                 case EDIT_USER_FORM_STEPS.NameStep:
-                    await changeUserMetadata(editedUser, ChangeNameToast);
+                    await changeUserMetadata(request, ChangeNameToast);
                     break;
                 case EDIT_USER_FORM_STEPS.AvatarStep:
-                    await changeUserMetadata(editedUser, SignUpToast);
+                    await changeUserMetadata(request, SignUpToast);
                     break;
             }
         });
