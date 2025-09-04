@@ -15,8 +15,8 @@ public class CarDetailsService {
     private final ModelService modelService;
 
     // cron = sec min hour day_of_month month day_of_week
-//    @Scheduled(cron = "0 0 3 1 * *")  // every month first day at 03:00
-    @Scheduled(fixedRate = 1500000000)
+    @Scheduled(cron = "0 0 3 1 * *")  // every month first day at 03:00
+//    @Scheduled(fixedRate = 1500000000)
     public void startCarDetailScraping() {
         try {
             makeService.triggerMakeScraping();
@@ -27,10 +27,10 @@ public class CarDetailsService {
 
     @RabbitListener(queues = "${queue.name.make}")
     public void consumeMake(MakeRequest request) {
-        System.out.println("Received from RabbitMQ (make) : " + request);
+//        System.out.println("Received from RabbitMQ (make) : " + request);
         try {
             MakeDto make = makeService.upsertMake(request);
-            modelService.triggerModelScraping(make.getId());
+//            modelService.triggerModelScraping(make.getId());
         } catch (Exception e) {
             System.out.println("Make consume error: " + e.getMessage());
         }
@@ -38,7 +38,7 @@ public class CarDetailsService {
 
     @RabbitListener(queues = "${queue.name.model}")
     public void consumeModel(ModelRequest request) {
-        System.out.println("Received from RabbitMQ (model): " + request);
+//        System.out.println("Received from RabbitMQ (model): " + request);
         try {
             modelService.upsertModel(request);
         } catch (Exception e) {

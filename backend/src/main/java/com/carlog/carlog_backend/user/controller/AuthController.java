@@ -19,6 +19,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.interfaces.RSAPublicKey;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequestMapping("/auth")
@@ -85,5 +91,20 @@ public class AuthController {
         } catch (Exception e) {
             throw new BadRequestException("Invalid or Expired refresh token");
         }
+    }
+
+    @GetMapping("/keys")
+    public JwksDto getKeys() {
+        RSAPublicKey publicKey = jwtTokenUtil.getPublicKey();
+
+        Map<String, String> keyMap = new HashMap<>();
+        keyMap.put("kty", "RSA");
+        keyMap.put("kid", "my-key-id");
+        keyMap.put("use", "sig");
+        keyMap.put("alg", "RS256");
+        keyMap.put("n", Base64.getUrlEncoder().withoutPadding().encodeToString(publicKey.getModulus().toByteArray()));
+        keyMap.put("e", Base64.getUrlEncoder().withoutPadding().encodeToString(publicKey.getPublicExponent().toByteArray()));
+
+        return new JwksDto(Collections.singletonList(keyMap));
     }
 }

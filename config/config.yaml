@@ -1,0 +1,31 @@
+replication:
+  connections:
+    - type: postgresql
+      uri: postgresql://carlog:password@db:5432/carlog_db
+      sslmode: disable
+
+storage:
+  type: mongodb
+  uri: mongodb://powersync-mongo:27017/powersync_demo
+
+port: 8081
+
+sync_rules:
+  content: |
+    bucket_definitions:
+      global:
+        data: 
+          - SELECT * FROM make
+          - SELECT * FROM model
+#      by_user:
+#        parameters: SELECT request.user_id() as uid
+#        data:
+#          - SELECT * FROM car WHERE car.owner = bucket.uid
+#          - SELECT * FROM "user" WHERE "user".id = bucket.uid
+
+client_auth:
+  supabase: false
+
+#  jwks_uri: http://backend:8080/auth/keys
+  jwks_uri: http://host.docker.internal:8080/auth/keys
+
