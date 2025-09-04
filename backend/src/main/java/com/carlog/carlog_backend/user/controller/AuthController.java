@@ -14,7 +14,6 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -63,12 +62,10 @@ public class AuthController {
     }
 
     @PostMapping("/signOut")
-    public ResponseEntity<String> signOut(RefreshTokenRequest request) {
+    public ResponseEntity<String> signOut(@RequestBody RefreshTokenRequest request) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getRefreshToken()).orElseGet(null);
 
-        if(refreshToken == null) return ResponseEntity.badRequest().body("Invalid refresh token");
-
-        refreshTokenRepository.delete(refreshToken);
+        if (refreshToken != null) refreshTokenRepository.delete(refreshToken);
         return ResponseEntity.ok("Signed out successfully");
     }
 
