@@ -21,7 +21,7 @@ public class JwtTokenUtil {
     @Value("${jwt.secret}")
     private String secretKey;
     @Value("${jwt.expiration}")
-    private long expirationTime;
+    private Long expirationTime;
 
     public boolean isValid(String token) {
         return !getClaims(token).getExpiration().before(new Date());
