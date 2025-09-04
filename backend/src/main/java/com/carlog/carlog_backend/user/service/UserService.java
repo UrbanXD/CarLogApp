@@ -55,8 +55,8 @@ public class UserService implements UserDetailsService {
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setFirstname(request.getFirstName());
-        user.setLastname(request.getLastName());
+        user.setFirstname(request.getFirstname());
+        user.setLastname(request.getLastname());
         user.setAvatarColor(request.getAvatarColor());
         user.setCreatedAt(Instant.now());
 
