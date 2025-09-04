@@ -7,6 +7,7 @@ import com.carlog.carlog_backend.user.repository.RefreshTokenRepository;
 import com.carlog.carlog_backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -42,5 +43,11 @@ public class RefreshTokenService {
 
     public boolean isTokenExpired(RefreshToken refreshToken) {
         return refreshToken.getExpiresAt().isBefore(Instant.now());
+    }
+
+    // cron = sec min hour day_of_month month day_of_week
+    @Scheduled(cron = "0 0 0 /1 * *")
+    public void deleteExpiredTokens() {
+        refreshTokenRepository.deleteExpiredTokens();
     }
 }
