@@ -9,4 +9,7 @@ declare module "@env" {
     export const LOCAL_STORAGE_KEY_NOT_VERIFIED_USER: string;
     export const LOCAL_STORAGE_KEY_CAR_BRANDS_VERSION: string;
     export const CAR_BRANDS_VERSION: string;
+    export const BACKEND_API_BASE_URL: string;
+    export const SECURE_STORAGE_KEY_TOKEN: string;
+    export const SECURE_STORAGE_KEY_REFRESH_TOKEN: string;
 }
