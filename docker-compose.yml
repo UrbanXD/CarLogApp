@@ -53,6 +53,7 @@ services:
 
   db:
     image: postgres:15
+    container_name: carlog-db
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
