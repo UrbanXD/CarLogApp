@@ -1,14 +1,12 @@
 import React from "react";
 import AuthScreen from "../screens/AuthScreen.tsx";
-import { useAuth } from "../contexts/auth/AuthContext.ts";
 import { Redirect } from "expo-router";
+import { useAuthNew } from "../features/auth/contexts/AuthContext.ts";
 
 const Page: React.FC = () => {
-    const { session, user } = useAuth();
+    const { authenticated } = useAuthNew();
 
-    if(session && user) {
-        return <Redirect href="/(main)"/>;
-    }
+    if(authenticated) return <Redirect href="/(main)"/>;
 
     return (
         <AuthScreen/>
