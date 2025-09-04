@@ -24,10 +24,10 @@ public class RefreshTokenService {
     public RefreshToken verifyRefreshToken(UUID token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token).orElseThrow(() -> new NotFoundException("Refresh token is invalid"));
 
-        if(!isTokenExpired(refreshToken)) return refreshToken;
-
         refreshTokenRepository.delete(refreshToken);
-        throw new RuntimeException("Refresh token is expired");
+        if (isTokenExpired(refreshToken)) throw new RuntimeException("Refresh token is expired");
+
+        return generateRefreshToken(refreshToken.getUser().getId());
     }
 
     public RefreshToken generateRefreshToken(UUID userId) {
