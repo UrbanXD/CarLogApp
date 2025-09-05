@@ -54,11 +54,10 @@ public class AuthController {
     public ResponseEntity<TokensDto> signIn(@Valid @RequestBody SignInRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        UserDetails userDetails = userService.loadUserByUsername(request.getEmail());
-        String token = jwtTokenUtil.generateToken(userDetails);
+        Session session = userService.loadUserByUsername(request.getEmail());
+        String token = jwtTokenUtil.generateToken(session);
 
-        UserDto user = userService.getUserByEmail(userDetails.getUsername());
-        RefreshToken refreshToken = refreshTokenService.generateRefreshToken(user.getId());
+        RefreshToken refreshToken = refreshTokenService.generateRefreshToken(session.getUserDto().getId());
 
         TokensDto tokens = new TokensDto();
         tokens.setToken(token);
@@ -80,8 +79,8 @@ public class AuthController {
         try {
             RefreshToken refreshToken = refreshTokenService.verifyRefreshToken(request.getRefreshToken());
 
-            UserDetails userDetails = userService.loadUserByUsername(refreshToken.getUser().getEmail());
-            String token = jwtTokenUtil.generateToken(userDetails);
+            Session session = userService.loadUserByUsername(refreshToken.getUser().getEmail());
+            String token = jwtTokenUtil.generateToken(session);
 
             TokensDto tokens = new TokensDto();
             tokens.setToken(token);
@@ -99,7 +98,7 @@ public class AuthController {
 
         Map<String, String> keyMap = new HashMap<>();
         keyMap.put("kty", "RSA");
-        keyMap.put("kid", "my-key-id");
+        keyMap.put("kid", "my-secret-carlog-key-id");
         keyMap.put("use", "sig");
         keyMap.put("alg", "RS256");
         keyMap.put("n", Base64.getUrlEncoder().withoutPadding().encodeToString(publicKey.getModulus().toByteArray()));

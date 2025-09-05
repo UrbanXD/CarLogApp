@@ -18,10 +18,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -58,8 +55,8 @@ public class JwtTokenUtil {
         return !getClaims(token).getExpiration().before(new Date());
     }
 
-    public String extractEmail(String token) {
-        return getClaims(token).getSubject();
+    public UUID extractUserId(String token) {
+        return UUID.fromString(getClaims(token).getSubject());
     }
 
     public String extractToken(HttpServletRequest request) {
@@ -67,9 +64,9 @@ public class JwtTokenUtil {
         return (header != null && header.startsWith("Bearer ")) ? header.substring(7) : null;
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(Session session) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", userDetails.getAuthorities().stream()
+        claims.put("roles", session.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
 
@@ -79,7 +76,7 @@ public class JwtTokenUtil {
                 .header().add("kid", keyId).and()
                 .audience().add(audCarlog).and()
                 .audience().add(audPowersync).and()
-                .subject(userDetails.getUsername())
+                .subject(String.valueOf(session.getUserDto().getId()))
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(privateKey, Jwts.SIG.RS256)
