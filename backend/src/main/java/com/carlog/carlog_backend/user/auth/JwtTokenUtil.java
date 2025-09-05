@@ -30,6 +30,15 @@ public class JwtTokenUtil {
     @Value("${jwt.expiration}")
     private Long expirationTime;
 
+    @Value("${jwt.keyId}")
+    private String keyId;
+
+    @Value("${jwt.aud.carlog}")
+    private String audCarlog;
+
+    @Value("${jwt.aud.powersync}")
+    private String audPowersync;
+
     public JwtTokenUtil() throws Exception {
         InputStream privStream = getClass().getClassLoader().getResourceAsStream("keys/private_key.pem");
         String privKey = new String(privStream.readAllBytes())
@@ -72,7 +81,9 @@ public class JwtTokenUtil {
         return Jwts
                 .builder()
                 .claims(claims)
-                .header().add("kid", "my-key-id").and()
+                .header().add("kid", keyId).and()
+                .audience().add(audCarlog).and()
+                .audience().add(audPowersync).and()
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))
@@ -83,6 +94,7 @@ public class JwtTokenUtil {
     private Claims getClaims(String token) {
         return Jwts.parser()
                 .verifyWith(publicKey)
+                .requireAudience(audCarlog)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
