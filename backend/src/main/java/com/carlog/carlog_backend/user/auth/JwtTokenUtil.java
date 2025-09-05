@@ -100,9 +100,10 @@ public class JwtTokenUtil {
         assert inputStream != null;
 
         String key = new String(inputStream.readAllBytes())
-                .replaceAll("-----BEGIN PRIVATE KEY-----", "")
-                .replaceAll("-----END PRIVATE KEY-----", "")
+                .replaceAll("-----BEGIN ([A-Z ]*)-----", "")
+                .replaceAll("-----END ([A-Z ]*)-----", "")
                 .replaceAll("\\s", "");
+
         return Base64.getDecoder().decode(key);
     }
 }
