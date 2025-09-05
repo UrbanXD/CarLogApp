@@ -47,9 +47,9 @@ export const CarlogApiClient = () => {
                     error.response.config.headers["Authorization"] = `Bearer ${ response.data.access_token }`;
                     return axios(error.response.config); // recall the base request with new tokens
                 } catch(error) {
-                    console.error("Error at refresh token", err.response.status);
+                    console.log("Error at refresh token", error?.response?.status ?? error);
 
-                    if(err.response.status === 400) throw { response: { status: 401 } };
+                    if(error?.response?.status === 400) throw { response: { status: 401 } };
 
                     return Promise.reject(error);
                 } finally {
