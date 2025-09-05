@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zImage } from "../../../types/zodTypes.ts";
 
 export const userSchema = z
 .object({
@@ -6,7 +7,7 @@ export const userSchema = z
     email: z.string().email("Nem megfelelő email cím formátum"),
     firstname: z.string().optional(),
     lastname: z.string().optional(),
-    avatarUrl: z.string().optional().nullable(),
+    avatar: zImage.optional().nullable(),
     avatarColor: z.string().optional().nullable()
 });
 

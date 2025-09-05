@@ -1,9 +1,9 @@
 import { Database } from "../../../../database/connector/Database.ts";
-import { UserDto, UserState } from "../types/user.ts";
+import { UserState } from "../types/user.ts";
 import { Image } from "../../../../types/index.ts";
-import { toUserDto, toUserEntity } from "../mapper/index.ts";
 import { createAsyncThunkWithTypes } from "../../../../database/redux/createAsyncThunkWithTypes.ts";
 import { EditUserRequest } from "../../schemas/editUserRequestSchema.ts";
+import { User } from "../../schemas/userSchema.tsx";
 
 type EditUserReturn = {
     user: UserState["user"] | null
@@ -30,15 +30,12 @@ export const editUser =
                 image: newAvatar?.image
             };
 
-            const userDto: UserDto = {
+            const user: User = {
                 ...oldUser,
                 ...newUser,
                 userAvatar: newUserAvatar
             };
 
-            const user = toUserEntity(userDto);
-            const returned = await userDAO.editUser(user);
-
-            return { user: await toUserDto(returned) };
+            return { user: await userDAO.editUser(user) };
         }
     );
