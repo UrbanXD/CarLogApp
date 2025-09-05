@@ -8,11 +8,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -39,24 +42,16 @@ public class JwtTokenUtil {
     @Value("${jwt.aud.powersync}")
     private String audPowersync;
 
-    public JwtTokenUtil() throws Exception {
-        InputStream privStream = getClass().getClassLoader().getResourceAsStream("keys/private_key.pem");
-        String privKey = new String(privStream.readAllBytes())
-                .replaceAll("-----BEGIN PRIVATE KEY-----", "")
-                .replaceAll("-----END PRIVATE KEY-----", "")
-                .replaceAll("\\s", "");
-        byte[] decodedPriv = Base64.getDecoder().decode(privKey);
-        PKCS8EncodedKeySpec keySpecPriv = new PKCS8EncodedKeySpec(decodedPriv);
-        privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpecPriv);
+    public JwtTokenUtil() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        PKCS8EncodedKeySpec keySpecPrivate = new PKCS8EncodedKeySpec(loadDecodedKey("keys/private_key.pem"));
+        privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpecPrivate);
 
-        InputStream pubStream = getClass().getClassLoader().getResourceAsStream("keys/public_key.pem");
-        String pubKey = new String(pubStream.readAllBytes())
-                .replaceAll("-----BEGIN PUBLIC KEY-----", "")
-                .replaceAll("-----END PUBLIC KEY-----", "")
-                .replaceAll("\\s", "");
-        byte[] decodedPub = Base64.getDecoder().decode(pubKey);
-        X509EncodedKeySpec keySpecPub = new X509EncodedKeySpec(decodedPub);
+        X509EncodedKeySpec keySpecPub = new X509EncodedKeySpec(loadDecodedKey("keys/public_key.pem"));
         publicKey = KeyFactory.getInstance("RSA").generatePublic(keySpecPub);
+    }
+
+    public RSAPublicKey getPublicKey() {
+        return (RSAPublicKey) publicKey;
     }
 
     public boolean isValid(String token) {
@@ -100,7 +95,14 @@ public class JwtTokenUtil {
                 .getPayload();
     }
 
-    public RSAPublicKey getPublicKey() {
-        return (RSAPublicKey) publicKey;
+    private byte[] loadDecodedKey(String path) throws IOException {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(path);
+        assert inputStream != null;
+
+        String key = new String(inputStream.readAllBytes())
+                .replaceAll("-----BEGIN PRIVATE KEY-----", "")
+                .replaceAll("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s", "");
+        return Base64.getDecoder().decode(key);
     }
 }
