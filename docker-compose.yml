@@ -13,7 +13,6 @@ services:
       db:
         condition: service_healthy
     environment:
-      POSTGRES_SERVER: ${POSTGRES_SERVER}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -33,46 +32,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 40s
-
-  powersync:
-    restart: unless-stopped
-    depends_on:
-      powersync-mongo-rs-init:
-        condition: service_completed_successfully
-      db:
-        condition: service_healthy
-    image: journeyapps/powersync-service:latest
-    command: ["start", "-r", "unified"]
-    volumes:
-      - ./config/config.yaml:/config/config.yaml
-    environment:
-      POWERSYNC_CONFIG_PATH: /config/config.yaml
-      POSTGRES_HOST: db
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "8081:8081"
-    networks:
-      - default
-
-  scrapperApi:
-    container_name: carlog-scrapper-api
-    image: carlog-scrapper-api
-    build: ./scrapperApi
-    ports:
-      - "9001:9001"
-    depends_on:
-      - rabbitmq
-    environment:
-      SCRAPER_API_PORT: ${SCRAPER_API_PORT}
-      SCRAPER_CAR_MAKES_URL: ${SCRAPER_CAR_MAKES_URL}
-      SCRAPER_CAR_MAKE_MODELS_BASE_URL: ${SCRAPER_CAR_MAKE_MODELS_BASE_URL}
-      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@${RABBITMQ_HOST}:${RABBITMQ_PORT}
-      RABBITMQ_SCRAPER_CAR_MAKE_QUEUE_NAME: ${RABBITMQ_SCRAPER_CAR_MAKE_QUEUE_NAME}
-      RABBITMQ_SCRAPER_CAR_MODEL_QUEUE_NAME: ${RABBITMQ_SCRAPER_CAR_MODEL_QUEUE_NAME}
-      CHROME_EXECUTABLE_PATH: ${CHROME_EXECUTABLE_PATH}
 
   db:
     image: postgres:15
@@ -95,6 +54,28 @@ services:
       retries: 5
       start_period: 40s
 
+  powersync:
+    restart: unless-stopped
+    depends_on:
+      powersync-mongo-rs-init:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+    image: journeyapps/powersync-service:latest
+    command: [ "start", "-r", "unified" ]
+    volumes:
+      - ./config:/config
+    environment:
+      POWERSYNC_CONFIG_PATH: ${POWERSYNC_CONFIG_PATH}
+      PS_POSTGRES_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      PS_MONGO_URI: mongodb://${POWERSYNC_MONGO_HOST}:${POWERSYNC_MONGO_PORT}/powersync_demo
+      PS_PORT: ${POWERSYNC_PORT}
+      PS_JWKS_URI: http://host.docker.internal:${BACKEND_PORT}/auth/keys
+    ports:
+      - "8081:8081"
+    networks:
+      - default
+
   powersync-mongo:
     image: mongo:7.0
     command: --replSet rs0 --bind_ip_all --quiet
@@ -114,7 +95,7 @@ services:
     entrypoint:
       - bash
       - -c
-      - 'mongosh --host powersync-mongo:27017 --eval ''try{rs.status().ok && quit(0)} catch {} rs.initiate({_id: "rs0", version: 1, members: [{ _id: 0, host: "powersync-mongo:27017" }]})'''
+      - 'mongosh --host ${POWERSYNC_MONGO_HOST}:${POWERSYNC_MONGO_PORT} --eval ''try{rs.status().ok && quit(0)} catch {} rs.initiate({_id: "rs0", version: 1, members: [{ _id: 0, host: "${POWERSYNC_MONGO_HOST}:${POWERSYNC_MONGO_PORT}" }]})'''
     networks:
       - default
 
@@ -137,6 +118,23 @@ services:
       timeout: 5s
       retries: 5
       start_period: 40s
+
+  scrapperApi:
+    container_name: carlog-scrapper-api
+    image: carlog-scrapper-api
+    build: ./scrapperApi
+    ports:
+      - "9001:9001"
+    depends_on:
+      - rabbitmq
+    environment:
+      SCRAPER_API_PORT: ${SCRAPER_API_PORT}
+      SCRAPER_CAR_MAKES_URL: ${SCRAPER_CAR_MAKES_URL}
+      SCRAPER_CAR_MAKE_MODELS_BASE_URL: ${SCRAPER_CAR_MAKE_MODELS_BASE_URL}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@${RABBITMQ_HOST}:${RABBITMQ_PORT}
+      RABBITMQ_SCRAPER_CAR_MAKE_QUEUE_NAME: ${RABBITMQ_SCRAPER_CAR_MAKE_QUEUE_NAME}
+      RABBITMQ_SCRAPER_CAR_MODEL_QUEUE_NAME: ${RABBITMQ_SCRAPER_CAR_MODEL_QUEUE_NAME}
+      CHROME_EXECUTABLE_PATH: ${CHROME_EXECUTABLE_PATH}
 
 volumes:
   db-data:
