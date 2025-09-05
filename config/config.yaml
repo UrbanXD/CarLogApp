@@ -1,0 +1,29 @@
+replication:
+  connections:
+    - type: postgresql
+      uri: !env PS_POSTGRES_URI
+      sslmode: disable
+
+storage:
+  type: mongodb
+  uri: !env PS_MONGO_URI
+
+port: !env PS_PORT
+
+sync_rules:
+  content: |
+    bucket_definitions:
+      global:
+        data: 
+          - SELECT * FROM make
+          - SELECT * FROM model
+#      by_user:
+#        parameters: SELECT request.user_id() as uid
+#        data:
+#          - SELECT * FROM car WHERE car.owner = bucket.uid
+#          - SELECT * FROM "user" WHERE "user".id = bucket.uid
+
+client_auth:
+  jwks_uri: !env PS_JWKS_URI
+  audience: ["powersync"]
+

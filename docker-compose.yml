@@ -13,7 +13,8 @@ services:
       db:
         condition: service_healthy
     environment:
-      POSTGRES_SERVER: ${POSTGRES_SERVER}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -29,6 +30,92 @@ services:
       - default
     healthcheck:
       test: "curl --fail --silent ${BACKEND_HOST}:${BACKEND_PORT}/api/actuator/health | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  db:
+    image: postgres:15
+    container_name: carlog-db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - default
+    command: [ "postgres", "-c", "wal_level=logical" ]
+    healthcheck:
+      test: "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  powersync:
+    restart: unless-stopped
+    depends_on:
+      powersync-mongo-rs-init:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+    image: journeyapps/powersync-service:latest
+    command: [ "start", "-r", "unified" ]
+    volumes:
+      - ./config:/config
+    environment:
+      POWERSYNC_CONFIG_PATH: ${POWERSYNC_CONFIG_PATH}
+      PS_POSTGRES_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      PS_MONGO_URI: mongodb://${POWERSYNC_MONGO_HOST}:${POWERSYNC_MONGO_PORT}/powersync_demo
+      PS_PORT: ${POWERSYNC_PORT}
+      PS_JWKS_URI: http://host.docker.internal:${BACKEND_PORT}/auth/keys
+    ports:
+      - "8081:8081"
+    networks:
+      - default
+
+  powersync-mongo:
+    image: mongo:7.0
+    command: --replSet rs0 --bind_ip_all --quiet
+    restart: unless-stopped
+    ports:
+      - "27017:20717"
+    volumes:
+      - mongo-storage:/data/db
+    networks:
+      - default
+
+  powersync-mongo-rs-init:
+    image: mongo:7.0
+    depends_on:
+      - powersync-mongo
+    restart: on-failure
+    entrypoint:
+      - bash
+      - -c
+      - 'mongosh --host ${POWERSYNC_MONGO_HOST}:${POWERSYNC_MONGO_PORT} --eval ''try{rs.status().ok && quit(0)} catch {} rs.initiate({_id: "rs0", version: 1, members: [{ _id: 0, host: "${POWERSYNC_MONGO_HOST}:${POWERSYNC_MONGO_PORT}" }]})'''
+    networks:
+      - default
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672" # AMQP
+      - "15672:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    networks:
+      - default
+    healthcheck:
+      test: "rabbitmq-diagnostics -q ping"
       interval: 20s
       timeout: 5s
       retries: 5
@@ -51,48 +138,9 @@ services:
       RABBITMQ_SCRAPER_CAR_MODEL_QUEUE_NAME: ${RABBITMQ_SCRAPER_CAR_MODEL_QUEUE_NAME}
       CHROME_EXECUTABLE_PATH: ${CHROME_EXECUTABLE_PATH}
 
-  db:
-    image: postgres:15
-    container_name: carlog-db
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    networks:
-      - default
-    healthcheck:
-      test: "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
-      interval: 20s
-      timeout: 5s
-      retries: 5
-      start_period: 40s
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
-    ports:
-      - "5672:5672" # AMQP
-      - "15672:15672" # Management UI
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
-    networks:
-      - default
-    healthcheck:
-      test: "rabbitmq-diagnostics -q ping"
-      interval: 20s
-      timeout: 5s
-      retries: 5
-      start_period: 40s
-
 volumes:
   db-data:
+  mongo-storage:
   backend-build:
   scrapper-build:
   rabbitmq-data:
