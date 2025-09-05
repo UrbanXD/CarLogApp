@@ -15,16 +15,20 @@ import Button from "../components/Button/Button.ts";
 import { EDIT_USER_FORM_STEPS } from "../features/user/hooks/useEditUserSteps.tsx";
 import Avatar from "../components/Avatar/Avatar.ts";
 import { getLabelByName } from "../utils/getLabelByName.ts";
-import { useAuth } from "../contexts/auth/AuthContext.ts";
 import { useUserManagement } from "../features/user/hooks/useUserManagement.ts";
 import { Redirect, router } from "expo-router";
+import { useAppSelector } from "../hooks/index.ts";
+import { getUser } from "../features/user/model/selectors/index.ts";
+import { useAuth } from "../features/auth/contexts/AuthContext.ts";
 
 const ProfileScreen: React.FC = () => {
-    const { session, user, signOut } = useAuth();
+    const user = useAppSelector(getUser);
+    const { signOut } = useAuth();
     const { deleteUserProfile } = useUserManagement();
     const { bottom } = useSafeAreaInsets();
 
     if(!user) return Redirect({ href: "backToRootIndex" });
+
     const name = `${ user.lastname } ${ user.firstname }`;
     const avatarColor = user.avatarColor;
 
@@ -53,9 +57,9 @@ const ProfileScreen: React.FC = () => {
             <View style={ styles.container }>
                 <View style={ styles.informationContainer }>
                     {
-                        user?.userAvatar
+                        user?.avatar
                         ? <Avatar.Image
-                            source={ user.userAvatar.image }
+                            source={ user.avatar.image }
                             avatarSize={ hp(20) }
                             borderColor={ COLORS.black5 }
                             style={ styles.profileImage }
@@ -75,7 +79,7 @@ const ProfileScreen: React.FC = () => {
                             { name }
                         </Text>
                         <Text style={ styles.emailText }>
-                            { user?.email }
+                            { user.email }
                         </Text>
                     </View>
                 </View>
@@ -117,11 +121,13 @@ const ProfileScreen: React.FC = () => {
                     <Button.Text
                         iconLeft={ ICON_NAMES.password }
                         iconRight={ ICON_NAMES.rightArrowHead }
-                        text={ session?.user.user_metadata.has_password ? "Jelszó csere" : "Jelszó hozzáadás" }
+                        text={ "Jelszo csere" } //TODO: Majd ha lesz google oauth tarolni hogy van-e jelszo mar beallitva hozza
+                        // text={ session?.user.user_metadata.has_password ? "Jelszó csere" : "Jelszó hozzáadás" }
                         textStyle={ { textAlign: "left" } }
-                        onPress={ session?.user.user_metadata.has_password
-                                  ? openResetPassword
-                                  : openAddPasswordToOAuthUser }
+                        onPress={ openResetPassword }
+                        // onPress={ session?.user.user_metadata.has_password
+                        //           ? openResetPassword
+                        //           : openAddPasswordToOAuthUser }
                         backgroundColor="transparent"
                         fontSize={ FONT_SIZES.p1 }
                         loadingIndicator

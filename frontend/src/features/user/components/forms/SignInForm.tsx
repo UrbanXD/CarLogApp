@@ -7,12 +7,12 @@ import TextDivider from "../../../../components/TextDivider.tsx";
 import Form from "../../../../components/Form/Form.tsx";
 import { useForm } from "react-hook-form";
 import { SignInRequest, useSignInFormProps } from "../../schemas/signInRequest.ts";
-import { useAuthNew } from "../../../auth/contexts/AuthContext.ts";
+import { useAuth } from "../../../auth/contexts/AuthContext.ts";
 
 const SignInForm: React.FC = () => {
-    const { signIn } = useAuthNew();
+    const { signIn } = useAuth();
     const { control, handleSubmit } = useForm<SignInRequest>(useSignInFormProps);
-    
+
     const submitHandler = handleSubmit(signIn);
 
     return (
