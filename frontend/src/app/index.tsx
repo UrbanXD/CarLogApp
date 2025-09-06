@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import AnimatedSplashScreen from "../screens/AnimatedSplashScreen.tsx";
-import { useAuthNew } from "../features/auth/contexts/AuthContext.ts";
+import { useAuth } from "../features/auth/contexts/AuthContext.ts";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -14,7 +14,7 @@ const App: React.FC = () => {
         "DSEG7": require("../assets/fonts/DSEG7ClassicMini-Bold.ttf")
     });
 
-    const { authenticated } = useAuthNew();
+    const { authenticated } = useAuth();
 
     useEffect(() => {
         if((fontsLoaded || fontsLoadError) && authenticated !== null) SplashScreen.hideAsync();

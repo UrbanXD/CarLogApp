@@ -1,12 +1,11 @@
-import { UserState } from "../types/user.ts";
 import { createSlice } from "@reduxjs/toolkit";
 import { loadUser } from "../actions/loadUser.ts";
-import { editUser } from "../actions/editUser.ts";
+import { editUserName } from "../actions/editUserName.ts";
+import { User } from "../../schemas/userSchema.tsx";
 
-const initialState: UserState = {
-    isLoading: false,
-    user: null
-};
+type UserState = { user: User | null }
+
+const initialState: UserState = { user: null };
 
 const userSlice = createSlice({
     name: "user",
@@ -14,19 +13,13 @@ const userSlice = createSlice({
     reducers: {},
     extraReducers: builder => {
         builder
-        .addCase(loadUser.pending, (state) => {
-            state.isLoading = true;
-        })
-        .addCase(loadUser.rejected, (state, action) => {
-            state.isLoading = false;
-            state.user = action.payload ?? null;
-        })
         .addCase(loadUser.fulfilled, (state, action) => {
-            state.isLoading = false;
             state.user = action.payload;
         })
-        .addCase(editUser.fulfilled, (state, action) => {
+        .addCase(editUserName.fulfilled, (state, action) => {
             state.user = action.payload.user;
+        }).addCase(editUserName.rejected, (state, action) => {
+            console.log(state);
         });
     }
 });

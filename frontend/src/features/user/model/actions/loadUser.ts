@@ -1,35 +1,23 @@
 import { Database } from "../../../../database/connector/Database.ts";
-import { UserTableType } from "../../../../database/connector/powersync/AppSchema.ts";
-import { toUserDto } from "../mapper/index.ts";
-import { UserDto } from "../types/user.ts";
 import { createAsyncThunkWithTypes } from "../../../../database/redux/createAsyncThunkWithTypes.ts";
+import { User } from "../../schemas/userSchema.tsx";
 
-interface LoadUserArgs {
-    database: Database;
-    userId: string;
-    defaultUserValue?: UserTableType;
-}
-
-interface AsyncThunkConfig {
-    rejectValue: UserDto;
+type LoadUserArgs = {
+    database: Database
+    userId: string
 }
 
 export const loadUser =
-    createAsyncThunkWithTypes<UserDto, LoadUserArgs, AsyncThunkConfig>(
+    createAsyncThunkWithTypes<User, LoadUserArgs>(
         "user/load",
         async (args, { rejectWithValue }) => {
-            const {
-                database: { userDAO, attachmentQueue },
-                userId,
-                defaultUserValue
-            } = args;
+            const { database: { userDAO, attachmentQueue }, userId } = args;
 
             try {
-                const user = await userDAO.getUser(userId);
-
-                return await toUserDto(user, attachmentQueue);
-            } catch(_) {
-                return rejectWithValue(await toUserDto(defaultUserValue, attachmentQueue));
+                return await userDAO.getUser(userId, attachmentQueue);
+            } catch(error) {
+                console.log("Load user error: ", error);
+                return rejectWithValue();
             }
         }
     );

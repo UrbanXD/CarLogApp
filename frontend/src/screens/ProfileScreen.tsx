@@ -15,30 +15,29 @@ import Button from "../components/Button/Button.ts";
 import { EDIT_USER_FORM_STEPS } from "../features/user/hooks/useEditUserSteps.tsx";
 import Avatar from "../components/Avatar/Avatar.ts";
 import { getLabelByName } from "../utils/getLabelByName.ts";
-import { useAuth } from "../contexts/auth/AuthContext.ts";
-import { useUserManagement } from "../features/user/hooks/useUserManagement.ts";
 import { Redirect, router } from "expo-router";
+import { useAppSelector } from "../hooks/index.ts";
+import { getUser } from "../features/user/model/selectors/index.ts";
+import { useAuth } from "../features/auth/contexts/AuthContext.ts";
 
 const ProfileScreen: React.FC = () => {
-    const { session, user, signOut } = useAuth();
-    const { deleteUserProfile } = useUserManagement();
+    const user = useAppSelector(getUser);
+    const { signOut } = useAuth();
+    // const { deleteUserProfile } = useUserManagement();
     const { bottom } = useSafeAreaInsets();
 
     if(!user) return Redirect({ href: "backToRootIndex" });
+
     const name = `${ user.lastname } ${ user.firstname }`;
     const avatarColor = user.avatarColor;
 
-    const openEditUser =
-        (stepIndex: number, passwordReset: boolean = true) =>
-            router.push({
-                pathname: "bottomSheet/editUser",
-                params: { passwordReset, stepIndex }
-            });
+    const openEditUser = (stepIndex: number) => router.push({
+        pathname: "bottomSheet/editUser",
+        params: { stepIndex }
+    });
 
     const openChangeName =
         () => openEditUser(EDIT_USER_FORM_STEPS.NameStep);
-    const openAddPasswordToOAuthUser =
-        () => openEditUser(EDIT_USER_FORM_STEPS.PasswordStep, false);
     const openResetPassword =
         () => openEditUser(EDIT_USER_FORM_STEPS.PasswordStep);
     const openChangeEmail =
@@ -53,9 +52,9 @@ const ProfileScreen: React.FC = () => {
             <View style={ styles.container }>
                 <View style={ styles.informationContainer }>
                     {
-                        user?.userAvatar
+                        user?.avatar
                         ? <Avatar.Image
-                            source={ user.userAvatar.image }
+                            source={ user.avatar.image }
                             avatarSize={ hp(20) }
                             borderColor={ COLORS.black5 }
                             style={ styles.profileImage }
@@ -75,7 +74,7 @@ const ProfileScreen: React.FC = () => {
                             { name }
                         </Text>
                         <Text style={ styles.emailText }>
-                            { user?.email }
+                            { user.email }
                         </Text>
                     </View>
                 </View>
@@ -90,18 +89,6 @@ const ProfileScreen: React.FC = () => {
                         fontSize={ FONT_SIZES.p1 }
                         loadingIndicator
                     />
-                    {/*<Divider/>*/ }
-                    {/*<Button.Text*/ }
-                    {/*    iconLeft={ ICON_NAMES.user }*/ }
-                    {/*    iconRight={ ICON_NAMES.rightArrowHead }*/ }
-                    {/*    text="Identity link"*/ }
-                    {/*    textStyle={ { textAlign: "left" } }*/ }
-                    {/*    onPress={ () => {*/ }
-                    {/*    } }*/ }
-                    {/*    backgroundColor="transparent"*/ }
-                    {/*    fontSize={ FONT_SIZES.p1 }*/ }
-                    {/*    loadingIndicator*/ }
-                    {/*/>*/ }
                     <Divider/>
                     <Button.Text
                         iconLeft={ ICON_NAMES.email }
@@ -117,11 +104,9 @@ const ProfileScreen: React.FC = () => {
                     <Button.Text
                         iconLeft={ ICON_NAMES.password }
                         iconRight={ ICON_NAMES.rightArrowHead }
-                        text={ session?.user.user_metadata.has_password ? "Jelszó csere" : "Jelszó hozzáadás" }
+                        text="Jelszó csere"
                         textStyle={ { textAlign: "left" } }
-                        onPress={ session?.user.user_metadata.has_password
-                                  ? openResetPassword
-                                  : openAddPasswordToOAuthUser }
+                        onPress={ openResetPassword }
                         backgroundColor="transparent"
                         fontSize={ FONT_SIZES.p1 }
                         loadingIndicator
@@ -131,7 +116,7 @@ const ProfileScreen: React.FC = () => {
                         iconLeft={ ICON_NAMES.trashCan }
                         iconRight={ ICON_NAMES.rightArrowHead }
                         text="Fiók törlése"
-                        onPress={ deleteUserProfile }
+                        onPress={ () => {} }
                         textStyle={ { textAlign: "left" } }
                         backgroundColor="transparent"
                         textColor={ COLORS.redLight }

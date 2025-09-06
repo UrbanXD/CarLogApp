@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants/index.ts";
 import { widthPercentageToDP } from "react-native-responsive-screen";
@@ -6,17 +6,16 @@ import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button/Button";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SignInBottomSheet, SignUpBottomSheet } from "../features/user/presets/bottomSheet/index.ts";
-import { useAuth } from "../contexts/auth/AuthContext.ts";
 import Animated, { FadeIn, SlideInRight } from "react-native-reanimated";
 import Divider from "../components/Divider.tsx";
 import CarlogTitle from "../components/CarlogTitle.tsx";
 import { router } from "expo-router";
-import { useSignUp } from "../features/user/hooks/useSignUp.ts";
+import { useAuth } from "../features/auth/contexts/AuthContext.ts";
 
 const AuthScreen: React.FC = () => {
     const { top, bottom } = useSafeAreaInsets();
-    const { session, notVerifiedUser } = useAuth();
-    const { openUserVerification } = useSignUp();
+    const { authenticated, notVerifiedUser } = useAuth();
+    // const { openUserVerification } = useSignUp();
 
     const ENTERING_ANIMATION_DURATION = 300;
 
@@ -24,9 +23,9 @@ const AuthScreen: React.FC = () => {
     const openSignIn = () => router.push("bottomSheet/signIn");
 
 
-    const openVerification = useCallback(() => {
-        if(notVerifiedUser && notVerifiedUser.email) openUserVerification(notVerifiedUser.email);
-    }, [notVerifiedUser]);
+    // const openVerification = useCallback(() => {
+    //      if(notVerifiedUser && notVerifiedUser.email) openUserVerification(notVerifiedUser.email);
+    // }, [notVerifiedUser]);
 
     const styles = useStyles(top, bottom);
 
@@ -85,7 +84,7 @@ const AuthScreen: React.FC = () => {
                 </Animated.View>
             </View>
             {
-                !session && notVerifiedUser &&
+                !authenticated && notVerifiedUser &&
                <Animated.View entering={ SlideInRight.duration(ENTERING_ANIMATION_DURATION * 1.5) }
                               style={ styles.verificationContainer }>
                   <Button.Icon

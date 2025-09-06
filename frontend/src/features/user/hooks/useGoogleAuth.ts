@@ -55,7 +55,7 @@ export const useGoogleAuth = () => {
                 firstname: googleData.user.givenName || "",
                 lastname: googleData.user.familyName || "",
                 avatarColor: AVATAR_COLOR[Math.floor(Math.random() * AVATAR_COLOR.length)],
-                avatarImage: null
+                avatar: null
             });
 
             openToast(SignUpToast.success());

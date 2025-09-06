@@ -4,8 +4,8 @@ import { ChangeEmailToast, DeleteUserToast, ResetPasswordToast, SignUpToast } fr
 import { router } from "expo-router";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 import { OtpVerificationHandlerType } from "../../../app/bottomSheet/otpVerification.tsx";
-import { useAuth } from "../../../contexts/auth/AuthContext.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
+import { useAuth } from "../../auth/contexts/AuthContext.ts";
 
 
 export const useOtpVerificationHandler = () => {
