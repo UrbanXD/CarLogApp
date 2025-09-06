@@ -21,7 +21,8 @@ export function AuthProvider({
     children
 }: ProviderProps) {
     const dispatch = useAppDispatch();
-    const { carlogApi } = useDatabase();
+    const database = useDatabase();
+    const { carlogApi, powersync } = database;
     const { openToast } = useAlert();
 
     const [authenticated, setAuthenticated] = useState<boolean | null>(null);
@@ -59,7 +60,8 @@ export function AuthProvider({
             statusChanged: status => {
                 if(status.hasSynced && initialSync.current) {
                     initialSync.current = false;
-                    void fetchLocalData();
+                    setNotVerifiedUser(null);
+                    dispatch(loadUser({ database, userId: "2aec9550-6bde-4ff5-89fb-bed486db5012" }));  //only for testing
                 }
             }
         });
@@ -120,23 +122,22 @@ export function AuthProvider({
     };
 
     const signOut = async (disabledToast?: boolean) => {
+        const refreshToken = await LargeSecureStore.getItem(BaseConfig.SECURE_STORAGE_KEY_REFRESH_TOKEN);
+
+        setAuthenticated(false);
+
+        await LargeSecureStore.removeItem(BaseConfig.SECURE_STORAGE_KEY_REFRESH_TOKEN);
+        await LargeSecureStore.removeItem(BaseConfig.SECURE_STORAGE_KEY_TOKEN);
+
+        router.replace({ pathname: "/backToRootIndex", params: {} });
+        if(!disabledToast) openToast(SignOutToast.success());
+
+        if(!refreshToken) return;
+
         try {
-            const refreshToken = await LargeSecureStore.getItem(BaseConfig.SECURE_STORAGE_KEY_REFRESH_TOKEN);
-
-            if(!refreshToken) throw new Error("Refresh token not set");
-
-            await carlogApi.post<string>("auth/signOut", { refreshToken });
-
-            setAuthenticated(false);
-
-            await LargeSecureStore.removeItem(BaseConfig.SECURE_STORAGE_KEY_REFRESH_TOKEN);
-            await LargeSecureStore.removeItem(BaseConfig.SECURE_STORAGE_KEY_TOKEN);
-
-            router.replace({ pathname: "/backToRootIndex", params: {} });
-            if(!disabledToast) openToast(SignOutToast.success());
-            // await database.disconnect();
+            await carlogApi.post<string>("auth/signOut", { refreshToken }); // handle refresh token delete from db
         } catch(error: AxiosError) {
-            console.log("SignOut error:", error);
+            console.log("SignOut error (removing refresh token from db) :", error);
         }
     };
 
