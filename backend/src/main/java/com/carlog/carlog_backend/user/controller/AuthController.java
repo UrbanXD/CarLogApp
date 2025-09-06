@@ -68,9 +68,10 @@ public class AuthController {
 
     @PostMapping("/signOut")
     public ResponseEntity<String> signOut(@RequestBody RefreshTokenRequest request) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getRefreshToken()).orElseGet(null);
+        if(request != null && request.getRefreshToken() != null) {
+            refreshTokenRepository.findByToken(request.getRefreshToken()).ifPresent(refreshTokenRepository::delete);
+        }
 
-        if (refreshToken != null) refreshTokenRepository.delete(refreshToken);
         return ResponseEntity.ok("Signed out successfully");
     }
 
