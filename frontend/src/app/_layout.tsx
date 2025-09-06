@@ -8,7 +8,6 @@ import { Provider } from "react-redux";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import Compactor from "../components/Compactor";
 import { ScreenScrollViewProvider } from "../contexts/screenScrollView/ScreenScrollViewProvider.tsx";
-import { AuthProvider } from "../contexts/auth/AuthProvider.tsx";
 import { useDatabase } from "../contexts/database/DatabaseContext.ts";
 import { DatabaseProvider } from "../contexts/database/DatabaseProvider.tsx";
 import { store } from "../database/redux/store.ts";
@@ -18,6 +17,7 @@ import ModalManager from "../ui/alert/components/modal/ModalManager.tsx";
 import * as SystemUI from "expo-system-ui";
 import { SystemBars } from "react-native-edge-to-edge";
 import { GLOBAL_STYLE } from "../constants/index.ts";
+import { AuthProvider } from "../features/auth/contexts/AuthProvider.tsx";
 
 
 const Layout: React.FC = () => {

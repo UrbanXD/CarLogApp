@@ -1,7 +1,7 @@
 import { Kysely } from "@powersync/kysely-driver";
 import { DatabaseType, UserTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
 import { USER_TABLE } from "../../../../database/connector/powersync/tables/user.ts";
-import { toUserDto } from "../mapper/index.ts";
+import { toUserDto, toUserEntity } from "../mapper/index.ts";
 import { User } from "../../schemas/userSchema.tsx";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 
@@ -36,12 +36,20 @@ export class UserDAO {
     }
 
     async editUser(user: User) {
-        const updatedUser: UserTableRow = await this.db
-        .updateTable(USER_TABLE)
-        .set(user)
-        .where("id", "=", user.id)
-        .executeTakeFirstOrThrow();
+        console.log(user, "edit ");
+        try {
+            const userEntity = await toUserEntity(user);
+            const updatedUser: UserTableRow = await this.db
+            .updateTable(USER_TABLE)
+            .set(userEntity)
+            .where("id", "=", user.id)
+            .executeTakeFirstOrThrow();
 
-        return toUserDto(updatedUser);
+            console.log(updatedUser);
+
+            return toUserDto(updatedUser);
+        } catch(e) {
+            console.log("e ", e);
+        }
     }
 }

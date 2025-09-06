@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { loadUser } from "../actions/loadUser.ts";
-import { editUser } from "../actions/editUser.ts";
+import { editUserName } from "../actions/editUserName.ts";
 import { User } from "../../schemas/userSchema.tsx";
 
 type UserState = { user: User | null }
@@ -16,8 +16,10 @@ const userSlice = createSlice({
         .addCase(loadUser.fulfilled, (state, action) => {
             state.user = action.payload;
         })
-        .addCase(editUser.fulfilled, (state, action) => {
+        .addCase(editUserName.fulfilled, (state, action) => {
             state.user = action.payload.user;
+        }).addCase(editUserName.rejected, (state, action) => {
+            console.log(state);
         });
     }
 });

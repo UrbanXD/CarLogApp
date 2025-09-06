@@ -70,7 +70,7 @@ export class Database {
 
     async init() {
         await this.powersync.init();
-        await this.powersync.connect(this.supabaseConnector);
+        await this.powersync.connect(this.carlogApiConnector);
 
         if(this.attachmentQueue) {
             await this.attachmentQueue.init();
