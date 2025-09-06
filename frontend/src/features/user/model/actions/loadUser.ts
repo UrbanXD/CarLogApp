@@ -11,14 +11,12 @@ export const loadUser =
     createAsyncThunkWithTypes<User, LoadUserArgs>(
         "user/load",
         async (args, { rejectWithValue }) => {
-            const {
-                database: { userDAO, attachmentQueue },
-                userId
-            } = args;
+            const { database: { userDAO, attachmentQueue }, userId } = args;
 
             try {
-                return await userDAO.getUser(userId);
-            } catch(_) {
+                return await userDAO.getUser(userId, attachmentQueue);
+            } catch(error) {
+                console.log("Load user error: ", error);
                 return rejectWithValue();
             }
         }

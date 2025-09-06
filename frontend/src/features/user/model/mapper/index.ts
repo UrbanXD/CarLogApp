@@ -3,10 +3,10 @@ import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/P
 import { getImageFromAttachmentQueue } from "../../../../database/utils/getImageFromAttachmentQueue.ts";
 import { User, userSchema } from "../../schemas/userSchema.tsx";
 
-export const toUserDto = async (userRow?: UserTableRow, attachmentQueue?: PhotoAttachmentQueue): User => {
+export const toUserDto = async (userRow?: UserTableRow, attachmentQueue?: PhotoAttachmentQueue): User | null => {
     if(!userRow) return null;
 
-    let avatar = await getImageFromAttachmentQueue(attachmentQueue, user.avatar_url);
+    let avatar = await getImageFromAttachmentQueue(attachmentQueue, userRow.avatar_url);
 
     return userSchema.parse({
         id: userRow.id,

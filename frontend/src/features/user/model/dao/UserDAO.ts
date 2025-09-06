@@ -3,6 +3,7 @@ import { DatabaseType, UserTableRow } from "../../../../database/connector/power
 import { USER_TABLE } from "../../../../database/connector/powersync/tables/user.ts";
 import { toUserDto } from "../mapper/index.ts";
 import { User } from "../../schemas/userSchema.tsx";
+import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 
 export class UserDAO {
     db: Kysely<DatabaseType>;
@@ -11,14 +12,14 @@ export class UserDAO {
         this.db = db;
     }
 
-    async getUser(userId: string): User {
+    async getUser(userId: string, attachmentQueue?: PhotoAttachmentQueue): User {
         const user: UserTableRow = await this.db
         .selectFrom(USER_TABLE)
         .selectAll()
         .where("id", "=", userId)
         .executeTakeFirstOrThrow();
 
-        return toUserDto(user);
+        return toUserDto(user, attachmentQueue);
     }
 
     async insertUser(user: User) {
