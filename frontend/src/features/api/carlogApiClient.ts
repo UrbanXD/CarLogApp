@@ -46,8 +46,8 @@ export const CarlogApiClient = () => {
 
                     error.response.config.headers["Authorization"] = `Bearer ${ response.data.access_token }`;
                     return axios(error.response.config); // recall the base request with new tokens
-                } catch(error) {
-                    console.log("Error at refresh token", error?.response?.status ?? error);
+                } catch(error: AxiosError) {
+                    console.log("Error at refresh token", error.message);
 
                     if(error?.response?.status === 400) throw { response: { status: 401 } };
 
@@ -59,70 +59,59 @@ export const CarlogApiClient = () => {
         );
     }
 
-    const get = <Response>(
+    const get = async <Response>(
         endpoint: string,
         schema?: ZodSchema<Response>,
         config?: AxiosRequestConfig
     ): AxiosResponse<Response> => {
-        return api.get(endpoint, config).then((response) => ({
-            ...response,
-            data: schema.parse(response.data)
-        }));
+        const response = await api.get(endpoint, config);
+
+        return { ...response, data: schema ? schema?.parse(response.data) : response.data };
     };
 
-    const post = <Response>(
-        endpoint: string,
-        body: any,
-        schema?: ZodSchema<Response>,
-        config?: AxiosRequestConfig
-    ): AxiosResponse<Response> => {
-        console.log("before ", body);
-        return api.post(endpoint, body, config).then((response) => {
-            return ({
-                ...response,
-                data: schema ? schema.parse(response.data) : response.data
-            });
-        });
-    };
-
-    const put = <Response>(
+    const post = async <Response>(
         endpoint: string,
         body: any,
         schema?: ZodSchema<Response>,
         config?: AxiosRequestConfig
     ): AxiosResponse<Response> => {
-        return api.put(endpoint, body, config).then((response) => ({
-            ...response,
-            data: schema ? schema.parse(response.data) : response.data
-        }));
+        const response = await api.post(endpoint, body, config);
+
+        return { ...response, data: schema ? schema?.parse(response.data) : response.data };
     };
 
-    const patch = <Response>(
+    const put = async <Response>(
+        endpoint: string,
+        body: any,
+        schema?: ZodSchema<Response>,
+        config?: AxiosRequestConfig
+    ): AxiosResponse<Response> => {
+        const response = await api.put(endpoint, body, config);
+
+        return { ...response, data: schema ? schema?.parse(response.data) : response.data };
+    };
+
+    const patch = async <Response>(
         endpoint: string,
         body: any,
         schema?: ZodSchema<Response>,
         config?: AxiosRequestConfigs
     ): AxiosResponse<Response> => {
-        return api.patch(endpoint, body, config).then((response) => ({
-            ...response,
-            data: schema ? schema.parse(response.data) : response.data
-        }));
+        const response = await api.patch(endpoint, body, config);
+
+        return { ...response, data: schema ? schema?.parse(response.data) : response.data };
     };
 
-    const del = <Response>(endpoint: string, schema: ZodSchema<Response>): AxiosResponse<Response> => {
-        return api.delete(endpoint).then((response) => ({
-            ...response,
-            data: schema ? schema.parse(response.data) : response.data
-        }));
+    const del = async <Response>(
+        endpoint: string,
+        schema: ZodSchema<Response>
+    ): AxiosResponse<Response> => {
+        const response = await api.delete(endpoint);
+
+        return { ...response, data: schema ? schema?.parse(response.data) : response.data };
     };
 
-    return {
-        get,
-        post,
-        patch,
-        put,
-        del
-    };
+    return { get, post, patch, put, del };
 };
 
 export type CarlogApi = ReturnType<typeof CarlogApiClient>;
