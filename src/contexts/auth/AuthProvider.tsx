@@ -2,13 +2,13 @@ import React, { ProviderProps, useEffect, useMemo, useRef, useState } from "reac
 import { AuthContext } from "./AuthContext.ts";
 import { useAppDispatch } from "../../hooks/index.ts";
 import { useDatabase } from "../database/DatabaseContext.ts";
-import { AuthError, Session, User } from "@supabase/supabase-js";
+import { AuthError, GenerateLinkParams, Session, User } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AVATAR_COLOR, BaseConfig } from "../../constants/index.ts";
 import { loadUser } from "../../features/user/model/actions/loadUser.ts";
 import { loadCars } from "../../features/car/model/actions/loadCars.ts";
 import { router } from "expo-router";
-import { SignInToast, SignOutToast, SignUpToast } from "../../features/user/presets/toast/index.ts";
+import { DeleteUserToast, SignInToast, SignOutToast, SignUpToast } from "../../features/user/presets/toast/index.ts";
 import { getToastMessage } from "../../ui/alert/utils/getToastMessage.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { SignInRequest } from "../../features/user/schemas/form/signInRequest.ts";
@@ -42,7 +42,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 setSession(supabaseSession);
 
                 if(supabaseSession) {
-                    dispatch(loadUser({ database, userId: session.user.id }));
+                    dispatch(loadUser({ database, userId: supabaseSession.user.id }));
                     dispatch(loadCars(database));
                 }
 
@@ -54,10 +54,10 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     }, []);
 
     useEffect(() => {
-        if(!authenticated) return;
-
-        dispatch(loadUser({ database, userId: session.user.id }));
+        dispatch(loadUser({ database, userId: session?.user.id ?? null }));
         dispatch(loadCars(database));
+
+        if(!session) return;
 
         return powersync.registerListener({
             statusChanged: status => {
@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 }
             }
         });
-    }, [authenticated]);
+    }, [session]);
 
     const openAccountVerification = (email: string) => {
         router.push({
@@ -159,6 +159,38 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         }
     };
 
+    const deleteAccount = async () => {
+        try {
+            if(!session?.user) throw { code: "session_not_found" };
+
+            const emailParams: GenerateLinkParams = { type: "magiclink", email: session.user.email };
+
+            const { error } = await supabaseConnector.client.functions.invoke(
+                "generate-email",
+                {
+                    method: "POST",
+                    body: JSON.stringify(emailParams)
+                }
+            );
+
+            if(error) throw error;
+
+            router.push({
+                pathname: "bottomSheet/otpVerification",
+                params: {
+                    type: "magiclink", // magiclink viselkedik ugy mint ha torlest verifyolna *mivel supabasebe nincs implementalva ez meg*
+                    title: "Fiók törlése",
+                    email: emailParams.email,
+                    userId: session?.user.id,
+                    handlerType: OtpVerificationHandlerType.UserDelete
+                }
+            });
+        } catch(error) {
+            console.log(error);
+            openToast(getToastMessage({ messages: DeleteUserToast, error }));
+        }
+    };
+
     const fetchNotVerifiedUser = async () => {
         const newNotVerifiedUser = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_USER);
         if(!newNotVerifiedUser) return;
@@ -200,6 +232,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 signUp,
                 signIn,
                 signOut,
+                deleteAccount,
                 refreshSession,
                 notVerifiedUser,
                 updateNotVerifiedUser
@@ -212,6 +245,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             signUp,
             signIn,
             signOut,
+            deleteAccount,
             refreshSession,
             notVerifiedUser,
             updateNotVerifiedUser

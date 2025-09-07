@@ -9,6 +9,7 @@ type AuthContextValue = {
     signUp: () => Promise<void>
     signIn: () => Promise<void>
     signOut: (disabledToast?: boolean) => Promise<void>
+    deleteAccount: () => Promise<void>
     refreshSession: () => Promise<void>
 
     // TODO: not verified user rework

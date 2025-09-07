@@ -12,42 +12,33 @@ import {
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Divider from "../components/Divider.tsx";
 import Button from "../components/Button/Button.ts";
-import { EDIT_USER_FORM_STEPS } from "../features/user/hooks/useEditUserSteps.tsx";
 import Avatar from "../components/Avatar/Avatar.ts";
 import { getLabelByName } from "../utils/getLabelByName.ts";
 import { useAuth } from "../contexts/auth/AuthContext.ts";
-import { useUserManagement } from "../features/user/hooks/useUserManagement.ts";
 import { Redirect, router } from "expo-router";
 import { useAppSelector } from "../hooks/index.ts";
 import { getUser } from "../features/user/model/selectors/index.ts";
+import { EDIT_USER_FORM_TYPE } from "../features/user/presets/bottomSheet/index.ts";
 
 const ProfileScreen: React.FC = () => {
     const user = useAppSelector(getUser);
-    const { hasPassword, signOut } = useAuth();
-    const { deleteUserProfile } = useUserManagement();
+    const { hasPassword, signOut, deleteAccount } = useAuth();
     const { bottom } = useSafeAreaInsets();
 
     if(!user) return Redirect({ href: "backToRootIndex" });
     const name = `${ user.lastname } ${ user.firstname }`;
     const avatarColor = user.avatarColor;
 
-    const openEditUser =
-        (stepIndex: number, passwordReset: boolean = true) =>
-            router.push({
-                pathname: "bottomSheet/editUser",
-                params: { passwordReset, stepIndex }
-            });
+    const openEditUser = (type: EDIT_USER_FORM_TYPE) => router.push({
+        pathname: "bottomSheet/editUser",
+        params: { type }
+    });
 
-    const openChangeName =
-        () => openEditUser(EDIT_USER_FORM_STEPS.NameStep);
-    const openAddPasswordToOAuthUser =
-        () => openEditUser(EDIT_USER_FORM_STEPS.PasswordStep, false);
-    const openResetPassword =
-        () => openEditUser(EDIT_USER_FORM_STEPS.PasswordStep);
-    const openChangeEmail =
-        () => openEditUser(EDIT_USER_FORM_STEPS.EmailStep);
-    const openChangeAvatar =
-        () => openEditUser(EDIT_USER_FORM_STEPS.AvatarStep);
+    const openEditName = () => openEditUser(EDIT_USER_FORM_TYPE.EditName);
+    const openLinkPasswordToOAuth = () => openEditUser(EDIT_USER_FORM_TYPE.LinkPasswordToOAuth);
+    const openResetPassword = () => openEditUser(EDIT_USER_FORM_TYPE.ResetPassword);
+    const openChangeEmail = () => openEditUser(EDIT_USER_FORM_TYPE.ChangeEmail);
+    const openEditAvatar = () => openEditUser(EDIT_USER_FORM_TYPE.EditAvatar);
 
     const styles = useStyles(bottom);
 
@@ -62,7 +53,7 @@ const ProfileScreen: React.FC = () => {
                             avatarSize={ hp(20) }
                             borderColor={ COLORS.black5 }
                             style={ styles.profileImage }
-                            onPressBadge={ openChangeAvatar }
+                            onPressBadge={ openEditAvatar }
                         />
                         : <Avatar.Text
                             label={ getLabelByName(name) }
@@ -70,7 +61,7 @@ const ProfileScreen: React.FC = () => {
                             backgroundColor={ avatarColor ?? undefined }
                             borderColor={ COLORS.black5 }
                             style={ styles.profileImage }
-                            onPressBadge={ openChangeAvatar }
+                            onPressBadge={ openEditAvatar }
                         />
                     }
                     <View style={ styles.textContainer }>
@@ -88,7 +79,7 @@ const ProfileScreen: React.FC = () => {
                         iconRight={ ICON_NAMES.rightArrowHead }
                         text="Személyes adatok"
                         textStyle={ { textAlign: "left" } }
-                        onPress={ openChangeName }
+                        onPress={ openEditName }
                         backgroundColor="transparent"
                         fontSize={ FONT_SIZES.p1 }
                         loadingIndicator
@@ -122,7 +113,7 @@ const ProfileScreen: React.FC = () => {
                         iconRight={ ICON_NAMES.rightArrowHead }
                         text={ hasPassword ? "Jelszó csere" : "Jelszó hozzáadás" }
                         textStyle={ { textAlign: "left" } }
-                        onPress={ hasPassword ? openResetPassword : openAddPasswordToOAuthUser }
+                        onPress={ hasPassword ? openResetPassword : openLinkPasswordToOAuth }
                         backgroundColor="transparent"
                         fontSize={ FONT_SIZES.p1 }
                         loadingIndicator
@@ -132,7 +123,7 @@ const ProfileScreen: React.FC = () => {
                         iconLeft={ ICON_NAMES.trashCan }
                         iconRight={ ICON_NAMES.rightArrowHead }
                         text="Fiók törlése"
-                        onPress={ deleteUserProfile }
+                        onPress={ deleteAccount }
                         textStyle={ { textAlign: "left" } }
                         backgroundColor="transparent"
                         textColor={ COLORS.redLight }
