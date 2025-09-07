@@ -1,4 +1,4 @@
 import { RootState } from "../../../../database/redux/index.ts";
-import { UserDto } from "../types/user.ts";
+import { UserAccount } from "../../schemas/userSchema.ts";
 
-export const getUser = (state: RootState): UserDto => state.user.user;
+export const getUser = (state: RootState): UserAccount | null => state.user.user;

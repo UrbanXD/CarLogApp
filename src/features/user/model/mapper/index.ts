@@ -1,30 +1,30 @@
-import { UserTableType } from "../../../../database/connector/powersync/AppSchema.ts";
-import { UserDto } from "../types/user.ts";
+import { UserAccount, userSchema } from "../../schemas/userSchema.ts";
+import { UserTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 import { getImageFromAttachmentQueue } from "../../../../database/utils/getImageFromAttachmentQueue.ts";
 
-export const toUserDto = async (user?: UserTableType, attachmentQueue?: PhotoAttachmentQueue): UserDto => {
-    if(!user) return null;
+export const toUserDto = async (userRow?: UserTableRow, attachmentQueue?: PhotoAttachmentQueue): UserAccount | null => {
+    if(!userRow) return null;
 
-    let userAvatar = await getImageFromAttachmentQueue(attachmentQueue, user.avatarImage);
+    let avatar = await getImageFromAttachmentQueue(attachmentQueue, userRow.avatar_url);
 
+    return userSchema.parse({
+        id: userRow.id,
+        email: userRow.email,
+        firstname: userRow.firstname,
+        lastname: userRow.lastname,
+        avatarColor: userRow.avatar_color,
+        avatar
+    });
+};
+
+export const toUserEntity = (user: UserAccount): UserTableRow => {
     return {
         id: user.id,
         email: user.email,
         firstname: user.firstname,
         lastname: user.lastname,
-        avatarColor: user.avatarColor,
-        userAvatar: userAvatar
-    };
-};
-
-export const toUserEntity = (userDto: UserDto): UserTableType => {
-    return {
-        id: userDto.id,
-        email: userDto.email,
-        firstname: userDto.firstname,
-        lastname: userDto.lastname,
-        avatarColor: userDto.avatarColor,
-        avatarImage: userDto.userAvatar?.path ?? null
+        avatar_color: user.avatarColor,
+        avatar_url: user.avatar?.path ?? null
     };
 };

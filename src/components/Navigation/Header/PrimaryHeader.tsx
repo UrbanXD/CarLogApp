@@ -36,6 +36,8 @@ const PrimaryHeader: React.FC = () => {
         router.push("/(profile)/user");
     };
 
+    if(user === null) return router.back();
+
     return (
         <HeaderView>
             <View style={ { flex: 1 } }>
