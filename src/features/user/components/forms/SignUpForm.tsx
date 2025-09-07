@@ -4,6 +4,7 @@ import { useSignUpSteps } from "../../hooks/useSignUpSteps.tsx";
 import { useForm } from "react-hook-form";
 import { SignUpFormFieldType, useSignUpFormProps } from "../../schemas/userSchema.tsx";
 import { useSignUp } from "../../hooks/useSignUp.ts";
+import { useAuth } from "../../../../contexts/auth/AuthContext.ts";
 
 const SignUpForm: React.FC = () => {
     const {
@@ -12,7 +13,7 @@ const SignUpForm: React.FC = () => {
         trigger,
         resetField
     } = useForm<SignUpFormFieldType>(useSignUpFormProps());
-    const { signUp } = useSignUp();
+    const { signUp } = useAuth();
 
     const submitHandler = handleSubmit(signUp);
 

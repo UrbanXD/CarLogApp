@@ -11,12 +11,10 @@ import Animated, { FadeIn, SlideInRight } from "react-native-reanimated";
 import Divider from "../components/Divider.tsx";
 import CarlogTitle from "../components/CarlogTitle.tsx";
 import { router } from "expo-router";
-import { useSignUp } from "../features/user/hooks/useSignUp.ts";
 
 const AuthScreen: React.FC = () => {
     const { top, bottom } = useSafeAreaInsets();
-    const { session, notVerifiedUser } = useAuth();
-    const { openUserVerification } = useSignUp();
+    const { authenticated, notVerifiedUser, openAccountVerification } = useAuth();
 
     const ENTERING_ANIMATION_DURATION = 300;
 
@@ -25,7 +23,7 @@ const AuthScreen: React.FC = () => {
 
 
     const openVerification = useCallback(() => {
-        if(notVerifiedUser && notVerifiedUser.email) openUserVerification(notVerifiedUser.email);
+        if(notVerifiedUser && notVerifiedUser.email) openAccountVerification(notVerifiedUser.email);
     }, [notVerifiedUser]);
 
     const styles = useStyles(top, bottom);
@@ -85,9 +83,11 @@ const AuthScreen: React.FC = () => {
                 </Animated.View>
             </View>
             {
-                !session && notVerifiedUser &&
-               <Animated.View entering={ SlideInRight.duration(ENTERING_ANIMATION_DURATION * 1.5) }
-                              style={ styles.verificationContainer }>
+                !authenticated && notVerifiedUser &&
+               <Animated.View
+                  entering={ SlideInRight.duration(ENTERING_ANIMATION_DURATION * 1.5) }
+                  style={ styles.verificationContainer }
+               >
                   <Button.Icon
                      icon={ "email-seal-outline" }
                      onPress={ openVerification }

@@ -6,16 +6,17 @@ import UpcomingRidesBlock from "./UpcomingRidesBlock";
 import Divider from "../../../components/Divider";
 import LatestExpensesBlock from "./LatestExpensesBlock";
 import { ScreenScrollView } from "../../../components/ScreenScrollView.tsx";
-import { useAuth } from "../../../contexts/auth/AuthContext.ts";
+import { useAppSelector } from "../../../hooks/index.ts";
+import { getUser } from "../../../features/user/model/selectors/index.ts";
 
 const HomeScreen: React.FC = () => {
-    const { user } = useAuth();
+    const user = useAppSelector(getUser);
 
     return (
         <ScreenScrollView>
             <View style={ styles.titleContainer }>
                 <Text style={ styles.welcomeText }>
-                    Üdv { `${ user?.firstname ?? "" } ${ user?.lastname ?? "" }` }!
+                    Üdv { `${ user?.lastname ?? "" } ${ user?.firstname ?? "" }` }!
                 </Text>
                 <Text style={ styles.infoText }>
                     Vezzessen számot nálunk az autóiról!

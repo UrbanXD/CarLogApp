@@ -4,7 +4,6 @@ import { SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
 import Avatar from "../../Avatar/Avatar.ts";
 import { router } from "expo-router";
 import { getLabelByName } from "../../../utils/getLabelByName.ts";
-import { useAuth } from "../../../contexts/auth/AuthContext.ts";
 import { loadSelectedCar } from "../../../features/car/model/actions/loadSelectedCar.ts";
 import { selectCar } from "../../../features/car/model/actions/selectCar.ts";
 import { store } from "../../../database/redux/store.ts";
@@ -12,11 +11,12 @@ import { getCarsAsPickerElements, isLoading } from "../../../features/car/model/
 import { useAppSelector } from "../../../hooks/index.ts";
 import { getSelectedCarId } from "../../../features/car/model/selectors/getSelectedCarId.ts";
 import HeaderView from "./HeaderView.tsx";
+import { getUser, isUserLoading } from "../../../features/user/model/selectors/index.ts";
 
 const PrimaryHeader: React.FC = () => {
-    const { user, userLoading } = useAuth();
+    const user = useAppSelector(getUser);
+    const userLoading = useAppSelector(isUserLoading);
     const name = `${ user?.lastname } ${ user?.firstname }`;
-    const avatarColor = user?.avatarColor;
 
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
@@ -58,16 +58,16 @@ const PrimaryHeader: React.FC = () => {
                     ? <Avatar.Skeleton
                         avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
                     />
-                    : user?.userAvatar
+                    : user?.avatar
                       ? <Avatar.Image
-                          source={ user.userAvatar.image }
+                          source={ user.avatar.image }
                           avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
                           onPress={ openProfile }
                       />
                       : <Avatar.Text
                           label={ getLabelByName(name) }
                           avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
-                          backgroundColor={ avatarColor ?? undefined }
+                          backgroundColor={ user.avatarColor }
                           onPress={ openProfile }
                       />
                 )

@@ -10,28 +10,27 @@ import getImageState from "../../../database/utils/getImageState.ts";
 import { getPathFromImageType } from "../../../utils/getPathFromImageType.ts";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 import { OtpVerificationHandlerType } from "../../../app/bottomSheet/otpVerification.tsx";
-import { useAppDispatch } from "../../../hooks/index.ts";
-import { editUser } from "../model/actions/editUser.ts";
+import { useAppDispatch, useAppSelector } from "../../../hooks/index.ts";
+import { editUserName } from "../model/actions/editUserName.ts";
 import { Image } from "../../../types/index.ts";
-import { EditUserFormFieldType } from "../schemas/userSchema.tsx";
+import { EditUserFormFieldType } from "../schemas/userSchema.ts";
+import { getUser } from "../model/selectors/index.ts";
 
 export const useUserManagement = () => {
     const database = useDatabase();
     const dispatch = useAppDispatch();
+    const user = useAppSelector(getUser);
+
     const { supabaseConnector, attachmentQueue, userDAO } = database;
-    const { session, user, refreshSession } = useAuth();
+    const { providers, authenticated, hasPassword, refreshSession } = useAuth();
     const { openToast } = useAlert();
 
     const changeEmail = async (newEmail: string) => {
         try {
-            if(!session) throw { code: "session_not_found" };
-            if(!session.user.email) throw { code: "email_not_found" };
+            if(!authenticated) throw { code: "session_not_found" };
+            if(!user?.email) throw { code: "email_not_found" };
 
-            const { error } =
-                await supabaseConnector
-                .client
-                .auth
-                .updateUser({ email: newEmail });
+            const { error } = await supabaseConnector.client.auth.updateUser({ email: newEmail });
 
             if(error) throw error;
 
@@ -40,30 +39,27 @@ export const useUserManagement = () => {
                 params: {
                     type: "email_change",
                     title: "Email módosítási kérelem hitelesítés",
-                    email: session.user.email,
+                    email: user.email,
                     newEmail,
                     handlerType: OtpVerificationHandlerType.CurrentEmailChange
                 }
             });
         } catch(error) {
-            openToast(
-                getToastMessage({
-                    messages: ChangeEmailToast,
-                    error
-                })
-            );
+            openToast(getToastMessage({ messages: ChangeEmailToast, error }));
         }
     };
 
+    //TODO szetbontani edit name es edit avatarra
     const changeUserMetadata = async (newUser: EditUserFormFieldType | null, toastMessages: ToastMessages) => {
         try {
+            //TODO ne itt mentse a kepet hanem vigyuk at az editUserAvatarba
             let newUserAvatar: Image | null = user?.userAvatar ?? null;
             if(newUser?.avatarImage && user?.userAvatar?.path !== getPathFromImageType(newUser.avatarImage, user?.id)) {
                 const newAvatarImage = await attachmentQueue.saveFile(newUser.avatarImage, user.id);
                 newUserAvatar = getImageState(newAvatarImage.filename, newUser.avatarImage.buffer);
             }
 
-            await dispatch(editUser({ database, newUser, newAvatar: newUserAvatar }));
+            await dispatch(editUserName({ database, newUser, newAvatar: newUserAvatar }));
 
             openToast(toastMessages.success());
             router.dismissTo("(profile)/user");
@@ -79,39 +75,27 @@ export const useUserManagement = () => {
 
     const addPasswordToOAuthUser = async (newPassword: string) => {
         try {
-            if(!session) throw { code: "session_not_found" } as AuthError;
-            if(session.user.user_metadata.has_password) throw { code: "has_password" };
+            if(!authenticated) throw { code: "session_not_found" };
+            if(!user?.email) throw { code: "email_not_found" };
+            if(hasPassword) throw { code: "has_password" };
 
-            const { error } =
-                await supabaseConnector
-                .client
-                .auth
-                .updateUser({ password: newPassword });
+            const { error } = await supabaseConnector.client.auth.updateUser({ password: newPassword });
 
             if(error) throw error;
 
             openToast(AddPasswordToast.success());
             await refreshSession();
         } catch(error) {
-            openToast(
-                getToastMessage({
-                    messages: AddPasswordToast,
-                    error
-                })
-            );
+            openToast(getToastMessage({ messages: AddPasswordToast, error }));
         }
     };
 
     const resetPassword = async (newPassword: string) => {
         try {
-            if(!session) throw { code: "session_not_found" };
-            if(!session.user.email) throw { code: "email_not_found" };
+            if(!authenticated) throw { code: "session_not_found" };
+            if(!user?.email) throw { code: "email_not_found" };
 
-            const { error } =
-                await supabaseConnector
-                .client
-                .auth
-                .resetPasswordForEmail(session.user.email);
+            const { error } = await supabaseConnector.client.auth.resetPasswordForEmail(user.email);
 
             if(error) throw error;
 
@@ -121,99 +105,68 @@ export const useUserManagement = () => {
                     type: "recovery",
                     title: "Jelszó módosítása",
                     newPassword,
-                    email: session.user.email,
+                    email: user.email,
                     handlerType: OtpVerificationHandlerType.PasswordReset
                 }
             });
         } catch(error) {
-            openToast(
-                getToastMessage({
-                    messages: ResetPasswordToast,
-                    error
-                })
-            );
+            openToast(getToastMessage({ messages: ResetPasswordToast, error }));
         }
     };
 
     const deleteUserProfile = async () => {
-        if(session?.user) {
-            try {
-                if(!session) throw { code: "session_not_found" };
-                if(!session.user.email) throw { code: "email_not_found" };
+        if(!user) return;
 
-                const emailParams: GenerateLinkParams = {
-                    type: "magiclink",
-                    email: session.user.email
-                };
+        try {
+            if(!authenticated) throw { code: "session_not_found" };
+            if(!user?.email) throw { code: "email_not_found" };
 
-                const { error } =
-                    await supabaseConnector
-                    .client
-                    .functions
-                    .invoke(
-                        "generate-email",
-                        {
-                            method: "POST",
-                            body: JSON.stringify(emailParams)
-                        }
-                    );
+            const emailParams: GenerateLinkParams = { type: "magiclink", email: user.email };
 
-                if(error) throw error;
+            const { error } = await supabaseConnector.client.functions.invoke(
+                "generate-email",
+                {
+                    method: "POST",
+                    body: JSON.stringify(emailParams)
+                }
+            );
 
-                router.push({
-                    pathname: "bottomSheet/otpVerification",
-                    params: {
-                        type: "magiclink", // magiclink viselkedik ugy mint ha torlest verifyolna *mivel supabasebe nincs implementalva ez meg*
-                        title: "Fiók törlése",
-                        email: emailParams.email,
-                        userId: session.user.id,
-                        handlerType: OtpVerificationHandlerType.UserDelete
-                    }
-                });
-            } catch(error) {
-                openToast(
-                    getToastMessage({
-                        messages: DeleteUserToast,
-                        error
-                    })
-                );
-            }
+            if(error) throw error;
+
+            router.push({
+                pathname: "bottomSheet/otpVerification",
+                params: {
+                    type: "magiclink", // magiclink viselkedik ugy mint ha torlest verifyolna *mivel supabasebe nincs implementalva ez meg*
+                    title: "Fiók törlése",
+                    email: emailParams.email,
+                    userId: user.id,
+                    handlerType: OtpVerificationHandlerType.UserDelete
+                }
+            });
+        } catch(error) {
+            openToast(getToastMessage({ messages: DeleteUserToast, error }));
         }
     };
 
     const verifyOTP = async (args: VerifyEmailOtpParams) => {
-        const { data, error } =
-            await supabaseConnector
-            .client
-            .auth
-            .verifyOtp(args);
+        const { data, error } = await supabaseConnector.client.auth.verifyOtp(args);
 
         if(error) throw error;
 
-        if(data.session) {
-            await supabaseConnector
-            .client
-            .auth
-            .setSession(data.session);
-        }
+        await supabaseConnector.client.auth.setSession(data.session);
     };
 
     const resendOTP = async (args: ResendParams) => {
-        const { error } =
-            await supabaseConnector
-            .client
-            .auth
-            .resend(args);
+        const { error } = await supabaseConnector.client.auth.resend(args);
 
         if(error) throw error;
     };
 
     const linkIdentity = async (provider: Provider) => {
         try {
-            if(!session) throw { code: "session_not_found" } as AuthError;
+            if(!authenticated) throw { code: "session_not_found" };
 
-            const userProviders: Array<string> = session.user.app_metadata.providers || [session.user.app_metadata.provider];
-            if(userProviders.includes(provider)) throw { code: "identity_already_exists" } as AuthError;
+            if(providers?.includes(provider)) throw { code: "identity_already_exists" } as AuthError;
 
             // nincs megvalositva meg Supabaseben (native flowra) az identity hozzarendeles, igy automatic linking lesz ujra beloginoltatassal (de mas emailre nem rakhato)
         } catch(error) {

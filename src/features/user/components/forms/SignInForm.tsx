@@ -8,6 +8,7 @@ import Form from "../../../../components/Form/Form.tsx";
 import { useForm } from "react-hook-form";
 import { SignInFormFieldType, useSignInFormProps } from "../../schemas/userSchema.tsx";
 import { useSignIn } from "../../hooks/useSignIn.ts";
+import { useAuth } from "../../../../contexts/auth/AuthContext.ts";
 
 const SignInForm: React.FC = () => {
     const {
@@ -15,7 +16,7 @@ const SignInForm: React.FC = () => {
         handleSubmit
     } = useForm<SignInFormFieldType>(useSignInFormProps);
 
-    const { signIn } = useSignIn();
+    const { signIn } = useAuth();
     const submitHandler = handleSubmit(signIn);
 
     return (
