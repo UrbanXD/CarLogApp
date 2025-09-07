@@ -1,49 +1,42 @@
-import React from "react";
-import { UseCustomFormProps } from "../../features/car/constants/index.ts";
-import { ICON_NAMES, SEPARATOR_SIZES } from "../../constants/index.ts";
-import { FlatList } from "react-native-gesture-handler";
-import Button from "../Button/Button.ts";
+import React, { ReactNode } from "react";
 import { View } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../constants/index.ts";
+import Button from "../Button/Button.ts";
+import { UseFormReturn } from "react-hook-form";
 
-interface EditFormProps extends UseCustomFormProps {
-    stepIndex: number;
+type EditFormProps<FormSchema> = {
+    renderInputFields: () => ReactNode
+    submitHandler: () => Promise<void>
+    reset: UseFormReturn<FormSchema>["reset"]
 }
 
-const EditForm: React.FC<EditFormProps> = ({
-    stepIndex,
-    steps,
-    reset = () => {
-    },
-    submitHandler
-}) => {
-    const handleSave =
-        async () => await submitHandler(stepIndex);
-
+function EditForm<FormSchema = any>({
+    renderInputFields,
+    submitHandler,
+    reset
+}: EditFormProps<FormSchema>) {
     return (
         <View style={ { flex: 1, gap: SEPARATOR_SIZES.normal } }>
             <FlatList
                 data={ [] }
                 renderItem={ () => <></> }
-                ListEmptyComponent={
-                    <>
-                        { steps[stepIndex]() }
-                    </>
-                }
+                ListEmptyComponent={ () => <>{ renderInputFields() }</> }
             />
             <Button.Row>
                 <Button.Icon
                     icon={ ICON_NAMES.reset }
-                    onPress={ () => reset && reset() }
+                    onPress={ () => reset() }
                 />
                 <Button.Text
                     text="Mentés"
-                    onPress={ handleSave }
+                    onPress={ submitHandler }
                     style={ { flex: 0.9 } }
                     loadingIndicator
                 />
             </Button.Row>
         </View>
     );
-};
+}
 
 export default EditForm;
