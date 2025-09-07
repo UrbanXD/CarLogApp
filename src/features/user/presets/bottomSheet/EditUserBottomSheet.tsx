@@ -1,12 +1,47 @@
 import React from "react";
-import { EditUserForm, EditUserFormProps } from "../../components/forms/EditUserForm.tsx";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
+import { EditUserNameForm } from "../../components/forms/EditUserNameForm.tsx";
+import { UserAccount } from "../../schemas/userSchema.ts";
+import { EditUserAvatarForm } from "../../components/forms/EditUserAvatarForm.tsx";
+import { ChangeEmailForm } from "../../components/forms/ChangeEmailForm.tsx";
+import { ResetPasswordForm } from "../../components/forms/ResetPasswordForm.tsx";
+import { LinkPasswordToOAuthForm } from "../../components/forms/LinkPasswordToOAuthForm.tsx";
 
-type EditUserBottomSheetProps = EditUserFormProps
+export enum EDIT_USER_FORM_TYPE {
+    ChangeEmail,
+    EditName,
+    EditAvatar,
+    ResetPassword,
+    LinkPasswordToOAuth
+}
 
-const EditUserBottomSheet: React.FC<EditUserBottomSheetProps> = ({ user, passwordReset, stepIndex }) => {
-    const CONTENT = <EditUserForm user={ user } passwordReset={ passwordReset } stepIndex={ stepIndex }/>;
+type EditUserBottomSheetProps = {
+    user: UserAccount
+    type: EDIT_USER_FORM_TYPE
+}
+
+const EditUserBottomSheet: React.FC<EditUserBottomSheetProps> = ({ user, type }) => {
+    let CONTENT = null;
+
+    switch(type) {
+        case EDIT_USER_FORM_TYPE.EditName:
+            CONTENT = <EditUserNameForm user={ user }/>;
+            break;
+        case EDIT_USER_FORM_TYPE.EditAvatar:
+            CONTENT = <EditUserAvatarForm user={ user }/>;
+            break;
+        case EDIT_USER_FORM_TYPE.ChangeEmail:
+            CONTENT = <ChangeEmailForm user={ user }/>;
+            break;
+        case EDIT_USER_FORM_TYPE.ResetPassword:
+            CONTENT = <ResetPasswordForm user={ user }/>;
+            break;
+        case EDIT_USER_FORM_TYPE.LinkPasswordToOAuth:
+            CONTENT = <LinkPasswordToOAuthForm/>;
+            break;
+    }
+
     const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
 
     return (
