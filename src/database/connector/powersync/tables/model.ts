@@ -4,7 +4,7 @@ export const MODEL_TABLE = "model";
 
 export const modelTable = new Table({
     id: column.text,
-    make_id: column.text,
+    make_id: column.integer,
     name: column.text,
     start_year: column.text,
     end_year: column.text
