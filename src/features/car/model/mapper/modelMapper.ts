@@ -6,7 +6,7 @@ import { CarModel, carModelSchema } from "../../schemas/carModelSchema.ts";
 export class ModelMapper {
     constructor(private readonly makeDao: MakeDao) {}
 
-    toModelDto(modelRow): Model {
+    toModelDto(modelRow: ModelTableRow): Model {
         return modelSchema.parse({
             id: modelRow.id,
             makeId: modelRow.make_id,
