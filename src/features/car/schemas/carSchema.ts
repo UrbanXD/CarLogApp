@@ -1,47 +1,27 @@
 import { z } from "zod";
-import { zImage, zNumber, zPickerRequired } from "../../../types/zodTypes.ts";
+import { zImage } from "../../../types/zodTypes.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { odometerSchema } from "./odometerSchema.ts";
+import { fuelTankSchema } from "./fuelTankSchema.ts";
+import { carModelSchema } from "./carModelSchema.ts";
 
-const carFormSchema = z
+export const carSchema = z
 .object({
-    name: z.string().min(2, "2 karakter legyen min").max(20, "20 karakter legyen max"),
-    brandId: zPickerRequired,
-    modelId: zPickerRequired,
-    modelYear: z.string().min(4), //TODO: custom model year validation
-    odometerMeasurement: zPickerRequired,
-    odometerValue: zNumber(),
-    fuelType: zPickerRequired,
-    fuelMeasurement: zPickerRequired,
-    fuelTankSize: zNumber(),
-    fuelValue: zNumber(0),
-    image: zImage.optional()
+    id: z.string(),
+    ownerId: z.string(),
+    name: z.string().min(1, "Adja meg az autó azonosítóját!").max(24, "Az autó azonosítója maximum 24 karakter lehet!"),
+    model: carModelSchema,
+    odometer: odometerSchema,
+    fuelTank: fuelTankSchema,
+    image: zImage,
+    createdAt: z.string()
 });
 
-export type AddCarFormFieldType = z.infer<typeof carFormSchema>;
+export type Car = z.infer<typeof carSchema>;
 
-const editCarFormSchema = carFormSchema.partial();
+const editCarFormSchema = carSchema.partial();
 
 export type EditCarFormFieldType = z.infer<typeof editCarFormSchema>;
-
-export const useAddCarFormProps = () => {
-    const defaultValues: AddCarFormFieldType = {
-        name: "",
-        brandId: "",
-        modelId: "",
-        modelYear: "",
-        odometerValue: NaN,
-        fuelType: "",
-        fuelMeasurement: "",
-        fuelTankSize: NaN,
-        fuelValue: 0,
-        image: null
-    };
-
-    return {
-        defaultValues,
-        resolver: zodResolver(carFormSchema)
-    };
-};
 
 export const useEditCarFormProps = (car?: EditCarFormFieldType) => {
     return {

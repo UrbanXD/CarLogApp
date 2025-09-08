@@ -3,6 +3,9 @@ import { CarTableType } from "../../../../database/connector/powersync/AppSchema
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 import { getImageFromAttachmentQueue } from "../../../../database/utils/getImageFromAttachmentQueue.ts";
 
+export * from "./makeMapper.ts";
+export * from "./modelMapper.ts";
+
 export const toCarDto = async (car?: CarTableType, attachmentQueue?: PhotoAttachmentQueue): CarDto => {
     if(!car) return null;
 
