@@ -4,130 +4,81 @@ import Input from "../../../../../components/Input/Input.ts";
 import { StepProps } from "../../../../../types/index.ts";
 import { ICON_NAMES } from "../../../../../constants/index.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
-import {
-    CAR_BRAND_TABLE,
-    CAR_MODEL_TABLE,
-    CarBrandTableType,
-    CarModelTableType
-} from "../../../../../database/connector/powersync/AppSchema.ts";
-import { PaginatorFactory, PaginatorType } from "../../../../../database/paginator/PaginatorFactory.ts";
-import { ToPickerItemsSelectors } from "../../../../../utils/toPickerItems.ts";
-import { getToday } from "../../../../../utils/getDate.ts";
+import { MakeTableRow, ModelTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
+import { CarFormFields } from "../../../schemas/form/carForm.ts";
 
-const CarModelStep: React.FC<StepProps> = ({
-    control,
-    resetField
-}) => {
-    const { db, carDAO } = useDatabase();
+type CarModelStepProps<FormFields> = Pick<StepProps<FormFields>, "control" | "resetField" | "setValue">;
 
-    const selectedBrandId = useWatch({
-        control,
-        name: "brandId"
-    });
+function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValue }: CarModelStepProps<FormFields>) {
+    const { makeDao, modelDao } = useDatabase();
 
-    const selectedModelId = useWatch({
-        control,
-        name: "modelId"
-    });
-
+    const selectedMakeId = useWatch({ control, name: "model.makeId" });
+    const selectedModelId = useWatch({ control, name: "model.id" });
     const [modelYears, setModelYears] = useState<Array<string>>([]);
 
-    const brandsPaginator = useMemo(() => PaginatorFactory.createPaginator<CarBrandTableType>(
-        PaginatorType.cursor,
-        db,
-        CAR_BRAND_TABLE,
-        "id",
-        {
-            perPage: 50,
-            orderBy: { field: "name", direction: "asc", toLowerCase: true },
-            searchBy: "name"
-        },
-        "name"
-    ), [db]);
-
-    const modelsPaginator = useMemo(() => {
-        console.log("modalsPaginator useMemo");
-        return PaginatorFactory.createPaginator<CarModelTableType>(
-            PaginatorType.cursor,
-            db,
-            CAR_MODEL_TABLE,
-            "id",
-            {
-                perPage: 25,
-                filterBy: selectedBrandId ? { field: "brand", value: selectedBrandId, operator: "=" } : undefined,
-                orderBy: { field: "name", direction: "asc", toLowerCase: true },
-                searchBy: "name"
-            },
-            "name"
-        );
-    }, [db, selectedBrandId]);
+    const makePaginator = useMemo(() => makeDao.paginator(50), []);
+    const modelPaginator = useMemo(() => modelDao.paginatorByMakeId(selectedMakeId, 25), [selectedMakeId]);
 
     useEffect(() => {
-        const fetchYears = async () => {
-            const model = await carDAO.getCarModelById(selectedModelId);
+        if(!selectedModelId) return;
 
-            if(!model) return;
-            const years = {
-                start: Number(model.startYear),
-                end: !model?.endYear
-                     ? getToday().getFullYear()
-                     : Number(model.endYear)
-            };
-
-            const result = Array.from(
-                { length: years.end - years.start + 1 },
-                (_, key) => (years.start + key).toString()
-            ).reverse();
-
-            setModelYears(result);
-        };
-
+        const fetchYears = async () => setModelYears(await modelDao.getModelYearsById(selectedModelId, true));
         fetchYears();
     }, [selectedModelId]);
 
     useEffect(() => {
-        if(resetField) resetField("modelId", { keepError: true, keepDirty: true });
-    }, [selectedBrandId]);
+        resetField("model.id", { keepError: true, keepDirty: true });
+    }, [selectedMakeId]);
 
     useEffect(() => {
-        if(resetField) resetField("modelYear", { keepError: true, keepDirty: true });
+        resetField("model.year", { keepError: true, keepDirty: true });
+
+        const setHiddenInputsValue = async () => {
+            const model = await modelDao.getModelById(selectedModelId);
+            const make = await makeDao.getMakeById(model.makeId);
+
+            setValue("model.name", model.name);
+            setValue("model.makeName", make.name);
+        };
+
+        if(selectedModelId) setHiddenInputsValue();
     }, [selectedModelId]);
 
     return (
         <Input.Group>
             <Input.Field
                 control={ control }
-                fieldName="brandId"
+                fieldName="model.makeId"
                 fieldNameText="Márka"
             >
-                <Input.Picker.Dropdown<CarBrandTableType>
-                    paginator={ brandsPaginator }
+                <Input.Picker.Dropdown<MakeTableRow>
+                    paginator={ makePaginator }
                     icon={ ICON_NAMES.car }
                     dataTransformSelectors={ {
                         title: "name",
                         value: "id"
-                    } as ToPickerItemsSelectors<CarBrandTableType> }
+                    } }
                 />
             </Input.Field>
             <Input.Field
                 control={ control }
-                fieldName="modelId"
+                fieldName="model.id"
                 fieldNameText="Modell"
             >
-                <Input.Picker.Dropdown<CarModelTableType>
-                    paginator={ modelsPaginator }
+                <Input.Picker.Dropdown<ModelTableRow>
+                    paginator={ modelPaginator }
                     icon={ ICON_NAMES.car }
                     dataTransformSelectors={ {
                         title: "name",
                         value: "id"
-                    } as ToPickerItemsSelectors<CarModelTableType> }
-                    disabled={ !selectedBrandId }
+                    } }
+                    disabled={ !selectedMakeId }
                     disabledText="Először válassza ki az autó márkáját!"
                 />
             </Input.Field>
             <Input.Field
                 control={ control }
-                fieldName="modelYear"
+                fieldName="model.year"
                 fieldNameText="Évjárat"
             >
                 <Input.Picker.Dropdown<string>
@@ -143,6 +94,6 @@ const CarModelStep: React.FC<StepProps> = ({
             </Input.Field>
         </Input.Group>
     );
-};
+}
 
 export default CarModelStep;
