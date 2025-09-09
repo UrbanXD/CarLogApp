@@ -6,7 +6,6 @@ import { AuthError, GenerateLinkParams, Session, User } from "@supabase/supabase
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AVATAR_COLOR, BaseConfig } from "../../constants/index.ts";
 import { loadUser } from "../../features/user/model/actions/loadUser.ts";
-import { loadCars } from "../../features/car/model/actions/loadCars.ts";
 import { router } from "expo-router";
 import { DeleteUserToast, SignInToast, SignOutToast, SignUpToast } from "../../features/user/presets/toast/index.ts";
 import { getToastMessage } from "../../ui/alert/utils/getToastMessage.ts";
@@ -14,6 +13,7 @@ import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { SignInRequest } from "../../features/user/schemas/form/signInRequest.ts";
 import { SignUpRequest } from "../../features/user/schemas/form/signUpRequest.ts";
 import { OtpVerificationHandlerType } from "../../app/bottomSheet/otpVerification.tsx";
+import { loadCars } from "../../features/car/model/actions/loadCars.ts";
 
 export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     children

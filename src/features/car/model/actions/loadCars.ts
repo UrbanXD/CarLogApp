@@ -5,9 +5,9 @@ export const loadCars = createAsyncThunk(
     "cars",
     async (database: Database, { rejectWithValue }) => {
         try {
-            return await database.carDAO.getCars();
+            return await database.carDao.getCars();
         } catch(e) {
-            console.log("load cars error: ", e);
+            console.log("loadCars", e);
             return rejectWithValue("");
         }
     }
