@@ -3,6 +3,8 @@ import { DatabaseType, MakeTableRow } from "../../../../database/connector/power
 import { MakeMapper } from "../mapper/index.ts";
 import { Make } from "../../schemas/makeSchema.ts";
 import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";
+import { PaginatorFactory, PaginatorType } from "../../../../database/paginator/PaginatorFactory.ts";
+import { CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
 
 export class MakeDao {
     private readonly db: Kysely<DatabaseType>;
@@ -21,5 +23,20 @@ export class MakeDao {
         .executeTakeFirstOrThrow();
 
         return this.mapper.toMakeDto(makeRow);
+    }
+
+    paginator(perPage?: number = 50): CursorPaginator<MakeTableRow> {
+        return PaginatorFactory.createPaginator<MakeTableRow>(
+            PaginatorType.cursor,
+            this.db,
+            MAKE_TABLE,
+            "id",
+            {
+                perPage,
+                orderBy: { field: "name", direction: "asc", toLowerCase: true },
+                searchBy: "name"
+            },
+            "name"
+        );
     }
 }
