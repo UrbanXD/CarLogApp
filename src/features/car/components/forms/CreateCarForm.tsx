@@ -1,15 +1,15 @@
 import React from "react";
 import MultiStepForm from "../../../../components/Form/MultiStepForm.tsx";
-import useNewCarForm from "../../hooks/useNewCar.tsx";
+import useCreateCarForm from "../../hooks/useCreateCar.tsx";
 
-const NewCarForm: React.FC = () => {
+const CreateCarForm: React.FC = () => {
     const {
         control,
         submitHandler,
         trigger,
         resetField,
         steps
-    } = useNewCarForm();
+    } = useCreateCarForm();
 
     return (
         <MultiStepForm
@@ -23,4 +23,4 @@ const NewCarForm: React.FC = () => {
     );
 };
 
-export default NewCarForm;
+export default CreateCarForm;

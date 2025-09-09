@@ -1,14 +1,11 @@
 import { Kysely } from "@powersync/kysely-driver";
 import {
-    CAR_MODEL_TABLE,
     CAR_TABLE,
-    CarModelTableType,
     CarTableRow,
     CarTableType,
     DatabaseType,
-    InsertableCarTableRow,
-    InsertableFuelTankRow,
-    InsertableOdometerTableRow
+    FuelTankTableRow,
+    OdometerTableRow
 } from "../../../../database/connector/powersync/AppSchema.ts";
 import { ModelDao } from "./ModelDao.ts";
 import { MakeDao } from "./MakeDao.ts";
@@ -56,32 +53,28 @@ export class CarDao {
         return this.mapper.toCarDtoArray(carRowArray);
     }
 
-    async createCar(
-        car: InsertableCarTableRow,
-        odometer: (carId: string) => InsertableOdometerTableRow,
-        fuelTank: (carId: string) => InsertableFuelTankRow
-    ): Promise<Car> {
+    async createCar(car: CarTableRow, odometer: OdometerTableRow, fuelTank: FuelTankTableRow): Promise<Car> {
         const insertedCar = await this.db.transaction().execute(async trx => {
-            const [carRow] = await trx
+            const carRow = await trx
             .insertInto(CAR_TABLE)
             .values(car)
             .returningAll()
-            .execute();
+            .executeTakeFirstOrThrow();
 
             await trx
             .insertInto(ODOMETER_TABLE)
-            .values(odometer(carRow.id))
+            .values(odometer)
             .execute();
 
             await trx
             .insertInto(FUEL_TANK_TABLE)
-            .values(fuelTank(carRow.id))
+            .values(fuelTank)
             .execute();
 
             return carRow;
         });
-
-        return this.mapper.toCarDto(insertedCar);
+        console.log("insertedCar: ", insertedCar);
+        return await this.mapper.toCarDto(insertedCar);
     }
 
     async editCar(car: CarTableType) {
@@ -100,13 +93,5 @@ export class CarDao {
         .where("id", "=", carId)
         .returning("id")
         .executeTakeFirstOrThrow();
-    }
-
-    async getCarModelById(modelId: string) {
-        return await this.db
-        .selectFrom(CAR_MODEL_TABLE)
-        .selectAll()
-        .where("id", "=", modelId)
-        .executeTakeFirst() as unknown as CarModelTableType;
     }
 }

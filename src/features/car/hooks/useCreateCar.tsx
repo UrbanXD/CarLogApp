@@ -1,16 +1,18 @@
-import { AddCarFormFieldType, useAddCarFormProps } from "../schemas/carSchema.ts";
 import { useForm } from "react-hook-form";
 import useCarSteps from "./useCarSteps.tsx";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
-import { addCar } from "../model/actions/addCar.ts";
+import { createCar } from "../model/actions/createCar.ts";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 import { CarCreateToast } from "../presets/toast/index.ts";
 import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
-import { useAppDispatch } from "../../../hooks/index.ts";
+import { useAppDispatch, useAppSelector } from "../../../hooks/index.ts";
+import { CreateCarRequest, useCreatCarFormProps } from "../schemas/form/createCarRequest.ts";
+import { getUser } from "../../user/model/selectors/index.ts";
 
-const useNewCarForm = () => {
+const useCreateCarForm = () => {
     const database = useDatabase();
     const dispatch = useAppDispatch();
+    const user = useAppSelector(getUser);
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
 
@@ -21,12 +23,14 @@ const useNewCarForm = () => {
         reset,
         resetField,
         getValues
-    } = useForm<AddCarFormFieldType>(useAddCarFormProps());
+    } = useForm<CreateCarRequest>(useCreatCarFormProps());
 
     const submitHandler =
-        handleSubmit(async (newCar: AddCarFormFieldType) => {
+        handleSubmit(async (request: CreateCarRequest) => {
             try {
-                await dispatch(addCar({ database, car: newCar }));
+                if(!user) throw new Error("User not found");
+
+                await dispatch(createCar({ database, request: { ...request, ownerId: user.id } }));
 
                 reset();
                 if(dismissBottomSheet) dismissBottomSheet(true);
@@ -46,4 +50,4 @@ const useNewCarForm = () => {
     };
 };
 
-export default useNewCarForm;
+export default useCreateCarForm;

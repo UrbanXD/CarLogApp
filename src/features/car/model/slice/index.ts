@@ -1,7 +1,7 @@
 import { CarsState } from "../types/index.ts";
 import { createSlice } from "@reduxjs/toolkit";
 import { loadCars } from "../actions/loadCars.ts";
-import { addCar } from "../actions/addCar.ts";
+import { createCar } from "../actions/createCar.ts";
 import { editCar } from "../actions/editCar.ts";
 import { deleteCar } from "../actions/deleteCar.ts";
 import { loadSelectedCar } from "../actions/loadSelectedCar.ts";
@@ -31,11 +31,11 @@ const carsSlice = createSlice({
             state.loading = false;
             state.cars = action.payload;
         })
-        .addCase(addCar.fulfilled, (state, action) => {
+        .addCase(createCar.fulfilled, (state, action) => {
             if(!action.payload) return;
             state.cars.push(action.payload);
         })
-        .addCase(addCar.rejected, () => {
+        .addCase(createCar.rejected, () => {
             console.log("hiba addCar, Slices");
         })
         .addCase(editCar.fulfilled, (state, action) => {
