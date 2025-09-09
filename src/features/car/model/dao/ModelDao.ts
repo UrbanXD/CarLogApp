@@ -17,7 +17,7 @@ export class ModelDao {
         this.mapper = new ModelMapper(makeDao);
     }
 
-    async getModelById(id: number): Promise<Model> {
+    async getModelById(id: string): Promise<Model> {
         const modelRow: ModelTableRow = await this.db
         .selectFrom(MODEL_TABLE)
         .selectAll()
@@ -27,7 +27,7 @@ export class ModelDao {
         return this.mapper.toModelDto(modelRow);
     }
 
-    async getModelYearsById(id: number, desc?: boolean): Promise<Array<string>> {
+    async getModelYearsById(id: string, desc?: boolean): Promise<Array<string>> {
         const model: Model = await this.getModelById(id);
 
         const years = {
@@ -43,7 +43,7 @@ export class ModelDao {
         return result;
     }
 
-    paginatorByMakeId(makeId: number | undefined, perPage?: number = 50): CursorPaginator<ModelTableRow> {
+    paginatorByMakeId(makeId: string | undefined, perPage?: number = 50): CursorPaginator<ModelTableRow> {
         return PaginatorFactory.createPaginator<ModelTableRow>(
             PaginatorType.cursor,
             this.db,
