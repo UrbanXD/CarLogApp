@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const makeSchema = z
 .object({
-    id: z.string(),
+    id: z.string().uuid(),
     name: z.string()
 });
 

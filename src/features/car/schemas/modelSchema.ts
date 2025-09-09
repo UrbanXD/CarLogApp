@@ -2,8 +2,8 @@ import { z } from "zod";
 
 export const modelSchema = z
 .object({
-    id: z.string(),
-    makeId: z.string(),
+    id: z.string().uuid(),
+    makeId: z.string().uuid(),
     name: z.string(),
     startYear: z.string(),
     endYear: z.string().nullable()

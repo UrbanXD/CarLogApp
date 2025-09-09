@@ -1,4 +1,4 @@
-import { CarTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
+import { CarTableRow, FuelTankTableRow, OdometerTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 import { getImageFromAttachmentQueue } from "../../../../database/utils/getImageFromAttachmentQueue.ts";
 import { Car, carSchema } from "../../schemas/carSchema.ts";
@@ -6,6 +6,7 @@ import { MakeDao } from "../dao/MakeDao.ts";
 import { ModelDao } from "../dao/ModelDao.ts";
 import { OdometerDao } from "../dao/OdometerDao.ts";
 import { FuelTankDao } from "../dao/FuelTankDao.ts";
+import { CarFormFields, carFormSchema } from "../../schemas/form/carForm.ts";
 
 export class CarMapper {
     constructor(
@@ -48,5 +49,41 @@ export class CarMapper {
             created_at: car.createdAt,
             image_url: car.image?.path ?? null
         };
+    }
+
+    fromFormResultToCarEntities(carFormResult: CarFormFields, createdAt?: string): {
+        car: CarTableRow,
+        odometer: OdometerTableRow,
+        fuelTank: FuelTankTableRow
+    } {
+        const request = carFormSchema.parse(formResult);
+
+        const car: CarTableRow = {
+            id: request.id,
+            owner_id: request.ownerId,
+            name: request.name,
+            model_id: request.model.id,
+            model_year: request.model.year,
+            image_url: request.image?.path ?? null,
+            created_at: createdAt
+        };
+
+        const odometer: OdometerTableRow = {
+            id: request.odometer.id,
+            car_id: request.id,
+            value: request.odometer.value,
+            measurement: request.odometer.measurement
+        };
+
+        const fuelTank: FuelTankTableRow = {
+            id: request.fuelTank.id,
+            car_id: request.id,
+            type: request.fuelTank.type,
+            capacity: request.fuelTank.capacity,
+            value: request.fuelTank.value,
+            measurement: request.fuelTank.measurement
+        };
+
+        return { car, odometer, fuelTank };
     }
 }

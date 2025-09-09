@@ -18,9 +18,9 @@ export const zNumber = (defaultValue?: number = NaN, minValue?: number = 0) => z
     )
 );
 
-export const zPickerRequired = z
+export const zPickerRequired = (errorMessage?: string = "Válasszon ki egy elemet!") => z
 .string()
-.min(1, "Válasszon ki egy elemet!");
+.min(1, errorMessage);
 
 export const zImage = z
 .custom<Image | null>(value => value === null || value instanceof Image);

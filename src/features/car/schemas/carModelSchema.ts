@@ -4,6 +4,6 @@ import { z } from "zod";
 
 export const carModelSchema = modelSchema
 .pick({ id: true, name: true })
-.extend({ make: makeSchema, year: z.string().min(4).max(4) });
+.extend({ make: makeSchema, year: modelSchema.shape.startYear });
 
 export type CarModel = z.infer<typeof carModelSchema>;

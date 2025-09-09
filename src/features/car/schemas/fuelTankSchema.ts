@@ -1,13 +1,12 @@
 import { z } from "zod";
-import { zNumber } from "../../../types/zodTypes.ts";
 
 export const fuelTankSchema = z
 .object({
-    id: z.string(),
-    type: z.string(),
-    capacity: zNumber(0, 0),
-    value: zNumber(0, 0),
-    measurement: z.string()
+    id: z.string().uuid(),
+    type: z.string(), //convert to enum
+    capacity: z.number().min(0),
+    value: z.number().min(0),
+    measurement: z.string() // convert to enum
 });
 
 export type FuelTank = z.infer<typeof fuelTankSchema>;

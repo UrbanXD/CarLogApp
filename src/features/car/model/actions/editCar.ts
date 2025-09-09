@@ -1,44 +1,23 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Database } from "../../../../database/connector/Database.ts";
-import { EditCarFormFieldType } from "../../schemas/carSchema.ts";
-import { CarDto } from "../types/index.ts";
-import { toCarEntity } from "../mapper/index.ts";
+import { CarFormFields } from "../../schemas/form/carForm.ts";
 
-interface EditCarArgs {
-    database: Database;
-    oldCar: CarDto;
-    newCar: EditCarFormFieldType;
+type EditCarArgs = {
+    database: Database
+    formResult: CarFormFields
 }
 
 export const editCar = createAsyncThunk(
     "editCar",
     async (args: EditCarArgs, { rejectWithValue }) => {
-        const {
-            database: { carDAO, supabaseConnector, attachmentQueue },
-            oldCar,
-            newCar
-        } = args;
+        const { database: { carDao }, formResult } = args;
 
         try {
-            const { userID } = await supabaseConnector.fetchCredentials();
+            const { car, odometer, fuelTank } = carDao.mapper.fromFormResultToCarEntities(formResult);
 
-            let image = null;
-            if(attachmentQueue && newCar.image) {
-                image = await attachmentQueue.saveFile(newCar.image, userID);
-            }
-            if(image === newCar) newCar.image = image ? image.filename : null;
-
-            const carDto: CarDto = {
-                ...oldCar,
-                ...newCar,
-                image: image ? image.filename : oldCar.image ? oldCar.image : null
-            };
-            const car = toCarEntity(carDto);
-            await carDAO.editCar(car);
-
-            return carDto;
+            return await carDao.editCar(car, odometer, fuelTank);
         } catch(e) {
-            console.log(e);
+            console.log("edit car action error: ", e);
             return rejectWithValue("");
         }
     }
