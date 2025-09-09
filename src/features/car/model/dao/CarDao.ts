@@ -2,7 +2,6 @@ import { Kysely } from "@powersync/kysely-driver";
 import {
     CAR_TABLE,
     CarTableRow,
-    CarTableType,
     DatabaseType,
     FuelTankTableRow,
     OdometerTableRow
@@ -19,7 +18,7 @@ import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/P
 
 export class CarDao {
     private readonly db: Kysely<DatabaseType>;
-    private readonly mapper: CarMapper;
+    readonly mapper: CarMapper;
 
     constructor(db: Kysely<DatabaseType>, attachmentQueue?: PhotoAttachmentQueue) {
         this.db = db;
@@ -77,14 +76,31 @@ export class CarDao {
         return await this.mapper.toCarDto(insertedCar);
     }
 
-    async editCar(car: CarTableType) {
-        await this.db
-        .updateTable(CAR_TABLE)
-        .set({ ...car })
-        .where("id", "=", car.id)
-        .executeTakeFirst();
+    async editCar(car: CarTableRow, odometer: OdometerTableRow, fuelTank: FuelTankTableRow) {
+        const updatedCar = await this.db.transaction().execute(async trx => {
+            const carRow = await trx
+            .updateTable(CAR_TABLE)
+            .set(car)
+            .where("id", "=", car.id)
+            .returningAll()
+            .executeTakeFirstOrThrow();
 
-        return car;
+            await trx
+            .updateTable(ODOMETER_TABLE)
+            .set(odometer)
+            .where("id", "=", odometer.id)
+            .execute();
+
+            await trx
+            .updateTable(FUEL_TANK_TABLE)
+            .set(fuelTank)
+            .where("id", "=", fuelTank.id)
+            .execute();
+
+            return carRow;
+        });
+
+        return await this.mapper.toCarDto(updatedCar);
     }
 
     async deleteCar(carId: string) {
