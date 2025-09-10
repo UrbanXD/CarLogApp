@@ -1,6 +1,6 @@
 import { Kysely } from "@powersync/kysely-driver";
 import { DatabaseType, MakeTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
-import { MakeMapper } from "../mapper/index.ts";
+import { MakeMapper } from "../mapper/makeMapper.ts";
 import { Make } from "../../schemas/makeSchema.ts";
 import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";
 import { PaginatorFactory, PaginatorType } from "../../../../database/paginator/PaginatorFactory.ts";

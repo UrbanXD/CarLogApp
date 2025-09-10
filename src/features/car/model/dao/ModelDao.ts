@@ -1,6 +1,6 @@
 import { Kysely } from "@powersync/kysely-driver";
 import { DatabaseType, ModelTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
-import { ModelMapper } from "../mapper/index.ts";
+import { ModelMapper } from "../mapper/modelMapper.ts";
 import { MODEL_TABLE } from "../../../../database/connector/powersync/tables/model.ts";
 import { Model } from "../../schemas/modelSchema.ts";
 import { MakeDao } from "./MakeDao.ts";

@@ -2,7 +2,7 @@ import { Kysely } from "@powersync/kysely-driver";
 import { DatabaseType } from "../../../../database/connector/powersync/AppSchema.ts";
 import { FuelTank } from "../../schemas/fuelTankSchema.ts";
 import { FUEL_TANK_TABLE } from "../../../../database/connector/powersync/tables/fuelTank.ts";
-import { FuelTankMapper } from "../mapper/fuelTankMapper.tsx";
+import { FuelTankMapper } from "../mapper/fuelTankMapper.ts";
 
 export class FuelTankDao {
     private readonly db: Kysely<DatabaseType>;
