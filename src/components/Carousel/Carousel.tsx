@@ -44,6 +44,9 @@ const Carousel: React.FC<CarouselProps> = ({
     }, []);
 
     useEffect(() => {
+        const maxOffset = Math.max(0, (data.length - 1) * ITEM_SIZE);
+        if(x.value > maxOffset) x.value = maxOffset;
+
         flatlistRef.current?.scrollToOffset({ animated: false, offset: x.value });
     }, [data]);
 
