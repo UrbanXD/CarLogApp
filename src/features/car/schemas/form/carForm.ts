@@ -62,7 +62,6 @@ export const useCreatCarFormProps = (userId: string) => {
 };
 
 export const useEditCarFormProps = (car: Car) => {
-    console.log(car.ownerId, " geco");
     const defaultValues: CarFormFields = {
         id: car.id,
         ownerId: car.ownerId,
@@ -88,6 +87,6 @@ export const useEditCarFormProps = (car: Car) => {
             measurement: car.fuelTank.measurement
         }
     };
-    console.log(defaultValues);
+
     return { defaultValues, resolver: zodResolver(carFormSchema) };
 };

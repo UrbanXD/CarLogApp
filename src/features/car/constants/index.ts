@@ -1,11 +1,4 @@
-import { UseFormReturn } from "react-hook-form";
-import { RenderComponent } from "../../../types/index.ts";
 import { RawPickerElement } from "../../../utils/toPickerItems.ts";
-
-export interface UseCustomFormProps extends Partial<UseFormReturn<any>> {
-    steps: Array<RenderComponent>;
-    submitHandler: () => Promise<void>;
-}
 
 export const ODOMETER_MEASUREMENTS: Array<RawPickerElement> = [
     { title: "Kilóméter (km)", value: "km" },
