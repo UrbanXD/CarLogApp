@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
 import { SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
 import Avatar from "../../Avatar/Avatar.ts";
 import { router } from "expo-router";
 import { getLabelByName } from "../../../utils/getLabelByName.ts";
-import { loadSelectedCar } from "../../../features/car/model/actions/loadSelectedCar.ts";
-import { selectCar } from "../../../features/car/model/actions/selectCar.ts";
-import { store } from "../../../database/redux/store.ts";
-import { getCarsAsPickerElements, isLoading } from "../../../features/car/model/selectors/index.ts";
+// import { loadSelectedCar } from "../../../features/car/model/actions/loadSelectedCar.ts";
+// import { selectCar } from "../../../features/car/model/actions/selectCar.ts";
+// import { store } from "../../../database/redux/store.ts";
+// import { getCarsAsPickerElements, isLoading } from "../../../features/car/model/selectors/index.ts";
 import { useAppSelector } from "../../../hooks/index.ts";
-import { getSelectedCarId } from "../../../features/car/model/selectors/getSelectedCarId.ts";
+// import { getSelectedCarId } from "../../../features/car/model/selectors/getSelectedCarId.ts";
 import HeaderView from "./HeaderView.tsx";
 import { getUser, isUserLoading } from "../../../features/user/model/selectors/index.ts";
 
@@ -20,23 +20,23 @@ const PrimaryHeader: React.FC = () => {
 
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-    const cars = useAppSelector(getCarsAsPickerElements());
-    const carsLoading = useAppSelector(isLoading);
-    const selectedCarId = useAppSelector(getSelectedCarId);
-
-    const onCarSelect = (id: string) => {
-        store.dispatch(selectCar(id));
-    };
-
-    useEffect(() => {
-        store.dispatch(loadSelectedCar({}));
-    }, []);
+    // const cars = useAppSelector(getCarsAsPickerElements());
+    // const carsLoading = useAppSelector(isLoading);
+    // const selectedCarId = useAppSelector(getSelectedCarId);
+    //
+    // const onCarSelect = (id: string) => {
+    //     store.dispatch(selectCar(id));
+    // };
+    //
+    // useEffect(() => {
+    //     store.dispatch(loadSelectedCar({}));
+    // }, []);
 
     const openProfile = () => {
         router.push("/(profile)/user");
     };
 
-    if(user === null) return router.back();
+    if(user === null) return null;
 
     return (
         <HeaderView>
