@@ -1,10 +1,11 @@
 import { AbstractAttachmentQueue, AttachmentRecord, AttachmentState } from "@powersync/attachments";
 import * as FileSystem from "expo-file-system/legacy";
 import { BaseConfig } from "../../../constants/index.ts";
-import { CAR_TABLE, USER_TABLE } from "./AppSchema.ts";
 import { getUUID } from "../../utils/uuid.ts";
 import { ImageType } from "../../utils/pickImage.ts";
 import { encode } from "base64-arraybuffer";
+import { USER_TABLE } from "./tables/user.ts";
+import { CAR_TABLE } from "./tables/car.ts";
 
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
 

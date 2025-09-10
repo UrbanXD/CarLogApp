@@ -1,6 +1,5 @@
 import { Kysely } from "@powersync/kysely-driver";
 import {
-    CAR_TABLE,
     CarTableRow,
     DatabaseType,
     FuelTankTableRow,
@@ -16,6 +15,7 @@ import { ODOMETER_TABLE } from "../../../../database/connector/powersync/tables/
 import { FUEL_TANK_TABLE } from "../../../../database/connector/powersync/tables/fuelTank.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 import { SupabaseStorageAdapter } from "../../../../database/connector/storage/SupabaseStorageAdapter.ts";
+import { CAR_TABLE } from "../../../../database/connector/powersync/tables/car.ts";
 
 export class CarDao {
     private readonly db: Kysely<DatabaseType>;
@@ -126,7 +126,7 @@ export class CarDao {
         .where("id", "=", carId)
         .returning("id")
         .executeTakeFirstOrThrow();
-        
+
         return result.id;
     }
 }
