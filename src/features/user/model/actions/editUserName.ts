@@ -16,7 +16,7 @@ export const editUserName =
         "user/edit/name",
         async (args, { getState }) => {
             const { user: { user: oldUser } } = getState();
-            const { database: { userDAO }, request } = args;
+            const { database: { userDao }, request } = args;
 
             const user: UserAccount = {
                 ...oldUser,
@@ -24,6 +24,6 @@ export const editUserName =
                 lastname: request.lastname
             };
 
-            return await userDAO.editUser(user);
+            return await userDao.editUser(user);
         }
     );

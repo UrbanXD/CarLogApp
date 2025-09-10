@@ -13,7 +13,7 @@ export const useGoogleAuth = () => {
     });
 
     const database = useDatabase();
-    const { supabaseConnector, userDAO } = database;
+    const { supabaseConnector, userDao } = database;
     const { openToast } = useAlert();
 
     const googleAuth = async () => {
@@ -49,7 +49,7 @@ export const useGoogleAuth = () => {
             }
 
             // uj fiok kerult letrehozasra, mentsuk le a nevet a felhasznalonak
-            await userDAO.insertUser({
+            await userDao.insertUser({
                 id: user.id,
                 email: user.email,
                 firstname: googleData.user.givenName || "",

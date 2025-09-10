@@ -1,25 +1,31 @@
 import { Kysely } from "@powersync/kysely-driver";
 import { DatabaseType, UserTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
 import { USER_TABLE } from "../../../../database/connector/powersync/tables/user.ts";
-import { toUserDto, toUserEntity } from "../mapper/index.ts";
+import { UserMapper } from "../mapper/userMapper.ts";
 import { UserAccount } from "../../schemas/userSchema.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 
-export class UserDAO {
-    db: Kysely<DatabaseType>;
+export class UserDao {
+    private readonly db: Kysely<DatabaseType>;
+    private readonly attachmentQueue?: PhotoAttachmentQueue;
+    readonly mapper: UserMapper;
 
-    constructor(db: Kysely<DatabaseType>) {
+    constructor(db: Kysely<DatabaseType>, attachmentQueue?: PhotoAttachmentQueue) {
         this.db = db;
+        this.attachmentQueue = attachmentQueue;
+        this.mapper = new UserMapper(this.attachmentQueue);
     }
 
-    async getUser(userId: string, attachmentQueue?: PhotoAttachmentQueue): UserAccount {
-        const user: UserTableRow = await this.db
+    async getUser(userId: string): UserAccount | null {
+        const user: UserTableRow | undefined = await this.db
         .selectFrom(USER_TABLE)
         .selectAll()
         .where("id", "=", userId)
-        .executeTakeFirstOrThrow();
+        .executeTakeFirst();
 
-        return toUserDto(user, attachmentQueue);
+        if(!user) return null;
+
+        return this.mapper.toUserDto(user);
     }
 
     async insertUser(user: UserAccount) {
@@ -30,7 +36,7 @@ export class UserDAO {
             .returningAll()
             .executeTakeFirstOrThrow();
 
-            return toUserDto(insertedUser);
+            return this.mapper.toUserDto(insertedUser);
         } catch(_e) {
             return null;
         }
@@ -38,7 +44,8 @@ export class UserDAO {
 
     async editUser(user: UserAccount) {
         try {
-            const userEntity = await toUserEntity(user);
+            const userEntity = this.mapper.toUserEntity(user);
+
             const updatedUser: UserTableRow = await this.db
             .updateTable(USER_TABLE)
             .set(userEntity)
@@ -46,7 +53,7 @@ export class UserDAO {
             .returningAll()
             .executeTakeFirstOrThrow();
 
-            return toUserDto(updatedUser);
+            return this.mapper.toUserDto(updatedUser);
         } catch(_e) {
             return null;
         }

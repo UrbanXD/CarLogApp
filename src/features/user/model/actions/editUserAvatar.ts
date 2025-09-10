@@ -16,7 +16,7 @@ export const editUserAvatar =
         "user/edit/avatar",
         async (args, { getState }) => {
             const { user: { user: oldUser } } = getState();
-            const { database: { userDAO, attachmentQueue }, request } = args;
+            const { database: { userDao, attachmentQueue }, request } = args;
 
             //TODO fixalni hogy maga a request ImageType legyen hogy itt tudjam lementeni
 
@@ -38,6 +38,6 @@ export const editUserAvatar =
                 avatarColor: request.avatarColor
             };
 
-            return await userDAO.editUser(user);
+            return await userDao.editUser(user);
         }
     );

@@ -21,7 +21,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     const dispatch = useAppDispatch();
     const { openToast } = useAlert();
     const database = useDatabase();
-    const { supabaseConnector, powersync, userDAO, carDAO } = database;
+    const { supabaseConnector, powersync, userDao, carDAO } = database;
 
     const [session, setSession] = useState<Session | null>(null);
     const [authenticated, setAuthenticated] = useState<boolean | null>(null);
@@ -108,7 +108,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             updateNotVerifiedUser(supabaseUser).catch(console.error);
 
             openAccountVerification(supabaseUser.email);
-            await userDAO.insertUser({
+            await userDao.insertUser({
                 id: supabaseUser.id,
                 email: supabaseUser.email,
                 firstname: supabaseUser.user_metadata.firstname,

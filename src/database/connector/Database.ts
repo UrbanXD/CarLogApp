@@ -5,7 +5,7 @@ import { Kysely, wrapPowerSyncWithKysely } from "@powersync/kysely-driver";
 import { SupabaseStorageAdapter } from "./storage/SupabaseStorageAdapter.ts";
 import { PhotoAttachmentQueue } from "./powersync/PhotoAttachmentQueue.ts";
 import { AttachmentRecord } from "@powersync/attachments";
-import { UserDAO } from "../../features/user/model/dao/UserDAO.ts";
+import { UserDao } from "../../features/user/model/dao/UserDao.ts";
 import { CarDao } from "../../features/car/model/dao/CarDao.ts";
 import { BaseConfig } from "../../constants/index.ts";
 import { ModelDao } from "../../features/car/model/dao/ModelDao.ts";
@@ -17,7 +17,7 @@ export class Database {
     supabaseConnector: SupabaseConnector;
     storage: SupabaseStorageAdapter;
     attachmentQueue?: PhotoAttachmentQueue;
-    private _userDAO?: UserDAO;
+    private _userDao?: UserDao;
     private _carDao?: CarDao;
     private _makeDao?: MakeDao;
     private _modelDao?: ModelDao;
@@ -52,10 +52,10 @@ export class Database {
         }
     }
 
-    get userDAO(): UserDAO {
-        if(!this._userDAO) this._userDAO = new UserDAO(this.db);
+    get userDao(): UserDao {
+        if(!this._userDao) this._userDao = new UserDao(this.db, this.attachmentQueue);
 
-        return this._userDAO;
+        return this._userDao;
     }
 
     get carDao(): CarDao {
