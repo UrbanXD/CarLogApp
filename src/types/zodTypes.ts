@@ -2,12 +2,12 @@ import { z } from "zod";
 import { ColorValue } from "react-native";
 import { Image } from "./index.ts";
 
-export const zNumber = (defaultValue?: number = NaN, minValue?: number = 0) => z
+export const zNumber = (minValue?: number = 0) => z
 .preprocess(
-    (value: any) => value ? value.toString() : defaultValue.toString(),
+    (value: any) => value ? value.toString() : "",
     z
     .string()
-    .transform((value) => (Number(value)))
+    .transform((value) => (value === "" ? NaN : Number(value)))
     .refine(
         (value) => !isNaN(value),
         { message: "Kérem adjon meg egy számot." }
