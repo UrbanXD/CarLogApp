@@ -20,7 +20,7 @@ const useCarProfile = (carId: string) => {
             title: `A(z) ${ car.name } nevű autó törlése`,
             body: `Az autó kitörlése egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
             acceptText: "Törlés",
-            acceptAction: () => dispatch(deleteCar({ database, carID: car.id }))
+            acceptAction: () => dispatch(deleteCar({ database, carId: car.id }))
         });
     };
 

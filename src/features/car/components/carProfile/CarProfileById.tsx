@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import useCarProfile from "../../hooks/useCarProfile.tsx";
 import CarProfileView from "./CarProfileView.tsx";
 import { router } from "expo-router";
@@ -9,16 +9,16 @@ type CarProfileByIdProps = {
 }
 
 const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId, fuelSliderDisabled = false }) => {
-    const {
-        car,
-        handleDeleteCar,
-        openEditCarStepBottomSheet
-    } = useCarProfile(carId);
+    const { car, handleDeleteCar, openEditCarStepBottomSheet } = useCarProfile(carId);
 
-    if(!car) {
+    useEffect(() => {
+        if(car) return;
+
         if(router.canGoBack()) return router.back();
         return router.replace("(main)/index");
-    }
+    }, [car]);
+
+    if(!car) return null;
 
     return (
         <CarProfileView

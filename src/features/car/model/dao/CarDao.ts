@@ -15,13 +15,18 @@ import { Car } from "../../schemas/carSchema.ts";
 import { ODOMETER_TABLE } from "../../../../database/connector/powersync/tables/odometer.ts";
 import { FUEL_TANK_TABLE } from "../../../../database/connector/powersync/tables/fuelTank.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
+import { SupabaseStorageAdapter } from "../../../../database/connector/storage/SupabaseStorageAdapter.ts";
 
 export class CarDao {
     private readonly db: Kysely<DatabaseType>;
+    private readonly storage: SupabaseStorageAdapter;
+    private readonly attachmentQueue?: PhotoAttachmentQueue;
     readonly mapper: CarMapper;
 
-    constructor(db: Kysely<DatabaseType>, attachmentQueue?: PhotoAttachmentQueue) {
+    constructor(db: Kysely<DatabaseType>, storage: SupabaseStorageAdapter, attachmentQueue?: PhotoAttachmentQueue) {
         this.db = db;
+        this.storage = storage;
+        this.attachmentQueue = attachmentQueue;
 
         const makeDao = new MakeDao(this.db);
         const modelDao = new ModelDao(this.db, makeDao);
@@ -72,7 +77,7 @@ export class CarDao {
 
             return carRow;
         });
-        console.log("insertedCar: ", insertedCar);
+
         return await this.mapper.toCarDto(insertedCar);
     }
 
@@ -104,10 +109,24 @@ export class CarDao {
     }
 
     async deleteCar(carId: string) {
-        return await this.db
+        try {
+            const car = await this.getCar(carId);
+            if(car?.image && this.attachmentQueue) {
+                const imageFilename = attachmentQueue.getLocalFilePathSuffix(car.image);
+                const localImageUri = attachmentQueue.getLocalUri(imageFilename);
+
+                await storage.deleteFile(localImageUri);
+            }
+        } catch(e) {
+            console.log("Car image cannot be deleted: ", e);
+        }
+
+        const result = await this.db
         .deleteFrom(CAR_TABLE)
         .where("id", "=", carId)
         .returning("id")
         .executeTakeFirstOrThrow();
+        
+        return result.id;
     }
 }

@@ -59,7 +59,7 @@ export class Database {
     }
 
     get carDao(): CarDao {
-        if(!this._carDao) this._carDao = new CarDao(this.db, this.attachmentQueue);
+        if(!this._carDao) this._carDao = new CarDao(this.db, this.storage, this.attachmentQueue);
 
         return this._carDao;
     }
