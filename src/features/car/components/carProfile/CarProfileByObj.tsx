@@ -1,9 +1,9 @@
 import React from "react";
 import CarProfileView from "./CarProfileView.tsx";
-import { CarTableType } from "../../../../database/connector/powersync/AppSchema.ts";
+import { Car } from "../../schemas/carSchema.ts";
 
 type CarProfileByObjProps = {
-    car: CarTableType
+    car: Car
     goTo?: (stepIndex: number) => void
     fuelSliderDisabled?: boolean
 }

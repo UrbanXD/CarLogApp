@@ -2,17 +2,17 @@ import React from "react";
 import EditForm from "../../../../components/Form/EditForm.tsx";
 import { useAppDispatch } from "../../../../hooks/index.ts";
 import { useForm } from "react-hook-form";
-import { EditCarFormFieldType, useEditCarFormProps } from "../../schemas/carSchema.ts";
 import useCarSteps from "../../hooks/useCarSteps.tsx";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { editCar } from "../../model/actions/editCar.ts";
-import { CarDto } from "../../model/types/index.ts";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
+import { CarFormFields, useEditCarFormProps } from "../../schemas/form/carForm.ts";
+import { Car } from "../../schemas/carSchema.ts";
 
-export interface EditCarFormProps {
-    car: CarDto;
-    stepIndex: number;
+export type EditCarFormProps = {
+    car: Car
+    stepIndex: number
 }
 
 const EditCarForm: React.FC<EditCarFormProps> = ({
@@ -24,27 +24,21 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
 
-    const editCarFormFieldType: EditCarFormFieldType = {
-        ...car,
-        image: car.image?.image || null
-    };
     const {
         control,
         resetField,
         reset,
+        setValue,
+        getValues,
         handleSubmit
-    } = useForm<EditCarFormFieldType>(useEditCarFormProps(editCarFormFieldType));
+    } = useForm<CarFormFields>(useEditCarFormProps(car));
 
-    const { steps } = useCarSteps(control, resetField);
+    const { steps } = useCarSteps<CarFormFields>({ control, resetField, setValue, getValues });
 
-    const submitHandler =
-        handleSubmit(async (editedCar) => {
+    const submitHandler = handleSubmit(
+        async (formResult: CarFormFields) => {
             try {
-                await dispatch(editCar({
-                    database,
-                    oldCar: car,
-                    newCar: editedCar
-                })).unwrap();
+                await dispatch(editCar({ database, formResult }));
 
                 const step = steps[stepIndex ?? 0];
                 if(steps[stepIndex] && step.editToastMessages) {
@@ -55,12 +49,15 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
             } catch(e) {
                 console.error("Hiba a submitHandler-ben:", e);
             }
-        });
+        },
+        (errors) => {
+            console.log("Edit car validation errors", errors);
+        }
+    );
 
     return (
         <EditForm
-            steps={ steps.map(step => step.render) }
-            stepIndex={ stepIndex }
+            renderInputFields={ () => steps[stepIndex].render() }
             submitHandler={ submitHandler }
             reset={ reset }
         />

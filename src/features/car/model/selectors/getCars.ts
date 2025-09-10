@@ -1,4 +1,4 @@
 import { RootState } from "../../../../database/redux/index.ts";
-import { CarDto } from "../types/index.ts";
+import { Car } from "../../schemas/carSchema.ts";
 
-export const getCars = (state: RootState): Array<CarDto> => state.cars.cars;
+export const getCars = (state: RootState): Array<Car> => state.cars.cars;

@@ -1,77 +1,26 @@
+import { userTable } from "./tables/user.ts";
+import { carTable } from "./tables/car.ts";
+import { odometerTable } from "./tables/odometer.ts";
+import { fuelTankTable } from "./tables/fuelTank.ts";
+import { makeTable } from "./tables/make.ts";
+import { modelTable } from "./tables/model.ts";
 import { AttachmentTable } from "@powersync/attachments";
-import { column, Schema, Table } from "@powersync/react-native";
-
-export const USER_TABLE = "user";
-export const CAR_TABLE = "car";
-export const SERVICE_TABLE = "service";
-export const CAR_BRAND_TABLE = "carBrand";
-export const CAR_MODEL_TABLE = "carModel";
-
-const user = new Table({
-    id: column.text,
-    email: column.text,
-    firstname: column.text,
-    lastname: column.text,
-    avatarImage: column.text,
-    avatarColor: column.text
-});
-
-const car = new Table({
-    id: column.text,
-    owner: column.text,
-    name: column.text,
-    brand: column.text,
-    model: column.text,
-    modelYear: column.text,
-    odometerMeasurement: column.text,
-    odometerValue: column.integer,
-    fuelType: column.text,
-    fuelMeasurement: column.text,
-    fuelTankSize: column.integer,
-    fuelValue: column.integer,
-    image: column.text,
-    createdAt: column.text
-});
-
-const service = new Table({
-    id: column.text,
-    car: column.text,
-    date: column.text,
-    odometer: column.text,
-    price: column.integer,
-    type: column.text,
-    works: column.text,
-    mechanic: column.text,
-    comment: column.text
-});
-
-/* LOCAL ONLY TABLES */
-const carBrand = new Table({
-    id: column.integer,
-    name: column.text
-}, { localOnly: true });
-
-const carModel = new Table({
-    id: column.integer,
-    brand: column.text, // foreign key
-    name: column.text,
-    startYear: column.integer,
-    endYear: column.integer
-}, { localOnly: true });
-/* LOCAL ONLY TABLES */
+import { Schema } from "@powersync/react-native";
 
 export const AppSchema = new Schema({
-    car,
-    user,
-    service,
     attachments: new AttachmentTable(),
-    carBrand,
-    carModel
+    user_account: userTable,
+    car: carTable,
+    odometer: odometerTable,
+    fuel_tank: fuelTankTable,
+    make: makeTable,
+    model: modelTable
 });
 
 export type DatabaseType = (typeof AppSchema)["types"];
-export type UserTableType = DatabaseType["user"];
-export type CarTableType = DatabaseType["car"];
-export type ServiceTableType = DatabaseType["service"];
-export type CarBrandTableType = DatabaseType["carBrand"];
-export type CarModelTableType = DatabaseType["carModel"];
+export type UserTableRow = DatabaseType["user_account"];
+export type MakeTableRow = DatabaseType["make"];
+export type ModelTableRow = DatabaseType["model"];
+export type CarTableRow = DatabaseType["car"];
+export type OdometerTableRow = DatabaseType["odometer"];
+export type FuelTankTableRow = DatabaseType["fuel_tank"];

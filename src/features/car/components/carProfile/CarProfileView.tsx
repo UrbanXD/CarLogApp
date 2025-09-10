@@ -15,10 +15,10 @@ import Divider from "../../../../components/Divider.tsx";
 import Odometer from "../Odometer.tsx";
 import FuelGauge from "../FuelGauge.tsx";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { CarDto } from "../../model/types/index.ts";
+import { Car } from "../../schemas/carSchema.ts";
 
 type CarProfileViewProps = {
-    car: CarDto
+    car: Car
     openEditCarStep: (stepIndex: number) => void
     fuelSliderDisabled?: boolean
     handleDeleteCar?: () => void
@@ -74,15 +74,15 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                 />
                 <View style={ styles.carInfoRow }>
                     <Text style={ styles.carInfoTitleText }>Gyártó</Text>
-                    <Text style={ styles.carInfoText }>{ car.brand }</Text>
+                    <Text style={ styles.carInfoText }>{ car.model.make.name }</Text>
                 </View>
                 <View style={ styles.carInfoRow }>
                     <Text style={ styles.carInfoTitleText }>Model</Text>
-                    <Text style={ styles.carInfoText }>{ car.model }</Text>
+                    <Text style={ styles.carInfoText }>{ car.model.name }</Text>
                 </View>
                 <View style={ styles.carInfoRow }>
                     <Text style={ styles.carInfoTitleText }>Évjárat</Text>
-                    <Text style={ styles.carInfoText }>{ car.modelYear }</Text>
+                    <Text style={ styles.carInfoText }>{ car.model.year }</Text>
                 </View>
                 <Button.Row style={ {
                     marginTop: SEPARATOR_SIZES.lightSmall,
@@ -111,15 +111,15 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
                 </Button.Row>
             </View>
             <Odometer
-                value={ car.odometerValue }
-                measurement={ car.odometerMeasurement }
+                value={ car.odometer.value }
+                measurement={ car.odometer.measurement }
                 openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.OdometerStep) }
             />
             <FuelGauge
-                value={ car.fuelValue }
-                tankSize={ car.fuelTankSize }
-                fuelType={ car.fuelType }
-                measurement={ car.fuelMeasurement }
+                value={ car.fuelTank.value }
+                tankSize={ car.fuelTank.capacity }
+                fuelType={ car.fuelTank.type }
+                measurement={ car.fuelTank.measurement }
                 disabled={ fuelSliderDisabled }
                 openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.FuelStep) }
             />

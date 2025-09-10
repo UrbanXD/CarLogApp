@@ -1,12 +1,14 @@
-import { UserState } from "../types/user.ts";
 import { createSlice } from "@reduxjs/toolkit";
 import { loadUser } from "../actions/loadUser.ts";
-import { editUser } from "../actions/editUser.ts";
+import { editUserName } from "../actions/editUserName.ts";
+import { UserAccount } from "../../schemas/userSchema.ts";
 
-const initialState: UserState = {
-    isLoading: false,
-    user: null
-};
+export type UserState = {
+    user: UserAccount | null
+    loading: boolean
+}
+
+const initialState: UserState = { user: null };
 
 const userSlice = createSlice({
     name: "user",
@@ -15,18 +17,21 @@ const userSlice = createSlice({
     extraReducers: builder => {
         builder
         .addCase(loadUser.pending, (state) => {
-            state.isLoading = true;
-        })
-        .addCase(loadUser.rejected, (state, action) => {
-            state.isLoading = false;
-            state.user = action.payload ?? null;
+            state.loading = true;
         })
         .addCase(loadUser.fulfilled, (state, action) => {
-            state.isLoading = false;
+            state.user = action.payload;
+            state.loading = false;
+        })
+        .addCase(loadUser.rejected, (state) => {
+            state.loading = false;
+            state.user = null;
+        })
+        .addCase(editUserName.fulfilled, (state, action) => {
             state.user = action.payload;
         })
-        .addCase(editUser.fulfilled, (state, action) => {
-            state.user = action.payload.user;
+        .addCase(editUserName.rejected, (state, action) => {
+            console.log("Edit User Name Error");
         });
     }
 });

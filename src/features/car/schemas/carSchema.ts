@@ -1,51 +1,22 @@
 import { z } from "zod";
-import { zImage, zNumber, zPickerRequired } from "../../../types/zodTypes.ts";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zImage } from "../../../types/zodTypes.ts";
+import { odometerSchema } from "./odometerSchema.ts";
+import { fuelTankSchema } from "./fuelTankSchema.ts";
+import { carModelSchema } from "./carModelSchema.ts";
 
-const carFormSchema = z
+export const carSchema = z
 .object({
-    name: z.string().min(2, "2 karakter legyen min").max(20, "20 karakter legyen max"),
-    brandId: zPickerRequired,
-    modelId: zPickerRequired,
-    modelYear: z.string().min(4), //TODO: custom model year validation
-    odometerMeasurement: zPickerRequired,
-    odometerValue: zNumber(),
-    fuelType: zPickerRequired,
-    fuelMeasurement: zPickerRequired,
-    fuelTankSize: zNumber(),
-    fuelValue: zNumber(0),
-    image: zImage.optional()
+    id: z.string().uuid(),
+    ownerId: z.string().uuid(),
+    name: z.string().min(1, "Kérem adjon meg egy azonosítót az autója számára!").max(
+        24,
+        "Az autó azonosítója maximum 24 karakter lehet!"
+    ),
+    model: carModelSchema,
+    odometer: odometerSchema,
+    fuelTank: fuelTankSchema,
+    image: zImage,
+    createdAt: z.string()
 });
 
-export type AddCarFormFieldType = z.infer<typeof carFormSchema>;
-
-const editCarFormSchema = carFormSchema.partial();
-
-export type EditCarFormFieldType = z.infer<typeof editCarFormSchema>;
-
-export const useAddCarFormProps = () => {
-    const defaultValues: AddCarFormFieldType = {
-        name: "",
-        brandId: "",
-        modelId: "",
-        modelYear: "",
-        odometerValue: NaN,
-        fuelType: "",
-        fuelMeasurement: "",
-        fuelTankSize: NaN,
-        fuelValue: 0,
-        image: null
-    };
-
-    return {
-        defaultValues,
-        resolver: zodResolver(carFormSchema)
-    };
-};
-
-export const useEditCarFormProps = (car?: EditCarFormFieldType) => {
-    return {
-        defaultValues: car,
-        resolver: zodResolver(editCarFormSchema)
-    };
-};
+export type Car = z.infer<typeof carSchema>;

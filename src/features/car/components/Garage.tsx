@@ -10,12 +10,7 @@ import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-nat
 import useGarage from "../hooks/useGarage.tsx";
 
 const Garage: React.FC = () => {
-    const {
-        cars,
-        loading,
-        openNewCarForm,
-        openCarProfile
-    } = useGarage();
+    const { cars, loading, openNewCarForm, openCarProfile } = useGarage();
 
     const renderDefaultElement =
         (size: number, spacerSize: number) =>

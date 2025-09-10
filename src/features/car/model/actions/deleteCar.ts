@@ -3,25 +3,13 @@ import { Database } from "../../../../database/connector/Database.ts";
 
 export const deleteCar = createAsyncThunk(
     "deleteCar",
-    async (args: { database: Database, carID: string }, { rejectWithValue }) => {
+    async (args: { database: Database, carId: string }, { dispatch, rejectWithValue }) => {
         try {
-            const {
-                database: { attachmentQueue, storage, carDAO },
-                carID
-            } = args;
+            const { database: { carDao }, carId } = args;
 
-            const car = await carDAO.getCar(carID);
-            if(car.image && attachmentQueue) {
-                const imageFilename = attachmentQueue.getLocalFilePathSuffix(car.image);
-                const localImageUri = attachmentQueue.getLocalUri(imageFilename);
-
-                await storage.deleteFile(localImageUri);
-            }
-            await carDAO.deleteCar(carID);
-
-            return { id: car.id };
+            return await carDao.deleteCar(carId);
         } catch(e) {
-            console.log(e);
+            console.log("Error at car deleteing: ", e);
             return rejectWithValue("");
         }
     }

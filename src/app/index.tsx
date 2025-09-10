@@ -14,20 +14,20 @@ const App: React.FC = () => {
         "DSEG7": require("../assets/fonts/DSEG7ClassicMini-Bold.ttf")
     });
 
-    const { session, sessionLoading } = useAuth();
+    const { authenticated } = useAuth();
 
     useEffect(() => {
-        if((fontsLoaded || fontsLoadError) && !sessionLoading) {
+        if((fontsLoaded || fontsLoadError) && authenticated !== null) {
             SplashScreen.hideAsync();
         }
-    }, [fontsLoaded, fontsLoadError, sessionLoading]);
+    }, [fontsLoaded, fontsLoadError, authenticated]);
 
     if(!fontsLoaded) return null;
 
     return (
         <AnimatedSplashScreen
-            loaded={ !sessionLoading }
-            redirectTo={ session && session.user ? "/(main)" : "/auth" }
+            loaded={ authenticated !== null }
+            redirectTo={ authenticated ? "/(main)" : "/auth" }
         />
     );
 };

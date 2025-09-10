@@ -4,7 +4,7 @@ import Input from "../../../../components/Input/Input.ts";
 import { AuthApiError, EmailOtpType } from "@supabase/supabase-js";
 import Divider from "../../../../components/Divider.tsx";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
-import { useUserManagement } from "../../hooks/useUserManagement.ts";
+import { useOtp } from "../../hooks/useOtp.ts";
 
 export type HandleVerificationOtpType = (errorCode?: string) => (Promise<void> | void)
 
@@ -25,7 +25,7 @@ const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
     subtitle,
     handleVerification
 }) => {
-    const { verifyOTP, resendOTP } = useUserManagement();
+    const { verifyOTP, resendOTP } = useOtp();
 
     const defaultSubtitle = () =>
         <Text style={ styles.subtitleText }>
@@ -35,11 +35,7 @@ const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
 
     const onSubmit = async (token: string) => {
         try {
-            await verifyOTP({
-                email,
-                token,
-                type
-            });
+            await verifyOTP({ email, token, type });
 
             await handleVerification();
         } catch(error: AuthApiError | any) {
@@ -47,11 +43,7 @@ const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
         }
     };
 
-    const resend = async () =>
-        await resendOTP({
-            type: "signup",
-            email: email
-        });
+    const resend = async () => await resendOTP({ type, email });
 
     return (
         <View style={ styles.pageContainer }>
