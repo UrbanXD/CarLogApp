@@ -18,7 +18,7 @@ const InputError: React.FC = () => {
 
 const styles = StyleSheet.create({
     errorText: {
-        paddingLeft: hp(2),
+        paddingLeft: hp(0.5),
         fontFamily: "Gilroy-Medium",
         fontSize: hp(1.85),
         letterSpacing: hp(1.85) * 0.05,
