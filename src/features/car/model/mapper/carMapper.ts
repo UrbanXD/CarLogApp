@@ -17,13 +17,13 @@ export class CarMapper {
         private readonly attachmentQueue?: PhotoAttachmentQueue
     ) {}
 
-    async toCarDto(carRow: CarTableRow): Promise<Car> {
+    async toCarDto(carRow: CarTableRow): Promise<Car | null> {
         const image = await getImageFromAttachmentQueue(this.attachmentQueue, carRow.image_url);
         const model = await this.modelDao.getModelById(carRow.model_id);
         const odometer = await this.odometerDao.getOdometerByCarId(carRow.id);
         const fuelTank = await this.fuelTankDao.getFuelTankByCarId(carRow.id);
 
-        return carSchema.parse({
+        const { data } = carSchema.safeParse({
             id: carRow.id,
             ownerId: carRow.owner_id,
             name: carRow.name,
@@ -33,10 +33,14 @@ export class CarMapper {
             image,
             createdAt: carRow.created_at
         });
+
+        if(!data) return null;
+
+        return data;
     }
 
     async toCarDtoArray(carRowArray: Array<CarTableRow>): Promise<Array<Car>> {
-        return Promise.all(carRowArray.map(carRow => this.toCarDto(carRow)));
+        return (await Promise.all(carRowArray.map(carRow => this.toCarDto(carRow)))).filter(element => element !== null);
     }
 
     toCarEntity(car: Car): CarTableRow {
@@ -51,7 +55,7 @@ export class CarMapper {
         };
     }
 
-    fromFormResultToCarEntities(carFormResult: CarFormFields, createdAt?: string): {
+    fromFormResultToCarEntities(formResult: CarFormFields, createdAt?: string): {
         car: CarTableRow,
         odometer: OdometerTableRow,
         fuelTank: FuelTankTableRow

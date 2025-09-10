@@ -39,10 +39,13 @@ const carsSlice = createSlice({
             console.log("hiba addCar, Slices");
         })
         .addCase(editCar.fulfilled, (state, action) => {
+            if(!action.payload) return;
+
             const editedCar = action.payload;
 
             const index = state.cars.findIndex(car => car.id === editedCar.id);
             if(index === -1) return;
+
             state.cars[index] = editedCar;
         })
         .addCase(deleteCar.fulfilled, (state, action) => {
