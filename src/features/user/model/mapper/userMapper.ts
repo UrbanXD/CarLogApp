@@ -6,8 +6,8 @@ import { getImageFromAttachmentQueue } from "../../../../database/utils/getImage
 export class UserMapper {
     constructor(private readonly attachmentQueue?: PhotoAttachmentQueue) {}
 
-    async toUserDto(carRow: UserTableRow): Promise<UserAccount> {
-        let avatar = await getImageFromAttachmentQueue(attachmentQueue, userRow.avatar_url);
+    async toUserDto(userRow: UserTableRow): Promise<UserAccount> {
+        let avatar = await getImageFromAttachmentQueue(this.attachmentQueue, userRow.avatar_url);
 
         return userSchema.parse({
             id: userRow.id,
