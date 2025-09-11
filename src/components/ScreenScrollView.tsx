@@ -15,9 +15,10 @@ const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 export function ScreenScrollView({ style, children }: ScreenScrollViewProps) {
     const { bottom } = useSafeAreaInsets();
-    const { y, distanceFromBottom, scrollDirection } = useScreenScrollView();
+    const { y, distanceFromBottom, scrollDirection, isScrolling } = useScreenScrollView();
 
     const prevOffset = useSharedValue(0);
+    const scrollTimeout = useSharedValue(null);
 
     const [layoutHeight, setLayoutHeight] = useState(0);
 
@@ -30,6 +31,10 @@ export function ScreenScrollView({ style, children }: ScreenScrollViewProps) {
     }, []);
 
     const onScroll = useAnimatedScrollHandler({
+        onBeginDrag: () => {
+            isScrolling.value = true;
+            if(scrollTimeout.value) clearTimeout(scrollTimeout.value);
+        },
         onScroll: ({ contentOffset, contentSize, layoutMeasurement }) => {
             if(prevOffset.value < contentOffset.y) {
                 scrollDirection.value = "up";
@@ -41,6 +46,10 @@ export function ScreenScrollView({ style, children }: ScreenScrollViewProps) {
             prevOffset.value = contentOffset.y;
 
             distanceFromBottom.value = Math.max(0, contentSize.height - (contentOffset.y + layoutMeasurement.height));
+        },
+        onEndDrag: () => {
+            if(scrollTimeout.value) clearTimeout(scrollTimeout.value);
+            scrollTimeout.value = setTimeout(() => isScrolling.value = false, 150);
         }
     });
 

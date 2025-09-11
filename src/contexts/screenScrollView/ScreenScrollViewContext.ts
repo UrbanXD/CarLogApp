@@ -5,6 +5,7 @@ type ScreenScrollViewContextValue = {
     y: SharedValue<number>
     distanceFromBottom: SharedValue<number>
     scrollDirection: SharedValue<"up" | "down">
+    isScrolling: SharedValue<boolean>
 }
 
 export const ScreenScrollViewContext = createContext<ScreenScrollViewContextValue | null>(null);
