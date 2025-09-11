@@ -1,93 +1,56 @@
-import React, { useEffect } from "react";
-import { Pressable, StyleSheet } from "react-native";
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import React from "react";
+import { Pressable, StyleSheet, Text } from "react-native";
 import Icon from "../../Icon.tsx";
-import { COLORS } from "../../../constants/index.ts";
+import { COLORS, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
 
-interface TabBarIconProp {
-    focused: boolean
+type TabBarIconProps = {
+    title: string
     iconName?: string
-    iconColor?: string,
-    iconSize?: number,
+    iconColor?: string
+    iconSize?: number
     onPress: () => void
-    onLongPress: () => void,
-    width: number
+    onLongPress: () => void
 }
 
-const TabBarIcon: React.FC<TabBarIconProp> = ({
-    focused,
+function TabBarIcon({
+    title,
     iconName = "home",
     iconColor = COLORS.white,
     iconSize,
     onPress,
-    onLongPress,
-    width
-}) => {
-    const scale = useSharedValue(0);
-    const icon = useSharedValue(0);
-
-    useEffect(() => {
-        scale.value = withSpring(
-            focused ? 1 : 0,
-            { duration: 2000 }
-        );
-    }, [focused, scale]);
-
-    useEffect(() => {
-        icon.value = withSpring(
-            focused ? 1 : 0,
-            { duration: 1500 }
-        );
-    }, [focused, icon]);
-
-
-    const animatedIconSizeStyle = useAnimatedStyle(() => {
-        const sizeValue = interpolate(
-            icon.value,
-            [0, 1],
-            [1, 1.5]
-        );
-
-        return {
-            transform: [
-                {
-                    scale: sizeValue
-                }
-            ],
-            alignItems: "center",
-            alignSelf: "center",
-            justifyContent: "center"
-        };
-    });
-
-    const styles = useStyles(width);
+    onLongPress
+}: TabBarIconProps) {
+    const styles = useStyles(iconColor);
 
     return (
         <Pressable
             onPress={ onPress }
             onLongPress={ onLongPress }
-            style={ styles.iconContainer }
+            style={ styles.container }
         >
-            <Animated.View style={ animatedIconSizeStyle }>
-                <Icon
-                    icon={ iconName }
-                    size={ iconSize }
-                    color={ iconColor }
-                />
-            </Animated.View>
+            <Icon
+                icon={ iconName }
+                size={ iconSize }
+                color={ iconColor }
+            />
+            <Text style={ styles.title }>{ title }</Text>
         </Pressable>
     );
-};
+}
 
 export default TabBarIcon;
 
-const useStyles = (iconWidth: number) =>
+const useStyles = (color: string) =>
     StyleSheet.create({
-        iconContainer: {
+        container: {
+            flex: 1,
+            height: SIMPLE_TABBAR_HEIGHT,
             alignSelf: "center",
             justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
-            width: iconWidth
+            alignItems: "center"
+        },
+        title: {
+            fontFamily: "Gilroy-Medium",
+            color
         }
     });
