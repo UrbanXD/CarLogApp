@@ -1,10 +1,10 @@
-import React from "react";
-import { View, ViewStyle } from "react-native";
-import { GLOBAL_STYLE, SIMPLE_TABBAR_HEIGHT } from "../constants/index.ts";
-import Animated, { useAnimatedScrollHandler, useSharedValue, withTiming } from "react-native-reanimated";
+import React, { useCallback, useState } from "react";
+import { LayoutChangeEvent, View, ViewStyle } from "react-native";
+import { GLOBAL_STYLE, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../constants/index.ts";
+import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { ScrollView } from "react-native-gesture-handler";
 import { useScreenScrollView } from "../contexts/screenScrollView/ScreenScrollViewContext.ts";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ScreenScrollViewProps {
     style?: ViewStyle,
@@ -13,45 +13,56 @@ interface ScreenScrollViewProps {
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-export const ScreenScrollView: React.FC<ScreenScrollViewProps> = ({
-    style,
-    children
-}) => {
+export function ScreenScrollView({ style, children }: ScreenScrollViewProps) {
     const { bottom } = useSafeAreaInsets();
-    const { offset } = useScreenScrollView();
+    const { y, distanceFromBottom, scrollDirection } = useScreenScrollView();
+
     const prevOffset = useSharedValue(0);
-    const SCROLL_BOUNCE_THRESHOLD = 0.25;
 
-    const onScroll = useAnimatedScrollHandler({
-        onScroll: event => {
-            const currentOffset = event.contentOffset.y < 0 ? 0 : event.contentOffset.y;
+    const [layoutHeight, setLayoutHeight] = useState(0);
 
-            if(Math.abs(prevOffset.value - currentOffset) > SCROLL_BOUNCE_THRESHOLD) {
-                offset.value = withTiming(
-                    currentOffset < prevOffset.value
-                    ? 0
-                    : SIMPLE_TABBAR_HEIGHT * 2,
-                    { duration: 300 }
-                );
-            }
-            prevOffset.value = currentOffset;
-        }
+    const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
+        setLayoutHeight(nativeEvent.layout.height);
     }, []);
 
+    const onContentSizeChange = useCallback((_width: number, height: number) => {
+        distanceFromBottom.value = Math.max(0, height - layoutHeight);
+    }, []);
+
+    const onScroll = useAnimatedScrollHandler({
+        onScroll: ({ contentOffset, contentSize, layoutMeasurement }) => {
+            if(prevOffset.value < contentOffset.y) {
+                scrollDirection.value = "up";
+            } else {
+                scrollDirection.value = "down";
+            }
+
+            y.value = contentOffset.y;
+            prevOffset.value = contentOffset.y;
+
+            distanceFromBottom.value = Math.max(0, contentSize.height - (contentOffset.y + layoutMeasurement.height));
+        }
+    });
+
     return (
-        <View style={ [
+        <SafeAreaView style={ [
             GLOBAL_STYLE.pageContainer,
             style,
             { paddingBottom: bottom + GLOBAL_STYLE.pageContainer.paddingBottom }
         ] }>
             <AnimatedScrollView
+                onLayout={ onLayout }
+                onContentSizeChange={ onContentSizeChange }
                 onScroll={ onScroll }
+                scrollEventThrottle={ 16 }
                 showsVerticalScrollIndicator={ false }
                 nestedScrollEnabled
                 contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
             >
-                { children }
+                <View style={ { flex: 1, paddingBottom: SIMPLE_TABBAR_HEIGHT, gap: SEPARATOR_SIZES.lightSmall } }>
+                    { children }
+                </View>
             </AnimatedScrollView>
-        </View>
+        </SafeAreaView>
     );
 };
