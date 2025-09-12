@@ -37,12 +37,14 @@ export const ICON_NAMES = {
     calendar: "calendar-range-outline",
     reset: "refresh",
     upload: "upload-outline",
-    fuel: "gas-station-outline",
-    fuelTank: "propane-tank-outline",
+    fuelPump: "gas-station-outline",
+    fuelCan: "fuel",
     settings: "cog-outline",
     signOut: "logout",
     swap: "swap-horizontal",
-    add: "plus"
+    add: "plus",
+    receipt: "receipt-text-outline",
+    road: "road-variant"
 };
 
 export const ICON_COLORS = {
