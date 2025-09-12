@@ -27,13 +27,8 @@ export function FloatingActionButton({
     index,
     icon,
     label,
-    onPress = () => { console.log("anya d " + index); }
+    onPress
 }: FloatingActionButtonProps) {
-    const handlePress = () => {
-        onPress();
-        isMenuExpanded.value = false;
-    };
-
     const animatedStyles = useAnimatedStyle(() => {
         const translateY = withSpring(
             isMenuExpanded.value ? (-BUTTON_SIZE - SEPARATOR_SIZES.lightSmall / 2) * index : 0,
@@ -52,7 +47,10 @@ export function FloatingActionButton({
     });
 
     return (
-        <AnimatedPressable style={ [animatedStyles, styles.container] } onPress={ handlePress }>
+        <AnimatedPressable
+            style={ [animatedStyles, styles.container] }
+            onPress={ onPress }
+        >
             <View style={ styles.labelContainer }>
                 <Animated.Text style={ [styles.labelContainer.text, labelStyle] }>{ label }</Animated.Text>
             </View>
