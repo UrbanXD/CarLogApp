@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     },
     container: {
         position: "absolute",
-        bottom: SIMPLE_TABBAR_HEIGHT + SEPARATOR_SIZES.small,
+        bottom: SIMPLE_TABBAR_HEIGHT + SEPARATOR_SIZES.normal,
         right: DEFAULT_SEPARATOR,
         justifyContent: "flex-end",
         alignItems: "flex-end",
