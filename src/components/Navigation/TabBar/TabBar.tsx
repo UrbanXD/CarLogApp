@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 import TabBarIcon from "./TabBarIcon.tsx";
-import { COLORS, FONT_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
@@ -27,7 +27,6 @@ function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
                         const isFocused = state.index === index;
 
                         const icons = JSON.parse(options.tabBarIcon());
-                        const icon = icons?.[isFocused ? "active" : "inactive"] ?? "help";
 
                         const onPress = () => {
                             const event = navigation.emit({
@@ -44,10 +43,13 @@ function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
                         return (
                             <TabBarIcon
                                 key={ index }
+                                isFocused={ isFocused }
                                 title={ options.title }
-                                iconName={ icon }
+                                activeIcon={ icons?.["active"] }
+                                inactiveIcon={ icons?.["inactive"] }
                                 iconSize={ FONT_SIZES.h2 }
-                                iconColor={ COLORS.white }
+                                activeColor={ COLORS.white }
+                                inactiveColor={ COLORS.white2 }
                                 onPress={ onPress }
                                 onLongPress={ onLongPress }
                             />
@@ -70,6 +72,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         height: SIMPLE_TABBAR_HEIGHT,
+        gap: SEPARATOR_SIZES.small,
         width: "100%",
         backgroundColor: "transparent"
     }
