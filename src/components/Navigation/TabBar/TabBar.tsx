@@ -1,7 +1,13 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 import TabBarIcon from "./TabBarIcon.tsx";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
+import {
+    COLORS,
+    FONT_SIZES,
+    SECONDARY_COLOR,
+    SEPARATOR_SIZES,
+    SIMPLE_TABBAR_HEIGHT
+} from "../../../constants/index.ts";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
@@ -16,8 +22,8 @@ function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
                 <LinearGradient
                     locations={ [0, 0.75] }
                     colors={ [
-                        hexToRgba(COLORS.black2, 0.35),
-                        hexToRgba(COLORS.black2, 1)
+                        hexToRgba(SECONDARY_COLOR, 0.35),
+                        hexToRgba(SECONDARY_COLOR, 1)
                     ] }
                     style={ StyleSheet.absoluteFillObject }
                 />
