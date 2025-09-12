@@ -1,20 +1,28 @@
 import React, { useCallback, useState } from "react";
 import { LayoutChangeEvent, View, ViewStyle } from "react-native";
-import { GLOBAL_STYLE, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../constants/index.ts";
+import { COLORS, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../constants/index.ts";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { ScrollView } from "react-native-gesture-handler";
 import { useScreenScrollView } from "../contexts/screenScrollView/ScreenScrollViewContext.ts";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { Edges, SafeAreaView } from "react-native-safe-area-context";
 
-interface ScreenScrollViewProps {
+type ScreenScrollViewProps = {
+    screenHasHeader?: boolean,
+    screenHasTabBar?: boolean,
+    safeAreaEdges?: Edges,
     style?: ViewStyle,
     children?: React.ReactNode,
 }
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-export function ScreenScrollView({ style, children }: ScreenScrollViewProps) {
-    const { bottom } = useSafeAreaInsets();
+export function ScreenScrollView({
+    screenHasHeader = true,
+    screenHasTabBar = true,
+    safeAreaEdges = [!screenHasHeader && "top", "bottom", "right", "left"],
+    style,
+    children
+}: ScreenScrollViewProps) {
     const { y, distanceFromBottom, scrollDirection, isScrolling } = useScreenScrollView();
 
     const prevOffset = useSharedValue(0);
@@ -54,10 +62,14 @@ export function ScreenScrollView({ style, children }: ScreenScrollViewProps) {
     });
 
     return (
-        <SafeAreaView style={ [
-            GLOBAL_STYLE.pageContainer,
-            style,
-            { paddingBottom: bottom + GLOBAL_STYLE.pageContainer.paddingBottom }
+        <SafeAreaView edges={ safeAreaEdges } style={ [
+            {
+                flex: 1,
+                paddingTop: SEPARATOR_SIZES.lightSmall,
+                paddingBottom: SEPARATOR_SIZES.lightSmall,
+                backgroundColor: COLORS.black2
+            },
+            style
         ] }>
             <AnimatedScrollView
                 onLayout={ onLayout }
@@ -66,9 +78,13 @@ export function ScreenScrollView({ style, children }: ScreenScrollViewProps) {
                 scrollEventThrottle={ 16 }
                 showsVerticalScrollIndicator={ false }
                 nestedScrollEnabled
-                contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
+                contentContainerStyle={ { flexGrow: 1 } }
             >
-                <View style={ { flex: 1, paddingBottom: SIMPLE_TABBAR_HEIGHT, gap: SEPARATOR_SIZES.lightSmall } }>
+                <View style={ {
+                    flex: 1,
+                    paddingBottom: screenHasTabBar ? SIMPLE_TABBAR_HEIGHT : 0,
+                    gap: SEPARATOR_SIZES.lightSmall
+                } }>
                     { children }
                 </View>
             </AnimatedScrollView>

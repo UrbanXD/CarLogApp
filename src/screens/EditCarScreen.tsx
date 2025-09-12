@@ -1,9 +1,8 @@
 import React from "react";
-import { StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants/index.ts";
+import { DEFAULT_SEPARATOR } from "../constants/index.ts";
 import { router, useLocalSearchParams } from "expo-router";
 import CarProfile from "../features/car/components/carProfile/CarProfile.ts";
+import { ScreenScrollView } from "../components/ScreenScrollView.tsx";
 
 const EditCarScreen: React.FC = () => {
     const { id } = useLocalSearchParams();
@@ -14,18 +13,14 @@ const EditCarScreen: React.FC = () => {
     }
 
     return (
-        <SafeAreaView style={ styles.pageContainer }>
+        <ScreenScrollView
+            screenHasTabBar={ false }
+            safeAreaEdges={ ["right", "left"] }
+            style={ { paddingHorizontal: DEFAULT_SEPARATOR } }
+        >
             <CarProfile.ById carId={ id } fuelSliderDisabled/>
-        </SafeAreaView>
+        </ScreenScrollView>
     );
 };
-
-const styles = StyleSheet.create({
-    pageContainer: {
-        ...GLOBAL_STYLE.pageContainer,
-        paddingHorizontal: DEFAULT_SEPARATOR,
-        paddingBottom: SEPARATOR_SIZES.small
-    }
-});
 
 export default EditCarScreen;

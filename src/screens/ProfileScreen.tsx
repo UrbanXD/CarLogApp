@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
     COLORS,
     DEFAULT_SEPARATOR,
@@ -19,6 +19,7 @@ import { Redirect, router } from "expo-router";
 import { useAppSelector } from "../hooks/index.ts";
 import { getUser } from "../features/user/model/selectors/index.ts";
 import { EDIT_USER_FORM_TYPE } from "../features/user/presets/bottomSheet/index.ts";
+import { ScreenScrollView } from "../components/ScreenScrollView.tsx";
 
 const ProfileScreen: React.FC = () => {
     const user = useAppSelector(getUser);
@@ -43,7 +44,7 @@ const ProfileScreen: React.FC = () => {
     const styles = useStyles(bottom);
 
     return (
-        <SafeAreaView style={ styles.pageContainer }>
+        <ScreenScrollView screenHasTabBar={ false } safeAreaEdges={ ["left", "right"] } style={ { paddingBottom: 0 } }>
             <View style={ styles.container }>
                 <View style={ styles.informationContainer }>
                     {
@@ -140,13 +141,13 @@ const ProfileScreen: React.FC = () => {
                     fontSize={ FONT_SIZES.p1 }
                 />
             </View>
-        </SafeAreaView>
+        </ScreenScrollView>
     );
 };
 
 const useStyles = (bottom: number) => StyleSheet.create({
     pageContainer: {
-        ...GLOBAL_STYLE.pageContainer
+        flex: 1
     },
     container: {
         position: "absolute",

@@ -4,7 +4,7 @@ import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { formatNumber } from "../utils/formatNumber";
 import Divider from "../components/Divider";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ScreenScrollView } from "../components/ScreenScrollView.tsx";
 
 const ServiceLogScreen: React.FC = () => {
     const logs = [
@@ -27,78 +27,68 @@ const ServiceLogScreen: React.FC = () => {
     ];
 
     return (
-        <SafeAreaView style={ [GLOBAL_STYLE.pageContainer, styles.pageContainer] }>
-            <ScrollView
-                showsVerticalScrollIndicator={ false }
-                contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
-            >
-                <View style={ [GLOBAL_STYLE.contentContainer, { height: hp(60), justifyContent: "space-between" }] }>
-                    <View>
-                        <View style={ { flexDirection: "row", alignItems: "center", justifyContent: "space-between" } }>
-                            <Text style={ GLOBAL_STYLE.containerTitleText }>
-                                Szervízkönyv
-                            </Text>
-                            <Text style={ [GLOBAL_STYLE.containerTitleText] }>
-                                2024
-                            </Text>
-                        </View>
-                        <View style={ { flexDirection: "row", justifyContent: "space-between" } }>
-                            <Text style={ GLOBAL_STYLE.containerText }>
-                                Search
-                            </Text>
-                            <Text style={ GLOBAL_STYLE.containerText }>
-                                Datum nov / csokk
-                            </Text>
-                        </View>
+        <ScreenScrollView>
+            <View style={ [GLOBAL_STYLE.contentContainer, { height: hp(60), justifyContent: "space-between" }] }>
+                <View>
+                    <View style={ { flexDirection: "row", alignItems: "center", justifyContent: "space-between" } }>
+                        <Text style={ GLOBAL_STYLE.containerTitleText }>
+                            Szervízkönyv
+                        </Text>
+                        <Text style={ [GLOBAL_STYLE.containerTitleText] }>
+                            2024
+                        </Text>
                     </View>
-                    <Divider/>
-                    <ScrollView
-                        showsVerticalScrollIndicator={ false }
-                        contentContainerStyle={ [
-                            GLOBAL_STYLE.scrollViewContentContainer,
-                            { gap: GLOBAL_STYLE.contentContainer.gap }
-                        ] }
-                    >
-                        {
-                            logs.map((log, index) => {
-                                return (
-                                    <View key={ index } style={ [GLOBAL_STYLE.rowContainer, styles.rowContainer] }>
-                                        <View style={ [GLOBAL_STYLE.columnContainer, { flex: 0.45 }] }>
-                                            <Text style={ [GLOBAL_STYLE.containerTitleText] }>
-                                                { log.dateText }
-                                            </Text>
-                                            <Text style={ [GLOBAL_STYLE.containerText, styles.kilometerText] }>
-                                                { formatNumber(log.km) } km
-                                            </Text>
-                                        </View>
-                                        <View style={ GLOBAL_STYLE.columnContainer }>
-                                            <Text numberOfLines={ 2 }
-                                                  style={ [GLOBAL_STYLE.containerText, styles.descriptionText] }>
-                                                { log.description }
-                                            </Text>
-                                            <Text numberOfLines={ 1 }
-                                                  style={ [GLOBAL_STYLE.containerText, styles.priceText] }>
-                                                { formatNumber(log.price) } { log.currencyText }
-                                            </Text>
-                                        </View>
-                                    </View>
-                                );
-                            })
-                        }
-                    </ScrollView>
+                    <View style={ { flexDirection: "row", justifyContent: "space-between" } }>
+                        <Text style={ GLOBAL_STYLE.containerText }>
+                            Search
+                        </Text>
+                        <Text style={ GLOBAL_STYLE.containerText }>
+                            Datum nov / csokk
+                        </Text>
+                    </View>
                 </View>
-            </ScrollView>
-        </SafeAreaView>
+                <Divider/>
+                <ScrollView
+                    showsVerticalScrollIndicator={ false }
+                    contentContainerStyle={ [
+                        GLOBAL_STYLE.scrollViewContentContainer,
+                        { gap: GLOBAL_STYLE.contentContainer.gap }
+                    ] }
+                >
+                    {
+                        logs.map((log, index) => {
+                            return (
+                                <View key={ index } style={ [GLOBAL_STYLE.rowContainer, styles.rowContainer] }>
+                                    <View style={ [GLOBAL_STYLE.columnContainer, { flex: 0.45 }] }>
+                                        <Text style={ [GLOBAL_STYLE.containerTitleText] }>
+                                            { log.dateText }
+                                        </Text>
+                                        <Text style={ [GLOBAL_STYLE.containerText, styles.kilometerText] }>
+                                            { formatNumber(log.km) } km
+                                        </Text>
+                                    </View>
+                                    <View style={ GLOBAL_STYLE.columnContainer }>
+                                        <Text numberOfLines={ 2 }
+                                              style={ [GLOBAL_STYLE.containerText, styles.descriptionText] }>
+                                            { log.description }
+                                        </Text>
+                                        <Text numberOfLines={ 1 }
+                                              style={ [GLOBAL_STYLE.containerText, styles.priceText] }>
+                                            { formatNumber(log.price) } { log.currencyText }
+                                        </Text>
+                                    </View>
+                                </View>
+                            );
+                        })
+                    }
+                </ScrollView>
+            </View>
+        </ScreenScrollView>
 
     );
 };
 
 const styles = StyleSheet.create({
-    pageContainer: {
-        backgroundColor: COLORS.black2,
-        marginBottom: 0,
-        paddingHorizontal: 0
-    },
     rowContainer: {
         height: hp(11)
     },
