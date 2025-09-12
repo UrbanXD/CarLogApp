@@ -17,12 +17,14 @@ DROP TABLE fuel_log CASCADE;
 CREATE TABLE fuel_log
 (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    car_id UUID NOT NULL, -- because of powersync sync rule
     expense_id UUID NOT NULL,
     current_odometer BIGINT NOT NULL, -- current odometer value
     quantity NUMERIC(10,3) NOT NULL,
     price_per_unit NUMERIC(10,3) NOT NULL,
     unit VARCHAR(3) DEFAULT 'l' NOT NULL, --{ 'l', 'gal' }     unit VARCHAR(8) DEFAULT 'L' NOT NULL CHECK (unit IN ('L', 'GAL', 'KG'))
-    FOREIGN KEY (expense_id) REFERENCES expense (id) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (expense_id) REFERENCES expense (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (car_id) REFERENCES car (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 ALTER TABLE public.fuel_log ENABLE ROW LEVEL SECURITY;
