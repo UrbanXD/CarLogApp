@@ -32,6 +32,7 @@ const Layout: React.FC = () => {
         <Stack
             screenOptions={ {
                 header: () => <SystemBars style="light" hidden={ false }/>,
+                headerTransparent: true,
                 animation: "slide_from_right",
                 statusBarAnimation: "slide",
                 contentStyle: { backgroundColor: SECONDARY_COLOR }

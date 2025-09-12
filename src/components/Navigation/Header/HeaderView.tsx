@@ -25,7 +25,8 @@ const HeaderView: React.FC<HeaderViewProps> = ({ children }) => {
 const useStyles = (top: number) =>
     StyleSheet.create({
         wrapper: {
-            paddingTop: top
+            paddingTop: top,
+            backgroundColor: SECONDARY_COLOR
         },
         barContainer: {
             flexDirection: "row",

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { LayoutChangeEvent, View, ViewStyle } from "react-native";
-import { COLORS, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../constants/index.ts";
+import { COLORS, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT, SIMPLE_TABBAR_HEIGHT } from "../constants/index.ts";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { ScrollView } from "react-native-gesture-handler";
 import { useScreenScrollView } from "../contexts/screenScrollView/ScreenScrollViewContext.ts";
@@ -19,7 +19,7 @@ const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 export function ScreenScrollView({
     screenHasHeader = true,
     screenHasTabBar = true,
-    safeAreaEdges = [!screenHasHeader && "top", "bottom", "right", "left"],
+    safeAreaEdges = ["top", "bottom", "right", "left"],
     style,
     children
 }: ScreenScrollViewProps) {
@@ -62,15 +62,17 @@ export function ScreenScrollView({
     });
 
     return (
-        <SafeAreaView edges={ safeAreaEdges } style={ [
-            {
-                flex: 1,
-                paddingTop: SEPARATOR_SIZES.lightSmall,
-                paddingBottom: SEPARATOR_SIZES.lightSmall,
-                backgroundColor: COLORS.black2
-            },
-            style
-        ] }>
+        <SafeAreaView
+            edges={ safeAreaEdges }
+            style={ [
+                {
+                    flex: 1,
+                    paddingTop: (screenHasHeader && SIMPLE_HEADER_HEIGHT) + SEPARATOR_SIZES.lightSmall,
+                    paddingBottom: SEPARATOR_SIZES.lightSmall,
+                    backgroundColor: COLORS.black2
+                },
+                style
+            ] }>
             <AnimatedScrollView
                 onLayout={ onLayout }
                 onContentSizeChange={ onContentSizeChange }

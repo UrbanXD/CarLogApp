@@ -15,7 +15,6 @@ const EditCarScreen: React.FC = () => {
     return (
         <ScreenScrollView
             screenHasTabBar={ false }
-            safeAreaEdges={ ["right", "left"] }
             style={ { paddingHorizontal: DEFAULT_SEPARATOR } }
         >
             <CarProfile.ById carId={ id } fuelSliderDisabled/>
