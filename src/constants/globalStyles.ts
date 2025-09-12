@@ -5,11 +5,6 @@ import { DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "./separatorSizes.ts";
 import { FONT_SIZES } from "./fontSizes.ts";
 
 export const GLOBAL_STYLE = StyleSheet.create({
-    pageContainer: {
-        flex: 1,
-        paddingBottom: SEPARATOR_SIZES.lightSmall,
-        backgroundColor: COLORS.black2
-    },
     scrollViewContentContainer: {
         flexGrow: 1,
         gap: SEPARATOR_SIZES.normal

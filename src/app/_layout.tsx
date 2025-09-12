@@ -17,14 +17,14 @@ import ToastManager from "../ui/alert/components/toast/ToastManager.tsx";
 import ModalManager from "../ui/alert/components/modal/ModalManager.tsx";
 import * as SystemUI from "expo-system-ui";
 import { SystemBars } from "react-native-edge-to-edge";
-import { GLOBAL_STYLE } from "../constants/index.ts";
+import { SECONDARY_COLOR } from "../constants/index.ts";
 
 
 const Layout: React.FC = () => {
     const database = useDatabase();
 
     useEffect(() => {
-        SystemUI.setBackgroundColorAsync(GLOBAL_STYLE.pageContainer.backgroundColor);
+        SystemUI.setBackgroundColorAsync(SECONDARY_COLOR);
         database.init();
     }, []);
 
@@ -32,9 +32,10 @@ const Layout: React.FC = () => {
         <Stack
             screenOptions={ {
                 header: () => <SystemBars style="light" hidden={ false }/>,
+                headerTransparent: true,
                 animation: "slide_from_right",
                 statusBarAnimation: "slide",
-                contentStyle: { backgroundColor: GLOBAL_STYLE.pageContainer.backgroundColor }
+                contentStyle: { backgroundColor: SECONDARY_COLOR }
             } }
         >
             <Stack.Screen name="index"/>

@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
-import { DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
+import { DEFAULT_SEPARATOR, SECONDARY_COLOR, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SystemBars } from "react-native-edge-to-edge";
 
@@ -25,7 +25,8 @@ const HeaderView: React.FC<HeaderViewProps> = ({ children }) => {
 const useStyles = (top: number) =>
     StyleSheet.create({
         wrapper: {
-            paddingTop: top
+            paddingTop: top,
+            backgroundColor: SECONDARY_COLOR
         },
         barContainer: {
             flexDirection: "row",
@@ -33,7 +34,7 @@ const useStyles = (top: number) =>
             alignItems: "center",
             gap: SEPARATOR_SIZES.lightSmall,
             height: SIMPLE_HEADER_HEIGHT,
-            backgroundColor: GLOBAL_STYLE.pageContainer.backgroundColor,
+            backgroundColor: SECONDARY_COLOR,
             paddingHorizontal: DEFAULT_SEPARATOR,
             overflow: "hidden"
         }

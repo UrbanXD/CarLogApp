@@ -9,13 +9,14 @@ interface ScreenScrollViewProviderProps {
 export const ScreenScrollViewProvider: React.FC<ScreenScrollViewProviderProps> = ({
     children
 }) => {
-    const offset = useSharedValue(0);
+    const y = useSharedValue(0);
+    const distanceFromBottom = useSharedValue(0);
+    const scrollDirection = useSharedValue<"up" | "down">("down");
+    const isScrolling = useSharedValue(false);
 
     return (
         <ScreenScrollViewContext.Provider
-            value={ {
-                offset
-            } }
+            value={ { y, distanceFromBottom, scrollDirection, isScrolling } }
         >
             { children }
         </ScreenScrollViewContext.Provider>

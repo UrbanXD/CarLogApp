@@ -1,6 +1,13 @@
 import React, { useCallback } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants/index.ts";
+import {
+    COLORS,
+    DEFAULT_SEPARATOR,
+    FONT_SIZES,
+    GLOBAL_STYLE,
+    SECONDARY_COLOR,
+    SEPARATOR_SIZES
+} from "../constants/index.ts";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button/Button";
@@ -39,11 +46,7 @@ const AuthScreen: React.FC = () => {
                 />
                 <LinearGradient
                     locations={ [0, 0.35, 0.85] }
-                    colors={ [
-                        "transparent",
-                        "rgba(0,0,0,0.25)",
-                        GLOBAL_STYLE.pageContainer.backgroundColor
-                    ] }
+                    colors={ ["transparent", "rgba(0,0,0,0.25)", SECONDARY_COLOR] }
                     style={ StyleSheet.absoluteFillObject }
                 />
             </View>

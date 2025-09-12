@@ -1,57 +1,95 @@
-import React from "react";
-import { View, ViewStyle } from "react-native";
-import { GLOBAL_STYLE, SIMPLE_TABBAR_HEIGHT } from "../constants/index.ts";
-import Animated, { useAnimatedScrollHandler, useSharedValue, withTiming } from "react-native-reanimated";
+import React, { useCallback, useState } from "react";
+import { LayoutChangeEvent, View, ViewStyle } from "react-native";
+import { COLORS, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT, SIMPLE_TABBAR_HEIGHT } from "../constants/index.ts";
+import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { ScrollView } from "react-native-gesture-handler";
 import { useScreenScrollView } from "../contexts/screenScrollView/ScreenScrollViewContext.ts";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Edges, SafeAreaView } from "react-native-safe-area-context";
 
-interface ScreenScrollViewProps {
+type ScreenScrollViewProps = {
+    screenHasHeader?: boolean,
+    screenHasTabBar?: boolean,
+    safeAreaEdges?: Edges,
     style?: ViewStyle,
     children?: React.ReactNode,
 }
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-export const ScreenScrollView: React.FC<ScreenScrollViewProps> = ({
+export function ScreenScrollView({
+    screenHasHeader = true,
+    screenHasTabBar = true,
+    safeAreaEdges = ["top", "bottom", "right", "left"],
     style,
     children
-}) => {
-    const { bottom } = useSafeAreaInsets();
-    const { offset } = useScreenScrollView();
+}: ScreenScrollViewProps) {
+    const { y, distanceFromBottom, scrollDirection, isScrolling } = useScreenScrollView();
+
     const prevOffset = useSharedValue(0);
-    const SCROLL_BOUNCE_THRESHOLD = 0.25;
+    const scrollTimeout = useSharedValue(null);
 
-    const onScroll = useAnimatedScrollHandler({
-        onScroll: event => {
-            const currentOffset = event.contentOffset.y < 0 ? 0 : event.contentOffset.y;
+    const [layoutHeight, setLayoutHeight] = useState(0);
 
-            if(Math.abs(prevOffset.value - currentOffset) > SCROLL_BOUNCE_THRESHOLD) {
-                offset.value = withTiming(
-                    currentOffset < prevOffset.value
-                    ? 0
-                    : SIMPLE_TABBAR_HEIGHT * 2,
-                    { duration: 300 }
-                );
-            }
-            prevOffset.value = currentOffset;
-        }
+    const onLayout = useCallback(({ nativeEvent }: LayoutChangeEvent) => {
+        setLayoutHeight(nativeEvent.layout.height);
     }, []);
 
+    const onContentSizeChange = useCallback((_width: number, height: number) => {
+        distanceFromBottom.value = Math.max(0, height - layoutHeight);
+    }, []);
+
+    const onScroll = useAnimatedScrollHandler({
+        onBeginDrag: () => {
+            isScrolling.value = true;
+            if(scrollTimeout.value) clearTimeout(scrollTimeout.value);
+        },
+        onScroll: ({ contentOffset, contentSize, layoutMeasurement }) => {
+            if(prevOffset.value < contentOffset.y) {
+                scrollDirection.value = "up";
+            } else {
+                scrollDirection.value = "down";
+            }
+
+            y.value = contentOffset.y;
+            prevOffset.value = contentOffset.y;
+
+            distanceFromBottom.value = Math.max(0, contentSize.height - (contentOffset.y + layoutMeasurement.height));
+        },
+        onEndDrag: () => {
+            if(scrollTimeout.value) clearTimeout(scrollTimeout.value);
+            scrollTimeout.value = setTimeout(() => isScrolling.value = false, 150);
+        }
+    });
+
     return (
-        <View style={ [
-            GLOBAL_STYLE.pageContainer,
-            style,
-            { paddingBottom: bottom + GLOBAL_STYLE.pageContainer.paddingBottom }
-        ] }>
+        <SafeAreaView
+            edges={ safeAreaEdges }
+            style={ [
+                {
+                    flex: 1,
+                    paddingTop: (screenHasHeader && SIMPLE_HEADER_HEIGHT) + SEPARATOR_SIZES.lightSmall,
+                    paddingBottom: SEPARATOR_SIZES.lightSmall,
+                    backgroundColor: COLORS.black2
+                },
+                style
+            ] }>
             <AnimatedScrollView
+                onLayout={ onLayout }
+                onContentSizeChange={ onContentSizeChange }
                 onScroll={ onScroll }
+                scrollEventThrottle={ 16 }
                 showsVerticalScrollIndicator={ false }
                 nestedScrollEnabled
-                contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
+                contentContainerStyle={ { flexGrow: 1 } }
             >
-                { children }
+                <View style={ {
+                    flex: 1,
+                    paddingBottom: screenHasTabBar ? SIMPLE_TABBAR_HEIGHT : 0,
+                    gap: SEPARATOR_SIZES.lightSmall
+                } }>
+                    { children }
+                </View>
             </AnimatedScrollView>
-        </View>
+        </SafeAreaView>
     );
 };

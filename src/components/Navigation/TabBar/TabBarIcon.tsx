@@ -1,93 +1,71 @@
-import React, { useEffect } from "react";
-import { Pressable, StyleSheet } from "react-native";
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import React from "react";
+import { StyleSheet } from "react-native";
 import Icon from "../../Icon.tsx";
-import { COLORS } from "../../../constants/index.ts";
+import { SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
+import { Color, ImageSource } from "../../../types/index.ts";
+import Animated, { Easing, useAnimatedStyle, withTiming } from "react-native-reanimated";
+import { AnimatedPressable } from "../../AnimatedComponents/index.ts";
 
-interface TabBarIconProp {
-    focused: boolean
-    iconName?: string
-    iconColor?: string,
-    iconSize?: number,
+type TabBarIconProps = {
+    title: string
+    isFocused: boolean
+    activeIcon?: ImageSource
+    inactiveIcon?: ImageSource
+    iconSize: number
+    activeColor: Color
+    inactiveColor: Color
     onPress: () => void
-    onLongPress: () => void,
-    width: number
+    onLongPress: () => void
 }
 
-const TabBarIcon: React.FC<TabBarIconProp> = ({
-    focused,
-    iconName = "home",
-    iconColor = COLORS.white,
+function TabBarIcon({
+    title,
+    isFocused,
+    activeIcon = "help",
+    inactiveIcon = "help",
     iconSize,
+    activeColor,
+    inactiveColor,
     onPress,
-    onLongPress,
-    width
-}) => {
-    const scale = useSharedValue(0);
-    const icon = useSharedValue(0);
+    onLongPress
+}: TabBarIconProps) {
+    const styles = useStyles(isFocused ? activeColor : inactiveColor);
 
-    useEffect(() => {
-        scale.value = withSpring(
-            focused ? 1 : 0,
-            { duration: 2000 }
-        );
-    }, [focused, scale]);
+    const containerStyle = useAnimatedStyle(() => {
+        const scale = withTiming(isFocused ? 1.15 : 1, { duration: 150, easing: Easing.quad });
 
-    useEffect(() => {
-        icon.value = withSpring(
-            focused ? 1 : 0,
-            { duration: 1500 }
-        );
-    }, [focused, icon]);
-
-
-    const animatedIconSizeStyle = useAnimatedStyle(() => {
-        const sizeValue = interpolate(
-            icon.value,
-            [0, 1],
-            [1, 1.5]
-        );
-
-        return {
-            transform: [
-                {
-                    scale: sizeValue
-                }
-            ],
-            alignItems: "center",
-            alignSelf: "center",
-            justifyContent: "center"
-        };
+        return { transform: [{ scale }] };
     });
 
-    const styles = useStyles(width);
-
     return (
-        <Pressable
+        <AnimatedPressable
             onPress={ onPress }
             onLongPress={ onLongPress }
-            style={ styles.iconContainer }
+            style={ [styles.container, containerStyle] }
         >
-            <Animated.View style={ animatedIconSizeStyle }>
-                <Icon
-                    icon={ iconName }
-                    size={ iconSize }
-                    color={ iconColor }
-                />
-            </Animated.View>
-        </Pressable>
+            <Icon
+                icon={ isFocused ? activeIcon : inactiveIcon }
+                size={ iconSize }
+                color={ isFocused ? activeColor : inactiveColor }
+            />
+            <Animated.Text style={ styles.title }>{ title }</Animated.Text>
+        </AnimatedPressable>
     );
-};
+}
 
 export default TabBarIcon;
 
-const useStyles = (iconWidth: number) =>
+const useStyles = (color: Color) =>
     StyleSheet.create({
-        iconContainer: {
+        container: {
+            flex: 1,
+            height: SIMPLE_TABBAR_HEIGHT,
             alignSelf: "center",
             justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
-            width: iconWidth
+            alignItems: "center"
+        },
+        title: {
+            fontFamily: "Gilroy-Medium",
+            color
         }
     });

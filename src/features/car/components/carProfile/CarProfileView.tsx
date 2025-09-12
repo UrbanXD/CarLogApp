@@ -1,14 +1,7 @@
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Image from "../../../../components/Image.tsx";
-import {
-    COLORS,
-    FONT_SIZES,
-    GLOBAL_STYLE,
-    ICON_FONT_SIZE_SCALE,
-    ICON_NAMES,
-    SEPARATOR_SIZES
-} from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import Button from "../../../../components/Button/Button.ts";
 import { CAR_FORM_STEPS } from "../../constants/index.ts";
 import Divider from "../../../../components/Divider.tsx";
@@ -31,109 +24,100 @@ const CarProfileView: React.FC<CarProfileViewProps> = ({
     handleDeleteCar
 }) =>
     <View style={ styles.container }>
-        <ScrollView
-            contentContainerStyle={ styles.contentContainer }
-            showsVerticalScrollIndicator={ false }
-        >
-            <View style={ styles.imageContainer }>
-                <Image
-                    source={ car.image?.image }
-                    alt={ ICON_NAMES.car }
-                    overlay
-                >
-                    <View style={ styles.editImageIconContainer }>
-                        <Button.Icon
-                            icon={ ICON_NAMES.pencil }
-                            iconSize={ FONT_SIZES.h2 }
-                            iconColor={ COLORS.gray1 }
-                            width={ FONT_SIZES.h2 }
-                            height={ FONT_SIZES.h2 }
-                            style={ styles.editImageIcon }
-                            backgroundColor="transparent"
-                            onPress={ () => openEditCarStep(CAR_FORM_STEPS.ImageStep) }
-                        />
-                    </View>
-                </Image>
-            </View>
-            <View style={ styles.contentRowContainer }>
-                <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carNameText }>{ car.name }</Text>
+        <View style={ styles.imageContainer }>
+            <Image
+                source={ car.image?.image }
+                alt={ ICON_NAMES.car }
+                overlay
+            >
+                <View style={ styles.editImageIconContainer }>
                     <Button.Icon
                         icon={ ICON_NAMES.pencil }
-                        iconSize={ FONT_SIZES.h3 }
+                        iconSize={ FONT_SIZES.h2 }
                         iconColor={ COLORS.gray1 }
-                        width={ FONT_SIZES.h3 }
-                        height={ FONT_SIZES.h3 }
+                        width={ FONT_SIZES.h2 }
+                        height={ FONT_SIZES.h2 }
+                        style={ styles.editImageIcon }
                         backgroundColor="transparent"
-                        onPress={ () => openEditCarStep(CAR_FORM_STEPS.NameStep) }
+                        onPress={ () => openEditCarStep(CAR_FORM_STEPS.ImageStep) }
                     />
                 </View>
-                <Divider
-                    color={ COLORS.gray3 }
-                    margin={ SEPARATOR_SIZES.lightSmall / 2.5 }
+            </Image>
+        </View>
+        <View style={ styles.contentRowContainer }>
+            <View style={ styles.carInfoRow }>
+                <Text style={ styles.carNameText }>{ car.name }</Text>
+                <Button.Icon
+                    icon={ ICON_NAMES.pencil }
+                    iconSize={ FONT_SIZES.h3 }
+                    iconColor={ COLORS.gray1 }
+                    width={ FONT_SIZES.h3 }
+                    height={ FONT_SIZES.h3 }
+                    backgroundColor="transparent"
+                    onPress={ () => openEditCarStep(CAR_FORM_STEPS.NameStep) }
                 />
-                <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoTitleText }>Gyártó</Text>
-                    <Text style={ styles.carInfoText }>{ car.model.make.name }</Text>
-                </View>
-                <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoTitleText }>Model</Text>
-                    <Text style={ styles.carInfoText }>{ car.model.name }</Text>
-                </View>
-                <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoTitleText }>Évjárat</Text>
-                    <Text style={ styles.carInfoText }>{ car.model.year }</Text>
-                </View>
-                <Button.Row style={ {
-                    marginTop: SEPARATOR_SIZES.lightSmall,
-                    justifyContent: handleDeleteCar ? "space-between" : "center"
-                } }>
-                    {
-                        handleDeleteCar &&
-                       <Button.Icon
-                          icon={ ICON_NAMES.trashCan }
-                          iconSize={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
-                          backgroundColor={ COLORS.googleRed }
-                          iconColor={ COLORS.black }
-                          height={ FONT_SIZES.p2 * 2 }
-                          onPress={ handleDeleteCar }
-                       />
-                    }
-                    <Button.Text
-                        text="Módosítás"
-                        textColor={ COLORS.gray1 }
-                        fontSize={ FONT_SIZES.p2 }
-                        height={ FONT_SIZES.p2 * 2 }
-                        backgroundColor="transparent"
-                        style={ { flex: 0.75, borderColor: COLORS.gray1, borderWidth: 2.5 } }
-                        onPress={ () => openEditCarStep(CAR_FORM_STEPS.CarModelStep) }
-                    />
-                </Button.Row>
             </View>
-            <Odometer
-                value={ car.odometer.value }
-                measurement={ car.odometer.measurement }
-                openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.OdometerStep) }
+            <Divider
+                color={ COLORS.gray3 }
+                margin={ SEPARATOR_SIZES.lightSmall / 2.5 }
             />
-            <FuelGauge
-                value={ car.fuelTank.value }
-                tankSize={ car.fuelTank.capacity }
-                fuelType={ car.fuelTank.type }
-                measurement={ car.fuelTank.measurement }
-                disabled={ fuelSliderDisabled }
-                openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.FuelStep) }
-            />
-        </ScrollView>
+            <View style={ styles.carInfoRow }>
+                <Text style={ styles.carInfoTitleText }>Gyártó</Text>
+                <Text style={ styles.carInfoText }>{ car.model.make.name }</Text>
+            </View>
+            <View style={ styles.carInfoRow }>
+                <Text style={ styles.carInfoTitleText }>Model</Text>
+                <Text style={ styles.carInfoText }>{ car.model.name }</Text>
+            </View>
+            <View style={ styles.carInfoRow }>
+                <Text style={ styles.carInfoTitleText }>Évjárat</Text>
+                <Text style={ styles.carInfoText }>{ car.model.year }</Text>
+            </View>
+            <Button.Row style={ {
+                marginTop: SEPARATOR_SIZES.lightSmall,
+                justifyContent: handleDeleteCar ? "space-between" : "center"
+            } }>
+                {
+                    handleDeleteCar &&
+                   <Button.Icon
+                      icon={ ICON_NAMES.trashCan }
+                      iconSize={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
+                      backgroundColor={ COLORS.googleRed }
+                      iconColor={ COLORS.black }
+                      height={ FONT_SIZES.p2 * 2 }
+                      onPress={ handleDeleteCar }
+                   />
+                }
+                <Button.Text
+                    text="Módosítás"
+                    textColor={ COLORS.gray1 }
+                    fontSize={ FONT_SIZES.p2 }
+                    height={ FONT_SIZES.p2 * 2 }
+                    backgroundColor="transparent"
+                    style={ { flex: 0.75, borderColor: COLORS.gray1, borderWidth: 2.5 } }
+                    onPress={ () => openEditCarStep(CAR_FORM_STEPS.CarModelStep) }
+                />
+            </Button.Row>
+        </View>
+        <Odometer
+            value={ car.odometer.value }
+            measurement={ car.odometer.measurement }
+            openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.OdometerStep) }
+        />
+        <FuelGauge
+            value={ car.fuelTank.value }
+            tankSize={ car.fuelTank.capacity }
+            fuelType={ car.fuelTank.type }
+            measurement={ car.fuelTank.measurement }
+            disabled={ fuelSliderDisabled }
+            openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.FuelStep) }
+        />
     </View>;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: "column",
-        gap: SEPARATOR_SIZES.small
-    },
-    contentContainer: {
-        ...GLOBAL_STYLE.scrollViewContentContainer, //flexGrow: 1
         gap: SEPARATOR_SIZES.normal
     },
     imageContainer: {

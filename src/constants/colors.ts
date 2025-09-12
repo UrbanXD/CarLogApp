@@ -22,6 +22,10 @@ export const COLORS = {
     fuelYellow: "#FFDF00"
 };
 
+export const PRIMARY_COLOR = COLORS.white;
+export const SECONDARY_COLOR = COLORS.black2;
+export const ACCENT_COLOR = COLORS.fuelYellow;
+
 export const AVATAR_COLOR = [
     "#FF5733", "#FF6F61", "#FF8C42", // Pirosas-narancs árnyalatok
     "#33FF57", "#2ECC71", "#27AE60", // Zöld árnyalatok

@@ -1,120 +1,69 @@
 import React from "react";
-import { Dimensions, StyleSheet, View, ViewStyle } from "react-native";
+import { StyleSheet } from "react-native";
 import TabBarIcon from "./TabBarIcon.tsx";
-import Animated, { Extrapolation, interpolate, useAnimatedStyle, withTiming } from "react-native-reanimated";
-import { COLORS, FONT_SIZES, ICON_COLORS, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
+import {
+    COLORS,
+    FONT_SIZES,
+    SECONDARY_COLOR,
+    SEPARATOR_SIZES,
+    SIMPLE_TABBAR_HEIGHT
+} from "../../../constants/index.ts";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { useScreenScrollView } from "../../../contexts/screenScrollView/ScreenScrollViewContext.ts";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
+import { LinearGradient } from "expo-linear-gradient";
+import FloatingActionMenu from "../../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
 
-interface TabBarProps {
-    tabBarStyle?: ViewStyle,
-    tabBarActiveTintColor?: string,
-}
-
-const TabBar: React.FC<BottomTabBarProps & TabBarProps> = ({
-    state,
-    descriptors,
-    navigation,
-    tabBarStyle = {},
-    tabBarActiveTintColor = ICON_COLORS.active
-}) => {
-    const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView);
-    const { offset } = useScreenScrollView();
-    const { bottom } = useSafeAreaInsets();
-
-    const TAB_BAR_WIDTH = Dimensions.get("screen").width;
-    const TAB_WIDTH = TAB_BAR_WIDTH / state.routes.length;
-
-    const slideAnimationStyle = useAnimatedStyle(() => {
-        const translateX = withTiming(TAB_WIDTH * state.index);
-        return {
-            transform: [{ translateX }]
-        };
-    });
-    const animatedStyle = useAnimatedStyle(() => {
-        const translateY = withTiming(
-            interpolate(
-                offset.value,
-                [0, SIMPLE_TABBAR_HEIGHT],
-                [0, SIMPLE_TABBAR_HEIGHT * 2],
-                Extrapolation.CLAMP
-            ),
-            { duration: 750 }
-        );
-
-        const opacity = withTiming(
-            interpolate(
-                offset.value,
-                [0, SIMPLE_TABBAR_HEIGHT],
-                [1, 0.15],
-                Extrapolation.CLAMP
-            ),
-            { duration: 750 }
-        );
-
-        return {
-            transform: [{ translateY }],
-            opacity
-        };
-    });
+function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
     return (
-        <AnimatedSafeAreaView style={ [styles.container, { bottom }, tabBarStyle, animatedStyle] }>
-            <Animated.View style={ [styles.slidingElementContainer, { width: TAB_WIDTH }, slideAnimationStyle] }>
-                <View style={ styles.slidingElement }/>
-            </Animated.View>
-            {
-                state.routes.map((route: any, index: number) => {
-                    const { options } = descriptors[route.key];
-                    const isFocused = state.index === index;
+        <>
+            <FloatingActionMenu/>
+            <SafeAreaView style={ [styles.container, { paddingBottom: insets.bottom }] }>
+                <LinearGradient
+                    locations={ [0, 0.75] }
+                    colors={ [
+                        hexToRgba(SECONDARY_COLOR, 0.35),
+                        hexToRgba(SECONDARY_COLOR, 1)
+                    ] }
+                    style={ StyleSheet.absoluteFillObject }
+                />
+                {
+                    state.routes.map((route: any, index: number) => {
+                        const { options } = descriptors[route.key];
+                        const isFocused = state.index === index;
 
-                    const icons =
-                        JSON.parse(
-                            options.tabBarIcon
-                            ? options.tabBarIcon({
-                                focused: isFocused,
-                                color: isFocused ? tabBarActiveTintColor : "red",
-                                size: 500
-                            }) as string
-                            : "help"
+                        const icons = JSON.parse(options.tabBarIcon());
+
+                        const onPress = () => {
+                            const event = navigation.emit({
+                                type: "tabPress",
+                                target: route.key,
+                                canPreventDefault: true
+                            });
+
+                            if(!isFocused && !event.defaultPrevented) navigation.navigate(route.name, route.params);
+                        };
+
+                        const onLongPress = () => navigation.emit({ type: "tabLongPress", target: route.key });
+
+                        return (
+                            <TabBarIcon
+                                key={ index }
+                                isFocused={ isFocused }
+                                title={ options.title }
+                                activeIcon={ icons?.["active"] }
+                                inactiveIcon={ icons?.["inactive"] }
+                                iconSize={ FONT_SIZES.h2 }
+                                activeColor={ COLORS.white }
+                                inactiveColor={ COLORS.white2 }
+                                onPress={ onPress }
+                                onLongPress={ onLongPress }
+                            />
                         );
-
-                    const icon = icons[isFocused ? "active" : "inactive"];
-
-                    const onPress = () => {
-                        const event = navigation.emit({
-                            type: "tabPress",
-                            target: route.key,
-                            canPreventDefault: true
-                        });
-
-                        if(!isFocused && !event.defaultPrevented) {
-                            navigation.navigate(route.name, route.params);
-                        }
-                    };
-
-                    const onLongPress = () => {
-                        navigation.emit({
-                            type: "tabLongPress",
-                            target: route.key
-                        });
-                    };
-
-                    return (
-                        <TabBarIcon
-                            key={ index }
-                            iconName={ icon }
-                            iconSize={ FONT_SIZES.h2 }
-                            iconColor={ COLORS.gray1 }
-                            focused={ isFocused }
-                            width={ TAB_WIDTH }
-                            onPress={ onPress }
-                            onLongPress={ onLongPress }
-                        />
-                    );
-                })
-            }
-        </AnimatedSafeAreaView>
+                    })
+                }
+            </SafeAreaView>
+        </>
     );
 };
 
@@ -129,25 +78,9 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         height: SIMPLE_TABBAR_HEIGHT,
-        backgroundColor: COLORS.black2,
-        borderColor: COLORS.gray4,
-        borderWidth: 0.5,
-        // borderBottomWidth: 2.5,
-        borderTopStartRadius: 45,
-        borderTopEndRadius: 45
-    },
-    titleText: {
-        fontSize: FONT_SIZES.p1,
-        alignItems: "center"
-    },
-    slidingElementContainer: {
-        ...StyleSheet.absoluteFillObject,
-        justifyContent: "flex-end"
-    },
-    slidingElement: {
+        gap: SEPARATOR_SIZES.small,
         width: "100%",
-        height: 2,
-        backgroundColor: COLORS.gray1
+        backgroundColor: "transparent"
     }
 });
 
