@@ -1,12 +1,14 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import { carsReducer, CarsState } from "../../features/car/model/slice/index.ts";
-import { userReducer, UserState } from "../../features/user/model/slice/index.ts";
+import { userReducer } from "../../features/user/model/slice/index.ts";
 import { alertReducer } from "../../ui/alert/model/slice/index.ts";
+import { carLogReducer } from "../../features/carLog/model/slice/index.ts";
 
 const rootReducer = combineReducers({
     cars: carsReducer,
     user: userReducer,
-    alert: alertReducer
+    alert: alertReducer,
+    carLog: carLogReducer
 });
 
 export default rootReducer;
