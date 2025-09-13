@@ -3,6 +3,7 @@ import {
     CarTableRow,
     DatabaseType,
     FuelTankTableRow,
+    OdometerLogTableRow,
     OdometerTableRow
 } from "../../../../database/connector/powersync/AppSchema.ts";
 import { ModelDao } from "./ModelDao.ts";
@@ -16,17 +17,25 @@ import { FUEL_TANK_TABLE } from "../../../../database/connector/powersync/tables
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 import { SupabaseStorageAdapter } from "../../../../database/connector/storage/SupabaseStorageAdapter.ts";
 import { CAR_TABLE } from "../../../../database/connector/powersync/tables/car.ts";
+import { OdometerLogDao } from "../../../carLog/model/dao/OdometerLogDao.ts";
 
 export class CarDao {
     private readonly db: Kysely<DatabaseType>;
     private readonly storage: SupabaseStorageAdapter;
     private readonly attachmentQueue?: PhotoAttachmentQueue;
+    private readonly odometerLogDao: OdometerLogDao;
     readonly mapper: CarMapper;
 
-    constructor(db: Kysely<DatabaseType>, storage: SupabaseStorageAdapter, attachmentQueue?: PhotoAttachmentQueue) {
+    constructor(
+        db: Kysely<DatabaseType>,
+        storage: SupabaseStorageAdapter,
+        odometerLogDao: OdometerLogDao,
+        attachmentQueue?: PhotoAttachmentQueue
+    ) {
         this.db = db;
         this.storage = storage;
         this.attachmentQueue = attachmentQueue;
+        this.odometerLogDao = odometerLogDao;
 
         const makeDao = new MakeDao(this.db);
         const modelDao = new ModelDao(this.db, makeDao);
@@ -77,6 +86,12 @@ export class CarDao {
 
             return carRow;
         });
+
+        const odometerLog: OdometerLogTableRow = this.odometerLogDao.mapper.fromOdometerEntityToOdometerLogEntity(
+            odometer,
+            insertedCar.created_at
+        );
+        await this.odometerLogDao.createOdometerLog(odometerLog);
 
         return await this.mapper.toCarDto(insertedCar);
     }
