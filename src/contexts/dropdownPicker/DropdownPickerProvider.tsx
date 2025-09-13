@@ -7,7 +7,6 @@ import { debounce } from "es-toolkit";
 import { useInputFieldContext } from "../inputField/InputFieldContext.ts";
 import { DropdownPickerProps } from "../../components/Input/picker/DropdownPicker.tsx";
 import { DropdownPickerControllerProps } from "../../components/Input/picker/DropdownPickerController.tsx";
-import { ControllerRenderArgs } from "../../constants/index.ts";
 import { toPickerItem, toPickerItems } from "../../utils/toPickerItems.ts";
 
 type DropdownPickerProviderProps<Item, DB> =
@@ -31,10 +30,9 @@ export function DropdownPickerProvider<Item, DB>({
     const IS_STATIC = !!data;
 
     const { openToast } = useAlert();
-    const {
-        field: { onChange, value: inputFieldValue },
-        fieldState: { isDirty: inputFieldDirty }
-    } = useInputFieldContext() ?? { field: {}, fieldState: {} } as ControllerRenderArgs;
+    const inputFieldContext = useInputFieldContext();
+    const onChange = inputFieldContext?.field.onChange;
+    const inputFieldValue = inputFieldContext?.field.value;
 
     const [initialLoadCompleted, setInitialLoadCompleted] = useState(false);
     const [items, setItems] = useState<Array<PickerItemType>>([]);
@@ -115,6 +113,7 @@ export function DropdownPickerProvider<Item, DB>({
         if(IS_STATIC && data) {
             const transformedData = toPickerItems<Item>(data, dataTransformSelectors);
             setItems(transformedData);
+
             if(!initialLoadCompleted) setInitialLoadCompleted(true);
         }
 
@@ -128,14 +127,15 @@ export function DropdownPickerProvider<Item, DB>({
 
     useEffect(() => {
         if(!initialLoadCompleted) return;
+
+        setSelectedItem(findItemByValue(items, inputFieldValue));
+    }, [items, inputFieldValue, initialLoadCompleted]);
+
+    useEffect(() => {
+        if(!initialLoadCompleted) return;
         debouncedFilter();
         return () => debouncedFilter.cancel();
     }, [searchTerm]);
-
-    useEffect(() => {
-        if(!inputFieldDirty) return;
-        setSelectedItem(findItemByValue(items, inputFieldValue));
-    }, [inputFieldValue]);
 
     useEffect(() => {
         if(onDropdownToggle) onDropdownToggle(showItems);
