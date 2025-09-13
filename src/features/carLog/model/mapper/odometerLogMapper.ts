@@ -20,6 +20,7 @@ export class OdometerLogMapper {
             id: formResult.id,
             car_id: formResult.car_id,
             value: formResult.value,
+            unit: formResult.unit,
             note: formResult.note,
             date: formResult.date
         };
