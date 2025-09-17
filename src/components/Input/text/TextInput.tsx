@@ -95,7 +95,6 @@ const TextInput: React.FC<TextInputProps> = ({
     }));
 
     const onContentSizeChange = (event: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
-        console.log("kutya", event.nativeEvent.contentSize.height, maxHeight);
         height.value = Math.min(event.nativeEvent.contentSize.height, maxHeight);
     };
 
