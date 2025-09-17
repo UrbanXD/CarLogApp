@@ -9,6 +9,9 @@ type DatePickerContextValue = {
     date: dayjs.Dayjs
     setDate: (date: dayjs.Dayjs) => void
     manipulateDate: (type: ManipulateDateType, value: number, unit: dayjs.UnitType) => dayjs.Dayjs
+    calendarDate: dayjs.Dayjs
+    nextMonthInCalendar: () => void
+    previousMonthInCalendar: () => void
     currentView: DatePickerViews
     openView: (view: DatePickerViews) => void
     locale: string

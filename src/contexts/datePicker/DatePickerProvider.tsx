@@ -24,6 +24,7 @@ export function DatePickerProvider({
     onSubmit
 }: DatePickerProviderProps) {
     const [date, setDate] = useState<dayjs.Dayjs>(dayjs(initialDate).locale(locale));
+    const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs(initialDate).locale(locale));
     const [view, setView] = useState<CalendarViews>(initialView);
 
     const manipulate = (date: dayjs.Dayjs, type: ManipulateDateType, value: number, unit: dayjs.UnitType) => {
@@ -41,6 +42,14 @@ export function DatePickerProvider({
         setDate(prevState => manipulate(prevState, type, value, unit));
     };
 
+    const nextMonthInCalendar = () => {
+        setCalendarDate(manipulate(calendarDate, "add", 1, "month"));
+    };
+
+    const previousMonthInCalendar = () => {
+        setCalendarDate(manipulate(calendarDate, "subtract", 1, "month"));
+    };
+
     const openView = (view: DatePickerViews) => setView(view);
 
     const submit = () => {
@@ -53,6 +62,9 @@ export function DatePickerProvider({
                 date,
                 setDate,
                 manipulateDate,
+                calendarDate,
+                nextMonthInCalendar,
+                previousMonthInCalendar,
                 currentView: view,
                 openView,
                 locale,
