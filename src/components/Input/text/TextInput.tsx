@@ -1,10 +1,20 @@
 import React, { RefObject, useEffect, useState } from "react";
-import { StyleSheet, TextInput as TextInputRN, TextStyle, View, ViewStyle } from "react-native";
+import {
+    NativeSyntheticEvent,
+    StyleSheet,
+    TextInput as TextInputRN,
+    TextInputContentSizeChangeEventData,
+    TextStyle,
+    View,
+    ViewStyle
+} from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { COLORS, ICON_COLORS, ICON_NAMES } from "../../../constants/index.ts";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import Icon from "../../Icon.tsx";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
+import { formTheme } from "../../../ui/form/constants/theme.ts";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 export type TextInputProps = {
     inputRef?: RefObject<TextInputRN | null>
@@ -51,8 +61,14 @@ const TextInput: React.FC<TextInputProps> = ({
     const onChange = inputFieldContext?.field?.onChange;
     const error = inputFieldContext?.fieldState?.error;
 
+    const height = useSharedValue(formTheme.containerHeight);
+
     const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(isSecure);
+
+    useEffect(() => {
+        if(shouldHandleKeyboardEvents) shouldHandleKeyboardEvents.value = focused;
+    }, [focused, shouldHandleKeyboardEvents]);
 
     const changeSecure = () => setSecure(prevState => !prevState);
     const onFocus = () => setFocused(true);
@@ -63,14 +79,31 @@ const TextInput: React.FC<TextInputProps> = ({
         if(setValue) setValue(value);
     };
 
-    useEffect(() => {
-        if(shouldHandleKeyboardEvents) shouldHandleKeyboardEvents.value = focused;
-    }, [focused, shouldHandleKeyboardEvents]);
+    const numberOfLines = multiline ? 5 : 1;
+    const maxHeight = numberOfLines * formTheme.containerHeight;
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        height: withTiming(height.value, { duration: 250 }),
+        alignItems: height.value > formTheme.containerHeight ? "flex-start" : "center"
+    }));
+
+    const animatedIconStyle = useAnimatedStyle(() => ({
+        paddingTop: withTiming(
+            height.value > formTheme.containerHeight ? SEPARATOR_SIZES.lightSmall : 0,
+            { duration: 250 }
+        )
+    }));
+
+    const onContentSizeChange = (event: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
+        console.log("kutya", event.nativeEvent.contentSize.height, maxHeight);
+        height.value = Math.min(event.nativeEvent.contentSize.height, maxHeight);
+    };
 
     return (
-        <View
+        <Animated.View
             style={ [
                 styles.formFieldContainer,
+                animatedStyle,
                 type === "primary" && styles.primaryFormFieldContainer,
                 containerStyle,
                 (focused || alwaysFocused) && styles.activeFormFieldContainer,
@@ -78,13 +111,13 @@ const TextInput: React.FC<TextInputProps> = ({
             ] }>
             {
                 icon &&
-               <View style={ styles.formFieldIconContainer }>
+               <Animated.View style={ [styles.formFieldIconContainer, animatedIconStyle] }>
                   <Icon
                      icon={ icon }
-                     size={ hp(4.5) }
+                     size={ formTheme.iconSize }
                      color={ styles.textInput.color }
                   />
-               </View>
+               </Animated.View>
             }
             <TextInputRN
                 ref={ inputRef }
@@ -93,12 +126,14 @@ const TextInput: React.FC<TextInputProps> = ({
                 placeholderTextColor={ styles.placeholderText.color }
                 value={ fieldValue.toString() }
                 multiline={ multiline }
+                numberOfLines={ numberOfLines }
                 keyboardType={ numeric ? "numeric" : "default" }
                 secureTextEntry={ secure }
                 onChangeText={ updateFieldValue }
                 onBlur={ onBlur }
                 onFocus={ onFocus }
                 editable={ editable }
+                onContentSizeChange={ multiline ? onContentSizeChange : undefined }
             />
             {
                 isSecure &&
@@ -106,7 +141,7 @@ const TextInput: React.FC<TextInputProps> = ({
                   <Icon
                      icon={ secure ? ICON_NAMES.eyeOff : ICON_NAMES.eye }
                      size={ hp(3.25) }
-                     color={ ICON_COLORS.default }
+                     color={ formTheme.iconColor }
                      onPress={ changeSecure }
                   />
                </View>
@@ -116,49 +151,50 @@ const TextInput: React.FC<TextInputProps> = ({
                <View style={ styles.formFieldIconContainer }>
                   <Icon
                      icon={ actionIcon }
-                     size={ hp(4.5) }
-                     color={ ICON_COLORS.default }
+                     size={ formTheme.iconSize }
+                     color={ formTheme.iconColor }
                      onPress={ onAction }
                   />
                </View>
             }
-        </View>
+        </Animated.View>
     );
 };
 
 const styles = StyleSheet.create({
     formFieldContainer: {
-        minHeight: hp(6),
-        maxHeight: hp(6),
+        minHeight: formTheme.containerHeight,
         flexDirection: "row",
         alignItems: "center",
-        gap: hp(1.5),
         overflow: "hidden"
     },
     primaryFormFieldContainer: {
-        backgroundColor: COLORS.gray5,
-        paddingHorizontal: hp(1.5),
-        borderRadius: 20,
+        backgroundColor: formTheme.containerBackgroundColor,
+        paddingHorizontal: formTheme.containerPaddingHorizontal,
+        borderRadius: formTheme.borderRadius,
         borderWidth: 1,
-        borderColor: COLORS.gray5
+        borderColor: formTheme.borderColor
     },
     activeFormFieldContainer: {
-        borderColor: COLORS.gray2
+        borderColor: formTheme.activeColor
     },
     errorFormFieldContainer: {
-        borderColor: COLORS.redLight
+        borderColor: formTheme.errorColor
     },
     formFieldIconContainer: {
-        flex: 0.15,
+        width: formTheme.iconSize,
         alignItems: "center"
     },
     textInput: {
         flex: 1,
-        color: COLORS.gray1,
-        fontSize: hp(2.25)
+        color: formTheme.valueTextColor,
+        fontSize: formTheme.valueTextFontSize,
+        // lineHeight: formTheme.valueTextFontSize,
+        alignItems: "center",
+        justifyContent: "center"
     },
     placeholderText: {
-        color: COLORS.gray2
+        color: formTheme.placeHolderColor
     }
 });
 
