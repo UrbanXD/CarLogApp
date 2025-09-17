@@ -1,27 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDatePicker } from "../../../../contexts/datePicker/DatePickerContext.ts";
 import { SingleChange, Styles } from "react-native-ui-datepicker/lib/typescript/types";
-import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen";
+import { heightPercentageToDP } from "react-native-responsive-screen";
 import DateTimePicker, { useDefaultStyles } from "react-native-ui-datepicker";
 import dayjs from "dayjs";
 import { StyleSheet } from "react-native";
-import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES } from "../../../../constants/index.ts";
 
 export function CalendarPicker() {
-    const { date, setDate, locale } = useDatePicker();
+    const { date, setDate, calendarDate, locale } = useDatePicker();
     const defaultStyles = useDefaultStyles("dark");
 
+    const [year, setYear] = useState(calendarDate.year());
+
+    useEffect(() => {
+        setYear(calendarDate.year());
+    }, [calendarDate]);
+
     const onDateChange: SingleChange = ({ date: newDateObj }) => {
-        setDate(dayjs(newDateObj));
+        const newDate = dayjs(newDateObj);
+
+        setDate(prevState => prevState
+            .set("year", newDate.year())
+            .set("month", newDate.month())
+            .set("date", newDate.date())
+        );
     };
 
     const datePickerStyles: Styles = {
         ...defaultStyles,
-        header: styles.header,
-        button_next_image: styles.header.navigationButtonImage,
-        button_prev_image: styles.header.navigationButtonImage,
-        year_selector_label: styles.header.selector,
-        month_selector_label: styles.header.selector,
         weekdays: styles.weekdays,
         weekday_label: styles.weekdays.label,
         days: styles.contentBackground,
@@ -38,14 +45,15 @@ export function CalendarPicker() {
         <DateTimePicker
             mode="single"
             initialView="day"
+            hideHeader
             disableMonthPicker
             disableYearPicker
             firstDayOfWeek={ 1 } // start with Monday (1) | Sunday is 0
             weekdaysFormat="min"
             showOutsideDays
             date={ date }
-            year={ date.year() }
-            month={ date.month() }
+            year={ year }
+            month={ calendarDate.month() }
             onChange={ onDateChange }
             locale={ locale }
             containerHeight={ heightPercentageToDP(25) }
@@ -55,24 +63,6 @@ export function CalendarPicker() {
 }
 
 const styles = StyleSheet.create({
-    header: {
-        borderTopRightRadius: 25,
-        borderTopLeftRadius: 25,
-        alignSelf: "center",
-        width: widthPercentageToDP(100) - 2 * DEFAULT_SEPARATOR - 2 * DEFAULT_SEPARATOR,
-
-        navigationButtonImage: {
-            tintColor: COLORS.gray1,
-            alignSelf: "center"
-        },
-
-        selector: {
-            fontFamily: "Gilroy-Heavy",
-            fontSize: FONT_SIZES.p3,
-            color: COLORS.gray1,
-            textTransform: "capitalize"
-        }
-    },
     weekdays: {
         borderColor: COLORS.gray1,
         borderBottomWidth: 0.50,

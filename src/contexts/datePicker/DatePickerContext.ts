@@ -7,8 +7,7 @@ export type ManipulateDateType = "add" | "subtract" | "set";
 
 type DatePickerContextValue = {
     date: dayjs.Dayjs
-    setDate: (date: dayjs.Dayjs) => void
-    manipulateDate: (type: ManipulateDateType, value: number, unit: dayjs.UnitType) => dayjs.Dayjs
+    setDate: (value: (((prevState: dayjs.Dayjs) => dayjs.Dayjs) | dayjs.Dayjs)) => void
     calendarDate: dayjs.Dayjs
     nextMonthInCalendar: () => void
     previousMonthInCalendar: () => void

@@ -1,8 +1,8 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { CalendarViews } from "react-native-ui-datepicker/lib/typescript/enums";
 import { DateType } from "react-native-ui-datepicker";
-import { DatePickerContext, DatePickerViews, ManipulateDateType } from "./DatePickerContext.ts";
+import { DatePickerContext, DatePickerViews } from "./DatePickerContext.ts";
 
 export type DatePickerProviderProps = {
     children: ReactElement
@@ -27,27 +27,16 @@ export function DatePickerProvider({
     const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs(initialDate).locale(locale));
     const [view, setView] = useState<CalendarViews>(initialView);
 
-    const manipulate = (date: dayjs.Dayjs, type: ManipulateDateType, value: number, unit: dayjs.UnitType) => {
-        switch(type) {
-            case "add":
-                return date.add(value, unit);
-            case "subtract":
-                return date.subtract(value, unit);
-            case "set":
-                return date.set(unit, value);
-        }
-    };
-
-    const manipulateDate = (type: ManipulateDateType, value: number, unit: dayjs.UnitType) => {
-        setDate(prevState => manipulate(prevState, type, value, unit));
-    };
+    useEffect(() => {
+        setCalendarDate(date);
+    }, [date]);
 
     const nextMonthInCalendar = () => {
-        setCalendarDate(manipulate(calendarDate, "add", 1, "month"));
+        setCalendarDate(prevState => prevState.add(1, "month"));
     };
 
     const previousMonthInCalendar = () => {
-        setCalendarDate(manipulate(calendarDate, "subtract", 1, "month"));
+        setCalendarDate(prevState => prevState.subtract(1, "month"));
     };
 
     const openView = (view: DatePickerViews) => setView(view);
@@ -61,7 +50,6 @@ export function DatePickerProvider({
             value={ {
                 date,
                 setDate,
-                manipulateDate,
                 calendarDate,
                 nextMonthInCalendar,
                 previousMonthInCalendar,
