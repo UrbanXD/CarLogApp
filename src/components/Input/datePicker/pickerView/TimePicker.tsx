@@ -27,13 +27,15 @@ const minuteOptions = Array.from({ length: 60 }).map((_, index) => ({
 }));
 
 export function TimePicker() {
-    const { date, manipulateDate } = useDatePicker();
+    const { date, setDate } = useDatePicker();
 
     const pickerControl = usePickerControl<ControlPickersMap>();
 
     useOnPickerValueChangedEffect(pickerControl, (event) => {
-        manipulateDate("set", event.pickers.hour.item.value, "hour");
-        manipulateDate("set", event.pickers.minute.item.value, "minute");
+        setDate(prevState => prevState
+            .set("hour", event.pickers.hour.item.value)
+            .set("minute", event.pickers.minute.item.value)
+        );
     });
 
     return (
