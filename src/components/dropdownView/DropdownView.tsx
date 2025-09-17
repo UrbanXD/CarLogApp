@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect } from "react";
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { StyleSheet, ViewStyle } from "react-native";
 import { COLORS, SEPARATOR_SIZES } from "../../constants/index.ts";
 
@@ -11,12 +11,17 @@ type DropdownViewProps = {
     style?: ViewStyle
 }
 
+const SPRING_CONFIG = {
+    duration: 500,
+    overshootClamping: true,
+    dampingRatio: 0.8
+};
+
 function DropdownView({ children, height, expanded, paddingVertical = 0, style }: DropdownViewProps) {
     const display = useSharedValue(expanded ? 1 : 0);
-    const displayAnimationConfig = { duration: 350, easing: Easing.out(Easing.ease) };
 
     useEffect(() => {
-        display.value = withTiming(expanded ? 1 : 0, displayAnimationConfig);
+        display.value = withSpring(expanded ? 1 : 0, SPRING_CONFIG);
     }, [expanded]);
 
     const dropdownViewStyle = useAnimatedStyle(() => ({
