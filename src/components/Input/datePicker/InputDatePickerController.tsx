@@ -14,12 +14,12 @@ type InputDatePickerControllerProps = {
     expanded: boolean
 }
 
-export function InputDatePickerController({ date, open, expanded }: InputDatePickerControllerProps) {
+export function InputDatePickerController({ date, open }: InputDatePickerControllerProps) {
     const onPressDate = useCallback(() => open("calendar"));
     const onPressTime = useCallback(() => open("time"));
 
     return (
-        <InputRow focused={ expanded }>
+        <InputRow>
             <Pressable
                 onPress={ onPressDate }
                 style={ { flex: 1 } }
