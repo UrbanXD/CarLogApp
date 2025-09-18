@@ -13,12 +13,11 @@ import { useScreenScrollView } from "../../../contexts/screenScrollView/ScreenSc
 import { FloatingActionButton } from "./FloatingActionButton.tsx";
 import { AnimatedPressable, AnimatedSafeAreaView } from "../../../components/AnimatedComponents/index.ts";
 import { Action, ACTIONS } from "../constants/index.ts";
+import { Overlay } from "../../../components/overlay/Overlay.tsx";
 
 function FloatingActionMenu() {
     const { isScrolling } = useScreenScrollView();
     const isExpanded = useSharedValue(false);
-    const isAnimating = useSharedValue(false);
-    const overlayDisplay = useSharedValue<"flex" | "none">("none");
     const titleDisplay = useSharedValue<"flex" | "none">("none");
 
     useAnimatedReaction(
@@ -28,20 +27,12 @@ function FloatingActionMenu() {
         }
     );
 
-    const overlayStyle = useAnimatedStyle(() => {
-        const opacity = withTiming(
-            isExpanded.value ? 0.525 : 0,
-            { duration: 400 },
-            (finished) => {
-                if(finished) {
-                    isAnimating.value = false;
-                    overlayDisplay.value = isExpanded.value ? "flex" : "none";
-                }
-            }
-        );
-
-        return { opacity, display: overlayDisplay.value };
-    });
+    useAnimatedReaction(
+        () => isExpanded.value,
+        (expanded) => {
+            if(expanded) titleDisplay.value = "flex";
+        }
+    );
 
     const actionButtonIconStyle = useAnimatedStyle(() => {
         const rotateValue = withTiming(isExpanded.value ? "45deg" : "0deg");
@@ -51,19 +42,10 @@ function FloatingActionMenu() {
     });
 
     const toggle = () => {
-        if(isAnimating.value) return;
-        isAnimating.value = true;
-
-        const expanded = !isExpanded.value;
-        isExpanded.value = expanded;
-
-        if(expanded) overlayDisplay.value = "flex";
-        if(expanded) titleDisplay.value = "flex";
+        isExpanded.value = !isExpanded.value;
     };
 
     const close = () => {
-        if(isAnimating.value) return;
-
         isExpanded.value = false;
     };
 
@@ -87,10 +69,7 @@ function FloatingActionMenu() {
 
     return (
         <>
-            <AnimatedPressable
-                onPress={ close }
-                style={ [styles.overlay, overlayStyle] }
-            />
+            <Overlay opened={ isExpanded } onPress={ close }/>
             <AnimatedSafeAreaView style={ styles.container }>
                 <View style={ styles.buttonsContainer }>
                     <AnimatedPressable
@@ -109,11 +88,6 @@ function FloatingActionMenu() {
 export default FloatingActionMenu;
 
 const styles = StyleSheet.create({
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        zIndex: 2,
-        backgroundColor: COLORS.black
-    },
     container: {
         position: "absolute",
         bottom: SIMPLE_TABBAR_HEIGHT + SEPARATOR_SIZES.normal,
