@@ -49,6 +49,7 @@ export function TimePicker() {
                 width="15%"
                 itemHeight={ styles.item.height }
                 itemTextStyle={ styles.item.text }
+                overlayItemStyle={ { backgroundColor: "transparent" } }
                 enableScrollByTapOnItem
                 visibleItemCount={ 7 }
                 scrollEventThrottle={ 16 }
@@ -62,6 +63,7 @@ export function TimePicker() {
                 width="15%"
                 itemHeight={ styles.item.height }
                 itemTextStyle={ styles.item.text }
+                overlayItemStyle={ { backgroundColor: "transparent" } }
                 enableScrollByTapOnItem
                 visibleItemCount={ 7 }
                 scrollEventThrottle={ 16 }
