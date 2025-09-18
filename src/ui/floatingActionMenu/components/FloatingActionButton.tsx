@@ -50,6 +50,8 @@ export function FloatingActionButton({
         <AnimatedPressable
             style={ [animatedStyles, styles.container] }
             onPress={ onPress }
+            pointerEvents="auto"
+            hitSlop={ 10 }
         >
             <View style={ styles.labelContainer }>
                 <Animated.Text style={ [styles.labelContainer.text, labelStyle] }>{ label }</Animated.Text>
