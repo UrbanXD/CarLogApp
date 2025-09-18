@@ -26,8 +26,13 @@ export function WheelDatePicker() {
     ), []);
 
     const onDateChanged = useCallback((event: { date: OnlyDateFormat }) => {
-        console.log(event);
-        setDate(dayjs(event.date));
+        const newDate = dayjs(event.date);
+
+        setDate(prevState => prevState
+            .set("year", newDate.year())
+            .set("month", newDate.month())
+            .set("date", newDate.date())
+        );
     }, []);
 
     return (
