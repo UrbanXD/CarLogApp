@@ -18,6 +18,7 @@ import ModalManager from "../ui/alert/components/modal/ModalManager.tsx";
 import * as SystemUI from "expo-system-ui";
 import { SystemBars } from "react-native-edge-to-edge";
 import { SECONDARY_COLOR } from "../constants/index.ts";
+import { PortalHost, PortalProvider } from "@gorhom/portal";
 
 
 const Layout: React.FC = () => {
@@ -132,11 +133,13 @@ const RootLayout: React.FC = () =>
             { Component: KeyboardProvider },
             { Component: ScreenScrollViewProvider },
             { Component: GestureHandlerRootView, props: { style: { flex: 1 } } },
+            { Component: PortalProvider },
             { Component: AuthProvider },
             { Component: ToastManager },
             { Component: ModalManager },
             { Component: BottomSheetModalProvider }
         ] }>
+            <PortalHost name="popup"/>
             <Layout/>
         </Compactor>
     </DatabaseProvider>;
