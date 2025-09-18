@@ -1,13 +1,12 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { CalendarPicker } from "./pickerView/CalendarPicker.tsx";
 import { WheelDatePicker } from "./pickerView/WheelDatePicker.tsx";
 import { useDatePicker } from "../../../contexts/datePicker/DatePickerContext.ts";
 import { TimePicker } from "./pickerView/TimePicker.tsx";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { heightPercentageToDP } from "react-native-responsive-screen";
-import { DatePickerHeader } from "./header/DatePickerHeader.tsx";
+import { CalendarHeader } from "./header/CalendarHeader.tsx";
 
 export function DatePicker() {
     const { currentView } = useDatePicker();
@@ -16,7 +15,7 @@ export function DatePicker() {
         <View style={ styles.container }>
             {
                 currentView === "calendar" &&
-               <DatePickerHeader/>
+               <CalendarHeader/>
             }
             <View style={ styles.viewContainer }>
                 {
@@ -46,7 +45,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: "100%",
-        gap: SEPARATOR_SIZES.small
+        gap: 5
     },
     viewContainer: {
         flex: 1,
