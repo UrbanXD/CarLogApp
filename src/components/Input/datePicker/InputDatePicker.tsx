@@ -1,7 +1,7 @@
 import { useAnimatedReaction, useSharedValue } from "react-native-reanimated";
 import { StyleSheet } from "react-native";
 import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DateType } from "react-native-ui-datepicker";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { DatePicker } from "./DatePicker.tsx";
@@ -13,13 +13,31 @@ import dayjs from "dayjs";
 import { scheduleOnRN } from "react-native-worklets";
 import { InputDatePickerController } from "./InputDatePickerController.tsx";
 import { DatePickerViews } from "../../../contexts/datePicker/DatePickerContext.ts";
+import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 
-function InputDatePicker() {
+type InputDatePicker = {
+    defaultDate?: DateType
+    minDate?: DateType
+    maxDate?: DateType
+    locale?: string
+}
+
+function InputDatePicker({ defaultDate, maxDate, minDate, locale = "hu" }: InputDatePicker) {
+    const inputFieldContext = useInputFieldContext();
+    const onChange = inputFieldContext?.field?.onChange;
+    const fieldValue = inputFieldContext?.field.value && dayjs(inputFieldContext?.field.value).isValid()
+                       ? dayjs(inputFieldContext?.field.value)
+                       : dayjs(defaultDate);
+
     const isExpanded = useSharedValue(false);
 
-    const [selected, setSelected] = useState<dayjs.Dayjs>(dayjs("2018-08-01"));
+    const [date, setDate] = useState<dayjs.Dayjs>(fieldValue);
     const [view, setView] = useState<DatePickerViews>("calendar");
     const [key, setKey] = useState(0); // for force reset
+
+    useEffect(() => {
+        if(onChange) onChange(date.toDate());
+    }, [date]);
 
     const resetDatePicker = () => {
         setKey(prevState => ++prevState);
@@ -42,22 +60,24 @@ function InputDatePicker() {
     };
 
     const submit = (date: DateType) => {
-        setSelected(dayjs(date).locale("hu"));
+        setDate(dayjs(date).locale(locale));
         isExpanded.value = false;
     };
 
     return (
         <>
-            <InputDatePickerController date={ selected } open={ open } expanded={ isExpanded }/>
+            <InputDatePickerController date={ date } open={ open } expanded={ false }/>
             <PopupView
                 opened={ isExpanded }
                 style={ styles.popupContainer }
             >
                 <DatePickerProvider
                     key={ key }
-                    initialDate={ selected }
+                    initialDate={ date }
+                    maxDate={ maxDate }
+                    minDate={ minDate }
                     initialView={ view }
-                    locale="hu"
+                    locale={ locale }
                     onSubmit={ submit }
                     onClose={ close }
                 >
