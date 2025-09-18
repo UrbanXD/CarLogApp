@@ -31,6 +31,10 @@ export function DatePickerProvider({
         setCalendarDate(date);
     }, [date]);
 
+    useEffect(() => {
+        setView(initialView);
+    }, [initialView]);
+
     const nextMonthInCalendar = () => {
         setCalendarDate(prevState => prevState.add(1, "month"));
     };
