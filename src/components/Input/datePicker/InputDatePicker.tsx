@@ -1,4 +1,4 @@
-import { useAnimatedReaction, useSharedValue } from "react-native-reanimated";
+import { useSharedValue } from "react-native-reanimated";
 import { StyleSheet } from "react-native";
 import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import React, { useEffect, useState } from "react";
@@ -10,7 +10,6 @@ import { PopupView } from "../../popupView/PopupView.tsx";
 import { DatePickerHeader } from "./header/DatePickerHeader.tsx";
 import { DatePickerFooter } from "./footer/DatePickerFooter.tsx";
 import dayjs from "dayjs";
-import { scheduleOnRN } from "react-native-worklets";
 import { InputDatePickerController } from "./InputDatePickerController.tsx";
 import { DatePickerViews } from "../../../contexts/datePicker/DatePickerContext.ts";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
@@ -26,29 +25,17 @@ function InputDatePicker({ defaultDate, maxDate, minDate, locale = "hu" }: Input
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field?.onChange;
     const fieldValue = inputFieldContext?.field.value && dayjs(inputFieldContext?.field.value).isValid()
-                       ? dayjs(inputFieldContext?.field.value)
-                       : dayjs(defaultDate);
+                       ? dayjs(inputFieldContext?.field.value).locale(locale)
+                       : dayjs(defaultDate).locale(locale);
 
     const isExpanded = useSharedValue(false);
 
     const [date, setDate] = useState<dayjs.Dayjs>(fieldValue);
     const [view, setView] = useState<DatePickerViews>("calendar");
-    const [key, setKey] = useState(0); // for force reset
 
     useEffect(() => {
         if(onChange) onChange(date.toDate());
     }, [date]);
-
-    const resetDatePicker = () => {
-        setKey(prevState => ++prevState);
-    };
-
-    useAnimatedReaction(
-        () => isExpanded.value,
-        (expanded, previousExpanded) => {
-            if(expanded !== previousExpanded && !expanded) scheduleOnRN(resetDatePicker);
-        }
-    );
 
     const open = (view: DatePickerViews) => {
         isExpanded.value = true;
@@ -72,7 +59,6 @@ function InputDatePicker({ defaultDate, maxDate, minDate, locale = "hu" }: Input
                 style={ styles.popupContainer }
             >
                 <DatePickerProvider
-                    key={ key }
                     initialDate={ date }
                     maxDate={ maxDate }
                     minDate={ minDate }

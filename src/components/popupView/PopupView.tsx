@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import Animated, {
     interpolate,
     SharedValue,
@@ -12,6 +12,7 @@ import { StyleSheet, View, ViewStyle } from "react-native";
 import { DEFAULT_SEPARATOR } from "../../constants/index.ts";
 import { Overlay } from "../overlay/Overlay.tsx";
 import { Portal } from "@gorhom/portal";
+import { scheduleOnRN } from "react-native-worklets";
 
 type PopupViewProps = {
     opened: SharedValue<boolean>
@@ -27,11 +28,21 @@ const SPRING_CONFIG = {
 
 export function PopupView({ opened, children, style }: PopupViewProps) {
     const popupDisplay = useSharedValue<"flex" | "none">("none");
+    const [mounted, setMounted] = useState(false);
 
     useAnimatedReaction(
         () => opened.value,
         (isOpened) => {
             if(isOpened) popupDisplay.value = "flex";
+        }
+    );
+
+    useAnimatedReaction(
+        () => popupDisplay.value,
+        (display, previousDisplay) => {
+            if(display === previousDisplay) return;
+
+            scheduleOnRN(setMounted, display === "flex");
         }
     );
 
@@ -51,11 +62,14 @@ export function PopupView({ opened, children, style }: PopupViewProps) {
     return (
         <Portal hostName="popup">
             <Overlay opened={ opened } onPress={ close }/>
-            <View style={ styles.container } pointerEvents="box-none">
-                <Animated.View style={ [popupStyle, styles.popup, style] }>
-                    { children }
-                </Animated.View>
-            </View>
+            {
+                mounted &&
+               <View style={ styles.container } pointerEvents="box-none">
+                  <Animated.View style={ [popupStyle, styles.popup, style] }>
+                      { children }
+                  </Animated.View>
+               </View>
+            }
         </Portal>
     );
 }
