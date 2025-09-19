@@ -1,6 +1,12 @@
 import React, { useCallback, useState } from "react";
 import { LayoutChangeEvent, View, ViewStyle } from "react-native";
-import { COLORS, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT, SIMPLE_TABBAR_HEIGHT } from "../constants/index.ts";
+import {
+    COLORS,
+    DEFAULT_SEPARATOR,
+    SEPARATOR_SIZES,
+    SIMPLE_HEADER_HEIGHT,
+    SIMPLE_TABBAR_HEIGHT
+} from "../constants/index.ts";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { ScrollView } from "react-native-gesture-handler";
 import { useScreenScrollView } from "../contexts/screenScrollView/ScreenScrollViewContext.ts";
@@ -68,6 +74,7 @@ export function ScreenScrollView({
                 {
                     flex: 1,
                     paddingTop: (screenHasHeader && SIMPLE_HEADER_HEIGHT) + SEPARATOR_SIZES.lightSmall,
+                    paddingHorizontal: DEFAULT_SEPARATOR,
                     paddingBottom: SEPARATOR_SIZES.lightSmall,
                     backgroundColor: COLORS.black2
                 },

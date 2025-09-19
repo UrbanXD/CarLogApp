@@ -11,4 +11,4 @@ export const SEPARATOR_SIZES = {
     large: hp(8.5)
 };
 
-export const DEFAULT_SEPARATOR = SEPARATOR_SIZES.normal;
+export const DEFAULT_SEPARATOR = SEPARATOR_SIZES.lightSmall;
