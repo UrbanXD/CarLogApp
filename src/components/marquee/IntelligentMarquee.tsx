@@ -14,7 +14,9 @@ function IMarquee({ children, speed, spacing, style }: MarqueeProps) {
 
     return (
         <View style={ { width: "100%" } } onLayout={ viewOnLayout }>
-            <MeasureElement children={ children } onLayout={ childrenOnLayout }/>
+            <View style={ { flex: 1, position: "absolute" } }>
+                <MeasureElement children={ children } onLayout={ childrenOnLayout }/>
+            </View>
             {
                 childrenWidth < viewWidth
                 ? children
