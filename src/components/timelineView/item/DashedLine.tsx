@@ -2,6 +2,7 @@ import React from "react";
 import { LayoutChangeEvent, StyleSheet, View } from "react-native";
 import { COLORS } from "../../../constants/index.ts";
 import { Color } from "../../../types/index.ts";
+import { heightPercentageToDP } from "react-native-responsive-screen";
 
 type DashedLineProps = {
     lineHeight?: number
@@ -11,10 +12,10 @@ type DashedLineProps = {
 }
 
 export function DashedLine({
-    lineHeight = 10,
+    lineHeight = heightPercentageToDP(1.15),
     lineWidth = lineHeight / 2,
     color = COLORS.white,
-    gap = 6
+    gap = heightPercentageToDP(0.55)
 }: DashedLineProps) {
     const [height, setHeight] = React.useState(0);
 
