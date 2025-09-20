@@ -1,70 +1,102 @@
 import { StyleSheet, Text, View } from "react-native";
-import { IntelligentMarquee } from "../../marquee/IntelligentMarquee.tsx";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import { formatNumber } from "../../../utils/formatNumber.ts";
 import Icon from "../../Icon.tsx";
 import React from "react";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import Divider from "../../Divider.tsx";
 import { DashedLine } from "./DashedLine.tsx";
+import Button from "../../Button/Button.ts";
+import { Color } from "../../../types/index.ts";
+
+export type TimelineItemType = Omit<TimelineItemProps, "isFirst" | "isLast" | "iconSize">
 
 type TimelineItemProps = {
-    item?: any
+    milestone: string
+    title: string
+    color?: Color
+    icon?: string
     iconSize?: number
-    isLast?: boolean
-    isFirst?: boolean
+    iconColor?: Color
+    note?: string
+    footerText?: string
+    isFirst: boolean
+    isLast: boolean
+    onPressInfo?: () => void
 }
 
-const x = 25096701;
-
 export function TimelineItem({
-    item,
+    milestone,
+    title,
+    color = COLORS.fuelYellow,
+    icon,
+    iconColor = COLORS.black5,
+    iconSize = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE,
+    note,
+    footerText,
+    onPressInfo,
     isFirst,
-    isLast,
-    iconSize = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE
+    isLast
 }: TimelineItemProps) {
-    const styles = useStyles(iconSize * 1.25, isFirst, isLast);
+    const styles = useStyles(color, iconSize, isFirst, isLast);
 
     return (
         <View style={ styles.container }>
-            <View style={ styles.title.container }>
-                <IntelligentMarquee speed={ 0.30 } spacing={ SEPARATOR_SIZES.lightSmall }>
-                    <Text style={ styles.title.text } numberOfLines={ 1 }>
-                        { formatNumber(x, x >= 10000000000) }
-                    </Text>
-                </IntelligentMarquee>
-                <Text style={ styles.title.text }>km</Text>
-            </View>
             <View style={ styles.timeline }>
-                <View style={ [styles.timeline.line.dot, isFirst && styles.timeline.line.iconDot] }>
+                <View style={ [styles.timeline.line.dot, icon && styles.timeline.line.iconDot] }>
                     {
-                        isFirst &&
-                       <Icon icon={ ICON_NAMES.fuelPump } size={ iconSize } color={ COLORS.black5 }/>
+                        icon
+                        ? <Icon icon={ icon } size={ iconSize / 1.5 } color={ iconColor }/>
+                        : <View style={ {
+                            width: "40%",
+                            height: "40%",
+                            backgroundColor: iconColor,
+                            borderRadius: 100
+                        } }/>
                     }
                 </View>
                 <DashedLine/>
-                {/*<View style={ styles.timeline.line }/>*/ }
             </View>
             <View style={ styles.card }>
-                <View style={ styles.card.title.container }>
-                    <Text style={ styles.card.title.text } adjustsFontSizeToFit
-                          numberOfLines={ 1 }>Kilométeróra-frissítés
-                    </Text>
-                    <Divider color={ COLORS.fuelYellow } style={ { width: "45%", alignSelf: "flex-start" } }/>
+                <View style={ {
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    gap: SEPARATOR_SIZES.lightSmall
+                } }>
+                    <View style={ styles.card.title.container }>
+                        <Text style={ styles.card.title.text }>{ milestone }</Text>
+                        <Text style={ styles.card.subtitle }>{ title }</Text>
+                        {
+                            (note || footerText) &&
+                           <Divider color={ color } style={ { width: "45%", alignSelf: "flex-start" } }/> }
+                    </View>
+                    {
+                        onPressInfo &&
+                       <Button.Icon
+                          icon={ ICON_NAMES.info }
+                          iconSize={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
+                          width={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
+                          height={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
+                          style={ { alignSelf: "flex-start" } }
+                          backgroundColor={ "transparent" }
+                          iconColor={ COLORS.white }
+                          onPress={ onPressInfo }
+                       />
+                    }
                 </View>
                 {
-                    isFirst &&
-                   <Text style={ styles.card.note }>
-                      Ez itt egy note most itt. Nagyon fontos ez a note
-                   </Text>
+                    note &&
+                   <Text style={ styles.card.note }>{ note }</Text>
                 }
-                <Text style={ [styles.card.date] }>2025.09.19</Text>
+                {
+                    footerText &&
+                   <Text style={ [styles.card.date, !note && { alignSelf: "flex-end" }] }>{ footerText }</Text>
+                }
             </View>
         </View>
     );
 }
 
-const useStyles = (dotSize: number, isFirstItem: boolean, isLastItem: boolean) => StyleSheet.create({
+const useStyles = (color: Color, dotSize: number, isFirstItem: boolean, isLastItem: boolean) => StyleSheet.create({
     container: {
         flexDirection: "row",
         gap: SEPARATOR_SIZES.lightSmall,
@@ -81,7 +113,7 @@ const useStyles = (dotSize: number, isFirstItem: boolean, isLastItem: boolean) =
         text: {
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p2,
-            color: COLORS.gray1,
+            color: COLORS.white2,
             textAlign: "center"
         }
     },
@@ -111,7 +143,9 @@ const useStyles = (dotSize: number, isFirstItem: boolean, isLastItem: boolean) =
                 alignSelf: "center",
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: COLORS.fuelYellow,
+                backgroundColor: color,
+                borderColor: COLORS.black2,
+                borderWidth: 1,
                 borderRadius: 100
             },
 
@@ -129,27 +163,35 @@ const useStyles = (dotSize: number, isFirstItem: boolean, isLastItem: boolean) =
         backgroundColor: COLORS.gray5,
         marginTop: SEPARATOR_SIZES.small,
         padding: SEPARATOR_SIZES.lightSmall,
-        borderColor: COLORS.gray4,
+        borderColor: color,
         borderWidth: 1.5,
         borderRadius: 12.5,
         borderTopLeftRadius: 0,
 
         title: {
             container: {
+                flex: 1,
                 gap: SEPARATOR_SIZES.lightSmall / 2
             },
 
             text: {
                 fontFamily: "Gilroy-Heavy",
-                fontSize: FONT_SIZES.p2,
+                fontSize: FONT_SIZES.p1,
+                lineHeight: FONT_SIZES.p1,
                 color: COLORS.white
             }
         },
 
-        note: {
+        subtitle: {
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p2,
-            color: COLORS.white2,
+            color: COLORS.white
+        },
+
+        note: {
+            fontFamily: "Gilroy-Medium",
+            fontSize: FONT_SIZES.p3,
+            color: COLORS.gray1,
 
             notFound: {
                 color: COLORS.gray2
@@ -160,7 +202,7 @@ const useStyles = (dotSize: number, isFirstItem: boolean, isLastItem: boolean) =
             alignSelf: "flex-end",
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p4,
-            color: COLORS.gray2
+            color: COLORS.gray1
         }
     }
 });
