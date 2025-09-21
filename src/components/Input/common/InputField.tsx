@@ -11,6 +11,7 @@ interface InputFieldProps {
     fieldName: string;
     fieldNameText?: string;
     fieldInfoText?: string;
+    optional?: boolean;
     children: ReactNode;
 }
 
@@ -19,6 +20,7 @@ const InputField: React.FC<InputFieldProps> = ({
     fieldName,
     fieldNameText,
     fieldInfoText,
+    optional,
     children
 }) => {
     const renderControllerInput = (args: ControllerRenderArgs) => {
@@ -39,6 +41,7 @@ const InputField: React.FC<InputFieldProps> = ({
                <InputTitle
                   title={ fieldNameText }
                   subtitle={ fieldInfoText }
+                  optional={ optional }
                />
             }
             {
