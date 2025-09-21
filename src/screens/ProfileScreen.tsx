@@ -47,7 +47,7 @@ const ProfileScreen: React.FC = () => {
         <ScreenScrollView
             screenHasTabBar={ false }
             safeAreaEdges={ ["top", "left", "right"] }
-            style={ { paddingBottom: 0 } }
+            style={ { paddingBottom: 0, paddingHorizontal: 0 } }
         >
             <View style={ styles.container }>
                 <View style={ styles.informationContainer }>
