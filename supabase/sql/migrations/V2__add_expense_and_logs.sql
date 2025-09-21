@@ -29,11 +29,18 @@ CREATE TABLE fuel_log
 
 ALTER TABLE public.fuel_log ENABLE ROW LEVEL SECURITY;
 
+CREATE TYPE odometer_log_type AS ENUM (
+  'SERVICE',
+  'FUEL',
+  'SIMPLE'
+);
+
 DROP TABLE odometer_log CASCADE;
 CREATE TABLE odometer_log
 (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     car_id UUID NOT NULL,
+    type odometer_log_type NOT NULL DEFAULT 'SIMPLE',
     value       BIGINT     DEFAULT 0    NOT NULL,
     unit VARCHAR(6) DEFAULT 'km' NOT NULL, --{ 'km', 'mi' }
     note TEXT,
