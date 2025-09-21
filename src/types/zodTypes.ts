@@ -26,7 +26,7 @@ export const zNumber = (
 );
 
 export const zPickerRequired = (errorMessage?: string = "Válasszon ki egy elemet!") => z
-.string()
+.string({ required_error: errorMessage })
 .min(1, errorMessage);
 
 export const zImage = z
