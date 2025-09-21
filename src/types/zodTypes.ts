@@ -2,7 +2,10 @@ import { z } from "zod";
 import { ColorValue } from "react-native";
 import { Image } from "./index.ts";
 
-export const zNumber = (minValue?: number = 0) => z
+export const zNumber = (
+    bounds?: { min?: number, max?: number },
+    errorMessage?: { required?: string, minBound?: (min?: number) => string, maxBound?: (max?: number) => string }
+) => z
 .preprocess(
     (value: any) => value ? value.toString() : "",
     z
@@ -10,11 +13,15 @@ export const zNumber = (minValue?: number = 0) => z
     .transform((value) => (value === "" ? NaN : Number(value)))
     .refine(
         (value) => !isNaN(value),
-        { message: "Kérem adjon meg egy számot." }
+        { message: errorMessage?.required ?? "Kérem adjon meg egy számot." }
     )
     .refine(
-        (value) => value >= minValue,
-        { message: `A számnak nagyobbnak vagy egyenlőnek kell lennie mint ${ minValue }.` }
+        (value) => bounds?.min ? value >= bounds.min : true,
+        { message: errorMessage?.minBound(bounds?.min) ?? `A számnak nagyobbnak vagy egyenlőnek kell lennie mint ${ bounds?.min }.` }
+    )
+    .refine(
+        (value) => bounds?.max ? value < bounds.max : true,
+        { message: errorMessage?.maxBound(bounds?.max) ?? `A számnak kisebbnek kell lennie mint ${ bounds?.max }.` }
     )
 );
 

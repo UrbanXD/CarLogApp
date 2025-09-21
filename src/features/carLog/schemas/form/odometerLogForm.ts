@@ -4,11 +4,15 @@ import { z } from "zod";
 import { getUUID } from "../../../../database/utils/uuid.ts";
 import { Car } from "../../../car/schemas/carSchema.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { OdometerLogType } from "../../model/enums/odometerLogType.ts";
 
-export const odometerLogForm = odometerLogSchema
-.pick({ id: true, car_id: true, note: true })
+const odometerLogForm = (highestOdometerValue: number) => odometerLogSchema
+.pick({ id: true, car_id: true, type: true, note: true })
 .extend({
-    value: zNumber(0).pipe(odometerLogSchema.shape.value),
+    value: zNumber(
+        { min: highestOdometerValue },
+        { minBound: (min) => `Visszafelé nem pöröghet a kilométeróra, a jelenlegi állás ${ min }.` }
+    ).pipe(odometerLogSchema.shape.value),
     unit: zPickerRequired("Kérem válasszon ki egy mértékegységet!").pipe(odometerLogSchema.shape.unit),
     date: z.date().transform(v => v.toISOString()).pipe(odometerLogSchema.shape.date)
 });
@@ -19,11 +23,12 @@ export const useCreateOdometerLogFormProps = (car: Car) => {
     const defaultValues: OdometerLogFields = {
         id: getUUID(),
         car_id: car.id,
+        type: OdometerLogType.SIMPLE,
         value: car.odometer.value,
         unit: car.odometer.measurement,
         note: null,
-        date: new Date() //TODO remove after implemented date picker
+        date: new Date()
     };
 
-    return { defaultValues, resolver: zodResolver(odometerLogForm) };
+    return { defaultValues, resolver: zodResolver(odometerLogForm(car.odometer.value)) };
 };
