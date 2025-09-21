@@ -2,7 +2,7 @@ import { odometerLogSchema } from "../odometerLogSchema.ts";
 import { zNumber, zPickerRequired } from "../../../../types/zodTypes.ts";
 import { z } from "zod";
 import { getUUID } from "../../../../database/utils/uuid.ts";
-import { Car } from "../../../car/schemas/carSchema.ts";
+import { Car } from "../carSchema.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OdometerLogType } from "../../model/enums/odometerLogType.ts";
 

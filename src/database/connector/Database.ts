@@ -10,7 +10,7 @@ import { CarDao } from "../../features/car/model/dao/CarDao.ts";
 import { BaseConfig } from "../../constants/index.ts";
 import { ModelDao } from "../../features/car/model/dao/ModelDao.ts";
 import { MakeDao } from "../../features/car/model/dao/MakeDao.ts";
-import { OdometerLogDao } from "../../features/carLog/model/dao/OdometerLogDao.ts";
+import { OdometerDao } from "../../features/car/model/dao/OdometerDao.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
@@ -22,7 +22,7 @@ export class Database {
     private _carDao?: CarDao;
     private _makeDao?: MakeDao;
     private _modelDao?: ModelDao;
-    private _odometerLogDao?: OdometerLogDao;
+    private _odometerDao?: OdometerDao;
 
     constructor() {
         this.powersync = new PowerSyncDatabase({
@@ -61,7 +61,7 @@ export class Database {
     }
 
     get carDao(): CarDao {
-        if(!this._carDao) this._carDao = new CarDao(this.db, this.storage, this.odometerLogDao, this.attachmentQueue);
+        if(!this._carDao) this._carDao = new CarDao(this.db, this.storage, this.attachmentQueue);
 
         return this._carDao;
     }
@@ -78,10 +78,10 @@ export class Database {
         return this._modelDao;
     }
 
-    get odometerLogDao(): OdometerLogDao {
-        if(!this._odometerLogDao) this._odometerLogDao = new OdometerLogDao(this.db);
+    get odometerDao(): OdometerDao {
+        if(!this._odometerDao) this._odometerDao = new OdometerDao(this.db);
 
-        return this._odometerLogDao;
+        return this._odometerDao;
     }
 
     async init() {
