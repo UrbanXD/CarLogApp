@@ -17,11 +17,11 @@ export const zNumber = (
     )
     .refine(
         (value) => bounds?.min ? value >= bounds.min : true,
-        { message: errorMessage?.minBound(bounds?.min) ?? `A számnak nagyobbnak vagy egyenlőnek kell lennie mint ${ bounds?.min }.` }
+        { message: errorMessage?.minBound?.(bounds?.min) ?? `A számnak nagyobbnak vagy egyenlőnek kell lennie mint ${ bounds?.min }.` }
     )
     .refine(
         (value) => bounds?.max ? value < bounds.max : true,
-        { message: errorMessage?.maxBound(bounds?.max) ?? `A számnak kisebbnek kell lennie mint ${ bounds?.max }.` }
+        { message: errorMessage?.maxBound?.(bounds?.max) ?? `A számnak kisebbnek kell lennie mint ${ bounds?.max }.` }
     )
 );
 
