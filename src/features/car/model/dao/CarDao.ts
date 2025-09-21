@@ -17,25 +17,24 @@ import { FUEL_TANK_TABLE } from "../../../../database/connector/powersync/tables
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 import { SupabaseStorageAdapter } from "../../../../database/connector/storage/SupabaseStorageAdapter.ts";
 import { CAR_TABLE } from "../../../../database/connector/powersync/tables/car.ts";
-import { OdometerLogDao } from "../../../carLog/model/dao/OdometerLogDao.ts";
+import { ODOMETER_LOG_TABLE } from "../../../../database/connector/powersync/tables/odometerLog.ts";
+import { OdometerLogMapper } from "../mapper/odometerLogMapper.ts";
 
 export class CarDao {
     private readonly db: Kysely<DatabaseType>;
     private readonly storage: SupabaseStorageAdapter;
     private readonly attachmentQueue?: PhotoAttachmentQueue;
-    private readonly odometerLogDao: OdometerLogDao;
     readonly mapper: CarMapper;
+    readonly odometerLogMapper: OdometerLogMapper;
 
     constructor(
         db: Kysely<DatabaseType>,
         storage: SupabaseStorageAdapter,
-        odometerLogDao: OdometerLogDao,
         attachmentQueue?: PhotoAttachmentQueue
     ) {
         this.db = db;
         this.storage = storage;
         this.attachmentQueue = attachmentQueue;
-        this.odometerLogDao = odometerLogDao;
 
         const makeDao = new MakeDao(this.db);
         const modelDao = new ModelDao(this.db, makeDao);
@@ -43,6 +42,7 @@ export class CarDao {
         const fuelTankDao = new FuelTankDao(this.db);
 
         this.mapper = new CarMapper(makeDao, modelDao, odometerDao, fuelTankDao, attachmentQueue);
+        this.odometerLogMapper = new OdometerLogMapper();
     }
 
     async getCar(id: string) {
@@ -79,6 +79,14 @@ export class CarDao {
             .values(odometer)
             .execute();
 
+            const odometerLog: OdometerLogTableRow = this.odometerLogMapper
+            .fromOdometerEntityToOdometerLogEntity(odometer, carRow.created_at);
+
+            await trx
+            .insertInto(ODOMETER_LOG_TABLE)
+            .values(odometerLog)
+            .execute();
+
             await trx
             .insertInto(FUEL_TANK_TABLE)
             .values(fuelTank)
@@ -86,12 +94,6 @@ export class CarDao {
 
             return carRow;
         });
-
-        const odometerLog: OdometerLogTableRow = this.odometerLogDao.mapper.fromOdometerEntityToOdometerLogEntity(
-            odometer,
-            insertedCar.created_at
-        );
-        await this.odometerLogDao.createOdometerLog(odometerLog);
 
         return await this.mapper.toCarDto(insertedCar);
     }
