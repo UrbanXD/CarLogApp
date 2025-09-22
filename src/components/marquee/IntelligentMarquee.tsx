@@ -4,7 +4,7 @@ import { Marquee, MarqueeProps } from "./Marquee.tsx";
 import { MeasureElement } from "./helper/MeasureElement.tsx";
 
 
-function IMarquee({ children, speed, spacing, style }: MarqueeProps) {
+function IMarquee(props: MarqueeProps) {
     const [viewWidth, setViewWidth] = useState(0);
     const [childrenWidth, setChildrenWidth] = useState(0);
 
@@ -15,12 +15,12 @@ function IMarquee({ children, speed, spacing, style }: MarqueeProps) {
     return (
         <View style={ { width: "100%" } } onLayout={ viewOnLayout }>
             <View style={ { flex: 1, position: "absolute" } }>
-                <MeasureElement children={ children } onLayout={ childrenOnLayout }/>
+                <MeasureElement children={ props.children } onLayout={ childrenOnLayout }/>
             </View>
             {
                 childrenWidth < viewWidth
-                ? children
-                : <Marquee children={ children } speed={ speed } spacing={ spacing } style={ style }/>
+                ? props.children
+                : <Marquee children={ props.children } { ...props } />
             }
         </View>
     );
