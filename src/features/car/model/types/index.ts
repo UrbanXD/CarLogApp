@@ -4,5 +4,5 @@ export type CarsState = {
     loading: boolean
     loadError: boolean
     cars: Array<Car>
-    selectedCarId: Car["id"]
+    selectedCar: Car | null
 }

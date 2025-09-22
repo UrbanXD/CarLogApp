@@ -19,13 +19,12 @@ export function CreateOdometerLogForm() {
     const { odometerDao } = useDatabase();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
-    const { cars, selectedCarId, getCar } = useCars();
+    const { cars, selectedCar, getCar } = useCars();
 
-    const [car, setCar] = useState<Car | undefined>(getCar(selectedCarId));
+    const [car, setCar] = useState<Car | null>(selectedCar);
 
     const { control, handleSubmit, clearErrors } = useForm<OdometerLogFields>(useCreateOdometerLogFormProps(car));
     const formCarId = useWatch({ control, name: "car_id" });
-
 
     useEffect(() => {
         setCar(getCar(formCarId));

@@ -4,14 +4,13 @@ import { loadCars } from "../actions/loadCars.ts";
 import { createCar } from "../actions/createCar.ts";
 import { editCar } from "../actions/editCar.ts";
 import { deleteCar } from "../actions/deleteCar.ts";
-import { loadSelectedCar } from "../actions/loadSelectedCar.ts";
 import { selectCar } from "../actions/selectCar.ts";
 
 const initialState: CarsState = {
     loading: true,
     loadError: false,
     cars: [],
-    selectedCarId: ""
+    selectedCar: null
 };
 
 const carsSlice = createSlice({
@@ -29,7 +28,8 @@ const carsSlice = createSlice({
         })
         .addCase(loadCars.fulfilled, (state, action) => {
             state.loading = false;
-            state.cars = action.payload;
+            state.cars = action.payload.cars;
+            state.selectedCar = action.payload.selectedCar;
         })
         .addCase(createCar.fulfilled, (state, action) => {
             if(!action.payload) return;
@@ -54,15 +54,8 @@ const carsSlice = createSlice({
         .addCase(deleteCar.rejected, () => {
             console.log("hiba, delete car, slices");
         })
-        .addCase(loadSelectedCar.fulfilled, (state, action) => {
-            state.selectedCarID = action.payload;
-        })
-        .addCase(loadSelectedCar.rejected, state => {
-            console.log("roosz load car");
-            state.selectedCarID = "";
-        })
         .addCase(selectCar.fulfilled, (state, action) => {
-            state.selectedCarID = action.payload;
+            state.selectedCar = action.payload;
         })
         .addCase(selectCar.rejected, () => {
             console.log("nijncs kivalasztva HIBA");
