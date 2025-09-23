@@ -47,7 +47,8 @@ export function Odometer({ value, unit }: OdometerProps) {
 const useStyles = (numberOfDigits: number, odometerContainerWidth: number) => StyleSheet.create({
     container: {
         flexGrow: 1,
-        flexDirection: "row"
+        flexDirection: "row",
+        gap: SEPARATOR_SIZES.lightSmall
     },
     odometerContainer: {
         flexGrow: 1,
@@ -58,7 +59,7 @@ const useStyles = (numberOfDigits: number, odometerContainerWidth: number) => St
     },
     digitContainer: {
         minHeight: FONT_SIZES.p1 * 2,
-        width: (odometerContainerWidth - SEPARATOR_SIZES.lightSmall * numberOfDigits) / numberOfDigits,
+        width: (odometerContainerWidth - SEPARATOR_SIZES.lightSmall * (numberOfDigits - 1)) / numberOfDigits,
         position: "relative",
         backgroundColor: COLORS.gray5,
         alignItems: "center",
