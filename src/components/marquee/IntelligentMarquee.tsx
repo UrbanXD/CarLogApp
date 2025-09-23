@@ -19,7 +19,7 @@ function IMarquee(props: MarqueeProps) {
             </View>
             {
                 childrenWidth < viewWidth
-                ? props.children
+                ? <View style={ props.style }>{ props.children }</View>
                 : <Marquee children={ props.children } { ...props } />
             }
         </View>
