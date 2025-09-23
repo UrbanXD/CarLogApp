@@ -2,17 +2,20 @@ import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE } from "../../constants/index.
 import React, { ReactNode, useCallback } from "react";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { TimelineItem, TimelineItemType } from "./item/TimelineItem.tsx";
-import { FlashList, ListRenderItem } from "@shopify/flash-list";
+import { ListRenderItem } from "@shopify/flash-list";
+import { RNNativeScrollEvent } from "react-native-reanimated/lib/typescript/hook/commonTypes";
+import { AnimatedFlashList } from "../AnimatedComponents/index.ts";
 
 type TimelineViewProps = {
     data: Array<TimelineItemType>
     fetchMore?: () => Promise<void>
     renderMilestone?: (milestone: string) => ReactNode
+    onScroll?: (event: RNNativeScrollEvent) => void
 }
 
 const DOT_ICON_SIZE = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE;
 
-export function TimelineView({ data, fetchMore, renderMilestone }: TimelineViewProps) {
+export function TimelineView({ data, fetchMore, renderMilestone, onScroll }: TimelineViewProps) {
     const renderItem = useCallback(({ item, index }: ListRenderItem<TimelineItemType>) => (
         <TimelineItem
             key={ index }
@@ -39,7 +42,7 @@ export function TimelineView({ data, fetchMore, renderMilestone }: TimelineViewP
     const keyExtractor = useCallback((_item: TimelineItemType, index: number) => index.toString(), []);
 
     return (
-        <FlashList
+        <AnimatedFlashList
             data={ data }
             renderItem={ renderItem }
             maintainVisibleContentPosition={ { disabled: true } }
@@ -54,6 +57,7 @@ export function TimelineView({ data, fetchMore, renderMilestone }: TimelineViewP
             contentContainerStyle={ { flexGrow: 1 } }
             showsVerticalScrollIndicator={ false }
             showsHorizontalScrollIndicator={ false }
+            onScroll={ onScroll }
         />
     );
 }

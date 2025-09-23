@@ -12,6 +12,10 @@ import Divider from "../../../../components/Divider.tsx";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { Odometer } from "./Odometer.tsx";
 import { OdometerText } from "./OdometerText.tsx";
+import FloatingActionMenu from "../../../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
+import { router } from "expo-router";
+import { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
 type OdometerLogTimelineProps = {
     carId: string
@@ -26,6 +30,9 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
     if(!car) return <></>;
 
     const [data, setData] = useState<Array<TimelineItemType>>([]);
+    const [scrolling, setScrolling] = useState(false);
+
+    const scrollTimeout = useSharedValue(null);
 
     const odometerLogRowToTimelineItem = useCallback((odometerLogRow: OdometerLogTableRow): TimelineItemType => {
         let title = "Kilométeróra-frissítés";
@@ -40,7 +47,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
             case OdometerLogType.FUEL:
                 title = "Tankolás";
                 icon = ICON_NAMES.fuelPump;
-                color = "orange";
+                color = COLORS.fuelYellow;
                 onPressInfo = () => { Alert.alert("fuelocska"); };
                 break;
             case OdometerLogType.SERVICE:
@@ -84,6 +91,19 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
         });
     }, [paginator]);
 
+    const openCreateOdometerLog = useCallback(() => router.push("/bottomSheet/createOdometerLog"), []);
+
+    const onScroll = useAnimatedScrollHandler({
+        onBeginDrag: () => {
+            scheduleOnRN(setScrolling, true);
+            if(scrollTimeout.value) clearTimeout(scrollTimeout.value);
+        },
+        onEndDrag: () => {
+            if(scrollTimeout.value) clearTimeout(scrollTimeout.value);
+            scrollTimeout.value = setTimeout(() => scheduleOnRN(setScrolling, false), 750);
+        }
+    });
+
     return (
         <View style={ styles.container }>
             <View style={ styles.titleContainer }>
@@ -103,7 +123,12 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
                 subtitle={ `${ car.model.make.name } ${ car.model.name }` }
                 data={ data }
                 fetchMore={ fetchMore }
+                onScroll={ onScroll }
             />
+            {
+                !scrolling &&
+               <FloatingActionMenu action={ openCreateOdometerLog }/>
+            }
         </View>
     );
 }

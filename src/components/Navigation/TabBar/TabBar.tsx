@@ -13,11 +13,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
 import { LinearGradient } from "expo-linear-gradient";
 import FloatingActionMenu from "../../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
+import { ACTIONS } from "../../../ui/floatingActionMenu/constants/index.ts";
 
 function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
     return (
         <>
-            <FloatingActionMenu/>
+            <FloatingActionMenu
+                action={ ACTIONS }
+                containerStyle={ { bottom: SIMPLE_TABBAR_HEIGHT + SEPARATOR_SIZES.normal } }
+            />
             <SafeAreaView style={ [styles.container, { paddingBottom: insets.bottom }] }>
                 <LinearGradient
                     locations={ [0, 0.75] }
