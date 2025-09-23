@@ -46,13 +46,13 @@ export class CarDao {
     }
 
     async getCar(id: string) {
-        const carRow: CarTableRow = await this.db
+        const carRow: CarTableRow | null = await this.db
         .selectFrom(CAR_TABLE)
         .selectAll()
         .where("id", "=", id)
         .executeTakeFirst();
 
-        return this.mapper.toCarDto(carRow);
+        return carRow ? this.mapper.toCarDto(carRow) : null;
     }
 
     async getCars(): Promise<Array<Car>> {
