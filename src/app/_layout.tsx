@@ -127,7 +127,13 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="(edit)/car"
                 options={ {
-                    header: () => <Header.Secondary title="Autó Adatlap"/>
+                    header: () => <Header.Secondary title="Autó adatlap"/>
+                } }
+            />
+            <Stack.Screen
+                name="odometer/log"
+                options={ {
+                    header: () => <Header.Secondary title="Kilométeróra-állás"/>
                 } }
             />
         </Stack>

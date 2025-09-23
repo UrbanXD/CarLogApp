@@ -18,6 +18,8 @@ const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId, fuelSliderDisabl
         return router.replace("(main)/index");
     }, [car]);
 
+    const openOdometerLog = () => router.push({ pathname: "/odometer/log", params: { id: carId } });
+
     if(!car) return null;
 
     return (
@@ -26,6 +28,7 @@ const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId, fuelSliderDisabl
             handleDeleteCar={ handleDeleteCar }
             fuelSliderDisabled={ fuelSliderDisabled }
             openEditCarStep={ openEditCarStepBottomSheet }
+            openOdometerLog={ openOdometerLog }
         />
     );
 };
