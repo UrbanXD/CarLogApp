@@ -28,9 +28,9 @@ type TimelineItemProps = {
 export function TimelineItem({
     milestone,
     title,
-    color = COLORS.fuelYellow,
+    color = COLORS.gray2,
     icon,
-    iconColor = COLORS.black5,
+    iconColor = COLORS.black,
     iconSize = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE,
     note,
     footerText,
