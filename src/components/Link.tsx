@@ -1,22 +1,22 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Pressable, StyleSheet, Text, TextStyle, ViewStyle } from "react-native";
 import { COLORS, FONT_SIZES } from "../constants/index.ts";
 import Icon from "./Icon";
 
-interface LinkProps {
-    text?: string,
+type LinkProps = {
+    text?: string
     icon?: string
+    onPress?: () => void
+    style?: ViewStyle
+    textStyle?: TextStyle
 }
 
-const Link: React.FC<LinkProps> = ({
-    text,
-    icon
-}) => {
+function Link({ text, icon, onPress, style, textStyle }: LinkProps) {
     return (
-        <TouchableOpacity style={ styles.linkContainer }>
+        <Pressable style={ [styles.linkContainer, style] } onPress={ onPress } disabled={ !onPress }>
             {
                 text &&
-               <Text style={ styles.linkText }>
+               <Text style={ [styles.linkText, textStyle] }>
                    { text }
                </Text>
             }
@@ -28,14 +28,15 @@ const Link: React.FC<LinkProps> = ({
                   color={ styles.linkText.color }
                />
             }
-        </TouchableOpacity>
+        </Pressable>
     );
-};
+}
 
 const styles = StyleSheet.create({
     linkContainer: {
         flexDirection: "row",
-        justifyContent: "center"
+        justifyContent: "center",
+        alignSelf: "center"
     },
     linkText: {
         fontFamily: "Gilroy-Medium",
