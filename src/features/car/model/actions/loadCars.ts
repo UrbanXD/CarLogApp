@@ -10,7 +10,7 @@ export const loadCars = createAsyncThunk(
             const cars = await database.carDao.getCars();
 
             const id = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_SELECTED_CAR_INDEX);
-            const selectedCar = await database.carDao.getCar(id);
+            const selectedCar = id ? await database.carDao.getCar(id) : null;
 
             return { cars, selectedCar: selectedCar };
         } catch(e) {

@@ -50,7 +50,7 @@ export class CarDao {
         .selectFrom(CAR_TABLE)
         .selectAll()
         .where("id", "=", id)
-        .executeTakeFirstOrThrow();
+        .executeTakeFirst();
 
         return this.mapper.toCarDto(carRow);
     }
@@ -128,6 +128,7 @@ export class CarDao {
     async deleteCar(carId: string) {
         try {
             const car = await this.getCar(carId);
+
             if(car?.image && this.attachmentQueue) {
                 const imageFilename = attachmentQueue.getLocalFilePathSuffix(car.image);
                 const localImageUri = attachmentQueue.getLocalUri(imageFilename);
