@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import Icon from "../../Icon.tsx";
-import React from "react";
+import React, { ReactNode } from "react";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import Divider from "../../Divider.tsx";
 import { DashedLine } from "./DashedLine.tsx";
@@ -22,6 +22,7 @@ type TimelineItemProps = {
     isFirst: boolean
     isLast: boolean
     onPressInfo?: () => void
+    renderMilestone?: (milestone: string) => ReactNode
 }
 
 export function TimelineItem({
@@ -35,7 +36,8 @@ export function TimelineItem({
     footerText,
     onPressInfo,
     isFirst,
-    isLast
+    isLast,
+    renderMilestone
 }: TimelineItemProps) {
     const styles = useStyles(color, iconSize, isFirst, isLast);
 
@@ -63,11 +65,16 @@ export function TimelineItem({
                     gap: SEPARATOR_SIZES.lightSmall
                 } }>
                     <View style={ styles.card.title.container }>
-                        <Text style={ styles.card.title.text }>{ milestone }</Text>
+                        {
+                            renderMilestone
+                            ? renderMilestone(milestone)
+                            : <Text style={ styles.card.title.text }>{ milestone }</Text>
+                        }
                         <Text style={ styles.card.subtitle }>{ title }</Text>
                         {
                             (note || footerText) &&
-                           <Divider color={ color } style={ { width: "45%", alignSelf: "flex-start" } }/> }
+                           <Divider color={ color } style={ { width: "45%", alignSelf: "flex-start" } }/>
+                        }
                     </View>
                     {
                         onPressInfo &&
@@ -176,15 +183,15 @@ const useStyles = (color: Color, dotSize: number, isFirstItem: boolean, isLastIt
 
             text: {
                 fontFamily: "Gilroy-Heavy",
-                fontSize: FONT_SIZES.p1,
-                lineHeight: FONT_SIZES.p1,
+                fontSize: FONT_SIZES.p2,
+                lineHeight: FONT_SIZES.p2,
                 color: COLORS.white
             }
         },
 
         subtitle: {
             fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.p2,
+            fontSize: FONT_SIZES.p3,
             color: COLORS.white
         },
 
