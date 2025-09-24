@@ -9,7 +9,7 @@ import { Schema } from "@powersync/react-native";
 import { odometerLogTable } from "./tables/odometerLog.ts";
 import { fuelLogTable } from "./tables/fuelLog.ts";
 import { expenseTable } from "./tables/expense.ts";
-import { expenseTypeTable } from "./tables/expense_type.ts";
+import { expenseTypeTable } from "./tables/expenseType.ts";
 
 export const AppSchema = new Schema({
     attachments: new AttachmentTable(),
