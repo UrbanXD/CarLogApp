@@ -1,7 +1,7 @@
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { TimelineView } from "../../../../components/timelineView/TimelineView.tsx";
 import { TimelineItemType } from "../../../../components/timelineView/item/TimelineItem.tsx";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "dayjs";
 import { OdometerLogType } from "../../model/enums/odometerLogType.ts";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
@@ -14,8 +14,7 @@ import { Odometer } from "./Odometer.tsx";
 import { OdometerText } from "./OdometerText.tsx";
 import FloatingActionMenu from "../../../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
 import { router } from "expo-router";
-import { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
+import { clearTimeout } from "@testing-library/react-native/build/helpers/timers";
 
 type OdometerLogTimelineProps = {
     carId: string
@@ -23,16 +22,17 @@ type OdometerLogTimelineProps = {
 
 export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
     const { odometerDao } = useDatabase();
-    const paginator = useMemo(() => odometerDao.odometerLogPaginator(carId, 3), [carId]);
+    const paginator = useMemo(() => odometerDao.odometerLogPaginator(carId), [carId]);
     const { getCar } = useCars();
     const car = useMemo(() => getCar(carId), [carId, getCar]);
 
     if(!car) return <></>;
 
-    const [data, setData] = useState<Array<TimelineItemType>>([]);
-    const [scrolling, setScrolling] = useState(false);
+    const scrollTimeout = useRef(null);
 
-    const scrollTimeout = useSharedValue(null);
+    const [data, setData] = useState<Array<TimelineItemType>>([]);
+    const [isFetching, setIsFetching] = useState(true);
+    const [scrolling, setScrolling] = useState(false);
 
     const odometerLogRowToTimelineItem = useCallback((odometerLogRow: OdometerLogTableRow): TimelineItemType => {
         let title = "Kilométeróra-frissítés";
@@ -78,31 +78,43 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
 
     useEffect(() => {
         paginator.initial().then(result => {
-            setData(result.map(odometerLogRowToTimelineItem));
+            setData((_) => {
+                setIsFetching(false);
+                return result.map(odometerLogRowToTimelineItem);
+            });
         });
+
+        return () => {
+            if(scrollTimeout.current) clearTimeout(scrollTimeout.current);
+        };
     }, []);
 
-    const fetchMore = useCallback(() => {
-        paginator.next().then(result => {
-            if(!result) return;
+    const fetchMore = useCallback(async () => {
+        if(!paginator.hasNext()) return;
 
-            const newData = result.map(odometerLogRowToTimelineItem);
-            setData(prevState => [...prevState, ...newData]);
+        setIsFetching(true);
+        const result = await paginator.next();
+        if(!result) return setIsFetching(false);
+
+        const newData = result.map(odometerLogRowToTimelineItem);
+
+        setData(prevState => {
+            setIsFetching(false);
+            return [...prevState, ...newData];
         });
     }, [paginator]);
 
     const openCreateOdometerLog = useCallback(() => router.push("/bottomSheet/createOdometerLog"), []);
 
-    const onScroll = useAnimatedScrollHandler({
-        onBeginDrag: () => {
-            scheduleOnRN(setScrolling, true);
-            if(scrollTimeout.value) clearTimeout(scrollTimeout.value);
-        },
-        onEndDrag: () => {
-            if(scrollTimeout.value) clearTimeout(scrollTimeout.value);
-            scrollTimeout.value = setTimeout(() => scheduleOnRN(setScrolling, false), 750);
-        }
-    });
+    const onBeginDrag = useCallback(() => {
+        setScrolling(true);
+        if(scrollTimeout.current) clearTimeout(scrollTimeout.current);
+    }, []);
+
+    const onEndDrag = useCallback(() => {
+        if(scrollTimeout.current) clearTimeout(scrollTimeout.current);
+        scrollTimeout.current = setTimeout(() => setScrolling(false), 750);
+    }, []);
 
     return (
         <View style={ styles.container }>
@@ -123,7 +135,9 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
                 subtitle={ `${ car.model.make.name } ${ car.model.name }` }
                 data={ data }
                 fetchMore={ fetchMore }
-                onScroll={ onScroll }
+                isFetching={ isFetching }
+                onScrollBeginDrag={ onBeginDrag }
+                onScrollEndDrag={ onEndDrag }
             />
             {
                 !scrolling &&
