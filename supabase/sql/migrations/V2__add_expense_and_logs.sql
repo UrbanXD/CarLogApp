@@ -1,3 +1,11 @@
+CREATE TYPE currency_type AS ENUM (
+  'HUF',
+  'RSD',
+  'EUR',
+  'USD',
+  'GPB'
+);
+
 DROP TABLE expense_type
 CREATE TABLE expense_type
 (
@@ -27,7 +35,7 @@ CREATE TABLE expense
     car_id UUID NOT NULL,
     type_id UUID NOT NULL DEFAULT '11111111-1111-1111-1111-111111111111',
     amount NUMERIC(10, 2) NOT NULL, -- price
-    currency VARCHAR(3) NOT NULL, -- {'HUF', 'RSD', 'EUR', 'USD', 'GBP'...}
+    currency currency_type NOT NULL
     note TEXT,
     date DATE NOT NULL,
     FOREIGN KEY (car_id) REFERENCES car (id) ON UPDATE CASCADE ON DELETE CASCADE
