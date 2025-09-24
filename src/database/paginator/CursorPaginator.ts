@@ -7,7 +7,7 @@ import { CursorValue } from "react-native";
 type CursorOperator = "<" | ">" | ">=";
 type CursorValue<TableItem> = TableItem[keyof TableItem] | null;
 
-export class CursorPaginator<TableItem, DB = DatabaseType> extends Paginator<TableItem, DB> {
+export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseType> extends Paginator<TableItem, DB> {
     private prevCursor: CursorValue<TableItem>;
     private nextCursor: CursorValue<TableItem>;
     private readonly cursorFieldName: keyof TableItem;
@@ -17,7 +17,7 @@ export class CursorPaginator<TableItem, DB = DatabaseType> extends Paginator<Tab
         table: keyof DB,
         key: keyof TableItem | Array<keyof TableItem>,
         cursorFieldName: keyof TableItem,
-        options?: PaginatorOptions<keyof TableItem>
+        options?: PaginatorOptions<keyof TableItem, MappedItem>
     ) {
         super(database, table, key, options);
         this.cursorFieldName = cursorFieldName;
@@ -43,7 +43,7 @@ export class CursorPaginator<TableItem, DB = DatabaseType> extends Paginator<Tab
         return !!this.prevCursor;
     }
 
-    async filter(searchTerm?: string): Promise<Array<TableItem>> {
+    async filter(searchTerm?: string): Promise<Array<MappedItem>> {
         this.prevCursor = null;
         this.nextCursor = null;
 
@@ -51,7 +51,7 @@ export class CursorPaginator<TableItem, DB = DatabaseType> extends Paginator<Tab
 
         if(result.length !== 0) this.nextCursor = result[result.length - 1][this.cursorFieldName];
 
-        return result;
+        return await super.map(result);
     }
 
     async initial(defaultValue?: string | number): Promise<Array<TableItem>> {
@@ -65,7 +65,8 @@ export class CursorPaginator<TableItem, DB = DatabaseType> extends Paginator<Tab
             const result = await query.execute() as unknown as Array<TableItem>;
 
             if(result.length !== 0) this.nextCursor = result[result.length - 1][this.cursorFieldName];
-            return result;
+
+            return await super.map(result);
         }
 
         const halfPage = Math.floor(this.perPage / 2);
@@ -91,7 +92,7 @@ export class CursorPaginator<TableItem, DB = DatabaseType> extends Paginator<Tab
             this.nextCursor = nextResult[nextResult.length - 1][this.cursorFieldName];
         }
 
-        return [...prevResult, ...nextResult];
+        return await super.map([...prevResult, ...nextResult]);
     }
 
     async next(searchTerm?: string): Promise<Array<TableItem> | null> {
@@ -112,7 +113,7 @@ export class CursorPaginator<TableItem, DB = DatabaseType> extends Paginator<Tab
             this.nextCursor = result[result.length - 1][this.cursorFieldName];
         }
 
-        return result;
+        return await super.map(result);
     }
 
     async previous(searchTerm?: string): Promise<Array<TableItem> | null> {
@@ -134,6 +135,6 @@ export class CursorPaginator<TableItem, DB = DatabaseType> extends Paginator<Tab
             this.prevCursor = result[0][this.cursorFieldName];
         }
 
-        return result;
+        return await super.map(result);
     }
 }

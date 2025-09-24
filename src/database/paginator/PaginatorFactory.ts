@@ -10,14 +10,14 @@ export enum PaginatorType {
 }
 
 export class PaginatorFactory {
-    static createPaginator<TableItem, DB = DatabaseType>(
+    static createPaginator<TableItem, MappedItem = TableItem, DB = DatabaseType>(
         type: PaginatorType,
         database: Kysely<DB>,
         table: keyof DB,
         key: keyof TableItem | Array<keyof TableItem>,
-        options?: PaginatorOptions<TableItem>,
+        options?: PaginatorOptions<TableItem, MappedItem>,
         cursorFieldName?: keyof TableItem
-    ): Paginator<TableItem, DB> {
+    ): Paginator<TableItem, MappedItem, DB> {
         if(Array.isArray(key) && (key as (Array<keyof TableItem>)).length === 0) {
             throw new Error("At least one key must be in the key array");
         }
@@ -31,9 +31,9 @@ export class PaginatorFactory {
                     cursorField = key;
                 }
 
-                return new CursorPaginator<TableItem, DB>(database, table, key, cursorField, options);
+                return new CursorPaginator<TableItem, MappedItem, DB>(database, table, key, cursorField, options);
             case PaginatorType.page:
-                return new PagePaginator<TableItem, DB>(database, table, key, options);
+                return new PagePaginator<TableItem, MappedItem, DB>(database, table, key, options);
             default:
                 throw new Error("Invalid paginator type");
         }

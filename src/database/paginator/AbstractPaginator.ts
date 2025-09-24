@@ -14,21 +14,23 @@ export type OrderCondition<FieldName> = {
     toLowerCase?: boolean
 }
 
-export type PaginatorOptions<TableItem> = {
+export type PaginatorOptions<TableItem, MappedItem = any> = {
     filterBy?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>
     orderBy?: OrderCondition<keyof TableItem> | Array<OrderCondition<keyof TableItem>>
     searchBy?: keyof TableItem | Array<keyof TableItem>
     perPage?: number
+    mapper?: (tableRow?: TableItem) => MappedItem
 }
 
 
-export abstract class Paginator<TableItem, DB> {
+export abstract class Paginator<TableItem, MappedItem, DB> {
     private database: Kysely<DB>;
     private table: keyof DB;
     private readonly key: keyof TableItem | Array<keyof TableItem>;
     private readonly filterBy?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>;
     private readonly orderBy?: OrderCondition<keyof TableItem> | Array<OrderCondition<keyof TableItem>>;
     private readonly searchBy?: keyof TableItem | Array<keyof TableItem>;
+    private readonly mapper?: (tableRow?: TableItem) => MappedItem;
     protected perPage: number;
 
     protected constructor(
@@ -45,6 +47,7 @@ export abstract class Paginator<TableItem, DB> {
         this.filterBy = options?.filterBy;
         this.orderBy = options?.orderBy;
         this.searchBy = options?.searchBy;
+        this.mapper = options?.mapper;
     }
 
     protected getBaseQuery(reverseOrder?: boolean) {
@@ -134,6 +137,12 @@ export abstract class Paginator<TableItem, DB> {
         return query.orderBy(orderByField, orderDirection);
     }
 
+    async map(tableItems: Array<TableItem>): Promise<Array<MappedItem>> {
+        if(!this.mapper) return tableItems;
+
+        return (await Promise.all(tableItems.map(this.mapper).filter(element => element !== null)));
+    }
+
     async filter(searchTerm?: string): Promise<Array<TableItem>> {
         let query = this.getBaseQuery();
         query = this.addSearchFilter(query, searchTerm);
@@ -145,9 +154,9 @@ export abstract class Paginator<TableItem, DB> {
 
     abstract hasPrevious(): boolean;
 
-    abstract async initial(defaultValue?: string | number): Promise<Array<TableItem>>;
+    abstract async initial(defaultValue?: string | number): Promise<Array<MappedItem>>;
 
-    abstract async next(searchTerm?: string): Promise<Array<TableItem> | null>;
+    abstract async next(searchTerm?: string): Promise<Array<MappedItem> | null>;
 
-    abstract async previous(searchTerm?: string): Promise<Array<TableItem> | null>;
+    abstract async previous(searchTerm?: string): Promise<Array<MappedItem> | null>;
 }
