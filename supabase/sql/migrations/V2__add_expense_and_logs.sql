@@ -82,6 +82,12 @@ CREATE TABLE odometer_log
 ALTER TABLE public.odometer_log ENABLE ROW LEVEL SECURITY;
 
 -- RLS policies
+-- expense type
+CREATE POLICY "expense type owner and global can view" ON public.expense_type FOR SELECT TO authenticated USING ((owner_id IS NULL) OR (auth.uid() = owner_id));
+CREATE POLICY "expense type owner can insert" ON public.expense_type FOR INSERT TO authenticated WITH CHECK (auth.uid() = owner_id);
+CREATE POLICY "expense type update policy" ON public.expense_type FOR UPDATE TO authenticated USING (auth.uid() = owner_id);
+CREATE POLICY "expense type delete policy" ON public.expense_type FOR DELETE TO authenticated USING (auth.uid() = owner_id);
+
 -- expense - access via the linked car`s owner
 CREATE POLICY "expense owner can view" ON public.expense FOR SELECT TO authenticated USING ((SELECT auth.uid()) = (SELECT owner_id FROM public.car WHERE id = car_id));
 CREATE POLICY "expense owner can insert" ON public.expense FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = (SELECT owner_id FROM public.car WHERE id = car_id));

@@ -3,11 +3,13 @@ bucket_definitions:
     data:
       - SELECT * FROM make
       - SELECT * FROM model
+      - SELECT * FROM expense_type WHERE owner_id IS NULL
   by_user:
     parameters: SELECT request.user_id() as user_id
     data:
       - SELECT * FROM car WHERE car.owner_id = bucket.user_id
       - SELECT id, email, lastname, firstname, avatar_url, avatar_color FROM user_account WHERE user_account.id = bucket.user_id
+      - SELECT * FROM expense_type WHERE expense_type.owner_id = bucket.user_id
   by_car:
     parameters:
       - SELECT id as car_id FROM car WHERE request.user_id() = owner_id
