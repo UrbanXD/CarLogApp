@@ -5,7 +5,7 @@ export const EXPENSE_TABLE = "expense";
 export const expenseTable = new Table({
     id: column.text,
     car_id: column.text,
-    category: column.text,
+    type_id: column.text,
     amount: column.real,
     currency: column.text,
     note: column.text,

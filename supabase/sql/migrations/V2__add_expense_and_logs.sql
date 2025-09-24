@@ -1,14 +1,37 @@
+DROP TABLE expense_type
+CREATE TABLE expense_type
+(
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    key VARCHAR(64) NOT NULL DEFAULT 'OTHER',
+    owner_id UUID, -- if no owner then its global
+    FOREIGN KEY (owner_id) REFERENCES user_account (id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+ALTER TABLE expense_type ENABLE ROW LEVEL SECURITY;
+
+INSERT INTO expense_type (key)
+VALUES
+('SERVICE'),
+('FUEL'),
+('VEHICLE_INSPECTION'),
+('WASH'),
+('TOLL'),
+('PARKING'),
+('INSURANCE'),
+('11111111-1111-1111-1111-111111111111', 'OTHER');
+
 DROP TABLE expense CASCADE;
 CREATE TABLE expense
 (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     car_id UUID NOT NULL,
-    category VARCHAR(24) NOT NULL,
-    amount NUMERIC(10, 2) NOT NULL,
+    type_id UUID NOT NULL DEFAULT '11111111-1111-1111-1111-111111111111',
+    amount NUMERIC(10, 2) NOT NULL, -- price
     currency VARCHAR(3) NOT NULL, -- {'HUF', 'RSD', 'EUR', 'USD', 'GBP'...}
     note TEXT,
     date DATE NOT NULL,
     FOREIGN KEY (car_id) REFERENCES car (id) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (type_id) REFERENCES expense_type (id) ON UPDATE CASCADE ON DELETE SET DEFAULT
 );
 
 ALTER TABLE public.expense ENABLE ROW LEVEL SECURITY;

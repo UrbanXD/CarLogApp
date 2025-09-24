@@ -9,6 +9,7 @@ import { Schema } from "@powersync/react-native";
 import { odometerLogTable } from "./tables/odometerLog.ts";
 import { fuelLogTable } from "./tables/fuelLog.ts";
 import { expenseTable } from "./tables/expense.ts";
+import { expenseTypeTable } from "./tables/expense_type.ts";
 
 export const AppSchema = new Schema({
     attachments: new AttachmentTable(),
@@ -20,7 +21,8 @@ export const AppSchema = new Schema({
     fuel_log: fuelLogTable,
     make: makeTable,
     model: modelTable,
-    expense: expenseTable
+    expense: expenseTable,
+    expense_type: expenseTypeTable
 });
 
 export type DatabaseType = (typeof AppSchema)["types"];
@@ -33,3 +35,4 @@ export type OdometerLogTableRow = DatabaseType["odometer_log"];
 export type FuelTankTableRow = DatabaseType["fuel_tank"];
 export type FuelLogTableRow = DatabaseType["fuel_log"];
 export type ExpenseTableRow = DatabaseType["expense"];
+export type ExpenseTypeTableRow = DatabaseType["expense_type"];
