@@ -24,7 +24,7 @@ export function CreateOdometerLogForm() {
     const [car, setCar] = useState<Car | null>(selectedCar);
 
     const { control, handleSubmit, clearErrors } = useForm<OdometerLogFields>(useCreateOdometerLogFormProps(car));
-    const formCarId = useWatch({ control, name: "car_id" });
+    const formCarId = useWatch({ control, name: "carId" });
 
     useEffect(() => {
         setCar(getCar(formCarId));
@@ -53,7 +53,7 @@ export function CreateOdometerLogForm() {
         <Form>
             <Input.Field
                 control={ control }
-                fieldName="car_id"
+                fieldName="carId"
                 fieldNameText="Autó"
             >
                 <Input.Picker.Dropdown<Car>

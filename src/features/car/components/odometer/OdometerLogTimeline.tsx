@@ -6,7 +6,6 @@ import dayjs from "dayjs";
 import { OdometerLogType } from "../../model/enums/odometerLogType.ts";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { Alert, StyleSheet, Text, View } from "react-native";
-import { OdometerLogTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
 import useCars from "../../hooks/useCars.ts";
 import Divider from "../../../../components/Divider.tsx";
 import { widthPercentageToDP } from "react-native-responsive-screen";
@@ -15,6 +14,7 @@ import { OdometerText } from "./OdometerText.tsx";
 import FloatingActionMenu from "../../../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
 import { router } from "expo-router";
 import { clearTimeout } from "@testing-library/react-native/build/helpers/timers";
+import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
 
 type OdometerLogTimelineProps = {
     carId: string
@@ -34,13 +34,13 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
     const [isFetching, setIsFetching] = useState(true);
     const [scrolling, setScrolling] = useState(false);
 
-    const odometerLogRowToTimelineItem = useCallback((odometerLogRow: OdometerLogTableRow): TimelineItemType => {
+    const odometerLogRowToTimelineItem = useCallback((odometerLog: OdometerLog): TimelineItemType => {
         let title = "Kilométeróra-frissítés";
         let color;
         let icon;
         let onPressInfo;
 
-        switch(odometerLogRow?.type) {
+        switch(odometerLog.type) {
             case OdometerLogType.SIMPLE:
                 title = "Kilométeróra-frissítés";
                 break;
@@ -59,19 +59,19 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
         }
 
         return {
-            milestone: odometerLogRow.value.toString(),
+            milestone: odometerLog.value.toString(),
             renderMilestone: (milestone: string) =>
                 <OdometerText
                     text={ milestone }
-                    unit={ odometerLogRow.unit }
+                    unit={ odometerLog.unit }
                     textStyle={ { color: COLORS.white } }
                     unitTextStyle={ { color: COLORS.white } }
                 />,
             title,
             icon,
             color,
-            note: odometerLogRow.note,
-            footerText: dayjs(odometerLogRow.date).format("YYYY. MM DD."),
+            note: odometerLog.note,
+            footerText: dayjs(odometerLog.date).format("YYYY. MM DD."),
             onPressInfo
         };
     }, []);

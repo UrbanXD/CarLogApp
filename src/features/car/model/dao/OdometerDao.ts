@@ -51,7 +51,7 @@ export class OdometerDao {
     }
 
     odometerLogPaginator(carId: string, perPage?: number = 10): CursorPaginator<OdometerLogTableRow> {
-        return PaginatorFactory.createPaginator<OdometerLogTableRow>(
+        return PaginatorFactory.createPaginator<OdometerLogTableRow, OdometerLog>(
             PaginatorType.cursor,
             this.db,
             ODOMETER_LOG_TABLE,
@@ -59,7 +59,8 @@ export class OdometerDao {
             {
                 perPage,
                 orderBy: [{ field: "value", direction: "desc" }, { field: "date", direction: "desc" }],
-                filterBy: { field: "car_id", operator: "=", value: carId }
+                filterBy: { field: "car_id", operator: "=", value: carId },
+                mapper: this.logMapper.toOdometerLogDto
             },
             "id"
         );
