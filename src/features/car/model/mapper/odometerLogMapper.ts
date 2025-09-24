@@ -20,7 +20,7 @@ export class OdometerLogMapper {
     fromFormResultToOdometerLogEntity(formResult: OdometerLogFields): OdometerLogTableRow {
         return {
             id: formResult.id,
-            car_id: formResult.car_id,
+            car_id: formResult.carId,
             type: formResult.type,
             value: formResult.value,
             unit: formResult.unit,
@@ -32,7 +32,7 @@ export class OdometerLogMapper {
     toOdometerLogDto(odometerLogRow: OdometerLogTableRow): OdometerLog {
         return odometerLogSchema.parse({
             id: odometerLogRow.id,
-            car_id: odometerLogRow.car_id,
+            carId: odometerLogRow.car_id,
             type: odometerLogRow.type,
             value: odometerLogRow.value,
             unit: odometerLogRow.unit,
@@ -49,7 +49,7 @@ export class OdometerLogMapper {
     toOdometerLogEntity(odometerLog: OdometerLog): OdometerLogTableRow {
         return {
             id: odometerLog.id,
-            car_id: odometerLog.car_id,
+            car_id: odometerLog.carId,
             type: odometerLog.type,
             value: odometerLog.value,
             unit: odometerLog.unit,

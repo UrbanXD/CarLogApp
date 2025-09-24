@@ -9,7 +9,7 @@ import { OdometerLogType } from "../../model/enums/odometerLogType.ts";
 const odometerLogForm = (highestOdometerValue?: number = 0) => odometerLogSchema
 .pick({ id: true, type: true, note: true })
 .extend({
-    car_id: zPickerRequired("Kérem válasszon ki egy autót!").pipe(odometerLogSchema.shape.car_id),
+    carId: zPickerRequired("Kérem válasszon ki egy autót!").pipe(odometerLogSchema.shape.carId),
     value: zNumber(
         { min: highestOdometerValue },
         {
@@ -26,10 +26,9 @@ const odometerLogForm = (highestOdometerValue?: number = 0) => odometerLogSchema
 export type OdometerLogFields = z.infer<typeof odometerLogForm>;
 
 export const useCreateOdometerLogFormProps = (car?: Car) => {
-    console.log("faf", car?.odometer.value);
     const defaultValues: OdometerLogFields = {
         id: getUUID(),
-        car_id: car?.id,
+        carId: car?.id,
         type: OdometerLogType.SIMPLE,
         value: car?.odometer.value,
         unit: car?.odometer.measurement,
