@@ -120,7 +120,7 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         if(result.length !== this.perPage) {
             this.nextCursor = null;
         } else {
-            this.nextCursor(result);
+            this.setNextCursor(result);
         }
 
         return await super.map(result);
