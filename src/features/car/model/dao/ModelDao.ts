@@ -5,7 +5,6 @@ import { MODEL_TABLE } from "../../../../database/connector/powersync/tables/mod
 import { Model } from "../../schemas/modelSchema.ts";
 import { MakeDao } from "./MakeDao.ts";
 import { getToday } from "../../../../utils/getDate.ts";
-import { PaginatorFactory, PaginatorType } from "../../../../database/paginator/PaginatorFactory.ts";
 import { CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
 
 export class ModelDao {
@@ -44,18 +43,15 @@ export class ModelDao {
     }
 
     paginatorByMakeId(makeId: string | undefined, perPage?: number = 50): CursorPaginator<ModelTableRow> {
-        return PaginatorFactory.createPaginator<ModelTableRow>(
-            PaginatorType.cursor,
+        return new CursorPaginator<ModelTableRow>(
             this.db,
             MODEL_TABLE,
-            "id",
+            { field: ["name", "id"], order: "asc" },
             {
                 perPage,
                 filterBy: makeId ? { field: "make_id", value: makeId, operator: "=" } : undefined,
-                orderBy: { field: "name", direction: "asc", toLowerCase: true },
                 searchBy: "name"
-            },
-            "name"
+            }
         );
     }
 }

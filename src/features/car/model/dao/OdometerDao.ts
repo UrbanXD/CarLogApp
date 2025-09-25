@@ -11,7 +11,6 @@ import { OdometerLogMapper } from "../mapper/odometerLogMapper.ts";
 import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
 import { ODOMETER_LOG_TABLE } from "../../../../database/connector/powersync/tables/odometerLog.ts";
 import { CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
-import { PaginatorFactory, PaginatorType } from "../../../../database/paginator/PaginatorFactory.ts";
 
 export class OdometerDao {
     private readonly db: Kysely<DatabaseType>;
@@ -51,18 +50,18 @@ export class OdometerDao {
     }
 
     odometerLogPaginator(carId: string, perPage?: number = 10): CursorPaginator<OdometerLogTableRow> {
-        return PaginatorFactory.createPaginator<OdometerLogTableRow, OdometerLog>(
-            PaginatorType.cursor,
+        return new CursorPaginator<OdometerLogTableRow, OdometerLog>(
             this.db,
             ODOMETER_LOG_TABLE,
-            "id",
+            {
+                field: ["value", "date", "id"],
+                order: ["desc", "desc", "asc"]
+            },
             {
                 perPage,
-                orderBy: [{ field: "value", direction: "desc" }, { field: "date", direction: "desc" }],
                 filterBy: { field: "car_id", operator: "=", value: carId },
                 mapper: this.logMapper.toOdometerLogDto
-            },
-            "id"
+            }
         );
     }
 }

@@ -3,7 +3,6 @@ import { DatabaseType, MakeTableRow } from "../../../../database/connector/power
 import { MakeMapper } from "../mapper/makeMapper.ts";
 import { Make } from "../../schemas/makeSchema.ts";
 import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";
-import { PaginatorFactory, PaginatorType } from "../../../../database/paginator/PaginatorFactory.ts";
 import { CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
 
 export class MakeDao {
@@ -26,17 +25,11 @@ export class MakeDao {
     }
 
     paginator(perPage?: number = 50): CursorPaginator<MakeTableRow> {
-        return PaginatorFactory.createPaginator<MakeTableRow>(
-            PaginatorType.cursor,
+        return new CursorPaginator<MakeTableRow>(
             this.db,
             MAKE_TABLE,
-            "id",
-            {
-                perPage,
-                orderBy: { field: "name", direction: "asc", toLowerCase: true },
-                searchBy: "name"
-            },
-            "name"
+            { field: ["name", "id"], order: "asc" },
+            { perPage, searchBy: "name" }
         );
     }
 }
