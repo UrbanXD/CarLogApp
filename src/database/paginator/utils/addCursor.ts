@@ -14,14 +14,17 @@ export function addCursor<TableItem, DB>(
 
     if(Array.isArray(cursorOptions.field)) {
         cursorOptions.field.map((cursorField, index) => {
-            let direction: OrderByDirectionExpression = "asc";
+            let orderDirection: OrderByDirectionExpression = "asc";
             if(cursorOptions.order && Array.isArray(cursorOptions.order)) {
-                direction = cursorOptions.order?.[index] ?? "asc";
+                orderDirection = cursorOptions.order?.[index] ?? "asc";
             } else if(cursorOptions.order) {
-                direction = cursorOptions.order;
+                orderDirection = cursorOptions.order;
             }
 
-            subQuery = addOrder<TableItem, DB>(subQuery, { field: cursorField, direction });
+            subQuery = addOrder<TableItem, DB>(
+                subQuery,
+                { field: cursorField, direction: orderDirection, reverse: direction === "prev" }
+            );
         });
     }
 

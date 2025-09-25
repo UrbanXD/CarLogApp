@@ -1,5 +1,5 @@
 import { Kysely } from "@powersync/kysely-driver";
-import { ComparisonOperatorExpression, OrderByDirectionExpression } from "kysely";
+import { ComparisonOperatorExpression } from "kysely";
 import { addFilter } from "./utils/addFilter.ts";
 import { addSearchFilter } from "./utils/addSearchFilter.ts";
 
@@ -10,19 +10,12 @@ export type FilterCondition<TableItem, FieldName = keyof TableItem> = {
     toLowerCase?: boolean
 }
 
-export type OrderCondition<FieldName> = {
-    field: FieldName
-    direction?: OrderByDirectionExpression
-    toLowerCase?: boolean
-}
-
 export type PaginatorOptions<TableItem, MappedItem = any> = {
     filterBy?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>
     searchBy?: keyof TableItem | Array<keyof TableItem>
     perPage?: number
     mapper?: (tableRow?: TableItem) => MappedItem
 }
-
 
 export abstract class Paginator<TableItem, MappedItem, DB> {
     private database: Kysely<DB>;

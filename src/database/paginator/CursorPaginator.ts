@@ -5,6 +5,7 @@ import { OrderByDirectionExpression } from "kysely";
 import { CursorValue } from "react-native";
 import { addSearchFilter } from "./utils/addSearchFilter.ts";
 import { addCursor } from "./utils/addCursor.ts";
+import { defaultValueToCursorValue } from "./utils/defaultValueToCursorValue.ts";
 
 export type CursorDirection = "initial" | "next" | "prev";
 export type CursorValue<TableItem> = TableItem[keyof TableItem] | null;
@@ -63,11 +64,13 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         return await super.map(result);
     }
 
-    async initial(defaultValue?: string | number): Promise<Array<MappedItem>> {
+    async initial(defaultValue?: TableItem): Promise<Array<MappedItem>> {
         this.prevCursor = null;
         this.nextCursor = null;
 
-        if(!defaultValue) {
+        const defaultCursor = defaultValueToCursorValue<TableItem>(defaultValue, this.cursorOptions.field);
+
+        if(!defaultCursor) {
             let query = this.getBaseQuery();
             query = addCursor(query, this.cursorOptions, null, "initial");
 
@@ -78,30 +81,29 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
             return await super.map(result);
         }
 
-        const halfPage = Math.floor(this.perPage / 2);
+        const halfPage = Math.floor(this.perPage / 2) - (this.perPage % 2 === 0 ? 0 : 1);
 
         let prevQuery = super.getBaseQuery().limit(halfPage);
         let nextQuery = super.getBaseQuery().limit(halfPage);
 
-        prevQuery = addCursor(prevQuery, this.cursorOptions, defaultValue, "prev"); // TODO fix with default value
-        nextQuery = addCursor(nextQuery, this.cursorOptions, defaultValue, "next"); // TODO fix for >=
+        prevQuery = addCursor(prevQuery, this.cursorOptions, defaultCursor, "prev");
+        nextQuery = addCursor(nextQuery, this.cursorOptions, defaultCursor, "next");
 
-        const prevResult = (await prevQuery.execute()).reverse() as unknown as Array<TableItem>; //lehet kiveheto a reverse
+        const prevResult = (await prevQuery.execute()).reverse() as unknown as Array<TableItem>;
         const nextResult = await nextQuery.execute() as unknown as Array<TableItem>;
-
         if(prevResult.length !== halfPage) {
             this.prevCursor = null;
         } else {
-            this.setPreviousCursor(prevResult);
+            this.setPreviousCursor([...prevResult, defaultValue]);
         }
 
         if(nextResult.length !== halfPage) {
             this.nextCursor = null;
         } else {
-            this.setNextCursor(nextResult);
+            this.setNextCursor([defaultValue, ...nextResult]);
         }
 
-        return await super.map([...prevResult, ...nextResult]);
+        return await super.map([...prevResult, defaultValue, ...nextResult]);
     }
 
     async next(searchTerm?: string): Promise<Array<TableItem> | null> {
@@ -128,10 +130,10 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         if(!this.hasPrevious()) return null;
 
         let query = this.getBaseQuery(true);
-        query = addCursor(query, this.cursorOptions, this.prevCursor, "<");
+        query = addCursor(query, this.cursorOptions, this.prevCursor, "prev");
         query = addSearchFilter(query, searchTerm);
 
-        const result = (await query.execute()).reverse() as unknown as Array<TableItem>; /// lehet kiveheto a reverse
+        const result = (await query.execute()).reverse() as unknown as Array<TableItem>;
 
         if(result.length !== 0) this.setNextCursor(result);
 
