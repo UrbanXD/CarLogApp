@@ -29,7 +29,8 @@ export const ICON_NAMES = {
     expenses: "account-cash",
     car: "car-outline",
     nametag: "tag-text-outline",
-    odometer: "gauge",
+    odometer: "speedometer", //gauge
+    odometerLow: "speedometer-slow",
     search: "magnify",
     addImage: "image-plus",
     image: "image-outline",
@@ -37,7 +38,7 @@ export const ICON_NAMES = {
     calendar: "calendar-range-outline",
     reset: "refresh",
     upload: "upload-outline",
-    fuelPump: "gas-station-outline",
+    fuelPump: "gas-station",
     fuelCan: "fuel",
     settings: "cog-outline",
     signOut: "logout",
