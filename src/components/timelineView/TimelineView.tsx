@@ -6,6 +6,7 @@ import { ListRenderItem } from "@shopify/flash-list";
 import { MoreDataLoading } from "../loading/MoreDataLoading.tsx";
 import { AnimatedFlashList } from "../AnimatedComponents/index.ts";
 import { RNNativeScrollEvent } from "react-native-reanimated/lib/typescript/hook/commonTypes";
+import { ViewStyle } from "react-native";
 
 type TimelineViewProps = {
     data: Array<TimelineItemType>
@@ -16,6 +17,7 @@ type TimelineViewProps = {
     isPreviousFetching?: boolean
     renderMilestone?: (milestone: string) => ReactNode
     scrollHandler?: (event: RNNativeScrollEvent, context?: Record<string, unknown>) => void
+    style?: ViewStyle
 }
 
 const DOT_ICON_SIZE = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE;
@@ -28,7 +30,8 @@ function ITimelineView({
     isNextFetching,
     isPreviousFetching,
     renderMilestone,
-    scrollHandler
+    scrollHandler,
+    style
 }: TimelineViewProps) {
     const renderItem = useCallback(({ item, index }: ListRenderItem<TimelineItemType>) => (
         <TimelineItem
@@ -84,7 +87,7 @@ function ITimelineView({
             onStartReached={ fetchNext }
             onStartReachedThreshold={ 0.5 }
             keyboardDismissMode="on-drag"
-            contentContainerStyle={ { flexGrow: 1 } }
+            contentContainerStyle={ [style, { flexGrow: 1 }] }
             showsVerticalScrollIndicator={ false }
             showsHorizontalScrollIndicator={ false }
             onScroll={ scrollHandler }

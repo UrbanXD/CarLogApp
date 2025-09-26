@@ -7,6 +7,7 @@ import Divider from "../../Divider.tsx";
 import { DashedLine } from "./DashedLine.tsx";
 import Button from "../../Button/Button.ts";
 import { Color } from "../../../types/index.ts";
+import getContrastingColor from "../../../utils/colors/getContrastingColor.ts";
 
 export type TimelineItemType = Omit<TimelineItemProps, "isFirst" | "isLast" | "iconSize">
 
@@ -31,7 +32,7 @@ export function TimelineItem({
     title,
     color = COLORS.gray2,
     icon,
-    iconColor = COLORS.black,
+    iconColor = getContrastingColor(color, COLORS.white, COLORS.gray5),
     iconSize = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE,
     note,
     footerText,
