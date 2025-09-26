@@ -1,13 +1,3 @@
-import React from "react";
-import { Text, View } from "react-native";
-import { COLORS } from "../../constants/index.ts";
+import { ExpenseTimelineScreen } from "../../screens/ExpenseTimelineScreen.tsx";
 
-const Page: React.FC = () => {
-    return (
-        <View style={ { flex: 1, backgroundColor: COLORS.black2 } }>
-            <Text style={ { color: COLORS.white } }>Kiadasok</Text>
-        </View>
-    );
-};
-
-export default Page;
+export default ExpenseTimelineScreen;
