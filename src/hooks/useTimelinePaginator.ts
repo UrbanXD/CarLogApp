@@ -12,22 +12,22 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
     paginator,
     mapper
 }: UseTimelinePaginatorProps<TableItem, MappedItem, DB>) {
-
-    console.log(paginator, "pagis");
-
     const [data, setData] = useState<Array<TimelineItemType>>([]);
+    const [initialFetchHappened, setInitialFetchHappened] = useState(false);
     const [isInitialFetching, setIsInitialFetching] = useState(true);
     const [isNextFetching, setIsNextFetching] = useState(false);
     const [isPreviousFetching, setIsPreviousFetching] = useState(false);
 
     useEffect(() => {
+        setInitialFetchHappened(false);
         paginator.initial().then(result => {
             setData((_) => {
+                setInitialFetchHappened(true);
                 setIsInitialFetching(false);
                 return result.map(mapper);
             });
         });
-    }, []);
+    }, [paginator]);
 
     const fetchNext = useCallback(async () => {
         if(!paginator.hasNext()) return;
@@ -59,5 +59,13 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
         });
     }, [paginator]);
 
-    return { data, isInitialFetching, fetchNext, isNextFetching, fetchPrevious, isPreviousFetching };
+    return {
+        data,
+        initialFetchHappened,
+        isInitialFetching,
+        fetchNext,
+        isNextFetching,
+        fetchPrevious,
+        isPreviousFetching
+    };
 }
