@@ -14,6 +14,6 @@ export function getCursorOperator(
     let mainOrderDirection = Array.isArray(orderDirection) ? orderDirection?.[0] : orderDirection;
     if(!mainOrderDirection) mainOrderDirection = "asc";
 
-    if(mainOrderDirection === "desc") return cursorDirection === "next" ? "<" : ">";
-    return cursorDirection === "next" ? ">" : "<";
+    if(mainOrderDirection === "desc") return cursorDirection === "next" ? "<=" : ">=";
+    return cursorDirection === "next" ? ">=" : "<=";
 }

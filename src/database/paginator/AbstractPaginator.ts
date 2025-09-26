@@ -43,7 +43,7 @@ export abstract class Paginator<TableItem, MappedItem, DB> {
         let query = this.database
         .selectFrom(this.table)
         .selectAll()
-        .limit(this.perPage);
+        .limit(this.perPage + 1); // add plus 1 for get the cursor element as well
 
         if(this.filterBy && Array.isArray(this.filterBy)) {
             this.filterBy.forEach(filter => {
