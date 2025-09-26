@@ -31,17 +31,17 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
 
     private setNextCursor(data: Array<TableItem>) {
         if(Array.isArray(this.cursorOptions.field)) {
-            this.nextCursor = this.cursorOptions.field.map((cursorField) => data[data.length - 1][cursorField]);
+            this.nextCursor = this.cursorOptions.field.map((cursorField) => data[data.length - 1][cursorField] ?? null);
         } else {
-            this.nextCursor = data[data.length - 1][this.cursorOptions.cursorField];
+            this.nextCursor = data[data.length - 1][this.cursorOptions.cursorField] ?? null;
         }
     }
 
     private setPreviousCursor(data: Array<TableItem>) {
         if(Array.isArray(this.cursorOptions.field)) {
-            this.prevCursor = this.cursorOptions.field.map((cursorField) => data[0][cursorField]);
+            this.prevCursor = this.cursorOptions.field.map((cursorField) => data[0][cursorField] ?? null);
         } else {
-            this.prevCursor = data[0][this.cursorOptions.field];
+            this.prevCursor = data[0][this.cursorOptions.field] ?? null;
         }
     }
 
@@ -115,7 +115,7 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
 
         const result = await query.execute() as unknown as Array<TableItem>;
 
-        if(result.length !== 0) this.setPreviousCursor(result);
+        // if(result.length !== 0) this.setPreviousCursor(result);
 
         if(result.length !== this.perPage) {
             this.nextCursor = null;
@@ -135,7 +135,7 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
 
         const result = (await query.execute()).reverse() as unknown as Array<TableItem>;
 
-        if(result.length !== 0) this.setNextCursor(result);
+        // if(result.length !== 0) this.setNextCursor(result);
 
         if(result.length !== this.perPage) {
             this.prevCursor = null;
