@@ -56,7 +56,7 @@ function ITimelineView({
                 isLast
             />
         );
-    }, [isNextFetching, isPreviousFetching]);
+    }, [isInitialFetching]);
 
     const renderHeader = useCallback(() => {
         if(!isPreviousFetching) return <></>;
