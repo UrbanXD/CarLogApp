@@ -2,33 +2,36 @@ import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE } from "../../constants/index.
 import React, { ReactNode, useCallback } from "react";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { TimelineItem, TimelineItemType } from "./item/TimelineItem.tsx";
-import { FlashList, ListRenderItem } from "@shopify/flash-list";
+import { ListRenderItem } from "@shopify/flash-list";
 import { MoreDataLoading } from "../loading/MoreDataLoading.tsx";
-import { ScrollEvent } from "react-native";
+import { AnimatedFlashList } from "../AnimatedComponents/index.ts";
+import { RNNativeScrollEvent } from "react-native-reanimated/lib/typescript/hook/commonTypes";
 
 type TimelineViewProps = {
     data: Array<TimelineItemType>
-    fetchMore?: () => Promise<void>
-    isFetching?: boolean
+    isInitialFetching?: boolean
+    fetchNext?: () => Promise<void>
+    fetchPrevious?: () => Promise<void>
+    isNextFetching?: boolean
+    isPreviousFetching?: boolean
     renderMilestone?: (milestone: string) => ReactNode
-    onScrollBeginDrag?: (event: ScrollEvent) => void
-    onScrollEndDrag?: (event: ScrollEvent) => void
-
+    scrollHandler?: (event: RNNativeScrollEvent, context?: Record<string, unknown>) => void
 }
 
 const DOT_ICON_SIZE = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE;
 
 function ITimelineView({
     data,
-    fetchMore,
-    isFetching,
+    isInitialFetching,
+    fetchNext,
+    fetchPrevious,
+    isNextFetching,
+    isPreviousFetching,
     renderMilestone,
-    onScrollBeginDrag,
-    onScrollEndDrag
+    scrollHandler
 }: TimelineViewProps) {
     const renderItem = useCallback(({ item, index }: ListRenderItem<TimelineItemType>) => (
         <TimelineItem
-            key={ index }
             renderMilestone={ renderMilestone }
             { ...item }
             iconSize={ DOT_ICON_SIZE }
@@ -38,10 +41,11 @@ function ITimelineView({
     ), [renderMilestone, data]);
 
     const renderListEmptyComponent = useCallback(() => {
-        if(isFetching) return null;
+        if(isInitialFetching) return <MoreDataLoading text={ "Napló adatok olvasása" }/>;
 
         return (
             <TimelineItem
+                id="not-found"
                 milestone="Nem található adat"
                 title="Rögzítse első adatát itt..."
                 color={ COLORS.gray2 }
@@ -49,34 +53,42 @@ function ITimelineView({
                 isLast
             />
         );
-    }, [isFetching]);
+    }, [isNextFetching, isPreviousFetching]);
+
+    const renderHeader = useCallback(() => {
+        if(!isPreviousFetching) return <></>;
+
+        return <MoreDataLoading text={ "Korábbi napló adatok olvasása" }/>;
+    }, [isPreviousFetching]);
 
     const renderFooter = useCallback(() => {
-        if(!isFetching) return null;
+        if(!isNextFetching) return <></>;
 
         return <MoreDataLoading text={ "Régebbi napló adatok olvasása" }/>;
-    }, [isFetching]);
+    }, [isNextFetching]);
 
-    const keyExtractor = useCallback((_item: TimelineItemType, index: number) => index.toString(), []);
+    const keyExtractor = useCallback((item: TimelineItemType) => item.id, []);
 
     return (
-        <FlashList
+        <AnimatedFlashList
             data={ data }
             renderItem={ renderItem }
             maintainVisibleContentPosition={ { disabled: true } }
             drawDistance={ heightPercentageToDP(100) }
             keyExtractor={ keyExtractor }
             ListEmptyComponent={ renderListEmptyComponent }
+            ListHeaderComponent={ renderHeader }
             ListFooterComponent={ renderFooter }
-            scrollEventThrottle={ 16 }
-            onEndReached={ fetchMore }
+            onEndReached={ fetchPrevious }
             onEndReachedThreshold={ 0.5 }
+            onStartReached={ fetchNext }
+            onStartReachedThreshold={ 0.5 }
             keyboardDismissMode="on-drag"
             contentContainerStyle={ { flexGrow: 1 } }
             showsVerticalScrollIndicator={ false }
             showsHorizontalScrollIndicator={ false }
-            onScrollBeginDrag={ onScrollBeginDrag }
-            onScrollEndDrag={ onScrollEndDrag }
+            onScroll={ scrollHandler }
+            scrollEventThrottle={ 16 }
         />
     );
 }
