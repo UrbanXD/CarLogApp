@@ -27,7 +27,7 @@ export const useOdometerTimelineItem = () => {
             case OdometerLogType.SERVICE:
                 title = "Szervíz";
                 icon = ICON_NAMES.serviceOutline;
-                color = COLORS.blueLight;
+                color = COLORS.service;
                 onPressInfo = () => Alert.alert(" SZERVIZECSKE ");
                 break;
         }
