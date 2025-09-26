@@ -140,7 +140,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
                 isNextFetching={ isNextFetching }
                 isPreviousFetching={ isPreviousFetching }
             />
-            <FloatingActionMenu action={ openCreateOdometerLog } isParentScrolling={ scrolling }/>
+            <FloatingActionMenu action={ openCreateOdometerLog }/>
         </View>
     );
 }
