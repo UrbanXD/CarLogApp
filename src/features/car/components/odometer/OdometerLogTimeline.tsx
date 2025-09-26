@@ -2,15 +2,14 @@ import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { TimelineView } from "../../../../components/timelineView/TimelineView.tsx";
 import { TimelineItemType } from "../../../../components/timelineView/item/TimelineItem.tsx";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
-import { StyleSheet, Text, View } from "react-native";
+import { SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { StyleSheet, View } from "react-native";
 import useCars from "../../hooks/useCars.ts";
-import Divider from "../../../../components/Divider.tsx";
-import { widthPercentageToDP } from "react-native-responsive-screen";
 import { Odometer } from "./Odometer.tsx";
 import FloatingActionMenu from "../../../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
 import { router } from "expo-router";
 import { useOdometerTimelineItem } from "../../hooks/useOdometerTimelineItem.tsx";
+import { Title } from "../../../../components/Title.tsx";
 
 type OdometerLogTimelineProps = {
     carId: string
@@ -75,14 +74,9 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
     return (
         <View style={ styles.container }>
             <View style={ styles.titleContainer }>
-                <Text style={ styles.title }>{ car.name }</Text>
-                <Text style={ styles.subtitle }>{ `${ car.model.make.name } ${ car.model.name }` }</Text>
-                <Divider
-                    thickness={ 5 }
-                    size={ widthPercentageToDP(35) }
-                    color={ COLORS.fuelYellow }
-                    margin={ SEPARATOR_SIZES.lightSmall / 2 }
-                    style={ styles.divider }
+                <Title
+                    title={ car.name }
+                    subtitle={ `${ car.model.make.name } ${ car.model.name }` }
                 />
                 <Odometer value={ car.odometer.value } unit={ car.odometer.measurement }/>
             </View>
@@ -108,22 +102,5 @@ const styles = StyleSheet.create({
     },
     titleContainer: {
         gap: SEPARATOR_SIZES.lightSmall / 2
-    },
-    title: {
-        fontFamily: "Gilroy-Heavy",
-        fontSize: FONT_SIZES.p1,
-        lineHeight: FONT_SIZES.p1,
-        color: COLORS.white
-    },
-    subtitle: {
-        fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.p2,
-        lineHeight: FONT_SIZES.p2,
-        color: COLORS.gray1,
-        textAlign: "left"
-    },
-    divider: {
-        alignSelf: "flex-start",
-        marginLeft: SEPARATOR_SIZES.mediumSmall
     }
 });
