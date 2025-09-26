@@ -11,6 +11,7 @@ import { Color } from "../../../types/index.ts";
 export type TimelineItemType = Omit<TimelineItemProps, "isFirst" | "isLast" | "iconSize">
 
 type TimelineItemProps = {
+    id: string
     milestone: string
     title: string
     color?: Color
