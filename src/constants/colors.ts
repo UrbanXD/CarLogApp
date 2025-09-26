@@ -19,7 +19,14 @@ export const COLORS = {
     blueLight: "#82c8e5",
     redLight: "#f9504f",
     redDark: "#B71C1C",
-    fuelYellow: "#FFDF00"
+
+    fuelYellow: "#FFDF00",
+    service: "#8CCEE8",
+    vehicleInspection: "#2BC92F",
+    wash: "#00BFFF",
+    toll: "#FF8C00",
+    parking: "#E0E0E0",
+    insurance: "#C53535"
 };
 
 export const PRIMARY_COLOR = COLORS.white;

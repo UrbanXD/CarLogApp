@@ -44,7 +44,11 @@ export const ICON_NAMES = {
     swap: "swap-horizontal",
     add: "plus",
     receipt: "receipt-text-outline",
-    road: "road-variant"
+    road: "road-variant",
+    carWash: "car-wash",
+    parking: "parking",
+    vehicleInspection: "car-search",
+    insurance: "shield-car"
 };
 
 export const ICON_COLORS = {
