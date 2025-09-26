@@ -2,18 +2,15 @@ import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { TimelineView } from "../../../../components/timelineView/TimelineView.tsx";
 import { TimelineItemType } from "../../../../components/timelineView/item/TimelineItem.tsx";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import dayjs from "dayjs";
-import { OdometerLogType } from "../../model/enums/odometerLogType.ts";
-import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { StyleSheet, Text, View } from "react-native";
 import useCars from "../../hooks/useCars.ts";
 import Divider from "../../../../components/Divider.tsx";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { Odometer } from "./Odometer.tsx";
-import { OdometerText } from "./OdometerText.tsx";
 import FloatingActionMenu from "../../../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
 import { router } from "expo-router";
-import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
+import { useOdometerTimelineItem } from "../../hooks/useOdometerTimelineItem.tsx";
 
 type OdometerLogTimelineProps = {
     carId: string
@@ -21,8 +18,10 @@ type OdometerLogTimelineProps = {
 
 export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
     const { odometerDao } = useDatabase();
-    const paginator = useMemo(() => odometerDao.odometerLogPaginator(carId), [carId]);
     const { getCar } = useCars();
+    const { mapper } = useOdometerTimelineItem();
+
+    const paginator = useMemo(() => odometerDao.odometerLogPaginator(carId), [carId]);
     const car = useMemo(() => getCar(carId), [carId, getCar]);
 
     if(!car) return <></>;
@@ -32,54 +31,11 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
     const [isNextFetching, setIsNextFetching] = useState(false);
     const [isPreviousFetching, setIsPreviousFetching] = useState(false);
 
-    const odometerLogRowToTimelineItem = useCallback((odometerLog: OdometerLog): TimelineItemType => {
-        let title = "Kilométeróra-frissítés";
-        let color;
-        let icon;
-        let onPressInfo;
-
-        switch(odometerLog.type) {
-            case OdometerLogType.SIMPLE:
-                title = "Kilométeróra-frissítés";
-                break;
-            case OdometerLogType.FUEL:
-                title = "Tankolás";
-                icon = ICON_NAMES.fuelPump;
-                color = COLORS.fuelYellow;
-                onPressInfo = () => { Alert.alert("fuelocska"); };
-                break;
-            case OdometerLogType.SERVICE:
-                title = "Szervíz";
-                icon = ICON_NAMES.serviceOutline;
-                color = COLORS.blueLight;
-                onPressInfo = () => Alert.alert(" SZERVIZECSKE ");
-                break;
-        }
-
-        return {
-            id: odometerLog.id,
-            milestone: odometerLog.value.toString(),
-            renderMilestone: (milestone: string) =>
-                <OdometerText
-                    text={ milestone }
-                    unit={ odometerLog.unit }
-                    textStyle={ { color: COLORS.white } }
-                    unitTextStyle={ { color: COLORS.white } }
-                />,
-            title,
-            icon,
-            color,
-            note: odometerLog.note,
-            footerText: dayjs(odometerLog.date).format("YYYY. MM DD."),
-            onPressInfo
-        };
-    }, []);
-
     useEffect(() => {
         paginator.initial().then(result => {
             setData((_) => {
                 setIsInitialFetching(false);
-                return result.map(odometerLogRowToTimelineItem);
+                return result.map(mapper);
             });
         });
     }, []);
@@ -91,7 +47,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
         const result = await paginator.next();
         if(!result) return setIsNextFetching(false);
 
-        const newData = result.map(odometerLogRowToTimelineItem);
+        const newData = result.map(mapper);
 
         setData(prevState => {
             setIsNextFetching(false);
@@ -107,7 +63,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
 
         if(!result) return setIsPreviousFetching(false);
 
-        const newData = result.map(odometerLogRowToTimelineItem);
+        const newData = result.map(mapper);
         setData(prevState => {
             setIsPreviousFetching(false);
             return [...newData, ...prevState];
