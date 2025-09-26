@@ -11,6 +11,7 @@ import { BaseConfig } from "../../constants/index.ts";
 import { ModelDao } from "../../features/car/model/dao/ModelDao.ts";
 import { MakeDao } from "../../features/car/model/dao/MakeDao.ts";
 import { OdometerDao } from "../../features/car/model/dao/OdometerDao.ts";
+import { ExpenseDao } from "../../features/expense/model/dao/ExpenseDao.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
@@ -23,6 +24,7 @@ export class Database {
     private _makeDao?: MakeDao;
     private _modelDao?: ModelDao;
     private _odometerDao?: OdometerDao;
+    private _expenseDao?: ExpenseDao;
 
     constructor() {
         this.powersync = new PowerSyncDatabase({
@@ -82,6 +84,12 @@ export class Database {
         if(!this._odometerDao) this._odometerDao = new OdometerDao(this.db);
 
         return this._odometerDao;
+    }
+
+    get expenseDao(): ExpenseDao {
+        if(!this._expenseDao) this._expenseDao = new ExpenseDao(this.db);
+
+        return this._expenseDao;
     }
 
     async init() {
