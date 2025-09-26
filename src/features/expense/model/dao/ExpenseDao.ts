@@ -1,9 +1,5 @@
 import { Kysely } from "@powersync/kysely-driver";
-import {
-    DatabaseType,
-    ExpenseTableRow,
-    OdometerLogTableRow
-} from "../../../../database/connector/powersync/AppSchema.ts";
+import { DatabaseType, ExpenseTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
 import { Expense } from "../../schemas/expenseSchema.ts";
 import { EXPENSE_TABLE } from "../../../../database/connector/powersync/tables/expense.ts";
 import { ExpenseTypeDao } from "./ExpenseTypeDao.ts";
@@ -21,7 +17,7 @@ export class ExpenseDao {
         this.mapper = new ExpenseMapper(this.expenseTypeDao);
     }
 
-    paginator(carId: string, perPage?: number = 10): CursorPaginator<OdometerLogTableRow> {
+    paginator(carId: string, perPage?: number = 10): CursorPaginator<ExpenseTableRow, Expense> {
         return new CursorPaginator<ExpenseTableRow, Expense>(
             this.db,
             EXPENSE_TABLE,
