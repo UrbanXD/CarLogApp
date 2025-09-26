@@ -7,13 +7,18 @@ type LinkProps = {
     text?: string
     icon?: string
     onPress?: () => void
+    disabled?: boolean
     style?: ViewStyle
     textStyle?: TextStyle
 }
 
-function Link({ text, icon, onPress, style, textStyle }: LinkProps) {
+function Link({ text, icon, onPress, disabled, style, textStyle }: LinkProps) {
     return (
-        <Pressable style={ [styles.linkContainer, style] } onPress={ onPress } disabled={ !onPress }>
+        <Pressable
+            style={ [styles.linkContainer, style] }
+            onPress={ onPress }
+            disabled={ !onPress || disabled }
+        >
             {
                 text &&
                <Text style={ [styles.linkText, textStyle] }>
