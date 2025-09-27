@@ -73,10 +73,11 @@ export function TimelineItem({
                             : <Text style={ styles.card.title.text }>{ milestone }</Text>
                         }
                         <Text style={ styles.card.subtitle }>{ title }</Text>
-                        {
-                            (note || footerText) &&
-                           <Divider color={ color } style={ { width: "45%", alignSelf: "flex-start" } }/>
-                        }
+                        <Divider
+                            color={ color }
+                            thickness={ 3 }
+                            style={ { width: "45%", alignSelf: "flex-start" } }
+                        />
                     </View>
                     {
                         onPressInfo &&
@@ -172,8 +173,6 @@ const useStyles = (color: Color, dotSize: number, isFirstItem: boolean, isLastIt
         backgroundColor: COLORS.gray5,
         marginTop: SEPARATOR_SIZES.small,
         padding: SEPARATOR_SIZES.lightSmall,
-        borderColor: color,
-        borderWidth: 1.5,
         borderRadius: 12.5,
         borderTopLeftRadius: 0,
 
