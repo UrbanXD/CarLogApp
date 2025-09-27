@@ -12,10 +12,12 @@ import { ToPickerItemsSelectors } from "../../../utils/toPickerItems.ts";
 type ConditionalDropdownPickerProps<Item, DB> = | {
     /** Used when the dropdown fetches data with pagination */
     paginator: Paginator<Item, DB>
+    searchBy?: keyof Item
     /** Used when the dropdown has static data and no pagination is required */
     data?: never
 } | {
     paginator?: never
+    searchBy?: never
     data: Array<Item>
 }
 

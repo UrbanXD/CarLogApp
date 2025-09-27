@@ -29,7 +29,7 @@ export class MakeDao {
             this.db,
             MAKE_TABLE,
             { field: ["name", "id"], order: "asc" },
-            { perPage, searchBy: "name" }
+            { perPage }
         );
     }
 }

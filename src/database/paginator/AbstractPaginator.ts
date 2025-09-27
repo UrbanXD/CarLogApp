@@ -1,7 +1,6 @@
 import { Kysely } from "@powersync/kysely-driver";
 import { ComparisonOperatorExpression } from "kysely";
 import { addFilter } from "./utils/addFilter.ts";
-import { addSearchFilter } from "./utils/addSearchFilter.ts";
 
 export type FilterCondition<TableItem, FieldName = keyof TableItem> = {
     field: FieldName
@@ -12,7 +11,6 @@ export type FilterCondition<TableItem, FieldName = keyof TableItem> = {
 
 export type PaginatorOptions<TableItem, MappedItem = any> = {
     filterBy?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>
-    searchBy?: keyof TableItem | Array<keyof TableItem>
     perPage?: number
     mapper?: (tableRow?: TableItem) => MappedItem
 }
@@ -20,8 +18,7 @@ export type PaginatorOptions<TableItem, MappedItem = any> = {
 export abstract class Paginator<TableItem, MappedItem, DB> {
     private database: Kysely<DB>;
     private table: keyof DB;
-    private readonly filterBy?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>;
-    private readonly searchBy?: keyof TableItem | Array<keyof TableItem>;
+    private filterBy: Array<FilterCondition<TableItem>>;
     private readonly mapper?: (tableRow?: TableItem) => MappedItem | Promise<MappedItem>;
     protected perPage: number;
 
@@ -34,9 +31,8 @@ export abstract class Paginator<TableItem, MappedItem, DB> {
         this.table = table;
 
         this.perPage = options?.perPage ?? 15;
-        this.filterBy = options?.filterBy;
-        this.searchBy = options?.searchBy;
         this.mapper = options?.mapper;
+        this.setFilter(options?.filterBy);
     }
 
     protected getBaseQuery() {
@@ -45,13 +41,9 @@ export abstract class Paginator<TableItem, MappedItem, DB> {
         .selectAll()
         .limit(this.perPage + 1); // add plus 1 for get the cursor element as well
 
-        if(this.filterBy && Array.isArray(this.filterBy)) {
-            this.filterBy.forEach(filter => {
-                query = addFilter<TableItem, DB>(query, filter);
-            });
-        } else if(this.filterBy) {
-            query = addFilter<TableItem, DB>(query, this.filterBy);
-        }
+        this.filterBy.forEach(filter => {
+            query = addFilter<TableItem, DB>(query, filter);
+        });
 
         return query;
     }
@@ -62,22 +54,31 @@ export abstract class Paginator<TableItem, MappedItem, DB> {
         return (await Promise.all(tableItems.map(await this.mapper).filter(element => element !== null)));
     }
 
-    async filter(searchTerm?: string): Promise<Array<MappedItem>> {
-        let query = this.getBaseQuery();
-        query = addSearchFilter<TableItem, DB>(query, searchTerm);
+    async filter(filterBy?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>): Promise<Array<TableItem>> {
+        this.setFilter(filterBy);
 
-        const result = await query.execute() as unknown as Array<TableItem>;
+        return await this.getBaseQuery().execute() as unknown as Array<TableItem>;
+    }
 
-        return await this.map(result);
+    protected setFilter(filterBy?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>): void {
+        if(!filterBy) return this.clearFilter();
+
+        if(Array.isArray(filterBy)) return this.filterBy = filterBy;
+
+        this.filterBy = [filterBy];
+    }
+
+    protected clearFilter() {
+        this.filterBy = [];
     }
 
     abstract hasNext(): boolean;
 
     abstract hasPrevious(): boolean;
 
-    abstract async initial(defaultValue?: string | number): Promise<Array<MappedItem>>;
+    abstract async initial(defaultValue?: TableItem): Promise<Array<MappedItem>>;
 
-    abstract async next(searchTerm?: string): Promise<Array<MappedItem> | null>;
+    abstract async next(): Promise<Array<MappedItem> | null>;
 
-    abstract async previous(searchTerm?: string): Promise<Array<MappedItem> | null>;
+    abstract async previous(): Promise<Array<MappedItem> | null>;
 }

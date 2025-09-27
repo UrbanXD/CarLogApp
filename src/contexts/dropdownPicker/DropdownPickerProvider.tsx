@@ -17,6 +17,7 @@ export function DropdownPickerProvider<Item, DB>({
     children,
     data,
     paginator,
+    searchBy,
     dataTransformSelectors,
     defaultSelectedItem,
     setValue,
@@ -54,10 +55,17 @@ export function DropdownPickerProvider<Item, DB>({
     }, [findItemByValue, items]);
 
     const fetchBySearching = useCallback(() => {
-        paginator?.filter(searchTerm).then(result => {
+        if(!searchBy) return;
+
+        paginator?.filter({
+            field: searchBy,
+            operator: "like",
+            value: `%${ searchTerm.toLowerCase() }%`,
+            toLowerCase: true
+        }).then(result => {
             setItems(toPickerItems<Item>(result, dataTransformSelectors));
         });
-    }, [searchTerm, paginator]);
+    }, [paginator, searchTerm]);
 
     const staticSearching = useCallback(() => {
         if(!IS_STATIC || !data) return;
@@ -72,10 +80,10 @@ export function DropdownPickerProvider<Item, DB>({
         let rawResult: Array<Item> | null = [];
         switch(direction) {
             case "next":
-                rawResult = await paginator.next(searchTerm);
+                rawResult = await paginator.next();
                 break;
             case "prev":
-                rawResult = await paginator.previous(searchTerm);
+                rawResult = await paginator.previous();
                 break;
         }
 
@@ -91,7 +99,7 @@ export function DropdownPickerProvider<Item, DB>({
                     return [...prevState];
             }
         });
-    }, [searchTerm, initialLoadCompleted, paginator]);
+    }, [initialLoadCompleted, paginator]);
 
     const debouncedFilter = useMemo(
         () => debounce(IS_STATIC ? staticSearching : fetchBySearching, 300),

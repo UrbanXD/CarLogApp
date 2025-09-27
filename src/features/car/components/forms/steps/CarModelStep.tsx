@@ -60,6 +60,7 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
             >
                 <Input.Picker.Dropdown<MakeTableRow>
                     paginator={ makePaginator }
+                    searchBy="name"
                     icon={ ICON_NAMES.car }
                     dataTransformSelectors={ {
                         title: "name",
@@ -74,6 +75,7 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
             >
                 <Input.Picker.Dropdown<ModelTableRow>
                     paginator={ modelPaginator }
+                    searchBy="name"
                     icon={ ICON_NAMES.car }
                     dataTransformSelectors={ {
                         title: "name",

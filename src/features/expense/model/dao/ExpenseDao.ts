@@ -5,6 +5,7 @@ import { EXPENSE_TABLE } from "../../../../database/connector/powersync/tables/e
 import { ExpenseTypeDao } from "./ExpenseTypeDao.ts";
 import { ExpenseMapper } from "../mapper/expenseMapper.ts";
 import { CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
+import { FilterCondition } from "../../../../database/paginator/AbstractPaginator.ts";
 
 export class ExpenseDao {
     private readonly db: Kysely<DatabaseType>;
@@ -17,7 +18,10 @@ export class ExpenseDao {
         this.mapper = new ExpenseMapper(this.expenseTypeDao);
     }
 
-    paginator(carId: string, perPage?: number = 10): CursorPaginator<ExpenseTableRow, Expense> {
+    paginator(
+        filterBy?: FilterCondition<ExpenseTableRow> | Array<FilterCondition<ExpenseTableRow>>,
+        perPage?: number = 10
+    ): CursorPaginator<ExpenseTableRow, Expense> {
         return new CursorPaginator<ExpenseTableRow, Expense>(
             this.db,
             EXPENSE_TABLE,
@@ -27,7 +31,7 @@ export class ExpenseDao {
             },
             {
                 perPage,
-                filterBy: { field: "car_id", operator: "=", value: carId },
+                filterBy,
                 mapper: this.mapper.toExpenseDto.bind(this.mapper)
             }
         );

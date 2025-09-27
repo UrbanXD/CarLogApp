@@ -1,17 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
 import { TimelineItemType } from "../components/timelineView/item/TimelineItem.tsx";
-import { Paginator } from "../database/paginator/AbstractPaginator.ts";
-import { DatabaseType } from "../database/connector/powersync/AppSchema.ts";
+import { FilterCondition, Paginator } from "../database/paginator/AbstractPaginator.ts";
+import { DatabaseType, ExpenseTableRow } from "../database/connector/powersync/AppSchema.ts";
+import { useFilterBy } from "./useFilterBy.ts";
 
 type UseTimelinePaginatorProps<TableItem, MappedItem, DB> = {
     paginator: Paginator<TableItem, MappedItem, DB>
     mapper: (item: MappedItem) => TimelineItemType
+    defaultFilters?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>
 }
 
 export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = DatabaseType>({
     paginator,
-    mapper
+    mapper,
+    defaultFilters
 }: UseTimelinePaginatorProps<TableItem, MappedItem, DB>) {
+    const { filters, setFilter, removeFilter } = useFilterBy<ExpenseTableRow>(defaultFilters);
+
     const [data, setData] = useState<Array<TimelineItemType>>([]);
     const [initialFetchHappened, setInitialFetchHappened] = useState(false);
     const [isInitialFetching, setIsInitialFetching] = useState(true);
@@ -27,7 +32,15 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
                 return result.map(mapper);
             });
         });
-    }, [paginator]);
+    }, []);
+
+    useEffect(() => {
+        paginator.filter(filters).then(result => {
+            setData((_) => {
+                return result.map(mapper);
+            });
+        });
+    }, [filters]);
 
     const fetchNext = useCallback(async () => {
         if(!paginator.hasNext()) return;
@@ -66,6 +79,8 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
         fetchNext,
         isNextFetching,
         fetchPrevious,
-        isPreviousFetching
+        isPreviousFetching,
+        setFilter,
+        removeFilter
     };
 }
