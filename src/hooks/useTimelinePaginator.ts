@@ -4,15 +4,18 @@ import { DatabaseType } from "../database/connector/powersync/AppSchema.ts";
 import { useFilterBy } from "./useFilterBy.ts";
 import { useCursor } from "./useCursor.ts";
 import { CursorPaginator } from "../database/paginator/CursorPaginator.ts";
+import { FilterButtonProps } from "../components/filter/FilterButton.tsx";
 
 type UseTimelinePaginatorProps<TableItem, MappedItem, DB> = {
     paginator: CursorPaginator<TableItem, MappedItem, DB>
     mapper: (item: MappedItem) => TimelineItemType
+    cursorOrderButtons?: Array<{ field: keyof TableItem, title: string }>
 }
 
 export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = DatabaseType>({
     paginator,
-    mapper
+    mapper,
+    cursorOrderButtons
 }: UseTimelinePaginatorProps<TableItem, MappedItem, DB>) {
     const { filters, setFilter, removeFilter } = useFilterBy<TableItem>(paginator.filterBy);
     const {
@@ -90,6 +93,14 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
         });
     }, [paginator]);
 
+    const orderButtons: Array<FilterButtonProps> | undefined = cursorOrderButtons?.map(cursor => ({
+        title: cursor.title,
+        active: isMainCursor(cursor.field),
+        onPress: () => makeFieldMainCursor(cursor.field),
+        icon: getOrderIconForField(cursor.field),
+        iconOnPress: () => toggleFieldOrder(cursor.field)
+    }));
+
     return {
         data,
         initialFetchHappened,
@@ -100,10 +111,6 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
         isPreviousFetching,
         setFilter,
         removeFilter,
-        isMainCursor,
-        cursorOptions,
-        makeFieldMainCursor,
-        toggleFieldOrder,
-        getOrderIconForField
+        orderButtons
     };
 }

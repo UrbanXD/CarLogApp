@@ -3,11 +3,6 @@ import { CursorOptions } from "../database/paginator/CursorPaginator.ts";
 import { ExpenseTableRow } from "../database/connector/powersync/AppSchema.ts";
 import { ICON_NAMES } from "../constants/index.ts";
 
-export type IsMainCursor<TableField> = (field: TableField) => boolean;
-export type MakeFieldMainCursor<TableField> = (field: TableField) => void;
-export type ToggleFieldOrder<TableField> = (field: TableField) => void;
-export type GetOrderIconForField<TableField> = (field: TableField) => string;
-
 export function useCursor<TableItem>(options: CursorOptions<keyof TableItem>) {
     const [cursorOptions, setCursorOptions] = useState<CursorOptions<keyof TableItem>>(options);
 
