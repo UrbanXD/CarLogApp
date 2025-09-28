@@ -26,6 +26,15 @@ export function addCursor<TableItem, DB>(
                 { field: cursorField, direction: orderDirection, reverse: direction === "prev" }
             );
         });
+    } else {
+        subQuery = addOrder<TableItem, DB>(
+            subQuery,
+            {
+                field: cursorOptions.field,
+                direction: Array.isArray(cursorOptions.order) ? cursorOptions.order?.[0] ?? "asc" : cursorOptions.order,
+                reverse: direction === "prev"
+            }
+        );
     }
 
     if(direction === "initial") return subQuery;

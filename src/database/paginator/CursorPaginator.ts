@@ -16,7 +16,7 @@ export type CursorOptions<TableField> = {
 export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseType> extends Paginator<TableItem, MappedItem, DB> {
     private prevCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
     private nextCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
-    private readonly cursorOptions: CursorOptions<keyof TableItem>;
+    private cursorOptions: CursorOptions<keyof TableItem>;
 
     constructor(
         database: Kysely<DB>,
@@ -52,15 +52,14 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         return !!this.prevCursor;
     }
 
+    async changeCursorOptions(options: CursorOptions<keyof TableItem>) {
+        this.cursorOptions = options;
+        return await this.initial();
+    }
+
     async filter(filterBy: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>): Promise<Array<MappedItem>> {
-        this.prevCursor = null;
-        this.nextCursor = null;
-
-        const result = await super.filter(filterBy);
-
-        if(result.length === this.perPage + 1) this.setNextCursor(result.pop());
-
-        return await super.map(result);
+        this.setFilter(filterBy);
+        return await this.initial();
     }
 
     async initial(defaultValue?: TableItem): Promise<Array<MappedItem>> {

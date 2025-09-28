@@ -1,21 +1,32 @@
 import { useCallback, useEffect, useState } from "react";
 import { TimelineItemType } from "../components/timelineView/item/TimelineItem.tsx";
-import { FilterCondition, Paginator } from "../database/paginator/AbstractPaginator.ts";
-import { DatabaseType, ExpenseTableRow } from "../database/connector/powersync/AppSchema.ts";
+import { FilterCondition } from "../database/paginator/AbstractPaginator.ts";
+import { DatabaseType } from "../database/connector/powersync/AppSchema.ts";
 import { useFilterBy } from "./useFilterBy.ts";
+import { useCursor } from "./useCursor.ts";
+import { CursorOptions, CursorPaginator } from "../database/paginator/CursorPaginator.ts";
 
 type UseTimelinePaginatorProps<TableItem, MappedItem, DB> = {
-    paginator: Paginator<TableItem, MappedItem, DB>
+    paginator: CursorPaginator<TableItem, MappedItem, DB>
     mapper: (item: MappedItem) => TimelineItemType
+    defaultCursorOptions: CursorOptions<TableItem>
     defaultFilters?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>
 }
 
 export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = DatabaseType>({
     paginator,
     mapper,
+    defaultCursorOptions,
     defaultFilters
 }: UseTimelinePaginatorProps<TableItem, MappedItem, DB>) {
-    const { filters, setFilter, removeFilter } = useFilterBy<ExpenseTableRow>(defaultFilters);
+    const { filters, setFilter, removeFilter } = useFilterBy<TableItem>(defaultFilters);
+    const {
+        cursorOptions,
+        isMainCursor,
+        makeFieldMainCursor,
+        toggleFieldOrder,
+        getOrderIconForField
+    } = useCursor<TableItem>(defaultCursorOptions);
 
     const [data, setData] = useState<Array<TimelineItemType>>([]);
     const [initialFetchHappened, setInitialFetchHappened] = useState(false);
@@ -35,12 +46,24 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
     }, []);
 
     useEffect(() => {
+        if(!initialFetchHappened) return;
+
         paginator.filter(filters).then(result => {
             setData((_) => {
                 return result.map(mapper);
             });
         });
     }, [filters]);
+
+    useEffect(() => {
+        if(!initialFetchHappened) return;
+
+        paginator.changeCursorOptions(cursorOptions).then(result => {
+            setData((_) => {
+                return result.map(mapper);
+            });
+        });
+    }, [cursorOptions]);
 
     const fetchNext = useCallback(async () => {
         if(!paginator.hasNext()) return;
@@ -81,6 +104,11 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
         fetchPrevious,
         isPreviousFetching,
         setFilter,
-        removeFilter
+        removeFilter,
+        isMainCursor,
+        cursorOptions,
+        makeFieldMainCursor,
+        toggleFieldOrder,
+        getOrderIconForField
     };
 }
