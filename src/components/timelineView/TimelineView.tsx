@@ -1,15 +1,19 @@
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE } from "../../constants/index.ts";
-import React, { ReactNode, useCallback } from "react";
+import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
+import React, { ReactNode, useCallback, useState } from "react";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { TimelineItem, TimelineItemType } from "./item/TimelineItem.tsx";
 import { ListRenderItem } from "@shopify/flash-list";
 import { MoreDataLoading } from "../loading/MoreDataLoading.tsx";
 import { AnimatedFlashList } from "../AnimatedComponents/index.ts";
 import { RNNativeScrollEvent } from "react-native-reanimated/lib/typescript/hook/commonTypes";
-import { ViewStyle } from "react-native";
+import { LayoutChangeEvent, StyleSheet, View, ViewStyle } from "react-native";
+import { FilterButton, FilterButtonProps } from "../filter/FilterButton.tsx";
+import { FilterRow } from "../filter/FilterRow.tsx";
 
 type TimelineViewProps = {
     data: Array<TimelineItemType>
+    orderButtons?: Array<FilterButtonProps>
+    filterButtons?: Array<FilterButtonProps>
     isInitialFetching?: boolean
     fetchNext?: () => Promise<void>
     fetchPrevious?: () => Promise<void>
@@ -18,12 +22,15 @@ type TimelineViewProps = {
     renderMilestone?: (milestone: string) => ReactNode
     scrollHandler?: (event: RNNativeScrollEvent, context?: Record<string, unknown>) => void
     style?: ViewStyle
+    filtersContainerStyle?: ViewStyle
 }
 
 const DOT_ICON_SIZE = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE;
 
 function ITimelineView({
     data,
+    orderButtons,
+    filterButtons,
     isInitialFetching,
     fetchNext,
     fetchPrevious,
@@ -31,8 +38,11 @@ function ITimelineView({
     isPreviousFetching,
     renderMilestone,
     scrollHandler,
-    style
+    style,
+    filtersContainerStyle
 }: TimelineViewProps) {
+    const [filterRowsHeight, setFilterRowsHeight] = useState(0);
+
     const renderItem = useCallback(({ item, index }: ListRenderItem<TimelineItemType>) => (
         <TimelineItem
             renderMilestone={ renderMilestone }
@@ -72,28 +82,67 @@ function ITimelineView({
 
     const keyExtractor = useCallback((item: TimelineItemType) => item.id, []);
 
+    const filterRowsOnLayout = useCallback((event: LayoutChangeEvent) => {
+        setFilterRowsHeight(event.nativeEvent.layout.height);
+    });
+
     return (
-        <AnimatedFlashList
-            data={ data }
-            renderItem={ renderItem }
-            maintainVisibleContentPosition={ { disabled: true } }
-            drawDistance={ heightPercentageToDP(100) }
-            keyExtractor={ keyExtractor }
-            ListEmptyComponent={ renderListEmptyComponent }
-            ListHeaderComponent={ renderHeader }
-            ListFooterComponent={ renderFooter }
-            onEndReached={ fetchPrevious }
-            onEndReachedThreshold={ 0.5 }
-            onStartReached={ fetchNext }
-            onStartReachedThreshold={ 0.5 }
-            keyboardDismissMode="on-drag"
-            contentContainerStyle={ [style, { flexGrow: 1 }] }
-            showsVerticalScrollIndicator={ false }
-            showsHorizontalScrollIndicator={ false }
-            onScroll={ scrollHandler }
-            scrollEventThrottle={ 16 }
-        />
+        <View style={ styles.container }>
+            <View
+                style={ [styles.filtersContainer, filtersContainerStyle] }
+                onLayout={ filterRowsOnLayout }
+            >
+                {
+                    orderButtons &&
+                   <FilterRow>
+                       { orderButtons.map((props, index) => <FilterButton key={ index.toString() } { ...props } />) }
+                   </FilterRow>
+                }
+                {
+                    filterButtons &&
+                   <FilterRow>
+                       { filterButtons.map((props, index) => <FilterButton key={ index.toString() } { ...props } />) }
+                   </FilterRow>
+                }
+            </View>
+            <AnimatedFlashList
+                data={ data }
+                renderItem={ renderItem }
+                maintainVisibleContentPosition={ { disabled: true } }
+                drawDistance={ heightPercentageToDP(100) }
+                keyExtractor={ keyExtractor }
+                ListEmptyComponent={ renderListEmptyComponent }
+                ListHeaderComponent={ renderHeader }
+                ListFooterComponent={ renderFooter }
+                onEndReached={ fetchPrevious }
+                onEndReachedThreshold={ 0.5 }
+                onStartReached={ fetchNext }
+                onStartReachedThreshold={ 0.5 }
+                keyboardDismissMode="on-drag"
+                contentContainerStyle={ [
+                    style,
+                    { flexGrow: 1, paddingTop: filterRowsHeight + SEPARATOR_SIZES.lightSmall }
+                ] }
+                showsVerticalScrollIndicator={ false }
+                showsHorizontalScrollIndicator={ false }
+                onScroll={ scrollHandler }
+                scrollEventThrottle={ 16 }
+            />
+        </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        position: "relative"
+    },
+    filtersContainer: {
+        position: "absolute",
+        left: -DEFAULT_SEPARATOR,
+        right: -DEFAULT_SEPARATOR,
+        zIndex: 1
+    }
+});
 
 export const TimelineView = React.memo(ITimelineView);

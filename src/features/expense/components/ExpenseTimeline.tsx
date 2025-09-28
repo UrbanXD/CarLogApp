@@ -4,15 +4,12 @@ import React, { useEffect, useMemo } from "react";
 import { TimelineView } from "../../../components/timelineView/TimelineView.tsx";
 import { Title } from "../../../components/Title.tsx";
 import { StyleSheet, View } from "react-native";
-import { DEFAULT_SEPARATOR, SIMPLE_HEADER_HEIGHT, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
+import { SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
 import { useTimelinePaginator } from "../../../hooks/useTimelinePaginator.ts";
 import { ExpenseTableRow } from "../../../database/connector/powersync/AppSchema.ts";
 import { Expense } from "../schemas/expenseSchema.ts";
 import { Car } from "../../car/schemas/carSchema.ts";
-import { FilterRow } from "../../../components/filter/FilterRow.tsx";
-import { FilterButton } from "../../../components/filter/FilterButton.tsx";
 import { useExpenseTimelineFilter } from "../hooks/useExpenseTimelineFilter.ts";
-import { useExpenseTimelineCursorOptions } from "../hooks/useExpenseTimelineCursorOptions.ts";
 
 type ExpenseTimelineProps = {
     car: Car
@@ -37,17 +34,11 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
         isPreviousFetching,
         setFilter,
         removeFilter,
-        isMainCursor,
-        makeFieldMainCursor,
-        toggleFieldOrder,
-        getOrderIconForField
-    } = useTimelinePaginator<ExpenseTableRow, Expense>({ paginator, mapper });
-
-    const { orderButtons } = useExpenseTimelineCursorOptions({
-        isMainCursor,
-        makeFieldMainCursor,
-        toggleFieldOrder,
-        getOrderIconForField
+        orderButtons
+    } = useTimelinePaginator<ExpenseTableRow, Expense>({
+        paginator,
+        mapper,
+        cursorOrderButtons: [{ field: "date", title: "Dátum" }, { field: "amount", title: "Ár" }]
     });
 
     useEffect(() => {
@@ -68,39 +59,24 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
                 title={ "Pénzügyek" }
                 subtitle={ `Az alábbi pénzügyi naplóban különböző kiadásai szerepelnek mely a kiválasztott autójához tartoznak.` }
             />
-            <View style={ { position: "relative", flex: 1 } }>
-                <View style={ {
-                    position: "absolute",
-                    left: -DEFAULT_SEPARATOR,
-                    right: -DEFAULT_SEPARATOR,
-                    zIndex: 40,
-                    gap: 0
-                    // height: SIMPLE_HEADER_HEIGHT * 2
-                } }>
-                    <FilterRow>
-                        { orderButtons.map((props, index) => <FilterButton key={ index.toString() } { ...props } />) }
-                    </FilterRow>
-                    <FilterRow>
-                        { filterButtons.map((props, index) => <FilterButton key={ index.toString() } { ...props } />) }
-                    </FilterRow>
-                </View>
-                <TimelineView
-                    data={ data }
-                    isInitialFetching={ isInitialFetching }
-                    fetchNext={ initialFetchHappened && paginator.hasNext() && fetchNext }
-                    fetchPrevious={ initialFetchHappened && paginator.hasPrevious() && fetchPrevious }
-                    isNextFetching={ isNextFetching }
-                    isPreviousFetching={ isPreviousFetching }
-                    style={ { paddingBottom: SIMPLE_TABBAR_HEIGHT, paddingTop: 2 * SIMPLE_HEADER_HEIGHT } }
-                />
-            </View>
+            <TimelineView
+                data={ data }
+                orderButtons={ orderButtons }
+                filterButtons={ filterButtons }
+                isInitialFetching={ isInitialFetching }
+                fetchNext={ initialFetchHappened && paginator.hasNext() && fetchNext }
+                fetchPrevious={ initialFetchHappened && paginator.hasPrevious() && fetchPrevious }
+                isNextFetching={ isNextFetching }
+                isPreviousFetching={ isPreviousFetching }
+                style={ { paddingBottom: SIMPLE_TABBAR_HEIGHT } }
+            />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
-        // gap: SEPARATOR_SIZES.small
+        flex: 1,
+        gap: SEPARATOR_SIZES.lightSmall
     }
 });
