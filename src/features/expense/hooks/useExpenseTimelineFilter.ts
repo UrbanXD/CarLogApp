@@ -11,11 +11,11 @@ export function useExpenseTimelineFilter() {
     const [typeFilter, setTypeFilter] = useState<ExpenseType | null>(null);
 
     useEffect(() => {
-        const call = (async () => {
-            const xd = await expenseDao.expenseTypeDao.getExpenseTypes();
-            setTypes(xd);
+        const getTypes = (async () => {
+            setTypes(await expenseDao.expenseTypeDao.getExpenseTypes());
         });
-        call();
+
+        getTypes();
     }, []);
 
     const selectTypeByKey = useCallback((key: ExpenseTypeEnum) => {
