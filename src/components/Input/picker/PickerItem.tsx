@@ -1,12 +1,11 @@
-import { Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
+import { StyleSheet, Text, View, ViewStyle } from "react-native";
 import React from "react";
-import { COLORS, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { COLORS, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 
 export type PickerItemType = {
     value: string
     title?: string
     subtitle?: string
-    icon?: ImageSourcePropType
 }
 
 type PickerItemProps = {
@@ -27,15 +26,6 @@ const PickerItem: React.FC<PickerItemProps> = ({
         disabled={ selected }
         style={ [styles.itemContainer, selected && styles.selectedItemContainer, style] }
     >
-        {
-            icon &&
-           <View style={ styles.iconContainer }>
-              <Image
-                 source={ icon }
-                 style={ styles.icon }
-              />
-           </View>
-        }
         <View style={ styles.textContainer }>
             <Text style={ styles.titleText }>
                 { title }
@@ -47,10 +37,6 @@ const PickerItem: React.FC<PickerItemProps> = ({
                </Text>
             }
         </View>
-        {
-            icon &&
-           <View style={ styles.iconContainer }/>
-        }
     </TouchableOpacity>
 );
 
@@ -59,7 +45,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: COLORS.gray4,
-        borderRadius: 15,
+        borderRadius: 12.5,
         borderWidth: 1.5,
         borderColor: COLORS.gray4,
         paddingVertical: SEPARATOR_SIZES.small,
@@ -67,15 +53,6 @@ const styles = StyleSheet.create({
     },
     selectedItemContainer: {
         borderColor: COLORS.gray1
-    },
-    iconContainer: {
-        flex: 0.25,
-        alignItems: "center"
-    },
-    icon: {
-        alignSelf: "center",
-        width: FONT_SIZES.h1,
-        height: FONT_SIZES.h1
     },
     textContainer: {
         flex: 1,
