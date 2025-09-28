@@ -1,7 +1,7 @@
 import React from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import CarProfile from "../features/car/components/carProfile/CarProfile.ts";
-import { ScreenScrollView } from "../components/ScreenScrollView.tsx";
+import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
 
 const EditCarScreen: React.FC = () => {
     const { id } = useLocalSearchParams();

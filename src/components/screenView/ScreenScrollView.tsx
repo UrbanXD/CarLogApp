@@ -1,24 +1,10 @@
 import React, { useCallback, useState } from "react";
-import { LayoutChangeEvent, View, ViewStyle } from "react-native";
-import {
-    COLORS,
-    DEFAULT_SEPARATOR,
-    SEPARATOR_SIZES,
-    SIMPLE_HEADER_HEIGHT,
-    SIMPLE_TABBAR_HEIGHT
-} from "../constants/index.ts";
+import { LayoutChangeEvent, View } from "react-native";
+import { SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../constants/index.ts";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { ScrollView } from "react-native-gesture-handler";
-import { useScreenScrollView } from "../contexts/screenScrollView/ScreenScrollViewContext.ts";
-import { Edges, SafeAreaView } from "react-native-safe-area-context";
-
-type ScreenScrollViewProps = {
-    screenHasHeader?: boolean,
-    screenHasTabBar?: boolean,
-    safeAreaEdges?: Edges,
-    style?: ViewStyle,
-    children?: React.ReactNode,
-}
+import { useScreenScrollView } from "../../contexts/screenScrollView/ScreenScrollViewContext.ts";
+import { ScreenView } from "./ScreenView.tsx";
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
@@ -68,18 +54,11 @@ export function ScreenScrollView({
     });
 
     return (
-        <SafeAreaView
-            edges={ safeAreaEdges }
-            style={ [
-                {
-                    flex: 1,
-                    paddingTop: (screenHasHeader && SIMPLE_HEADER_HEIGHT) + SEPARATOR_SIZES.lightSmall,
-                    paddingHorizontal: DEFAULT_SEPARATOR,
-                    paddingBottom: SEPARATOR_SIZES.lightSmall,
-                    backgroundColor: COLORS.black2
-                },
-                style
-            ] }>
+        <ScreenView
+            safeAreaEdges={ safeAreaEdges }
+            screenHasHeader={ screenHasHeader }
+            style={ style }
+        >
             <AnimatedScrollView
                 onLayout={ onLayout }
                 onContentSizeChange={ onContentSizeChange }
@@ -97,6 +76,6 @@ export function ScreenScrollView({
                     { children }
                 </View>
             </AnimatedScrollView>
-        </SafeAreaView>
+        </ScreenView>
     );
 };

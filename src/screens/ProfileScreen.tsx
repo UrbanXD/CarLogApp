@@ -19,7 +19,7 @@ import { Redirect, router } from "expo-router";
 import { useAppSelector } from "../hooks/index.ts";
 import { getUser } from "../features/user/model/selectors/index.ts";
 import { EDIT_USER_FORM_TYPE } from "../features/user/presets/bottomSheet/index.ts";
-import { ScreenScrollView } from "../components/ScreenScrollView.tsx";
+import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
 
 const ProfileScreen: React.FC = () => {
     const user = useAppSelector(getUser);

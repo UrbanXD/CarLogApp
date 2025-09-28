@@ -4,7 +4,7 @@ import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { formatNumber } from "../utils/formatNumber";
 import Divider from "../components/Divider";
-import { ScreenScrollView } from "../components/ScreenScrollView.tsx";
+import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
 
 const ServiceLogScreen: React.FC = () => {
     const logs = [
