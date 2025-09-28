@@ -23,6 +23,6 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.black2,
         gap: SEPARATOR_SIZES.lightSmall,
         paddingHorizontal: DEFAULT_SEPARATOR,
-        paddingVertical: SEPARATOR_SIZES.lightSmall / 2
+        paddingBottom: SEPARATOR_SIZES.lightSmall
     }
 });
