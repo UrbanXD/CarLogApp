@@ -10,7 +10,8 @@ import { ODOMETER_TABLE } from "../../../../database/connector/powersync/tables/
 import { OdometerLogMapper } from "../mapper/odometerLogMapper.ts";
 import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
 import { ODOMETER_LOG_TABLE } from "../../../../database/connector/powersync/tables/odometerLog.ts";
-import { CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
+import { CursorOptions, CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
+import { FilterCondition } from "../../../../database/paginator/AbstractPaginator.ts";
 
 export class OdometerDao {
     private readonly db: Kysely<DatabaseType>;
@@ -49,17 +50,18 @@ export class OdometerDao {
         });
     }
 
-    odometerLogPaginator(carId: string, perPage?: number = 10): CursorPaginator<OdometerLogTableRow> {
+    odometerLogPaginator(
+        cursorOptions: CursorOptions<keyof OdometerLogTableRow>,
+        filterBy?: FilterCondition<OdometerLogTableRow> | Array<FilterCondition<OdometerLogTableRow>>,
+        perPage?: number = 10
+    ): CursorPaginator<OdometerLogTableRow, OdometerLog> {
         return new CursorPaginator<OdometerLogTableRow, OdometerLog>(
             this.db,
             ODOMETER_LOG_TABLE,
-            {
-                field: ["value", "date", "id"],
-                order: ["desc", "desc", "asc"]
-            },
+            cursorOptions,
             {
                 perPage,
-                filterBy: { field: "car_id", operator: "=", value: carId },
+                filterBy,
                 mapper: this.logMapper.toOdometerLogDto
             }
         );
