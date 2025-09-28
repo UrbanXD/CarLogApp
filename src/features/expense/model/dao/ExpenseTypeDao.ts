@@ -13,13 +13,22 @@ export class ExpenseTypeDao {
         this.mapper = new ExpenseTypeMapper();
     }
 
+    async getExpenseTypes(): Promise<Array<ExpenseType>> {
+        const expenseTypes = await this.db
+        .selectFrom(EXPENSE_TYPE_TABLE)
+        .selectAll()
+        .execute();
+
+        return this.mapper.toExpenseTypeArrayDto(expenseTypes);
+    }
+
     async getExpenseTypeById(id: string): Promise<ExpenseType> {
         const expenseTypeRow = await this.db
         .selectFrom(EXPENSE_TYPE_TABLE)
         .selectAll()
         .where("id", "=", id)
         .executeTakeFirstOrThrow();
-
+        console.log(expenseTypeRow);
         return this.mapper.toExpenseTypeDto(expenseTypeRow);
     }
 
