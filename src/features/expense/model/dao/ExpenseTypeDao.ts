@@ -28,7 +28,7 @@ export class ExpenseTypeDao {
         .selectAll()
         .where("id", "=", id)
         .executeTakeFirstOrThrow();
-        console.log(expenseTypeRow);
+
         return this.mapper.toExpenseTypeDto(expenseTypeRow);
     }
 
