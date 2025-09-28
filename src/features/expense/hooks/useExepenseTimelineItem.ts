@@ -5,8 +5,11 @@ import { Alert } from "react-native";
 import dayjs from "dayjs";
 import { Expense } from "../schemas/expenseSchema.ts";
 import { ExpenseTypeEnum } from "../model/enums/ExpenseTypeEnum.ts";
+import utc from "dayjs/plugin/utc";
 
-export const useExpenseTimelineItem = () => {
+dayjs.extend(utc);
+
+export function useExpenseTimelineItem() {
     const mapper = useCallback((expense: Expense): TimelineItemType => {
         let title = "Egyéb";
         let color;
@@ -61,7 +64,7 @@ export const useExpenseTimelineItem = () => {
 
         return {
             id: expense.id,
-            milestone: dayjs(expense.date).format("YYYY. MM DD. hh:mm"),
+            milestone: dayjs(expense.date).format("YYYY. MM DD. HH:mm"),
             title,
             icon,
             color,
