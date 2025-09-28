@@ -4,7 +4,7 @@ import { Expense } from "../../schemas/expenseSchema.ts";
 import { EXPENSE_TABLE } from "../../../../database/connector/powersync/tables/expense.ts";
 import { ExpenseTypeDao } from "./ExpenseTypeDao.ts";
 import { ExpenseMapper } from "../mapper/expenseMapper.ts";
-import { CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
+import { CursorOptions, CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
 import { FilterCondition } from "../../../../database/paginator/AbstractPaginator.ts";
 
 export class ExpenseDao {
@@ -19,16 +19,14 @@ export class ExpenseDao {
     }
 
     paginator(
+        cursorOptions: CursorOptions<keyof ExpenseTableRow>,
         filterBy?: FilterCondition<ExpenseTableRow> | Array<FilterCondition<ExpenseTableRow>>,
         perPage?: number = 10
     ): CursorPaginator<ExpenseTableRow, Expense> {
         return new CursorPaginator<ExpenseTableRow, Expense>(
             this.db,
             EXPENSE_TABLE,
-            {
-                field: ["date", "id"],
-                order: ["desc", "asc"]
-            },
+            cursorOptions,
             {
                 perPage,
                 filterBy,
