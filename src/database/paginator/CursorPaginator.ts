@@ -16,7 +16,7 @@ export type CursorOptions<TableField> = {
 export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseType> extends Paginator<TableItem, MappedItem, DB> {
     private prevCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
     private nextCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
-    private cursorOptions: CursorOptions<keyof TableItem>;
+    cursorOptions: CursorOptions<keyof TableItem>;
 
     constructor(
         database: Kysely<DB>,

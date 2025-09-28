@@ -18,7 +18,7 @@ export type PaginatorOptions<TableItem, MappedItem = any> = {
 export abstract class Paginator<TableItem, MappedItem, DB> {
     private database: Kysely<DB>;
     private table: keyof DB;
-    private filterBy: Array<FilterCondition<TableItem>>;
+    filterBy: Array<FilterCondition<TableItem>>;
     private readonly mapper?: (tableRow?: TableItem) => MappedItem | Promise<MappedItem>;
     protected perPage: number;
 
