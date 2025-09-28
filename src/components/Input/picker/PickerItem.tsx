@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
 import React from "react";
 import { COLORS, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 
@@ -21,7 +21,7 @@ const PickerItem: React.FC<PickerItemProps> = ({
     selected,
     style
 }) => (
-    <TouchableOpacity
+    <Pressable
         onPress={ onPress }
         disabled={ selected }
         style={ [styles.itemContainer, selected && styles.selectedItemContainer, style] }
@@ -37,7 +37,7 @@ const PickerItem: React.FC<PickerItemProps> = ({
                </Text>
             }
         </View>
-    </TouchableOpacity>
+    </Pressable>
 );
 
 const styles = StyleSheet.create({
