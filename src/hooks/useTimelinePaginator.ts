@@ -1,32 +1,27 @@
 import { useCallback, useEffect, useState } from "react";
 import { TimelineItemType } from "../components/timelineView/item/TimelineItem.tsx";
-import { FilterCondition } from "../database/paginator/AbstractPaginator.ts";
 import { DatabaseType } from "../database/connector/powersync/AppSchema.ts";
 import { useFilterBy } from "./useFilterBy.ts";
 import { useCursor } from "./useCursor.ts";
-import { CursorOptions, CursorPaginator } from "../database/paginator/CursorPaginator.ts";
+import { CursorPaginator } from "../database/paginator/CursorPaginator.ts";
 
 type UseTimelinePaginatorProps<TableItem, MappedItem, DB> = {
     paginator: CursorPaginator<TableItem, MappedItem, DB>
     mapper: (item: MappedItem) => TimelineItemType
-    defaultCursorOptions: CursorOptions<TableItem>
-    defaultFilters?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>
 }
 
 export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = DatabaseType>({
     paginator,
-    mapper,
-    defaultCursorOptions,
-    defaultFilters
+    mapper
 }: UseTimelinePaginatorProps<TableItem, MappedItem, DB>) {
-    const { filters, setFilter, removeFilter } = useFilterBy<TableItem>(defaultFilters);
+    const { filters, setFilter, removeFilter } = useFilterBy<TableItem>(paginator.filterBy);
     const {
         cursorOptions,
         isMainCursor,
         makeFieldMainCursor,
         toggleFieldOrder,
         getOrderIconForField
-    } = useCursor<TableItem>(defaultCursorOptions);
+    } = useCursor<TableItem>(paginator.cursorOptions);
 
     const [data, setData] = useState<Array<TimelineItemType>>([]);
     const [initialFetchHappened, setInitialFetchHappened] = useState(false);
