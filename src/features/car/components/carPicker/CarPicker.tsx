@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native";
+import { ListRenderItemInfo, StyleSheet, View } from "react-native";
 import { FlashList, FlashListRef } from "@shopify/flash-list";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { Car } from "../../schemas/carSchema.ts";
@@ -18,12 +18,11 @@ import Animated, {
 } from "react-native-reanimated";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { scheduleOnRN } from "react-native-worklets";
-import Icon from "../../../../components/Icon.tsx";
 import { AnimatedPressable } from "../../../../components/AnimatedComponents/index.ts";
-import { IntelligentMarquee } from "../../../../components/marquee/IntelligentMarquee.tsx";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { router } from "expo-router";
 import useCars from "../../hooks/useCars.ts";
+import { SelectedCar } from "./SelectedCar.tsx";
 
 const CLOSE_ICON_SIZE = FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE;
 const MAX_TRANSLATE = widthPercentageToDP(100);
@@ -114,50 +113,12 @@ export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
                   onPress={ cars.length === 0 ? openCreateCarBottomSheet : openList }
                   style={ styles.controllerContainer }
                >
-                  <Icon
-                     icon={ ICON_NAMES.car }
-                     size={ FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE }
-                     color={ COLORS.white }
+                  <SelectedCar
+                     car={ selectedCar }
+                     placeholder={ "Válasszon autót" }
+                     userDontHaveCars={ cars.length === 0 }
+                     userDontHaveCarsPlaceholder={ "Kattintson ide és adja hozzá első autóját" }
                   />
-                   {
-                       cars.length === 0
-                       ?
-                       <View style={ { width: "60%" } }>
-                           <Text style={ styles.textContainer.model }>
-                               Adja hozzá első autóját most
-                           </Text>
-                       </View>
-                       :
-                       <View style={ { flex: 1 } }>
-                           {
-                               selectedCar &&
-                              <IntelligentMarquee
-                                 speed={ 0.65 }
-                                 delay={ 800 }
-                                 bounceDelay={ 800 }
-                                 spacing={ SEPARATOR_SIZES.lightSmall }
-                              >
-                                 <Text style={ styles.textContainer.name } numberOfLines={ 1 }>
-                                     { selectedCar.name }
-                                 </Text>
-                              </IntelligentMarquee>
-                           }
-                           <IntelligentMarquee
-                               speed={ 0.65 }
-                               delay={ 800 }
-                               bounceDelay={ 800 }
-                               spacing={ SEPARATOR_SIZES.lightSmall }
-                           >
-                               <Text style={ styles.textContainer.model } numberOfLines={ 1 }>
-                                   {
-                                       selectedCar
-                                       ? `${ selectedCar.model.make.name } ${ selectedCar.model.name }`
-                                       : "Válasszon egy autót!"
-                                   }
-                               </Text>
-                           </IntelligentMarquee>
-                       </View>
-                   }
                </AnimatedPressable>
             }
             <Animated.View style={ [styles.closeIconContainer, closeIconStyle] }>
