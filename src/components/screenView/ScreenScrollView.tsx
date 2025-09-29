@@ -4,7 +4,7 @@ import { SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../constants/index.ts"
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { ScrollView } from "react-native-gesture-handler";
 import { useScreenScrollView } from "../../contexts/screenScrollView/ScreenScrollViewContext.ts";
-import { ScreenView } from "./ScreenView.tsx";
+import { ScreenView, ScreenViewProps } from "./ScreenView.tsx";
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
@@ -14,7 +14,7 @@ export function ScreenScrollView({
     safeAreaEdges = ["top", "bottom", "right", "left"],
     style,
     children
-}: ScreenScrollViewProps) {
+}: ScreenViewProps) {
     const { y, distanceFromBottom, scrollDirection, isScrolling } = useScreenScrollView();
 
     const prevOffset = useSharedValue(0);
