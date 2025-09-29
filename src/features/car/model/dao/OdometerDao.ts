@@ -34,6 +34,16 @@ export class OdometerDao {
         return this.mapper.toOdometerDto(odometerRow);
     }
 
+    async getOdometerLogById(logId: string): Promise<OdometerLog> {
+        const odometerLog: OdometerLogTableRow = await this.db
+        .selectFrom(ODOMETER_LOG_TABLE)
+        .selectAll()
+        .where("id", "=", logId)
+        .executeTakeFirstOrThrow();
+
+        return this.logMapper.toOdometerLogDto(odometerLog);
+    }
+
     async createOdometerLog(odometerLogRow: OdometerLogTableRow): Promise<OdometerLog> {
         await this.db.transaction().execute(async trx => {
             const odometerLog = await trx
@@ -48,6 +58,14 @@ export class OdometerDao {
             .where("car_id", "=", odometerLog.car_id)
             .execute();
         });
+    }
+
+    async deleteOdometerLog(logId: string): Promise<string> {
+        return await this.db
+        .deleteFrom(ODOMETER_LOG_TABLE)
+        .where("id", "=", logId)
+        .returning("id")
+        .executeTakeFirstOrThrow();
     }
 
     odometerLogPaginator(

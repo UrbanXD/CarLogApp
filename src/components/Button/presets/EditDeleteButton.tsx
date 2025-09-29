@@ -34,7 +34,7 @@ export function EditDeleteButton({
             {
                 onDeletePress &&
                <Button.Icon
-                  icon={ ICON_NAMES.trashCan }
+                  icon={ deleteIcon }
                   iconSize={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
                   backgroundColor={ COLORS.googleRed }
                   iconColor={ COLORS.black }

@@ -13,7 +13,10 @@ export const useOdometerTimelineItem = () => {
         let title = "Kilométeróra-frissítés";
         let color;
         let icon;
-        let onPressInfo;
+        let onPress = () => router.push({
+            pathname: "/odometer/log/[id]",
+            params: { id: odometerLog.id }
+        });
 
         switch(odometerLog.type) {
             case OdometerLogType.FUEL:

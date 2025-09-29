@@ -133,6 +133,12 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="odometer/log"
                 options={ {
+                    header: () => <Header.Secondary title="Kilométeróra-állás napló"/>
+                } }
+            />
+            <Stack.Screen
+                name="odometer/log/[id]"
+                options={ {
                     header: () => <Header.Secondary title="Kilométeróra-állás"/>
                 } }
             />

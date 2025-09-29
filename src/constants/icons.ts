@@ -51,7 +51,8 @@ export const ICON_NAMES = {
     carWash: "car-wash",
     parking: "parking",
     vehicleInspection: "car-search",
-    insurance: "shield-car"
+    insurance: "shield-car",
+    note: "text"
 };
 
 export const ICON_COLORS = {
