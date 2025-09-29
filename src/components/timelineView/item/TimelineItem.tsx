@@ -1,11 +1,10 @@
-import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import Icon from "../../Icon.tsx";
 import React, { ReactNode } from "react";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import Divider from "../../Divider.tsx";
 import { DashedLine } from "./DashedLine.tsx";
-import Button from "../../Button/Button.ts";
 import { Color } from "../../../types/index.ts";
 import getContrastingColor from "../../../utils/colors/getContrastingColor.ts";
 
@@ -23,7 +22,7 @@ type TimelineItemProps = {
     footerText?: string
     isFirst: boolean
     isLast: boolean
-    onPressInfo?: () => void
+    onPress?: () => void
     renderMilestone?: (milestone: string) => ReactNode
 }
 
@@ -36,7 +35,7 @@ export function TimelineItem({
     iconSize = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE,
     note,
     footerText,
-    onPressInfo,
+    onPress,
     isFirst,
     isLast,
     renderMilestone
@@ -60,38 +59,19 @@ export function TimelineItem({
                 </View>
                 <DashedLine/>
             </View>
-            <View style={ styles.card }>
-                <View style={ {
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    gap: SEPARATOR_SIZES.lightSmall
-                } }>
-                    <View style={ styles.card.title.container }>
-                        {
-                            renderMilestone
-                            ? renderMilestone(milestone)
-                            : <Text style={ styles.card.title.text }>{ milestone }</Text>
-                        }
-                        <Text style={ styles.card.subtitle }>{ title }</Text>
-                        <Divider
-                            color={ color }
-                            thickness={ 3 }
-                            style={ { width: "45%", alignSelf: "flex-start" } }
-                        />
-                    </View>
+            <Pressable onPress={ onPress } disabled={ !onPress } style={ styles.card }>
+                <View style={ styles.card.title.container }>
                     {
-                        onPressInfo &&
-                       <Button.Icon
-                          icon={ ICON_NAMES.info }
-                          iconSize={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
-                          width={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
-                          height={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
-                          style={ { alignSelf: "flex-start" } }
-                          backgroundColor={ "transparent" }
-                          iconColor={ COLORS.white }
-                          onPress={ onPressInfo }
-                       />
+                        renderMilestone
+                        ? renderMilestone(milestone)
+                        : <Text style={ styles.card.title.text }>{ milestone }</Text>
                     }
+                    <Text style={ styles.card.subtitle }>{ title }</Text>
+                    <Divider
+                        color={ color }
+                        thickness={ 3 }
+                        style={ { width: "45%", alignSelf: "flex-start" } }
+                    />
                 </View>
                 {
                     note &&
@@ -101,7 +81,7 @@ export function TimelineItem({
                     footerText &&
                    <Text style={ [styles.card.date, !note && { alignSelf: "flex-end" }] }>{ footerText }</Text>
                 }
-            </View>
+            </Pressable>
         </View>
     );
 }

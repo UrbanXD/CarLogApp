@@ -6,6 +6,7 @@ import { COLORS, ICON_NAMES } from "../../../constants/index.ts";
 import { Alert } from "react-native";
 import { OdometerText } from "../components/odometer/OdometerText.tsx";
 import dayjs from "dayjs";
+import { router } from "expo-router";
 
 export const useOdometerTimelineItem = () => {
     const mapper = useCallback((odometerLog: OdometerLog): TimelineItemType => {
@@ -15,20 +16,17 @@ export const useOdometerTimelineItem = () => {
         let onPressInfo;
 
         switch(odometerLog.type) {
-            case OdometerLogType.SIMPLE:
-                title = "Kilométeróra-frissítés";
-                break;
             case OdometerLogType.FUEL:
                 title = "Tankolás";
                 icon = ICON_NAMES.fuelPump;
                 color = COLORS.fuelYellow;
-                onPressInfo = () => { Alert.alert("fuelocska"); };
+                onPress = () => { Alert.alert("fuelocska"); };
                 break;
             case OdometerLogType.SERVICE:
                 title = "Szervíz";
                 icon = ICON_NAMES.serviceOutline;
                 color = COLORS.service;
-                onPressInfo = () => Alert.alert(" SZERVIZECSKE ");
+                onPress = () => Alert.alert(" SZERVIZECSKE ");
                 break;
         }
 
@@ -47,7 +45,7 @@ export const useOdometerTimelineItem = () => {
             color,
             note: odometerLog.note,
             footerText: dayjs(odometerLog.date).format("YYYY. MM DD. hh:mm"),
-            onPressInfo
+            onPress
         };
     });
 
