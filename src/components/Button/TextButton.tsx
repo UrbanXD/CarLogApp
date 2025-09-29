@@ -9,7 +9,6 @@ import {
     View,
     ViewStyle
 } from "react-native";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
 import Icon from "../Icon";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
@@ -34,10 +33,10 @@ interface TextButtonProps {
 
 const TextButton: React.FC<TextButtonProps> = ({
     text,
-    fontSize = FONT_SIZES.h3,
+    fontSize = FONT_SIZES.p1,
     backgroundColor = COLORS.fuelYellow,
     textColor = getContrastingColor(backgroundColor, COLORS.white, COLORS.black),
-    height = hp(6),
+    height = FONT_SIZES.h3 * ICON_FONT_SIZE_SCALE + SEPARATOR_SIZES.lightSmall / 2,
     width,
     iconLeft,
     iconRight,
