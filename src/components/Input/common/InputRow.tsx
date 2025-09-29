@@ -1,16 +1,17 @@
 import React, { ReactElement } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import { SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { formTheme } from "../../../ui/form/constants/theme.ts";
 
 type InputRowProps = {
     children?: ReactElement
     focused?: boolean
+    style?: ViewStyle
 }
 
-export function InputRow({ children, focused = false }: InputRowProps) {
+export function InputRow({ children, focused = false, style }: InputRowProps) {
     return (
-        <View style={ [styles.container, focused && styles.focused] }>
+        <View style={ [styles.container, focused && styles.focused, style] }>
             { children }
         </View>
     );
@@ -31,3 +32,5 @@ const styles = StyleSheet.create({
         borderColor: formTheme.activeColor
     }
 });
+
+export default InputRow;
