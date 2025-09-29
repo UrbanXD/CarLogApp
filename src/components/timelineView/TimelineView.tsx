@@ -108,15 +108,14 @@ function ITimelineView({
             <AnimatedFlashList
                 data={ data }
                 renderItem={ renderItem }
-                maintainVisibleContentPosition={ { disabled: true } }
                 drawDistance={ heightPercentageToDP(100) }
                 keyExtractor={ keyExtractor }
                 ListEmptyComponent={ renderListEmptyComponent }
                 ListHeaderComponent={ renderHeader }
                 ListFooterComponent={ renderFooter }
-                onEndReached={ fetchPrevious }
+                onEndReached={ fetchNext }
                 onEndReachedThreshold={ 0.5 }
-                onStartReached={ fetchNext }
+                onStartReached={ fetchPrevious }
                 onStartReachedThreshold={ 0.5 }
                 keyboardDismissMode="on-drag"
                 contentContainerStyle={ [

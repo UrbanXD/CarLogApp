@@ -78,6 +78,8 @@ export abstract class Paginator<TableItem, MappedItem, DB> {
 
     abstract async initial(defaultValue?: TableItem): Promise<Array<MappedItem>>;
 
+    abstract async refresh(): Promise<Array<MappedItem>>;
+
     abstract async next(): Promise<Array<MappedItem> | null>;
 
     abstract async previous(): Promise<Array<MappedItem> | null>;

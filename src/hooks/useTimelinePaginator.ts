@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { TimelineItemType } from "../components/timelineView/item/TimelineItem.tsx";
 import { DatabaseType } from "../database/connector/powersync/AppSchema.ts";
 import { useFilterBy } from "./useFilterBy.ts";
 import { useCursor } from "./useCursor.ts";
 import { CursorPaginator } from "../database/paginator/CursorPaginator.ts";
 import { FilterButtonProps } from "../components/filter/FilterButton.tsx";
+import { useFocusEffect } from "expo-router";
 
 type UseTimelinePaginatorProps<TableItem, MappedItem, DB> = {
     paginator: CursorPaginator<TableItem, MappedItem, DB>
@@ -26,11 +27,26 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
         getOrderIconForField
     } = useCursor<TableItem>(paginator.cursorOptions);
 
+    const firstFocus = useRef(true);
+
     const [data, setData] = useState<Array<TimelineItemType>>([]);
     const [initialFetchHappened, setInitialFetchHappened] = useState(false);
     const [isInitialFetching, setIsInitialFetching] = useState(true);
     const [isNextFetching, setIsNextFetching] = useState(false);
     const [isPreviousFetching, setIsPreviousFetching] = useState(false);
+
+    useFocusEffect(
+        useCallback(() => {
+            if(firstFocus.current) {
+                firstFocus.current = false;
+                return;
+            }
+
+            paginator.refresh().then(result => {
+                setData(result.map(mapper));
+            });
+        }, [])
+    );
 
     useEffect(() => {
         setInitialFetchHappened(false);
