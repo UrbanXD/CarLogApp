@@ -1,3 +1,3 @@
-import { OdometerLogScreen } from "../../screens/OdometerLogScreen.tsx";
+import { OdometerLogTimelineScreen } from "../../screens/OdometerLogTimelineScreen.tsx";
 
-export default OdometerLogScreen;
+export default OdometerLogTimelineScreen;
