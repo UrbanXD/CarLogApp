@@ -4,6 +4,11 @@ bucket_definitions:
       - SELECT * FROM make
       - SELECT * FROM model
       - SELECT * FROM expense_type WHERE owner_id IS NULL
+      - SELECT * FROM currency
+      - SELECT * FROM odometer_log_type
+      - SELECT * FROM odometer_unit
+      - SELECT * FROM fuel_unit
+      - SELECT * FROM fuel_type
   by_user:
     parameters: SELECT request.user_id() as user_id
     data:

@@ -10,19 +10,29 @@ import { odometerLogTable } from "./tables/odometerLog.ts";
 import { fuelLogTable } from "./tables/fuelLog.ts";
 import { expenseTable } from "./tables/expense.ts";
 import { expenseTypeTable } from "./tables/expenseType.ts";
+import { fuelTypeTable } from "./tables/fuelType.ts";
+import { odometerUnitTable } from "./tables/odometerUnit.ts";
+import { odometerLogTypeTable } from "./tables/odometerLogType.ts";
+import { fuelUnitTable } from "./tables/fuelUnit.ts";
+import { currencyTable } from "./tables/currency.ts";
 
 export const AppSchema = new Schema({
     attachments: new AttachmentTable(),
     user_account: userTable,
     car: carTable,
     odometer: odometerTable,
+    odometer_unit: odometerUnitTable,
     odometer_log: odometerLogTable,
+    odometer_log_type: odometerLogTypeTable,
     fuel_tank: fuelTankTable,
+    fuel_unit: fuelUnitTable,
     fuel_log: fuelLogTable,
+    fuel_type: fuelTypeTable,
     make: makeTable,
     model: modelTable,
     expense: expenseTable,
-    expense_type: expenseTypeTable
+    expense_type: expenseTypeTable,
+    currency: currencyTable
 });
 
 export type DatabaseType = (typeof AppSchema)["types"];
