@@ -1,24 +1,33 @@
 import React, { ReactElement, ReactNode } from "react";
-import { GLOBAL_STYLE, SEPARATOR_SIZES } from "../../constants/index.ts";
+import { SEPARATOR_SIZES } from "../../constants/index.ts";
 import { FlatList } from "react-native-gesture-handler";
+import { ViewStyle } from "react-native";
 
-interface FormProps {
-    children: ReactNode | null;
+type FormProps = {
+    children: ReactNode | null
+    containerStyle?: ViewStyle
 }
 
-const Form: React.FC<FormProps> = ({
-    children
-}) =>
-    <FlatList
-        data={ React.Children.toArray(children) }
-        renderItem={ ({ item }) => item as ReactElement }
-        keyExtractor={ (_, index) => index.toString() }
-        contentContainerStyle={ [
-            GLOBAL_STYLE.scrollViewContentContainer, {
-                justifyContent: "flex-start",
-                gap: SEPARATOR_SIZES.mediumSmall
-            }
-        ] }
-    />;
+function Form({
+    children,
+    containerStyle
+}: FormProps) {
+    return (
+        <FlatList
+            data={ React.Children.toArray(children) }
+            renderItem={ ({ item }) => item as ReactElement }
+            keyExtractor={ (_, index) => index.toString() }
+            contentContainerStyle={ [
+                {
+                    flexGrow: 1,
+                    justifyContent: "flex-start",
+                    gap: SEPARATOR_SIZES.mediumSmall
+                },
+                containerStyle
+            ] }
+            showsVerticalScrollIndicator={ false }
+        />
+    );
+}
 
 export default Form;
