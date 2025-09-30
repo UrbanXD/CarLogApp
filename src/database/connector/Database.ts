@@ -12,6 +12,7 @@ import { ModelDao } from "../../features/car/model/dao/ModelDao.ts";
 import { MakeDao } from "../../features/car/model/dao/MakeDao.ts";
 import { OdometerDao } from "../../features/car/_features/odometer/model/dao/OdometerDao.ts";
 import { ExpenseDao } from "../../features/expense/model/dao/ExpenseDao.ts";
+import { FuelTypeDao } from "../../features/car/_features/fuel/model/dao/FuelTypeDao.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
@@ -25,6 +26,7 @@ export class Database {
     private _modelDao?: ModelDao;
     private _odometerDao?: OdometerDao;
     private _expenseDao?: ExpenseDao;
+    private _fuelTypeDao?: FuelTypeDao;
 
     constructor() {
         this.powersync = new PowerSyncDatabase({
@@ -90,6 +92,12 @@ export class Database {
         if(!this._expenseDao) this._expenseDao = new ExpenseDao(this.db);
 
         return this._expenseDao;
+    }
+
+    get fuelTypeDao(): FuelTypeDao {
+        if(!this._fuelTypeDao) this._fuelTypeDao = new FuelTypeDao(this.db);
+
+        return this._fuelTypeDao;
     }
 
     async init() {
