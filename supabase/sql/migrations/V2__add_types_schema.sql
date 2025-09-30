@@ -79,6 +79,22 @@ INSERT INTO odometer_unit (key, short, conversion_factor) VALUES
     ('KILOMETER', 'km', 1),
     ('MILE', 'mi', 1.60934); -- 1 mi → km
 
+CREATE TABLE fuel_type (
+    id SERIAL PRIMARY KEY,
+    key TEXT NOT NULL UNIQUE
+);
+
+INSERT INTO fuel_type (key) VALUES
+('GASOLINE'),
+('DIESEL'),
+('ELECTRIC'),
+('HYBRID'),
+('LPG');
+
+ALTER TABLE fuel_type ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY select_all_fuel_type ON fuel_type
+    FOR SELECT USING (true);
 
 CREATE POLICY "expense type owner and global can view" ON public.expense_type FOR SELECT TO authenticated USING ((owner_id IS NULL) OR (auth.uid() = owner_id));
 CREATE POLICY "expense type owner can insert" ON public.expense_type FOR INSERT TO authenticated WITH CHECK (auth.uid() = owner_id);
