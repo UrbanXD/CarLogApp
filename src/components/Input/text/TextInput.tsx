@@ -94,6 +94,13 @@ const TextInput: React.FC<TextInputProps> = ({
         )
     }));
 
+    const actionIconStyle = useAnimatedStyle(() => ({
+        opacity: withTiming(
+            fieldValue.length > 0 ? 1 : 0,
+            { duration: 200 }
+        )
+    }));
+
     const onContentSizeChange = (event: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
         height.value = Math.min(event.nativeEvent.contentSize.height, maxHeight);
     };
@@ -147,14 +154,15 @@ const TextInput: React.FC<TextInputProps> = ({
             }
             {
                 actionIcon &&
-               <View style={ styles.formFieldIconContainer }>
+               <Animated.View
+                  style={ [styles.formFieldIconContainer, animatedIconStyle, multiline && actionIconStyle] }>
                   <Icon
                      icon={ actionIcon }
                      size={ formTheme.iconSize }
                      color={ formTheme.iconColor }
                      onPress={ onAction }
                   />
-               </View>
+               </Animated.View>
             }
         </Animated.View>
     );
