@@ -1,3 +1,5 @@
-import { CreateOdometerLogBottomSheet } from "../../features/car/presets/bottomSheet/index.ts";
+import {
+    CreateOdometerLogBottomSheet
+} from "../../features/car/_features/odometer/presets/bottomSheet/CreateOdometerLogBottomSheet.tsx";
 
 export default CreateOdometerLogBottomSheet;

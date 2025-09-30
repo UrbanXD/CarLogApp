@@ -8,7 +8,7 @@ export class OdometerMapper {
         return odometerSchema.parse({
             id: odometerRow.id,
             value: odometerRow.value,
-            measurement: odometerRow.measurement
+            unit: odometerRow.unit
         });
     }
 
@@ -16,7 +16,7 @@ export class OdometerMapper {
         return {
             id: odometer.id,
             value: odometer.value,
-            measurement: odometer.measurement
+            unit: odometer.unit
         };
     }
 }

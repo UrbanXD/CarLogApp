@@ -5,8 +5,8 @@ import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES }
 import Button from "../../../../components/Button/Button.ts";
 import { CAR_FORM_STEPS } from "../../constants/index.ts";
 import Divider from "../../../../components/Divider.tsx";
-import { Odometer } from "../odometer/Odometer.tsx";
-import FuelGauge from "../FuelGauge.tsx";
+import { Odometer } from "../../_features/odometer/components/Odometer.tsx";
+import FuelGauge from "../../_features/fuel/components/FuelGauge.tsx";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { Car } from "../../schemas/carSchema.ts";
 import { IntelligentMarquee } from "../../../../components/marquee/IntelligentMarquee.tsx";
@@ -150,7 +150,7 @@ function CarProfileView({
             </View>
             <View style={ { gap: SEPARATOR_SIZES.lightSmall } }>
                 <View style={ styles.odometerContainer }>
-                    <Text style={ styles.odometerContainer.title }>Kilóméteróra ({ car.odometer.measurement })</Text>
+                    <Text style={ styles.odometerContainer.title }>Kilóméteróra</Text>
                     {
                         openEditCarStep &&
                        <Button.Icon
@@ -164,7 +164,7 @@ function CarProfileView({
                        />
                     }
                 </View>
-                <Odometer value={ car.odometer.value } unit={ car.odometer.measurement }/>
+                <Odometer value={ car.odometer.value } unit={ car.odometer.unit }/>
                 {
                     openOdometerLog &&
                    <Link
@@ -178,7 +178,7 @@ function CarProfileView({
                 value={ car.fuelTank.value }
                 tankSize={ car.fuelTank.capacity }
                 fuelType={ car.fuelTank.type }
-                measurement={ car.fuelTank.measurement }
+                unit={ car.fuelTank.unit }
                 disabled={ fuelSliderDisabled }
                 openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.FuelStep) }
             />

@@ -3,15 +3,17 @@ import {
     DatabaseType,
     OdometerLogTableRow,
     OdometerTableRow
-} from "../../../../database/connector/powersync/AppSchema.ts";
-import { Odometer } from "../../schemas/odometerSchema.ts";
+} from "../../../../../../database/connector/powersync/AppSchema.ts";
+import { Odometer } from "../../../../schemas/odometerSchema.ts";
 import { OdometerMapper } from "../mapper/odometerMapper.ts";
-import { ODOMETER_TABLE } from "../../../../database/connector/powersync/tables/odometer.ts";
+import { ODOMETER_TABLE } from "../../../../../../database/connector/powersync/tables/odometer.ts";
 import { OdometerLogMapper } from "../mapper/odometerLogMapper.ts";
-import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
-import { ODOMETER_LOG_TABLE } from "../../../../database/connector/powersync/tables/odometerLog.ts";
-import { CursorOptions, CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
-import { FilterCondition } from "../../../../database/paginator/AbstractPaginator.ts";
+import { OdometerLog } from "../../../../schemas/odometerLogSchema.ts";
+import { ODOMETER_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/odometerLog.ts";
+import { CursorOptions, CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
+import { FilterCondition } from "../../../../../../database/paginator/AbstractPaginator.ts";
+import { OdometerUnit } from "../enums/odometerUnit.ts";
+import { mileToKilometer } from "../../utils/convertOdometerUnit.ts";
 
 export class OdometerDao {
     private readonly db: Kysely<DatabaseType>;
@@ -21,7 +23,7 @@ export class OdometerDao {
     constructor(db: Kysely<DatabaseType>) {
         this.db = db;
         this.mapper = new OdometerMapper();
-        this.logMapper = new OdometerLogMapper();
+        this.logMapper = new OdometerLogMapper(this);
     }
 
     async getOdometerByCarId(carId: string): Promise<Odometer> {
@@ -41,10 +43,10 @@ export class OdometerDao {
         .where("id", "=", logId)
         .executeTakeFirstOrThrow();
 
-        return this.logMapper.toOdometerLogDto(odometerLog);
+        return await this.logMapper.toOdometerLogDto(odometerLog);
     }
 
-    async createOdometerLog(odometerLogRow: OdometerLogTableRow): Promise<OdometerLog> {
+    async createOdometerLog(odometerLogRow: OdometerLogTableRow, unit: string): Promise<OdometerLog> {
         await this.db.transaction().execute(async trx => {
             const odometerLog = await trx
             .insertInto(ODOMETER_LOG_TABLE)
@@ -54,7 +56,11 @@ export class OdometerDao {
 
             await trx
             .updateTable(ODOMETER_TABLE)
-            .set({ value: odometerLog.value })
+            .set({
+                value: unit.toUpperCase() === OdometerUnit.MILE
+                       ? mileToKilometer(odometerLog.value)
+                       : odometerLog.value
+            })
             .where("car_id", "=", odometerLog.car_id)
             .execute();
         });
@@ -80,7 +86,7 @@ export class OdometerDao {
             {
                 perPage,
                 filterBy,
-                mapper: this.logMapper.toOdometerLogDto
+                mapper: (row) => this.logMapper.toOdometerLogDto(row)
             }
         );
     }

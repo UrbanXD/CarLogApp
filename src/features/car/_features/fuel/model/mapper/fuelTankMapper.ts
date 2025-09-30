@@ -1,4 +1,4 @@
-import { FuelTankTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
+import { FuelTankTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { FuelTank, fuelTankSchema } from "../../schemas/fuelTankSchema.ts";
 
 export class FuelTankMapper {
@@ -10,7 +10,7 @@ export class FuelTankMapper {
             type: fuelTankRow.type,
             capacity: fuelTankRow.capacity,
             value: fuelTankRow.value,
-            measurement: fuelTankRow.measurement
+            unit: fuelTankRow.unit
         });
     }
 
@@ -20,7 +20,7 @@ export class FuelTankMapper {
             type: fuelTank.type,
             capacity: fuelTank.capacity,
             value: fuelTank.value,
-            measurement: fuelTank.measurement
+            unit: fuelTank.unit
         };
     }
 }

@@ -17,14 +17,14 @@ export const carFormSchema = carSchema
     }),
     odometer: carSchema.shape.odometer.pick({ id: true }).extend({
         value: zNumber({ min: 0 }).pipe(carSchema.shape.odometer.shape.value),
-        measurement: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
-        .pipe(carSchema.shape.odometer.shape.measurement)
+        unit: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
+        .pipe(carSchema.shape.odometer.shape.unit)
     }),
     fuelTank: carSchema.shape.fuelTank.pick({ id: true, value: true }).extend({
         type: zPickerRequired("Kérem válasszon ki egy üzemanyag típust!").pipe(carSchema.shape.fuelTank.shape.type),
         capacity: zNumber({ min: 0 }).pipe(carSchema.shape.fuelTank.shape.capacity),
-        measurement: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
-        .pipe(carSchema.shape.fuelTank.shape.measurement)
+        unit: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
+        .pipe(carSchema.shape.fuelTank.shape.unit)
     })
 });
 
@@ -46,14 +46,14 @@ export const useCreatCarFormProps = (userId: string) => {
         odometer: {
             id: getUUID(),
             value: NaN,
-            measurement: ""
+            unit: ""
         },
         fuelTank: {
             id: getUUID(),
             type: "",
             capacity: NaN,
             value: 0,
-            measurement: ""
+            unit: ""
         }
     };
 
@@ -76,14 +76,14 @@ export const useEditCarFormProps = (car: Car) => {
         odometer: {
             id: car.odometer.id,
             value: car.odometer.value,
-            measurement: car.odometer.measurement
+            unit: car.odometer.unit
         },
         fuelTank: {
             id: car.fuelTank.id,
             type: car.fuelTank.type,
             capacity: car.fuelTank.capacity,
             value: car.fuelTank.value,
-            measurement: car.fuelTank.measurement
+            unit: car.fuelTank.unit
         }
     };
 

@@ -9,8 +9,8 @@ import {
 import { ModelDao } from "./ModelDao.ts";
 import { MakeDao } from "./MakeDao.ts";
 import { CarMapper } from "../mapper/carMapper.ts";
-import { OdometerDao } from "./OdometerDao.ts";
-import { FuelTankDao } from "./FuelTankDao.ts";
+import { OdometerDao } from "../../_features/odometer/model/dao/OdometerDao.ts";
+import { FuelTankDao } from "../../_features/fuel/model/dao/FuelTankDao.ts";
 import { Car } from "../../schemas/carSchema.ts";
 import { ODOMETER_TABLE } from "../../../../database/connector/powersync/tables/odometer.ts";
 import { FUEL_TANK_TABLE } from "../../../../database/connector/powersync/tables/fuelTank.ts";
@@ -18,7 +18,7 @@ import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/P
 import { SupabaseStorageAdapter } from "../../../../database/connector/storage/SupabaseStorageAdapter.ts";
 import { CAR_TABLE } from "../../../../database/connector/powersync/tables/car.ts";
 import { ODOMETER_LOG_TABLE } from "../../../../database/connector/powersync/tables/odometerLog.ts";
-import { OdometerLogMapper } from "../mapper/odometerLogMapper.ts";
+import { OdometerLogMapper } from "../../_features/odometer/model/mapper/odometerLogMapper.ts";
 
 export class CarDao {
     private readonly db: Kysely<DatabaseType>;

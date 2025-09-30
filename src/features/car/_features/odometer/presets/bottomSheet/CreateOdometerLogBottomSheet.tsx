@@ -1,6 +1,6 @@
 import React from "react";
-import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
-import { CreateOdometerLogForm } from "../../components/forms/CreateOdometerLog.tsx";
+import BottomSheet from "../../../../../../ui/bottomSheet/components/BottomSheet.tsx";
+import { CreateOdometerLogForm } from "../../components/forms/CreateOdometerLogForm.tsx";
 
 export function CreateOdometerLogBottomSheet() {
     const TITLE = "Kilométeróra-állás rögzítése";

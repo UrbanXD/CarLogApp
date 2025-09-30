@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { FuelUnit } from "../model/enums/fuelUnit.ts";
 
 export const fuelTankSchema = z
 .object({
@@ -6,7 +7,7 @@ export const fuelTankSchema = z
     type: z.string(), //convert to enum
     capacity: z.number().min(0),
     value: z.number().min(0),
-    measurement: z.string() // convert to enum
+    unit: z.enum(Object.keys(FuelUnit))
 });
 
 export type FuelTank = z.infer<typeof fuelTankSchema>;

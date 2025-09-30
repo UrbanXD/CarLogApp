@@ -1,4 +1,4 @@
-import { ToastMessage, ToastMessages } from "../../../../ui/alert/model/types/index.ts";
+import { ToastMessage, ToastMessages } from "../../../../../../ui/alert/model/types/index.ts";
 
 const success: ToastMessage = () => {
     return {

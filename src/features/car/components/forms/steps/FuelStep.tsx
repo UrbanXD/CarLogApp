@@ -31,7 +31,7 @@ function FuelStep<FormFields = CarFormFields>({ control }: FuelStepProps<FormFie
             </Input.Field>
             <Input.Field
                 control={ control }
-                fieldName="fuelTank.measurement"
+                fieldName="fuelTank.unit"
                 fieldNameText="Mértékegység"
             >
                 <Input.Picker.Simple items={ generatePickerItems(FUEL_MEASUREMENTS) }/>

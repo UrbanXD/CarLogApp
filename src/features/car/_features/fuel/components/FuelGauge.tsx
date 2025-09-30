@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import { heightPercentageToDP } from "react-native-responsive-screen";
-import Button from "../../../components/Button/Button.ts";
-import Input from "../../../components/Input/Input.ts";
+import Button from "../../../../../components/Button/Button.ts";
+import Input from "../../../../../components/Input/Input.ts";
 
 type FuelGaugeProps = {
     value: number
     tankSize: number
     fuelType: string
-    measurement: string
+    unit: string
     disabled?: boolean
     openEditForm?: () => void
 }
@@ -18,7 +18,7 @@ const FuelGauge: React.FC<FuelGaugeProps> = ({
     value,
     tankSize,
     fuelType,
-    measurement,
+    unit,
     disabled = false,
     openEditForm
 }) => {
@@ -57,7 +57,7 @@ const FuelGauge: React.FC<FuelGaugeProps> = ({
             <Input.Slider
                 minValue={ 0 }
                 maxValue={ tankSize }
-                measurement={ measurement }
+                unit={ unit }
                 value={ value ?? 0 }
                 setValue={ setFuelValue }
                 disabled={ disabled }

@@ -2,9 +2,16 @@ import { OdometerLogTableRow, OdometerTableRow } from "../../../../database/conn
 import { OdometerLog, odometerLogSchema } from "../../schemas/odometerLogSchema.ts";
 import { OdometerLogFields } from "../../schemas/form/odometerLogForm.ts";
 import { OdometerLogType } from "../enums/odometerLogType.ts";
+import { OdometerDao } from "../dao/OdometerDao.ts";
+import { kilometerToMile } from "../../utils/convertOdometerUnit.ts";
+import { OdometerUnit } from "../enums/odometerUnit.ts";
 
 export class OdometerLogMapper {
-    constructor() {}
+    private odometerDao: OdometerDao;
+
+    constructor(odometerDao: OdometerDao) {
+        this.odometerDao = odometerDao;
+    }
 
     fromOdometerEntityToOdometerLogEntity(odometerRow: OdometerTableRow, createdAt: string): OdometerLogTableRow {
         return {
@@ -23,25 +30,25 @@ export class OdometerLogMapper {
             car_id: formResult.carId,
             type: formResult.type,
             value: formResult.value,
-            unit: formResult.unit,
             note: formResult.note,
             date: formResult.date
         };
     }
 
-    toOdometerLogDto(odometerLogRow: OdometerLogTableRow): OdometerLog {
+    async toOdometerLogDto(odometerLogRow: OdometerLogTableRow): Promise<OdometerLog> {
+        const odometer = await this.odometerDao.getOdometerByCarId(odometerLogRow.car_id);
         return odometerLogSchema.parse({
             id: odometerLogRow.id,
             carId: odometerLogRow.car_id,
             type: odometerLogRow.type,
-            value: odometerLogRow.value,
-            unit: odometerLogRow.unit,
+            value: odometer.unit === OdometerUnit.MILE ? kilometerToMile(odometerLogRow.value) : odometerLogRow.value,
+            unit: odometer.unit,
             note: odometerLogRow.note,
             date: odometerLogRow.date
         });
     }
 
-    toOdometerLogDtoArray(odometerLogRowArray: Array<OdometerLog>) {
+    async atoOdometerLogDtoArray(odometerLogRowArray: Array<OdometerLog>) {
         return (odometerLogRowArray.map(odometerLogRow => this.toOdometerLogDto(odometerLogRow))).filter(
             element => element !== null);
     }
@@ -52,7 +59,6 @@ export class OdometerLogMapper {
             car_id: odometerLog.carId,
             type: odometerLog.type,
             value: odometerLog.value,
-            unit: odometerLog.unit,
             note: odometerLog.note,
             date: odometerLog.date
         };

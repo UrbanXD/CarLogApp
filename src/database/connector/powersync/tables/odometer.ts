@@ -6,5 +6,5 @@ export const odometerTable = new Table({
     id: column.text,
     car_id: column.text,
     value: column.integer,
-    measurement: column.text
+    unit: column.text
 });

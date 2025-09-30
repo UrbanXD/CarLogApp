@@ -10,7 +10,7 @@ import { CarDao } from "../../features/car/model/dao/CarDao.ts";
 import { BaseConfig } from "../../constants/index.ts";
 import { ModelDao } from "../../features/car/model/dao/ModelDao.ts";
 import { MakeDao } from "../../features/car/model/dao/MakeDao.ts";
-import { OdometerDao } from "../../features/car/model/dao/OdometerDao.ts";
+import { OdometerDao } from "../../features/car/_features/odometer/model/dao/OdometerDao.ts";
 import { ExpenseDao } from "../../features/expense/model/dao/ExpenseDao.ts";
 
 export class Database {

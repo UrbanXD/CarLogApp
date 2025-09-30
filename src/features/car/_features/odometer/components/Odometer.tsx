@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { LayoutChangeEvent, StyleSheet, View } from "react-native";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import { OdometerText } from "./OdometerText.tsx";
 import { OdometerUnitText } from "./UnitText.tsx";
 

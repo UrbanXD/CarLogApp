@@ -4,8 +4,8 @@ import { getImageFromAttachmentQueue } from "../../../../database/utils/getImage
 import { Car, carSchema } from "../../schemas/carSchema.ts";
 import { MakeDao } from "../dao/MakeDao.ts";
 import { ModelDao } from "../dao/ModelDao.ts";
-import { OdometerDao } from "../dao/OdometerDao.ts";
-import { FuelTankDao } from "../dao/FuelTankDao.ts";
+import { OdometerDao } from "../../_features/odometer/model/dao/OdometerDao.ts";
+import { FuelTankDao } from "../../_features/fuel/model/dao/FuelTankDao.ts";
 import { CarFormFields, carFormSchema } from "../../schemas/form/carForm.ts";
 
 export class CarMapper {
@@ -76,7 +76,7 @@ export class CarMapper {
             id: request.odometer.id,
             car_id: request.id,
             value: request.odometer.value,
-            measurement: request.odometer.measurement
+            unit: request.odometer.unit
         };
 
         const fuelTank: FuelTankTableRow = {
@@ -85,7 +85,7 @@ export class CarMapper {
             type: request.fuelTank.type,
             capacity: request.fuelTank.capacity,
             value: request.fuelTank.value,
-            measurement: request.fuelTank.measurement
+            unit: request.fuelTank.unit
         };
 
         return { car, odometer, fuelTank };

@@ -7,7 +7,6 @@ export const odometerLogTable = new Table({
     car_id: column.text,
     type: column.text,
     value: column.integer,
-    unit: column.text,
     note: column.text,
     date: column.text
 });

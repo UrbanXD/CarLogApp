@@ -31,7 +31,7 @@ import type {
     PanGestureHandlerEventPayload
 } from "react-native-gesture-handler/src/handlers/GestureHandlerEventPayload.ts";
 import { PanGestureChangeEventPayload } from "react-native-gesture-handler/src/handlers/gestures/panGesture.ts";
-import { addMeasurementToValue } from "../../../utils/addMeasurementToValue.ts";
+import { addUnitToValue } from "../../../utils/addUnitToValue.ts";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
@@ -40,7 +40,7 @@ interface SliderProps {
     setValue?: (value: number) => void;
     minValue?: number;
     maxValue?: number;
-    measurement?: string;
+    unit?: string;
     disabled?: boolean;
     tapToSeek?: boolean;
     tooltipAsInputField?: boolean;
@@ -75,7 +75,7 @@ const Slider: React.FC<SliderProps> = ({
     maxValue,
     value = minValue,
     setValue,
-    measurement,
+    unit,
     disabled,
     tapToSeek = true,
     tooltipAsInputField = false,
@@ -436,7 +436,7 @@ const Slider: React.FC<SliderProps> = ({
 
     const animatedTooltipProps = useAnimatedProps(() => {
         let text = inputValue.value.toString();
-        if(measurement) text += ` ${ measurement }`;
+        if(unit) text += ` ${ unit }`;
         if(setValue) runOnJS(setValue)(inputValue.value);
 
         return { text };
@@ -460,7 +460,7 @@ const Slider: React.FC<SliderProps> = ({
                          <View pointerEvents="none">
                             <AnimatedTextInput
                                ref={ tooltipInputRef }
-                               defaultValue={ addMeasurementToValue(currentValue, measurement) }
+                               defaultValue={ addUnitToValue(currentValue, unit) }
                                editable={ tooltipAsInputField }
                                animatedProps={ animatedTooltipProps }
                                keyboardType="numeric"
@@ -503,8 +503,8 @@ const Slider: React.FC<SliderProps> = ({
             {
                 showsBoundingValues &&
                <View style={ styles.boundingValues }>
-                  <Text style={ styles.boundingValues.text }>{ minValue } { measurement }</Text>
-                  <Text style={ styles.boundingValues.text }>{ maxValue } { measurement }</Text>
+                  <Text style={ styles.boundingValues.text }>{ minValue } { unit }</Text>
+                  <Text style={ styles.boundingValues.text }>{ maxValue } { unit }</Text>
                </View>
             }
         </View>

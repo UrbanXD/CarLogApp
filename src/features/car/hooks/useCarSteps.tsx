@@ -27,13 +27,13 @@ function useCarSteps({ control, resetField, setValue, getValues }: StepProps<Car
             },
             {
                 title: "Kilométeróra",
-                fields: ["odometer.value", "odometer.measurement"],
+                fields: ["odometer.value", "odometer.unit"],
                 render: () => <OdometerStep control={ control }/>,
                 editToastMessages: CarEditNameToast
             },
             {
                 title: "Üzemanyag",
-                fields: ["fuelTank.type", "fuelTank.measurement", "fuelTank.capacity"],
+                fields: ["fuelTank.type", "fuelTank.unit", "fuelTank.capacity"],
                 render: () => <FuelStep control={ control }/>,
                 editToastMessages: CarEditNameToast
             },
@@ -59,13 +59,13 @@ function useCarSteps({ control, resetField, setValue, getValues }: StepProps<Car
                     },
                     odometer: {
                         value: values.odometer.value,
-                        measurement: values.odometer.measurement
+                        unit: values.odometer.unit
                     },
                     fuelTank: {
                         type: values.fuelTank.type,
                         capacity: values.fuelTank.capacity,
                         value: values.fuelTank.value,
-                        measurement: values.fuelTank.measurement
+                        unit: values.fuelTank.unit
                     },
                     image: values.image
                 };

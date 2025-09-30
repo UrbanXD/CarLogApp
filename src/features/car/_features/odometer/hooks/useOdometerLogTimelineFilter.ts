@@ -1,6 +1,6 @@
-import { FilterButtonProps } from "../../../components/filter/FilterButton.tsx";
+import { FilterButtonProps } from "../../../../../components/filter/FilterButton.tsx";
 import { useState } from "react";
-import { COLORS } from "../../../constants/index.ts";
+import { COLORS } from "../../../../../constants/index.ts";
 import { OdometerLogType } from "../model/enums/odometerLogType.ts";
 
 export function useOdometerLogTimelineFilter() {

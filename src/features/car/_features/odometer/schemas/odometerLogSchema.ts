@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { OdometerLogType } from "../model/enums/odometerLogType.ts";
+import { OdometerUnit } from "../model/enums/odometerUnit.ts";
 
 export const odometerLogSchema = z
 .object({
@@ -7,7 +8,7 @@ export const odometerLogSchema = z
     carId: z.string().uuid(),
     type: z.enum(Object.keys(OdometerLogType)),
     value: z.number().min(0),
-    unit: z.string(), //convert to enum
+    unit: z.enum(Object.keys(OdometerUnit)),
     note: z.string().nullable(),
     date: z.string()
 });

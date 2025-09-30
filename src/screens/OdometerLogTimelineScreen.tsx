@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../constants/index.ts";
-import { OdometerLogTimeline } from "../features/car/components/odometer/OdometerLogTimeline.tsx";
+import { OdometerLogTimeline } from "../features/car/_features/odometer/components/OdometerLogTimeline.tsx";
 
 export function OdometerLogTimelineScreen() {
     const { id } = useLocalSearchParams();

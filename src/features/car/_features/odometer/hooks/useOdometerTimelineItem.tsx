@@ -1,10 +1,10 @@
 import React, { useCallback } from "react";
-import { OdometerLog } from "../schemas/odometerLogSchema.ts";
-import { TimelineItemType } from "../../../components/timelineView/item/TimelineItem.tsx";
+import { OdometerLog } from "../../../schemas/odometerLogSchema.ts";
+import { TimelineItemType } from "../../../../../components/timelineView/item/TimelineItem.tsx";
 import { OdometerLogType } from "../model/enums/odometerLogType.ts";
-import { COLORS, ICON_NAMES } from "../../../constants/index.ts";
+import { COLORS, ICON_NAMES } from "../../../../../constants/index.ts";
 import { Alert } from "react-native";
-import { OdometerText } from "../components/odometer/OdometerText.tsx";
+import { OdometerText } from "../components/OdometerText.tsx";
 import dayjs from "dayjs";
 import { router } from "expo-router";
 

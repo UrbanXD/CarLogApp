@@ -1,18 +1,18 @@
-import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
-import { TimelineView } from "../../../../components/timelineView/TimelineView.tsx";
+import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
+import { TimelineView } from "../../../../../components/timelineView/TimelineView.tsx";
 import React, { useCallback, useEffect, useMemo } from "react";
-import { SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import { StyleSheet, View } from "react-native";
-import useCars from "../../hooks/useCars.ts";
+import useCars from "../../../hooks/useCars.ts";
 import { Odometer } from "./Odometer.tsx";
-import FloatingActionMenu from "../../../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
+import FloatingActionMenu from "../../../../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
 import { router } from "expo-router";
-import { useOdometerTimelineItem } from "../../hooks/useOdometerTimelineItem.tsx";
-import { Title } from "../../../../components/Title.tsx";
-import { useTimelinePaginator } from "../../../../hooks/useTimelinePaginator.ts";
-import { OdometerLogTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
-import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
-import { useOdometerLogTimelineFilter } from "../../hooks/useOdometerLogTimelineFilter.ts";
+import { useOdometerTimelineItem } from "../hooks/useOdometerTimelineItem.tsx";
+import { Title } from "../../../../../components/Title.tsx";
+import { useTimelinePaginator } from "../../../../../hooks/useTimelinePaginator.ts";
+import { OdometerLogTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
+import { OdometerLog } from "../../../schemas/odometerLogSchema.ts";
+import { useOdometerLogTimelineFilter } from "../hooks/useOdometerLogTimelineFilter.ts";
 
 type OdometerLogTimelineProps = {
     carId: string
@@ -67,7 +67,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
                     title={ car.name }
                     subtitle={ `${ car.model.make.name } ${ car.model.name }` }
                 />
-                <Odometer value={ car.odometer.value } unit={ car.odometer.measurement }/>
+                <Odometer value={ car.odometer.value } unit={ car.odometer.unit }/>
             </View>
             <TimelineView
                 data={ data }

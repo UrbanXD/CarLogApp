@@ -8,5 +8,5 @@ export const fuelTankTable = new Table({
     type: column.text,
     capacity: column.integer,
     value: column.integer,
-    measurement: column.text
+    unit: column.text
 });

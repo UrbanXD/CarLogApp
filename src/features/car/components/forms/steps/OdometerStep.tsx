@@ -24,7 +24,7 @@ function OdometerStep<FormFields = CarFormFields>({ control }: OdometerStepProps
             </Input.Field>
             <Input.Field
                 control={ control }
-                fieldName="odometer.measurement"
+                fieldName="odometer.unit"
                 fieldNameText="Mértékegység"
             >
                 <Input.Picker.Simple items={ generatePickerItems(ODOMETER_MEASUREMENTS) }/>
