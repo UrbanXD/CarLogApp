@@ -1,16 +1,19 @@
-import React, { ProviderProps } from "react";
-import { ControllerRenderArgs } from "../../constants/index.ts";
+import React, { ReactNode } from "react";
 import { InputFieldContext } from "./InputFieldContext.ts";
+import { Control, UseControllerReturn } from "react-hook-form";
 
-export const InputFieldProvider: React.FC<ProviderProps<ControllerRenderArgs>> = ({
+export type InputFieldProviderProps = {
+    children: ReactNode
+    value: UseControllerReturn & { control: Control<any> }
+}
+
+export function InputFieldProvider({
     children,
     value
-}) => {
+}: InputFieldProviderProps) {
     return (
-        <InputFieldContext.Provider
-            value={ value }
-        >
+        <InputFieldContext.Provider value={ value }>
             { children }
         </InputFieldContext.Provider>
     );
-};
+}

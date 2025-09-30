@@ -2,13 +2,13 @@ import Button from "../../Button/Button.ts";
 import { pickImage } from "../../../utils/pickImage.ts";
 import { ImageSourcePropType, StyleSheet, View } from "react-native";
 import { encode } from "base64-arraybuffer";
-import { Control, Controller } from "react-hook-form";
+import { Control, Controller, UseControllerReturn } from "react-hook-form";
 import React, { useCallback, useEffect, useState } from "react";
 import Carousel, { CarouselItemType } from "../../Carousel/Carousel.tsx";
 import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../../Carousel/CarouselItem.tsx";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { COLORS, ControllerRenderArgs, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import InputTitle from "../common/InputTitle.tsx";
 import DefaultElement from "../../DefaultElement.tsx";
 import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
@@ -137,7 +137,7 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
         });
     };
 
-    const render = useCallback((args: ControllerRenderArgs) => {
+    const render = useCallback((args: UseControllerReturn) => {
         const { field: { onChange, value }, fieldState: { error } } = args;
 
         useEffect(() => {

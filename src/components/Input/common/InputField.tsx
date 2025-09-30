@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
-import { Control, Controller } from "react-hook-form";
-import { ControllerRenderArgs, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { Control, Controller, UseControllerReturn } from "react-hook-form";
+import { SEPARATOR_SIZES } from "../../../constants/index.ts";
 import InputTitle from "./InputTitle.tsx";
 import { StyleSheet, View } from "react-native";
 import { InputFieldProvider } from "../../../contexts/inputField/InputFieldProvider.tsx";
@@ -23,9 +23,9 @@ const InputField: React.FC<InputFieldProps> = ({
     optional,
     children
 }) => {
-    const renderControllerInput = (args: ControllerRenderArgs) => {
+    const renderControllerInput = (args: UseControllerReturn<any>) => {
         return (
-            <InputFieldProvider value={ args }>
+            <InputFieldProvider value={ { ...args, control: control } }>
                 <View>
                     { children }
                 </View>
