@@ -8,9 +8,9 @@ import Divider from "../components/Divider.tsx";
 import { InfoRow } from "../components/InfoRow.tsx";
 import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { EditDeleteButton } from "../components/Button/presets/index.ts";
 import { useAlert } from "../ui/alert/hooks/useAlert.ts";
 import { DeleteOdometerLogToast } from "../features/car/presets/toast/DeleteOdometerLogToast.ts";
+import Button from "../components/Button/Button.ts";
 
 const DIVIDER_COLOR = COLORS.gray3;
 const DIVIDER_MARGIN = SEPARATOR_SIZES.lightSmall / 3;
@@ -87,7 +87,7 @@ export function OdometerLogScreen() {
                     subtitleStyle={ !odometerLog?.note && { color: COLORS.gray2 } }
                 />
             </ScreenScrollView>
-            <EditDeleteButton
+            <Button.EditDelete
                 buttonContainerStyle={ { paddingBottom: bottom + SEPARATOR_SIZES.lightSmall } }
                 onDeletePress={ onDelete }
                 onEditPress={ () => {} }
