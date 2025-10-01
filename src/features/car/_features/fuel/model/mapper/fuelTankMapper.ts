@@ -1,26 +1,42 @@
 import { FuelTankTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { FuelTank, fuelTankSchema } from "../../schemas/fuelTankSchema.ts";
+import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
+import { FuelTypeDao } from "../dao/FuelTypeDao.ts";
+import { FuelUnitDao } from "../dao/FuelUnitDao.ts";
 
-export class FuelTankMapper {
-    constructor() {}
+export class FuelTankMapper extends AbstractMapper<FuelTankTableRow, FuelTank> {
+    private readonly fuelTypeDao: FuelTypeDao;
+    private readonly fuelUnitDao: FuelUnitDao;
 
-    toFuelTankDto(fuelTankRow: FuelTankTableRow): FuelTank {
+    constructor(fuelTypeDao: FuelTypeDao, fuelUnitDao: FuelUnitDao) {
+        super();
+        this.fuelTypeDao = fuelTypeDao;
+        this.fuelUnitDao = fuelUnitDao;
+    }
+
+    async toDto(entity: FuelTankTableRow): Promise<FuelTank> {
+        const type = await this.fuelTypeDao.getById(entity.type_id);
+        if(!type) throw new Error(`Fuel Type (${ entity.type_id }) not found`);
+
+        const unit = await this.fuelUnitDao.getById(entity.unit_id);
+        if(!unit) throw new Error(`Fuel Unit (${ entity.unit_id }) not found`);
+
         return fuelTankSchema.parse({
-            id: fuelTankRow.id,
-            type: fuelTankRow.type,
-            capacity: fuelTankRow.capacity,
-            value: fuelTankRow.value,
-            unit: fuelTankRow.unit
+            id: entity.id,
+            type: type,
+            unit: unit,
+            capacity: entity.capacity,
+            value: entity.capacity
         });
     }
 
-    toFuelTankEntity(fuelTank: FuelTank): FuelTankTableRow {
+    async toEntity(dto: FuelTank): Promise<FuelTankTableRow> {
         return {
-            id: fuelTank.id,
-            type: fuelTank.type,
-            capacity: fuelTank.capacity,
-            value: fuelTank.value,
-            unit: fuelTank.unit
+            id: dto.id,
+            type_id: dto.type.id,
+            unit_id: dto.unit.id,
+            capacity: dto.capacity,
+            value: dto.value
         };
     }
 }

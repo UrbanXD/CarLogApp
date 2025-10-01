@@ -1,14 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Input from "../../../../../components/Input/Input.ts";
 import { ICON_NAMES } from "../../../../../constants/index.ts";
-import { FUEL_MEASUREMENTS, FUEL_TYPES } from "../../../constants/index.ts";
 import { StepProps } from "../../../../../types/index.ts";
-import { generatePickerItems } from "../../../../../utils/toPickerItems.ts";
 import { CarFormFields } from "../../../schemas/form/carForm.ts";
+import { FuelType } from "../../../_features/fuel/schemas/fuelTypeSchema.ts";
+import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
+import { FuelUnit } from "../../../_features/fuel/schemas/fuelUnitSchema.ts";
+import { MoreDataLoading } from "../../../../../components/loading/MoreDataLoading.tsx";
 
 type FuelStepProps<FormFields> = Pick<StepProps<FormFields>, "control">
 
 function FuelStep<FormFields = CarFormFields>({ control }: FuelStepProps<FormFields>) {
+    const { fuelTypeDao, fuelUnitDao } = useDatabase();
+
+    const [fuelTypes, setFuelTypes] = useState<Array<FuelType>>();
+    const [fuelUnits, setFuelUnits] = useState<Array<FuelUnit>>();
+
+    useEffect(() => {
+        (async () => {
+            const fuelTypesDto = await fuelTypeDao.getAll();
+            const fuelUnitsDto = await fuelUnitDao.getAll();
+
+            setFuelTypes(fuelTypeDao.mapper.dtoToPicker(fuelTypesDto));
+            setFuelUnits(fuelUnitDao.mapper.dtoToPicker(fuelUnitsDto));
+        })();
+    }, []);
+
+
     return (
         <Input.Group>
             <Input.Field
@@ -24,17 +42,29 @@ function FuelStep<FormFields = CarFormFields>({ control }: FuelStepProps<FormFie
             </Input.Field>
             <Input.Field
                 control={ control }
-                fieldName="fuelTank.type"
+                fieldName="fuelTank.typeId"
                 fieldNameText="Típus"
             >
-                <Input.Picker.Simple items={ generatePickerItems(FUEL_TYPES) }/>
+                {
+                    fuelTypes
+                    ?
+                    <Input.Picker.Simple items={ fuelTypes }/>
+                    :
+                    <MoreDataLoading/>
+                }
             </Input.Field>
             <Input.Field
                 control={ control }
-                fieldName="fuelTank.unit"
+                fieldName="fuelTank.unitId"
                 fieldNameText="Mértékegység"
             >
-                <Input.Picker.Simple items={ generatePickerItems(FUEL_MEASUREMENTS) }/>
+                {
+                    fuelUnits
+                    ?
+                    <Input.Picker.Simple items={ fuelUnits }/>
+                    :
+                    <MoreDataLoading/>
+                }
             </Input.Field>
         </Input.Group>
     );

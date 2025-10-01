@@ -1,6 +1,7 @@
 import { FuelTypeTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { FuelType, fuelTypeSchema } from "../../schemas/fuelTypeSchema.ts";
 import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
+import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
 
 export class FuelTypeMapper extends AbstractMapper<FuelTypeTableRow, FuelType> {
     constructor() {
@@ -10,7 +11,8 @@ export class FuelTypeMapper extends AbstractMapper<FuelTypeTableRow, FuelType> {
     async toDto(entity: FuelTypeTableRow): Promise<FuelType> {
         return fuelTypeSchema.parse({
             id: entity.id,
-            key: entity.key
+            key: entity.key,
+            locale: entity.key //todo localization
         });
     }
 
@@ -19,5 +21,12 @@ export class FuelTypeMapper extends AbstractMapper<FuelTypeTableRow, FuelType> {
             id: dto.id,
             key: dto.key
         };
+    }
+
+    dtoToPicker(dtos: Array<FuelType>): Promise<PickerItemType> {
+        return dtos.map(dto => ({
+            value: dto.id.toString(),
+            title: dto.locale
+        }));
     }
 }

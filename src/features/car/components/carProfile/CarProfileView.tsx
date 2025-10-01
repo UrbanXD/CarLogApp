@@ -164,7 +164,7 @@ function CarProfileView({
                        />
                     }
                 </View>
-                <Odometer value={ car.odometer.value } unit={ car.odometer.unit }/>
+                <Odometer value={ car.odometer.value } unit={ car.odometer.unit.short }/>
                 {
                     openOdometerLog &&
                    <Link
@@ -177,8 +177,8 @@ function CarProfileView({
             <FuelGauge
                 value={ car.fuelTank.value }
                 tankSize={ car.fuelTank.capacity }
-                fuelType={ car.fuelTank.type }
-                unit={ car.fuelTank.unit }
+                fuelType={ car.fuelTank.type.locale }
+                unit={ car.fuelTank.unit.short }
                 disabled={ fuelSliderDisabled }
                 openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.FuelStep) }
             />

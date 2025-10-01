@@ -5,7 +5,7 @@ import { FuelType } from "../../schemas/fuelTypeSchema.ts";
 import { Dao } from "../../../../../../database/dao/Dao.ts";
 import { FUEL_TYPE_TABLE } from "../../../../../../database/connector/powersync/tables/fuelType.ts";
 
-export class FuelTypeDao extends Dao<FuelTypeTableRow, FuelType> {
+export class FuelTypeDao extends Dao<FuelTypeTableRow, FuelType, FuelTypeMapper> {
     constructor(db: Kysely<DatabaseType>) {
         super(db, FUEL_TYPE_TABLE, new FuelTypeMapper());
     }
