@@ -27,7 +27,7 @@ export class FuelUnitMapper extends AbstractMapper<FuelUnitTableRow, FuelUnit> {
         };
     }
 
-    dtoToPicker(dtos: Array<FuelUnit>): Promise<PickerItemType> {
+    dtoToPicker(dtos: Array<FuelUnit>): Promise<Array<PickerItemType>> {
         return dtos.map(dto => ({
             value: dto.id.toString(),
             title: `${ dto.locale } (${ dto.short })`

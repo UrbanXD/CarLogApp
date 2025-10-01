@@ -3,7 +3,7 @@ import { DatabaseType, FuelUnitTableRow } from "../../../../../../database/conne
 import { Kysely } from "@powersync/kysely-driver";
 import { FuelUnitMapper } from "../mapper/fuelUnitMapper.ts";
 import { FUEL_UNIT_TABLE } from "../../../../../../database/connector/powersync/tables/fuelUnit.ts";
-import { FuelUnit } from "../enums/fuelUnit.ts";
+import { FuelUnit } from "../../schemas/fuelUnitSchema.ts";
 
 export class FuelUnitDao extends Dao<FuelUnitTableRow, FuelUnit, FuelUnitMapper> {
     constructor(db: Kysely<DatabaseType>) {

@@ -16,10 +16,7 @@ export class FuelTankMapper extends AbstractMapper<FuelTankTableRow, FuelTank> {
 
     async toDto(entity: FuelTankTableRow): Promise<FuelTank> {
         const type = await this.fuelTypeDao.getById(entity.type_id);
-        if(!type) throw new Error(`Fuel Type (${ entity.type_id }) not found`);
-
         const unit = await this.fuelUnitDao.getById(entity.unit_id);
-        if(!unit) throw new Error(`Fuel Unit (${ entity.unit_id }) not found`);
 
         return fuelTankSchema.parse({
             id: entity.id,
