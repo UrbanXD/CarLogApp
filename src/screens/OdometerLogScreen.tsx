@@ -1,6 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { OdometerLog } from "../features/car/schemas/odometerLogSchema.ts";
 import { useDatabase } from "../contexts/database/DatabaseContext.ts";
 import { Car } from "../features/car/schemas/carSchema.ts";
 import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
@@ -9,15 +8,16 @@ import { InfoRow } from "../components/InfoRow.tsx";
 import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAlert } from "../ui/alert/hooks/useAlert.ts";
-import { DeleteOdometerLogToast } from "../features/car/presets/toast/DeleteOdometerLogToast.ts";
 import Button from "../components/Button/Button.ts";
+import { DeleteOdometerLogToast } from "../features/car/_features/odometer/presets/toast/DeleteOdometerLogToast.ts";
+import { OdometerLog } from "../features/car/_features/odometer/schemas/odometerLogSchema.ts";
 
 const DIVIDER_COLOR = COLORS.gray3;
 const DIVIDER_MARGIN = SEPARATOR_SIZES.lightSmall / 3;
 
 export function OdometerLogScreen() {
     const { id } = useLocalSearchParams();
-    const { odometerDao, carDao } = useDatabase();
+    const { odometerLogDao, carDao } = useDatabase();
     const { openModal, openToast } = useAlert();
     const { bottom } = useSafeAreaInsets();
 
@@ -26,7 +26,7 @@ export function OdometerLogScreen() {
 
     useEffect(() => {
         const getOdometerLog = async () => {
-            setOdometerLog(await odometerDao.getOdometerLogById(id) ?? null);
+            setOdometerLog(await odometerLogDao.getById(id) ?? null);
         };
 
         getOdometerLog();
@@ -36,7 +36,7 @@ export function OdometerLogScreen() {
         if(car?.id === odometerLog?.carId || !odometerLog?.carId) return;
 
         const getCar = async () => {
-            setCar(await carDao.getCar(odometerLog.carId));
+            setCar(await carDao.getById(odometerLog.carId));
         };
 
         getCar();
@@ -44,18 +44,18 @@ export function OdometerLogScreen() {
 
     const handleDelete = useCallback(async (id: string) => {
         try {
-            await odometerDao.deleteOdometerLog(id);
+            await odometerLogDao.delete(id);
             openToast(DeleteOdometerLogToast.success());
 
             if(router.canGoBack()) return router.back();
             router.replace("/odometer/log");
-        } catch(_) {
+        } catch(e) {
+            console.log(e);
             openToast(DeleteOdometerLogToast.error());
         }
-    }, [odometerDao]);
+    }, [odometerLogDao]);
 
     const onDelete = useCallback(() => {
-        console.log("feslkn ksefn lnslgn");
         if(!odometerLog) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
 
         openModal({
@@ -64,7 +64,16 @@ export function OdometerLogScreen() {
             acceptText: "Törlés",
             acceptAction: () => handleDelete(odometerLog.id)
         });
-    }, [odometerLog, openToast, openModal, odometerDao]);
+    }, [odometerLog, openToast, openModal]);
+
+    const onEdit = useCallback(() => {
+        if(!odometerLog) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
+
+        router.push({
+            pathname: "/odometer/log/edit/[id]",
+            params: { id: odometerLog.id }
+        });
+    });
 
     return (
         <>
@@ -78,7 +87,7 @@ export function OdometerLogScreen() {
                 <InfoRow
                     icon={ ICON_NAMES.odometer }
                     title={ "Kilométeróra-állás" }
-                    subtitle={ `${ odometerLog?.value } ${ odometerLog?.unit }` }
+                    subtitle={ `${ odometerLog?.value } ${ odometerLog?.unit.short }` }
                 />
                 <Divider color={ DIVIDER_COLOR } margin={ DIVIDER_MARGIN }/>
                 <InfoRow
@@ -90,7 +99,7 @@ export function OdometerLogScreen() {
             <Button.EditDelete
                 buttonContainerStyle={ { paddingBottom: bottom + SEPARATOR_SIZES.lightSmall } }
                 onDeletePress={ onDelete }
-                onEditPress={ () => {} }
+                onEditPress={ onEdit }
             />
         </>
     );

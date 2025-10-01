@@ -28,7 +28,7 @@ export class Dao<Entity, Dto, Mapper> {
         return dtos;
     }
 
-    async getById(id: string | number): Promise<Dto | null> {
+    async getById(id: string | number, safe?: boolean = true): Promise<Dto | null> {
         if(this.cache.has(id)) return this.cache.get(id)!;
 
         const entity = await this.db
@@ -36,6 +36,8 @@ export class Dao<Entity, Dto, Mapper> {
         .selectAll()
         .where("id", "=", id)
         .executeTakeFirst();
+
+        if(safe && entity === null) throw new Error(`Table item not found by ${ id } id. [${ this.table }]`);
 
         return entity ? await this.mapper.toDto(entity) : null;
     }
@@ -62,16 +64,19 @@ export class Dao<Entity, Dto, Mapper> {
         .returningAll()
         .executeTakeFirst();
 
+        const dto = result ? await this.mapper.toDto(result) : null;
+
         if(dto) this.cache.set(dto.id, dto);
 
         return dto;
     }
 
-    async deleteById(id: string | number): Promise<string | number | null> {
+    async delete(id: string | number): Promise<string | number | null> {
         const deletedId = await this.db
         .deleteFrom(this.table)
         .returning("id")
-        .where("id", "=", id);
+        .where("id", "=", id)
+        .execute();
 
         if(deletedId) this.cache.delete(deletedId);
 

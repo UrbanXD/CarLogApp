@@ -13,12 +13,12 @@ export const createCar = createAsyncThunk(
         const { database: { carDao }, formResult } = args;
 
         try {
-            const { car, odometer, fuelTank } = carDao.mapper.fromFormResultToCarEntities(
+            const { car, odometer, fuelTank } = carDao.mapper.formResultToCarEntities(
                 formResult,
                 new Date().toISOString()
             );
 
-            return await carDao.createCar(car, odometer, fuelTank);
+            return await carDao.create(car, odometer, fuelTank);
         } catch(e) {
             console.log("create car action error: ", e);
             return rejectWithValue("");

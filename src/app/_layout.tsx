@@ -142,6 +142,15 @@ const Layout: React.FC = () => {
                     header: () => <Header.Secondary title="Kilométeróra-állás"/>
                 } }
             />
+            <Stack.Screen
+                name="odometer/log/edit/[id]"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
         </Stack>
     );
 };

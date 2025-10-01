@@ -7,7 +7,7 @@ export const deleteCar = createAsyncThunk(
         try {
             const { database: { carDao }, carId } = args;
 
-            return await carDao.deleteCar(carId);
+            return await carDao.delete(carId);
         } catch(e) {
             console.log("Error at car deleteing: ", e);
             return rejectWithValue("");

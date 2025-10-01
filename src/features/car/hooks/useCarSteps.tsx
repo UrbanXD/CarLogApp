@@ -25,7 +25,7 @@ function useCarSteps({ control, resetField, setValue, getValues }: StepProps<Car
         },
         {
             title: "Kilométeróra",
-            fields: ["odometer.value", "odometer.unit"],
+            fields: ["odometer.value", "odometer.unitId"],
             render: () => <OdometerStep control={ control }/>,
             editToastMessages: CarEditNameToast
         },

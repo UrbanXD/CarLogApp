@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-import { OdometerLog } from "../../../schemas/odometerLogSchema.ts";
 import { TimelineItemType } from "../../../../../components/timelineView/item/TimelineItem.tsx";
 import { OdometerLogType } from "../model/enums/odometerLogType.ts";
 import { COLORS, ICON_NAMES } from "../../../../../constants/index.ts";
@@ -7,6 +6,7 @@ import { Alert } from "react-native";
 import { OdometerText } from "../components/OdometerText.tsx";
 import dayjs from "dayjs";
 import { router } from "expo-router";
+import { OdometerLog } from "../schemas/odometerLogSchema.ts";
 
 export const useOdometerTimelineItem = () => {
     const mapper = useCallback((odometerLog: OdometerLog): TimelineItemType => {
@@ -39,7 +39,7 @@ export const useOdometerTimelineItem = () => {
             renderMilestone: (milestone: string) =>
                 <OdometerText
                     text={ milestone }
-                    unit={ odometerLog.unit }
+                    unit={ odometerLog.unit.short }
                     textStyle={ { color: COLORS.white } }
                     unitTextStyle={ { color: COLORS.white } }
                 />,

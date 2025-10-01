@@ -17,14 +17,15 @@ export const carFormSchema = carSchema
     }),
     odometer: carSchema.shape.odometer.pick({ id: true }).extend({
         value: zNumber({ min: 0 }).pipe(carSchema.shape.odometer.shape.value),
-        unit: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
-        .pipe(carSchema.shape.odometer.shape.unit)
+        unitId: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
+        .pipe(carSchema.shape.odometer.shape.unit.shape.id)
     }),
     fuelTank: carSchema.shape.fuelTank.pick({ id: true, value: true }).extend({
-        type: zPickerRequired("Kérem válasszon ki egy üzemanyag típust!").pipe(carSchema.shape.fuelTank.shape.type),
+        typeId: zPickerRequired("Kérem válasszon ki egy üzemanyag típust!")
+        .pipe(carSchema.shape.fuelTank.shape.type.shape.id),
         capacity: zNumber({ min: 0 }).pipe(carSchema.shape.fuelTank.shape.capacity),
-        unit: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
-        .pipe(carSchema.shape.fuelTank.shape.unit)
+        unitId: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
+        .pipe(carSchema.shape.fuelTank.shape.unit.shape.id)
     })
 });
 
@@ -46,14 +47,14 @@ export const useCreatCarFormProps = (userId: string) => {
         odometer: {
             id: getUUID(),
             value: NaN,
-            unit: ""
+            unitId: ""
         },
         fuelTank: {
             id: getUUID(),
-            type: "",
+            typeId: "",
+            unitId: "",
             capacity: NaN,
-            value: 0,
-            unit: ""
+            value: 0
         }
     };
 
@@ -76,14 +77,14 @@ export const useEditCarFormProps = (car: Car) => {
         odometer: {
             id: car.odometer.id,
             value: car.odometer.value,
-            unit: car.odometer.unit
+            unitId: car.odometer.unit.id
         },
         fuelTank: {
             id: car.fuelTank.id,
-            type: car.fuelTank.type,
+            typeId: car.fuelTank.type.id,
+            unitId: car.fuelTank.unit.id,
             capacity: car.fuelTank.capacity,
-            value: car.fuelTank.value,
-            unit: car.fuelTank.unit
+            value: car.fuelTank.value
         }
     };
 

@@ -14,6 +14,9 @@ import { OdometerDao } from "../../features/car/_features/odometer/model/dao/Odo
 import { ExpenseDao } from "../../features/expense/model/dao/ExpenseDao.ts";
 import { FuelTypeDao } from "../../features/car/_features/fuel/model/dao/FuelTypeDao.ts";
 import { FuelUnitDao } from "../../features/car/_features/fuel/model/dao/FuelUnitDao.ts";
+import { OdometerUnitDao } from "../../features/car/_features/odometer/model/dao/OdometerUnitDao.ts";
+import { FuelTankDao } from "../../features/car/_features/fuel/model/dao/FuelTankDao.ts";
+import { OdometerLogDao } from "../../features/car/_features/odometer/model/dao/OdometerLogDao.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
@@ -29,6 +32,9 @@ export class Database {
     private _expenseDao?: ExpenseDao;
     private _fuelTypeDao?: FuelTypeDao;
     private _fuelUnitDao?: FuelUnitDao;
+    private _fuelTankDao?: FuelTankDao;
+    private _odometerUnitDao?: OdometerUnitDao;
+    private _odometerLogDao?: OdometerLogDao;
 
     constructor() {
         this.powersync = new PowerSyncDatabase({
@@ -66,12 +72,6 @@ export class Database {
         return this._userDao;
     }
 
-    get carDao(): CarDao {
-        if(!this._carDao) this._carDao = new CarDao(this.db, this.storage, this.attachmentQueue);
-
-        return this._carDao;
-    }
-
     get makeDao(): MakeDao {
         if(!this._makeDao) this._makeDao = new MakeDao(this.db);
 
@@ -82,12 +82,6 @@ export class Database {
         if(!this._modelDao) this._modelDao = new ModelDao(this.db, this.makeDao);
 
         return this._modelDao;
-    }
-
-    get odometerDao(): OdometerDao {
-        if(!this._odometerDao) this._odometerDao = new OdometerDao(this.db);
-
-        return this._odometerDao;
     }
 
     get expenseDao(): ExpenseDao {
@@ -106,6 +100,46 @@ export class Database {
         if(!this._fuelUnitDao) this._fuelUnitDao = new FuelUnitDao(this.db);
 
         return this._fuelUnitDao;
+    }
+
+    get fuelTankDao(): FuelTankDao {
+        if(!this._fuelTankDao) this._fuelTankDao = new FuelTankDao(this.db, this.fuelTypeDao, this.fuelUnitDao);
+
+        return this._fuelTankDao;
+    }
+
+    get odometerUnitDao(): OdometerUnitDao {
+        if(!this._odometerUnitDao) this._odometerUnitDao = new OdometerUnitDao(this.db);
+
+        return this._odometerUnitDao;
+    }
+
+    get odometerDao(): OdometerDao {
+        if(!this._odometerDao) this._odometerDao = new OdometerDao(this.db, this.odometerUnitDao);
+
+        return this._odometerDao;
+    }
+
+    get odometerLogDao(): OdometerLogDao {
+        if(!this._odometerLogDao) this._odometerLogDao = new OdometerLogDao(this.db, this.odometerDao);
+
+        return this._odometerLogDao;
+    }
+
+    get carDao(): CarDao {
+        if(!this._carDao) {
+            this._carDao = new CarDao(
+                this.db,
+                this.storage,
+                this.attachmentQueue,
+                this.makeDao,
+                this.modelDao,
+                this.odometerDao,
+                this.fuelTankDao
+            );
+        }
+
+        return this._carDao;
     }
 
     async init() {

@@ -19,12 +19,12 @@ type OdometerLogTimelineProps = {
 };
 
 export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
-    const { odometerDao, expenseDao } = useDatabase();
+    const { odometerLogDao } = useDatabase();
     const { getCar } = useCars();
     const { mapper } = useOdometerTimelineItem();
 
     const car = useMemo(() => getCar(carId), [carId, getCar]);
-    const paginator = useMemo(() => odometerDao.odometerLogPaginator({
+    const paginator = useMemo(() => odometerLogDao.paginator({
         field: ["value", "date", "id"],
         order: ["desc", "desc", "asc"]
     }, { field: "car_id", operator: "=", value: car.id }, 15), []);
@@ -67,7 +67,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
                     title={ car.name }
                     subtitle={ `${ car.model.make.name } ${ car.model.name }` }
                 />
-                <Odometer value={ car.odometer.value } unit={ car.odometer.unit }/>
+                <Odometer value={ car.odometer.value } unit={ car.odometer.unit.short }/>
             </View>
             <TimelineView
                 data={ data }

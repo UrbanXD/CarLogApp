@@ -1,22 +1,33 @@
-import { OdometerTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
 import { Odometer, odometerSchema } from "../../schemas/odometerSchema.ts";
+import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
+import { OdometerTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
+import { OdometerUnitDao } from "../dao/OdometerUnitDao.ts";
 
-export class OdometerMapper {
-    constructor() {}
+export class OdometerMapper extends AbstractMapper<OdometerTableRow, Odometer> {
+    private readonly odometerUnitDao: OdometerUnitDao;
 
-    toOdometerDto(odometerRow: OdometerTableRow): Odometer {
+    constructor(odometerUnitDao: OdometerUnitDao) {
+        super();
+        this.odometerUnitDao = odometerUnitDao;
+    }
+
+    async toDto(entity: OdometerTableRow): Promise<Odometer> {
+        const unit = await this.odometerUnitDao.getById(entity.unit_id);
+
         return odometerSchema.parse({
-            id: odometerRow.id,
-            value: odometerRow.value,
-            unit: odometerRow.unit
+            id: entity.id,
+            carId: entity.car_id,
+            unit,
+            value: entity.value
         });
     }
 
-    toOdometerEntity(odometer: Odometer): OdometerTableRow {
+    async toEntity(dto: Odometer): Promise<OdometerTableRow> {
         return {
-            id: odometer.id,
-            value: odometer.value,
-            unit: odometer.unit
+            id: dto.id,
+            car_id: dto.carId,
+            value: dto.value,
+            unit_id: dto.unit.id
         };
     }
 }

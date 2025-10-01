@@ -1,11 +1,12 @@
 import { z } from "zod";
-import { OdometerUnit } from "../model/enums/odometerUnit.ts";
+import { odometerUnitSchema } from "./odometerUnitSchema.ts";
 
 export const odometerSchema = z
 .object({
     id: z.string().uuid(),
+    carId: z.string().uuid(),
     value: z.number().min(0),
-    unit: z.enum(Object.keys(OdometerUnit))
+    unit: odometerUnitSchema
 });
 
 export type Odometer = z.infer<typeof odometerSchema>;
