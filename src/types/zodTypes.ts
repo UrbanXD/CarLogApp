@@ -25,9 +25,10 @@ export const zNumber = (
     )
 );
 
-export const zPickerRequired = (errorMessage?: string = "Válasszon ki egy elemet!") => z
-.string({ required_error: errorMessage })
-.min(1, errorMessage);
+export const zPickerRequired = (errorMessage?: string = "Válasszon ki egy elemet!") => z.union([
+    z.string({ required_error: errorMessage }).min(1, errorMessage),
+    z.number({ required_error: errorMessage })
+]);
 
 export const zImage = z
 .custom<Image | null>(value => value === null || value instanceof Image);
