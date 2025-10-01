@@ -2,27 +2,35 @@ import { Kysely } from "@powersync/kysely-driver";
 import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 import { AbstractMapper } from "./AbstractMapper.ts";
 
-export class Dao<Entity, Dto> {
-    private readonly db: Kysely<DatabaseType>;
-    private readonly table: keyof DatabaseType;
-    readonly mapper: AbstractMapper<Entity, Dto>;
+export class Dao<Entity, Dto, Mapper> {
+    protected cache = new Map<string | number, Dto>();
+    protected readonly db: Kysely<DatabaseType>;
+    protected readonly table: keyof DatabaseType;
+    readonly mapper: Mapper<Entity, Dto>;
 
-    protected constructor(db: Kysely<DatabaseType>, table: keyof DatabaseType, mapper: AbstractMapper<Entity, Dto>) {
+    constructor(db: Kysely<DatabaseType>, table: keyof DatabaseType, mapper: AbstractMapper<Entity, Dto>) {
         this.db = db;
         this.table = table;
         this.mapper = mapper;
     }
 
-    async getAll(): Promise<Array<Dto>> {
+    async getAll(useCache?: boolean = true): Promise<Array<Dto>> {
+        if(useCache && this.cache.size > 0) return [...this.cache.values()];
+
         const entities = await this.db
         .selectFrom(this.table)
         .selectAll()
         .execute();
 
-        return await this.mapper.toDtoArray(entities);
+        const dtos = await this.mapper.toDtoArray(entities);
+        for(const dto of dtos) this.cache.set(dto.id, dto);
+
+        return dtos;
     }
 
     async getById(id: string | number): Promise<Dto | null> {
+        if(this.cache.has(id)) return this.cache.get(id)!;
+
         const entity = await this.db
         .selectFrom(this.table)
         .selectAll()
@@ -39,7 +47,11 @@ export class Dao<Entity, Dto> {
         .returningAll()
         .executeTakeFirst();
 
-        return result ? await this.mapper.toDto(result) : null;
+        const dto = result ? await this.mapper.toDto(result) : null;
+
+        if(dto) this.cache.set(dto.id, dto);
+
+        return dto;
     }
 
     async update(entity: (Entity | Partial<Entity>) & { id: string | number }): Promise<Dto | null> {
@@ -50,7 +62,9 @@ export class Dao<Entity, Dto> {
         .returningAll()
         .executeTakeFirst();
 
-        return result ? await this.mapper.toDto(result) : null;
+        if(dto) this.cache.set(dto.id, dto);
+
+        return dto;
     }
 
     async deleteById(id: string | number): Promise<string | number | null> {
@@ -58,6 +72,8 @@ export class Dao<Entity, Dto> {
         .deleteFrom(this.table)
         .returning("id")
         .where("id", "=", id);
+
+        if(deletedId) this.cache.delete(deletedId);
 
         return deletedId ?? null;
     }
