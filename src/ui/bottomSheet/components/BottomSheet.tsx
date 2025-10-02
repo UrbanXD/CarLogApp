@@ -1,7 +1,14 @@
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import {
+    BottomSheetRoutes,
+    COLORS,
+    DEFAULT_SEPARATOR,
+    FONT_SIZES,
+    GLOBAL_STYLE,
+    SEPARATOR_SIZES
+} from "../../../constants/index.ts";
 import { BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
 import BottomSheetBackdrop from "./BottomSheetBackdrop.tsx";
@@ -69,7 +76,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         while(stackOfRoutes.length > 0) {
             const route = stackOfRoutes.pop();
             if(!route) continue;
-            if(!route.name.startsWith("bottomSheet/")) {
+            if(!route.name.startsWith("bottomSheet/") && !BottomSheetRoutes.includes(route.name)) {
                 router.dismissTo({ pathname: route.name, params: route.params });
                 break;
             }

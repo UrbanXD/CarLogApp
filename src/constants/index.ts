@@ -7,6 +7,7 @@ export * from "./fontSizes.ts";
 export * from "../ui/alert/constants/index.ts";
 export * from "./separatorSizes.ts";
 export * from "./globalStyles.ts";
+export * from "./bottomSheetRoutes.ts";
 
 export const SIMPLE_HEADER_HEIGHT = hp(6.75);
 export const SIMPLE_TABBAR_HEIGHT = hp(7.5);
