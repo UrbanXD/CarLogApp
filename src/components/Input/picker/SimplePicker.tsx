@@ -24,7 +24,7 @@ const SimplePicker: React.FC<SimplePickerProps> = ({
     );
 
     const [selectedItem, setSelectedItem] = useState<PickerItemType | undefined>(
-        findItemByValue(inputFieldContext?.field.value ?? defaultValue)
+        findItemByValue(inputFieldContext?.field.value.toString() ?? defaultValue)
     );
 
     const onSelect = useCallback((value: string) => {

@@ -33,7 +33,7 @@ export function DropdownPickerProvider<Item, DB>({
     const { openToast } = useAlert();
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field.onChange;
-    const inputFieldValue = inputFieldContext?.field.value;
+    const inputFieldValue = inputFieldContext?.field.value.toString();
 
     const [initialLoadCompleted, setInitialLoadCompleted] = useState(false);
     const [items, setItems] = useState<Array<PickerItemType>>([]);
