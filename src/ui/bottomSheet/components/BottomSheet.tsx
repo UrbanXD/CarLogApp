@@ -69,7 +69,10 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         while(stackOfRoutes.length > 0) {
             const route = stackOfRoutes.pop();
             if(!route) continue;
-            if(!route.name.startsWith("bottomSheet/") && router.canDismiss()) router.dismissTo(route.name);
+            if(!route.name.startsWith("bottomSheet/")) {
+                router.dismissTo({ pathname: route.name, params: route.params });
+                break;
+            }
         }
     }, [navigation]);
 
