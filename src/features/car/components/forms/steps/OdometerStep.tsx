@@ -10,7 +10,7 @@ import { MoreDataLoading } from "../../../../../components/loading/MoreDataLoadi
 type OdometerStepProps<FormFields> = Pick<StepProps<FormFields>, "control">;
 
 function OdometerStep<FormFields = CarFormFields>({ control }: OdometerStepProps<FormFields>) {
-    const { odometerUnitDao, fuelUnitDao } = useDatabase();
+    const { odometerUnitDao } = useDatabase();
 
     const [odometerUnits, setOdometerUnits] = useState<Array<OdometerUnit>>();
 

@@ -6,6 +6,7 @@ export const carTable = new Table({
     id: column.text,
     owner_id: column.text,
     name: column.text,
+    odometer_unit_id: column.text,
     model_id: column.text,
     model_year: column.text,
     image_url: column.text,

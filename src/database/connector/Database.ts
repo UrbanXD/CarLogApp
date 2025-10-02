@@ -10,7 +10,6 @@ import { CarDao } from "../../features/car/model/dao/CarDao.ts";
 import { BaseConfig } from "../../constants/index.ts";
 import { ModelDao } from "../../features/car/model/dao/ModelDao.ts";
 import { MakeDao } from "../../features/car/model/dao/MakeDao.ts";
-import { OdometerDao } from "../../features/car/_features/odometer/model/dao/OdometerDao.ts";
 import { ExpenseDao } from "../../features/expense/model/dao/ExpenseDao.ts";
 import { FuelTypeDao } from "../../features/car/_features/fuel/model/dao/FuelTypeDao.ts";
 import { FuelUnitDao } from "../../features/car/_features/fuel/model/dao/FuelUnitDao.ts";
@@ -28,7 +27,6 @@ export class Database {
     private _carDao?: CarDao;
     private _makeDao?: MakeDao;
     private _modelDao?: ModelDao;
-    private _odometerDao?: OdometerDao;
     private _expenseDao?: ExpenseDao;
     private _fuelTypeDao?: FuelTypeDao;
     private _fuelUnitDao?: FuelUnitDao;
@@ -114,14 +112,8 @@ export class Database {
         return this._odometerUnitDao;
     }
 
-    get odometerDao(): OdometerDao {
-        if(!this._odometerDao) this._odometerDao = new OdometerDao(this.db, this.odometerUnitDao);
-
-        return this._odometerDao;
-    }
-
     get odometerLogDao(): OdometerLogDao {
-        if(!this._odometerLogDao) this._odometerLogDao = new OdometerLogDao(this.db, this.odometerDao);
+        if(!this._odometerLogDao) this._odometerLogDao = new OdometerLogDao(this.db, this.odometerUnitDao);
 
         return this._odometerLogDao;
     }
@@ -134,7 +126,8 @@ export class Database {
                 this.attachmentQueue,
                 this.makeDao,
                 this.modelDao,
-                this.odometerDao,
+                this.odometerLogDao,
+                this.odometerUnitDao,
                 this.fuelTankDao
             );
         }

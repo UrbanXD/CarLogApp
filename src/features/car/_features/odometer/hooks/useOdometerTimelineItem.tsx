@@ -47,7 +47,7 @@ export const useOdometerTimelineItem = () => {
             icon,
             color,
             note: odometerLog.note,
-            footerText: dayjs(odometerLog.date).format("YYYY. MM DD. hh:mm"),
+            footerText: dayjs(odometerLog.date).format("YYYY. MM DD. HH:mm"),
             onPress
         };
     });

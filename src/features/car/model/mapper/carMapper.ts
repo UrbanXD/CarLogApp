@@ -1,19 +1,32 @@
-import { CarTableRow, FuelTankTableRow, OdometerTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
+import {
+    CarTableRow,
+    FuelTankTableRow,
+    OdometerLogTableRow
+} from "../../../../database/connector/powersync/AppSchema.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 import { getImageFromAttachmentQueue } from "../../../../database/utils/getImageFromAttachmentQueue.ts";
 import { Car, carSchema } from "../../schemas/carSchema.ts";
 import { MakeDao } from "../dao/MakeDao.ts";
 import { ModelDao } from "../dao/ModelDao.ts";
-import { OdometerDao } from "../../_features/odometer/model/dao/OdometerDao.ts";
 import { FuelTankDao } from "../../_features/fuel/model/dao/FuelTankDao.ts";
 import { CarFormFields } from "../../schemas/form/carForm.ts";
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
+import { OdometerLogDao } from "../../_features/odometer/model/dao/OdometerLogDao.ts";
+import { odometerSchema } from "../../_features/odometer/schemas/odometerSchema.ts";
+import { OdometerUnitDao } from "../../_features/odometer/model/dao/OdometerUnitDao.ts";
+import {
+    convertOdometerValueFromKilometer,
+    convertOdometerValueToKilometer
+} from "../../_features/odometer/utils/convertOdometerUnit.ts";
+import { getUUID } from "../../../../database/utils/uuid.ts";
+import { OdometerLogType } from "../../_features/odometer/model/enums/odometerLogType.ts";
 
 export class CarMapper extends AbstractMapper<CarTableRow, Car> {
     constructor(
         private readonly makeDao: MakeDao,
         private readonly modelDao: ModelDao,
-        private readonly odometerDao: OdometerDao,
+        private readonly odometerLogDao: OdometerLogDao,
+        private readonly odometerUnitDao: OdometerUnitDao,
         private readonly fuelTankDao: FuelTankDao,
         private readonly attachmentQueue?: PhotoAttachmentQueue
     ) {
@@ -24,8 +37,14 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
         const image = await getImageFromAttachmentQueue(this.attachmentQueue, entity.image_url);
         const model = await this.modelDao.getModelById(entity.model_id);
         const carModel = await this.modelDao.mapper.toCarModelDto(model, entity.model_year);
-        const odometer = await this.odometerDao.getByCarId(entity.id);
         const fuelTank = await this.fuelTankDao.getByCarId(entity.id);
+
+        const odometerValue = await this.odometerLogDao.getOdometerValueByCarId(entity.id);
+        const odometerUnit = await this.odometerUnitDao.getById(entity.odometer_unit_id);
+        const odometer = odometerSchema.parse({
+            value: convertOdometerValueFromKilometer(odometerValue, odometerUnit?.conversionFactor ?? 1),
+            unit: odometerUnit
+        });
 
         const { data } = carSchema.safeParse({
             id: entity.id,
@@ -48,6 +67,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
             id: dto.id,
             owner_id: dto.ownerId,
             name: dto.name,
+            odometer_unit_id: dto.odometer.unit,
             model_id: dto.model.id,
             model_year: dto.model.year,
             created_at: dto.createdAt,
@@ -55,26 +75,30 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
         };
     }
 
-    formResultToCarEntities(request: CarFormFields, createdAt?: string): {
+    async formResultToCarEntities(request: CarFormFields, createdAt?: string): Promise<{
         car: CarTableRow,
-        odometer: OdometerTableRow,
         fuelTank: FuelTankTableRow
-    } {
+    }> {
+        const odometerUnit = await this.odometerUnitDao.getById(request.odometer.unitId);
+
         const car: CarTableRow = {
             id: request.id,
             owner_id: request.ownerId,
             name: request.name,
+            odometer_unit_id: request.odometer.unitId,
             model_id: request.model.id,
             model_year: request.model.year,
             image_url: request.image?.path ?? null,
             created_at: createdAt
         };
 
-        const odometer: OdometerTableRow = {
-            id: request.odometer.id,
+        const odometerLog: OdometerLogTableRow = {
+            id: getUUID(),
             car_id: request.id,
-            value: request.odometer.value,
-            unit_id: request.odometer.unitId
+            type: OdometerLogType.SIMPLE,
+            value: convertOdometerValueToKilometer(request.odometer.value, odometerUnit?.conversionFactor),
+            note: "Induló Kilométeróra-állás",
+            date: createdAt
         };
 
         const fuelTank: FuelTankTableRow = {
@@ -86,6 +110,6 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
             value: request.fuelTank.value
         };
 
-        return { car, odometer, fuelTank };
+        return { car, odometerLog, fuelTank };
     }
 }

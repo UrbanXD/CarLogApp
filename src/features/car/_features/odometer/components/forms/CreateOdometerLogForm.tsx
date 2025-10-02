@@ -14,8 +14,11 @@ import { View } from "react-native";
 import { CarCreateToast } from "../../../../presets/toast/index.ts";
 import { OdometerUnitText } from "../UnitText.tsx";
 import Button from "../../../../../../components/Button/Button.ts";
+import { useAppDispatch } from "../../../../../../hooks/index.ts";
+import { updateCarOdometer } from "../../../../model/slice/index.ts";
 
 export function CreateOdometerLogForm() {
+    const dispatch = useAppDispatch();
     const { odometerLogDao } = useDatabase();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
@@ -38,7 +41,8 @@ export function CreateOdometerLogForm() {
     const submitHandler = handleSubmit(
         async (formResult: OdometerLogFields) => {
             try {
-                await odometerLogDao.create(formResult);
+                const result = await odometerLogDao.create(formResult);
+                dispatch(updateCarOdometer({ carId: result.carId, value: result.value }));
 
                 openToast(CarCreateToast.success());
 

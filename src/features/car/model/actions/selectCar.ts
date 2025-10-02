@@ -15,7 +15,7 @@ export const selectCar = createAsyncThunk(
 
         try {
             await AsyncStorage.setItem(BaseConfig.LOCAL_STORAGE_KEY_SELECTED_CAR_INDEX, carId);
-            return await carDao.getCar(carId);
+            return await carDao.getById(carId);
         } catch(e) {
             console.log(e);
             return rejectWithValue(null);

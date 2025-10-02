@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDatabase } from "../contexts/database/DatabaseContext.ts";
 import { Car } from "../features/car/schemas/carSchema.ts";
@@ -11,6 +11,7 @@ import { useAlert } from "../ui/alert/hooks/useAlert.ts";
 import Button from "../components/Button/Button.ts";
 import { DeleteOdometerLogToast } from "../features/car/_features/odometer/presets/toast/DeleteOdometerLogToast.ts";
 import { OdometerLog } from "../features/car/_features/odometer/schemas/odometerLogSchema.ts";
+import dayjs from "dayjs";
 
 const DIVIDER_COLOR = COLORS.gray3;
 const DIVIDER_MARGIN = SEPARATOR_SIZES.lightSmall / 3;
@@ -24,13 +25,16 @@ export function OdometerLogScreen() {
     const [car, setCar] = useState<Car | null>(null);
     const [odometerLog, setOdometerLog] = useState<OdometerLog | null>(null);
 
-    useEffect(() => {
-        const getOdometerLog = async () => {
-            setOdometerLog(await odometerLogDao.getById(id) ?? null);
-        };
+    useFocusEffect(
+        useCallback(() => {
+            const getOdometerLog = async () => {
+                const log = await odometerLogDao.getById(id);
+                setOdometerLog(log ?? null);
+            };
 
-        getOdometerLog();
-    }, [id]);
+            getOdometerLog();
+        }, [id, odometerLogDao])
+    );
 
     useEffect(() => {
         if(car?.id === odometerLog?.carId || !odometerLog?.carId) return;
@@ -88,6 +92,12 @@ export function OdometerLogScreen() {
                     icon={ ICON_NAMES.odometer }
                     title={ "Kilométeróra-állás" }
                     subtitle={ `${ odometerLog?.value } ${ odometerLog?.unit.short }` }
+                />
+                <Divider color={ DIVIDER_COLOR } margin={ DIVIDER_MARGIN }/>
+                <InfoRow
+                    icon={ ICON_NAMES.calendar }
+                    title={ "Dátum" }
+                    subtitle={ dayjs(odometerLog?.date).format("YYYY. MM DD. HH:mm") }
                 />
                 <Divider color={ DIVIDER_COLOR } margin={ DIVIDER_MARGIN }/>
                 <InfoRow

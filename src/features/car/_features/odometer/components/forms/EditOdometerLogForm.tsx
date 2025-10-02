@@ -13,6 +13,8 @@ import { CarCreateToast } from "../../../../presets/toast/index.ts";
 import { OdometerUnitText } from "../UnitText.tsx";
 import Button from "../../../../../../components/Button/Button.ts";
 import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
+import { useAppDispatch } from "../../../../../../hooks/index.ts";
+import { updateCarOdometer } from "../../../../model/slice/index.ts";
 
 export type EditOdometerLogFormProps = {
     odometerLog: OdometerLog
@@ -21,7 +23,8 @@ export type EditOdometerLogFormProps = {
 export function EditOdometerLogForm({
     odometerLog
 }: EditOdometerLogFormProps) {
-    const { odometerDao, odometerLogDao } = useDatabase();
+    const dispatch = useAppDispatch();
+    const { odometerLogDao } = useDatabase();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
 
@@ -31,8 +34,8 @@ export function EditOdometerLogForm({
     const submitHandler = handleSubmit(
         async (formResult: OdometerLogFields) => {
             try {
-                const odometerLogRow = odometerDao.logMapper.formResultToEntity(formResult);
-                await odometerLogDao.update(odometerLogRow);
+                const result = await odometerLogDao.update(formResult);
+                dispatch(updateCarOdometer({ carId: result.carId, value: result.value }));
 
                 openToast(CarCreateToast.success());
 

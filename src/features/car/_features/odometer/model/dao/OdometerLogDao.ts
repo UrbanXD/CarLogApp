@@ -4,33 +4,36 @@ import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
 import { OdometerLogMapper } from "../mapper/odometerLogMapper.ts";
 import { Kysely } from "@powersync/kysely-driver";
 import { ODOMETER_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/odometerLog.ts";
-import { OdometerDao } from "./OdometerDao.ts";
-import { ODOMETER_TABLE } from "../../../../../../database/connector/powersync/tables/odometer.ts";
 import { CursorOptions, CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
 import { FilterCondition } from "../../../../../../database/paginator/AbstractPaginator.ts";
 import { OdometerLogFields } from "../../schemas/form/odometerLogForm.ts";
+import { OdometerUnitDao } from "./OdometerUnitDao.ts";
 
 export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, OdometerLogMapper> {
-    constructor(db: Kysely<DatabaseType>, odometerDao: OdometerDao) {
-        super(db, ODOMETER_LOG_TABLE, new OdometerLogMapper(odometerDao));
+    constructor(db: Kysely<DatabaseType>, odometerUnitDao: OdometerUnitDao) {
+        super(db, ODOMETER_LOG_TABLE, new OdometerLogMapper(odometerUnitDao));
+    }
+
+    async getOdometerValueByCarId(carId: string): Promise<number> {
+        const result = await this.db
+        .selectFrom(ODOMETER_LOG_TABLE)
+        .select("value")
+        .where("car_id", "=", carId)
+        .orderBy("value", "desc")
+        .limit(1)
+        .executeTakeFirstOrThrow();
+
+        return result.value;
     }
 
     async create(formResult: OdometerLogFields): Promise<OdometerLog> {
         const odometerLogRow = await this.mapper.formResultToEntity(formResult);
+        return await super.create(odometerLogRow);
+    }
 
-        await this.db.transaction().execute(async trx => {
-            const odometerLog = await trx
-            .insertInto(ODOMETER_LOG_TABLE)
-            .values(odometerLogRow)
-            .returningAll()
-            .executeTakeFirstOrThrow();
-
-            await trx
-            .updateTable(ODOMETER_TABLE)
-            .set({ value: odometerLog.value })
-            .where("car_id", "=", odometerLog.car_id)
-            .executeTakeFirstOrThrow();
-        });
+    async update(formResult: OdometerLogFields): Promise<OdometerLog> {
+        const odometerLogRow = await this.mapper.formResultToEntity(formResult);
+        return await super.update(odometerLogRow);
     }
 
     paginator(

@@ -1,5 +1,5 @@
 import { CarsState } from "../types/index.ts";
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { loadCars } from "../actions/loadCars.ts";
 import { createCar } from "../actions/createCar.ts";
 import { editCar } from "../actions/editCar.ts";
@@ -16,7 +16,17 @@ const initialState: CarsState = {
 const carsSlice = createSlice({
     name: "cars",
     initialState,
-    reducers: {},
+    reducers: {
+        updateCarOdometer: (state, action: PayloadAction<{ carId: string, value: number }>) => {
+            const carIndex = state.cars.findIndex(car => car.id === action.payload.carId);
+            if(carIndex === -1) return;
+
+            const updatedCar = state.cars[carIndex];
+            updatedCar.odometer.value = action.payload.value;
+
+            state.cars[carIndex] = updatedCar;
+        }
+    },
     extraReducers: builder => {
         builder
         .addCase(loadCars.pending, (state) => {
@@ -63,4 +73,5 @@ const carsSlice = createSlice({
     }
 });
 
+export const { updateCarOdometer } = carsSlice.actions;
 export const carsReducer = carsSlice.reducer;

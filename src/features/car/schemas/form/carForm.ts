@@ -45,7 +45,6 @@ export const useCreatCarFormProps = (userId: string) => {
             year: ""
         },
         odometer: {
-            id: getUUID(),
             value: NaN,
             unitId: ""
         },
@@ -75,7 +74,6 @@ export const useEditCarFormProps = (car: Car) => {
             year: car.model.year
         },
         odometer: {
-            id: car.odometer.id,
             value: car.odometer.value,
             unitId: car.odometer.unit.id
         },
