@@ -1,26 +1,74 @@
 import { ExpenseTypeTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
 import { ExpenseType, expenseTypeSchema } from "../../schemas/expenseTypeSchema.ts";
+import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
+import { ExpenseTypeEnum } from "../enums/ExpenseTypeEnum.ts";
+import { COLORS, ICON_NAMES } from "../../../../constants/index.ts";
 
-export class ExpenseTypeMapper {
-    constructor() {}
+export class ExpenseTypeMapper extends AbstractMapper<ExpenseTypeTableRow, ExpenseType> {
+    constructor() {
+        super();
+    }
 
-    toExpenseTypeDto(expenseTypeRow: ExpenseTypeTableRow): ExpenseType {
+    async toDto(entity: ExpenseTypeTableRow): Promise<ExpenseType> {
+        let locale = "Egyéb";
+        let icon = null;
+        let primaryColor = null;
+        let secondaryColor = null;
+
+        switch(entity.key) {
+            case ExpenseTypeEnum.FUEL:
+                locale = "Tankolás";
+                icon = ICON_NAMES.fuelPump;
+                primaryColor = COLORS.fuelYellow;
+                break;
+            case ExpenseTypeEnum.SERVICE:
+                locale = "Szervíz";
+                icon = ICON_NAMES.service;
+                primaryColor = COLORS.service;
+                break;
+            case ExpenseTypeEnum.VEHICLE_INSPECTION:
+                locale = "Műszaki vizsgálat";
+                icon = ICON_NAMES.vehicleInspection;
+                primaryColor = COLORS.vehicleInspection;
+                break;
+            case ExpenseTypeEnum.WASH:
+                locale = "Autómosás";
+                icon = ICON_NAMES.carWash;
+                primaryColor = COLORS.wash;
+                break;
+            case ExpenseTypeEnum.TOLL:
+                locale = "Útdíj";
+                icon = ICON_NAMES.road;
+                primaryColor = COLORS.toll;
+                break;
+            case ExpenseTypeEnum.PARKING:
+                locale = "Parkolás";
+                icon = ICON_NAMES.parking;
+                primaryColor = COLORS.parking;
+                break;
+            case ExpenseTypeEnum.INSURANCE:
+                locale = "Biztosítás";
+                icon = ICON_NAMES.insurance;
+                primaryColor = COLORS.insurance;
+                break;
+        }
+
         return expenseTypeSchema.parse({
-            id: expenseTypeRow.id,
-            key: expenseTypeRow.key,
-            ownerId: expenseTypeRow.owner_id
+            id: entity.id,
+            key: entity.key,
+            ownerId: entity.owner_id,
+            locale,
+            icon: icon,
+            primaryColor: primaryColor,
+            secondaryColor: secondaryColor
         });
     }
 
-    toExpenseTypeArrayDto(expenseTypeRows: Array<ExpenseTypeTableRow>): Array<ExpenseType> {
-        return expenseTypeRows.map(this.toExpenseTypeDto);
-    }
-
-    toExpenseTypeEntity(expenseType: ExpenseType): ExpenseTypeTableRow {
+    async toEntity(dto: ExpenseType): Promise<ExpenseTypeTableRow> {
         return {
-            id: expenseType.id,
-            key: expenseType.key,
-            owner_id: expenseType.ownerId
+            id: dto.id,
+            key: dto.key,
+            owner_id: dto.ownerId
         };
     }
 }

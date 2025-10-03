@@ -6,16 +6,11 @@ import { ExpenseTypeDao } from "./ExpenseTypeDao.ts";
 import { ExpenseMapper } from "../mapper/expenseMapper.ts";
 import { CursorOptions, CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
 import { FilterCondition } from "../../../../database/paginator/AbstractPaginator.ts";
+import { Dao } from "../../../../database/dao/Dao.ts";
 
-export class ExpenseDao {
-    private readonly db: Kysely<DatabaseType>;
-    readonly expenseTypeDao: ExpenseTypeDao;
-    readonly mapper: ExpenseMapper;
-
-    constructor(db: Kysely<DatabaseType>) {
-        this.db = db;
-        this.expenseTypeDao = new ExpenseTypeDao(this.db);
-        this.mapper = new ExpenseMapper(this.expenseTypeDao);
+export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper> {
+    constructor(db: Kysely<DatabaseType>, expenseTypeDao: ExpenseTypeDao) {
+        super(db, EXPENSE_TABLE, new ExpenseMapper(expenseTypeDao));
     }
 
     paginator(
@@ -30,28 +25,8 @@ export class ExpenseDao {
             {
                 perPage,
                 filterBy,
-                mapper: this.mapper.toExpenseDto.bind(this.mapper)
+                mapper: this.mapper.toDto.bind(this.mapper)
             }
         );
-    }
-
-    async getExpenseById(id: string): Promise<Expense> {
-        const expenseRow = await this.db
-        .selectFrom(EXPENSE_TABLE)
-        .selectAll()
-        .where("id", "=", id)
-        .executeTakeFirstOrThrow();
-
-        return await this.mapper.toExpenseDto(expenseRow);
-    }
-
-    async deleteExpenseById(id: string): Promise<string> {
-        const result = await this.db
-        .deleteFrom(EXPENSE_TABLE)
-        .where("id", "=", id)
-        .returning("id")
-        .executeTakeFirstOrThrow();
-
-        return result.id;
     }
 }
