@@ -151,6 +151,12 @@ const Layout: React.FC = () => {
                     contentStyle: { backgroundColor: "transparent" }
                 } }
             />
+            <Stack.Screen
+                name="expense/[id]"
+                options={ {
+                    header: () => <Header.Secondary title="Kiadás"/>
+                } }
+            />
         </Stack>
     );
 };
