@@ -12,14 +12,14 @@ export type FilterCondition<TableItem, FieldName = keyof TableItem> = {
 export type PaginatorOptions<TableItem, MappedItem = any> = {
     filterBy?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>
     perPage?: number
-    mapper?: (tableRow?: TableItem) => MappedItem
+    mapper?: (tableRow?: TableItem) => Promise<MappedItem>
 }
 
 export abstract class Paginator<TableItem, MappedItem, DB> {
     private database: Kysely<DB>;
     private table: keyof DB;
     filterBy: Array<FilterCondition<TableItem>>;
-    private readonly mapper?: (tableRow?: TableItem) => MappedItem | Promise<MappedItem>;
+    private readonly mapper?: (tableRow?: TableItem) => Promise<MappedItem>;
     protected perPage: number;
 
     protected constructor(

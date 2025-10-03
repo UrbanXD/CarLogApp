@@ -77,11 +77,10 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
 
         const result = await query.execute() as unknown as Array<TableItem>;
 
-        if(result.length !== 0) {
-            this.setPreviousCursor(result.shift());
-            this.setRefreshCursor(result[0]);
-        }
+        if(result.length > 1) this.setPreviousCursor(result.shift());
+        if(result.length === 0) return [];
 
+        this.setRefreshCursor(result[0]);
         if(result.length === this.perPage + 1) this.setNextCursor(result.pop());
 
         const refreshMappedResult = await super.map(result);
