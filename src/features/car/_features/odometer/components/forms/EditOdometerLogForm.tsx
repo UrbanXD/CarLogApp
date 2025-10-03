@@ -15,6 +15,7 @@ import Button from "../../../../../../components/Button/Button.ts";
 import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
 import { useAppDispatch } from "../../../../../../hooks/index.ts";
 import { updateCarOdometer } from "../../../../model/slice/index.ts";
+import { convertOdometerValueFromKilometer } from "../../utils/convertOdometerUnit.ts";
 
 export type EditOdometerLogFormProps = {
     odometerLog: OdometerLog
@@ -37,7 +38,10 @@ export function EditOdometerLogForm({
                 const result = await odometerLogDao.update(formResult);
                 const newHighestOdometerValue = await odometerLogDao.getOdometerValueInKmByCarId(result.carId);
 
-                dispatch(updateCarOdometer({ carId: result.carId, value: newHighestOdometerValue }));
+                dispatch(updateCarOdometer({
+                    carId: result.carId,
+                    value: convertOdometerValueFromKilometer(newHighestOdometerValue, result.unit.conversionFactor)
+                }));
 
                 openToast(CarCreateToast.success());
 

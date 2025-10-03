@@ -38,6 +38,10 @@ export function CreateOdometerLogForm() {
         clearErrors();
     }, [formCarId]);
 
+    useEffect(() => {
+        setValue("value", car?.odometer.value ?? 0);
+    }, [car?.odometer.value]);
+
     const submitHandler = handleSubmit(
         async (formResult: OdometerLogFields) => {
             try {
@@ -76,6 +80,7 @@ export function CreateOdometerLogForm() {
                     />
                 </Input.Field>
                 <Input.Field
+                    key={ car?.odometer.value ?? "key-odometer" }
                     control={ control }
                     fieldName="value"
                     fieldNameText="Kilóméteróra állás"
