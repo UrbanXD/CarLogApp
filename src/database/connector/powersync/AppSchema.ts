@@ -1,6 +1,5 @@
 import { userTable } from "./tables/user.ts";
 import { carTable } from "./tables/car.ts";
-import { odometerTable } from "./tables/odometer.ts";
 import { fuelTankTable } from "./tables/fuelTank.ts";
 import { makeTable } from "./tables/make.ts";
 import { modelTable } from "./tables/model.ts";
@@ -20,7 +19,6 @@ export const AppSchema = new Schema({
     attachments: new AttachmentTable(),
     user_account: userTable,
     car: carTable,
-    odometer: odometerTable,
     odometer_unit: odometerUnitTable,
     odometer_log: odometerLogTable,
     odometer_log_type: odometerLogTypeTable,
@@ -40,7 +38,6 @@ export type UserTableRow = DatabaseType["user_account"];
 export type MakeTableRow = DatabaseType["make"];
 export type ModelTableRow = DatabaseType["model"];
 export type CarTableRow = DatabaseType["car"];
-export type OdometerTableRow = DatabaseType["odometer"];
 export type OdometerUnitTableRow = DatabaseType["odometer_unit"];
 export type OdometerLogTableRow = DatabaseType["odometer_log"];
 export type OdometerLogTypeTableRow = DatabaseType["odometer_log_type"];
