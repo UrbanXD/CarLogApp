@@ -139,7 +139,7 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="odometer/log/[id]"
                 options={ {
-                    header: () => <Header.Secondary title="Kilométeróra-állás"/>
+                    header: () => <Header.Secondary title="Napló bejegyzés"/>
                 } }
             />
             <Stack.Screen

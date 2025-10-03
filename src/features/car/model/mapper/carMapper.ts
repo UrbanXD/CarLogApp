@@ -19,7 +19,7 @@ import {
     convertOdometerValueToKilometer
 } from "../../_features/odometer/utils/convertOdometerUnit.ts";
 import { getUUID } from "../../../../database/utils/uuid.ts";
-import { OdometerLogType } from "../../_features/odometer/model/enums/odometerLogType.ts";
+import { OdometerLogTypeEnum } from "../../_features/odometer/model/enums/odometerLogTypeEnum.ts";
 
 export class CarMapper extends AbstractMapper<CarTableRow, Car> {
     constructor(
@@ -39,7 +39,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
         const carModel = await this.modelDao.mapper.toCarModelDto(model, entity.model_year);
         const fuelTank = await this.fuelTankDao.getByCarId(entity.id);
 
-        const odometerValue = await this.odometerLogDao.getOdometerValueByCarId(entity.id);
+        const odometerValue = await this.odometerLogDao.getOdometerValueInKmByCarId(entity.id);
         const odometerUnit = await this.odometerUnitDao.getById(entity.odometer_unit_id);
         const odometer = odometerSchema.parse({
             value: convertOdometerValueFromKilometer(odometerValue, odometerUnit?.conversionFactor ?? 1),
@@ -95,7 +95,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
         const odometerLog: OdometerLogTableRow = {
             id: getUUID(),
             car_id: request.id,
-            type: OdometerLogType.SIMPLE,
+            type_id: OdometerLogTypeEnum.SIMPLE,
             value: convertOdometerValueToKilometer(request.odometer.value, odometerUnit?.conversionFactor),
             note: "Induló Kilométeróra-állás",
             date: createdAt

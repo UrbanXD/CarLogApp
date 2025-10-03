@@ -16,6 +16,7 @@ import { FuelUnitDao } from "../../features/car/_features/fuel/model/dao/FuelUni
 import { OdometerUnitDao } from "../../features/car/_features/odometer/model/dao/OdometerUnitDao.ts";
 import { FuelTankDao } from "../../features/car/_features/fuel/model/dao/FuelTankDao.ts";
 import { OdometerLogDao } from "../../features/car/_features/odometer/model/dao/OdometerLogDao.ts";
+import { OdometerLogTypeDao } from "../../features/car/_features/odometer/model/dao/OdometerLogTypeDao.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
@@ -32,6 +33,7 @@ export class Database {
     private _fuelUnitDao?: FuelUnitDao;
     private _fuelTankDao?: FuelTankDao;
     private _odometerUnitDao?: OdometerUnitDao;
+    private _odometerLogTypeDao?: OdometerLogTypeDao;
     private _odometerLogDao?: OdometerLogDao;
 
     constructor() {
@@ -112,8 +114,18 @@ export class Database {
         return this._odometerUnitDao;
     }
 
+    get odometerLogTypeDao(): OdometerLogTypeDao {
+        if(!this._odometerLogTypeDao) this._odometerLogTypeDao = new OdometerLogTypeDao(this.db);
+
+        return this._odometerLogTypeDao;
+    }
+
     get odometerLogDao(): OdometerLogDao {
-        if(!this._odometerLogDao) this._odometerLogDao = new OdometerLogDao(this.db, this.odometerUnitDao);
+        if(!this._odometerLogDao) this._odometerLogDao = new OdometerLogDao(
+            this.db,
+            this.odometerUnitDao,
+            this.odometerLogTypeDao
+        );
 
         return this._odometerLogDao;
     }

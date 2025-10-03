@@ -51,9 +51,9 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
     }, [car]);
 
     useEffect(() => {
-        if(!typeFilter) return removeFilter("type");
+        if(!typeFilter) return removeFilter("type_id");
 
-        setFilter("type", "=", typeFilter);
+        setFilter("type_id", "=", typeFilter);
     }, [typeFilter]);
 
     if(!car) return <></>;

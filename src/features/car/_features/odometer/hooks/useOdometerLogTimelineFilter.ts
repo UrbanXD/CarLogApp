@@ -1,12 +1,12 @@
 import { FilterButtonProps } from "../../../../../components/filter/FilterButton.tsx";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { COLORS } from "../../../../../constants/index.ts";
-import { OdometerLogType } from "../model/enums/odometerLogType.ts";
+import { OdometerLogTypeEnum } from "../model/enums/odometerLogTypeEnum.ts";
 
 export function useOdometerLogTimelineFilter() {
-    const [typeFilter, setTypeFilter] = useState<OdometerLogType | null>(null);
+    const [typeFilter, setTypeFilter] = useState<OdometerLogTypeEnum | null>(null);
 
-    const filterButtons: Array<FilterButtonProps> = [
+    const filterButtons: Array<FilterButtonProps> = useMemo(() => [
         {
             title: "Mind",
             active: !typeFilter,
@@ -14,22 +14,22 @@ export function useOdometerLogTimelineFilter() {
         },
         {
             title: "Egyéb",
-            active: typeFilter === OdometerLogType.SIMPLE,
-            onPress: () => setTypeFilter(OdometerLogType.SIMPLE)
+            active: typeFilter === OdometerLogTypeEnum.SIMPLE,
+            onPress: () => setTypeFilter(OdometerLogTypeEnum.SIMPLE)
         },
         {
             title: "Tankolás",
-            active: typeFilter === OdometerLogType.FUEL,
+            active: typeFilter === OdometerLogTypeEnum.FUEL,
             activeColor: COLORS.fuelYellow,
-            onPress: () => setTypeFilter(OdometerLogType.FUEL)
+            onPress: () => setTypeFilter(OdometerLogTypeEnum.FUEL)
         },
         {
             title: "Szervíz",
-            active: typeFilter === OdometerLogType.SERVICE,
+            active: typeFilter === OdometerLogTypeEnum.SERVICE,
             activeColor: COLORS.service,
-            onPress: () => setTypeFilter(OdometerLogType.SERVICE)
+            onPress: () => setTypeFilter(OdometerLogTypeEnum.SERVICE)
         }
-    ];
+    ], [typeFilter]);
 
     return { typeFilter, filterButtons };
 }

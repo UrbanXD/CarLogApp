@@ -4,22 +4,26 @@ import { convertOdometerValueFromKilometer, convertOdometerValueToKilometer } fr
 import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
 import { OdometerLogTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { OdometerUnitDao } from "../dao/OdometerUnitDao.ts";
+import { OdometerLogTypeDao } from "../dao/OdometerLogTypeDao.ts";
 
 export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, OdometerLog> {
     private readonly odometerUnitDao: OdometerUnitDao;
+    private readonly odometerLogTypeDao: OdometerLogTypeDao;
 
-    constructor(odometerUnitDao: OdometerUnitDao) {
+    constructor(odometerUnitDao: OdometerUnitDao, odometerLogTypeDao: OdometerLogTypeDao) {
         super();
         this.odometerUnitDao = odometerUnitDao;
+        this.odometerLogTypeDao = odometerLogTypeDao;
     }
 
     async toDto(entity: OdometerLogTableRow): Promise<OdometerLog> {
         const odometerUnit = await this.odometerUnitDao.getUnitByCarId(entity.car_id);
-
+        const odometerLogType = await this.odometerLogTypeDao.getById(entity.type_id);
+        
         return odometerLogSchema.parse({
             id: entity.id,
             carId: entity.car_id,
-            type: entity.type,
+            type: odometerLogType,
             value: convertOdometerValueFromKilometer(entity.value, odometerUnit.conversionFactor),
             unit: odometerUnit,
             note: entity.note,
@@ -31,7 +35,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
         return {
             id: dto.id,
             car_id: dto.carId,
-            type: dto.type,
+            type_id: dto.type.id,
             value: dto.value,
             note: dto.note,
             date: dto.date
@@ -42,7 +46,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
         return {
             id: formResult.id,
             car_id: formResult.carId,
-            type: formResult.type,
+            type_id: formResult.typeId,
             value: convertOdometerValueToKilometer(formResult.value, formResult.conversionFactor),
             note: formResult.note,
             date: formResult.date

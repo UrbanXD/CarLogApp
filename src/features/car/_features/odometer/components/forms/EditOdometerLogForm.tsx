@@ -35,7 +35,9 @@ export function EditOdometerLogForm({
         async (formResult: OdometerLogFields) => {
             try {
                 const result = await odometerLogDao.update(formResult);
-                dispatch(updateCarOdometer({ carId: result.carId, value: result.value }));
+                const newHighestOdometerValue = await odometerLogDao.getOdometerValueInKmByCarId(result.carId);
+
+                dispatch(updateCarOdometer({ carId: result.carId, value: newHighestOdometerValue }));
 
                 openToast(CarCreateToast.success());
 

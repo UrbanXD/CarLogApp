@@ -12,12 +12,19 @@ import Button from "../components/Button/Button.ts";
 import { DeleteOdometerLogToast } from "../features/car/_features/odometer/presets/toast/DeleteOdometerLogToast.ts";
 import { OdometerLog } from "../features/car/_features/odometer/schemas/odometerLogSchema.ts";
 import dayjs from "dayjs";
+import { Title } from "../components/Title.tsx";
+import { updateCarOdometer } from "../features/car/model/slice/index.ts";
+import { useAppDispatch } from "../hooks/index.ts";
+import { convertOdometerValueFromKilometer } from "../features/car/_features/odometer/utils/convertOdometerUnit.ts";
+import useCars from "../features/car/hooks/useCars.ts";
 
 const DIVIDER_COLOR = COLORS.gray3;
 const DIVIDER_MARGIN = SEPARATOR_SIZES.lightSmall / 3;
 
 export function OdometerLogScreen() {
+    const dispatch = useAppDispatch();
     const { id } = useLocalSearchParams();
+    const { getCar } = useCars();
     const { odometerLogDao, carDao } = useDatabase();
     const { openModal, openToast } = useAlert();
     const { bottom } = useSafeAreaInsets();
@@ -39,16 +46,22 @@ export function OdometerLogScreen() {
     useEffect(() => {
         if(car?.id === odometerLog?.carId || !odometerLog?.carId) return;
 
-        const getCar = async () => {
-            setCar(await carDao.getById(odometerLog.carId));
-        };
-
-        getCar();
+        setCar(getCar(odometerLog.carId));
     }, [odometerLog]);
 
     const handleDelete = useCallback(async (id: string) => {
         try {
+            if(!car) throw new Error("Car not found!");
+
             await odometerLogDao.delete(id);
+            const newHighestOdometerValueInKilometer = await odometerLogDao.getOdometerValueInKmByCarId(car.id);
+            const convertedOdometerValue = convertOdometerValueFromKilometer(
+                newHighestOdometerValueInKilometer,
+                car.odometer.unit.conversionFactor
+            );
+
+            dispatch(updateCarOdometer({ carId: car.id, value: convertedOdometerValue }));
+
             openToast(DeleteOdometerLogToast.success());
 
             if(router.canGoBack()) return router.back();
@@ -57,7 +70,7 @@ export function OdometerLogScreen() {
             console.log(e);
             openToast(DeleteOdometerLogToast.error());
         }
-    }, [odometerLogDao]);
+    }, [odometerLogDao, car]);
 
     const onDelete = useCallback(() => {
         if(!odometerLog) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
@@ -82,6 +95,13 @@ export function OdometerLogScreen() {
     return (
         <>
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
+                <Title
+                    title={ odometerLog?.type.locale }
+                    dividerStyle={ {
+                        backgroundColor: odometerLog?.type.primaryColor ?? COLORS.gray2,
+                        marginBottom: SEPARATOR_SIZES.normal
+                    } }
+                />
                 <InfoRow
                     icon={ ICON_NAMES.car }
                     title={ car?.name }

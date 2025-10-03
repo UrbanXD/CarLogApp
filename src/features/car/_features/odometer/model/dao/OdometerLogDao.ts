@@ -8,22 +8,23 @@ import { CursorOptions, CursorPaginator } from "../../../../../../database/pagin
 import { FilterCondition } from "../../../../../../database/paginator/AbstractPaginator.ts";
 import { OdometerLogFields } from "../../schemas/form/odometerLogForm.ts";
 import { OdometerUnitDao } from "./OdometerUnitDao.ts";
+import { OdometerLogTypeDao } from "./OdometerLogTypeDao.ts";
 
 export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, OdometerLogMapper> {
-    constructor(db: Kysely<DatabaseType>, odometerUnitDao: OdometerUnitDao) {
-        super(db, ODOMETER_LOG_TABLE, new OdometerLogMapper(odometerUnitDao));
+    constructor(db: Kysely<DatabaseType>, odometerUnitDao: OdometerUnitDao, odometerLogTypeDao: OdometerLogTypeDao) {
+        super(db, ODOMETER_LOG_TABLE, new OdometerLogMapper(odometerUnitDao, odometerLogTypeDao));
     }
 
-    async getOdometerValueByCarId(carId: string): Promise<number> {
+    async getOdometerValueInKmByCarId(carId: string): Promise<number> {
         const result = await this.db
         .selectFrom(ODOMETER_LOG_TABLE)
         .select("value")
         .where("car_id", "=", carId)
         .orderBy("value", "desc")
         .limit(1)
-        .executeTakeFirstOrThrow();
+        .executeTakeFirst();
 
-        return result.value;
+        return result.value ?? 0;
     }
 
     async create(formResult: OdometerLogFields): Promise<OdometerLog> {
@@ -48,7 +49,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
             {
                 perPage,
                 filterBy,
-                mapper: (entity) => this.mapper.toDto(entity)
+                mapper: async (entity) => await this.mapper.toDto(entity)
             }
         );
     }

@@ -4,13 +4,14 @@ import { z } from "zod";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { Car } from "../../../../schemas/carSchema.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { OdometerLogType } from "../../model/enums/odometerLogType.ts";
 import { odometerUnitSchema } from "../odometerUnitSchema.ts";
+import { OdometerLogTypeEnum } from "../../model/enums/odometerLogTypeEnum.ts";
 
 const odometerLogForm = (highestOdometerValue?: number = 0) => odometerLogSchema
-.pick({ id: true, type: true, note: true })
+.pick({ id: true, note: true })
 .extend({
     carId: zPickerRequired("Kérem válasszon ki egy autót!").pipe(odometerLogSchema.shape.carId),
+    typeId: zPickerRequired("Kérem válasszon ki egy típust!").pipe(odometerLogSchema.shape.type.shape.id),
     value: zNumber(
         { min: highestOdometerValue },
         {
@@ -30,7 +31,7 @@ export const useCreateOdometerLogFormProps = (car: Car | null) => {
     const defaultValues: OdometerLogFields = {
         id: getUUID(),
         carId: car?.id,
-        type: OdometerLogType.SIMPLE,
+        typeId: OdometerLogTypeEnum.SIMPLE,
         value: car?.odometer.value,
         note: null,
         date: new Date(),
@@ -44,7 +45,7 @@ export const useEditOdometerLogFormProps = (odometerLog: OdometerLog) => {
     const defaultValues: OdometerLogFields = {
         id: odometerLog.id,
         carId: odometerLog.carId,
-        type: odometerLog.type,
+        typeId: odometerLog.type.id,
         value: odometerLog.value,
         note: odometerLog.note,
         date: odometerLog.date,
