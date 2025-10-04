@@ -26,7 +26,8 @@ export const COLORS = {
     wash: "#00BFFF",
     toll: "#FF8C00",
     parking: "#E0E0E0",
-    insurance: "#C53535"
+    insurance: "#C53535",
+    registration: "#4169E1"
 };
 
 export const PRIMARY_COLOR = COLORS.white;

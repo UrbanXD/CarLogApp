@@ -52,6 +52,7 @@ export const ICON_NAMES = {
     parking: "parking",
     vehicleInspection: "car-search",
     insurance: "shield-car",
+    registration: "clipboard-text-multiple",
     note: "text"
 };
 

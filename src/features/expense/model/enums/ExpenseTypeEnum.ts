@@ -6,5 +6,6 @@ export enum ExpenseTypeEnum {
     WASH = "WASH",
     TOLL = "TOLL",
     PARKING = "PARKING",
-    INSURANCE = "INSURANCE"
+    INSURANCE = "INSURANCE",
+    REGISTRATION = "REGISTRATION"
 }

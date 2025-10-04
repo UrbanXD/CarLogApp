@@ -51,6 +51,11 @@ export class ExpenseTypeMapper extends AbstractMapper<ExpenseTypeTableRow, Expen
                 icon = ICON_NAMES.insurance;
                 primaryColor = COLORS.insurance;
                 break;
+            case ExpenseTypeEnum.REGISTRATION:
+                locale = "Regisztráció";
+                icon = ICON_NAMES.registration;
+                primaryColor = COLORS.registration;
+                break;
         }
 
         return expenseTypeSchema.parse({
