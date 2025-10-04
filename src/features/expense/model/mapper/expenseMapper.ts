@@ -13,34 +13,21 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
 
     async toDto(entity: ExpenseTableRow): Promise<Expense> {
         return expenseSchema.parse({
-            id: expenseRow.id,
-            carId: expenseRow.car_id,
-            type: await this.expenseTypeDao.getById(expenseRow.type_id),
-            amount: expenseRow.amount,
-            currency: expenseRow.currency,
-            note: expenseRow.note,
-            date: expenseRow.date
+            id: entity.id,
+            carId: entity.car_id,
+            type: await this.expenseTypeDao.getById(entity.type_id),
+            amount: entity.amount,
+            currency: entity.currency,
+            note: entity.note,
+            date: entity.date
         });
     }
 
     async toEntity(dto: Expense): Promise<ExpenseTableRow> {
         return {
-            id: expenseType.id,
-            key: expenseType.key,
-            owner_id: expenseType.ownerId
+            id: dto.id,
+            key: dto.key,
+            owner_id: dto.ownerId
         };
     }
-
-    async toExpenseDto(expenseRow: ExpenseTableRow): Promise<Expense> {
-        return expenseSchema.parse({
-            id: expenseRow.id,
-            carId: expenseRow.car_id,
-            type: await this.expenseTypeDao.getById(expenseRow.type_id),
-            amount: expenseRow.amount,
-            currency: expenseRow.currency,
-            note: expenseRow.note,
-            date: expenseRow.date
-        });
-    }
-
 }
