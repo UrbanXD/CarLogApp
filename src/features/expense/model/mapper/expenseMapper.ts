@@ -19,8 +19,9 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
             id: entity.id,
             carId: entity.car_id,
             type: await this.expenseTypeDao.getById(entity.type_id),
-            amount: entity.amount,
             currency: await this.currencyDao.getById(entity.currency_id),
+            amount: entity.amount,
+            exchangeRate: entity.exchange_rate,
             note: entity.note,
             date: entity.date
         });
@@ -33,6 +34,7 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
             type_id: dto.type.id,
             currency_id: dto.currency.id,
             amount: dto.amount,
+            exchange_rate: dto.exchangeRate,
             note: dto.note,
             date: dto.date
         };

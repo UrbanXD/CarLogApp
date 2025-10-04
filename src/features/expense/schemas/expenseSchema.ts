@@ -8,6 +8,7 @@ export const expenseSchema = z
     carId: z.string().uuid(),
     type: expenseTypeSchema,
     amount: z.number().min(0),
+    exchangeRate: z.number().min(0),
     currency: currencySchema,
     note: z.string().nullable(),
     date: z.string()
