@@ -2,13 +2,16 @@ import { ExpenseTableRow } from "../../../../database/connector/powersync/AppSch
 import { ExpenseTypeDao } from "../dao/ExpenseTypeDao.ts";
 import { Expense, expenseSchema } from "../../schemas/expenseSchema.ts";
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
+import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
 
 export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
     private readonly expenseTypeDao: ExpenseTypeDao;
+    private readonly currencyDao: CurrencyDao;
 
-    constructor(expenseTypeDao: ExpenseTypeDao) {
+    constructor(expenseTypeDao: ExpenseTypeDao, currencyDao: CurrencyDao) {
         super();
         this.expenseTypeDao = expenseTypeDao;
+        this.currencyDao = currencyDao;
     }
 
     async toDto(entity: ExpenseTableRow): Promise<Expense> {
@@ -17,7 +20,7 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
             carId: entity.car_id,
             type: await this.expenseTypeDao.getById(entity.type_id),
             amount: entity.amount,
-            currency: entity.currency,
+            currency: await this.currencyDao.getById(entity.currency_id),
             note: entity.note,
             date: entity.date
         });
@@ -26,8 +29,12 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
     async toEntity(dto: Expense): Promise<ExpenseTableRow> {
         return {
             id: dto.id,
-            key: dto.key,
-            owner_id: dto.ownerId
+            car_id: dto.carId,
+            type_id: dto.type.id,
+            currency_id: dto.currency.id,
+            amount: dto.amount,
+            note: dto.note,
+            date: dto.date
         };
     }
 }

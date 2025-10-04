@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { CurrencyType } from "../../_shared/enums/currencyType.ts";
 import { expenseTypeSchema } from "./expenseTypeSchema.ts";
+import { currencySchema } from "../../_shared/currency/schemas/currencySchema.ts";
 
 export const expenseSchema = z
 .object({
@@ -8,7 +8,7 @@ export const expenseSchema = z
     carId: z.string().uuid(),
     type: expenseTypeSchema,
     amount: z.number().min(0),
-    currency: z.enum(Object.keys(CurrencyType)),
+    currency: currencySchema,
     note: z.string().nullable(),
     date: z.string()
 });

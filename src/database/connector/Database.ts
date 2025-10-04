@@ -101,7 +101,7 @@ export class Database {
     }
 
     get expenseDao(): ExpenseDao {
-        if(!this._expenseDao) this._expenseDao = new ExpenseDao(this.db, this.expenseTypeDao);
+        if(!this._expenseDao) this._expenseDao = new ExpenseDao(this.db, this.expenseTypeDao, this.currencyDao);
 
         return this._expenseDao;
     }

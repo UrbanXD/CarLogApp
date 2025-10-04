@@ -7,10 +7,11 @@ import { ExpenseMapper } from "../mapper/expenseMapper.ts";
 import { CursorOptions, CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
 import { FilterCondition } from "../../../../database/paginator/AbstractPaginator.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
+import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
 
 export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper> {
-    constructor(db: Kysely<DatabaseType>, expenseTypeDao: ExpenseTypeDao) {
-        super(db, EXPENSE_TABLE, new ExpenseMapper(expenseTypeDao));
+    constructor(db: Kysely<DatabaseType>, expenseTypeDao: ExpenseTypeDao, currencyDao: CurrencyDao) {
+        super(db, EXPENSE_TABLE, new ExpenseMapper(expenseTypeDao, currencyDao));
     }
 
     paginator(

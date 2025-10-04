@@ -13,7 +13,7 @@ export function useExpenseTimelineItem() {
             pathname: "/expense/[id]",
             params: { id: expense.id }
         });
-        
+
         return {
             id: expense.id,
             milestone: dayjs(expense.date).format("YYYY. MM DD. HH:mm"),
@@ -22,7 +22,7 @@ export function useExpenseTimelineItem() {
             color: expense.type.primaryColor ?? undefined,
             iconColor: expense.type.secondaryColor ?? undefined,
             note: expense.note,
-            footerText: `${ expense.amount } ${ expense.currency }`,
+            footerText: `${ expense.amount } ${ expense.currency.symbol }`,
             onPress
         };
     });
