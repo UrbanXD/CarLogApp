@@ -73,7 +73,7 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         this.nextCursor = null;
 
         let query = this.getBaseQuery().limit(this.perPage + 2);
-        query = addCursor(query, this.cursorOptions, this.refreshCursor, "next");
+        query = addCursor(this.table, query, this.cursorOptions, this.refreshCursor, "next");
 
         const result = await query.execute() as unknown as Array<TableItem>;
 
@@ -107,7 +107,7 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
 
         if(!defaultCursor) {
             let query = this.getBaseQuery();
-            query = addCursor(query, this.cursorOptions, null, "initial");
+            query = addCursor(this.table, query, this.cursorOptions, null, "initial");
 
             const result = await query.execute() as unknown as Array<TableItem>;
 
@@ -124,8 +124,8 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         let prevQuery = super.getBaseQuery().limit(halfPage + 1);
         let nextQuery = super.getBaseQuery().limit(halfPage + 1);
 
-        prevQuery = addCursor(prevQuery, this.cursorOptions, defaultCursor, "prev");
-        nextQuery = addCursor(nextQuery, this.cursorOptions, defaultCursor, "next");
+        prevQuery = addCursor(this.table, prevQuery, this.cursorOptions, defaultCursor, "prev");
+        nextQuery = addCursor(this.table, nextQuery, this.cursorOptions, defaultCursor, "next");
 
         const prevResult = (await prevQuery.execute()).reverse() as unknown as Array<TableItem>;
         const nextResult = await nextQuery.execute() as unknown as Array<TableItem>;
@@ -148,7 +148,7 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         if(!this.hasNext()) return null;
 
         let query = super.getBaseQuery();
-        query = addCursor(query, this.cursorOptions, this.nextCursor, "next");
+        query = addCursor(this.table, query, this.cursorOptions, this.nextCursor, "next");
 
         const result = await query.execute() as unknown as Array<TableItem>;
 
@@ -166,7 +166,7 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         if(!this.hasPrevious()) return null;
 
         let query = this.getBaseQuery(true);
-        query = addCursor(query, this.cursorOptions, this.prevCursor, "prev");
+        query = addCursor(this.table, query, this.cursorOptions, this.prevCursor, "prev");
 
         const result = (await query.execute()).reverse() as unknown as Array<TableItem>;
 

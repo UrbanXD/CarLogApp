@@ -5,6 +5,7 @@ import { sql } from "@powersync/kysely-driver";
 import { CursorDirection, CursorOptions, CursorValue } from "../CursorPaginator.ts";
 
 export function addCursor<TableItem, DB>(
+    table: keyof DB,
     query: SelectQueryBuilder<DB, TableItem, any>,
     cursorOptions: CursorOptions<keyof TableItem>,
     value: CursorValue<TableItem> | Array<CursorValue<TableItem>>,
@@ -23,7 +24,7 @@ export function addCursor<TableItem, DB>(
 
             subQuery = addOrder<TableItem, DB>(
                 subQuery,
-                { field: cursorField, direction: orderDirection, reverse: direction === "prev" }
+                { field: `${ table }.${ cursorField }`, direction: orderDirection, reverse: direction === "prev" }
             );
         });
     } else {
@@ -46,7 +47,7 @@ export function addCursor<TableItem, DB>(
     const operator = getCursorOperator(cursorOptions.order, direction);
 
     if(Array.isArray(cursorOptions.field) && Array.isArray(value)) {
-        const tupleFields = sql.raw(cursorOptions.field.join(", "));
+        const tupleFields = sql.raw(cursorOptions.field.map(f => `"${ table }"."${ f }"`).join(", "));
         const tupleValues = sql.join(value.map(v => sql`${ v }`));
 
         // @formatter:off

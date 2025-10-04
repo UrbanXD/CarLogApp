@@ -1,5 +1,5 @@
 import { Kysely } from "@powersync/kysely-driver";
-import { ComparisonOperatorExpression } from "kysely";
+import { ComparisonOperatorExpression, SelectQueryBuilder } from "kysely";
 import { addFilter } from "./utils/addFilter.ts";
 
 export type FilterCondition<TableItem, FieldName = keyof TableItem> = {
@@ -10,6 +10,7 @@ export type FilterCondition<TableItem, FieldName = keyof TableItem> = {
 }
 
 export type PaginatorOptions<TableItem, MappedItem = any> = {
+    baseQuery?: SelectQueryBuilder<TableItem>
     filterBy?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>
     perPage?: number
     mapper?: (tableRow?: TableItem) => Promise<MappedItem>
@@ -17,7 +18,8 @@ export type PaginatorOptions<TableItem, MappedItem = any> = {
 
 export abstract class Paginator<TableItem, MappedItem, DB> {
     private database: Kysely<DB>;
-    private table: keyof DB;
+    protected table: keyof DB;
+    private baseQuery?: SelectQueryBuilder<DB, TableItem, any>;
     filterBy: Array<FilterCondition<TableItem>>;
     private readonly mapper?: (tableRow?: TableItem) => Promise<MappedItem>;
     protected perPage: number;
@@ -31,15 +33,17 @@ export abstract class Paginator<TableItem, MappedItem, DB> {
         this.table = table;
 
         this.perPage = options?.perPage ?? 15;
+        this.baseQuery = options?.baseQuery;
         this.mapper = options?.mapper;
         this.setFilter(options?.filterBy);
     }
 
     protected getBaseQuery() {
-        let query = this.database
+        let query = this.baseQuery ?? this.database
         .selectFrom(this.table)
-        .selectAll()
-        .limit(this.perPage + 1); // add plus 1 for get the cursor element as well
+        .selectAll();
+
+        query.limit(this.perPage + 1); // add plus 1 for get the cursor element as well
 
         this.filterBy.forEach(filter => {
             query = addFilter<TableItem, DB>(query, filter);
