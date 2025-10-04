@@ -88,7 +88,7 @@ export function ExpenseScreen() {
                 <InfoRow
                     icon={ ICON_NAMES.money }
                     title={ "Ár" }
-                    subtitle={ `${ expense?.amount } ${ expense?.currency }` }
+                    subtitle={ `${ expense?.amount } ${ expense?.currency.symbol }` }
                 />
                 <Divider color={ DIVIDER_COLOR } margin={ DIVIDER_MARGIN }/>
                 <InfoRow
