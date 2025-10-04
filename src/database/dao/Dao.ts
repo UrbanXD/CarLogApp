@@ -3,7 +3,6 @@ import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 import { AbstractMapper } from "./AbstractMapper.ts";
 
 export class Dao<Entity, Dto, Mapper> {
-    protected cache = new Map<string | number, Dto>();
     protected readonly db: Kysely<DatabaseType>;
     protected readonly table: keyof DatabaseType;
     readonly mapper: Mapper<Entity, Dto>;
@@ -14,23 +13,16 @@ export class Dao<Entity, Dto, Mapper> {
         this.mapper = mapper;
     }
 
-    async getAll(useCache?: boolean = true): Promise<Array<Dto>> {
-        if(useCache && this.cache.size > 0) return [...this.cache.values()];
-
+    async getAll(): Promise<Array<Dto>> {
         const entities = await this.db
         .selectFrom(this.table)
         .selectAll()
         .execute();
 
-        const dtos = await this.mapper.toDtoArray(entities);
-        for(const dto of dtos) this.cache.set(dto.id, dto);
-
-        return dtos;
+        return await this.mapper.toDtoArray(entities);
     }
 
     async getById(id: string | number, safe?: boolean = true): Promise<Dto | null> {
-        if(this.cache.has(id)) return this.cache.get(id)!;
-
         const entity = await this.db
         .selectFrom(this.table)
         .selectAll()
@@ -42,44 +34,42 @@ export class Dao<Entity, Dto, Mapper> {
         return entity ? await this.mapper.toDto(entity) : null;
     }
 
-    async create(entity: Entity): Promise<Dto | null> {
+    async create(entity: Partial<Entity>, safe?: boolean): Promise<Dto | null> {
         const result = await this.db
         .insertInto(this.table)
         .values(entity)
-        .returningAll()
+        .returning("id")
         .executeTakeFirst();
 
-        const dto = result ? await this.mapper.toDto(result) : null;
+        if(safe && !result?.id) throw new Error(`Table item not found by ${ entity?.id } id. [${ this.table }]`);
+        if(!result?.id) return null;
 
-        if(dto) this.cache.set(dto.id, dto);
-
-        return dto;
+        return await this.getById(result.id, safe);
     }
 
-    async update(entity: (Entity | Partial<Entity>) & { id: string | number }): Promise<Dto | null> {
+    async update(entity: Partial<Entity> & { id: string | number }, safe?: boolean): Promise<Dto | null> {
         const result = await this.db
         .updateTable(this.table)
         .set(entity)
         .where("id", "=", entity.id)
-        .returningAll()
+        .returning("id")
         .executeTakeFirst();
 
-        const dto = result ? await this.mapper.toDto(result) : null;
+        if(safe && !result?.id) throw new Error(`Table item not found by ${ entity.id } id. [${ this.table }]`);
+        if(!result?.id) return null;
 
-        if(dto) this.cache.set(dto.id, dto);
-
-        return dto;
+        return await this.getById(result.id, safe, useCache);
     }
 
-    async delete(id: string | number): Promise<string | number | null> {
-        const deletedId = await this.db
+    async delete(id: string | number, safe?: boolean = true): Promise<string | number | null> {
+        const result = await this.db
         .deleteFrom(this.table)
         .returning("id")
         .where("id", "=", id)
-        .execute();
+        .executeTakeFirst();
 
-        if(deletedId) this.cache.delete(deletedId);
+        if(!result?.id && safe) throw new Error(`Table item not found by ${ id }. [${ this.table }]`);
 
-        return deletedId ?? null;
+        return result?.id ?? null;
     }
 }
