@@ -85,6 +85,7 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
                 fieldNameText="Évjárat"
             >
                 <Input.Picker.Dropdown
+                    title={ "Évjárat" }
                     data={ modelYears }
                     searchBarEnable={ false }
                     masonry
