@@ -38,8 +38,8 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
 
     useEffect(() => {
         const setHiddenInputsValue = async () => {
-            const model = await modelDao.getModelById(selectedModelId);
-            const make = await makeDao.getMakeById(model.makeId);
+            const model = await modelDao.getById(selectedModelId);
+            const make = await makeDao.getById(model.makeId);
 
             setValue("model.name", model.name);
             setValue("model.makeName", make.name);
@@ -59,13 +59,10 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
                 fieldNameText="Márka"
             >
                 <Input.Picker.Dropdown<MakeTableRow>
+                    title={ "Márka" }
                     paginator={ makePaginator }
                     searchBy="name"
                     icon={ ICON_NAMES.car }
-                    dataTransformSelectors={ {
-                        title: "name",
-                        value: "id"
-                    } }
                 />
             </Input.Field>
             <Input.Field
@@ -74,13 +71,10 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
                 fieldNameText="Modell"
             >
                 <Input.Picker.Dropdown<ModelTableRow>
+                    title={ "Modell" }
                     paginator={ modelPaginator }
                     searchBy="name"
                     icon={ ICON_NAMES.car }
-                    dataTransformSelectors={ {
-                        title: "name",
-                        value: "id"
-                    } }
                     disabled={ !selectedMakeId }
                     disabledText="Először válassza ki az autó márkáját!"
                 />
@@ -90,9 +84,8 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
                 fieldName="model.year"
                 fieldNameText="Évjárat"
             >
-                <Input.Picker.Dropdown<string>
+                <Input.Picker.Dropdown
                     data={ modelYears }
-                    dataTransformSelectors={ {} }
                     searchBarEnable={ false }
                     masonry
                     numColumns={ 3 }

@@ -2,32 +2,36 @@ import { ModelTableRow } from "../../../../database/connector/powersync/AppSchem
 import { Model, modelSchema } from "../../schemas/modelSchema.ts";
 import { MakeDao } from "../dao/MakeDao.ts";
 import { CarModel, carModelSchema } from "../../schemas/carModelSchema.ts";
+import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
+import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 
-export class ModelMapper {
-    constructor(private readonly makeDao: MakeDao) {}
+export class ModelMapper extends AbstractMapper<ModelTableRow, Model> {
+    constructor(private readonly makeDao: MakeDao) {
+        super();
+    }
 
-    toModelDto(modelRow: ModelTableRow): Model {
+    async toDto(entity: ModelTableRow): Promise<Model> {
         return modelSchema.parse({
-            id: modelRow.id,
-            makeId: modelRow.make_id,
-            name: modelRow.name,
-            startYear: modelRow.start_year,
-            endYear: modelRow.end_year
+            id: entity.id,
+            makeId: entity.make_id,
+            name: entity.name,
+            startYear: entity.start_year,
+            endYear: entity.end_year
         });
     }
 
-    toModelEntity(model: Model): ModelTableRow {
+    async toEntity(dto: Model): Promise<ModelTableRow> {
         return {
-            id: model.id,
-            make_id: model.makeId,
-            name: model.name,
-            start_year: model.startYear,
-            end_year: model.endYear
+            id: dto.id,
+            make_id: dto.makeId,
+            name: dto.name,
+            start_year: dto.startYear,
+            end_year: dto.endYear
         };
     }
 
     async toCarModelDto(model: Model, modelYear: string): CarModel {
-        const make = await this.makeDao.getMakeById(model.makeId);
+        const make = await this.makeDao.getById(model.makeId);
 
         return carModelSchema.parse({
             id: model.id,
@@ -35,5 +39,12 @@ export class ModelMapper {
             name: model.name,
             year: modelYear
         });
+    }
+
+    toPickerItem(entity: ModelTableRow): PickerItemType {
+        return {
+            value: entity.id,
+            title: entity.name
+        };
     }
 }

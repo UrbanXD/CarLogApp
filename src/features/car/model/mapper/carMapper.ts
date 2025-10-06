@@ -20,6 +20,7 @@ import {
 } from "../../_features/odometer/utils/convertOdometerUnit.ts";
 import { getUUID } from "../../../../database/utils/uuid.ts";
 import { OdometerLogTypeEnum } from "../../_features/odometer/model/enums/odometerLogTypeEnum.ts";
+import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 
 export class CarMapper extends AbstractMapper<CarTableRow, Car> {
     constructor(
@@ -35,7 +36,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
 
     async toDto(entity: CarTableRow): Promise<Car | null> {
         const image = await getImageFromAttachmentQueue(this.attachmentQueue, entity.image_url);
-        const model = await this.modelDao.getModelById(entity.model_id);
+        const model = await this.modelDao.getById(entity.model_id);
         const carModel = await this.modelDao.mapper.toCarModelDto(model, entity.model_year);
         const fuelTank = await this.fuelTankDao.getByCarId(entity.id);
 
@@ -111,5 +112,13 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
         };
 
         return { car, odometerLog, fuelTank };
+    }
+
+    dtoToPicker(dtos: Array<Car>): Array<PickerItemType> {
+        return dtos.map(dto => ({
+            value: dto.id,
+            title: dto.name,
+            subtitle: `${ dto.model.make.name } ${ dto.model.name }`
+        }));
     }
 }
