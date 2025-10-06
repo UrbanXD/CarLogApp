@@ -3,6 +3,7 @@ import { ExpenseType, expenseTypeSchema } from "../../schemas/expenseTypeSchema.
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
 import { ExpenseTypeEnum } from "../enums/ExpenseTypeEnum.ts";
 import { COLORS, ICON_NAMES } from "../../../../constants/index.ts";
+import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 
 export class ExpenseTypeMapper extends AbstractMapper<ExpenseTypeTableRow, ExpenseType> {
     constructor() {
@@ -75,5 +76,12 @@ export class ExpenseTypeMapper extends AbstractMapper<ExpenseTypeTableRow, Expen
             key: dto.key,
             owner_id: dto.ownerId
         };
+    }
+
+    dtoToPicker(dtos: Array<ExpenseType>): Promise<Array<PickerItemType>> {
+        return dtos.map(dto => ({
+            value: dto.id.toString(),
+            title: `${ dto.locale }`
+        }));
     }
 }

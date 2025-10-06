@@ -1,6 +1,7 @@
 import { AbstractMapper } from "../../../../../database/dao/AbstractMapper.ts";
 import { CurrencyTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
 import { Currency, currencySchema } from "../../schemas/currencySchema.ts";
+import { PickerItemType } from "../../../../../components/Input/picker/PickerItem.tsx";
 
 export class CurrencyMapper extends AbstractMapper<CurrencyTableRow, Currency> {
     constructor() {
@@ -21,5 +22,12 @@ export class CurrencyMapper extends AbstractMapper<CurrencyTableRow, Currency> {
             key: dto.key,
             symbol: dto.symbol
         };
+    }
+
+    dtoToPicker(dtos: Array<Currency>): Promise<Array<PickerItemType>> {
+        return dtos.map(dto => ({
+            value: dto.id.toString(),
+            title: `${ dto.key } (${ dto.symbol })`
+        }));
     }
 }
