@@ -78,10 +78,10 @@ export class ExpenseTypeMapper extends AbstractMapper<ExpenseTypeTableRow, Expen
         };
     }
 
-    dtoToPicker(dtos: Array<ExpenseType>): Promise<Array<PickerItemType>> {
+    dtoToPicker(dtos: Array<ExpenseType>): Array<PickerItemType> {
         return dtos.map(dto => ({
             value: dto.id.toString(),
-            title: `${ dto.locale }`
+            title: dto.locale
         }));
     }
 }
