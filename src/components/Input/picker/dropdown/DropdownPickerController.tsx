@@ -1,34 +1,36 @@
 import React from "react";
 import { TouchableOpacity } from "react-native";
-import TextInput from "../text/TextInput.tsx";
-import { ICON_NAMES } from "../../../constants/index.ts";
-import { useDropdownPickerContext } from "../../../contexts/dropdownPicker/DropdownPickerContext.ts";
+import TextInput from "../../text/TextInput.tsx";
+import { ICON_NAMES } from "../../../../constants/index.ts";
+import { PickerItemType } from "../PickerItem.tsx";
+import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
+import { PickerDisabledToast } from "../../../../ui/alert/presets/toast/index.ts";
 
 export type DropdownPickerControllerProps = {
+    selectedItem: PickerItemType | null
+    toggleDropdown: () => void
     icon?: string
     inputPlaceholder?: string
+    disabled?: boolean
+    disabledText?: string
 }
 
 const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
+    selectedItem,
+    toggleDropdown,
     icon,
-    inputPlaceholder = "Válasszon a listából"
+    inputPlaceholder = "Válasszon a listából",
+    disabled,
+    disabledText
 }) => {
-    const {
-        selectedItem,
-        toggleDropdown,
-        showItems,
-        alwaysShowInput
-    } = useDropdownPickerContext();
-
-    const arrows = [ICON_NAMES.downArrowHead, ICON_NAMES.upArrowHead];
-    const actionIcon = arrows[!showItems ? 0 : 1];
+    const { openToast } = useAlert();
     const controllerValue = selectedItem?.title ?? selectedItem?.value ?? "";
 
     const onPress = () => {
-        if(toggleDropdown) toggleDropdown();
-    };
+        if(disabled) return openToast(PickerDisabledToast.warning(disabledText));
 
-    if(!alwaysShowInput && showItems) return <></>;
+        toggleDropdown();
+    };
 
     return (
         <TouchableOpacity
@@ -39,9 +41,8 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
                 value={ controllerValue }
                 placeholder={ inputPlaceholder }
                 icon={ icon }
-                actionIcon={ actionIcon }
+                actionIcon={ ICON_NAMES.downArrowHead }
                 editable={ false }
-                alwaysFocused={ showItems }
             />
         </TouchableOpacity>
     );
