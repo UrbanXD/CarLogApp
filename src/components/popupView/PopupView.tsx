@@ -16,6 +16,7 @@ import { scheduleOnRN } from "react-native-worklets";
 
 type PopupViewProps = {
     opened: SharedValue<boolean>
+    dismount?: boolean
     children?: ReactNode
     style?: ViewStyle
 }
@@ -26,7 +27,7 @@ const SPRING_CONFIG = {
     dampingRatio: 0.8
 };
 
-export function PopupView({ opened, children, style }: PopupViewProps) {
+export function PopupView({ opened, dismount = true, children, style }: PopupViewProps) {
     const popupDisplay = useSharedValue<"flex" | "none">("none");
     const [mounted, setMounted] = useState(false);
 
@@ -63,7 +64,7 @@ export function PopupView({ opened, children, style }: PopupViewProps) {
         <Portal hostName="popup">
             <Overlay opened={ opened } onPress={ close }/>
             {
-                mounted &&
+                (!dismount || mounted) &&
                <View style={ styles.container } pointerEvents="box-none">
                   <Animated.View style={ [popupStyle, styles.popup, style] }>
                       { children }
