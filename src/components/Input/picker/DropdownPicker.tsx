@@ -7,7 +7,7 @@ import { PopupView } from "../../popupView/PopupView.tsx";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { useAnimatedReaction, useSharedValue } from "react-native-reanimated";
 import { PickerItemType } from "./PickerItem.tsx";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TextStyle, View } from "react-native";
 import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { DropdownPickerHeader } from "./dropdown/DropdownPickerHeader.tsx";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
@@ -53,6 +53,10 @@ type CommonDropdownPickerProps = {
     icon?: string
     /** Placeholder text displayed in the controller when no item is selected */
     inputPlaceholder?: string
+    /** Controller design type */
+    hiddenBackground?: boolean
+    /** Controller display text style */
+    textInputStyle?: TextStyle
 };
 
 export type DropdownPickerProps<Item, DB> =
@@ -73,7 +77,9 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     defaultSelectedItemValue,
     setValue,
     disabled,
-    disabledText
+    disabledText,
+    hiddenBackground,
+    textInputStyle
 }: DropdownPickerProps<Item, DB>) => {
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field.onChange;
@@ -209,6 +215,8 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
                 inputPlaceholder={ inputPlaceholder }
                 disabled={ disabled }
                 disabledText={ disabledText }
+                hiddenBackground={ hiddenBackground }
+                textInputStyle={ textInputStyle }
             />
             <PopupView opened={ isOpened } style={ styles.popupContainer }>
                 <View style={ { flex: 1, width: "100%" } }>
