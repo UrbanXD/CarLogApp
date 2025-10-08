@@ -25,7 +25,7 @@ export const formTheme: FormTheme = {
     iconColor: COLORS.gray1,
     iconSize: FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE,
     borderRadius: 20,
-    borderColor: COLORS.gray5,
+    borderColor: COLORS.gray3,
     activeColor: COLORS.gray2,
     errorColor: COLORS.redLight
 };
