@@ -1,6 +1,5 @@
 import { ReactNode, useState } from "react";
 import Animated, {
-    interpolate,
     SharedValue,
     useAnimatedReaction,
     useAnimatedStyle,
@@ -22,43 +21,51 @@ type PopupViewProps = {
 }
 
 const SPRING_CONFIG = {
-    duration: 900,
+    duration: 800,
     overshootClamping: true,
     dampingRatio: 0.8
 };
 
 export function PopupView({ opened, dismount = true, children, style }: PopupViewProps) {
     const popupDisplay = useSharedValue<"flex" | "none">("none");
+    const opacity = useSharedValue(0);
+    const scale = useSharedValue(1);
     const [mounted, setMounted] = useState(false);
 
     useAnimatedReaction(
         () => opened.value,
-        (isOpened) => {
-            if(isOpened) popupDisplay.value = "flex";
-        }
-    );
+        (isOpened, prev) => {
+            if(isOpened === prev) return;
 
-    useAnimatedReaction(
-        () => popupDisplay.value,
-        (display, previousDisplay) => {
-            if(display === previousDisplay) return;
+            if(isOpened) {
+                // mount and show
+                popupDisplay.value = "flex";
+                scheduleOnRN(setMounted, true);
 
-            scheduleOnRN(setMounted, display === "flex");
-        }
+                // animate in
+                opacity.value = withTiming(1, { duration: 250 });
+                scale.value = withSpring(1, SPRING_CONFIG);
+            } else {
+                // animate out
+                opacity.value = withTiming(0, { duration: 250 });
+                scale.value = withSpring(1.1, SPRING_CONFIG, (finished) => {
+                    if(!finished) return;
+
+                    popupDisplay.value = "none";
+                    scheduleOnRN(setMounted, false);
+                });
+            }
+        },
+        []
     );
 
     const close = () => opened.value = false;
 
-    const popupStyle = useAnimatedStyle(() => {
-        const scaleValue = interpolate(Number(opened.value), [0, 1], [1.15, 1]);
-        const scale = withSpring(scaleValue, SPRING_CONFIG, (finished) => {
-            if(finished && !opened.value) popupDisplay.value = "none";
-        });
-
-        const opacity = withTiming(Number(opened.value), { duration: SPRING_CONFIG.duration / 2 });
-
-        return { display: popupDisplay.value, opacity, transform: [{ scale }] };
-    });
+    const popupStyle = useAnimatedStyle(() => ({
+        display: popupDisplay.value,
+        opacity: opacity.value,
+        transform: [{ scale: scale.value }]
+    }));
 
     return (
         <Portal hostName="popup">
