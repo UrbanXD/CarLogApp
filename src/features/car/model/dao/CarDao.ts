@@ -18,6 +18,7 @@ import { ODOMETER_LOG_TABLE } from "../../../../database/connector/powersync/tab
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { OdometerLogDao } from "../../_features/odometer/model/dao/OdometerLogDao.ts";
 import { OdometerUnitDao } from "../../_features/odometer/model/dao/OdometerUnitDao.ts";
+import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
 
 export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
     private readonly storage: SupabaseStorageAdapter;
@@ -31,12 +32,13 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
         modelDao: ModelDao,
         odometerLogDao: OdometerLogDao,
         odometerUnitDao: OdometerUnitDao,
-        fuelTankDao: FuelTankDao
+        fuelTankDao: FuelTankDao,
+        currencyDao: CurrencyDao
     ) {
         super(
             db,
             CAR_TABLE,
-            new CarMapper(makeDao, modelDao, odometerLogDao, odometerUnitDao, fuelTankDao, attachmentQueue)
+            new CarMapper(makeDao, modelDao, odometerLogDao, odometerUnitDao, fuelTankDao, currencyDao, attachmentQueue)
         );
         this.storage = storage;
         this.attachmentQueue = attachmentQueue;

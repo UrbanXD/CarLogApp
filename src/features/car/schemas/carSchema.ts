@@ -3,6 +3,7 @@ import { zImage } from "../../../types/zodTypes.ts";
 import { odometerSchema } from "../_features/odometer/schemas/odometerSchema.ts";
 import { fuelTankSchema } from "../_features/fuel/schemas/fuelTankSchema.ts";
 import { carModelSchema } from "./carModelSchema.ts";
+import { currencySchema } from "../../_shared/currency/schemas/currencySchema.ts";
 
 export const carSchema = z
 .object({
@@ -14,6 +15,7 @@ export const carSchema = z
     ),
     model: carModelSchema,
     odometer: odometerSchema,
+    currency: currencySchema,
     fuelTank: fuelTankSchema,
     image: zImage,
     createdAt: z.string()

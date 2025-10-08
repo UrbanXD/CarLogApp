@@ -21,6 +21,7 @@ import {
 import { getUUID } from "../../../../database/utils/uuid.ts";
 import { OdometerLogTypeEnum } from "../../_features/odometer/model/enums/odometerLogTypeEnum.ts";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
+import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
 
 export class CarMapper extends AbstractMapper<CarTableRow, Car> {
     constructor(
@@ -29,6 +30,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
         private readonly odometerLogDao: OdometerLogDao,
         private readonly odometerUnitDao: OdometerUnitDao,
         private readonly fuelTankDao: FuelTankDao,
+        private readonly currencyDao: CurrencyDao,
         private readonly attachmentQueue?: PhotoAttachmentQueue
     ) {
         super();
@@ -47,12 +49,15 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
             unit: odometerUnit
         });
 
+        const currency = await this.currencyDao.getById(entity.currency_id);
+
         const { data } = carSchema.safeParse({
             id: entity.id,
             ownerId: entity.owner_id,
             name: entity.name,
             model: carModel,
             odometer,
+            currency,
             fuelTank,
             image,
             createdAt: entity.created_at

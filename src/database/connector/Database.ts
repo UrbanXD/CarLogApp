@@ -156,7 +156,8 @@ export class Database {
                 this.modelDao,
                 this.odometerLogDao,
                 this.odometerUnitDao,
-                this.fuelTankDao
+                this.fuelTankDao,
+                this.currencyDao
             );
         }
 
