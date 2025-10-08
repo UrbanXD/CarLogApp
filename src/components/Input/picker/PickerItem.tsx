@@ -4,6 +4,7 @@ import { COLORS, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.
 
 export type PickerItemType = {
     value: string
+    controllerTitle?: string
     title?: string
     subtitle?: string
 }

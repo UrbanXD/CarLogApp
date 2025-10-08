@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity } from "react-native";
+import { TextStyle, TouchableOpacity } from "react-native";
 import TextInput from "../../text/TextInput.tsx";
 import { ICON_NAMES } from "../../../../constants/index.ts";
 import { PickerItemType } from "../PickerItem.tsx";
@@ -13,6 +13,8 @@ export type DropdownPickerControllerProps = {
     inputPlaceholder?: string
     disabled?: boolean
     disabledText?: string
+    type?: "primary" | "secondary"
+    textInputStyle?: TextStyle
 }
 
 const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
@@ -21,10 +23,12 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
     icon,
     inputPlaceholder = "Válasszon a listából",
     disabled,
-    disabledText
+    disabledText,
+    type,
+    textInputStyle
 }) => {
     const { openToast } = useAlert();
-    const controllerValue = selectedItem?.title ?? selectedItem?.value ?? "";
+    const controllerValue = selectedItem?.controllerTitle ?? selectedItem?.title ?? selectedItem?.value ?? "";
 
     const onPress = () => {
         if(disabled) return openToast(PickerDisabledToast.warning(disabledText));
@@ -33,16 +37,15 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
     };
 
     return (
-        <TouchableOpacity
-            onPress={ onPress }
-            style={ { flex: 1 } }
-        >
+        <TouchableOpacity onPress={ onPress }>
             <TextInput
                 value={ controllerValue }
                 placeholder={ inputPlaceholder }
                 icon={ icon }
                 actionIcon={ ICON_NAMES.downArrowHead }
                 editable={ false }
+                type={ type }
+                textInputStyle={ [textInputStyle, { flex: 1 }] }
             />
         </TouchableOpacity>
     );
