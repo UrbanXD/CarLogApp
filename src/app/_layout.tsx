@@ -157,6 +157,15 @@ const Layout: React.FC = () => {
                     header: () => <Header.Secondary title="Kiadás"/>
                 } }
             />
+            <Stack.Screen
+                name="expense/create"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
         </Stack>
     );
 };

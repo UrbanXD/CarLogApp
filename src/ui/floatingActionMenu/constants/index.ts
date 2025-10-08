@@ -12,7 +12,7 @@ export const ACTIONS: Array<Action> = [
     { icon: ICON_NAMES.car, label: "Autó létrehozás", onPress: () => router.push("bottomSheet/createCar") },
     { icon: ICON_NAMES.serviceOutline, label: "Szervizelés", onPress: () => {} },
     { icon: ICON_NAMES.fuelPump, label: "Tankolás", onPress: () => {} },
-    { icon: ICON_NAMES.receipt, label: "Egyéb kiadások", onPress: () => {} },
+    { icon: ICON_NAMES.receipt, label: "Egyéb kiadások", onPress: () => router.push("expense/create") },
     { icon: ICON_NAMES.road, label: "Út tervezés", onPress: () => {} },
     {
         icon: ICON_NAMES.odometer,

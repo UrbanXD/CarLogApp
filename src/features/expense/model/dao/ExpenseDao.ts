@@ -8,10 +8,15 @@ import { CursorOptions, CursorPaginator } from "../../../../database/paginator/C
 import { FilterCondition } from "../../../../database/paginator/AbstractPaginator.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
+import { ExpenseFields } from "../../schemas/form/expenseForm.ts";
 
 export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper> {
     constructor(db: Kysely<DatabaseType>, expenseTypeDao: ExpenseTypeDao, currencyDao: CurrencyDao) {
         super(db, EXPENSE_TABLE, new ExpenseMapper(expenseTypeDao, currencyDao));
+    }
+
+    async create(formResult: ExpenseFields, safe?: boolean): Promise<Expense | null> {
+        return await super.create(this.mapper.formResultToEntity(formResult), safe);
     }
 
     paginator(

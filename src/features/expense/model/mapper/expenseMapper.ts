@@ -3,6 +3,7 @@ import { ExpenseTypeDao } from "../dao/ExpenseTypeDao.ts";
 import { Expense, expenseSchema } from "../../schemas/expenseSchema.ts";
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
 import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
+import { ExpenseFields } from "../../schemas/form/expenseForm.ts";
 
 export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
     private readonly expenseTypeDao: ExpenseTypeDao;
@@ -37,6 +38,19 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
             exchange_rate: dto.exchangeRate,
             note: dto.note,
             date: dto.date
+        };
+    }
+
+    formResultToEntity(formResult: ExpenseFields): ExpenseTableRow {
+        return {
+            id: formResult.id,
+            car_id: formResult.carId,
+            type_id: formResult.typeId,
+            currency_id: formResult.currencyId,
+            amount: formResult.amount,
+            exchange_rate: formResult.exchangeRate,
+            note: formResult.note,
+            date: formResult.date
         };
     }
 }
