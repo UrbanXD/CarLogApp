@@ -10,19 +10,19 @@ import useCars from "../../../../hooks/useCars.ts";
 import Input from "../../../../../../components/Input/Input.ts";
 import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
 import InputDatePicker from "../../../../../../components/Input/datePicker/InputDatePicker.tsx";
-import { View } from "react-native";
 import { CarCreateToast } from "../../../../presets/toast/index.ts";
-import { OdometerUnitText } from "../UnitText.tsx";
 import Button from "../../../../../../components/Button/Button.ts";
 import { useAppDispatch } from "../../../../../../hooks/index.ts";
 import { updateCarOdometer } from "../../../../model/slice/index.ts";
+import { OdometerValueInput } from "./inputFields/OdometerValueInput.tsx";
+import { CarPickerInput } from "../../../../components/forms/inputFields/CarPickerInput.tsx";
 
 export function CreateOdometerLogForm() {
     const dispatch = useAppDispatch();
     const { odometerLogDao } = useDatabase();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
-    const { cars, selectedCar, getCar } = useCars();
+    const { selectedCar, getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(selectedCar);
 
@@ -65,42 +65,16 @@ export function CreateOdometerLogForm() {
     return (
         <>
             <Form containerStyle={ { paddingBottom: SEPARATOR_SIZES.small } }>
-                <Input.Field
+                <CarPickerInput
                     control={ control }
                     fieldName="carId"
-                    fieldNameText="Autó"
-                >
-                    <Input.Picker.Dropdown<Car>
-                        data={ cars }
-                        icon={ ICON_NAMES.car }
-                        dataTransformSelectors={ {
-                            title: "name",
-                            value: "id"
-                        } }
-                    />
-                </Input.Field>
-                <Input.Field
-                    key={ car?.odometer.value ?? "key-odometer" }
+                />
+                <OdometerValueInput
                     control={ control }
                     fieldName="value"
-                    fieldNameText="Kilóméteróra állás"
-                    fieldInfoText={ car && `A jelenlegi kilométeróra állás: ${ car.odometer.value } ${ car.odometer.unit.short }` }
-                >
-                    <Input.Row style={ { gap: 0 } }>
-                        <View style={ { flex: 1 } }>
-                            <Input.Text
-                                icon={ ICON_NAMES.odometer }
-                                placeholder="100000"
-                                numeric
-                                type={ "secondary" }
-                            />
-                        </View>
-                        <OdometerUnitText
-                            text={ car?.odometer.unit.short }
-                            style={ { padding: SEPARATOR_SIZES.lightSmall } }
-                        />
-                    </Input.Row>
-                </Input.Field>
+                    currentOdometerValue={ car?.odometer.value }
+                    unitText={ car?.odometer.unit.short }
+                />
                 <Input.Field
                     control={ control }
                     fieldName="date"

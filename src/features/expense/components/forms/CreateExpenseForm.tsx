@@ -15,6 +15,7 @@ import { ExpenseFields, useCreateExpenseFormProps } from "../../schemas/form/exp
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 import { AmountInput } from "../../../../components/Input/_presets/AmountInput.tsx";
+import { CarPickerInput } from "../../../car/components/forms/inputFields/CarPickerInput.tsx";
 
 export function CreateExpenseForm() {
     const { carDao, expenseDao, currencyDao, expenseTypeDao } = useDatabase();
@@ -23,7 +24,6 @@ export function CreateExpenseForm() {
     const { cars, selectedCar, getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(selectedCar);
-    const [carsData, setCarsData] = useState<Array<PickerItemType> | null>(null);
     const [expenseTypes, setExpenseTypes] = useState<Array<PickerItemType> | null>(null);
 
     const { control, handleSubmit, clearErrors, resetField } =
@@ -37,10 +37,6 @@ export function CreateExpenseForm() {
             setExpenseTypes(expenseTypeDao.mapper.dtoToPicker(expenseTypesDto));
         })();
     }, []);
-
-    useEffect(() => {
-        setCarsData(carDao.mapper.dtoToPicker(cars));
-    }, [cars]);
 
     useEffect(() => {
         const car = getCar(formCarId);
@@ -70,23 +66,10 @@ export function CreateExpenseForm() {
     return (
         <>
             <Form containerStyle={ { paddingBottom: SEPARATOR_SIZES.small } }>
-                <Input.Field
+                <CarPickerInput
                     control={ control }
                     fieldName="carId"
-                    fieldNameText="Autó"
-                >
-                    {
-                        carsData
-                        ?
-                        <Input.Picker.Dropdown
-                            title={ "Autó" }
-                            data={ carsData }
-                            icon={ ICON_NAMES.car }
-                        />
-                        :
-                        <MoreDataLoading/>
-                    }
-                </Input.Field>
+                />
                 <Input.Field
                     control={ control }
                     fieldName={ "typeId" }
