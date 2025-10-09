@@ -7,8 +7,9 @@ export const expenseTable = new Table({
     car_id: column.text,
     type_id: column.text,
     currency_id: column.integer,
-    amount: column.real,
+    original_amount: column.real,
     exchange_rate: column.real,
+    amount: column.real,
     note: column.text,
     date: column.text
 });

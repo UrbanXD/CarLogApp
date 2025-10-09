@@ -17,7 +17,7 @@ type ExpenseTimelineProps = {
 
 export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
     const { expenseDao } = useDatabase();
-    const { mapper } = useExpenseTimelineItem();
+    const { mapper } = useExpenseTimelineItem(car.currency);
     const paginator = useMemo(() => expenseDao.paginator({
         field: ["date", "amount", "id"],
         order: ["desc", "desc", "asc"]
