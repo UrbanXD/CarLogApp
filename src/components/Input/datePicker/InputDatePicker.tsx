@@ -1,7 +1,7 @@
 import { useSharedValue } from "react-native-reanimated";
 import { StyleSheet } from "react-native";
 import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { DateType } from "react-native-ui-datepicker";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { DatePicker } from "./DatePicker.tsx";
@@ -24,9 +24,13 @@ type InputDatePicker = {
 function InputDatePicker({ defaultDate, maxDate, minDate, locale = "hu" }: InputDatePicker) {
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field?.onChange;
-    const fieldValue = inputFieldContext?.field.value && dayjs(inputFieldContext?.field.value).isValid()
-                       ? dayjs(inputFieldContext?.field.value).locale(locale)
-                       : dayjs(defaultDate).locale(locale);
+    const fieldValue = useMemo(() => {
+        const rawValue = inputFieldContext?.field.value;
+
+        if(rawValue && dayjs(rawValue).isValid()) return dayjs(rawValue).locale(locale);
+
+        return dayjs(defaultDate).locale(locale);
+    }, [inputFieldContext?.field.value, locale, defaultDate]);
 
     const isExpanded = useSharedValue(false);
 
@@ -36,6 +40,12 @@ function InputDatePicker({ defaultDate, maxDate, minDate, locale = "hu" }: Input
     useEffect(() => {
         if(onChange) onChange(date.toDate());
     }, [date]);
+
+    useEffect(() => {
+        if(date.isSame(fieldValue)) return;
+
+        setDate(fieldValue);
+    }, [fieldValue]);
 
     const open = (view: DatePickerViews) => {
         isExpanded.value = true;
