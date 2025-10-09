@@ -1,13 +1,11 @@
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-    EditOdometerLogForm
-} from "../../../../features/car/_features/odometer/components/forms/EditOdometerLogForm.tsx";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
 import { OdometerLog } from "../../../../features/car/schemas/odometerLogSchema.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
+import { OdometerLogForm } from "../../../../features/car/_features/odometer/components/forms/OdometerLogForm.tsx";
 
 function Page() {
     const { id } = useLocalSearchParams();
@@ -38,7 +36,7 @@ function Page() {
 
     if(!odometerLog) return <></>;
 
-    const CONTENT = <EditOdometerLogForm odometerLog={ odometerLog }/>;
+    const CONTENT = <OdometerLogForm odometerLog={ odometerLog }/>;
     const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
 
     return (

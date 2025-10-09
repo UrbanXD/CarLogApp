@@ -58,7 +58,10 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
 
     if(!car) return <></>;
 
-    const openCreateOdometerLog = useCallback(() => router.push("/bottomSheet/createOdometerLog"), []);
+    const openCreateOdometerLog = useCallback(() => router.push({
+        pathname: "/odometer/log/create",
+        params: { carId: car.id }
+    }), []);
 
     return (
         <View style={ styles.container }>

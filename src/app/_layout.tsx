@@ -103,15 +103,6 @@ const Layout: React.FC = () => {
                 } }
             />
             <Stack.Screen
-                name="bottomSheet/createOdometerLog"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
                 name="(main)"
                 options={ {
                     header: () => <Header.Primary/>,
@@ -140,6 +131,15 @@ const Layout: React.FC = () => {
                 name="odometer/log/[id]"
                 options={ {
                     header: () => <Header.Secondary title="Napló bejegyzés"/>
+                } }
+            />
+            <Stack.Screen
+                name="odometer/log/create"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
                 } }
             />
             <Stack.Screen

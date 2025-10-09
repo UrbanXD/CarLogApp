@@ -17,6 +17,6 @@ export const ACTIONS: Array<Action> = [
     {
         icon: ICON_NAMES.odometer,
         label: "Kilóméteróra-állás frissítés",
-        onPress: () => router.push("bottomSheet/createOdometerLog")
+        onPress: () => router.push("odometer/log/create")
     }
 ];

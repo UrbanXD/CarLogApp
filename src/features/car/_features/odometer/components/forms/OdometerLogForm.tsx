@@ -1,34 +1,45 @@
 import React, { useEffect, useState } from "react";
-import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
-import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
-import { useBottomSheet } from "../../../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useForm, useWatch } from "react-hook-form";
-import { OdometerLogFields, useCreateOdometerLogFormProps } from "../../schemas/form/odometerLogForm.ts";
+import {
+    OdometerLogFields,
+    useCreateOdometerLogFormProps,
+    useEditOdometerLogFormProps
+} from "../../schemas/form/odometerLogForm.ts";
 import { Car } from "../../../../schemas/carSchema.ts";
 import Form from "../../../../../../components/Form/Form.tsx";
 import useCars from "../../../../hooks/useCars.ts";
 import Input from "../../../../../../components/Input/Input.ts";
-import { SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
 import InputDatePicker from "../../../../../../components/Input/datePicker/InputDatePicker.tsx";
-import { CarCreateToast } from "../../../../presets/toast/index.ts";
 import Button from "../../../../../../components/Button/Button.ts";
-import { useAppDispatch } from "../../../../../../hooks/index.ts";
-import { updateCarOdometer } from "../../../../model/slice/index.ts";
 import { OdometerValueInput } from "./inputFields/OdometerValueInput.tsx";
 import { CarPickerInput } from "../../../../components/forms/inputFields/CarPickerInput.tsx";
 import { NoteInput } from "../../../../../../components/Input/_presets/NoteInput.tsx";
+import { useCreateOdometerLog } from "../../hooks/useCreateOdometerLog.ts";
+import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
+import { useEditOdometerLog } from "../../hooks/useEditOdometerLog.ts";
 
-export function CreateOdometerLogForm() {
-    const dispatch = useAppDispatch();
-    const { odometerLogDao } = useDatabase();
-    const { openToast } = useAlert();
-    const { dismissBottomSheet } = useBottomSheet();
+export type OdometerLogFormProps = {
+    /** Only for edit form */
+    odometerLog?: OdometerLog
+    /** Only for create form, used to set default selected car */
+    defaultCarId?: string
+}
+
+export function OdometerLogForm({ odometerLog, defaultCarId }: OdometerLogFormProps) {
+    const IS_EDIT_FORM = !!odometerLog;
+
     const { selectedCar, getCar } = useCars();
 
-    const [car, setCar] = useState<Car | null>(selectedCar);
+    const [car, setCar] = useState<Car | null>(defaultCarId ? getCar(defaultCarId) ?? selectedCar : selectedCar);
 
-    const { control, handleSubmit, clearErrors, resetField, setValue } =
-        useForm<OdometerLogFields>(useCreateOdometerLogFormProps(car));
+    const { control, handleSubmit, clearErrors, resetField, setValue, reset } =
+        useForm<OdometerLogFields>(
+            IS_EDIT_FORM
+            ? useEditOdometerLogFormProps(odometerLog)
+            : useCreateOdometerLogFormProps(car)
+        );
+    const { submitHandler } = IS_EDIT_FORM ? useEditOdometerLog(handleSubmit) : useCreateOdometerLog(handleSubmit);
 
     const formCarId = useWatch({ control, name: "carId" });
 
@@ -40,28 +51,10 @@ export function CreateOdometerLogForm() {
     }, [formCarId]);
 
     useEffect(() => {
+        if(IS_EDIT_FORM) return; // prevent update odometer value when form is for edit
+
         setValue("value", car?.odometer.value ?? 0);
     }, [car?.odometer.value]);
-
-    const submitHandler = handleSubmit(
-        async (formResult: OdometerLogFields) => {
-            try {
-                const result = await odometerLogDao.create(formResult);
-                dispatch(updateCarOdometer({ carId: result.carId, value: result.value }));
-
-                openToast(CarCreateToast.success());
-
-                if(dismissBottomSheet) dismissBottomSheet(true);
-            } catch(e) {
-                openToast(CarCreateToast.error());
-                console.error("Hiba a submitHandler-ben log:", e);
-            }
-        },
-        (errors) => {
-            console.log("Create odometer log validation errors", errors);
-            openToast(CarCreateToast.error());
-        }
-    );
 
     return (
         <>
@@ -73,6 +66,7 @@ export function CreateOdometerLogForm() {
                 <OdometerValueInput
                     control={ control }
                     fieldName="value"
+                    fieldInfoText={ IS_EDIT_FORM && `Bejegyzés eredeti kilométeróra-állása: ${ odometerLog.value } ${ odometerLog.unit.short }` }
                     currentOdometerValue={ car?.odometer.value }
                     unitText={ car?.odometer.unit.short }
                 />
@@ -89,11 +83,20 @@ export function CreateOdometerLogForm() {
                     fieldName="note"
                 />
             </Form>
-            <Button.Text
-                text={ "Rögizítés" }
-                onPress={ submitHandler }
-                style={ { width: "70%", alignSelf: "flex-end" } }
-            />
+            <Button.Row style={ { justifyContent: IS_EDIT_FORM ? "space-between" : "flex-end" } }>
+                {
+                    IS_EDIT_FORM &&
+                   <Button.Icon
+                      icon={ ICON_NAMES.reset }
+                      onPress={ () => reset() }
+                   />
+                }
+                <Button.Text
+                    text={ IS_EDIT_FORM ? "Mentés" : "Rögizítés" }
+                    onPress={ submitHandler }
+                    style={ { width: "75%" } }
+                />
+            </Button.Row>
         </>
     );
 }
