@@ -1,5 +1,5 @@
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { ScreenScrollView } from "../../components/screenView/ScreenScrollView.tsx";
 import { Title } from "../../components/Title.tsx";
@@ -7,13 +7,13 @@ import { useDatabase } from "../../contexts/database/DatabaseContext.ts";
 import { Expense } from "../../features/expense/schemas/expenseSchema.ts";
 import { Car } from "../../features/car/schemas/carSchema.ts";
 import useCars from "../../features/car/hooks/useCars.ts";
-import { InfoRow } from "../../components/InfoRow.tsx";
-import Divider from "../../components/Divider.tsx";
+import { InfoRowProps } from "../../components/InfoRow.tsx";
 import dayjs from "dayjs";
 import Button from "../../components/Button/Button.ts";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { DeleteExpenseToast } from "../../features/expense/presets/toasts/DeleteExpenseToast.ts";
+import { InfoContainer } from "../../components/info/InfoContainer.tsx";
 
 const DIVIDER_COLOR = COLORS.gray3;
 const DIVIDER_MARGIN = SEPARATOR_SIZES.lightSmall / 3;
@@ -69,6 +69,29 @@ export function ExpenseScreen() {
         });
     }, [expense, openToast, openModal]);
 
+    const infos: Array<InfoRowProps> = useMemo(() => ([
+        {
+            icon: ICON_NAMES.car,
+            title: car?.name,
+            subtitle: `${ car?.model.make.name } ${ car?.model.name }`
+        },
+        {
+            icon: ICON_NAMES.money,
+            title: "Ár",
+            subtitle: `${ expense?.originalAmount } ${ expense?.currency.symbol } (${ expense?.amount } ${ car?.currency.symbol })`
+        },
+        {
+            icon: ICON_NAMES.calendar,
+            title: "Dátum",
+            subtitle: dayjs(expense?.date).format("YYYY. MM DD. HH:mm")
+        },
+        {
+            icon: ICON_NAMES.note,
+            subtitle: expense?.note ?? "Nincs megjegyzés",
+            subtitleStyle: !expense?.note && { color: COLORS.gray2 }
+        }
+    ]), [car, expense]);
+
     return (
         <>
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
@@ -79,29 +102,7 @@ export function ExpenseScreen() {
                         marginBottom: SEPARATOR_SIZES.normal
                     } }
                 />
-                <InfoRow
-                    icon={ ICON_NAMES.car }
-                    title={ car?.name }
-                    subtitle={ `${ car?.model.make.name } ${ car?.model.name }` }
-                />
-                <Divider color={ DIVIDER_COLOR } margin={ DIVIDER_MARGIN }/>
-                <InfoRow
-                    icon={ ICON_NAMES.money }
-                    title={ "Ár" }
-                    subtitle={ `${ expense?.amount } ${ expense?.currency.symbol }` }
-                />
-                <Divider color={ DIVIDER_COLOR } margin={ DIVIDER_MARGIN }/>
-                <InfoRow
-                    icon={ ICON_NAMES.calendar }
-                    title={ "Dátum" }
-                    subtitle={ dayjs(expense?.date).format("YYYY. MM DD. HH:mm") }
-                />
-                <Divider color={ DIVIDER_COLOR } margin={ DIVIDER_MARGIN }/>
-                <InfoRow
-                    icon={ ICON_NAMES.note }
-                    subtitle={ expense?.note ?? "Nincs megjegyzés" }
-                    subtitleStyle={ !expense?.note && { color: COLORS.gray2 } }
-                />
+                <InfoContainer data={ infos }/>
             </ScreenScrollView>
             <Button.EditDelete
                 buttonContainerStyle={ { paddingBottom: bottom + SEPARATOR_SIZES.lightSmall } }

@@ -1,14 +1,15 @@
 import React from "react";
-import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../constants/index.ts";
-import Icon from "./Icon.tsx";
-import { IntelligentMarquee } from "./marquee/IntelligentMarquee.tsx";
+import { Pressable, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
+import Icon from "../Icon.tsx";
+import { IntelligentMarquee } from "../marquee/IntelligentMarquee.tsx";
 
-type InfoRowProps = {
+export type InfoRowProps = {
     icon?: string
     title?: string
     subtitle?: string
     marquee?: boolean
+    onPress?: () => void
     containerStyle?: ViewStyle
     iconStyle?: ViewStyle
     textContainerStyle?: ViewStyle
@@ -21,6 +22,7 @@ export function InfoRow({
     title,
     subtitle,
     marquee,
+    onPress,
     containerStyle,
     iconStyle,
     textContainerStyle,
@@ -28,7 +30,11 @@ export function InfoRow({
     subtitleStyle
 }: InfoRowProps) {
     return (
-        <View style={ [styles.container, containerStyle] }>
+        <Pressable
+            onPress={ onPress }
+            disabled={ !onPress }
+            style={ [styles.container, containerStyle] }
+        >
             {
                 icon &&
                <Icon
@@ -80,7 +86,7 @@ export function InfoRow({
                     )
                 }
             </View>
-        </View>
+        </Pressable>
     );
 }
 

@@ -1,10 +1,9 @@
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDatabase } from "../contexts/database/DatabaseContext.ts";
 import { Car } from "../features/car/schemas/carSchema.ts";
 import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
-import Divider from "../components/Divider.tsx";
-import { InfoRow } from "../components/InfoRow.tsx";
+import { InfoRowProps } from "../components/InfoRow.tsx";
 import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAlert } from "../ui/alert/hooks/useAlert.ts";
@@ -17,9 +16,7 @@ import { updateCarOdometer } from "../features/car/model/slice/index.ts";
 import { useAppDispatch } from "../hooks/index.ts";
 import { convertOdometerValueFromKilometer } from "../features/car/_features/odometer/utils/convertOdometerUnit.ts";
 import useCars from "../features/car/hooks/useCars.ts";
-
-const DIVIDER_COLOR = COLORS.gray3;
-const DIVIDER_MARGIN = SEPARATOR_SIZES.lightSmall / 3;
+import { InfoContainer } from "../components/info/InfoContainer.tsx";
 
 export function OdometerLogScreen() {
     const dispatch = useAppDispatch();
@@ -92,6 +89,29 @@ export function OdometerLogScreen() {
         });
     });
 
+    const infos: Array<InfoRowProps> = useMemo(() => ([
+        {
+            icon: ICON_NAMES.car,
+            title: car?.name,
+            subtitle: `${ car?.model.make.name } ${ car?.model.name }`
+        },
+        {
+            icon: ICON_NAMES.odometer,
+            title: "Kilométeróra-állás",
+            subtitle: `${ odometerLog?.value } ${ odometerLog?.unit.short }`
+        },
+        {
+            icon: ICON_NAMES.calendar,
+            title: "Dátum",
+            subtitle: dayjs(odometerLog?.date).format("YYYY. MM DD. HH:mm")
+        },
+        {
+            icon: ICON_NAMES.note,
+            subtitle: odometerLog?.note ?? "Nincs megjegyzés",
+            subtitleStyle: !odometerLog?.note && { color: COLORS.gray2 }
+        }
+    ]), [car, odometerLog]);
+
     return (
         <>
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
@@ -102,29 +122,7 @@ export function OdometerLogScreen() {
                         marginBottom: SEPARATOR_SIZES.normal
                     } }
                 />
-                <InfoRow
-                    icon={ ICON_NAMES.car }
-                    title={ car?.name }
-                    subtitle={ `${ car?.model.make.name } ${ car?.model.name }` }
-                />
-                <Divider color={ DIVIDER_COLOR } margin={ DIVIDER_MARGIN }/>
-                <InfoRow
-                    icon={ ICON_NAMES.odometer }
-                    title={ "Kilométeróra-állás" }
-                    subtitle={ `${ odometerLog?.value } ${ odometerLog?.unit.short }` }
-                />
-                <Divider color={ DIVIDER_COLOR } margin={ DIVIDER_MARGIN }/>
-                <InfoRow
-                    icon={ ICON_NAMES.calendar }
-                    title={ "Dátum" }
-                    subtitle={ dayjs(odometerLog?.date).format("YYYY. MM DD. HH:mm") }
-                />
-                <Divider color={ DIVIDER_COLOR } margin={ DIVIDER_MARGIN }/>
-                <InfoRow
-                    icon={ ICON_NAMES.note }
-                    subtitle={ odometerLog?.note ?? "Nincs megjegyzés" }
-                    subtitleStyle={ !odometerLog?.note && { color: COLORS.gray2 } }
-                />
+                <InfoContainer data={ infos }/>
             </ScreenScrollView>
             <Button.EditDelete
                 buttonContainerStyle={ { paddingBottom: bottom + SEPARATOR_SIZES.lightSmall } }
