@@ -58,7 +58,7 @@ export class Dao<Entity, Dto, Mapper> {
         if(safe && !result?.id) throw new Error(`Table item not found by ${ entity.id } id. [${ this.table }]`);
         if(!result?.id) return null;
 
-        return await this.getById(result.id, safe, useCache);
+        return await this.getById(result.id, safe);
     }
 
     async delete(id: string | number, safe?: boolean = true): Promise<string | number | null> {
