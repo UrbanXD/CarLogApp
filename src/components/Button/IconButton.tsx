@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
 import Icon from "../Icon";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE } from "../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { Color, ImageSource } from "../../types/index.ts";
 
 interface IconButtonProps {
@@ -22,8 +22,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
     iconSize = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE,
     iconColor = COLORS.black,
     backgroundColor = COLORS.fuelYellow,
-    width = iconSize * 1.5,
-    height = iconSize * 1.5,
+    width = FONT_SIZES.h3 * ICON_FONT_SIZE_SCALE + SEPARATOR_SIZES.lightSmall / 2,
+    height = FONT_SIZES.h3 * ICON_FONT_SIZE_SCALE + SEPARATOR_SIZES.lightSmall / 2,
     style,
     inverse = false,
     disabled = false,
