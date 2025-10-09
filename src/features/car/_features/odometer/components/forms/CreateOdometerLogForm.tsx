@@ -8,7 +8,7 @@ import { Car } from "../../../../schemas/carSchema.ts";
 import Form from "../../../../../../components/Form/Form.tsx";
 import useCars from "../../../../hooks/useCars.ts";
 import Input from "../../../../../../components/Input/Input.ts";
-import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
+import { SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
 import InputDatePicker from "../../../../../../components/Input/datePicker/InputDatePicker.tsx";
 import { CarCreateToast } from "../../../../presets/toast/index.ts";
 import Button from "../../../../../../components/Button/Button.ts";
@@ -16,6 +16,7 @@ import { useAppDispatch } from "../../../../../../hooks/index.ts";
 import { updateCarOdometer } from "../../../../model/slice/index.ts";
 import { OdometerValueInput } from "./inputFields/OdometerValueInput.tsx";
 import { CarPickerInput } from "../../../../components/forms/inputFields/CarPickerInput.tsx";
+import { NoteInput } from "../../../../../../components/Input/_presets/NoteInput.tsx";
 
 export function CreateOdometerLogForm() {
     const dispatch = useAppDispatch();
@@ -82,20 +83,11 @@ export function CreateOdometerLogForm() {
                 >
                     <InputDatePicker/>
                 </Input.Field>
-                <Input.Field
+                <NoteInput
                     control={ control }
+                    resetField={ resetField }
                     fieldName="note"
-                    fieldNameText="Megjegyzés"
-                    optional
-                >
-                    <Input.Text
-                        icon={ ICON_NAMES.note }
-                        placeholder="Megjegyzés"
-                        multiline
-                        actionIcon={ ICON_NAMES.close }
-                        onAction={ () => resetField("note") }
-                    />
-                </Input.Field>
+                />
             </Form>
             <Button.Text
                 text={ "Rögizítés" }

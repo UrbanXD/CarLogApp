@@ -16,12 +16,13 @@ import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 import { AmountInput } from "../../../../components/Input/_presets/AmountInput.tsx";
 import { CarPickerInput } from "../../../car/components/forms/inputFields/CarPickerInput.tsx";
+import { NoteInput } from "../../../../components/Input/_presets/NoteInput.tsx";
 
 export function CreateExpenseForm() {
-    const { carDao, expenseDao, currencyDao, expenseTypeDao } = useDatabase();
+    const { expenseDao, currencyDao, expenseTypeDao } = useDatabase();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
-    const { cars, selectedCar, getCar } = useCars();
+    const { selectedCar, getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(selectedCar);
     const [expenseTypes, setExpenseTypes] = useState<Array<PickerItemType> | null>(null);
@@ -103,20 +104,11 @@ export function CreateExpenseForm() {
                 >
                     <InputDatePicker/>
                 </Input.Field>
-                <Input.Field
+                <NoteInput
                     control={ control }
+                    resetField={ resetField }
                     fieldName="note"
-                    fieldNameText="Megjegyzés"
-                    optional
-                >
-                    <Input.Text
-                        icon={ ICON_NAMES.note }
-                        placeholder="Megjegyzés"
-                        multiline
-                        actionIcon={ ICON_NAMES.close }
-                        onAction={ () => resetField("note") }
-                    />
-                </Input.Field>
+                />
             </Form>
             <Button.Text
                 text={ "Rögizítés" }
