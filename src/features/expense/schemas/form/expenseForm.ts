@@ -1,9 +1,10 @@
 import { z } from "zod";
-import { expenseSchema } from "../expenseSchema.ts";
+import { Expense, expenseSchema } from "../expenseSchema.ts";
 import { zNumber, zPickerRequired } from "../../../../types/zodTypes.ts";
 import { Car } from "../../../car/schemas/carSchema.ts";
 import { getUUID } from "../../../../database/utils/uuid.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CurrencyEnum } from "../../../_shared/currency/enums/currencyEnum.ts";
 
 
 const expenseForm = expenseSchema
@@ -37,12 +38,12 @@ const expenseForm = expenseSchema
 
 export type ExpenseFields = z.infer<typeof expenseForm>;
 
-export const useCreateExpenseFormProps = (car: Car | null) => {
+export function useCreateExpenseFormProps(car: Car | null) {
     const defaultValues: ExpenseFields = {
         id: getUUID(),
         carId: car?.id,
         typeId: null,
-        currencyId: 1,// currencyId: car.currencyId
+        currencyId: car?.currency.id ?? CurrencyEnum.EUR,
         amount: NaN,
         exchangeRate: 1,
         note: null,
@@ -50,18 +51,19 @@ export const useCreateExpenseFormProps = (car: Car | null) => {
     };
 
     return { defaultValues, resolver: zodResolver(expenseForm) };
-};
+}
 
-// export const useEditOdometerLogFormProps = (odometerLog: OdometerLog) => {
-//     const defaultValues: OdometerLogFields = {
-//         id: odometerLog.id,
-//         carId: odometerLog.carId,
-//         typeId: odometerLog.type.id,
-//         value: odometerLog.value,
-//         note: odometerLog.note,
-//         date: odometerLog.date,
-//         conversionFactor: odometerLog.unit.conversionFactor
-//     };
-//
-//     return { defaultValues, resolver: zodResolver(odometerLogForm(0)) };
-// };
+export function useEditExpenseFormProps(expense: Expense) {
+    const defaultValues: ExpenseFields = {
+        id: expense.id,
+        carId: expense.carId,
+        typeId: expense.type.id,
+        currencyId: expense.currency.id,
+        amount: expense.originalAmount,
+        exchangeRate: expense.exchangeRate,
+        note: expense.note,
+        date: expense.date
+    };
+
+    return { defaultValues, resolver: zodResolver(expenseForm) };
+}
