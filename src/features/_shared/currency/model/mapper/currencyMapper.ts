@@ -24,10 +24,10 @@ export class CurrencyMapper extends AbstractMapper<CurrencyTableRow, Currency> {
         };
     }
 
-    dtoToPicker(dtos: Array<Currency>): Promise<Array<PickerItemType>> {
+    dtoToPicker(dtos: Array<Currency>, getControllerTitle?: (dto: Currency) => string): Promise<Array<PickerItemType>> {
         return dtos.map(dto => ({
             value: dto.id.toString(),
-            controllerTitle: dto.symbol,
+            controllerTitle: getControllerTitle?.(dto) ?? dto.symbol,
             title: `${ dto.key } - ${ dto.symbol }`
         }));
     }

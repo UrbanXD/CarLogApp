@@ -1,18 +1,19 @@
-import React from "react";
+import React, { useMemo } from "react";
 import EditForm from "../../../../components/Form/EditForm.tsx";
 import { useAppDispatch } from "../../../../hooks/index.ts";
 import { useForm } from "react-hook-form";
-import useCarSteps from "../../hooks/useCarSteps.tsx";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { editCar } from "../../model/actions/editCar.ts";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { CarFormFields, useEditCarFormProps } from "../../schemas/form/carForm.ts";
 import { Car } from "../../schemas/carSchema.ts";
+import { EDIT_CAR_FORM_STEPS } from "../../constants/index.ts";
+import { useEditCarSteps } from "../../hooks/useEditCarSteps.tsx";
 
 export type EditCarFormProps = {
     car: Car
-    stepIndex: number
+    stepIndex: EDIT_CAR_FORM_STEPS
 }
 
 const EditCarForm: React.FC<EditCarFormProps> = ({
@@ -24,26 +25,17 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
 
-    const {
-        control,
-        resetField,
-        reset,
-        setValue,
-        getValues,
-        handleSubmit
-    } = useForm<CarFormFields>(useEditCarFormProps(car));
+    const form = useForm<CarFormFields>(useEditCarFormProps(car));
+    const { handleSubmit, reset } = form;
 
-    const { steps } = useCarSteps<CarFormFields>({ control, resetField, setValue, getValues });
+    const editFields = useEditCarSteps({ ...form, index: stepIndex, car });
 
-    const submitHandler = handleSubmit(
+    const submitHandler = useMemo(() => handleSubmit(
         async (formResult: CarFormFields) => {
             try {
                 await dispatch(editCar({ database, formResult }));
 
-                const step = steps[stepIndex ?? 0];
-                if(steps[stepIndex] && step.editToastMessages) {
-                    openToast(step.editToastMessages.success());
-                }
+                openToast(editFields.toastMessages.success());
 
                 if(dismissBottomSheet) dismissBottomSheet(true);
             } catch(e) {
@@ -53,11 +45,11 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
         (errors) => {
             console.log("Edit car validation errors", errors);
         }
-    );
+    ), [handleSubmit, editFields]);
 
     return (
         <EditForm
-            renderInputFields={ () => steps[stepIndex].render() }
+            renderInputFields={ editFields.render }
             submitHandler={ submitHandler }
             reset={ reset }
         />

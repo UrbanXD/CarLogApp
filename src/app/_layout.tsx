@@ -58,15 +58,6 @@ const Layout: React.FC = () => {
                 } }
             />
             <Stack.Screen
-                name="bottomSheet/editCar"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
                 name="bottomSheet/signIn"
                 options={ {
                     header: () => <></>,
@@ -119,6 +110,15 @@ const Layout: React.FC = () => {
                 name="(edit)/car"
                 options={ {
                     header: () => <Header.Secondary title="Autó adatlap"/>
+                } }
+            />
+            <Stack.Screen
+                name="car/edit/[id]"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
                 } }
             />
             <Stack.Screen

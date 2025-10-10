@@ -14,7 +14,7 @@ import Button from "../../../../components/Button/Button.ts";
 import { ExpenseFields, useCreateExpenseFormProps } from "../../schemas/form/expenseForm.ts";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
-import { AmountInput } from "../../../../components/Input/_presets/AmountInput.tsx";
+import { AmountInput } from "../../../_shared/currency/components/AmountInput.tsx";
 import { CarPickerInput } from "../../../car/components/forms/inputFields/CarPickerInput.tsx";
 import { NoteInput } from "../../../../components/Input/_presets/NoteInput.tsx";
 

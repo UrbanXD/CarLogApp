@@ -1,12 +1,12 @@
-import Input from "../Input.ts";
+import Input from "../../../../components/Input/Input.ts";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import { MoreDataLoading } from "../../loading/MoreDataLoading.tsx";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 import React, { useCallback, useEffect, useState } from "react";
 import { Control, useWatch } from "react-hook-form";
-import { PickerItemType } from "../picker/PickerItem.tsx";
-import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
-import { formTheme } from "../../../ui/form/constants/theme.ts";
+import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
+import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
+import { formTheme } from "../../../..//ui/form/constants/theme.ts";
 
 type AmountInputProps = {
     control: Control<any>

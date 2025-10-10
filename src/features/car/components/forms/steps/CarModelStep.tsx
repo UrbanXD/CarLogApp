@@ -23,7 +23,7 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
     const modelPaginator = useMemo(() => modelDao.paginatorByMakeId(selectedMakeId, 25), [selectedMakeId]);
 
     useEffect(() => {
-        if(defaultLoadModelId) return setDefaultLoadModelId(false);
+        if(defaultLoadModelId) setDefaultLoadModelId(false);
         if(!selectedModelId) return;
 
         const fetchYears = async () => setModelYears(await modelDao.getModelYearsById(selectedModelId, true));

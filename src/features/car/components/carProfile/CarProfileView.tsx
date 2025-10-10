@@ -1,21 +1,21 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Image from "../../../../components/Image.tsx";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import Button from "../../../../components/Button/Button.ts";
-import { CAR_FORM_STEPS } from "../../constants/index.ts";
+import { EDIT_CAR_FORM_STEPS } from "../../constants/index.ts";
 import Divider from "../../../../components/Divider.tsx";
 import { Odometer } from "../../_features/odometer/components/Odometer.tsx";
-import FuelGauge from "../../_features/fuel/components/FuelGauge.tsx";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { Car } from "../../schemas/carSchema.ts";
 import { IntelligentMarquee } from "../../../../components/marquee/IntelligentMarquee.tsx";
 import Link from "../../../../components/Link.tsx";
+import { InfoContainer } from "../../../../components/info/InfoContainer.tsx";
+import { InfoRowProps } from "../../../../components/info/InfoRow.tsx";
 
 type CarProfileViewProps = {
     car: Car
     openEditCarStep: (stepIndex: number) => void
-    fuelSliderDisabled?: boolean
     handleDeleteCar?: () => void
     openOdometerLog?: () => void
 }
@@ -27,10 +27,33 @@ const MARQUEE_BOUNCE_DELAY = 500;
 function CarProfileView({
     car,
     openEditCarStep,
-    fuelSliderDisabled = false,
     handleDeleteCar,
     openOdometerLog
 }: CarProfileViewProps) {
+    const infos: Array<InfoRowProps> = useMemo(() => ([
+        {
+            title: car.fuelTank.type.key,
+            subtitle: "Üzemanyag Típus",
+            onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelType)
+        }, {
+            title: car.fuelTank.capacity,
+            subtitle: "Tartálytérfogat",
+            onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelTankCapacity)
+        }, {
+            title: car.fuelTank.unit.short,
+            subtitle: "Üzemanyag mértékegység",
+            onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelUnit)
+        }, {
+            title: car.odometer.unit.short,
+            subtitle: "Kilométeróra Mértékegység",
+            onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.OdometerUnit)
+        }, {
+            title: car.currency.symbol,
+            subtitle: "Elsődleges Valuta",
+            onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.Currency)
+        }
+    ]), [car, openEditCarStep]);
+
     return (
         <View style={ styles.container }>
             <View style={ styles.imageContainer }>
@@ -48,7 +71,7 @@ function CarProfileView({
                             height={ FONT_SIZES.h2 }
                             style={ styles.editImageIcon }
                             backgroundColor="transparent"
-                            onPress={ () => openEditCarStep(CAR_FORM_STEPS.ImageStep) }
+                            onPress={ () => openEditCarStep(EDIT_CAR_FORM_STEPS.Image) }
                         />
                     </View>
                 </Image>
@@ -72,7 +95,7 @@ function CarProfileView({
                         width={ FONT_SIZES.h3 }
                         height={ FONT_SIZES.h3 }
                         backgroundColor="transparent"
-                        onPress={ () => openEditCarStep(CAR_FORM_STEPS.NameStep) }
+                        onPress={ () => openEditCarStep(EDIT_CAR_FORM_STEPS.Name) }
                     />
                 </View>
                 <Divider
@@ -117,8 +140,7 @@ function CarProfileView({
                             spacing={ SEPARATOR_SIZES.medium }
                             style={ { alignSelf: "flex-end" } }
                         >
-                            <Text
-                                style={ styles.carInfoRow.infoContainer.text }>{ car.model.year }</Text>
+                            <Text style={ styles.carInfoRow.infoContainer.text }>{ car.model.year }</Text>
                         </IntelligentMarquee>
                     </View>
                 </View>
@@ -144,26 +166,16 @@ function CarProfileView({
                         height={ FONT_SIZES.p2 * 2 }
                         backgroundColor="transparent"
                         style={ { flex: 0.75, borderColor: COLORS.gray1, borderWidth: 2.5 } }
-                        onPress={ () => openEditCarStep(CAR_FORM_STEPS.CarModelStep) }
+                        onPress={ () => openEditCarStep(EDIT_CAR_FORM_STEPS.CarModel) }
                     />
                 </Button.Row>
             </View>
-            <View style={ { gap: SEPARATOR_SIZES.lightSmall } }>
-                <View style={ styles.odometerContainer }>
-                    <Text style={ styles.odometerContainer.title }>Kilóméteróra</Text>
-                    {
-                        openEditCarStep &&
-                       <Button.Icon
-                          icon={ ICON_NAMES.pencil }
-                          iconSize={ FONT_SIZES.h3 }
-                          iconColor={ COLORS.gray1 }
-                          width={ FONT_SIZES.h3 }
-                          height={ FONT_SIZES.h3 }
-                          backgroundColor="transparent"
-                          onPress={ () => openEditCarStep(CAR_FORM_STEPS.OdometerStep) }
-                       />
-                    }
-                </View>
+            <View style={ styles.block }>
+                <Text style={ styles.block.title }>Alap információk</Text>
+                <InfoContainer data={ infos } flexDirection={ "column" } maxItemInRow={ 3 }/>
+            </View>
+            <View style={ styles.block }>
+                <Text style={ styles.block.title }>Kilóméteróra</Text>
                 <Odometer value={ car.odometer.value } unit={ car.odometer.unit.short }/>
                 {
                     openOdometerLog &&
@@ -174,14 +186,6 @@ function CarProfileView({
                    />
                 }
             </View>
-            <FuelGauge
-                value={ car.fuelTank.value }
-                tankSize={ car.fuelTank.capacity }
-                fuelType={ car.fuelTank.type.locale }
-                unit={ car.fuelTank.unit.short }
-                disabled={ fuelSliderDisabled }
-                openEditForm={ () => openEditCarStep(CAR_FORM_STEPS.FuelStep) }
-            />
         </View>);
 }
 
@@ -193,7 +197,7 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         flexDirection: "row",
-        height: hp(25),
+        height: hp(22.5),
         justifyContent: "center",
         gap: SEPARATOR_SIZES.small,
         overflow: "hidden"
@@ -209,7 +213,7 @@ const styles = StyleSheet.create({
     contentRowContainer: {
         gap: SEPARATOR_SIZES.lightSmall / 2.5,
         backgroundColor: COLORS.black4,
-        padding: SEPARATOR_SIZES.mediumSmall,
+        padding: SEPARATOR_SIZES.normal,
         borderRadius: 25
     },
     carNameText: {
@@ -244,16 +248,15 @@ const styles = StyleSheet.create({
             }
         }
     },
-    odometerContainer: {
-        flex: 1,
-        flexDirection: "row",
-        justifyContent: "space-between",
+    block: {
+        gap: SEPARATOR_SIZES.lightSmall,
 
         title: {
             flexShrink: 1,
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p2,
             letterSpacing: FONT_SIZES.p2 * 0.05,
+            textAlign: "center",
             color: COLORS.gray1
         }
     }

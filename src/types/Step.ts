@@ -8,11 +8,15 @@ export type UseStepFormResult = {
     resultStep?: ResultStep
 }
 
+export type EditFields = {
+    render: RenderComponent
+    toastMessages: ToastMessages
+}
+
 export type Step = {
     title: string
     fields: Array<string>
     render: RenderComponent
-    editToastMessages?: ToastMessages
 }
 
 export type Steps = Array<Step>

@@ -80,6 +80,7 @@ export const useEditCarFormProps = (car: Car) => {
             value: car.odometer.value,
             unitId: car.odometer.unit.id
         },
+        currencyId: car.currency.id,
         fuelTank: {
             id: car.fuelTank.id,
             typeId: car.fuelTank.type.id,
