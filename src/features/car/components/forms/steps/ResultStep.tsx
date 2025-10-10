@@ -7,6 +7,7 @@ import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts
 import { FuelUnit } from "../../../_features/fuel/schemas/fuelUnitSchema.ts";
 import { FuelType } from "../../../_features/fuel/schemas/fuelTypeSchema.ts";
 import { OdometerUnit } from "../../../_features/odometer/schemas/odometerUnitSchema.ts";
+import { Currency } from "../../../../_shared/currency/schemas/currencySchema.ts";
 
 type ResultStepProps = {
     formValues: CarFormFields
@@ -17,24 +18,47 @@ export function ResultStep({
     formValues,
     goTo
 }: ResultStepProps) {
-    const { fuelTypeDao, fuelUnitDao, odometerUnitDao } = useDatabase();
+    const { fuelTypeDao, fuelUnitDao, odometerUnitDao, currencyDao } = useDatabase();
 
     const [fuelUnit, setFuelUnit] = useState<FuelUnit | null>(null);
     const [fuelType, setFuelType] = useState<FuelType | null>(null);
     const [odometerUnit, setOdometerUnit] = useState<OdometerUnit | null>(null);
+    const [currency, setCurrency] = useState<Currency | null>(null);
 
     useEffect(() => {
-        if(!formValues.fuelTank.unitId || !formValues.fuelTank.typeId || !formValues.odometer.unitId) return;
-
         (async () => {
-            setFuelUnit(await fuelUnitDao.getById(formValues.fuelTank.unitId));
+            if(!formValues.currencyId) return;
+
+            setCurrency(await currencyDao.getById(formValues.currencyId));
+        })();
+    }, [formValues.currencyId]);
+
+    useEffect(() => {
+        (async () => {
+            if(!formValues.fuelTank.typeId) return;
+
             setFuelType(await fuelTypeDao.getById(formValues.fuelTank.typeId));
+        })();
+    }, [formValues.fuelTank.typeId]);
+
+    useEffect(() => {
+        (async () => {
+            if(!formValues.fuelTank.unitId) return;
+
+            setFuelUnit(await fuelUnitDao.getById(formValues.fuelTank.unitId));
+        })();
+    }, [formValues.fuelTank.unitId]);
+
+    useEffect(() => {
+        (async () => {
+            if(!formValues.odometer.unitId) return;
+
             setOdometerUnit(await odometerUnitDao.getById(formValues.odometer.unitId));
         })();
-    }, [formValues.fuelTank.typeId, formValues.fuelTank.unitId, formValues.odometer.unitId]);
+    }, [formValues.odometer.unitId]);
 
 
-    if(!fuelType || !fuelUnit || !odometerUnit) return <MoreDataLoading/>;
+    if(!fuelType || !fuelUnit || !odometerUnit || !currency) return <MoreDataLoading/>;
 
     const car: Car = {
         name: formValues.name,
@@ -48,6 +72,7 @@ export function ResultStep({
             value: formValues.odometer.value,
             unit: odometerUnit
         },
+        currency,
         fuelTank: {
             type: fuelType,
             unit: fuelUnit,

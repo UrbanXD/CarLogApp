@@ -15,9 +15,10 @@ import { InfoRowProps } from "../../../../components/info/InfoRow.tsx";
 
 type CarProfileViewProps = {
     car: Car
-    openEditCarStep: (stepIndex: number) => void
+    openEditCarStep: (stepIndex: EDIT_CAR_FORM_STEPS) => void
     handleDeleteCar?: () => void
     openOdometerLog?: () => void
+    openEditOdometerValue?: () => void
 }
 
 const MARQUEE_SPEED = 0.75;
@@ -28,7 +29,8 @@ function CarProfileView({
     car,
     openEditCarStep,
     handleDeleteCar,
-    openOdometerLog
+    openOdometerLog,
+    openEditOdometerValue
 }: CarProfileViewProps) {
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
@@ -175,7 +177,28 @@ function CarProfileView({
                 <InfoContainer data={ infos } flexDirection={ "column" } maxItemInRow={ 3 }/>
             </View>
             <View style={ styles.block }>
-                <Text style={ styles.block.title }>Kilóméteróra</Text>
+                <View style={ {
+                    flexDirection: "row",
+                    justifyContent: openEditOdometerValue ? "space-between" : "center"
+                } }>
+                    {
+                        openEditOdometerValue &&
+                       <View style={ { width: FONT_SIZES.h3, height: FONT_SIZES.h3, backgroundColor: "transparent" } }/>
+                    }
+                    <Text style={ styles.block.title }>Kilóméteróra</Text>
+                    {
+                        openEditOdometerValue &&
+                       <Button.Icon
+                          icon={ ICON_NAMES.pencil }
+                          iconSize={ FONT_SIZES.h3 }
+                          iconColor={ COLORS.gray1 }
+                          width={ FONT_SIZES.h3 }
+                          height={ FONT_SIZES.h3 }
+                          backgroundColor="transparent"
+                          onPress={ openEditOdometerValue }
+                       />
+                    }
+                </View>
                 <Odometer value={ car.odometer.value } unit={ car.odometer.unit.short }/>
                 {
                     openOdometerLog &&
