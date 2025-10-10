@@ -3,7 +3,7 @@ import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../../../../constants/inde
 import React from "react";
 import { Control } from "react-hook-form";
 import { View } from "react-native";
-import { OdometerUnitText } from "../../../../odometer/components/UnitText.tsx";
+import { UnitText } from "../../../../../../../components/UnitText.tsx";
 
 type FuelTankCapacityInputProps = {
     control: Control<any>
@@ -38,7 +38,7 @@ export function FuelTankCapacityInput({
                 </View>
                 {
                     unitText &&
-                   <OdometerUnitText
+                   <UnitText
                       text={ unitText }
                       style={ { padding: SEPARATOR_SIZES.lightSmall } }
                    />

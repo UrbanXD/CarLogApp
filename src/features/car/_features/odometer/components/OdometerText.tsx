@@ -1,6 +1,7 @@
+import React from "react";
 import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
-import { OdometerUnitText } from "./UnitText.tsx";
+import { UnitText } from "../../../../../components/UnitText.tsx";
 
 type OdometerTextProps = {
     text: string
@@ -30,7 +31,7 @@ export function OdometerText({
                 </Text>
             </View>
             {
-                unit && <OdometerUnitText text={ unit } style={ unitTextStyle }/>
+                unit && <UnitText text={ unit } style={ unitTextStyle }/>
             }
         </View>
     );

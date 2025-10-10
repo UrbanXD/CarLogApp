@@ -3,7 +3,7 @@ import { Control } from "react-hook-form";
 import Input from "../../../../../../../components/Input/Input.ts";
 import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../../../../constants/index.ts";
 import { View } from "react-native";
-import { OdometerUnitText } from "../../UnitText.tsx";
+import { UnitText } from "../../../../../../../components/UnitText.tsx";
 
 type OdometerValueInputProps = {
     control: Control<any>
@@ -42,7 +42,7 @@ export function OdometerValueInput({
                 </View>
                 {
                     unitText &&
-                   <OdometerUnitText
+                   <UnitText
                       text={ unitText }
                       style={ { padding: SEPARATOR_SIZES.lightSmall } }
                    />

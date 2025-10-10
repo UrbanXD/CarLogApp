@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { LayoutChangeEvent, StyleSheet, View } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import { OdometerText } from "./OdometerText.tsx";
-import { OdometerUnitText } from "./UnitText.tsx";
+import { UnitText } from "../../../../../components/UnitText.tsx";
 
 type OdometerProps = {
     value: number | string
@@ -38,7 +38,7 @@ export function Odometer({ value, unit }: OdometerProps) {
             </View>
             {
                 unit &&
-               <OdometerUnitText text={ unit }/>
+               <UnitText text={ unit }/>
             }
         </View>
     );

@@ -6,7 +6,7 @@ type OdometerUnitTextProps = {
     style?: TextStyle
 }
 
-export function OdometerUnitText({ text, style }: OdometerUnitTextProps) {
+export function UnitText({ text, style }: OdometerUnitTextProps) {
     return (
         <Text style={ [styles.unitText, style] }>{ text }</Text>
     );
