@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TextStyle } from "react-native";
-import { COLORS, FONT_SIZES } from "../../../../../constants/index.ts";
+import { COLORS, FONT_SIZES } from "../constants/index.ts";
 
 type OdometerUnitTextProps = {
     text: string
