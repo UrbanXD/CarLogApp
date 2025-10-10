@@ -5,6 +5,8 @@ import { modelSchema } from "../modelSchema.ts";
 import { zNumber, zPickerRequired } from "../../../../types/zodTypes.ts";
 import { getUUID } from "../../../../database/utils/uuid.ts";
 import { currencySchema } from "../../../_shared/currency/schemas/currencySchema.ts";
+import { CurrencyEnum } from "../../../_shared/currency/enums/currencyEnum.ts";
+import { getLocales } from "expo-localization";
 
 export const carFormSchema = carSchema
 .pick({ id: true, ownerId: true, name: true, image: true })
@@ -34,6 +36,10 @@ export const carFormSchema = carSchema
 export type CarFormFields = z.infer<typeof carFormSchema>;
 
 export const useCreatCarFormProps = (userId: string) => {
+    const locales = getLocales();
+    const currencyCode = locales?.[0]?.currencyCode;
+    const regionCode = locales?.[0]?.regionCode ?? "US";
+
     const defaultValues: CarFormFields = {
         id: getUUID(),
         ownerId: userId,
@@ -50,7 +56,8 @@ export const useCreatCarFormProps = (userId: string) => {
             value: NaN,
             unitId: ""
         },
-        currencyId: 1, //todo defaulpt currency load by gps location
+        currencyId: Number((CurrencyEnum?.[currencyCode] ??
+            (regionCode === "EU" ? CurrencyEnum.EUR : CurrencyEnum.USD))),
         fuelTank: {
             id: getUUID(),
             typeId: "",
