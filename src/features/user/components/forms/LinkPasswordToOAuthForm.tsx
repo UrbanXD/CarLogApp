@@ -1,11 +1,13 @@
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useForm } from "react-hook-form";
-import EditForm from "../../../../components/Form/EditForm.tsx";
 import { PasswordStep } from "./steps/index.ts";
 import { getToastMessage } from "../../../../ui/alert/utils/getToastMessage.ts";
 import { AddPasswordToast } from "../../presets/toast/index.ts";
 import { NewPasswordRequest, useNewPasswordFormProps } from "../../schemas/form/newPasswordRequest.ts";
 import { useAuth } from "../../../../contexts/auth/AuthContext.ts";
+import Form from "../../../../components/Form/Form.tsx";
+import { EditFormButtons } from "../../../../components/Button/presets/EditFormButtons.tsx";
+import React from "react";
 
 export function LinkPasswordToOAuthForm() {
     const { openToast } = useAlert();
@@ -33,10 +35,9 @@ export function LinkPasswordToOAuthForm() {
     });
 
     return (
-        <EditForm
-            renderInputFields={ () => <PasswordStep control={ control }/> }
-            submitHandler={ submitHandler }
-            reset={ reset }
-        />
+        <Form>
+            <PasswordStep control={ control }/>
+            <EditFormButtons reset={ reset } submit={ submitHandler }/>
+        </Form>
     );
 }

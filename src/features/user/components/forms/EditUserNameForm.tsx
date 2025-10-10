@@ -2,7 +2,6 @@ import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useForm } from "react-hook-form";
 import { EditUserNameRequest, useEditUserNameFormProps } from "../../schemas/form/editUserNameRequest.ts";
 import { UserAccount } from "../../schemas/userSchema.ts";
-import EditForm from "../../../../components/Form/EditForm.tsx";
 import { NameStep } from "./steps/index.ts";
 import { router } from "expo-router";
 import { getToastMessage } from "../../../../ui/alert/utils/getToastMessage.ts";
@@ -10,6 +9,9 @@ import { editUserName } from "../../model/actions/editUserName.ts";
 import { ChangeNameToast } from "../../presets/toast/index.ts";
 import { useAppDispatch } from "../../../../hooks/index.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
+import Form from "../../../../components/Form/Form.tsx";
+import { EditFormButtons } from "../../../../components/Button/presets/EditFormButtons.tsx";
+import React from "react";
 
 export type EditUserNameFormProps = { user: UserAccount }
 
@@ -36,10 +38,9 @@ export function EditUserNameForm({ user }: EditUserNameFormProps) {
     });
 
     return (
-        <EditForm
-            renderInputFields={ () => <NameStep control={ control }/> }
-            submitHandler={ submitHandler }
-            reset={ reset }
-        />
+        <Form>
+            <NameStep control={ control }/>
+            <EditFormButtons reset={ reset } submit={ submitHandler }/>
+        </Form>
     );
 }

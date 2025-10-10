@@ -1,13 +1,15 @@
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useForm } from "react-hook-form";
 import { UserAccount } from "../../schemas/userSchema.ts";
-import EditForm from "../../../../components/Form/EditForm.tsx";
 import { PasswordStep } from "./steps/index.ts";
 import { router } from "expo-router";
 import { getToastMessage } from "../../../../ui/alert/utils/getToastMessage.ts";
 import { ResetPasswordToast } from "../../presets/toast/index.ts";
 import { OtpVerificationHandlerType } from "../../../../app/bottomSheet/otpVerification.tsx";
 import { NewPasswordRequest, useNewPasswordFormProps } from "../../schemas/form/newPasswordRequest.ts";
+import Form from "../../../../components/Form/Form.tsx";
+import { EditFormButtons } from "../../../../components/Button/presets/EditFormButtons.tsx";
+import React from "react";
 
 export type ResetPasswordFormProps = { user: UserAccount }
 
@@ -42,10 +44,9 @@ export function ResetPasswordForm({ user }: ResetPasswordFormProps) {
     });
 
     return (
-        <EditForm
-            renderInputFields={ () => <PasswordStep control={ control }/> }
-            submitHandler={ submitHandler }
-            reset={ reset }
-        />
+        <Form>
+            <PasswordStep control={ control }/>
+            <EditFormButtons reset={ reset } submit={ submitHandler }/>
+        </Form>
     );
 }

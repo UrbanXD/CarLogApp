@@ -1,5 +1,4 @@
 import React, { useMemo } from "react";
-import EditForm from "../../../../components/Form/EditForm.tsx";
 import { useAppDispatch } from "../../../../hooks/index.ts";
 import { useForm } from "react-hook-form";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
@@ -10,6 +9,8 @@ import { CarFormFields, useEditCarFormProps } from "../../schemas/form/carForm.t
 import { Car } from "../../schemas/carSchema.ts";
 import { EDIT_CAR_FORM_STEPS } from "../../constants/index.ts";
 import { useEditCarSteps } from "../../hooks/useEditCarSteps.tsx";
+import Form from "../../../../components/Form/Form.tsx";
+import { EditFormButtons } from "../../../../components/Button/presets/EditFormButtons.tsx";
 
 export type EditCarFormProps = {
     car: Car
@@ -48,11 +49,10 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
     ), [handleSubmit, editFields]);
 
     return (
-        <EditForm
-            renderInputFields={ editFields.render }
-            submitHandler={ submitHandler }
-            reset={ reset }
-        />
+        <Form>
+            { editFields.render() }
+            <EditFormButtons reset={ reset } submit={ submitHandler }/>
+        </Form>
     );
 };
 
