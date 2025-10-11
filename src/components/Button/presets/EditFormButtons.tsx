@@ -1,9 +1,10 @@
 import Button from "../Button.ts";
 import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import React from "react";
+import { UseFormReturn } from "react-hook-form";
 
 type EditFormButtonsProps = {
-    reset: () => void
+    reset: UseFormReturn<any>["reset"]
     submit: () => Promise<void>
     submitText?: string
 }
