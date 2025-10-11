@@ -17,6 +17,7 @@ const SimplePicker: React.FC<SimplePickerProps> = ({
 }) => {
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field?.onChange;
+    const inputFieldValue = inputFieldContext?.field.value?.toString() ?? null;
 
     const findItemByValue = useCallback(
         (value: string) => items.find(item => item.value === value),
@@ -24,17 +25,8 @@ const SimplePicker: React.FC<SimplePickerProps> = ({
     );
 
     const [selectedItem, setSelectedItem] = useState<PickerItemType | undefined>(
-        findItemByValue(inputFieldContext?.field?.value?.toString() ?? defaultValue)
+        findItemByValue(inputFieldValue ?? defaultValue)
     );
-
-    const onSelect = useCallback((value: string) => {
-        const item = findItemByValue(value);
-        if(!item) return;
-
-        if(onChange) onChange(item.value);
-        if(setValue) setValue(item.value);
-        setSelectedItem(item);
-    }, [items, setValue, onChange, findItemByValue]);
 
     useEffect(() => {
         if(!selectedItem) return;
@@ -46,6 +38,22 @@ const SimplePicker: React.FC<SimplePickerProps> = ({
         setSelectedItem(item);
     }, [items]);
 
+    useEffect(() => {
+        if(!inputFieldContext?.field.value) return setSelectedItem(undefined);
+
+        const item = findItemByValue(inputFieldContext?.field?.value?.toString());
+        setSelectedItem(item);
+    }, [inputFieldContext?.field.value]);
+
+    const onSelect = useCallback((value: string) => {
+        const item = findItemByValue(value);
+        if(!item) return;
+
+        if(onChange) onChange(item.value);
+        if(setValue) setValue(item.value);
+        setSelectedItem(item);
+    }, [items, setValue, onChange, findItemByValue]);
+
     const renderItem = useCallback((item: PickerItemType, index: number) => (
         <PickerItem
             key={ index }
@@ -53,7 +61,7 @@ const SimplePicker: React.FC<SimplePickerProps> = ({
             onPress={ () => onSelect(item.value) }
             selected={ item.value === selectedItem?.value }
         />
-    ), [selectedItem]);
+    ), [selectedItem, onSelect]);
 
     return (
         <View style={ styles.container }>
