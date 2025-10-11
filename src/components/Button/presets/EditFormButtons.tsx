@@ -14,7 +14,7 @@ export function EditFormButtons({ reset, submit, submitText = "Mentés" }: EditF
         <Button.Row style={ { paddingTop: SEPARATOR_SIZES.lightSmall } }>
             <Button.Icon
                 icon={ ICON_NAMES.reset }
-                onPress={ reset }
+                onPress={ () => reset() }
             />
             <Button.Text
                 text={ submitText }
