@@ -1,11 +1,11 @@
-import { Control } from "react-hook-form";
+import { Control, UseFormReturn } from "react-hook-form";
 import Input from "../Input.ts";
 import { ICON_NAMES } from "../../../constants/index.ts";
 import React from "react";
 
 type NoteInputProps = {
     control: Control<any>
-    resetField: (name: string) => void
+    setValue: UseFormReturn<any>["setValue"]
     fieldName: string
     title?: string
     subtitle?: string
@@ -15,7 +15,7 @@ type NoteInputProps = {
 
 export function NoteInput({
     control,
-    resetField,
+    setValue,
     fieldName,
     title = "Megjegyzés",
     subtitle,
@@ -27,6 +27,7 @@ export function NoteInput({
             control={ control }
             fieldName={ fieldName }
             fieldNameText={ title }
+            fieldInfoText={ subtitle }
             optional={ optional }
         >
             <Input.Text
@@ -34,7 +35,7 @@ export function NoteInput({
                 placeholder={ placeholder }
                 multiline
                 actionIcon={ ICON_NAMES.close }
-                onAction={ () => resetField("note") }
+                onAction={ () => setValue("note", "") }
             />
         </Input.Field>
     );

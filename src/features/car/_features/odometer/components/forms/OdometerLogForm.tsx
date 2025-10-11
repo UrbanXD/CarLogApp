@@ -79,7 +79,7 @@ export function OdometerLogForm({ odometerLog, defaultCarId }: OdometerLogFormPr
                 </Input.Field>
                 <NoteInput
                     control={ control }
-                    resetField={ resetField }
+                    setValue={ setValue }
                     fieldName="note"
                 />
             </Form>
