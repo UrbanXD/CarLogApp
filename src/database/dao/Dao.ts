@@ -29,7 +29,7 @@ export class Dao<Entity, Dto, Mapper> {
         .where("id", "=", id)
         .executeTakeFirst();
 
-        if(safe && entity === null) throw new Error(`Table item not found by ${ id } id. [${ this.table }]`);
+        if(safe && !entity) throw new Error(`Table item not found by ${ id } id. [${ this.table }]`);
 
         return entity ? await this.mapper.toDto(entity) : null;
     }
@@ -68,7 +68,7 @@ export class Dao<Entity, Dto, Mapper> {
         .where("id", "=", id)
         .executeTakeFirst();
 
-        if(!result?.id && safe) throw new Error(`Table item not found by ${ id }. [${ this.table }]`);
+        if(safe && !result?.id) throw new Error(`Table item not found by ${ id }. [${ this.table }]`);
 
         return result?.id ?? null;
     }
