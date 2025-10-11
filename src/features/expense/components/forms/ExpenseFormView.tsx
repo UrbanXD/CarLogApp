@@ -14,7 +14,7 @@ import useCars from "../../../car/hooks/useCars.ts";
 
 type ExpenseFormViewProps = UseFormReturn<ExpenseFields>;
 
-export function ExpenseFormView({ control, setValue, clearErrors }: ExpenseFormViewProps) {
+export function ExpenseFormView({ control, resetField, setValue, clearErrors }: ExpenseFormViewProps) {
     const { getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(null);

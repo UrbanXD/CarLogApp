@@ -19,7 +19,7 @@ type UseEditExpenseFieldsArgs = UseFormReturn<ExpenseFields> & {
 }
 
 export function useEditExpenseFields({ field, ...restProps }: UseEditExpenseFieldsArgs) {
-    const { control, setValue } = restProps;
+    const { control, resetField, setValue } = restProps;
     const { getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(null);
