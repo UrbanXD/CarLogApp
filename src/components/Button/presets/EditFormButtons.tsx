@@ -1,5 +1,5 @@
 import Button from "../Button.ts";
-import { ICON_NAMES } from "../../../constants/index.ts";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import React from "react";
 
 type EditFormButtonsProps = {
@@ -10,7 +10,7 @@ type EditFormButtonsProps = {
 
 export function EditFormButtons({ reset, submit, submitText = "Mentés" }: EditFormButtonsProps) {
     return (
-        <Button.Row>
+        <Button.Row style={ { paddingTop: SEPARATOR_SIZES.lightSmall } }>
             <Button.Icon
                 icon={ ICON_NAMES.reset }
                 onPress={ reset }
