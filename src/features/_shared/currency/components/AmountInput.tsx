@@ -2,14 +2,15 @@ import Input from "../../../../components/Input/Input.ts";
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
-import React, { useCallback, useEffect, useState } from "react";
-import { Control, useWatch } from "react-hook-form";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Control, UseFormSetValue, useWatch } from "react-hook-form";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { formTheme } from "../../../..//ui/form/constants/theme.ts";
 
 type AmountInputProps = {
     control: Control<any>
+    setValue: UseFormSetValue<any>
     title?: string
     subtitle?: string
     amountPlaceholder?: string
@@ -18,12 +19,12 @@ type AmountInputProps = {
     exchangeRateFieldName?: string
     exchangeText?: (exchangedAmount: string) => string
     showsExchangeRate?: boolean
-    resetExchangeRate?: () => void
     defaultCurrency?: string | number
 }
 
 export function AmountInput({
     control,
+    setValue,
     title = "Összeg",
     subtitle,
     amountPlaceholder = "Összeg",
@@ -32,12 +33,13 @@ export function AmountInput({
     exchangeRateFieldName,
     exchangeText,
     showsExchangeRate = !!exchangeRateFieldName,
-    resetExchangeRate,
     defaultCurrency
 }: AmountInputProps) {
     const { currencyDao } = useDatabase();
 
     const [currencies, setCurrencies] = useState<Array<PickerItemType> | null>(null);
+
+    const latestExchangeRate = useRef(1);
 
     const formCurrency = useWatch({ control, name: currencyFieldName });
     const formAmount = useWatch({ control, name: amountFieldName });
@@ -51,7 +53,14 @@ export function AmountInput({
     }, []);
 
     useEffect(() => {
-        if(formCurrency?.toString() === defaultCurrency?.toString() && resetExchangeRate) resetExchangeRate();
+        if(!exchangeRateFieldName) return;
+
+        if(formCurrency?.toString() === defaultCurrency?.toString()) {
+            latestExchangeRate.current = formExchangeRate;
+            setValue(exchangeRateFieldName, 1);
+        } else if(formExchangeRate === 1 && latestExchangeRate.current !== 1) {
+            setValue(exchangeRateFieldName, latestExchangeRate.current);
+        }
     }, [formCurrency]);
 
     const getCurrencyText = useCallback((currencyId: string) => {

@@ -43,11 +43,11 @@ export function useEditExpenseFields({ field, ...restProps }: UseEditExpenseFiel
         [EditExpenseFormFields.Amount]: {
             render: () => <AmountInput
                 control={ control }
+                setValue={ setValue }
                 amountFieldName="amount"
                 currencyFieldName="currencyId"
                 exchangeRateFieldName="exchangeRate"
                 exchangeText={ (exchangedAmount) => `Az autó alapvalutájában számolt összeg: ${ exchangedAmount }` }
-                resetExchangeRate={ () => resetField("exchangeRate") }
                 defaultCurrency={ car?.currency.id }
             />,
             toastMessages: CarEditNameToast

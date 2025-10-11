@@ -14,7 +14,7 @@ import useCars from "../../../car/hooks/useCars.ts";
 
 type ExpenseFormViewProps = UseFormReturn<ExpenseFields>;
 
-export function ExpenseFormView({ control, resetField, setValue, clearErrors }: ExpenseFormViewProps) {
+export function ExpenseFormView({ control, setValue, clearErrors }: ExpenseFormViewProps) {
     const { getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(null);
@@ -39,11 +39,11 @@ export function ExpenseFormView({ control, resetField, setValue, clearErrors }: 
             />
             <AmountInput
                 control={ control }
+                setValue={ setValue }
                 amountFieldName="amount"
                 currencyFieldName="currencyId"
                 exchangeRateFieldName="exchangeRate"
                 exchangeText={ (exchangedAmount) => `Az autó alapvalutájában számolt összeg: ${ exchangedAmount }` }
-                resetExchangeRate={ () => resetField("exchangeRate") }
                 defaultCurrency={ car?.currency.id }
             />
             <Input.Field
