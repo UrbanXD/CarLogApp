@@ -51,7 +51,7 @@ export function AmountInput({
     }, []);
 
     useEffect(() => {
-        if(formCurrency.toString() === defaultCurrency?.toString()) resetExchangeRate();
+        if(formCurrency?.toString() === defaultCurrency?.toString()) resetExchangeRate();
     }, [formCurrency]);
 
     const getCurrencyText = useCallback((currencyId: string) => {
@@ -107,7 +107,7 @@ export function AmountInput({
                 </View>
             </Input.Row>
             {
-                showsExchangeRate && exchangeRateFieldName && (formCurrency.toString() !== defaultCurrency?.toString()) &&
+                showsExchangeRate && exchangeRateFieldName && (formCurrency?.toString() !== defaultCurrency?.toString()) &&
                <View style={ styles.exchangeContainer }>
                   <View style={ styles.exchangeContainer.textContainer }>
                      <Text style={ styles.exchangeContainer.textContainer.text }>
