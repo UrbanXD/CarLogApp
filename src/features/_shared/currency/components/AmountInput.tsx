@@ -127,7 +127,7 @@ export function AmountInput({
                               <Text style={ styles.exchangeContainer.inputContainer.label.baseText }>1</Text>
                               <Text
                                  style={ styles.exchangeContainer.inputContainer.label.currencyText }>
-                                  { getCurrencyText(formCurrency.toString()) }
+                                  { getCurrencyText(formCurrency?.toString()) }
                               </Text>
                               <Text style={ styles.exchangeContainer.inputContainer.label.arrow }>⇄</Text>
                            </View>

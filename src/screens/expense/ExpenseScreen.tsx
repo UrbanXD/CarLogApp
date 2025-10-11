@@ -7,16 +7,14 @@ import { useDatabase } from "../../contexts/database/DatabaseContext.ts";
 import { Expense } from "../../features/expense/schemas/expenseSchema.ts";
 import { Car } from "../../features/car/schemas/carSchema.ts";
 import useCars from "../../features/car/hooks/useCars.ts";
-import { InfoRowProps } from "../../components/InfoRow.tsx";
 import dayjs from "dayjs";
 import Button from "../../components/Button/Button.ts";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { DeleteExpenseToast } from "../../features/expense/presets/toasts/DeleteExpenseToast.ts";
 import { InfoContainer } from "../../components/info/InfoContainer.tsx";
-
-const DIVIDER_COLOR = COLORS.gray3;
-const DIVIDER_MARGIN = SEPARATOR_SIZES.lightSmall / 3;
+import { EditExpenseFormFields } from "../../features/expense/enums/editExpenseFormFields.ts";
+import { InfoRowProps } from "../../components/info/InfoRow.tsx";
 
 export function ExpenseScreen() {
     const { id } = useLocalSearchParams();
@@ -69,26 +67,39 @@ export function ExpenseScreen() {
         });
     }, [expense, openToast, openModal]);
 
+    const onEdit = useCallback((field?: EditExpenseFormFields) => {
+        if(!expense) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
+
+        router.push({
+            pathname: "/expense/edit/[id]",
+            params: { id: expense.id, field: field }
+        });
+    }, [expense, openToast]);
+
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
             icon: ICON_NAMES.car,
             title: car?.name,
-            subtitle: `${ car?.model.make.name } ${ car?.model.name }`
+            subtitle: `${ car?.model.make.name } ${ car?.model.name }`,
+            onPress: () => onEdit(EditExpenseFormFields.Car)
         },
         {
             icon: ICON_NAMES.money,
             title: "Ár",
-            subtitle: `${ expense?.originalAmount } ${ expense?.currency.symbol } (${ expense?.amount } ${ car?.currency.symbol })`
+            subtitle: `${ expense?.originalAmount } ${ expense?.currency.symbol } (${ expense?.amount } ${ car?.currency.symbol })`,
+            onPress: () => onEdit(EditExpenseFormFields.Amount)
         },
         {
             icon: ICON_NAMES.calendar,
             title: "Dátum",
-            subtitle: dayjs(expense?.date).format("YYYY. MM DD. HH:mm")
+            subtitle: dayjs(expense?.date).format("YYYY. MM DD. HH:mm"),
+            onPress: () => onEdit(EditExpenseFormFields.Date)
         },
         {
             icon: ICON_NAMES.note,
             subtitle: expense?.note ?? "Nincs megjegyzés",
-            subtitleStyle: !expense?.note && { color: COLORS.gray2 }
+            subtitleStyle: !expense?.note && { color: COLORS.gray2 },
+            onPress: () => onEdit(EditExpenseFormFields.Note)
         }
     ]), [car, expense]);
 
@@ -107,7 +118,7 @@ export function ExpenseScreen() {
             <Button.EditDelete
                 buttonContainerStyle={ { paddingBottom: bottom + SEPARATOR_SIZES.lightSmall } }
                 onDeletePress={ onDelete }
-                onEditPress={ () => {} }
+                onEditPress={ onEdit }
             />
         </>
     );

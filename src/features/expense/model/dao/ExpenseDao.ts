@@ -16,7 +16,13 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper> {
     }
 
     async create(formResult: ExpenseFields, safe?: boolean): Promise<Expense | null> {
-        return await super.create(this.mapper.formResultToEntity(formResult), safe);
+        const expenseEntity = this.mapper.formResultToEntity(formResult);
+        return await super.create(expenseEntity, safe);
+    }
+
+    async update(formResult: ExpenseFields, safe?: boolean): Promise<Expense | null> {
+        const expenseEntity = this.mapper.formResultToEntity(formResult);
+        return await super.update(expenseEntity, safe);
     }
 
     paginator(
