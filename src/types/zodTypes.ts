@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ColorValue } from "react-native";
 import { Image } from "./index.ts";
+import dayjs from "dayjs";
 
 export const zNumber = (
     bounds?: { min?: number, max?: number },
@@ -40,3 +41,13 @@ export const zImage = z
 
 export const zColor = z
 .custom<ColorValue | null>(value => value === null || value instanceof ColorValue);
+
+export const zDate = (requiredErrorMessage?: string) => {
+    const required_error = requiredErrorMessage ?? "Kérem válasszon ki egy dátumot!";
+    return z.union([
+        z.string({ required_error })
+        .transform(v => dayjs(v).isValid() ? dayjs(v).toISOString() : null),
+        z.date({ required_error })
+        .transform(v => v.toISOString())
+    ]);
+};

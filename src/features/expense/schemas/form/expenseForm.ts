@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Expense, expenseSchema } from "../expenseSchema.ts";
-import { zNumber, zPickerRequired } from "../../../../types/zodTypes.ts";
+import { zDate, zNumber, zPickerRequired } from "../../../../types/zodTypes.ts";
 import { Car } from "../../../car/schemas/carSchema.ts";
 import { getUUID } from "../../../../database/utils/uuid.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,9 +22,7 @@ const expenseForm = expenseSchema
                                : `A költség összegének minimum ${ min } értékűnek lennie kell.`
         }
     ).pipe(expenseSchema.shape.amount),
-    date: z.date({ required_error: "Kérem válasszon ki egy dátumot!" })
-    .transform(v => v.toISOString())
-    .pipe(expenseSchema.shape.date),
+    date: zDate().pipe(expenseSchema.shape.date),
     exchangeRate: zNumber(
         { min: expenseSchema.shape.exchangeRate.minValue ?? 0 },
         {

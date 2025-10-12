@@ -1,5 +1,5 @@
 import { OdometerLog, odometerLogSchema } from "../odometerLogSchema.ts";
-import { zNumber, zPickerRequired } from "../../../../../../types/zodTypes.ts";
+import { zDate, zNumber, zPickerRequired } from "../../../../../../types/zodTypes.ts";
 import { z } from "zod";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { Car } from "../../../../schemas/carSchema.ts";
@@ -20,8 +20,7 @@ const odometerLogForm = (highestOdometerValue?: number = 0) => odometerLogSchema
                                : `Visszafelé nem pöröghet a kilométeróra, a jelenlegi állás ${ min }.`
         }
     ).pipe(odometerLogSchema.shape.value),
-    date: z.date({ required_error: "Kérem válasszon ki egy dátumot!" }).transform(v => v.toISOString()).pipe(
-        odometerLogSchema.shape.date),
+    date: zDate().pipe(odometerLogSchema.shape.date),
     conversionFactor: odometerUnitSchema.shape.conversionFactor // hidden
 });
 
