@@ -10,7 +10,7 @@ import { ChangeNameToast } from "../../presets/toast/index.ts";
 import { useAppDispatch } from "../../../../hooks/index.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import Form from "../../../../components/Form/Form.tsx";
-import { EditFormButtons } from "../../../../components/Button/presets/EditFormButtons.tsx";
+import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 import React from "react";
 
 export type EditUserNameFormProps = { user: UserAccount }
@@ -40,7 +40,7 @@ export function EditUserNameForm({ user }: EditUserNameFormProps) {
     return (
         <Form>
             <NameStep control={ control }/>
-            <EditFormButtons reset={ reset } submit={ submitHandler }/>
+            <FormButtons reset={ reset } submit={ submitHandler }/>
         </Form>
     );
 }

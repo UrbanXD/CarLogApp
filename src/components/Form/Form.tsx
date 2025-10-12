@@ -21,7 +21,8 @@ function Form({
                 {
                     flexGrow: 1,
                     justifyContent: "flex-start",
-                    gap: SEPARATOR_SIZES.mediumSmall
+                    gap: SEPARATOR_SIZES.mediumSmall,
+                    paddingBottom: SEPARATOR_SIZES.lightSmall
                 },
                 containerStyle
             ] }

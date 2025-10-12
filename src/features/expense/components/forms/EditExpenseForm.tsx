@@ -4,7 +4,7 @@ import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useForm } from "react-hook-form";
 import { Expense } from "../../schemas/expenseSchema.ts";
-import { EditFormButtons } from "../../../../components/Button/presets/EditFormButtons.tsx";
+import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 import { ExpenseFields, useEditExpenseFormProps } from "../../schemas/form/expenseForm.ts";
 import { EditExpenseFormFields } from "../../enums/editExpenseFormFields.ts";
 import { useEditExpenseFields } from "../../hooks/useEditExpenseFields.tsx";
@@ -33,14 +33,16 @@ export function EditExpenseForm({
         async (formResult: ExpenseFields) => {
             try {
                 await expenseDao.update(formResult);
-                openToast(editFields.toastMessages.success());
+                openToast(editFields.editToastMessages.success());
 
                 if(dismissBottomSheet) dismissBottomSheet(true);
             } catch(e) {
+                openToast(editFields.editToastMessages.error());
                 console.error("Hiba a submitHandler-ben:", e);
             }
         },
         (errors) => {
+            openToast(editFields.editToastMessages.error());
             console.log("Edit car validation errors", errors);
         }
     ), [handleSubmit, editFields]);
@@ -48,7 +50,7 @@ export function EditExpenseForm({
     return (
         <Form>
             { editFields.render() }
-            <EditFormButtons reset={ reset } submit={ submitHandler }/>
+            <FormButtons reset={ reset } submit={ submitHandler }/>
         </Form>
     );
 };

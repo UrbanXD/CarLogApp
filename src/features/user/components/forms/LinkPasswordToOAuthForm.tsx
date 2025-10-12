@@ -6,7 +6,7 @@ import { AddPasswordToast } from "../../presets/toast/index.ts";
 import { NewPasswordRequest, useNewPasswordFormProps } from "../../schemas/form/newPasswordRequest.ts";
 import { useAuth } from "../../../../contexts/auth/AuthContext.ts";
 import Form from "../../../../components/Form/Form.tsx";
-import { EditFormButtons } from "../../../../components/Button/presets/EditFormButtons.tsx";
+import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 import React from "react";
 
 export function LinkPasswordToOAuthForm() {
@@ -37,7 +37,7 @@ export function LinkPasswordToOAuthForm() {
     return (
         <Form>
             <PasswordStep control={ control }/>
-            <EditFormButtons reset={ reset } submit={ submitHandler }/>
+            <FormButtons reset={ reset } submit={ submitHandler }/>
         </Form>
     );
 }

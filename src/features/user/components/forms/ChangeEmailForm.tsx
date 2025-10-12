@@ -9,7 +9,7 @@ import { ChangeEmailToast } from "../../presets/toast/index.ts";
 import { OtpVerificationHandlerType } from "../../../../app/bottomSheet/otpVerification.tsx";
 import { ChangeEmailRequest, useChangeEmailFormProps } from "../../schemas/form/changeEmailRequest.ts";
 import Form from "../../../../components/Form/Form.tsx";
-import { EditFormButtons } from "../../../../components/Button/presets/EditFormButtons.tsx";
+import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 
 export type ChangeEmailFormProps = { user: UserAccount }
 
@@ -46,7 +46,7 @@ export function ChangeEmailForm({ user }: ChangeEmailFormProps) {
     return (
         <Form>
             <EmailStep control={ control }/>
-            <EditFormButtons reset={ reset } submit={ submitHandler }/>
+            <FormButtons reset={ reset } submit={ submitHandler }/>
         </Form>
     );
 }

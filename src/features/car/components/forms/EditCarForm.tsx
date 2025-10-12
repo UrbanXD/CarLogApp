@@ -10,7 +10,7 @@ import { Car } from "../../schemas/carSchema.ts";
 import { EDIT_CAR_FORM_STEPS } from "../../constants/index.ts";
 import { useEditCarSteps } from "../../hooks/useEditCarSteps.tsx";
 import Form from "../../../../components/Form/Form.tsx";
-import { EditFormButtons } from "../../../../components/Button/presets/EditFormButtons.tsx";
+import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 
 export type EditCarFormProps = {
     car: Car
@@ -36,7 +36,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
             try {
                 await dispatch(editCar({ database, formResult }));
 
-                openToast(editFields.toastMessages.success());
+                openToast(editFields.editToastMessages.success());
 
                 if(dismissBottomSheet) dismissBottomSheet(true);
             } catch(e) {
@@ -51,7 +51,7 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
     return (
         <Form>
             { editFields.render() }
-            <EditFormButtons reset={ reset } submit={ submitHandler }/>
+            <FormButtons reset={ reset } submit={ submitHandler }/>
         </Form>
     );
 };

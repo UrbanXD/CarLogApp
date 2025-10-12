@@ -8,7 +8,7 @@ import { ResetPasswordToast } from "../../presets/toast/index.ts";
 import { OtpVerificationHandlerType } from "../../../../app/bottomSheet/otpVerification.tsx";
 import { NewPasswordRequest, useNewPasswordFormProps } from "../../schemas/form/newPasswordRequest.ts";
 import Form from "../../../../components/Form/Form.tsx";
-import { EditFormButtons } from "../../../../components/Button/presets/EditFormButtons.tsx";
+import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 import React from "react";
 
 export type ResetPasswordFormProps = { user: UserAccount }
@@ -46,7 +46,7 @@ export function ResetPasswordForm({ user }: ResetPasswordFormProps) {
     return (
         <Form>
             <PasswordStep control={ control }/>
-            <EditFormButtons reset={ reset } submit={ submitHandler }/>
+            <FormButtons reset={ reset } submit={ submitHandler }/>
         </Form>
     );
 }

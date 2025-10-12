@@ -41,7 +41,7 @@ export function CreateExpenseForm() {
         <>
             <ExpenseFormView { ...form } />
             <Button.Text
-                text={ "Rögizítés" }
+                text={ "Rögzítés" }
                 onPress={ submitHandler }
                 style={ { width: "70%", alignSelf: "flex-end" } }
             />

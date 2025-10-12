@@ -11,7 +11,7 @@ import { router } from "expo-router";
 import { getToastMessage } from "../../../../ui/alert/utils/getToastMessage.ts";
 import { AvatarStep } from "./steps/AvatarStep.tsx";
 import Form from "../../../../components/Form/Form.tsx";
-import { EditFormButtons } from "../../../../components/Button/presets/EditFormButtons.tsx";
+import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 
 type EditUserAvatarFormProps = { user: UserAccount }
 
@@ -42,7 +42,7 @@ export function EditUserAvatarForm({ user }: EditUserAvatarFormProps) {
     return (
         <Form>
             <AvatarStep control={ control }/>
-            <EditFormButtons reset={ reset } submit={ submitHandler }/>
+            <FormButtons reset={ reset } submit={ submitHandler }/>
         </Form>
     );
 }
