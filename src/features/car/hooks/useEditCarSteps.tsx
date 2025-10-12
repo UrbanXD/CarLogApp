@@ -1,4 +1,4 @@
-import { EditFields } from "../../../types/index.ts";
+import { FormFields } from "../../../types/index.ts";
 import { CarFormFields } from "../schemas/form/carForm.ts";
 import React from "react";
 import { EDIT_CAR_FORM_STEPS } from "../constants/index.ts";
@@ -16,11 +16,11 @@ import { CurrencyInput } from "../../_shared/currency/components/CurrencyInput.t
 
 type UseEditCarStepsArgs = UseFormReturn<CarFormFields> & { index: EDIT_CAR_FORM_STEPS, car: Car }
 
-export function useEditCarSteps({ control, resetField, setValue, index, car }: UseEditCarStepsArgs): EditFields {
-    const steps: Record<EDIT_CAR_FORM_STEPS, EditFields> = {
+export function useEditCarSteps({ control, resetField, setValue, index, car }: UseEditCarStepsArgs): FormFields {
+    const steps: Record<EDIT_CAR_FORM_STEPS, FormFields> = {
         [EDIT_CAR_FORM_STEPS.Name]: {
             render: () => <NameStep control={ control }/>,
-            toastMessages: CarEditNameToast
+            editToastMessages: CarEditNameToast
         },
         [EDIT_CAR_FORM_STEPS.CarModel]: {
             render: () => <CarModelStep
@@ -28,19 +28,19 @@ export function useEditCarSteps({ control, resetField, setValue, index, car }: U
                 resetField={ resetField }
                 setValue={ setValue }
             />,
-            toastMessages: CarEditNameToast
+            editToastMessages: CarEditNameToast
         },
         [EDIT_CAR_FORM_STEPS.Image]: {
             render: () => <ImageStep control={ control }/>,
-            toastMessages: CarEditNameToast
+            editToastMessages: CarEditNameToast
         },
         [EDIT_CAR_FORM_STEPS.OdometerUnit]: {
             render: () => <OdometerUnitInput control={ control } fieldName="odometer.unitId"/>,
-            toastMessages: CarEditNameToast
+            editToastMessages: CarEditNameToast
         },
         [EDIT_CAR_FORM_STEPS.FuelType]: {
             render: () => <FuelTypeInput control={ control } fieldName="fuelTank.typeId"/>,
-            toastMessages: CarEditNameToast
+            editToastMessages: CarEditNameToast
         },
         [EDIT_CAR_FORM_STEPS.FuelTankCapacity]: {
             render: () => <FuelTankCapacityInput
@@ -48,15 +48,15 @@ export function useEditCarSteps({ control, resetField, setValue, index, car }: U
                 fieldName="fuelTank.capacity"
                 unitText={ car.fuelTank.unit.short }
             />,
-            toastMessages: CarEditNameToast
+            editToastMessages: CarEditNameToast
         },
         [EDIT_CAR_FORM_STEPS.FuelUnit]: {
             render: () => <FuelUnitInput control={ control } fieldName="fuelTank.unitId"/>,
-            toastMessages: CarEditNameToast
+            editToastMessages: CarEditNameToast
         },
         [EDIT_CAR_FORM_STEPS.Currency]: {
             render: () => <CurrencyInput control={ control } fieldName="currencyId"/>,
-            toastMessages: CarEditNameToast
+            editToastMessages: CarEditNameToast
         }
     };
 

@@ -1,13 +1,14 @@
 import useCars from "../../../car/hooks/useCars.ts";
 import React from "react";
 import { useForm } from "react-hook-form";
-import Button from "../../../../components/Button/Button.ts";
 import { ExpenseFields, useCreateExpenseFormProps } from "../../schemas/form/expenseForm.ts";
-import { ExpenseFormView } from "./ExpenseFormView.tsx";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { CarCreateToast } from "../../../car/presets/toast/index.ts";
+import { useExpenseFormFields } from "../../hooks/useExpenseFormFields.tsx";
+import Form from "../../../../components/Form/Form.tsx";
+import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 
 export function CreateExpenseForm() {
     const { openToast } = useAlert();
@@ -17,6 +18,8 @@ export function CreateExpenseForm() {
 
     const form = useForm<ExpenseFields>(useCreateExpenseFormProps(selectedCar));
     const { handleSubmit } = form;
+
+    const { fullForm } = useExpenseFormFields(form);
 
     const submitHandler = handleSubmit(
         async (formResult: ExpenseFields) => {
@@ -38,13 +41,9 @@ export function CreateExpenseForm() {
     );
 
     return (
-        <>
-            <ExpenseFormView { ...form } />
-            <Button.Text
-                text={ "Rögzítés" }
-                onPress={ submitHandler }
-                style={ { width: "70%", alignSelf: "flex-end" } }
-            />
-        </>
+        <Form>
+            { fullForm.render() }
+            <FormButtons submit={ submitHandler } submitText={ "Rögzítés" }/>
+        </Form>
     );
 }

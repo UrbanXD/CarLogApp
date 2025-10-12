@@ -8,9 +8,9 @@ export type UseStepFormResult = {
     resultStep?: ResultStep
 }
 
-export type EditFields = {
+export type FormFields = {
     render: RenderComponent
-    toastMessages: ToastMessages
+    editToastMessages: ToastMessages
 }
 
 export type Step = {

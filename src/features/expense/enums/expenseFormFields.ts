@@ -1,4 +1,4 @@
-export enum EditExpenseFormFields {
+export enum ExpenseFormFields {
     Car,
     Type,
     Amount,

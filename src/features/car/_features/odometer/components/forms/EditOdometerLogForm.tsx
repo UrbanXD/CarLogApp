@@ -58,11 +58,9 @@ export function EditOdometerLogForm({ odometerLog, field }: EditOdometerLogFormP
     );
 
     return (
-        <>
-            <Form>
-                { editFields.render() }
-            </Form>
+        <Form>
+            { editFields.render() }
             <FormButtons reset={ reset } submit={ submitHandler }/>
-        </>
+        </Form>
     );
 }

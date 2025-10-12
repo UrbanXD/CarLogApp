@@ -66,11 +66,9 @@ export function CreateOdometerLogForm({ defaultCarId }: CreateOdometerLogFormPro
     );
 
     return (
-        <>
-            <Form>
-                { fullForm.render() }
-            </Form>
+        <Form>
+            { fullForm.render() }
             <FormButtons submit={ submitHandler } submitText={ "Rögzítés" }/>
-        </>
+        </Form>
     );
 }

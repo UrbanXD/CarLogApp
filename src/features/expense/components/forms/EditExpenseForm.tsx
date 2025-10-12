@@ -6,14 +6,15 @@ import { useForm } from "react-hook-form";
 import { Expense } from "../../schemas/expenseSchema.ts";
 import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 import { ExpenseFields, useEditExpenseFormProps } from "../../schemas/form/expenseForm.ts";
-import { EditExpenseFormFields } from "../../enums/editExpenseFormFields.ts";
-import { useEditExpenseFields } from "../../hooks/useEditExpenseFields.tsx";
+import { ExpenseFormFields } from "../../enums/expenseFormFields.ts";
+import { useExpenseFormFields } from "../../hooks/useExpenseFormFields.tsx";
 import Form from "../../../../components/Form/Form.tsx";
+import { FormFields } from "../../../../types/index.ts";
 
 type EditExpenseFormProps = {
     expense: Expense
     /** Which field will be edited, if its undefined that means full form view will appear */
-    field?: EditExpenseFormFields
+    field?: ExpenseFormFields
 }
 
 export function EditExpenseForm({
@@ -27,7 +28,8 @@ export function EditExpenseForm({
     const form = useForm<ExpenseFields>(useEditExpenseFormProps(expense));
     const { handleSubmit, reset } = form;
 
-    const editFields = useEditExpenseFields({ ...form, field });
+    const { fields, fullForm } = useExpenseFormFields(form);
+    const editFields: FormFields = fields?.[field] ?? fullForm;
 
     const submitHandler = useMemo(() => handleSubmit(
         async (formResult: ExpenseFields) => {

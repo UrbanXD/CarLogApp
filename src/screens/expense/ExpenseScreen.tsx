@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { DeleteExpenseToast } from "../../features/expense/presets/toasts/DeleteExpenseToast.ts";
 import { InfoContainer } from "../../components/info/InfoContainer.tsx";
-import { EditExpenseFormFields } from "../../features/expense/enums/editExpenseFormFields.ts";
+import { ExpenseFormFields } from "../../features/expense/enums/expenseFormFields.ts";
 import { InfoRowProps } from "../../components/info/InfoRow.tsx";
 
 export function ExpenseScreen() {
@@ -67,7 +67,7 @@ export function ExpenseScreen() {
         });
     }, [expense, openToast, openModal]);
 
-    const onEdit = useCallback((field?: EditExpenseFormFields) => {
+    const onEdit = useCallback((field?: ExpenseFormFields) => {
         if(!expense) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
 
         router.push({
@@ -81,25 +81,25 @@ export function ExpenseScreen() {
             icon: ICON_NAMES.car,
             title: car?.name,
             subtitle: `${ car?.model.make.name } ${ car?.model.name }`,
-            onPress: () => onEdit(EditExpenseFormFields.Car)
+            onPress: () => onEdit(ExpenseFormFields.Car)
         },
         {
             icon: ICON_NAMES.money,
             title: "Ár",
             subtitle: `${ expense?.originalAmount } ${ expense?.currency.symbol } (${ expense?.amount } ${ car?.currency.symbol })`,
-            onPress: () => onEdit(EditExpenseFormFields.Amount)
+            onPress: () => onEdit(ExpenseFormFields.Amount)
         },
         {
             icon: ICON_NAMES.calendar,
             title: "Dátum",
             subtitle: dayjs(expense?.date).format("YYYY. MM DD. HH:mm"),
-            onPress: () => onEdit(EditExpenseFormFields.Date)
+            onPress: () => onEdit(ExpenseFormFields.Date)
         },
         {
             icon: ICON_NAMES.note,
             subtitle: expense?.note ?? "Nincs megjegyzés",
             subtitleStyle: !expense?.note && { color: COLORS.gray2 },
-            onPress: () => onEdit(EditExpenseFormFields.Note)
+            onPress: () => onEdit(ExpenseFormFields.Note)
         }
     ]), [car, expense]);
 
