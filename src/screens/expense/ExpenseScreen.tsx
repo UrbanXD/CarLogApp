@@ -67,6 +67,14 @@ export function ExpenseScreen() {
         });
     }, [expense, openToast, openModal]);
 
+    const getAmountSubtitle = useCallback(() => {
+        let subtitle = `${ expense?.originalAmount } ${ expense?.currency.symbol }`;
+        if(expense?.currency.id === car?.currency.id && expense?.exchangeRate === 1) return subtitle;
+
+        subtitle += ` (${ expense?.amount } ${ car?.currency.symbol })`;
+        return subtitle;
+    }, [expense, car]);
+
     const onEdit = useCallback((field?: ExpenseFormFields) => {
         if(!expense) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
 
@@ -86,7 +94,7 @@ export function ExpenseScreen() {
         {
             icon: ICON_NAMES.money,
             title: "Ár",
-            subtitle: `${ expense?.originalAmount } ${ expense?.currency.symbol } (${ expense?.amount } ${ car?.currency.symbol })`,
+            subtitle: getAmountSubtitle(),
             onPress: () => onEdit(ExpenseFormFields.Amount)
         },
         {
@@ -101,7 +109,7 @@ export function ExpenseScreen() {
             subtitleStyle: !expense?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(ExpenseFormFields.Note)
         }
-    ]), [car, expense]);
+    ]), [car, expense, getAmountSubtitle]);
 
     return (
         <>
