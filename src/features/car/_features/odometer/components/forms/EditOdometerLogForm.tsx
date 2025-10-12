@@ -29,7 +29,7 @@ export function EditOdometerLogForm({ odometerLog, field }: EditOdometerLogFormP
     const form = useForm<OdometerLogFields>(useEditOdometerLogFormProps(odometerLog));
     const { handleSubmit, reset } = form;
 
-    const { fields, fullForm } = useOdometerLogFormFields({ odometerLog, field, ...form });
+    const { fields, fullForm } = useOdometerLogFormFields({ odometerLog, ...form });
     const editFields: FormFields = fields?.[field] ?? fullForm;
 
     const submitHandler = handleSubmit(

@@ -17,13 +17,11 @@ import { convertOdometerValueFromKilometer } from "../utils/convertOdometerUnit.
 type UseOdometerLogFormFieldsProps = UseFormReturn<OdometerLogFields> & {
     odometerLog?: OdometerLog
     defaultCarId?: string
-    field?: OdometerLogFormFields
 }
 
 export function useOdometerLogFormFields({
     odometerLog,
     defaultCarId,
-    field,
     ...restProps
 }: UseOdometerLogFormFieldsProps) {
     const { control, setValue, clearErrors, getFieldState } = restProps;
