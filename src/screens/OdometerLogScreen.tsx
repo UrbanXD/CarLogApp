@@ -17,6 +17,7 @@ import { useAppDispatch } from "../hooks/index.ts";
 import { convertOdometerValueFromKilometer } from "../features/car/_features/odometer/utils/convertOdometerUnit.ts";
 import useCars from "../features/car/hooks/useCars.ts";
 import { InfoContainer } from "../components/info/InfoContainer.tsx";
+import { OdometerLogFormFields } from "../features/car/_features/odometer/enums/odometerLogFormFields.ts";
 
 export function OdometerLogScreen() {
     const dispatch = useAppDispatch();
@@ -80,12 +81,12 @@ export function OdometerLogScreen() {
         });
     }, [odometerLog, openToast, openModal]);
 
-    const onEdit = useCallback(() => {
+    const onEdit = useCallback((field?: OdometerLogFormFields) => {
         if(!odometerLog) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
 
         router.push({
             pathname: "/odometer/log/edit/[id]",
-            params: { id: odometerLog.id }
+            params: { id: odometerLog.id, field: field }
         });
     });
 
@@ -93,22 +94,26 @@ export function OdometerLogScreen() {
         {
             icon: ICON_NAMES.car,
             title: car?.name,
-            subtitle: `${ car?.model.make.name } ${ car?.model.name }`
+            subtitle: `${ car?.model.make.name } ${ car?.model.name }`,
+            onPress: () => onEdit(OdometerLogFormFields.Car)
         },
         {
             icon: ICON_NAMES.odometer,
             title: "Kilométeróra-állás",
-            subtitle: `${ odometerLog?.value } ${ odometerLog?.unit.short }`
+            subtitle: `${ odometerLog?.value } ${ odometerLog?.unit.short }`,
+            onPress: () => onEdit(OdometerLogFormFields.OdometerValue)
         },
         {
             icon: ICON_NAMES.calendar,
             title: "Dátum",
-            subtitle: dayjs(odometerLog?.date).format("YYYY. MM DD. HH:mm")
+            subtitle: dayjs(odometerLog?.date).format("YYYY. MM DD. HH:mm"),
+            onPress: () => onEdit(OdometerLogFormFields.Date)
         },
         {
             icon: ICON_NAMES.note,
             subtitle: odometerLog?.note ?? "Nincs megjegyzés",
-            subtitleStyle: !odometerLog?.note && { color: COLORS.gray2 }
+            subtitleStyle: !odometerLog?.note && { color: COLORS.gray2 },
+            onPress: () => onEdit(OdometerLogFormFields.Note)
         }
     ]), [car, odometerLog]);
 

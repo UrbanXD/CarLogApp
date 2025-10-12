@@ -19,11 +19,12 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
     async toDto(entity: OdometerLogTableRow): Promise<OdometerLog> {
         const odometerUnit = await this.odometerUnitDao.getUnitByCarId(entity.car_id);
         const odometerLogType = await this.odometerLogTypeDao.getById(entity.type_id);
-        
+
         return odometerLogSchema.parse({
             id: entity.id,
             carId: entity.car_id,
             type: odometerLogType,
+            valueInKm: entity.value,
             value: convertOdometerValueFromKilometer(entity.value, odometerUnit.conversionFactor),
             unit: odometerUnit,
             note: entity.note,

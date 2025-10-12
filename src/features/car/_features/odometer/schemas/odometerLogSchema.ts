@@ -7,6 +7,7 @@ export const odometerLogSchema = z
     id: z.string().uuid(),
     carId: z.string().uuid(),
     type: odometerLogTypeSchema,
+    valueInKm: z.number().min(0),
     value: z.number().min(0),
     unit: odometerUnitSchema,
     note: z.string().nullable(),
