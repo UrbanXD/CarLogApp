@@ -35,7 +35,7 @@ export function NoteInput({
                 placeholder={ placeholder }
                 multiline
                 actionIcon={ ICON_NAMES.close }
-                onAction={ () => setValue("note", "") }
+                onAction={ () => setValue("note", null) }
             />
         </Input.Field>
     );
