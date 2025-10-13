@@ -10,6 +10,18 @@ export class ExpenseTypeDao extends Dao<ExpenseTypeTableRow, ExpenseType, Expens
         super(db, EXPENSE_TYPE_TABLE, new ExpenseTypeMapper());
     }
 
+    async getIdByKey(key: string, safe?: boolean = true): Promise<string | null> {
+        const result = await this.db
+        .selectFrom(EXPENSE_TYPE_TABLE)
+        .select("id")
+        .where("key", "=", key)
+        .executeTakeFirst();
+
+        if(safe && !result?.id) throw new Error(`Table item not found by ${ key } key. [${ this.table }]`);
+
+        return result?.id ? result.id : null;
+    }
+
     async delete(id: string): Promise<string> {
         const result = await this.db
         .deleteFrom(EXPENSE_TYPE_TABLE)

@@ -4,15 +4,18 @@ import { Expense, expenseSchema } from "../../schemas/expenseSchema.ts";
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
 import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
 import { ExpenseFields } from "../../schemas/form/expenseForm.ts";
+import { FuelLogDao } from "../../../car/_features/fuel/model/dao/FuelLogDao.ts";
 
 export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
     private readonly expenseTypeDao: ExpenseTypeDao;
     private readonly currencyDao: CurrencyDao;
+    private readonly fuelLogDao: FuelLogDao;
 
-    constructor(expenseTypeDao: ExpenseTypeDao, currencyDao: CurrencyDao) {
+    constructor(expenseTypeDao: ExpenseTypeDao, currencyDao: CurrencyDao, fuelLogDao: FuelLogDao) {
         super();
         this.expenseTypeDao = expenseTypeDao;
         this.currencyDao = currencyDao;
+        this.fuelLogDao = fuelLogDao;
     }
 
     async toDto(entity: ExpenseTableRow): Promise<Expense> {
@@ -25,7 +28,8 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
             exchangeRate: entity.exchange_rate,
             amount: entity.amount,
             note: entity.note,
-            date: entity.date
+            date: entity.date,
+            fuelLog: await this.fuelLogDao.getByExpenseId(entity.id, false) ?? null
         });
     }
 

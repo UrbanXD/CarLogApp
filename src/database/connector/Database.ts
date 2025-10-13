@@ -19,6 +19,7 @@ import { OdometerLogDao } from "../../features/car/_features/odometer/model/dao/
 import { OdometerLogTypeDao } from "../../features/car/_features/odometer/model/dao/OdometerLogTypeDao.ts";
 import { ExpenseTypeDao } from "../../features/expense/model/dao/ExpenseTypeDao.ts";
 import { CurrencyDao } from "../../features/_shared/currency/model/dao/CurrencyDao.ts";
+import { FuelLogDao } from "../../features/car/_features/fuel/model/dao/FuelLogDao.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
@@ -36,6 +37,7 @@ export class Database {
     private _fuelTypeDao?: FuelTypeDao;
     private _fuelUnitDao?: FuelUnitDao;
     private _fuelTankDao?: FuelTankDao;
+    private _fuelLogDao?: FuelLogDao;
     private _odometerUnitDao?: OdometerUnitDao;
     private _odometerLogTypeDao?: OdometerLogTypeDao;
     private _odometerLogDao?: OdometerLogDao;
@@ -101,7 +103,12 @@ export class Database {
     }
 
     get expenseDao(): ExpenseDao {
-        if(!this._expenseDao) this._expenseDao = new ExpenseDao(this.db, this.expenseTypeDao, this.currencyDao);
+        if(!this._expenseDao) this._expenseDao = new ExpenseDao(
+            this.db,
+            this.expenseTypeDao,
+            this.currencyDao,
+            this.fuelLogDao
+        );
 
         return this._expenseDao;
     }
@@ -122,6 +129,17 @@ export class Database {
         if(!this._fuelTankDao) this._fuelTankDao = new FuelTankDao(this.db, this.fuelTypeDao, this.fuelUnitDao);
 
         return this._fuelTankDao;
+    }
+
+    get fuelLogDao(): FuelLogDao {
+        if(!this._fuelLogDao) this._fuelLogDao = new FuelLogDao(
+            this.db,
+            this.fuelUnitDao,
+            this.expenseTypeDao,
+            this.carDao
+        );
+
+        return this._fuelLogDao;
     }
 
     get odometerUnitDao(): OdometerUnitDao {

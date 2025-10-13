@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { expenseTypeSchema } from "./expenseTypeSchema.ts";
 import { currencySchema } from "../../_shared/currency/schemas/currencySchema.ts";
+import { fuelLogSchema } from "../../car/_features/fuel/schemas/fuelLogSchema.ts";
 
 export const expenseSchema = z
 .object({
@@ -12,7 +13,8 @@ export const expenseSchema = z
     amount: z.number().min(0),
     currency: currencySchema,
     note: z.string().nullable(),
-    date: z.string()
+    date: z.string(),
+    fuelLog: fuelLogSchema.nullable()
 });
 
 export type Expense = z.infer<typeof expenseSchema>;
