@@ -3,6 +3,7 @@ import { odometerUnitSchema } from "./odometerUnitSchema.ts";
 
 export const odometerSchema = z
 .object({
+    valueInKm: z.number().min(0),
     value: z.number().min(0),
     unit: odometerUnitSchema
 });

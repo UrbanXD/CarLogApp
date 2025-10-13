@@ -45,6 +45,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
         const odometerValue = await this.odometerLogDao.getOdometerValueInKmByCarId(entity.id);
         const odometerUnit = await this.odometerUnitDao.getById(entity.odometer_unit_id);
         const odometer = odometerSchema.parse({
+            valueInKm: odometerValue,
             value: convertOdometerValueFromKilometer(odometerValue, odometerUnit?.conversionFactor ?? 1),
             unit: odometerUnit
         });

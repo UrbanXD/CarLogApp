@@ -37,7 +37,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
             id: dto.id,
             car_id: dto.carId,
             type_id: dto.type.id,
-            value: dto.value,
+            value: dto.valueInKm,
             note: dto.note,
             date: dto.date
         };
