@@ -1,5 +1,5 @@
 import React from "react";
-import { StepProps, UseStepFormResult } from "../../../types/index.ts";
+import { StepProps, Steps, UseStepFormResult } from "../../../types/index.ts";
 import { CarFormFields } from "../schemas/form/carForm.ts";
 import CarModelStep from "../components/forms/steps/CarModelStep.tsx";
 import NameStep from "../components/forms/steps/NameStep.tsx";
@@ -10,7 +10,7 @@ import { ResultStep } from "../components/forms/steps/ResultStep.tsx";
 import { CarEditNameToast } from "../presets/toast/index.ts";
 
 function useCarSteps({ control, resetField, setValue, getValues }: StepProps<CarFormFields>): UseStepFormResult {
-    const steps = [
+    const steps: Steps = [
         {
             title: "Elnevezés",
             fields: ["name"],
