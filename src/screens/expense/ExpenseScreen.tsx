@@ -75,6 +75,16 @@ export function ExpenseScreen() {
         return subtitle;
     }, [expense, car]);
 
+    const getPricePerUnitSubtitle = useCallback(() => {
+        if(!expense?.fuelLog) return "";
+
+        let subtitle = `${ expense.fuelLog.originalPricePerUnit } ${ expense.currency.symbol }`;
+        if(expense?.currency.id === car?.currency.id && expense?.exchangeRate === 1) return subtitle;
+
+        subtitle += ` (${ expense?.fuelLog.pricePerUnit } ${ car?.currency.symbol })`;
+        return subtitle;
+    }, [expense, car]);
+
     const onEdit = useCallback((field?: ExpenseFormFields) => {
         if(!expense) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
 
@@ -91,6 +101,18 @@ export function ExpenseScreen() {
             subtitle: `${ car?.model.make.name } ${ car?.model.name }`,
             onPress: () => onEdit(ExpenseFormFields.Car)
         },
+        ...(expense?.fuelLog ? [
+            {
+                icon: ICON_NAMES.fuelPump,
+                title: "Tankolás",
+                subtitle: `${ expense.fuelLog.quantity } ${ expense.fuelLog.fuelUnit.short }`
+            },
+            {
+                icon: ICON_NAMES.money,
+                title: `Egyságár - ${ expense.fuelLog.fuelUnit.short }/${ expense.currency.symbol }`,
+                subtitle: getPricePerUnitSubtitle()
+            }
+        ] : []),
         {
             icon: ICON_NAMES.money,
             title: "Ár",
@@ -103,13 +125,20 @@ export function ExpenseScreen() {
             subtitle: dayjs(expense?.date).format("YYYY. MM DD. HH:mm"),
             onPress: () => onEdit(ExpenseFormFields.Date)
         },
+        ...(expense?.fuelLog ? [
+            {
+                icon: ICON_NAMES.odometer,
+                title: "Kilométeróra-állás",
+                subtitle: `${ expense.fuelLog.odometer.value } ${ expense.fuelLog.odometer.unit.short }`
+            }
+        ] : []),
         {
             icon: ICON_NAMES.note,
             subtitle: expense?.note ?? "Nincs megjegyzés",
             subtitleStyle: !expense?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(ExpenseFormFields.Note)
         }
-    ]), [car, expense, getAmountSubtitle]);
+    ]), [car, expense, getAmountSubtitle, getPricePerUnitSubtitle]);
 
     return (
         <>
