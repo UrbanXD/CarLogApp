@@ -15,8 +15,6 @@ import Animated, {
     dispatchCommand,
     interpolate,
     interpolateColor,
-    runOnJS,
-    runOnUI,
     useAnimatedProps,
     useAnimatedReaction,
     useAnimatedRef,
@@ -31,7 +29,7 @@ import type {
     PanGestureHandlerEventPayload
 } from "react-native-gesture-handler/src/handlers/GestureHandlerEventPayload.ts";
 import { PanGestureChangeEventPayload } from "react-native-gesture-handler/src/handlers/gestures/panGesture.ts";
-import { addUnitToValue } from "../../../utils/addUnitToValue.ts";
+import { scheduleOnRN, scheduleOnUI } from "react-native-worklets";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
@@ -89,6 +87,16 @@ const Slider: React.FC<SliderProps> = ({
         setCurrentValue(value);
     }, [value]);
 
+    useEffect(() => {
+        if(setValue) setValue(currentValue);
+        if(onChange) onChange(currentValue);
+
+        percent.value = Math.max(
+            0,
+            Math.min(100, (currentValue - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
+        );
+    }, [currentValue]);
+
     const {
         borderRadius = 25,
         trackHeight = hp(1),
@@ -111,20 +119,23 @@ const Slider: React.FC<SliderProps> = ({
         innerTooltip = false
     } = style;
     const minBarWidth = SEPARATOR_SIZES.lightSmall; // csak akkor ha nincs handle
-    const tooltipPaddingVertical = SEPARATOR_SIZES.lightSmall / 2;
+    const tooltipPaddingVertical = 0;
     const tooltipPaddingHorizontal = SEPARATOR_SIZES.small / 2;
     const tooltipBorderRadius = 7.5;
     const tooltipBottomTriangleHeight = 10;
     const [tooltipLayout, setTooltipLayout] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
 
     const inputFieldContext = useInputFieldContext();
+    const fieldValue = Number.isNaN(Number(inputFieldContext?.field?.value))
+                       ? 0
+                       : Number(inputFieldContext?.field.value);
     const onChange = inputFieldContext?.field?.onChange;
     const error = inputFieldContext?.fieldState?.error;
 
     const trackWidth = useSharedValue(0);
     const thumbOffset = useSharedValue(0);
     const percent = useSharedValue(0);
-    const inputValue = useSharedValue(0);
+    const inputValue = useSharedValue(fieldValue);
     const bounds = useSharedValue({ min: minValue, max: maxValue });
     const [trackLayoutReady, setTrackLayoutReady] = useState(false);
 
@@ -169,10 +180,7 @@ const Slider: React.FC<SliderProps> = ({
 
         setInputValue();
 
-        // for set input controller value
-        if(setValue) runOnJS(setValue)(inputValue.value);
-        if(onChange) runOnJS(onChange)(inputValue.value);
-        runOnJS(setCurrentValue)(inputValue.value);
+        scheduleOnRN(setCurrentValue, inputValue.value);
     };
 
     const calculateOffsetByPanning = (changeX: number) => {
@@ -187,12 +195,12 @@ const Slider: React.FC<SliderProps> = ({
         if(!trackLayoutReady) return;
 
         inputValue.value = inputFieldContext?.field?.value ?? value;
-        runOnUI(calculateOffsetByPercent)();
+        scheduleOnUI(calculateOffsetByPercent);
     }, [trackLayoutReady]);
 
     useEffect(() => {
         const subscription = Keyboard.addListener("keyboardDidHide", () => {
-            runOnUI(dispatchCommand)(tooltipInputRef, "blur");
+            scheduleOnUI(dispatchCommand, tooltipInputRef, "blur");
         });
 
         return () => subscription.remove();
@@ -215,11 +223,11 @@ const Slider: React.FC<SliderProps> = ({
 
     useAnimatedReaction(
         () => trackWidth.value,
-        (newWidth) => runOnJS(setTrackLayoutReady)(newWidth > 0)
+        (newWidth) => scheduleOnRN(setTrackLayoutReady, newWidth > 0)
     );
 
     const onTrackPress = (event: GestureResponderEvent) => {
-        runOnUI(calculateOffsetByTapPosition)(event.nativeEvent.locationX);
+        scheduleOnUI(calculateOffsetByTapPosition, event.nativeEvent.locationX);
     };
 
     const panOnChange = (event: GestureUpdateEvent<PanGestureHandlerEventPayload & PanGestureChangeEventPayload>) => {
@@ -230,10 +238,7 @@ const Slider: React.FC<SliderProps> = ({
     };
 
     const panOnEnd = () => {
-        "worklet";
-        if(setValue) runOnJS(setValue)(inputValue.value);
-        if(onChange) runOnJS(onChange)(inputValue.value);
-        runOnJS(setCurrentValue)(inputValue.value);
+        scheduleOnRN(setCurrentValue, inputValue.value);
     };
 
     const barPan = useMemo(
@@ -436,8 +441,6 @@ const Slider: React.FC<SliderProps> = ({
 
     const animatedTooltipProps = useAnimatedProps(() => {
         let text = inputValue.value.toString();
-        if(unit) text += ` ${ unit }`;
-        if(setValue) runOnJS(setValue)(inputValue.value);
 
         return { text };
     });
@@ -457,16 +460,29 @@ const Slider: React.FC<SliderProps> = ({
                                 style={ [styles.slider.tooltip.bottomTriangle, tooltipBottomTriangleStyle] }
                              />
                           }
-                         <View pointerEvents="none">
+                         <View
+                            onLayout={ onTooltipTextLayout }
+                            pointerEvents="none"
+                            style={ { flexDirection: "row", alignItems: "center" } }
+                         >
                             <AnimatedTextInput
                                ref={ tooltipInputRef }
-                               defaultValue={ addUnitToValue(currentValue, unit) }
+                               defaultValue={ currentValue }
                                editable={ tooltipAsInputField }
                                animatedProps={ animatedTooltipProps }
                                keyboardType="numeric"
                                style={ styles.slider.tooltip.text }
-                               onLayout={ onTooltipTextLayout }
+                               onChangeText={ (value) => {
+                                   let number = Number(value);
+                                   if(isNaN(number)) return;
+
+                                   if(number > maxValue) number = maxValue;
+                                   if(number < minValue) number = minValue;
+                                   setCurrentValue(number);
+                               }
+                               }
                             />
+                             { unit && <Text style={ styles.slider.tooltip.text }>{ unit }</Text> }
                          </View>
                       </Animated.View>
                    </GestureDetector>
