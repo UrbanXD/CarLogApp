@@ -30,6 +30,7 @@ import type {
 } from "react-native-gesture-handler/src/handlers/GestureHandlerEventPayload.ts";
 import { PanGestureChangeEventPayload } from "react-native-gesture-handler/src/handlers/gestures/panGesture.ts";
 import { scheduleOnRN, scheduleOnUI } from "react-native-worklets";
+import { KeyboardController } from "react-native-keyboard-controller";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
@@ -230,6 +231,10 @@ const Slider: React.FC<SliderProps> = ({
         scheduleOnUI(calculateOffsetByTapPosition, event.nativeEvent.locationX);
     };
 
+    const panOnStart = () => {
+        scheduleOnRN(KeyboardController.dismiss);
+    };
+
     const panOnChange = (event: GestureUpdateEvent<PanGestureHandlerEventPayload & PanGestureChangeEventPayload>) => {
         "worklet";
         calculateOffsetByPanning(event.changeX);
@@ -244,6 +249,7 @@ const Slider: React.FC<SliderProps> = ({
     const barPan = useMemo(
         () => Gesture.Pan()
         .enabled(!showsHandle && !disabled)
+        .onStart(panOnStart)
         .onChange(panOnChange)
         .onEnd(panOnEnd),
         [showsHandle]
@@ -252,6 +258,7 @@ const Slider: React.FC<SliderProps> = ({
     const handlePan = useMemo(
         () => Gesture.Pan()
         .enabled(showsHandle && !disabled)
+        .onStart(panOnStart)
         .onChange(panOnChange)
         .onEnd(panOnEnd),
         [showsHandle]
@@ -260,6 +267,7 @@ const Slider: React.FC<SliderProps> = ({
     const tooltipPan = useMemo(
         () => Gesture.Pan()
         .enabled(showsTooltip && !disabled)
+        .onStart(panOnStart)
         .onChange(panOnChange)
         .onEnd(panOnEnd)
     );
@@ -274,7 +282,7 @@ const Slider: React.FC<SliderProps> = ({
         })
     );
 
-    const tooltipGesture = Gesture.Exclusive(tooltipDoubleTap, tooltipPan);
+    const tooltipGesture = Gesture.Exclusive(tooltipPan, tooltipDoubleTap);
 
     const onTrackLayout = (event: LayoutChangeEvent) => {
         trackWidth.value = (event.nativeEvent.layout.width - 2 * trackBorderWidth);
