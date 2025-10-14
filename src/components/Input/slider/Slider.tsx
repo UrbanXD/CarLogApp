@@ -96,6 +96,7 @@ const Slider: React.FC<SliderProps> = ({
             0,
             Math.min(100, (currentValue - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
         );
+        inputValue.value = currentValue;
     }, [currentValue]);
 
     const {
@@ -301,6 +302,13 @@ const Slider: React.FC<SliderProps> = ({
         setTooltipLayout({ width, height });
     };
 
+    const onTooltipTextChange = (value: string) => {
+        let number = Number(value);
+        if(isNaN(number)) return;
+
+        setCurrentValue(Math.min(maxValue, Math.max(number, minValue)));
+    };
+
     const sliderBarStyle = useAnimatedStyle(() => {
         const width = interpolate(
             percent.value,
@@ -480,15 +488,7 @@ const Slider: React.FC<SliderProps> = ({
                                animatedProps={ animatedTooltipProps }
                                keyboardType="numeric"
                                style={ styles.slider.tooltip.text }
-                               onChangeText={ (value) => {
-                                   let number = Number(value);
-                                   if(isNaN(number)) return;
-
-                                   if(number > maxValue) number = maxValue;
-                                   if(number < minValue) number = minValue;
-                                   setCurrentValue(number);
-                               }
-                               }
+                               onChangeText={ onTooltipTextChange }
                             />
                              { unit && <Text style={ styles.slider.tooltip.text }>{ unit }</Text> }
                          </View>
