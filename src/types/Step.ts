@@ -17,6 +17,7 @@ export type Step = {
     title: string
     fields: Array<string>
     render: RenderComponent
+    editToastMessages?: ToastMessages
 }
 
 export type Steps = Array<Step>

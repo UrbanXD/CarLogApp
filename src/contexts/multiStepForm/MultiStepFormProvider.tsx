@@ -29,10 +29,11 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
     const [currentStep, setCurrentStep] = useState(0);
 
     useEffect(() => {
-        if(!resultStep || formSteps[formSteps.length - 1] == resultStep) return;
+        const tmpSteps = steps;
+        if(resultStep) tmpSteps.push(resultStep);
 
-        setFormSteps(prevState => [...prevState, resultStep]);
-    }, []);
+        setFormSteps(tmpSteps);
+    }, [steps, resultStep]);
 
     const isFirstStep = () => currentStep === 0;
 

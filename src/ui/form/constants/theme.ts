@@ -14,6 +14,7 @@ type FormTheme = {
     borderColor: Color
     errorColor: Color
     activeColor: Color
+    gap: number
 }
 export const formTheme: FormTheme = {
     containerHeight: FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE + 2 * SEPARATOR_SIZES.lightSmall,
@@ -27,5 +28,6 @@ export const formTheme: FormTheme = {
     borderRadius: 20,
     borderColor: COLORS.gray3,
     activeColor: COLORS.gray2,
-    errorColor: COLORS.redLight
+    errorColor: COLORS.redLight,
+    gap: SEPARATOR_SIZES.small
 };
