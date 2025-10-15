@@ -25,6 +25,8 @@ interface TextButtonProps {
     iconRight?: ImageSource;
     textStyle?: TextStyle;
     style?: ViewStyle;
+    iconLeftStyle?: ViewStyle;
+    iconRightStyle?: ViewStyle;
     inverse?: boolean;
     disabled?: boolean;
     loadingIndicator?: boolean;
@@ -42,6 +44,8 @@ const TextButton: React.FC<TextButtonProps> = ({
     iconRight,
     style,
     textStyle,
+    iconLeftStyle,
+    iconRightStyle,
     inverse = false,
     disabled = false,
     loadingIndicator = false,
@@ -85,7 +89,7 @@ const TextButton: React.FC<TextButtonProps> = ({
                <>
                    {
                        (iconLeft || iconRight) &&
-                      <View style={ styles.sideSpacerContainer }>
+                      <View style={ [styles.sideSpacerContainer, iconLeftStyle] }>
                           {
                               iconLeft &&
                              <Icon
@@ -101,7 +105,7 @@ const TextButton: React.FC<TextButtonProps> = ({
                   </Text>
                    {
                        (iconLeft || iconRight) &&
-                      <View style={ styles.sideSpacerContainer }>
+                      <View style={ [styles.sideSpacerContainer, iconRightStyle] }>
                           {
                               iconRight &&
                              <Icon
@@ -129,8 +133,9 @@ export const useButtonStyles = (
         buttonContainer: {
             flexDirection: "row",
             alignSelf: "center",
-            justifyContent: "center",
+            justifyContent: "space-between",
             alignItems: "center",
+            gap: SEPARATOR_SIZES.lightSmall,
             paddingHorizontal: SEPARATOR_SIZES.small,
             width: width ?? "100%",
             height: height,
