@@ -577,7 +577,7 @@ const Slider: React.FC<SliderProps> = ({
                          defaultValue={ "0%" }
                          editable={ false }
                          animatedProps={ animatedPercentTextProps }
-                         style={ styles.boundingValues.text }
+                         style={ [styles.boundingValues.text, { padding: 0 }] }
                       />
                    }
                    {
@@ -634,7 +634,8 @@ const useStyles = ({
         text: {
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p4,
-            color: boundingValuesTextColor
+            color: boundingValuesTextColor,
+            textAlign: "center"
         }
     },
 
