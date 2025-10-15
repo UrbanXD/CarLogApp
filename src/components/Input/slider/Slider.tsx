@@ -96,7 +96,7 @@ const Slider: React.FC<SliderProps> = ({
             0,
             Math.min(100, (currentValue - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
         );
-        inputValue.value = currentValue;
+        inputValue.value = currentValue.toString();
     }, [currentValue]);
 
     const {
@@ -137,20 +137,22 @@ const Slider: React.FC<SliderProps> = ({
     const trackWidth = useSharedValue(0);
     const thumbOffset = useSharedValue(0);
     const percent = useSharedValue(0);
-    const inputValue = useSharedValue(fieldValue);
+    const inputValue = useSharedValue(fieldValue.toString());
     const bounds = useSharedValue({ min: minValue, max: maxValue });
     const [trackLayoutReady, setTrackLayoutReady] = useState(false);
 
     const setInputValue = () => {
         "worklet";
-        inputValue.value = Math.floor(bounds.value.min + ((bounds.value.max - bounds.value.min) * (percent.value / 100)));
+        inputValue.value = Math.floor(bounds.value.min + ((bounds.value.max - bounds.value.min) * (percent.value / 100)))
+        .toString();
     };
 
     const calculatePercentByValue = () => {
         "worklet";
         percent.value = Math.max(
             0,
-            Math.min(100, (inputValue.value - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
+            Math.min(100, (Number(inputValue.value) - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
+            .toString()
         );
     };
 
@@ -182,7 +184,8 @@ const Slider: React.FC<SliderProps> = ({
 
         setInputValue();
 
-        scheduleOnRN(setCurrentValue, inputValue.value);
+        const value = Number(inputValue.value);
+        if(!isNaN(value)) scheduleOnRN(setCurrentValue, value);
     };
 
     const calculateOffsetByPanning = (changeX: number) => {
@@ -196,7 +199,7 @@ const Slider: React.FC<SliderProps> = ({
     useEffect(() => {
         if(!trackLayoutReady) return;
 
-        inputValue.value = inputFieldContext?.field?.value ?? value;
+        inputValue.value = inputFieldContext?.field?.value?.toString() ?? value.toString();
         scheduleOnUI(calculateOffsetByPercent);
     }, [trackLayoutReady]);
 
@@ -244,7 +247,8 @@ const Slider: React.FC<SliderProps> = ({
     };
 
     const panOnEnd = () => {
-        scheduleOnRN(setCurrentValue, inputValue.value);
+        const value = Number(inputValue.value);
+        if(!isNaN(value)) scheduleOnRN(setCurrentValue, value);
     };
 
     const barPan = useMemo(
@@ -303,10 +307,23 @@ const Slider: React.FC<SliderProps> = ({
     };
 
     const onTooltipTextChange = (value: string) => {
-        let number = Number(value);
-        if(isNaN(number)) return;
+        const numericText = value.replace(/[^0-9.,]/g, "").replace(",", ".");
 
-        setCurrentValue(Math.min(maxValue, Math.max(number, minValue)));
+        let number = numericText.length === 0 ? minValue : Number(numericText);
+
+        const clamped = Math.min(maxValue, Math.max(number, minValue));
+        inputValue.value = clamped.toString() + " ";
+        scheduleOnRN(setTimeout, () => {
+            let clampedText = clamped.toString();
+            if(maxValue !== clamped && numericText.endsWith(".")) clampedText += ".";
+
+            inputValue.value = clampedText;
+        }, 0);
+
+        if(!isNaN(number)) {
+            scheduleOnUI(calculateOffsetByPercent);
+            scheduleOnRN(setCurrentValue, clamped);
+        }
     };
 
     const sliderBarStyle = useAnimatedStyle(() => {
@@ -456,7 +473,7 @@ const Slider: React.FC<SliderProps> = ({
     }), [trackColor, showsHandle, tooltipLayout, handleHeight]);
 
     const animatedTooltipProps = useAnimatedProps(() => {
-        let text = inputValue.value.toString();
+        let text = inputValue.value;
 
         return { text };
     });
