@@ -63,6 +63,7 @@ type SliderStyle = {
     valueTextColor: Color
     boundingValuesTextColor: Color
     showsBoundingValues: boolean
+    showsPercent: boolean
     showsTooltip: boolean
     showsHandle: boolean
     showsTag: boolean
@@ -82,23 +83,6 @@ const Slider: React.FC<SliderProps> = ({
 }) => {
     const tooltipInputRef = useAnimatedRef();
 
-    const [currentValue, setCurrentValue] = useState(value);
-
-    useEffect(() => {
-        setCurrentValue(value);
-    }, [value]);
-
-    useEffect(() => {
-        if(setValue) setValue(currentValue);
-        if(onChange) onChange(currentValue);
-
-        percent.value = Math.max(
-            0,
-            Math.min(100, (currentValue - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
-        );
-        inputValue.value = currentValue.toString();
-    }, [currentValue]);
-
     const {
         borderRadius = 25,
         trackHeight = hp(1),
@@ -115,6 +99,7 @@ const Slider: React.FC<SliderProps> = ({
         valueTextColor = COLORS.white,
         boundingValuesTextColor = COLORS.gray1,
         showsBoundingValues = true,
+        showsPercent = false,
         showsTooltip = true,
         showsHandle = true,
         showsTag = false,
@@ -128,9 +113,13 @@ const Slider: React.FC<SliderProps> = ({
     const [tooltipLayout, setTooltipLayout] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
 
     const inputFieldContext = useInputFieldContext();
-    const fieldValue = Number.isNaN(Number(inputFieldContext?.field?.value))
-                       ? 0
-                       : Number(inputFieldContext?.field.value);
+
+    const rawValue = inputFieldContext?.field?.value;
+    const numericValue = rawValue === "" || rawValue == null ? NaN : Number(rawValue);
+    const fieldValue = (isNaN(numericValue))
+                       ? minValue
+                       : Math.min(maxValue, Math.max(minValue, numericValue));
+
     const onChange = inputFieldContext?.field?.onChange;
     const error = inputFieldContext?.fieldState?.error;
 
@@ -140,6 +129,51 @@ const Slider: React.FC<SliderProps> = ({
     const inputValue = useSharedValue(fieldValue.toString());
     const bounds = useSharedValue({ min: minValue, max: maxValue });
     const [trackLayoutReady, setTrackLayoutReady] = useState(false);
+
+    const [currentValue, setCurrentValue] = useState(fieldValue ?? value);
+
+    useEffect(() => {
+        if(isNaN(value)) return;
+        setCurrentValue(Math.min(maxValue, Math.max(minValue, Number(value))));
+    }, [value]);
+
+    useEffect(() => {
+        if(isNaN(fieldValue)) return;
+        setCurrentValue(Math.min(maxValue, Math.max(minValue, fieldValue)));
+    }, [fieldValue]);
+
+    useEffect(() => {
+        if(setValue && currentValue !== fieldValue) setValue(currentValue);
+        if(onChange && currentValue !== fieldValue) onChange(currentValue);
+
+        percent.value = Math.max(
+            0,
+            Math.min(100, (currentValue - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
+        );
+        inputValue.value = currentValue.toString();
+        scheduleOnUI(calculateThumbOffsetByPercent);
+    }, [currentValue]);
+
+    useEffect(() => {
+        if(!trackLayoutReady) return;
+
+        if(isNaN(fieldValue)) return;
+        setCurrentValue(Math.min(maxValue, Math.max(minValue, fieldValue)));
+    }, [trackLayoutReady]);
+
+    useEffect(() => {
+        const subscription = Keyboard.addListener("keyboardDidHide", () => {
+            scheduleOnUI(dispatchCommand, tooltipInputRef, "blur");
+        });
+
+        return () => subscription.remove();
+    }, []);
+
+    useEffect(() => {
+        if(bounds.value.min === minValue && bounds.value.max === maxValue) return;
+
+        bounds.value = { min: minValue, max: maxValue };
+    }, [maxValue, minValue]);
 
     const setInputValue = () => {
         "worklet";
@@ -152,7 +186,6 @@ const Slider: React.FC<SliderProps> = ({
         percent.value = Math.max(
             0,
             Math.min(100, (Number(inputValue.value) - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
-            .toString()
         );
     };
 
@@ -199,27 +232,6 @@ const Slider: React.FC<SliderProps> = ({
             Math.max(0, thumbOffset.value + changeX)
         );
     };
-
-    useEffect(() => {
-        if(!trackLayoutReady) return;
-
-        inputValue.value = inputFieldContext?.field?.value?.toString() ?? value.toString();
-        scheduleOnUI(calculateOffsetByPercent);
-    }, [trackLayoutReady]);
-
-    useEffect(() => {
-        const subscription = Keyboard.addListener("keyboardDidHide", () => {
-            scheduleOnUI(dispatchCommand, tooltipInputRef, "blur");
-        });
-
-        return () => subscription.remove();
-    }, []);
-
-    useEffect(() => {
-        if(bounds.value.min === minValue && bounds.value.max === maxValue) return;
-
-        bounds.value = { min: minValue, max: maxValue };
-    }, [maxValue, minValue]);
 
     useAnimatedReaction(
         () => bounds.value,
@@ -483,6 +495,12 @@ const Slider: React.FC<SliderProps> = ({
         return { text };
     });
 
+    const animatedPercentTextProps = useAnimatedProps(() => {
+        let text = `${ percent.value.toFixed(2) }%`;
+
+        return { text };
+    });
+
     return (
         <View style={ styles.container }>
             <View style={ styles.slider }>
@@ -547,10 +565,25 @@ const Slider: React.FC<SliderProps> = ({
                 </Pressable>
             </View>
             {
-                showsBoundingValues &&
+                (showsBoundingValues || showsPercent) &&
                <View style={ styles.boundingValues }>
-                  <Text style={ styles.boundingValues.text }>{ minValue } { unit }</Text>
-                  <Text style={ styles.boundingValues.text }>{ maxValue } { unit }</Text>
+                   {
+                       showsBoundingValues &&
+                      <Text style={ styles.boundingValues.text }>{ minValue } { unit }</Text>
+                   }
+                   {
+                       showsPercent &&
+                      <AnimatedTextInput
+                         defaultValue={ "0%" }
+                         editable={ false }
+                         animatedProps={ animatedPercentTextProps }
+                         style={ styles.boundingValues.text }
+                      />
+                   }
+                   {
+                       showsBoundingValues &&
+                      <Text style={ styles.boundingValues.text }>{ maxValue } { unit }</Text>
+                   }
                </View>
             }
         </View>
