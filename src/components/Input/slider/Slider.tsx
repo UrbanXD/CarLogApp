@@ -164,11 +164,15 @@ const Slider: React.FC<SliderProps> = ({
         );
     };
 
+    const calculateThumbOffsetByPercent = () => {
+        thumbOffset.value = percent.value * (trackWidth.value - (showsHandle ? handleWidth : 0)) / 100;
+    };
+
     const calculateOffsetByPercent = () => {
         "worklet";
         calculatePercentByValue();
 
-        thumbOffset.value = percent.value * (trackWidth.value - (showsHandle ? handleWidth : 0)) / 100;
+        calculateThumbOffsetByPercent();
 
         setInputValue();
     };
@@ -318,10 +322,11 @@ const Slider: React.FC<SliderProps> = ({
             if(maxValue !== clamped && numericText.endsWith(".")) clampedText += ".";
 
             inputValue.value = clampedText;
-        }, 0);
+        }, 100);
 
         if(!isNaN(number)) {
-            scheduleOnUI(calculateOffsetByPercent);
+            scheduleOnUI(calculatePercentByValue);
+            scheduleOnUI(calculateThumbOffsetByPercent);
             scheduleOnRN(setCurrentValue, clamped);
         }
     };
