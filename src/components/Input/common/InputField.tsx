@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import { Control, Controller, UseControllerReturn } from "react-hook-form";
 import { SEPARATOR_SIZES } from "../../../constants/index.ts";
 import InputTitle from "./InputTitle.tsx";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import { InputFieldProvider } from "../../../contexts/inputField/InputFieldProvider.tsx";
 import InputError from "./InputError.tsx";
 
@@ -12,6 +12,7 @@ interface InputFieldProps {
     fieldNameText?: string;
     fieldInfoText?: string;
     optional?: boolean;
+    containerStyle?: ViewStyle;
     children: ReactNode;
 }
 
@@ -21,12 +22,13 @@ const InputField: React.FC<InputFieldProps> = ({
     fieldNameText,
     fieldInfoText,
     optional,
+    containerStyle,
     children
 }) => {
     const renderControllerInput = (args: UseControllerReturn<any>) => {
         return (
             <InputFieldProvider value={ { ...args, control: control } }>
-                <View>
+                <View style={ containerStyle }>
                     { children }
                 </View>
                 <InputError/>
