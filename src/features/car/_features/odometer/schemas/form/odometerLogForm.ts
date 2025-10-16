@@ -7,17 +7,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { odometerUnitSchema } from "../odometerUnitSchema.ts";
 import { OdometerLogTypeEnum } from "../../model/enums/odometerLogTypeEnum.ts";
 
-const odometerLogForm = (highestOdometerValue?: number = 0) => odometerLogSchema
+export const odometerLogForm = (highestOdometerValue?: number = 0) => odometerLogSchema
 .pick({ id: true, note: true })
 .extend({
     carId: zPickerRequired("Kérem válasszon ki egy autót!").pipe(odometerLogSchema.shape.carId),
     typeId: zPickerRequired("Kérem válasszon ki egy típust!").pipe(odometerLogSchema.shape.type.shape.id),
-    value: zNumber(
-        { min: highestOdometerValue },
-        {
-            minBound: (min) => min === 0
-                               ? "A kilométeróra-állás nem lehet negatív szám"
-                               : `Visszafelé nem pöröghet a kilométeróra, a jelenlegi állás ${ min }.`
+    value: zNumber({
+            bounds: { min: highestOdometerValue },
+            errorMessage: {
+                minBound: (min) => min === 0
+                                   ? "A kilométeróra-állás nem lehet negatív szám"
+                                   : `Visszafelé nem pöröghet a kilométeróra, a jelenlegi állás ${ min }.`
+            }
         }
     ).pipe(odometerLogSchema.shape.value),
     date: zDate().pipe(odometerLogSchema.shape.date),

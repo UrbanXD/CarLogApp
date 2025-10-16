@@ -3,28 +3,39 @@ import { ColorValue } from "react-native";
 import { Image } from "./index.ts";
 import dayjs from "dayjs";
 
-export const zNumber = (
+type ZodNumberArgs = {
+    optional?: boolean
     bounds?: { min?: number, max?: number },
     errorMessage?: { required?: string, minBound?: (min?: number) => string, maxBound?: (max?: number) => string }
-) => z
-.preprocess(
-    (value: any) => value ? value.toString() : "",
-    z
-    .string()
-    .transform((value) => (value === "" ? NaN : Number(value)))
-    .refine(
-        (value) => !isNaN(value),
-        { message: errorMessage?.required ?? "Kérem adjon meg egy számot." }
-    )
-    .refine(
-        (value) => bounds?.min ? value >= bounds.min : true,
-        { message: errorMessage?.minBound?.(bounds?.min) ?? `A számnak nagyobbnak vagy egyenlőnek kell lennie mint ${ bounds?.min }.` }
-    )
-    .refine(
-        (value) => bounds?.max ? value < bounds.max : true,
-        { message: errorMessage?.maxBound?.(bounds?.max) ?? `A számnak kisebbnek kell lennie mint ${ bounds?.max }.` }
-    )
-);
+}
+
+export const zNumber = ({
+    optional = false,
+    bounds,
+    errorMessage
+}: ZodNumberArgs) => {
+    const base = z
+    .preprocess(
+        (value: any) => value ? value.toString() : "",
+        z
+        .string()
+        .transform((value) => (value === "" ? (optional ? null : NaN) : Number(value)))
+        .refine(
+            (value) => optional || !isNaN(value),
+            { message: errorMessage?.required ?? "Kérem adjon meg egy számot." }
+        )
+        .refine(
+            (value) => bounds?.min !== undefined ? ((optional && value === null) || value >= bounds.min) : true,
+            { message: errorMessage?.minBound?.(bounds?.min) ?? `A számnak nagyobbnak vagy egyenlőnek kell lennie mint ${ bounds?.min }.` }
+        )
+        .refine(
+            (value) => bounds?.max !== undefined ? ((optional && value === null) || value < bounds.max) : true,
+            { message: errorMessage?.maxBound?.(bounds?.max) ?? `A számnak kisebbnek kell lennie mint ${ bounds?.max }.` }
+        )
+    );
+
+    return optional ? base.optional().nullable() : base;
+};
 
 export const zPickerRequired = (errorMessage?: string = "Válasszon ki egy elemet!") => z.union([
     z.string({ required_error: errorMessage }).min(1, errorMessage),

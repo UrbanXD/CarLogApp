@@ -19,7 +19,7 @@ export const carFormSchema = carSchema
         year: zPickerRequired("Válasszon ki egy gyártási évet!").pipe(modelSchema.shape.startYear)
     }),
     odometer: carSchema.shape.odometer.pick({ id: true }).extend({
-        value: zNumber({ min: 0 }).pipe(carSchema.shape.odometer.shape.value),
+        value: zNumber({ bounds: { min: 0 } }).pipe(carSchema.shape.odometer.shape.value),
         unitId: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
         .pipe(carSchema.shape.odometer.shape.unit.shape.id)
     }),
@@ -27,7 +27,7 @@ export const carFormSchema = carSchema
     fuelTank: carSchema.shape.fuelTank.pick({ id: true, value: true }).extend({
         typeId: zPickerRequired("Kérem válasszon ki egy üzemanyag típust!")
         .pipe(carSchema.shape.fuelTank.shape.type.shape.id),
-        capacity: zNumber({ min: 0 }).pipe(carSchema.shape.fuelTank.shape.capacity),
+        capacity: zNumber({ bounds: { min: 0 } }).pipe(carSchema.shape.fuelTank.shape.capacity),
         unitId: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
         .pipe(carSchema.shape.fuelTank.shape.unit.shape.id)
     })

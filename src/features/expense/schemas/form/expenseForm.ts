@@ -7,31 +7,31 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CurrencyEnum } from "../../../_shared/currency/enums/currencyEnum.ts";
 
 
-const expenseForm = expenseSchema
+export const expenseForm = expenseSchema
 .pick({ id: true, note: true })
 .extend({
     carId: zPickerRequired("Kérem válasszon ki egy autót!").pipe(expenseSchema.shape.carId),
     typeId: zPickerRequired("Kérem válasszon ki egy típust!").pipe(expenseSchema.shape.type.shape.id),
     currencyId: zPickerRequired("Kérem válasszon ki egy valutát!").pipe(expenseSchema.shape.currency.shape.id),
-    amount: zNumber(
-        { min: expenseSchema.shape.amount.minValue ?? 0 },
-        {
+    amount: zNumber({
+        bounds: { min: expenseSchema.shape.amount.minValue ?? 0 },
+        errorMessage: {
             required: "Kérem adja meg a költség összegét",
             minBound: (min) => min === 0
                                ? "A költség összege nem lehet negatív szám."
                                : `A költség összegének minimum ${ min } értékűnek lennie kell.`
         }
-    ).pipe(expenseSchema.shape.amount),
+    }).pipe(expenseSchema.shape.amount),
     date: zDate().pipe(expenseSchema.shape.date),
-    exchangeRate: zNumber(
-        { min: expenseSchema.shape.exchangeRate.minValue ?? 0 },
-        {
+    exchangeRate: zNumber({
+        bounds: { min: expenseSchema.shape.exchangeRate.minValue ?? 0 },
+        errorMessage: {
             required: "Kérem adja meg az átváltási árfolyamot.",
             minBound: (min) => min === 0
                                ? "Az átváltási árfolyam nem lehet negatív szám."
                                : `Az átváltási árfolyamnak minimum legyen legalább ${ min }.`
         }
-    ).pipe(expenseSchema.shape.exchangeRate)
+    }).pipe(expenseSchema.shape.exchangeRate)
 });
 
 export type ExpenseFields = z.infer<typeof expenseForm>;
