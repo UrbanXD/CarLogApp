@@ -10,6 +10,7 @@ type OdometerValueInputProps = {
     fieldName: string
     title?: string
     subtitle?: string
+    optional?: boolean
     placeholder?: string
     currentOdometerValue?: number
     unitText?: string
@@ -20,6 +21,7 @@ export function OdometerValueInput({
     fieldName,
     title = "Kilométeróra-állás",
     subtitle,
+    optional,
     placeholder = "100000",
     currentOdometerValue,
     unitText
@@ -30,6 +32,7 @@ export function OdometerValueInput({
             fieldName={ fieldName }
             fieldNameText={ title }
             fieldInfoText={ subtitle ?? (currentOdometerValue && `A jelenlegi kilométeróra-állás: ${ currentOdometerValue } ${ unitText }`) }
+            optional={ optional }
         >
             <Input.Row style={ { gap: 0 } }>
                 <View style={ { flex: 1 } }>
