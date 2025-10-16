@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES } from "../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 
 interface InputTitleProps {
     title: string,
@@ -14,7 +14,7 @@ const InputTitle: React.FC<InputTitleProps> = ({
     optional = false
 }) => {
     return (
-        <View>
+        <View style={ styles.container }>
             <View>
                 <Text style={ styles.inputNameText }>
                     {
@@ -39,6 +39,9 @@ const InputTitle: React.FC<InputTitleProps> = ({
 };
 
 const styles = StyleSheet.create({
+    container: {
+        gap: SEPARATOR_SIZES.lightSmall / 2
+    },
     inputNameText: {
         fontSize: FONT_SIZES.p1,
         fontFamily: "Gilroy-Heavy",
