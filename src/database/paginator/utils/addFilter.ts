@@ -3,10 +3,11 @@ import { FilterCondition } from "../AbstractPaginator.ts";
 import { sql } from "@powersync/kysely-driver";
 
 export function addFilter<TableItem = any, DB = any>(
+    table: string,
     query: SelectQueryBuilder<DB, TableItem, any>,
     filterCondition: FilterCondition<TableItem>
 ): SelectQueryBuilder<DB, TableItem, any> {
-    let filterField = filterCondition.field;
+    let filterField = `${ table }.${ filterCondition.field }`;
 
     // @formatter:off
     if(filterCondition.toLowerCase) filterField = sql`lower(${ sql.ref(filterField) })`;

@@ -46,7 +46,7 @@ export abstract class Paginator<TableItem, MappedItem, DB> {
         query.limit(this.perPage + 1); // add plus 1 for get the cursor element as well
 
         this.filterBy.forEach(filter => {
-            query = addFilter<TableItem, DB>(query, filter);
+            query = addFilter<TableItem, DB>(this.table, query, filter);
         });
 
         return query;
