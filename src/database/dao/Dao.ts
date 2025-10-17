@@ -1,33 +1,39 @@
 import { Kysely } from "@powersync/kysely-driver";
 import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 import { AbstractMapper } from "./AbstractMapper.ts";
+import { SelectQueryBuilder, SimplifyResult } from "kysely";
 
-export class Dao<Entity, Dto, Mapper> {
+export class Dao<Entity, Dto, Mapper, SelectEntity = Entity> {
     protected readonly db: Kysely<DatabaseType>;
     protected readonly table: keyof DatabaseType;
-    readonly mapper: Mapper<Entity, Dto>;
+    readonly mapper: Mapper<Entity, Dto, SelectEntity>;
 
-    constructor(db: Kysely<DatabaseType>, table: keyof DatabaseType, mapper: AbstractMapper<Entity, Dto>) {
+    constructor(
+        db: Kysely<DatabaseType>,
+        table: keyof DatabaseType,
+        mapper: AbstractMapper<Entity, Dto, SelectEntity>
+    ) {
         this.db = db;
         this.table = table;
         this.mapper = mapper;
     }
 
-    async getAll(): Promise<Array<Dto>> {
-        const entities = await this.db
+    selectQuery(): SelectQueryBuilder<DatabaseType, SelectEntity> {
+        return this.db
         .selectFrom(this.table)
-        .selectAll()
-        .execute();
+        .selectAll();
+    }
+
+    async getAll(): Promise<Array<Dto>> {
+        const entities = await (this.selectQuery().execute());
 
         return await this.mapper.toDtoArray(entities);
     }
 
     async getById(id: string | number, safe?: boolean = true): Promise<Dto | null> {
-        const entity = await this.db
-        .selectFrom(this.table)
-        .selectAll()
-        .where("id", "=", id)
-        .executeTakeFirst();
+        const entity = await (this.selectQuery()
+        .where(`${ this.table }.id`, "=", id)
+        .executeTakeFirst());
 
         if(safe && !entity) throw new Error(`Table item not found by ${ id } id. [${ this.table }]`);
 

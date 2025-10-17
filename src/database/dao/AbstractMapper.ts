@@ -1,9 +1,9 @@
-export abstract class AbstractMapper<Entity, Dto> {
-    abstract async toDto(entity: Entity): Promise<Dto>;
+export abstract class AbstractMapper<Entity, Dto, SelectEntity = Entity> {
+    abstract async toDto(entity: SelectEntity): Promise<Dto>;
 
     abstract async toEntity(dto: Dto): Promise<Entity>;
 
-    async toDtoArray(entities: Array<Entity>): Promise<Array<Dto>> {
+    async toDtoArray(entities: Array<SelectEntity>): Promise<Array<Dto>> {
         return Promise.all(entities.map(entity => this.toDto(entity)));
     }
 
