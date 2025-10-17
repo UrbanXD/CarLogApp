@@ -25,9 +25,9 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
 
     const car = useMemo(() => getCar(carId), [carId, getCar]);
     const paginator = useMemo(() => odometerLogDao.paginator({
-        field: ["value", "date", "id"],
-        order: ["desc", "desc", "asc"]
-    }, { field: "car_id", operator: "=", value: car.id }, 15), []);
+        field: ["value", "id"],
+        order: ["desc", "asc"]
+    }, { field: "car_id", operator: "=", value: car?.id }, 15), []);
 
     const { typeFilter, filterButtons } = useOdometerLogTimelineFilter();
     const {

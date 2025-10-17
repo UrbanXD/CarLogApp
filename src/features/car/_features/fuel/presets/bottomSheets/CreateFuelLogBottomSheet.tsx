@@ -1,10 +1,10 @@
 import React from "react";
-import { CreateExpenseForm } from "../../../../../expense/components/forms/CreateExpenseForm.tsx";
 import BottomSheet from "../../../../../../ui/bottomSheet/components/BottomSheet.tsx";
+import { CreateFuelLogForm } from "../../components/forms/CreateFuelLogForm.tsx";
 
 export function CreateFuelLogBottomSheet() {
     const TITLE = "Tankolás rögzítése";
-    const CONTENT = <CreateExpenseForm/>;
+    const CONTENT = <CreateFuelLogForm/>;
     const SNAP_POINTS = ["90%"];
 
     return (

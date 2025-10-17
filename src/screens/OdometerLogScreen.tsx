@@ -14,7 +14,6 @@ import dayjs from "dayjs";
 import { Title } from "../components/Title.tsx";
 import { updateCarOdometer } from "../features/car/model/slice/index.ts";
 import { useAppDispatch } from "../hooks/index.ts";
-import { convertOdometerValueFromKilometer } from "../features/car/_features/odometer/utils/convertOdometerUnit.ts";
 import useCars from "../features/car/hooks/useCars.ts";
 import { InfoContainer } from "../components/info/InfoContainer.tsx";
 import { OdometerLogFormFields } from "../features/car/_features/odometer/enums/odometerLogFormFields.ts";
@@ -34,7 +33,7 @@ export function OdometerLogScreen() {
         useCallback(() => {
             const getOdometerLog = async () => {
                 const log = await odometerLogDao.getById(id);
-                setOdometerLog(log ?? null);
+                setOdometerLog(log);
             };
 
             getOdometerLog();
@@ -52,13 +51,11 @@ export function OdometerLogScreen() {
             if(!car) throw new Error("Car not found!");
 
             await odometerLogDao.delete(id);
-            const newHighestOdometerValueInKilometer = await odometerLogDao.getOdometerValueInKmByCarId(car.id);
-            const convertedOdometerValue = convertOdometerValueFromKilometer(
-                newHighestOdometerValueInKilometer,
-                car.odometer.unit.conversionFactor
-            );
+            const odometer = await odometerLogDao.getOdometerByCarId(car.id);
 
-            dispatch(updateCarOdometer({ carId: car.id, value: convertedOdometerValue }));
+            if(odometer?.value) {
+                dispatch(updateCarOdometer({ carId: car.id, value: odometer.value }));
+            }
 
             openToast(DeleteOdometerLogToast.success());
 

@@ -12,12 +12,8 @@ import { FuelTankDao } from "../../_features/fuel/model/dao/FuelTankDao.ts";
 import { CarFormFields } from "../../schemas/form/carForm.ts";
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
 import { OdometerLogDao } from "../../_features/odometer/model/dao/OdometerLogDao.ts";
-import { odometerSchema } from "../../_features/odometer/schemas/odometerSchema.ts";
 import { OdometerUnitDao } from "../../_features/odometer/model/dao/OdometerUnitDao.ts";
-import {
-    convertOdometerValueFromKilometer,
-    convertOdometerValueToKilometer
-} from "../../_features/odometer/utils/convertOdometerUnit.ts";
+import { convertOdometerValueToKilometer } from "../../_features/odometer/utils/convertOdometerUnit.ts";
 import { getUUID } from "../../../../database/utils/uuid.ts";
 import { OdometerLogTypeEnum } from "../../_features/odometer/model/enums/odometerLogTypeEnum.ts";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
@@ -40,15 +36,9 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
         const image = await getImageFromAttachmentQueue(this.attachmentQueue, entity.image_url);
         const model = await this.modelDao.getById(entity.model_id);
         const carModel = await this.modelDao.mapper.toCarModelDto(model, entity.model_year);
-        const fuelTank = await this.fuelTankDao.getByCarId(entity.id);
 
-        const odometerValue = await this.odometerLogDao.getOdometerValueInKmByCarId(entity.id);
-        const odometerUnit = await this.odometerUnitDao.getById(entity.odometer_unit_id);
-        const odometer = odometerSchema.parse({
-            valueInKm: odometerValue,
-            value: convertOdometerValueFromKilometer(odometerValue, odometerUnit?.conversionFactor ?? 1),
-            unit: odometerUnit
-        });
+        const fuelTank = await this.fuelTankDao.getByCarId(entity.id);
+        const odometer = await this.odometerLogDao.getOdometerByCarId(entity.id);
 
         const currency = await this.currencyDao.getById(entity.currency_id);
 

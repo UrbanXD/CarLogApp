@@ -3,7 +3,7 @@ import BottomSheet from "../../../../../../ui/bottomSheet/components/BottomSheet
 import React, { useEffect, useState } from "react";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
-import { EditOdometerLogForm } from "../../components/forms/EditOdometerLogForm.tsx";
+import { EditOdometerChangeLogForm } from "../../components/forms/EditOdometerChangeLogForm.tsx";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 
 export function EditOdometerLogBottomSheet() {
@@ -33,7 +33,7 @@ export function EditOdometerLogBottomSheet() {
 
     if(!odometerLog) return <></>;
 
-    const CONTENT = <EditOdometerLogForm odometerLog={ odometerLog } field={ field }/>;
+    const CONTENT = <EditOdometerChangeLogForm odometerLog={ odometerLog } field={ field }/>;
     const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
 
     return (

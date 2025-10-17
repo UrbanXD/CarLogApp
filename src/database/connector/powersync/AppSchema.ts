@@ -14,6 +14,7 @@ import { odometerUnitTable } from "./tables/odometerUnit.ts";
 import { odometerLogTypeTable } from "./tables/odometerLogType.ts";
 import { fuelUnitTable } from "./tables/fuelUnit.ts";
 import { currencyTable } from "./tables/currency.ts";
+import { odometerChangeLogTable } from "./tables/odometerChangeLog.ts";
 
 export const AppSchema = new Schema({
     attachments: new AttachmentTable(),
@@ -21,6 +22,7 @@ export const AppSchema = new Schema({
     car: carTable,
     odometer_unit: odometerUnitTable,
     odometer_log: odometerLogTable,
+    odometer_change_log: odometerChangeLogTable,
     odometer_log_type: odometerLogTypeTable,
     fuel_tank: fuelTankTable,
     fuel_unit: fuelUnitTable,
@@ -40,6 +42,7 @@ export type ModelTableRow = DatabaseType["model"];
 export type CarTableRow = DatabaseType["car"];
 export type OdometerUnitTableRow = DatabaseType["odometer_unit"];
 export type OdometerLogTableRow = DatabaseType["odometer_log"];
+export type OdometerChangeLogTableRow = DatabaseType["odometer_change_log"];
 export type OdometerLogTypeTableRow = DatabaseType["odometer_log_type"];
 export type FuelTankTableRow = DatabaseType["fuel_tank"];
 export type FuelUnitTableRow = DatabaseType["fuel_unit"];

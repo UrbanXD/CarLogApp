@@ -3,20 +3,20 @@ import { DatabaseType, FuelLogTableRow } from "../../../../../../database/connec
 import { FuelLog } from "../../schemas/fuelLogSchema.ts";
 import { FuelLogMapper } from "../mapper/fuelLogMapper.ts";
 import { Kysely } from "@powersync/kysely-driver";
-import { CarDao } from "../../../../model/dao/CarDao.ts";
 import { ExpenseTypeDao } from "../../../../../expense/model/dao/ExpenseTypeDao.ts";
 import { FuelUnitDao } from "./FuelUnitDao.ts";
 import { FUEL_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/fuelLog.ts";
 import { EXPENSE_TABLE } from "../../../../../../database/connector/powersync/tables/expense.ts";
+import { OdometerLogDao } from "../../../odometer/model/dao/OdometerLogDao.ts";
 
 export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper> {
     constructor(
         db: Kysely<DatabaseType>,
         fuelUnitDao: FuelUnitDao,
         expenseTypeDao: ExpenseTypeDao,
-        carDao: CarDao
+        odometerLogDao: OdometerLogDao
     ) {
-        super(db, FUEL_LOG_TABLE, new FuelLogMapper(fuelUnitDao, expenseTypeDao, carDao));
+        super(db, FUEL_LOG_TABLE, new FuelLogMapper(fuelUnitDao, expenseTypeDao, odometerLogDao));
     }
 
     async getByExpenseId(expenseId: string, safe?: boolean = true): Promise<FuelLog | null> {

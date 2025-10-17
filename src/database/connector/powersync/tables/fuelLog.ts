@@ -6,7 +6,7 @@ export const fuelLogTable = new Table({
     id: column.text,
     owner_id: column.text,
     expense_id: column.text,
+    odometer_log_id: column.text,
     fuel_unit_id: column.text,
-    odometer_value: column.integer, //in kilometer
     quantity: column.real
 });

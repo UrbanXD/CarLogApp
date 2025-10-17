@@ -5,9 +5,11 @@ import { useAppDispatch } from "../../../../../../hooks/index.ts";
 import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
-import { OdometerLogFields, useEditOdometerLogFormProps } from "../../schemas/form/odometerLogForm.ts";
+import {
+    OdometerChangeLogFormFields,
+    useEditOdometerChangeLogFormProps
+} from "../../schemas/form/odometerChangeLogForm.ts";
 import { updateCarOdometer } from "../../../../model/slice/index.ts";
-import { convertOdometerValueFromKilometer } from "../../utils/convertOdometerUnit.ts";
 import { FormButtons } from "../../../../../../components/Button/presets/FormButtons.tsx";
 import { OdometerLogFormFields } from "../../enums/odometerLogFormFields.ts";
 import { useOdometerLogFormFields } from "../../hooks/useOdometerLogFormFields.tsx";
@@ -20,28 +22,30 @@ type EditOdometerLogFormProps = {
     field?: OdometerLogFormFields
 }
 
-export function EditOdometerLogForm({ odometerLog, field }: EditOdometerLogFormProps) {
+export function EditOdometerChangeLogForm({ odometerLog, field }: EditOdometerLogFormProps) {
     const dispatch = useAppDispatch();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
     const { odometerLogDao } = useDatabase();
 
-    const form = useForm<OdometerLogFields>(useEditOdometerLogFormProps(odometerLog));
+    const form = useForm<OdometerChangeLogFormFields>(useEditOdometerChangeLogFormProps(odometerLog));
     const { handleSubmit, reset } = form;
 
     const { fields, fullForm } = useOdometerLogFormFields({ odometerLog, ...form });
     const editFields: FormFields = fields?.[field] ?? fullForm;
 
     const submitHandler = handleSubmit(
-        async (formResult: OdometerLogFields) => {
+        async (formResult: OdometerChangeLogFormFields) => {
             try {
-                const result = await odometerLogDao.update(formResult);
-                const newHighestOdometerValue = await odometerLogDao.getOdometerValueInKmByCarId(result.carId);
+                const result = await odometerLogDao.updateOdometerChangeLog(formResult);
+                const odometer = await odometerLogDao.getOdometerByCarId(result.carId);
 
-                dispatch(updateCarOdometer({
-                    carId: result.carId,
-                    value: convertOdometerValueFromKilometer(newHighestOdometerValue, result.unit.conversionFactor)
-                }));
+                if(odometer) {
+                    dispatch(updateCarOdometer({
+                        carId: result.carId,
+                        value: odometer.value
+                    }));
+                }
 
                 openToast(editFields.editToastMessages.success());
 

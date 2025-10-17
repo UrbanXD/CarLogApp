@@ -2,16 +2,16 @@ import { OdometerLog, odometerLogSchema } from "../odometerLogSchema.ts";
 import { zDate, zNumber, zPickerRequired } from "../../../../../../types/zodTypes.ts";
 import { z } from "zod";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
-import { Car } from "../../../../schemas/carSchema.ts";
+import { Car, carSchema } from "../../../../schemas/carSchema.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { odometerUnitSchema } from "../odometerUnitSchema.ts";
-import { OdometerLogTypeEnum } from "../../model/enums/odometerLogTypeEnum.ts";
 
-export const odometerLogForm = (highestOdometerValue?: number = 0) => odometerLogSchema
+export const odometerChangeLogForm = (highestOdometerValue?: number = 0) => odometerLogSchema
 .pick({ id: true, note: true })
 .extend({
     carId: zPickerRequired("Kérem válasszon ki egy autót!").pipe(odometerLogSchema.shape.carId),
-    typeId: zPickerRequired("Kérem válasszon ki egy típust!").pipe(odometerLogSchema.shape.type.shape.id),
+    ownerId: carSchema.shape.ownerId, //hidden
+    odometerChangeLogId: z.string().uuid(), //hidden
     value: zNumber({
             bounds: { min: highestOdometerValue },
             errorMessage: {
@@ -25,32 +25,33 @@ export const odometerLogForm = (highestOdometerValue?: number = 0) => odometerLo
     conversionFactor: odometerUnitSchema.shape.conversionFactor // hidden
 });
 
-export type OdometerLogFields = z.infer<ReturnType<typeof odometerLogForm>>;
+export type OdometerChangeLogFormFields = z.infer<ReturnType<typeof odometerChangeLogForm>>;
 
-export const useCreateOdometerLogFormProps = (car: Car | null) => {
-    const defaultValues: OdometerLogFields = {
+export const useCreateOdometerChangeLogFormProps = (car: Car | null) => {
+    const defaultValues: OdometerChangeLogFormFields = {
         id: getUUID(),
+        odometerChangeLogId: getUUID(),
         carId: car?.id,
-        typeId: OdometerLogTypeEnum.SIMPLE,
+        ownerId: car?.ownerId,
         value: car?.odometer.value,
         note: null,
         date: new Date(),
         conversionFactor: car?.odometer.unit.conversionFactor ?? 1
     };
 
-    return { defaultValues, resolver: zodResolver(odometerLogForm(car?.odometer.value)) };
+    return { defaultValues, resolver: zodResolver(odometerChangeLogForm(car?.odometer.value)) };
 };
 
-export const useEditOdometerLogFormProps = (odometerLog: OdometerLog) => {
-    const defaultValues: OdometerLogFields = {
+export const useEditOdometerChangeLogFormProps = (odometerLog: OdometerLog) => {
+    const defaultValues: Partial<OdometerChangeLogFormFields> = {
         id: odometerLog.id,
+        odometerChangeLogId: odometerLog.relatedId,
         carId: odometerLog.carId,
-        typeId: odometerLog.type.id,
         value: odometerLog.value,
         note: odometerLog.note,
         date: odometerLog.date,
         conversionFactor: odometerLog.unit.conversionFactor
     };
 
-    return { defaultValues, resolver: zodResolver(odometerLogForm(0)) };
+    return { defaultValues, resolver: zodResolver(odometerChangeLogForm(0).omit({ ownerId: true })) };
 };

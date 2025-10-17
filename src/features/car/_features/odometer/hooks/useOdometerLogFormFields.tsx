@@ -11,10 +11,10 @@ import { NoteInput } from "../../../../../components/Input/_presets/NoteInput.ts
 import { OdometerLogFormFields } from "../enums/odometerLogFormFields.ts";
 import { OdometerValueInput } from "../components/forms/inputFields/OdometerValueInput.tsx";
 import { OdometerLog } from "../schemas/odometerLogSchema.ts";
-import { OdometerLogFields } from "../schemas/form/odometerLogForm.ts";
+import { OdometerChangeLogFormFields } from "../schemas/form/odometerChangeLogForm.ts";
 import { convertOdometerValueFromKilometer } from "../utils/convertOdometerUnit.ts";
 
-type UseOdometerLogFormFieldsProps = UseFormReturn<OdometerLogFields> & {
+type UseOdometerLogFormFieldsProps = UseFormReturn<OdometerChangeLogFormFields> & {
     odometerLog?: OdometerLog
     defaultCarId?: string
 }
