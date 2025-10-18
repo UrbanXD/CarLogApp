@@ -6,8 +6,11 @@ import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts"
 import { ExpenseFields } from "../../schemas/form/expenseForm.ts";
 import { ExpenseType } from "../../schemas/expenseTypeSchema.ts";
 import { Currency } from "../../../_shared/currency/schemas/currencySchema.ts";
+import { SelectExpenseTableRow } from "../dao/ExpenseDao.ts";
 
-export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
+export type SelectExpenseTableRow = ExpenseTableRow & { related_id: string }
+
+export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, SelectExpenseTableRow> {
     private readonly expenseTypeDao: ExpenseTypeDao;
     private readonly currencyDao: CurrencyDao;
 
@@ -17,7 +20,7 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
         this.currencyDao = currencyDao;
     }
 
-    async toDto(entity: ExpenseTableRow): Promise<Expense> {
+    async toDto(entity: SelectExpenseTableRow): Promise<Expense> {
         const [type, currency]: [ExpenseType | null, Currency | null] = await Promise.all([
             this.expenseTypeDao.getById(entity.type_id),
             this.currencyDao.getById(entity.currency_id)
@@ -26,6 +29,7 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
         return expenseSchema.parse({
             id: entity.id,
             carId: entity.car_id,
+            relatedId: entity?.related_id ?? null,
             type: type,
             currency: currency,
             originalAmount: entity.original_amount,
