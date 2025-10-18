@@ -40,12 +40,7 @@ export function EditOdometerChangeLogForm({ odometerLog, field }: EditOdometerLo
                 const result = await odometerLogDao.updateOdometerChangeLog(formResult);
                 const odometer = await odometerLogDao.getOdometerByCarId(result.carId);
 
-                if(odometer) {
-                    dispatch(updateCarOdometer({
-                        carId: result.carId,
-                        value: odometer.value
-                    }));
-                }
+                if(odometer) dispatch(updateCarOdometer({ odometer }));
 
                 openToast(editFields.editToastMessages.success());
 

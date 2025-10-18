@@ -8,7 +8,7 @@ export const fuelLogSchema = z
     ownerId: z.string().uuid(),
     expenseId: z.string().uuid(),
     fuelUnit: fuelUnitSchema,
-    odometer: odometerSchema,
+    odometer: odometerSchema.nullable(),
     quantity: z.number().min(0),
     originalPricePerUnit: z.number().min(0),
     pricePerUnit: z.number().min(0)

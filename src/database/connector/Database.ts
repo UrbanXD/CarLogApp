@@ -136,7 +136,8 @@ export class Database {
             this.db,
             this.fuelUnitDao,
             this.expenseTypeDao,
-            this.odometerLogDao
+            this.odometerLogDao,
+            this.odometerUnitDao
         );
 
         return this._fuelLogDao;

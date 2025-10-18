@@ -53,7 +53,9 @@ export function CreateOdometerChangeLogForm({ defaultCarId }: CreateOdometerLogF
         async (formResult: OdometerChangeLogFormFields) => {
             try {
                 const result = await odometerLogDao.createOdometerChangeLog(formResult);
-                dispatch(updateCarOdometer({ carId: result.carId, value: result.value }));
+                const odometer = await odometerLogDao.getOdometerByCarId(result.carId);
+
+                dispatch(updateCarOdometer({ odometer }));
 
                 openToast(CarCreateToast.success());
 

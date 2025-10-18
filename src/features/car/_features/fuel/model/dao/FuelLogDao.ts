@@ -8,15 +8,19 @@ import { FuelUnitDao } from "./FuelUnitDao.ts";
 import { FUEL_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/fuelLog.ts";
 import { EXPENSE_TABLE } from "../../../../../../database/connector/powersync/tables/expense.ts";
 import { OdometerLogDao } from "../../../odometer/model/dao/OdometerLogDao.ts";
+import { FuelLogFields } from "../../schemas/form/fuelLogForm.ts";
+import { ODOMETER_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/odometerLog.ts";
+import { OdometerUnitDao } from "../../../odometer/model/dao/OdometerUnitDao.ts";
 
 export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper> {
     constructor(
         db: Kysely<DatabaseType>,
         fuelUnitDao: FuelUnitDao,
         expenseTypeDao: ExpenseTypeDao,
-        odometerLogDao: OdometerLogDao
+        odometerLogDao: OdometerLogDao,
+        odometerUnitDao: OdometerUnitDao
     ) {
-        super(db, FUEL_LOG_TABLE, new FuelLogMapper(fuelUnitDao, expenseTypeDao, odometerLogDao));
+        super(db, FUEL_LOG_TABLE, new FuelLogMapper(fuelUnitDao, expenseTypeDao, odometerLogDao, odometerUnitDao));
     }
 
     async getByExpenseId(expenseId: string, safe?: boolean = true): Promise<FuelLog | null> {
@@ -36,5 +40,38 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper> {
         if(!fuelLogRow && safe) throw new Error(`Table item not found by ${ expenseId } expense id [${ FUEL_LOG_TABLE }]`);
 
         return fuelLogRow ? await this.mapper.toDto(fuelLogRow) : null;
+    }
+
+
+    async create(formResult: FuelLogFields): Promise<FuelLog | null> {
+        const { expense, fuelLog, odometerLog } = await this.mapper.formResultToEntities(formResult);
+
+        const insertedFuelLogExpenseId = await this.db.transaction().execute(async trx => {
+            const result = await trx
+            .insertInto(EXPENSE_TABLE)
+            .values(expense)
+            .returning("id")
+            .executeTakeFirstOrThrow();
+
+            if(odometerLog) {
+                await trx
+                .insertInto(ODOMETER_LOG_TABLE)
+                .values(odometerLog)
+                .returning("id")
+                .executeTakeFirstOrThrow();
+            }
+
+            await trx
+            .insertInto(FUEL_LOG_TABLE)
+            .values(fuelLog)
+            .returning("id")
+            .executeTakeFirstOrThrow();
+
+            return result.id;
+        });
+
+        console.log("inserted fuellog expense id", insertedFuelLogExpenseId);
+
+        return await this.getByExpenseId(insertedFuelLogExpenseId);
     }
 }

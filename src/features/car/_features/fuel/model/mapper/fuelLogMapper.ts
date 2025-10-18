@@ -1,43 +1,62 @@
 import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
-import { ExpenseTableRow, FuelLogTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
+import {
+    ExpenseTableRow,
+    FuelLogTableRow,
+    OdometerLogTableRow
+} from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { FuelLog, fuelLogSchema } from "../../schemas/fuelLogSchema.ts";
 import { FuelUnitDao } from "../dao/FuelUnitDao.ts";
-import { CarDao } from "../../../../model/dao/CarDao.ts";
-import { convertOdometerValueFromKilometer } from "../../../odometer/utils/convertOdometerUnit.ts";
+import {
+    convertOdometerValueFromKilometer,
+    convertOdometerValueToKilometer
+} from "../../../odometer/utils/convertOdometerUnit.ts";
 import { FuelLogFields } from "../../schemas/form/fuelLogForm.ts";
-import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { ExpenseTypeEnum } from "../../../../../expense/model/enums/ExpenseTypeEnum.ts";
 import { ExpenseTypeDao } from "../../../../../expense/model/dao/ExpenseTypeDao.ts";
-import { odometerSchema } from "../../../odometer/schemas/odometerSchema.ts";
+import { Odometer } from "../../../odometer/schemas/odometerSchema.ts";
+import { FuelUnit } from "../../schemas/fuelUnitSchema.ts";
+import { OdometerLogDao } from "../../../odometer/model/dao/OdometerLogDao.ts";
+import { OdometerLogTypeEnum } from "../../../odometer/model/enums/odometerLogTypeEnum.ts";
+import { OdometerUnitDao } from "../../../odometer/model/dao/OdometerUnitDao.ts";
 
-export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
+type SelectFuelLogTableRow =
+    FuelLogTableRow
+    & Pick<ExpenseTableRow, "car_id" | "original_amount" | "amount" | "exchange_rate">
+
+export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog, SelectFuelLogTableRow> {
     private readonly fuelUnitDao: FuelUnitDao;
     private readonly expenseTypeDao: ExpenseTypeDao;
-    private readonly carDao: CarDao;
+    private readonly odometerLogDao: OdometerLogDao;
+    private readonly odometerUnitDao: OdometerUnitDao;
 
-    constructor(fuelUnitDao: FuelUnitDao, expenseTypeDao: ExpenseTypeDao, carDao: CarDao) {
+    constructor(
+        fuelUnitDao: FuelUnitDao,
+        expenseTypeDao: ExpenseTypeDao,
+        odometerLogDao: OdometerLogDao,
+        odometerUnitDao: OdometerUnitDao
+    ) {
         super();
         this.fuelUnitDao = fuelUnitDao;
         this.expenseTypeDao = expenseTypeDao;
-        this.carDao = carDao;
+        this.odometerLogDao = odometerLogDao;
+        this.odometerUnitDao = odometerUnitDao;
     }
 
-    async toDto(entity: FuelLogTableRow & Pick<ExpenseTableRow, "car_id" | "original_amount" | "amount">): Promise<FuelLog> {
-        const car = await this.carDao.getById(entity.car_id);
+    async toDto(entity: SelectFuelLogTableRow): Promise<FuelLog> {
+        const [fuelUnit, odometer]: [FuelUnit | null, Odometer | null] = await Promise.all([
+            this.fuelUnitDao.getById(entity.fuel_unit_id),
+            (async () => {
+                if(!entity.odometer_log_id) return null;
+                return this.odometerLogDao.getOdometerByLogId(entity.odometer_log_id, entity.car_id);
+            })()
+        ]);
 
         return fuelLogSchema.parse({
             id: entity.id,
             ownerId: entity.owner_id,
             expenseId: entity.expense_id,
-            fuelUnit: await this.fuelUnitDao.getById(entity.fuel_unit_id),
-            odometer: odometerSchema.parse({
-                valueInKm: entity.odometer_value,
-                value: convertOdometerValueFromKilometer(
-                    entity.odometer_value,
-                    car?.odometer.unit.conversionFactor ?? 1
-                ),
-                unit: car?.odometer.unit
-            }),
+            fuelUnit: fuelUnit,
+            odometer: odometer,
             quantity: entity.quantity,
             originalPricePerUnit: Number((entity.original_amount / entity.quantity).toFixed(2)),
             pricePerUnit: Number((entity.amount / entity.quantity).toFixed(2))
@@ -57,13 +76,14 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
 
     async formResultToEntities(formResult: FuelLogFields): Promise<{
         fuelLog: FuelLogTableRow,
-        expense: ExpenseTableRow
+        expense: ExpenseTableRow,
+        odometerLog: OdometerLogTableRow | null
     }> {
-        const expenseId = getUUID();
+        const odometerUnit = await this.odometerUnitDao.getUnitByCarId(formResult.carId);
         const expenseTypeId = await this.expenseTypeDao.getIdByKey(ExpenseTypeEnum.FUEL);
 
         const expense: ExpenseTableRow = {
-            id: expenseId,
+            id: formResult.expenseId,
             car_id: formResult.carId,
             type_id: expenseTypeId,
             currency_id: formResult.currencyId,
@@ -77,12 +97,22 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
         const fuelLog: FuelLogTableRow = {
             id: formResult.id,
             owner_id: formResult.ownerId,
-            expense_id: expenseId,
+            expense_id: formResult.expenseId,
+            odometer_log_id: !!formResult?.odometerValue ? formResult.odometerLogId : null,
             fuel_unit_id: formResult.fuelUnitId,
-            odometer_value: formResult.odometerValue,
             quantity: formResult.quantity
         };
 
-        return { fuelLog, expense };
+        let odometerLog: OdometerLogTableRow | null = null;
+        if(!!formResult?.odometerValue) {
+            odometerLog = {
+                id: formResult.odometerLogId,
+                car_id: formResult.carId,
+                type_id: OdometerLogTypeEnum.FUEL,
+                value: convertOdometerValueToKilometer(formResult.odometerValue, odometerUnit.conversionFactor)
+            };
+        }
+
+        return { fuelLog, expense, odometerLog: odometerLog };
     }
 }

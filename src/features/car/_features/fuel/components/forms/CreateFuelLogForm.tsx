@@ -8,11 +8,14 @@ import { useForm } from "react-hook-form";
 import { CarCreateToast } from "../../../../presets/toast/index.ts";
 import { useFuelLogFormFields } from "../../hooks/useFuelLogForm.tsx";
 import { FuelLogFields, useCreateFuelLogFormProps } from "../../schemas/form/fuelLogForm.ts";
+import { updateCarOdometer } from "../../../../model/slice/index.ts";
+import { useAppDispatch } from "../../../../../../hooks/index.ts";
 
 export function CreateFuelLogForm() {
+    const dispatch = useAppDispatch();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
-    const { expenseDao } = useDatabase();
+    const { fuelLogDao } = useDatabase();
     const { selectedCar } = useCars();
 
     const form = useForm<FuelLogFields>(useCreateFuelLogFormProps(selectedCar));
@@ -23,8 +26,8 @@ export function CreateFuelLogForm() {
     const submitHandler = handleSubmit(
         async (formResult: FuelLogFields) => {
             try {
-                console.log(formResult);
-                await expenseDao.createFuelLog(formResult, true);
+                const result = await fuelLogDao.create(formResult);
+                if(result?.odometer) dispatch(updateCarOdometer({ odometer: result.odometer }));
 
                 openToast(CarCreateToast.success());
 

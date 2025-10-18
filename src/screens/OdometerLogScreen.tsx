@@ -46,16 +46,14 @@ export function OdometerLogScreen() {
         setCar(getCar(odometerLog.carId));
     }, [odometerLog]);
 
-    const handleDelete = useCallback(async (id: string) => {
+    const handleDelete = useCallback(async (odometerLogId: string, id: string) => {
         try {
             if(!car) throw new Error("Car not found!");
 
-            await odometerLogDao.delete(id);
+            await odometerLogDao.deleteOdometerChangeLog(odometerLogId, id);
             const odometer = await odometerLogDao.getOdometerByCarId(car.id);
 
-            if(odometer?.value) {
-                dispatch(updateCarOdometer({ carId: car.id, value: odometer.value }));
-            }
+            dispatch(updateCarOdometer({ odometer }));
 
             openToast(DeleteOdometerLogToast.success());
 
@@ -69,12 +67,11 @@ export function OdometerLogScreen() {
 
     const onDelete = useCallback(() => {
         if(!odometerLog) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
-
         openModal({
             title: `Kilométeróra-állás napló bejegyzés  törlése`,
             body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
             acceptText: "Törlés",
-            acceptAction: () => handleDelete(odometerLog.id)
+            acceptAction: () => handleDelete(odometerLog.id, odometerLog.relatedId)
         });
     }, [odometerLog, openToast, openModal]);
 

@@ -15,6 +15,7 @@ import { ODOMETER_CHANGE_LOG_TABLE } from "../../../../../../database/connector/
 import { EXPENSE_TABLE } from "../../../../../../database/connector/powersync/tables/expense.ts";
 import { SelectQueryBuilder } from "kysely";
 import { OdometerLogTypeEnum } from "../enums/odometerLogTypeEnum.ts";
+import { getUUID } from "../../../../../../database/utils/uuid.ts";
 
 export type SelectOdometerLogTableRow = OdometerLogTableRow & {
     note: string | null,
@@ -48,7 +49,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         ]);
     }
 
-    async getOdometerByCarId(carId: string): Promise<Odometer | null> {
+    async getOdometerByCarId(carId: string): Promise<Odometer> {
         const result = await this.db
         .selectFrom(ODOMETER_LOG_TABLE)
         .selectAll()
@@ -57,19 +58,29 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         .limit(1)
         .executeTakeFirst();
 
-        return result ? await this.mapper.toOdometerDto(result) : null;
+        const defaultOdometer: OdometerLogTableRow = { // when no odometer found fallback to 0
+            id: getUUID(),
+            car_id: carId,
+            value: 0
+        };
+
+        return await this.mapper.toOdometerDto(result ?? defaultOdometer);
     }
 
-    async getOdometerByLogId(logId: string, safe?: boolean): Promise<Odometer | null> {
+    async getOdometerByLogId(logId: string, fallbackCarId: string): Promise<Odometer> {
         const entity = await this.db
         .selectFrom(ODOMETER_LOG_TABLE)
         .selectAll()
         .where("id", "=", logId)
         .executeTakeFirst();
 
-        if(safe && !entity) throw new Error(`Table item not found by ${ logId } id. [${ ODOMETER_LOG_TABLE }]`);
+        const defaultOdometer: OdometerLogTableRow = { // when no odometer found fallback to 0
+            id: getUUID(),
+            car_id: fallbackCarId,
+            value: 0
+        };
 
-        return entity ? await this.mapper.toOdometerDto(entity) : null;
+        return await this.mapper.toOdometerDto(entity ?? defaultOdometer);
     }
 
     async createOdometerChangeLog(formResult: OdometerChangeLogFormFields): Promise<OdometerLog> {
@@ -108,12 +119,32 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
             .updateTable(ODOMETER_CHANGE_LOG_TABLE)
             .set(odometerChangeLog)
             .where("id", "=", odometerChangeLog.id)
+            .returning("id")
             .executeTakeFirstOrThrow();
 
             return result.id;
         });
 
         return await this.getById(updatedOdometerLogId);
+    }
+
+
+    async deleteOdometerChangeLog(odometerLogId: string, id: string): Promise<string> {
+        return await this.db.transaction().execute(async trx => {
+            const result = await trx
+            .deleteFrom(ODOMETER_LOG_TABLE)
+            .where("id", "=", odometerLogId)
+            .returning("id")
+            .executeTakeFirstOrThrow();
+
+            await trx
+            .deleteFrom(ODOMETER_CHANGE_LOG_TABLE)
+            .where("id", "=", id)
+            .returning("id")
+            .executeTakeFirstOrThrow();
+
+            return result.id;
+        });
     }
 
     paginator(

@@ -5,6 +5,8 @@ import { createCar } from "../actions/createCar.ts";
 import { editCar } from "../actions/editCar.ts";
 import { deleteCar } from "../actions/deleteCar.ts";
 import { selectCar } from "../actions/selectCar.ts";
+import { Car } from "../../schemas/carSchema.ts";
+import { Odometer } from "../../_features/odometer/schemas/odometerSchema.ts";
 
 const initialState: CarsState = {
     loading: true,
@@ -17,12 +19,12 @@ const carsSlice = createSlice({
     name: "cars",
     initialState,
     reducers: {
-        updateCarOdometer: (state, action: PayloadAction<{ carId: string, value: number }>) => {
-            const carIndex = state.cars.findIndex(car => car.id === action.payload.carId);
+        updateCarOdometer: (state, action: PayloadAction<{ odometer: Odometer }>) => {
+            const carIndex = state.cars.findIndex(car => car.id === action.payload.odometer.carId);
             if(carIndex === -1) return;
 
-            const updatedCar = state.cars[carIndex];
-            updatedCar.odometer.value = action.payload.value;
+            const updatedCar: Car = state.cars[carIndex];
+            updatedCar.odometer = action.payload?.odometer;
 
             state.cars[carIndex] = updatedCar;
         }
