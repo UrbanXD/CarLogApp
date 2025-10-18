@@ -24,7 +24,7 @@ export function ExpenseTypeInput({
 
     useEffect(() => {
         (async () => {
-            const expenseTypesDto = await expenseTypeDao.getAll();
+            const expenseTypesDto = await expenseTypeDao.getAllOtherExpenseType();
             setExpenseTypes(expenseTypeDao.mapper.dtoToPicker(expenseTypesDto));
         })();
     }, []);

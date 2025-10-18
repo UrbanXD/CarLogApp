@@ -5,6 +5,9 @@ import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
 import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
 import { ExpenseFields } from "../../schemas/form/expenseForm.ts";
 import { FuelLogDao } from "../../../car/_features/fuel/model/dao/FuelLogDao.ts";
+import { ExpenseType } from "../../schemas/expenseTypeSchema.ts";
+import { Currency } from "../../../_shared/currency/schemas/currencySchema.ts";
+import { ExpenseTypeEnum } from "../enums/ExpenseTypeEnum.ts";
 
 export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
     private readonly expenseTypeDao: ExpenseTypeDao;
@@ -19,17 +22,31 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
     }
 
     async toDto(entity: ExpenseTableRow): Promise<Expense> {
+        const [type, currency]: [ExpenseType | null, Currency | null] = await Promise.all([
+            this.expenseTypeDao.getById(entity.type_id),
+            this.currencyDao.getById(entity.currency_id)
+        ]);
+
+        let fuelLog = null;
+        let serviceLog = null;
+
+        if(type?.key === ExpenseTypeEnum.FUEL) {
+            fuelLog = await this.fuelLogDao.getByExpenseId(entity.id);
+        } else if(type?.key === ExpenseTypeEnum.SERVICE) {
+            serviceLog = null;
+        }
+
         return expenseSchema.parse({
             id: entity.id,
             carId: entity.car_id,
-            type: await this.expenseTypeDao.getById(entity.type_id),
-            currency: await this.currencyDao.getById(entity.currency_id),
+            type: type,
+            currency: currency,
             originalAmount: entity.original_amount,
             exchangeRate: entity.exchange_rate,
             amount: entity.amount,
             note: entity.note,
             date: entity.date,
-            fuelLog: await this.fuelLogDao.getByExpenseId(entity.id, false) ?? null
+            fuelLog: fuelLog
         });
     }
 
