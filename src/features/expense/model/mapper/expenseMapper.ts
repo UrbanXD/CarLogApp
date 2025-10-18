@@ -4,21 +4,17 @@ import { Expense, expenseSchema } from "../../schemas/expenseSchema.ts";
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
 import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
 import { ExpenseFields } from "../../schemas/form/expenseForm.ts";
-import { FuelLogDao } from "../../../car/_features/fuel/model/dao/FuelLogDao.ts";
 import { ExpenseType } from "../../schemas/expenseTypeSchema.ts";
 import { Currency } from "../../../_shared/currency/schemas/currencySchema.ts";
-import { ExpenseTypeEnum } from "../enums/ExpenseTypeEnum.ts";
 
 export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
     private readonly expenseTypeDao: ExpenseTypeDao;
     private readonly currencyDao: CurrencyDao;
-    private readonly fuelLogDao: FuelLogDao;
 
-    constructor(expenseTypeDao: ExpenseTypeDao, currencyDao: CurrencyDao, fuelLogDao: FuelLogDao) {
+    constructor(expenseTypeDao: ExpenseTypeDao, currencyDao: CurrencyDao) {
         super();
         this.expenseTypeDao = expenseTypeDao;
         this.currencyDao = currencyDao;
-        this.fuelLogDao = fuelLogDao;
     }
 
     async toDto(entity: ExpenseTableRow): Promise<Expense> {
@@ -26,15 +22,6 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
             this.expenseTypeDao.getById(entity.type_id),
             this.currencyDao.getById(entity.currency_id)
         ]);
-
-        let fuelLog = null;
-        let serviceLog = null;
-
-        if(type?.key === ExpenseTypeEnum.FUEL) {
-            fuelLog = await this.fuelLogDao.getByExpenseId(entity.id);
-        } else if(type?.key === ExpenseTypeEnum.SERVICE) {
-            serviceLog = null;
-        }
 
         return expenseSchema.parse({
             id: entity.id,
@@ -45,8 +32,7 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense> {
             exchangeRate: entity.exchange_rate,
             amount: entity.amount,
             note: entity.note,
-            date: entity.date,
-            fuelLog: fuelLog
+            date: entity.date
         });
     }
 

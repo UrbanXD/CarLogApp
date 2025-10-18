@@ -106,8 +106,7 @@ export class Database {
         if(!this._expenseDao) this._expenseDao = new ExpenseDao(
             this.db,
             this.expenseTypeDao,
-            this.currencyDao,
-            this.fuelLogDao
+            this.currencyDao
         );
 
         return this._expenseDao;
@@ -135,6 +134,7 @@ export class Database {
         if(!this._fuelLogDao) this._fuelLogDao = new FuelLogDao(
             this.db,
             this.fuelUnitDao,
+            this.expenseDao,
             this.expenseTypeDao,
             this.odometerLogDao,
             this.odometerUnitDao

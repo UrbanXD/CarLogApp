@@ -9,19 +9,17 @@ import { FilterCondition } from "../../../../database/paginator/AbstractPaginato
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
 import { ExpenseFields } from "../../schemas/form/expenseForm.ts";
-import { FuelLogDao } from "../../../car/_features/fuel/model/dao/FuelLogDao.ts";
 
 export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper> {
     constructor(
         db: Kysely<DatabaseType>,
         expenseTypeDao: ExpenseTypeDao,
-        currencyDao: CurrencyDao,
-        fuelLogDao: FuelLogDao
+        currencyDao: CurrencyDao
     ) {
         super(
             db,
             EXPENSE_TABLE,
-            new ExpenseMapper(expenseTypeDao, currencyDao, fuelLogDao)
+            new ExpenseMapper(expenseTypeDao, currencyDao)
         );
     }
 

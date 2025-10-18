@@ -18,6 +18,8 @@ import { FuelUnit } from "../../schemas/fuelUnitSchema.ts";
 import { OdometerLogDao } from "../../../odometer/model/dao/OdometerLogDao.ts";
 import { OdometerLogTypeEnum } from "../../../odometer/model/enums/odometerLogTypeEnum.ts";
 import { OdometerUnitDao } from "../../../odometer/model/dao/OdometerUnitDao.ts";
+import { Expense } from "../../../../../expense/schemas/expenseSchema.ts";
+import { ExpenseDao } from "../../../../../expense/model/dao/ExpenseDao.ts";
 
 type SelectFuelLogTableRow =
     FuelLogTableRow
@@ -25,36 +27,40 @@ type SelectFuelLogTableRow =
 
 export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog, SelectFuelLogTableRow> {
     private readonly fuelUnitDao: FuelUnitDao;
+    private readonly expenseDao: ExpenseDao;
     private readonly expenseTypeDao: ExpenseTypeDao;
     private readonly odometerLogDao: OdometerLogDao;
     private readonly odometerUnitDao: OdometerUnitDao;
 
     constructor(
         fuelUnitDao: FuelUnitDao,
+        expenseDao: ExpenseDao,
         expenseTypeDao: ExpenseTypeDao,
         odometerLogDao: OdometerLogDao,
         odometerUnitDao: OdometerUnitDao
     ) {
         super();
         this.fuelUnitDao = fuelUnitDao;
+        this.expenseDao = expenseDao;
         this.expenseTypeDao = expenseTypeDao;
         this.odometerLogDao = odometerLogDao;
         this.odometerUnitDao = odometerUnitDao;
     }
 
     async toDto(entity: SelectFuelLogTableRow): Promise<FuelLog> {
-        const [fuelUnit, odometer]: [FuelUnit | null, Odometer | null] = await Promise.all([
+        const [fuelUnit, odometer, expense]: [FuelUnit | null, Odometer | null, Expense | null] = await Promise.all([
             this.fuelUnitDao.getById(entity.fuel_unit_id),
             (async () => {
                 if(!entity.odometer_log_id) return null;
                 return this.odometerLogDao.getOdometerByLogId(entity.odometer_log_id, entity.car_id);
-            })()
+            })(),
+            this.expenseDao.getById(entity.expense_id)
         ]);
 
         return fuelLogSchema.parse({
             id: entity.id,
             ownerId: entity.owner_id,
-            expenseId: entity.expense_id,
+            expense: expense,
             fuelUnit: fuelUnit,
             odometer: odometer,
             quantity: entity.quantity,
