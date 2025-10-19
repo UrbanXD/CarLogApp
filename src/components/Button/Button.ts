@@ -2,6 +2,7 @@ import Row from "./ButtonsRow";
 import Text from "./TextButton";
 import Icon from "./IconButton";
 import {
+    DeleteButton as Delete,
     EditDeleteButton as EditDelete,
     GoogleButton as Google,
     InputAddMoreButton as InputAddMore,
@@ -17,6 +18,7 @@ const Button = {
     MultistepFormNext,
     MultistepFormBack,
     EditDelete,
+    Delete,
     InputAddMore
 };
 

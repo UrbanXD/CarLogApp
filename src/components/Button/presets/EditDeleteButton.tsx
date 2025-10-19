@@ -1,14 +1,8 @@
 import { StyleSheet, ViewStyle } from "react-native";
-import {
-    COLORS,
-    DEFAULT_SEPARATOR,
-    FONT_SIZES,
-    ICON_FONT_SIZE_SCALE,
-    ICON_NAMES,
-    SEPARATOR_SIZES
-} from "../../../constants/index.ts";
+import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import Button from "../Button.ts";
 import React from "react";
+import { DeleteButton } from "./DeleteButton.tsx";
 
 type EditDeleteButton = {
     deleteIcon?: string
@@ -33,13 +27,8 @@ export function EditDeleteButton({
         <Button.Row style={ [styles.buttonContainer, buttonContainerStyle] }>
             {
                 onDeletePress &&
-               <Button.Icon
+               <DeleteButton
                   icon={ deleteIcon }
-                  iconSize={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
-                  backgroundColor={ COLORS.googleRed }
-                  iconColor={ COLORS.black }
-                  height={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE + 2 * SEPARATOR_SIZES.lightSmall }
-                  width={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE + 2 * SEPARATOR_SIZES.lightSmall }
                   onPress={ onDeletePress }
                   style={ deleteButtonStyle }
                />

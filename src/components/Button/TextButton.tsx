@@ -51,7 +51,7 @@ const TextButton: React.FC<TextButtonProps> = ({
     loadingIndicator = false,
     onPress
 }) => {
-    const [isLoading, setIsLoading] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(true);
 
     const styles = useButtonStyles(
         !inverse ? backgroundColor : textColor,
@@ -75,14 +75,16 @@ const TextButton: React.FC<TextButtonProps> = ({
         >
             {
                 loadingIndicator && isLoading &&
-               <ActivityIndicator
-                  size={
-                      Platform.OS === "ios"
-                      ? "large"
-                      : styles.buttonContainer.height - SEPARATOR_SIZES.lightSmall
-                  }
-                  color={ !inverse ? textColor : backgroundColor }
-               />
+               <View style={ styles.activityIndicatorContainer }>
+                  <ActivityIndicator
+                     size={
+                         Platform.OS === "ios"
+                         ? "large"
+                         : styles.buttonContainer.height - SEPARATOR_SIZES.lightSmall
+                     }
+                     color={ !inverse ? textColor : backgroundColor }
+                  />
+               </View>
             }
             {
                 text && ((loadingIndicator && !isLoading) || !loadingIndicator) &&
@@ -143,6 +145,11 @@ export const useButtonStyles = (
             color: secondaryColor,
             borderRadius: 30,
             overflow: "hidden"
+        },
+        activityIndicatorContainer: {
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center"
         },
         buttonText: {
             flex: 1,
