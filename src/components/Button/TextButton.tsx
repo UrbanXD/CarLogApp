@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     ActivityIndicator,
     Platform,
@@ -51,7 +51,7 @@ const TextButton: React.FC<TextButtonProps> = ({
     loadingIndicator = false,
     onPress
 }) => {
-    const [isLoading, setIsLoading] = React.useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
     const styles = useButtonStyles(
         !inverse ? backgroundColor : textColor,
@@ -62,10 +62,22 @@ const TextButton: React.FC<TextButtonProps> = ({
     );
 
     const handlePress = async () => {
-        setIsLoading(true);
-        await onPress();
-        setIsLoading(false);
+        let didWaitLongEnough = false;
+
+        // if wait time is 250ms then show loading indicator
+        const timer = setTimeout(() => {
+            didWaitLongEnough = true;
+            setIsLoading(true);
+        }, 250);
+
+        try {
+            await onPress();
+        } finally {
+            clearTimeout(timer);
+            if(didWaitLongEnough) setIsLoading(false);
+        }
     };
+
 
     return (
         <TouchableOpacity
@@ -80,7 +92,7 @@ const TextButton: React.FC<TextButtonProps> = ({
                      size={
                          Platform.OS === "ios"
                          ? "large"
-                         : styles.buttonContainer.height - SEPARATOR_SIZES.lightSmall
+                         : styles.buttonContainer.minHeight - SEPARATOR_SIZES.lightSmall
                      }
                      color={ !inverse ? textColor : backgroundColor }
                   />
@@ -140,7 +152,7 @@ export const useButtonStyles = (
             gap: SEPARATOR_SIZES.lightSmall,
             paddingHorizontal: SEPARATOR_SIZES.small,
             width: width ?? "100%",
-            height: height,
+            minHeight: height,
             backgroundColor: primaryColor,
             color: secondaryColor,
             borderRadius: 30,
@@ -164,7 +176,6 @@ export const useButtonStyles = (
         },
         sideSpacerContainer: {
             flex: 0.15,
-            height: "100%",
             justifyContent: "center",
             alignItems: "center"
         }
