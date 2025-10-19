@@ -75,6 +75,59 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper> {
     }
 
 
+    async update(formResult: FuelLogFields): Promise<FuelLog | null> {
+        const { expense, fuelLog, odometerLog } = await this.mapper.formResultToEntities(formResult);
+
+        const updatedFuelLogId = await this.db.transaction().execute(async trx => {
+            await trx
+            .updateTable(EXPENSE_TABLE)
+            .set(expense)
+            .where("id", "=", expense.id)
+            .returning("id")
+            .executeTakeFirstOrThrow();
+
+            const originalFuelLog = await trx
+            .selectFrom(FUEL_LOG_TABLE)
+            .select("odometer_log_id as odometerLogId")
+            .where("id", "=", fuelLog.id)
+            .executeTakeFirst();
+
+            if(originalFuelLog?.odometerLogId && !odometerLog) {
+                await trx
+                .deleteFrom(ODOMETER_LOG_TABLE)
+                .where("id", "=", originalFuelLog.odometerLogId)
+                .returning("id")
+                .executeTakeFirstOrThrow();
+            } else if(odometerLog) {
+                if(originalFuelLog?.odometerLogId === odometerLog.id) {
+                    await trx
+                    .updateTable(ODOMETER_LOG_TABLE)
+                    .set(odometerLog)
+                    .where("id", "=", odometerLog.id)
+                    .returning("id")
+                    .executeTakeFirstOrThrow();
+                } else {
+                    await trx
+                    .insertInto(ODOMETER_LOG_TABLE)
+                    .values(odometerLog)
+                    .returning("id")
+                    .executeTakeFirstOrThrow();
+                }
+            }
+
+            const result = await trx
+            .updateTable(FUEL_LOG_TABLE)
+            .set(fuelLog)
+            .where("id", "=", fuelLog.id)
+            .returning("id")
+            .executeTakeFirstOrThrow();
+
+            return result.id;
+        });
+
+        return await this.getById(updatedFuelLogId);
+    }
+
     async delete(fuelLog: FuelLog): Promise<string | number> {
         return await this.db.transaction().execute(async trx => {
             const result = await trx

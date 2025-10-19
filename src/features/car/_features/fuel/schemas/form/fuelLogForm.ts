@@ -4,7 +4,7 @@ import { Car } from "../../../../schemas/carSchema.ts";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { CurrencyEnum } from "../../../../../_shared/currency/enums/currencyEnum.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { fuelLogSchema } from "../fuelLogSchema.ts";
+import { FuelLog, fuelLogSchema } from "../fuelLogSchema.ts";
 import { expenseForm } from "../../../../../expense/schemas/form/expenseForm.ts";
 import { odometerLogSchema } from "../../../odometer/schemas/odometerLogSchema.ts";
 
@@ -59,3 +59,23 @@ export function useCreateFuelLogFormProps(car: Car | null) {
 
     return { defaultValues, resolver: zodResolver(fuelLogForm) };
 }
+
+export const useEditFuelLogFormProps = (fuelLog: FuelLog) => {
+    const defaultValues: FuelLogFields = {
+        id: fuelLog.id,
+        expenseId: fuelLog.expense.id,
+        odometerLogId: fuelLog.odometer?.id ?? getUUID(),
+        ownerId: fuelLog.ownerId,
+        carId: fuelLog.expense.carId,
+        fuelUnitId: fuelLog.fuelUnit.id,
+        currencyId: fuelLog.expense.currency.id,
+        amount: fuelLog.expense.amount,
+        exchangeRate: fuelLog.expense.exchangeRate,
+        quantity: fuelLog.quantity,
+        odometerValue: fuelLog.odometer?.value ?? NaN,
+        note: fuelLog.expense.note,
+        date: fuelLog.expense.date
+    };
+
+    return { defaultValues, resolver: zodResolver(fuelLogForm) };
+};

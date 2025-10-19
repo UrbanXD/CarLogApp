@@ -190,6 +190,15 @@ const Layout: React.FC = () => {
                     contentStyle: { backgroundColor: "transparent" }
                 } }
             />
+            <Stack.Screen
+                name="expense/edit/fuel/[id]"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
         </Stack>
     );
 };
