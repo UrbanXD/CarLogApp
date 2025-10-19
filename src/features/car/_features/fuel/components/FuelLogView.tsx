@@ -1,0 +1,165 @@
+import { router, useFocusEffect } from "expo-router";
+import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
+import useCars from "../../../hooks/useCars.ts";
+import { useAlert } from "../../../../../ui/alert/hooks/useAlert.ts";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Car } from "../../../schemas/carSchema.ts";
+import { DeleteExpenseToast } from "../../../../expense/presets/toasts/DeleteExpenseToast.ts";
+import { InfoRowProps } from "../../../../../components/info/InfoRow.tsx";
+import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
+import dayjs from "dayjs";
+import { ScreenScrollView } from "../../../../../components/screenView/ScreenScrollView.tsx";
+import { Title } from "../../../../../components/Title.tsx";
+import { InfoContainer } from "../../../../../components/info/InfoContainer.tsx";
+import Button from "../../../../../components/Button/Button.ts";
+import { FuelLog } from "../schemas/fuelLogSchema.ts";
+import { FuelLogFormFieldsEnum } from "../enums/fuelLogFormFields.tsx";
+
+export type FuelLogViewProps = {
+    id: string
+}
+
+export function FuelLogView({ id }: FuelLogViewProps) {
+    const { fuelLogDao } = useDatabase();
+    const { getCar } = useCars();
+    const { openModal, openToast } = useAlert();
+    const { bottom } = useSafeAreaInsets();
+
+    const [car, setCar] = useState<Car | null>(null);
+    const [fuelLog, setFuelLog] = useState<FuelLog | null>(null);
+
+    useFocusEffect(
+        useCallback(() => {
+            (async () => {
+                setFuelLog(await fuelLogDao.getById(id));
+            })();
+        }, [id, fuelLogDao])
+    );
+
+    useEffect(() => {
+        if(car?.id === fuelLog?.expense.carId || !fuelLog?.expense.carId) return;
+
+        setCar(getCar(fuelLog.expense.carId));
+    }, [fuelLog]);
+
+    const handleDelete = useCallback(async (id: string) => {
+        try {
+            if(!car) throw new Error("Car not found!");
+
+            await fuelLogDao.delete(id);
+
+            openToast(DeleteExpenseToast.success());
+
+            if(router.canGoBack()) return router.back();
+            router.replace("/(main)/expense");
+        } catch(e) {
+            console.log(e);
+            openToast(DeleteExpenseToast.error());
+        }
+    }, [fuelLog, car]);
+
+    const onDelete = useCallback(() => {
+        if(!fuelLog) return openToast({ type: "warning", title: "Kiadás nem található!" });
+
+        openModal({
+            title: `Kiadás napló bejegyzés törlése`,
+            body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
+            acceptText: "Törlés",
+            acceptAction: () => handleDelete(fuelLog.id)
+        });
+    }, [fuelLog, openToast, openModal]);
+
+    const onEdit = useCallback((field?: FuelLogFormFieldsEnum) => {
+        if(!fuelLog) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
+
+        router.push({
+            pathname: "/expense/edit/fuel/[id]",
+            params: { id: fuelLog.id, field: field }
+        });
+    }, [fuelLog, openToast]);
+
+    const getAmountSubtitle = useCallback(() => {
+        let subtitle = `${ fuelLog?.expense.originalAmount } ${ fuelLog?.expense.currency.symbol }`;
+        if(fuelLog?.expense.currency.id === car?.currency.id && fuelLog?.expense.exchangeRate === 1) return subtitle;
+
+        subtitle += ` (${ fuelLog?.expense.amount } ${ car?.currency.symbol })`;
+        return subtitle;
+    }, [fuelLog, car]);
+
+    const getPricePerUnitSubtitle = useCallback(() => {
+        let subtitle = `${ fuelLog?.originalPricePerUnit } ${ fuelLog?.expense.currency.symbol }`;
+        if(fuelLog?.expense.currency.id === car?.currency.id && fuelLog?.expense.exchangeRate === 1) return subtitle;
+
+        subtitle += ` (${ fuelLog?.pricePerUnit } ${ car?.currency.symbol })`;
+        return subtitle;
+    }, [fuelLog, car]);
+
+    const infos: Array<InfoRowProps> = useMemo(() => ([
+        {
+            icon: ICON_NAMES.car,
+            title: car?.name,
+            subtitle: `${ car?.model.make.name } ${ car?.model.name }`,
+            onPress: () => onEdit(FuelLogFormFieldsEnum.Car)
+        },
+        {
+            icon: ICON_NAMES.fuelPump,
+            title: "Tankolás",
+            subtitle: `${ fuelLog?.quantity } ${ fuelLog?.fuelUnit.short }`,
+            onPress: () => onEdit(FuelLogFormFieldsEnum.Quantity)
+        },
+        {
+            icon: ICON_NAMES.money,
+            title: `Egyságár - ${ fuelLog?.fuelUnit.short }/${ fuelLog?.expense.currency.symbol }`,
+            subtitle: getPricePerUnitSubtitle(),
+            onPress: () => onEdit(FuelLogFormFieldsEnum.Amount)
+        },
+        {
+            icon: ICON_NAMES.money,
+            title: "Ár",
+            subtitle: getAmountSubtitle(),
+            onPress: () => onEdit(FuelLogFormFieldsEnum.Amount)
+        },
+        {
+            icon: ICON_NAMES.calendar,
+            title: "Dátum",
+            subtitle: dayjs(fuelLog?.expense?.date).format("YYYY. MM DD. HH:mm"),
+            onPress: () => onEdit(FuelLogFormFieldsEnum.Date)
+        },
+        {
+            icon: ICON_NAMES.odometer,
+            title: "Kilométeróra-állás",
+            subtitle: fuelLog?.odometer
+                      ? `${ fuelLog?.odometer?.value } ${ fuelLog.odometer.unit.short }`
+                      : "Nincs hozzárendelt kilométeróra-állás",
+            subtitleStyle: !fuelLog?.odometer && { color: COLORS.gray2 },
+            onPress: () => onEdit(FuelLogFormFieldsEnum.OdometerValue)
+        },
+        {
+            icon: ICON_NAMES.note,
+            subtitle: fuelLog?.expense?.note ?? "Nincs megjegyzés",
+            subtitleStyle: !fuelLog?.expense?.note && { color: COLORS.gray2 },
+            onPress: () => onEdit(FuelLogFormFieldsEnum.Note)
+        }
+    ]), [car, fuelLog, getAmountSubtitle, getPricePerUnitSubtitle]);
+
+    return (
+        <>
+            <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
+                <Title
+                    title={ fuelLog?.expense.type?.locale }
+                    dividerStyle={ {
+                        backgroundColor: fuelLog?.expense.type?.primaryColor ?? COLORS.gray2,
+                        marginBottom: SEPARATOR_SIZES.normal
+                    } }
+                />
+                <InfoContainer data={ infos }/>
+            </ScreenScrollView>
+            <Button.EditDelete
+                buttonContainerStyle={ { paddingBottom: bottom + SEPARATOR_SIZES.lightSmall } }
+                onDeletePress={ onDelete }
+                onEditPress={ onEdit }
+            />
+        </>
+    );
+}

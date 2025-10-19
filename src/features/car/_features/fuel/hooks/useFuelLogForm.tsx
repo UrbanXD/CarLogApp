@@ -9,7 +9,7 @@ import { AmountInput } from "../../../../_shared/currency/components/AmountInput
 import Input from "../../../../../components/Input/Input.ts";
 import InputDatePicker from "../../../../../components/Input/datePicker/InputDatePicker.tsx";
 import { NoteInput } from "../../../../../components/Input/_presets/NoteInput.tsx";
-import { FuelLogFormFields } from "../enums/fuelLogFormFields.tsx";
+import { FuelLogFormFieldsEnum } from "../enums/fuelLogFormFields.tsx";
 import { FuelLogFields } from "../schemas/form/fuelLogForm.ts";
 import { OdometerValueInput } from "../../odometer/components/forms/inputFields/OdometerValueInput.tsx";
 import { FuelInput } from "../components/forms/inputFields/FuelInput.tsx";
@@ -33,12 +33,12 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
         clearErrors();
     }, [formCarId]);
 
-    const fields: Record<FuelLogFormFields, FormFields> = useMemo(() => ({
-        [FuelLogFormFields.Car]: {
+    const fields: Record<FuelLogFormFieldsEnum, FormFields> = useMemo(() => ({
+        [FuelLogFormFieldsEnum.Car]: {
             render: () => <CarPickerInput control={ control } fieldName="carId"/>,
             editToastMessages: CarEditNameToast
         },
-        [FuelLogFormFields.Quantity]: {
+        [FuelLogFormFieldsEnum.Quantity]: {
             render: () => <FuelInput
                 control={ control }
                 setValue={ setValue }
@@ -49,7 +49,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             />,
             editToastMessages: CarEditNameToast
         },
-        [FuelLogFormFields.Amount]: {
+        [FuelLogFormFieldsEnum.Amount]: {
             render: () => <AmountInput
                 control={ control }
                 setValue={ setValue }
@@ -61,7 +61,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             />,
             editToastMessages: CarEditNameToast
         },
-        [FuelLogFormFields.Date]: {
+        [FuelLogFormFieldsEnum.Date]: {
             render: () => (
                 <Input.Field
                     control={ control }
@@ -73,7 +73,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             ),
             editToastMessages: CarEditNameToast
         },
-        [FuelLogFormFields.OdometerValue]: {
+        [FuelLogFormFieldsEnum.OdometerValue]: {
             render: () => <OdometerValueInput
                 control={ control }
                 fieldName="odometerValue"
@@ -83,7 +83,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             />,
             editToastMessages: CarEditNameToast
         },
-        [FuelLogFormFields.Note]: {
+        [FuelLogFormFieldsEnum.Note]: {
             render: () => <NoteInput
                 control={ control }
                 setValue={ setValue }
@@ -99,10 +99,10 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             fields: ["carId", "date", "odometerValue", "note"],
             render: () => (
                 <Input.Group>
-                    { fields[FuelLogFormFields.Car].render() }
-                    { fields[FuelLogFormFields.Date].render() }
-                    { fields[FuelLogFormFields.OdometerValue].render() }
-                    { fields[FuelLogFormFields.Note].render() }
+                    { fields[FuelLogFormFieldsEnum.Car].render() }
+                    { fields[FuelLogFormFieldsEnum.Date].render() }
+                    { fields[FuelLogFormFieldsEnum.OdometerValue].render() }
+                    { fields[FuelLogFormFieldsEnum.Note].render() }
                 </Input.Group>
             )
         },
@@ -111,8 +111,8 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             fields: ["quantity", "amount", "exchangeRate", "currencyId"],
             render: () => (
                 <Input.Group>
-                    { fields[FuelLogFormFields.Quantity].render() }
-                    { fields[FuelLogFormFields.Amount].render() }
+                    { fields[FuelLogFormFieldsEnum.Quantity].render() }
+                    { fields[FuelLogFormFieldsEnum.Amount].render() }
                 </Input.Group>
             )
         }

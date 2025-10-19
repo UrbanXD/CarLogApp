@@ -158,6 +158,12 @@ const Layout: React.FC = () => {
                 } }
             />
             <Stack.Screen
+                name="expense/fuel/[id]"
+                options={ ({ route }) => ({
+                    header: () => <Header.Secondary title={ route.params?.title ?? "Napló bejegyzés" }/>
+                }) }
+            />
+            <Stack.Screen
                 name="expense/create/index"
                 options={ {
                     header: () => <></>,

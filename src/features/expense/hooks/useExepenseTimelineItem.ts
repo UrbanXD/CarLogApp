@@ -5,15 +5,31 @@ import { Expense } from "../schemas/expenseSchema.ts";
 import utc from "dayjs/plugin/utc";
 import { router } from "expo-router";
 import { Currency } from "../../_shared/currency/schemas/currencySchema.ts";
+import { ExpenseTypeEnum } from "../model/enums/ExpenseTypeEnum.ts";
 
 dayjs.extend(utc);
 
 export function useExpenseTimelineItem(currency: Currency) {
     const mapper = useCallback((expense: Expense): TimelineItemType => {
-        const onPress = () => router.push({
-            pathname: "/expense/[id]",
-            params: { id: expense.id }
-        });
+        const routerPathTitle = "Kiadás";
+        let routerPathName = "/expense/[id]";
+        let itemId = expense.id;
+
+        switch(expense.type.key) {
+            case ExpenseTypeEnum.FUEL:
+                routerPathName = "/expense/fuel/[id]";
+                itemId = expense?.relatedId;
+                break;
+        }
+
+        const onPress = () => {
+            if(!itemId) return;
+
+            router.push({
+                pathname: routerPathName,
+                params: { id: itemId, title: routerPathTitle }
+            });
+        };
 
         let footer = `${ expense.originalAmount } ${ expense.currency.symbol }`;
         if(expense.currency.id !== currency.id) footer += ` (${ expense.amount } ${ currency.symbol })`;
@@ -32,4 +48,4 @@ export function useExpenseTimelineItem(currency: Currency) {
     }, [currency]);
 
     return { mapper };
-};
+}

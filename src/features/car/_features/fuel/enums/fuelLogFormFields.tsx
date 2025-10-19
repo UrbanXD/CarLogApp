@@ -1,4 +1,4 @@
-export enum FuelLogFormFields {
+export enum FuelLogFormFieldsEnum {
     Car,
     Quantity,
     Amount,
