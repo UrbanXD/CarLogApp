@@ -101,18 +101,6 @@ export function ExpenseScreen() {
             subtitle: `${ car?.model.make.name } ${ car?.model.name }`,
             onPress: () => onEdit(ExpenseFormFields.Car)
         },
-        ...(expense?.fuelLog ? [
-            {
-                icon: ICON_NAMES.fuelPump,
-                title: "Tankolás",
-                subtitle: `${ expense.fuelLog.quantity } ${ expense.fuelLog.fuelUnit.short }`
-            },
-            {
-                icon: ICON_NAMES.money,
-                title: `Egyságár - ${ expense.fuelLog.fuelUnit.short }/${ expense.currency.symbol }`,
-                subtitle: getPricePerUnitSubtitle()
-            }
-        ] : []),
         {
             icon: ICON_NAMES.money,
             title: "Ár",
@@ -125,13 +113,6 @@ export function ExpenseScreen() {
             subtitle: dayjs(expense?.date).format("YYYY. MM DD. HH:mm"),
             onPress: () => onEdit(ExpenseFormFields.Date)
         },
-        ...(expense?.fuelLog ? [
-            {
-                icon: ICON_NAMES.odometer,
-                title: "Kilométeróra-állás",
-                subtitle: `${ expense.fuelLog.odometer.value } ${ expense.fuelLog.odometer.unit.short }`
-            }
-        ] : []),
         {
             icon: ICON_NAMES.note,
             subtitle: expense?.note ?? "Nincs megjegyzés",
