@@ -73,4 +73,31 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper> {
 
         return await this.getById(insertedFuelLogId);
     }
+
+
+    async delete(fuelLog: FuelLog): Promise<string | number> {
+        return await this.db.transaction().execute(async trx => {
+            const result = await trx
+            .deleteFrom(FUEL_LOG_TABLE)
+            .where("id", "=", fuelLog.id)
+            .returning("id")
+            .executeTakeFirstOrThrow();
+
+            await trx
+            .deleteFrom(EXPENSE_TABLE)
+            .where("id", "=", fuelLog.expense.id)
+            .returning("id")
+            .executeTakeFirstOrThrow();
+
+            if(!!fuelLog.odometer) {
+                await trx
+                .deleteFrom(ODOMETER_LOG_TABLE)
+                .where("id", "=", fuelLog.odometer.id)
+                .returning("id")
+                .executeTakeFirstOrThrow();
+            }
+
+            return result.id;
+        });
+    }
 }

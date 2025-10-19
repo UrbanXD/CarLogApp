@@ -43,11 +43,11 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         setCar(getCar(fuelLog.expense.carId));
     }, [fuelLog]);
 
-    const handleDelete = useCallback(async (id: string) => {
+    const handleDelete = useCallback(async (fuelLog: FuelLog) => {
         try {
             if(!car) throw new Error("Car not found!");
 
-            await fuelLogDao.delete(id);
+            await fuelLogDao.delete(fuelLog);
 
             openToast(DeleteExpenseToast.success());
 
@@ -66,7 +66,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
             title: `Kiadás napló bejegyzés törlése`,
             body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
             acceptText: "Törlés",
-            acceptAction: () => handleDelete(fuelLog.id)
+            acceptAction: () => handleDelete(fuelLog)
         });
     }, [fuelLog, openToast, openModal]);
 
