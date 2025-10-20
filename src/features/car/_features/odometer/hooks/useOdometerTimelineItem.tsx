@@ -5,13 +5,29 @@ import { OdometerText } from "../components/OdometerText.tsx";
 import dayjs from "dayjs";
 import { router } from "expo-router";
 import { OdometerLog } from "../schemas/odometerLogSchema.ts";
+import { OdometerLogTypeEnum } from "../model/enums/odometerLogTypeEnum.ts";
 
 export const useOdometerTimelineItem = () => {
     const mapper = useCallback((odometerLog: OdometerLog): TimelineItemType => {
-        let onPress = () => router.push({
-            pathname: "/odometer/log/[id]",
-            params: { id: odometerLog.id }
-        });
+        const routerPathTitle = "Napló bejegyzés";
+        let routerPathName = "/odometer/log/[id]";
+        let itemId = odometerLog.id;
+
+        switch(odometerLog.type.id) {
+            case OdometerLogTypeEnum.FUEL:
+                routerPathName = "/expense/fuel/[id]";
+                itemId = odometerLog.relatedId;
+                break;
+        }
+
+        const onPress = () => {
+            if(!itemId) return;
+
+            router.push({
+                pathname: routerPathName,
+                params: { id: itemId, title: routerPathTitle }
+            });
+        };
 
         return {
             id: odometerLog.id,
