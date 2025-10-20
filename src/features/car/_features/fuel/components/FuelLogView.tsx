@@ -86,10 +86,10 @@ export function FuelLogView({ id }: FuelLogViewProps) {
     }, [fuelLog, car]);
 
     const getPricePerUnitSubtitle = useCallback(() => {
-        let subtitle = `${ fuelLog?.originalPricePerUnit } ${ fuelLog?.expense.currency.symbol }`;
+        let subtitle = `${ fuelLog?.originalPricePerUnit } ${ fuelLog?.expense.currency.symbol }/${ fuelLog?.fuelUnit.short }`;
         if(fuelLog?.expense.currency.id === car?.currency.id && fuelLog?.expense.exchangeRate === 1) return subtitle;
 
-        subtitle += ` (${ fuelLog?.pricePerUnit } ${ car?.currency.symbol })`;
+        subtitle += ` (${ fuelLog?.pricePerUnit } ${ car?.currency.symbol }//${ fuelLog?.fuelUnit.short })`;
         return subtitle;
     }, [fuelLog, car]);
 
@@ -108,15 +108,13 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         },
         {
             icon: ICON_NAMES.money,
-            title: `Egyságár - ${ fuelLog?.fuelUnit.short }/${ fuelLog?.expense.currency.symbol }`,
-            subtitle: getPricePerUnitSubtitle(),
-            onPress: () => onEdit(FuelLogFormFieldsEnum.Amount)
-        },
-        {
-            icon: ICON_NAMES.money,
             title: "Ár",
             subtitle: getAmountSubtitle(),
-            onPress: () => onEdit(FuelLogFormFieldsEnum.Amount)
+            onPress: () => onEdit(FuelLogFormFieldsEnum.Amount),
+            secondaryInfo: {
+                title: "Egységár",
+                subtitle: getPricePerUnitSubtitle()
+            }
         },
         {
             icon: ICON_NAMES.calendar,

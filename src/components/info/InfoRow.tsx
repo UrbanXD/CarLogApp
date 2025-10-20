@@ -1,33 +1,29 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
-import Icon from "../Icon.tsx";
-import { IntelligentMarquee } from "../marquee/IntelligentMarquee.tsx";
+import { Pressable, StyleSheet, TextStyle, View, ViewStyle } from "react-native";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../constants/index.ts";
+import { InfoText, InfoTextProps } from "./InfoText.tsx";
 
-export type InfoRowProps = {
+type InfoRowItem = {
     icon?: string
     title?: string
     subtitle?: string
     marquee?: boolean
-    onPress?: () => void
-    containerStyle?: ViewStyle
-    iconStyle?: ViewStyle
     textContainerStyle?: ViewStyle
     titleStyle?: TextStyle
     subtitleStyle?: TextStyle
 }
 
+export type InfoRowProps = InfoTextProps & {
+    onPress?: () => void
+    containerStyle?: ViewStyle
+    secondaryInfo?: InfoTextProps
+}
+
 export function InfoRow({
-    icon,
-    title,
-    subtitle,
-    marquee,
     onPress,
+    secondaryInfo,
     containerStyle,
-    iconStyle,
-    textContainerStyle,
-    titleStyle,
-    subtitleStyle
+    ...infoTextProps
 }: InfoRowProps) {
     return (
         <Pressable
@@ -35,66 +31,36 @@ export function InfoRow({
             disabled={ !onPress }
             style={ [styles.container, containerStyle] }
         >
-            {
-                icon &&
-               <Icon
-                  icon={ icon }
-                  size={ FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE }
-                  color={ COLORS.white }
-                  style={ iconStyle }
-               />
-            }
-            <View style={ [styles.textContainer, textContainerStyle] }>
-                {
-                    title && (
-                        marquee
-                        ?
-                        <IntelligentMarquee
-                            speed={ 0.65 }
-                            delay={ 800 }
-                            bounceDelay={ 800 }
-                            spacing={ SEPARATOR_SIZES.lightSmall }
-                        >
-                            <Text style={ [styles.textContainer.title, titleStyle] } numberOfLines={ 1 }>
-                                { title }
-                            </Text>
-                        </IntelligentMarquee>
-                        :
-                        <Text style={ [styles.textContainer.title, titleStyle] }>
-                            { title }
-                        </Text>
-                    )
-                }
-                {
-                    subtitle && (
-                        marquee
-                        ?
-                        <IntelligentMarquee
-                            speed={ 0.65 }
-                            delay={ 800 }
-                            bounceDelay={ 800 }
-                            spacing={ SEPARATOR_SIZES.lightSmall }
-                        >
-                            <Text style={ [styles.textContainer.subtitle, subtitleStyle] } numberOfLines={ 1 }>
-                                { subtitle }
-                            </Text>
-                        </IntelligentMarquee>
-                        :
-                        <Text style={ [styles.textContainer.subtitle, subtitleStyle] }>
-                            { subtitle }
-                        </Text>
-                    )
-                }
+            <View style={ styles.contentContainer }>
+                <InfoText { ...infoTextProps } />
             </View>
+            {
+                secondaryInfo &&
+               <View style={ [styles.contentContainer, styles.contentContainer.secondary] }>
+                  <InfoText
+                     subtitleStyle={ { textAlign: "right" } }
+                     titleStyle={ { textAlign: "right" } }
+                     { ...secondaryInfo }
+                  />
+               </View>
+            }
         </Pressable>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
+        justifyContent: "space-between"
+    },
+    contentContainer: {
+        flex: 1,
         flexDirection: "row",
         alignItems: "center",
-        gap: SEPARATOR_SIZES.lightSmall
+        gap: SEPARATOR_SIZES.lightSmall,
+
+        secondary: {
+            flexDirection: "row-reverse"
+        }
     },
     textContainer: {
         flex: 1,
