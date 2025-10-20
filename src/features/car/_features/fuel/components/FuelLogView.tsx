@@ -2,7 +2,6 @@ import { router, useFocusEffect } from "expo-router";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import useCars from "../../../hooks/useCars.ts";
 import { useAlert } from "../../../../../ui/alert/hooks/useAlert.ts";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Car } from "../../../schemas/carSchema.ts";
 import { DeleteExpenseToast } from "../../../../expense/presets/toasts/DeleteExpenseToast.ts";
@@ -12,9 +11,9 @@ import dayjs from "dayjs";
 import { ScreenScrollView } from "../../../../../components/screenView/ScreenScrollView.tsx";
 import { Title } from "../../../../../components/Title.tsx";
 import { InfoContainer } from "../../../../../components/info/InfoContainer.tsx";
-import Button from "../../../../../components/Button/Button.ts";
 import { FuelLog } from "../schemas/fuelLogSchema.ts";
 import { FuelLogFormFieldsEnum } from "../enums/fuelLogFormFields.tsx";
+import { FloatingDeleteButton } from "../../../../../components/Button/presets/FloatingDeleteButton.tsx";
 
 export type FuelLogViewProps = {
     id: string
@@ -24,7 +23,6 @@ export function FuelLogView({ id }: FuelLogViewProps) {
     const { fuelLogDao } = useDatabase();
     const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
-    const { bottom } = useSafeAreaInsets();
 
     const [car, setCar] = useState<Car | null>(null);
     const [fuelLog, setFuelLog] = useState<FuelLog | null>(null);
@@ -131,7 +129,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
             title: "Kilométeróra-állás",
             subtitle: fuelLog?.odometer
                       ? `${ fuelLog?.odometer?.value } ${ fuelLog.odometer.unit.short }`
-                      : "Nincs hozzárendelt kilométeróra-állás",
+                      : "Nincs hozzárendelve",
             subtitleStyle: !fuelLog?.odometer && { color: COLORS.gray2 },
             onPress: () => onEdit(FuelLogFormFieldsEnum.OdometerValue)
         },
@@ -155,11 +153,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
                 />
                 <InfoContainer data={ infos }/>
             </ScreenScrollView>
-            <Button.EditDelete
-                buttonContainerStyle={ { paddingBottom: bottom + SEPARATOR_SIZES.lightSmall } }
-                onDeletePress={ onDelete }
-                onEditPress={ onEdit }
-            />
+            <FloatingDeleteButton onPress={ onDelete }/>
         </>
     );
 }

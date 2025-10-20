@@ -23,7 +23,7 @@ export function FormButtons({ submit, reset, submitText = "Mentés" }: FormButto
             <Button.Text
                 text={ submitText }
                 onPress={ submit }
-                style={ { flex: 0.8 } }
+                style={ { flex: reset ? 1 : 0.8 } }
                 loadingIndicator
             />
         </Button.Row>

@@ -5,9 +5,7 @@ import { Car } from "../features/car/schemas/carSchema.ts";
 import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
 import { InfoRowProps } from "../components/InfoRow.tsx";
 import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAlert } from "../ui/alert/hooks/useAlert.ts";
-import Button from "../components/Button/Button.ts";
 import { DeleteOdometerLogToast } from "../features/car/_features/odometer/presets/toast/DeleteOdometerLogToast.ts";
 import { OdometerLog } from "../features/car/_features/odometer/schemas/odometerLogSchema.ts";
 import dayjs from "dayjs";
@@ -17,14 +15,14 @@ import { useAppDispatch } from "../hooks/index.ts";
 import useCars from "../features/car/hooks/useCars.ts";
 import { InfoContainer } from "../components/info/InfoContainer.tsx";
 import { OdometerLogFormFields } from "../features/car/_features/odometer/enums/odometerLogFormFields.ts";
+import { FloatingDeleteButton } from "../components/Button/presets/FloatingDeleteButton.tsx";
 
 export function OdometerLogScreen() {
     const dispatch = useAppDispatch();
     const { id } = useLocalSearchParams();
     const { getCar } = useCars();
-    const { odometerLogDao, carDao } = useDatabase();
+    const { odometerLogDao } = useDatabase();
     const { openModal, openToast } = useAlert();
-    const { bottom } = useSafeAreaInsets();
 
     const [car, setCar] = useState<Car | null>(null);
     const [odometerLog, setOdometerLog] = useState<OdometerLog | null>(null);
@@ -123,11 +121,7 @@ export function OdometerLogScreen() {
                 />
                 <InfoContainer data={ infos }/>
             </ScreenScrollView>
-            <Button.EditDelete
-                buttonContainerStyle={ { paddingBottom: bottom + SEPARATOR_SIZES.lightSmall } }
-                onDeletePress={ onDelete }
-                onEditPress={ onEdit }
-            />
+            <FloatingDeleteButton onPress={ onDelete }/>
         </>
     );
 }

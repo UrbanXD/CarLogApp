@@ -8,20 +8,18 @@ import { Expense } from "../../features/expense/schemas/expenseSchema.ts";
 import { Car } from "../../features/car/schemas/carSchema.ts";
 import useCars from "../../features/car/hooks/useCars.ts";
 import dayjs from "dayjs";
-import Button from "../../components/Button/Button.ts";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { DeleteExpenseToast } from "../../features/expense/presets/toasts/DeleteExpenseToast.ts";
 import { InfoContainer } from "../../components/info/InfoContainer.tsx";
 import { ExpenseFormFields } from "../../features/expense/enums/expenseFormFields.ts";
 import { InfoRowProps } from "../../components/info/InfoRow.tsx";
+import { FloatingDeleteButton } from "../../components/Button/presets/FloatingDeleteButton.tsx";
 
 export function ExpenseScreen() {
     const { id } = useLocalSearchParams();
     const { expenseDao } = useDatabase();
     const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
-    const { bottom } = useSafeAreaInsets();
 
     const [car, setCar] = useState<Car | null>(null);
     const [expense, setExpense] = useState<Expense | null>(null);
@@ -133,11 +131,7 @@ export function ExpenseScreen() {
                 />
                 <InfoContainer data={ infos }/>
             </ScreenScrollView>
-            <Button.EditDelete
-                buttonContainerStyle={ { paddingBottom: bottom + SEPARATOR_SIZES.lightSmall } }
-                onDeletePress={ onDelete }
-                onEditPress={ onEdit }
-            />
+            <FloatingDeleteButton onPress={ onDelete }/>
         </>
     );
 }

@@ -3,7 +3,7 @@ import Button from "../Button.ts";
 import React from "react";
 import { ViewStyle } from "react-native";
 
-type DeleteButtonProps = {
+export type DeleteButtonProps = {
     icon?: string
     onPress: () => void
     style?: ViewStyle
