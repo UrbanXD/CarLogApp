@@ -72,7 +72,7 @@ type SliderStyle = {
 
 const Slider: React.FC<SliderProps> = ({
     minValue = 0,
-    maxValue,
+    maxValue = Number.MAX_SAFE_INTEGER,
     value = minValue,
     setValue,
     unit,
@@ -113,38 +113,38 @@ const Slider: React.FC<SliderProps> = ({
     const [tooltipLayout, setTooltipLayout] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
 
     const inputFieldContext = useInputFieldContext();
-
-    const rawValue = inputFieldContext?.field?.value;
-    const numericValue = rawValue === "" || rawValue == null ? NaN : Number(rawValue);
-    const fieldValue = (isNaN(numericValue))
-                       ? minValue
-                       : Math.min(maxValue, Math.max(minValue, numericValue));
-
     const onChange = inputFieldContext?.field?.onChange;
     const error = inputFieldContext?.fieldState?.error;
 
     const trackWidth = useSharedValue(0);
     const thumbOffset = useSharedValue(0);
     const percent = useSharedValue(0);
-    const inputValue = useSharedValue(fieldValue.toString());
+    const inputValue = useSharedValue(value ? value.toString() : minValue.toString());
     const bounds = useSharedValue({ min: minValue, max: maxValue });
     const [trackLayoutReady, setTrackLayoutReady] = useState(false);
 
-    const [currentValue, setCurrentValue] = useState(fieldValue ?? value);
+    const [currentValue, setCurrentValue] = useState(value ?? 0);
 
     useEffect(() => {
         if(isNaN(value)) return;
-        setCurrentValue(Math.min(maxValue, Math.max(minValue, Number(value))));
+        setCurrentValue(Math.min(maxValue, Math.max(minValue, Number(value))).toString());
     }, [value]);
 
     useEffect(() => {
-        if(isNaN(fieldValue)) return;
-        setCurrentValue(Math.min(maxValue, Math.max(minValue, fieldValue)));
-    }, [fieldValue]);
+        const rawValue = inputFieldContext?.field?.value;
+        const numericValue = (rawValue === "" || rawValue == null) ? NaN : Number(rawValue);
+        const fieldValue = (isNaN(numericValue)) ? minValue : Math.min(maxValue, Math.max(minValue, numericValue));
+
+        setCurrentValue(fieldValue);
+    }, [inputFieldContext?.field?.value]);
+
 
     useEffect(() => {
-        if(setValue && currentValue !== fieldValue) setValue(currentValue);
-        if(onChange && currentValue !== fieldValue) onChange(currentValue);
+        if(!trackLayoutReady) return;
+
+        const fieldValueNumber = Number(inputFieldContext?.field?.value ?? 0);
+        if(setValue && currentValue !== fieldValueNumber) setValue(currentValue);
+        if(onChange && currentValue !== fieldValueNumber) onChange(currentValue);
 
         percent.value = Math.max(
             0,
@@ -152,14 +152,7 @@ const Slider: React.FC<SliderProps> = ({
         );
         inputValue.value = currentValue.toString();
         scheduleOnUI(calculateThumbOffsetByPercent);
-    }, [currentValue]);
-
-    useEffect(() => {
-        if(!trackLayoutReady) return;
-
-        if(isNaN(fieldValue)) return;
-        setCurrentValue(Math.min(maxValue, Math.max(minValue, fieldValue)));
-    }, [trackLayoutReady]);
+    }, [currentValue, trackLayoutReady]);
 
     useEffect(() => {
         const subscription = Keyboard.addListener("keyboardDidHide", () => {
@@ -328,7 +321,7 @@ const Slider: React.FC<SliderProps> = ({
         let number = numericText.length === 0 ? minValue : Number(numericText);
 
         const clamped = Math.min(maxValue, Math.max(number, minValue));
-        inputValue.value = clamped.toString() + " ";
+        inputValue.value = clamped.toString() + " "; // empty string add to prevent not updating text
         scheduleOnRN(setTimeout, () => {
             let clampedText = clamped.toString();
             if(maxValue !== clamped && numericText.endsWith(".")) clampedText += ".";
