@@ -12,7 +12,8 @@ export const fuelLogSchema = z
     odometer: odometerSchema.nullable(),
     quantity: z.number().min(0),
     originalPricePerUnit: z.number().min(0),
-    pricePerUnit: z.number().min(0)
+    pricePerUnit: z.number().min(0),
+    isPricePerUnit: z.boolean().default(false)
 });
 
 export type FuelLog = z.infer<typeof fuelLogSchema>;

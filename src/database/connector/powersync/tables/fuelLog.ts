@@ -8,5 +8,6 @@ export const fuelLogTable = new Table({
     expense_id: column.text,
     odometer_log_id: column.text,
     fuel_unit_id: column.text,
-    quantity: column.real
+    quantity: column.real,
+    is_price_per_unit: column.integer
 });

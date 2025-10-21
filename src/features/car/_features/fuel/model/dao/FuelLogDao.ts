@@ -11,7 +11,6 @@ import { OdometerLogDao } from "../../../odometer/model/dao/OdometerLogDao.ts";
 import { FuelLogFields } from "../../schemas/form/fuelLogForm.ts";
 import { ODOMETER_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/odometerLog.ts";
 import { OdometerUnitDao } from "../../../odometer/model/dao/OdometerUnitDao.ts";
-import { SelectQueryBuilder } from "kysely";
 import { ExpenseDao } from "../../../../../expense/model/dao/ExpenseDao.ts";
 
 export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper> {
@@ -28,20 +27,6 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper> {
             FUEL_LOG_TABLE,
             new FuelLogMapper(fuelUnitDao, expenseDao, expenseTypeDao, odometerLogDao, odometerUnitDao)
         );
-    }
-
-
-    selectQuery(): SelectQueryBuilder<DatabaseType, FuelLogTableRow> {
-        return this.db
-        .selectFrom(FUEL_LOG_TABLE)
-        .innerJoin(EXPENSE_TABLE, `${ EXPENSE_TABLE }.id`, `${ FUEL_LOG_TABLE }.expense_id`)
-        .selectAll(FUEL_LOG_TABLE)
-        .select([
-            `${ EXPENSE_TABLE }.car_id as car_id`,
-            `${ EXPENSE_TABLE }.amount as amount`,
-            `${ EXPENSE_TABLE }.original_amount as original_amount`,
-            `${ EXPENSE_TABLE }.exchange_rate as exchange_rate`
-        ]);
     }
 
     async create(formResult: FuelLogFields): Promise<FuelLog | null> {

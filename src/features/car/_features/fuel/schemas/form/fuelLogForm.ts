@@ -10,7 +10,7 @@ import { odometerLogSchema } from "../../../odometer/schemas/odometerLogSchema.t
 
 const fuelLogForm = expenseForm
 .pick({ carId: true, currencyId: true, amount: true, exchangeRate: true, date: true, note: true })
-.extend({ expenseId: expenseForm.shape.id })
+.extend({ expenseId: expenseForm.shape.id, isPricePerUnit: z.boolean().default(false) })
 .merge(
     fuelLogSchema.pick({ id: true, ownerId: true }).extend({
         quantity: zNumber({
@@ -50,6 +50,7 @@ export function useCreateFuelLogFormProps(car: Car | null) {
         fuelUnitId: car?.fuelTank.unit.id,
         currencyId: car?.currency.id ?? CurrencyEnum.EUR,
         amount: NaN,
+        isPricePerUnit: false,
         exchangeRate: 1,
         quantity: 0,
         odometerValue: NaN,
@@ -69,7 +70,8 @@ export const useEditFuelLogFormProps = (fuelLog: FuelLog) => {
         carId: fuelLog.expense.carId,
         fuelUnitId: fuelLog.fuelUnit.id,
         currencyId: fuelLog.expense.currency.id,
-        amount: fuelLog.expense.amount,
+        amount: fuelLog.isPricePerUnit ? fuelLog.originalPricePerUnit : fuelLog.expense.originalAmount,
+        isPricePerUnit: fuelLog.isPricePerUnit,
         exchangeRate: fuelLog.expense.exchangeRate,
         quantity: fuelLog.quantity,
         odometerValue: fuelLog.odometer?.value ?? NaN,
