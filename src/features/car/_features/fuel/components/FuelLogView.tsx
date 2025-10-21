@@ -89,7 +89,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         let subtitle = `${ fuelLog?.originalPricePerUnit } ${ fuelLog?.expense.currency.symbol }/${ fuelLog?.fuelUnit.short }`;
         if(fuelLog?.expense.currency.id === car?.currency.id && fuelLog?.expense.exchangeRate === 1) return subtitle;
 
-        subtitle += ` (${ fuelLog?.pricePerUnit } ${ car?.currency.symbol }//${ fuelLog?.fuelUnit.short })`;
+        subtitle += ` (${ fuelLog?.pricePerUnit } ${ car?.currency.symbol }/${ fuelLog?.fuelUnit.short })`;
         return subtitle;
     }, [fuelLog, car]);
 
