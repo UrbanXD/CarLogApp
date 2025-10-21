@@ -6,7 +6,7 @@ import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts"
 import { ExpenseFields } from "../../schemas/form/expenseForm.ts";
 import { ExpenseType } from "../../schemas/expenseTypeSchema.ts";
 import { Currency } from "../../../_shared/currency/schemas/currencySchema.ts";
-import { SelectExpenseTableRow } from "../dao/ExpenseDao.ts";
+import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
 
 export type SelectExpenseTableRow = ExpenseTableRow & { related_id: string }
 
@@ -32,9 +32,9 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, Sele
             relatedId: entity?.related_id ?? null,
             type: type,
             currency: currency,
-            originalAmount: entity.original_amount,
+            originalAmount: numberToFractionDigit(entity.original_amount),
             exchangeRate: entity.exchange_rate,
-            amount: entity.amount,
+            amount: numberToFractionDigit(entity.amount),
             note: entity.note,
             date: entity.date
         });

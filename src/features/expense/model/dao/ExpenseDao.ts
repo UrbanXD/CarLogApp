@@ -47,11 +47,11 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
     }
 
     paginator(
-        cursorOptions: CursorOptions<keyof ExpenseTableRow>,
-        filterBy?: FilterCondition<ExpenseTableRow> | Array<FilterCondition<ExpenseTableRow>>,
+        cursorOptions: CursorOptions<keyof SelectExpenseTableRow>,
+        filterBy?: FilterCondition<SelectExpenseTableRow> | Array<FilterCondition<SelectExpenseTableRow>>,
         perPage?: number = 10
-    ): CursorPaginator<ExpenseTableRow, Expense> {
-        return new CursorPaginator<ExpenseTableRow, Expense>(
+    ): CursorPaginator<SelectExpenseTableRow, Expense> {
+        return new CursorPaginator<SelectExpenseTableRow, Expense>(
             this.db,
             EXPENSE_TABLE,
             cursorOptions,

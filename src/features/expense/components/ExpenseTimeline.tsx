@@ -6,10 +6,10 @@ import { Title } from "../../../components/Title.tsx";
 import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
 import { useTimelinePaginator } from "../../../hooks/useTimelinePaginator.ts";
-import { ExpenseTableRow } from "../../../database/connector/powersync/AppSchema.ts";
 import { Expense } from "../schemas/expenseSchema.ts";
 import { Car } from "../../car/schemas/carSchema.ts";
 import { useExpenseTimelineFilter } from "../hooks/useExpenseTimelineFilter.ts";
+import { SelectExpenseTableRow } from "../model/mapper/expenseMapper.ts";
 
 type ExpenseTimelineProps = {
     car: Car
@@ -35,7 +35,7 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
         setFilter,
         removeFilter,
         orderButtons
-    } = useTimelinePaginator<ExpenseTableRow, Expense>({
+    } = useTimelinePaginator<SelectExpenseTableRow, Expense>({
         paginator,
         mapper,
         cursorOrderButtons: [{ field: "date", title: "Dátum" }, { field: "amount", title: "Ár" }]
