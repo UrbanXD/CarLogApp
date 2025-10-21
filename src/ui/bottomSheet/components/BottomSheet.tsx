@@ -91,6 +91,8 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     const onChangeSnapPoint = useCallback((index: number) => {
         if(index !== -1) return; // not closed
 
+        KeyboardController.dismiss();
+
         if(manuallyClosed.current) return manuallyClosed.current = false;
         if(forceClosed.current) return;
         if(enableDismissOnClose) return dismissBottomSheet();
