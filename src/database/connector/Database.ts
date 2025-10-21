@@ -193,6 +193,6 @@ export class Database {
     }
 
     async disconnect() {
-        await this.powersync.disconnectAndClear();
+        await this.powersync.disconnectAndClear({ clearLocal: true });
     }
 }

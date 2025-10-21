@@ -26,7 +26,8 @@ const ProfileScreen: React.FC = () => {
     const { hasPassword, signOut, deleteAccount } = useAuth();
     const { bottom } = useSafeAreaInsets();
 
-    if(!user) return Redirect({ href: "backToRootIndex" });
+    if(!user) return <Redirect href={ "backToRootIndex" }/>;
+
     const name = `${ user.lastname } ${ user.firstname }`;
     const avatarColor = user.avatarColor;
 
