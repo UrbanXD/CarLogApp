@@ -2,11 +2,12 @@ import Input from "../../../../components/Input/Input.ts";
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { Control, UseFormSetValue, useWatch } from "react-hook-form";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { formTheme } from "../../../..//ui/form/constants/theme.ts";
+import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
 
 type AmountInputProps = {
     control: Control<any>
@@ -16,8 +17,15 @@ type AmountInputProps = {
     amountPlaceholder?: string
     amountFieldName: string
     currencyFieldName: string
+    isPricePerUnitFieldName?: string
     exchangeRateFieldName?: string
-    exchangeText?: (exchangedAmount: string) => string
+    exchangeText?: (exchangedAmount: string, isTotalAmount?: boolean) => ReactNode
+    totalAmountText?: (
+        amount: number,
+        exchangedAmount: number,
+        defaultCurrencyText: string,
+        currencyText: string
+    ) => ReactNode
     showsExchangeRate?: boolean
     defaultCurrency?: string | number
 }
@@ -30,8 +38,10 @@ export function AmountInput({
     amountPlaceholder = "Összeg",
     amountFieldName,
     currencyFieldName,
+    isPricePerUnitFieldName,
     exchangeRateFieldName,
     exchangeText,
+    totalAmountText,
     showsExchangeRate = !!exchangeRateFieldName,
     defaultCurrency
 }: AmountInputProps) {
@@ -44,6 +54,7 @@ export function AmountInput({
     const formCurrency = useWatch({ control, name: currencyFieldName });
     const formAmount = useWatch({ control, name: amountFieldName });
     const formExchangeRate = exchangeRateFieldName ? useWatch({ control, name: exchangeRateFieldName }) : null;
+    const formIsPricePerUnit = isPricePerUnitFieldName ? useWatch({ control, name: isPricePerUnitFieldName }) : null;
 
     useEffect(() => {
         (async () => {
@@ -75,15 +86,52 @@ export function AmountInput({
         let exchangedAmount = 0;
 
         if(formAmount && !isNaN(Number(formAmount))) {
-            exchangedAmount = (Number(formAmount) * Number(formExchangeRate ?? 1)).toFixed(2).replace(/[.,]00$/, "");
+            exchangedAmount = numberToFractionDigit(Number(formAmount) * Number(formExchangeRate ?? 1));
         }
 
-        return `${ exchangedAmount } ${ defaultCurrencyText }`;
+        return `${ exchangedAmount }${ "\u00A0" }${ defaultCurrencyText }`; // "\u00A0" - for prevent only currency wrap to the next line
     }, [formAmount, formExchangeRate, defaultCurrency, getCurrencyText]);
+
+    const getTotalAmountText = useCallback(() => {
+        if(!totalAmountText) return;
+
+        const defaultCurrencyText = getCurrencyText(defaultCurrency?.toString());
+        const currencyText = getCurrencyText(formCurrency?.toString());
+
+        let amount = 0;
+        let exchangedAmount = 0;
+
+        if(formAmount && !isNaN(Number(formAmount)) && !isNaN(Number(formAmount))) {
+            amount = Number(formAmount);
+            exchangedAmount = amount * Number(formExchangeRate ?? 1);
+        }
+
+        return totalAmountText(amount, exchangedAmount, defaultCurrencyText, currencyText);
+    }, [formAmount, formExchangeRate, formCurrency, defaultCurrency, totalAmountText, getCurrencyText]);
 
     return (
         <View style={ styles.container }>
             <Input.Title title={ title } subtitle={ subtitle }/>
+            {
+                isPricePerUnitFieldName &&
+               <Input.Field control={ control } fieldName={ isPricePerUnitFieldName }>
+                  <View style={ {
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: SEPARATOR_SIZES.lightSmall
+                  } }>
+                     <Input.Switch label={ { on: "Egységár", off: "Összköltség" } }/>
+                      {
+                          formIsPricePerUnit &&
+                         <View style={ { flexShrink: 1, height: "100%" } }>
+                            <Text style={ styles.label }>
+                                { getTotalAmountText() }
+                            </Text>
+                         </View>
+                      }
+                  </View>
+               </Input.Field>
+            }
             <Input.Row style={ { gap: 0 } }>
                 <View style={ styles.amountContainer }>
                     <View style={ styles.amountContainer.amount }>
@@ -119,10 +167,10 @@ export function AmountInput({
                 showsExchangeRate && exchangeRateFieldName && (formCurrency?.toString() !== defaultCurrency?.toString()) &&
                <View style={ styles.exchangeContainer }>
                   <View style={ styles.exchangeContainer.textContainer }>
-                     <Text style={ styles.exchangeContainer.textContainer.text }>
+                     <Text style={ styles.label }>
                          {
                              exchangeText &&
-                             exchangeText(getExchangedAmount())
+                             exchangeText(getExchangedAmount(), !formIsPricePerUnit)
                          }
                      </Text>
                   </View>
@@ -172,6 +220,12 @@ const styles = StyleSheet.create({
             flex: 1
         }
     },
+    label: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p3,
+        color: COLORS.gray1
+
+    },
     exchangeContainer: {
         flex: 1,
         flexDirection: "row",
@@ -180,12 +234,7 @@ const styles = StyleSheet.create({
         gap: SEPARATOR_SIZES.lightSmall,
 
         textContainer: {
-            flex: 0.60,
-
-            text: {
-                fontFamily: "Gilroy-Medium", fontSize: FONT_SIZES.p3,
-                color: COLORS.gray1
-            }
+            flex: 0.60
         },
 
         inputContainer: {

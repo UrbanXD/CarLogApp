@@ -1,6 +1,6 @@
 import { UseFormReturn, useWatch } from "react-hook-form";
 import useCars from "../../../hooks/useCars.ts";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Car } from "../../../schemas/carSchema.ts";
 import { FormFields, Steps } from "../../../../../types/index.ts";
 import { CarPickerInput } from "../../../components/forms/inputFields/CarPickerInput.tsx";
@@ -13,6 +13,7 @@ import { FuelLogFormFieldsEnum } from "../enums/fuelLogFormFields.tsx";
 import { FuelLogFields } from "../schemas/form/fuelLogForm.ts";
 import { OdometerValueInput } from "../../odometer/components/forms/inputFields/OdometerValueInput.tsx";
 import { FuelInput } from "../components/forms/inputFields/FuelInput.tsx";
+import { Text } from "react-native";
 
 type UseFuelLogFormFieldsProps = UseFormReturn<FuelLogFields>
 
@@ -23,15 +24,52 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
     const [car, setCar] = useState<Car | null>(null);
 
     const formCarId = useWatch({ control, name: "carId" });
+    const formQuantity = useWatch({ control, name: "quantity" });
 
     useEffect(() => {
         const car = getCar(formCarId);
         setCar(car ?? null);
         setValue("ownerId", car?.ownerId);
         setValue("fuelUnitId", car?.fuelTank.unit.id);
-        setValue("currencyId", car?.currency.id);
         clearErrors();
     }, [formCarId]);
+
+    const amountFieldExchangeText = useCallback((exchangedAmount: string, isTotalAmount?: boolean) => {
+        return (
+            <>
+                Az autó alapvalutájában számolt { isTotalAmount ? "összeg " : "egységár " }
+                <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
+            </>
+        );
+    }, []);
+
+    const amountFieldTotalAmountText = useCallback((
+        amount: number,
+        exchangedAmount: number,
+        defaultCurrencyText: string,
+        currencyText: string
+    ) => {
+        let quantity = 0;
+        if(!isNaN(Number(formQuantity))) quantity = Number(formQuantity);
+
+        return (
+            <>
+                Az egyésgár szerinti összköltség{ " " }
+                <Text style={ { fontWeight: "bold" } }>
+                    { amount * quantity } { currencyText }
+                </Text>
+                {
+                    currencyText !== defaultCurrencyText &&
+                   <>
+                      , az autó alapvalutájában számítva{ " " }
+                      <Text style={ { fontWeight: "bold" } }>
+                          { exchangedAmount * quantity }{ "\u00A0" }{ defaultCurrencyText } {/* ${ "\u00A0" } for prevent currency wrap to the next line without amount */ }
+                      </Text>
+                   </>
+                }
+            </>
+        );
+    }, [formQuantity]);
 
     const fields: Record<FuelLogFormFieldsEnum, FormFields> = useMemo(() => ({
         [FuelLogFormFieldsEnum.Car]: {
@@ -55,8 +93,10 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
                 setValue={ setValue }
                 amountFieldName="amount"
                 currencyFieldName="currencyId"
+                isPricePerUnitFieldName="isPricePerUnit"
                 exchangeRateFieldName="exchangeRate"
-                exchangeText={ (exchangedAmount) => `Az autó alapvalutájában számolt összeg: ${ exchangedAmount }` }
+                exchangeText={ amountFieldExchangeText }
+                totalAmountText={ amountFieldTotalAmountText }
                 defaultCurrency={ car?.currency.id }
             />,
             editToastMessages: CarEditNameToast
@@ -91,7 +131,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             />,
             editToastMessages: CarEditNameToast
         }
-    }), [control, setValue, car]);
+    }), [control, setValue, car, amountFieldTotalAmountText, amountFieldExchangeText]);
 
     const multiStepFormSteps: Steps = [
         {
@@ -107,7 +147,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             )
         },
         {
-            title: "Tankolás infóók",
+            title: "Tankolás infók",
             fields: ["quantity", "amount", "exchangeRate", "currencyId"],
             render: () => (
                 <Input.Group>

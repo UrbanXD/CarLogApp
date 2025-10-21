@@ -7,11 +7,12 @@ import { CarPickerInput } from "../../car/components/forms/inputFields/CarPicker
 import { CarEditNameToast } from "../../car/presets/toast/index.ts";
 import { ExpenseTypeInput } from "../components/forms/inputFields/ExpenseTypeInput.tsx";
 import { AmountInput } from "../../_shared/currency/components/AmountInput.tsx";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import InputDatePicker from "../../../components/Input/datePicker/InputDatePicker.tsx";
 import Input from "../../../components/Input/Input.ts";
 import { NoteInput } from "../../../components/Input/_presets/NoteInput.tsx";
 import useCars from "../../car/hooks/useCars.ts";
+import { Text } from "react-native";
 
 type UseExpenseFormFieldsProps = UseFormReturn<ExpenseFields>
 
@@ -29,6 +30,15 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
         clearErrors();
     }, [formCarId]);
 
+    const amountFieldExchangeText = useCallback((exchangedAmount: string) => {
+        return (
+            <>
+                Az autó alapvalutájában számolt összeg{ " " }
+                <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
+            </>
+        );
+    }, []);
+
     const fields: Record<ExpenseFormFields, FormFields> = useMemo(() => ({
         [ExpenseFormFields.Car]: {
             render: () => <CarPickerInput control={ control } fieldName="carId"/>,
@@ -45,7 +55,7 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
                 amountFieldName="amount"
                 currencyFieldName="currencyId"
                 exchangeRateFieldName="exchangeRate"
-                exchangeText={ (exchangedAmount) => `Az autó alapvalutájában számolt összeg: ${ exchangedAmount }` }
+                exchangeText={ amountFieldExchangeText }
                 defaultCurrency={ car?.currency.id }
             />,
             editToastMessages: CarEditNameToast
