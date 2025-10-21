@@ -15,6 +15,9 @@ type FormTheme = {
     errorColor: Color
     activeColor: Color
     gap: number
+    trackColor: Color
+    barColor: Color
+    thumbColor: Color
 }
 export const formTheme: FormTheme = {
     containerHeight: FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE + 2 * SEPARATOR_SIZES.lightSmall,
@@ -25,9 +28,12 @@ export const formTheme: FormTheme = {
     placeHolderColor: COLORS.gray2,
     iconColor: COLORS.gray1,
     iconSize: FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE,
-    borderRadius: 20,
+    borderRadius: (FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE + 2 * SEPARATOR_SIZES.lightSmall) / 3.5,
     borderColor: COLORS.gray3,
     activeColor: COLORS.gray2,
     errorColor: COLORS.redLight,
-    gap: SEPARATOR_SIZES.small
+    gap: SEPARATOR_SIZES.small,
+    trackColor: COLORS.gray4,
+    barColor: COLORS.gray1,
+    thumbColor: COLORS.gray3
 };

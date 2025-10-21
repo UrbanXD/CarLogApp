@@ -31,6 +31,7 @@ import type {
 import { PanGestureChangeEventPayload } from "react-native-gesture-handler/src/handlers/gestures/panGesture.ts";
 import { scheduleOnRN, scheduleOnUI } from "react-native-worklets";
 import { KeyboardController } from "react-native-keyboard-controller";
+import { formTheme } from "../../../ui/form/constants/theme.ts";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
@@ -86,9 +87,9 @@ const Slider: React.FC<SliderProps> = ({
     const {
         borderRadius = 25,
         trackHeight = hp(1),
-        trackColor = COLORS.gray3,
+        trackColor = formTheme.trackColor,
         trackBorderWidth = 0,
-        barColor = COLORS.gray1 as SliderStyle["barColor"],
+        barColor = formTheme.barColor as SliderStyle["barColor"],
         handleHeight = hp(3.5),
         handleWidth = hp(3.5),
         handleColor = COLORS.gray1,
