@@ -6,7 +6,6 @@ import {
     Pressable,
     StyleSheet,
     Text,
-    TextInput,
     TouchableWithoutFeedback,
     View
 } from "react-native";
@@ -32,8 +31,9 @@ import { PanGestureChangeEventPayload } from "react-native-gesture-handler/src/h
 import { scheduleOnRN, scheduleOnUI } from "react-native-worklets";
 import { KeyboardController } from "react-native-keyboard-controller";
 import { formTheme } from "../../../ui/form/constants/theme.ts";
+import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 
-const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
+const AnimatedTextInput = Animated.createAnimatedComponent(BottomSheetTextInput);
 
 interface SliderProps {
     value?: number;

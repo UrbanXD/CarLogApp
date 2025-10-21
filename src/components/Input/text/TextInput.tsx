@@ -1,9 +1,10 @@
-import React, { RefObject, useEffect, useState } from "react";
+import React, { RefObject, useCallback, useState } from "react";
 import {
     NativeSyntheticEvent,
     StyleSheet,
     TextInput as TextInputRN,
     TextInputContentSizeChangeEventData,
+    TextInputFocusEventData,
     TextStyle,
     View,
     ViewStyle
@@ -54,7 +55,6 @@ const TextInput: React.FC<TextInputProps> = ({
     textInputStyle
 }) => {
     const bottomSheetInternal = useBottomSheetInternal(true);
-    const shouldHandleKeyboardEvents = bottomSheetInternal?.shouldHandleKeyboardEvents;
 
     const inputFieldContext = allowInputFieldContext ? useInputFieldContext() : null;
     const fieldValue = value || inputFieldContext?.field?.value || "";
@@ -66,13 +66,33 @@ const TextInput: React.FC<TextInputProps> = ({
     const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(isSecure);
 
-    useEffect(() => {
-        if(shouldHandleKeyboardEvents) shouldHandleKeyboardEvents.value = focused;
-    }, [focused, shouldHandleKeyboardEvents]);
-
     const changeSecure = () => setSecure(prevState => !prevState);
-    const onFocus = () => setFocused(true);
-    const onBlur = () => setFocused(false);
+    const onFocus = useCallback((args: NativeSyntheticEvent<TextInputFocusEventData>) => {
+        setFocused(true);
+
+        if(!bottomSheetInternal) return; // return if not in a bottom sheet
+        const { animatedKeyboardState } = bottomSheetInternal;
+        const keyboardState = animatedKeyboardState.get();
+
+        animatedKeyboardState.set({
+            ...keyboardState,
+            target: args.nativeEvent.target
+        });
+    }, [bottomSheetInternal?.animatedKeyboardState]);
+    const onBlur = useCallback((args: NativeSyntheticEvent<TextInputFocusEventData>) => {
+        setFocused(false);
+
+        if(!bottomSheetInternal) return; // return if not in a bottom sheet
+        const { animatedKeyboardState } = bottomSheetInternal;
+        const keyboardState = animatedKeyboardState.get();
+
+        if(keyboardState.target === args.nativeEvent.target) {
+            animatedKeyboardState.set({
+                ...keyboardState,
+                target: undefined
+            });
+        }
+    }, [bottomSheetInternal?.animatedKeyboardState]);
 
     const updateFieldValue = (value: string) => {
         if(onChange) onChange(value);
