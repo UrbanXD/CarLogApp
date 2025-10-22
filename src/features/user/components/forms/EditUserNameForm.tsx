@@ -20,11 +20,11 @@ export function EditUserNameForm({ user }: EditUserNameFormProps) {
     const database = useDatabase();
     const { openToast } = useAlert();
 
-    const {
-        control,
-        handleSubmit,
-        reset
-    } = useForm<EditUserNameRequest>(useEditUserNameFormProps({ firstname: user.firstname, lastname: user.lastname }));
+    const form = useForm<EditUserNameRequest>(useEditUserNameFormProps({
+        firstname: user.firstname,
+        lastname: user.lastname
+    }));
+    const { handleSubmit, reset } = form;
 
     const submitHandler = handleSubmit(async (request: EditUserNameRequest) => {
         try {
@@ -39,7 +39,7 @@ export function EditUserNameForm({ user }: EditUserNameFormProps) {
 
     return (
         <Form>
-            <NameStep control={ control }/>
+            <NameStep { ...form } />
             <FormButtons reset={ reset } submit={ submitHandler }/>
         </Form>
     );

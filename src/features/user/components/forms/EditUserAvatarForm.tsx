@@ -20,14 +20,12 @@ export function EditUserAvatarForm({ user }: EditUserAvatarFormProps) {
     const database = useDatabase();
     const { openToast } = useAlert();
 
-    const {
-        control,
-        handleSubmit,
-        reset
-    } = useForm<EditUserAvatarRequest>(useEditUserAvatarFormProps({
+    const form = useForm<EditUserAvatarRequest>(useEditUserAvatarFormProps({
         avatar: user.avatar,
         avatarColor: user.avatarColor
     }));
+    const { handleSubmit, reset } = form;
+
     const submitHandler = handleSubmit(async (request: EditUserAvatarRequest) => {
         try {
             await dispatch(editUserAvatar({ database, request: { ...request } }));
@@ -41,7 +39,7 @@ export function EditUserAvatarForm({ user }: EditUserAvatarFormProps) {
 
     return (
         <Form>
-            <AvatarStep control={ control }/>
+            <AvatarStep { ...form } />
             <FormButtons reset={ reset } submit={ submitHandler }/>
         </Form>
     );

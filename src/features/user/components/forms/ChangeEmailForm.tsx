@@ -10,17 +10,16 @@ import { OtpVerificationHandlerType } from "../../../../app/bottomSheet/otpVerif
 import { ChangeEmailRequest, useChangeEmailFormProps } from "../../schemas/form/changeEmailRequest.ts";
 import Form from "../../../../components/Form/Form.tsx";
 import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
+import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 
 export type ChangeEmailFormProps = { user: UserAccount }
 
 export function ChangeEmailForm({ user }: ChangeEmailFormProps) {
+    const { supabaseConnector } = useDatabase();
     const { openToast } = useAlert();
 
-    const {
-        control,
-        handleSubmit,
-        reset
-    } = useForm<EditUserNameRequest>(useChangeEmailFormProps({ email: user.email }));
+    const form = useForm<EditUserNameRequest>(useChangeEmailFormProps({ email: user.email }));
+    const { reset, handleSubmit } = form;
 
     const submitHandler = handleSubmit(async (request: ChangeEmailRequest) => {
         try {
@@ -39,13 +38,14 @@ export function ChangeEmailForm({ user }: ChangeEmailFormProps) {
                 }
             });
         } catch(error) {
+            console.log("Change Email error: ", error);
             openToast(getToastMessage({ messages: ChangeEmailToast, error }));
         }
     });
 
     return (
         <Form>
-            <EmailStep control={ control }/>
+            <EmailStep { ...form }/>
             <FormButtons reset={ reset } submit={ submitHandler }/>
         </Form>
     );

@@ -10,17 +10,16 @@ import { NewPasswordRequest, useNewPasswordFormProps } from "../../schemas/form/
 import Form from "../../../../components/Form/Form.tsx";
 import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 import React from "react";
+import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 
 export type ResetPasswordFormProps = { user: UserAccount }
 
 export function ResetPasswordForm({ user }: ResetPasswordFormProps) {
+    const { supabaseConnector } = useDatabase();
     const { openToast } = useAlert();
 
-    const {
-        control,
-        handleSubmit,
-        reset
-    } = useForm<NewPasswordRequest>(useNewPasswordFormProps());
+    const form = useForm<NewPasswordRequest>(useNewPasswordFormProps());
+    const { reset, handleSubmit } = form;
 
     const submitHandler = handleSubmit(async (request: NewPasswordRequest) => {
         try {
@@ -39,13 +38,14 @@ export function ResetPasswordForm({ user }: ResetPasswordFormProps) {
                 }
             });
         } catch(error) {
+            console.log("Reset password error: ", error);
             openToast(getToastMessage({ messages: ResetPasswordToast, error }));
         }
     });
 
     return (
         <Form>
-            <PasswordStep control={ control }/>
+            <PasswordStep { ...form }/>
             <FormButtons reset={ reset } submit={ submitHandler }/>
         </Form>
     );

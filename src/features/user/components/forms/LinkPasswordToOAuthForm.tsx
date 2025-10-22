@@ -8,16 +8,15 @@ import { useAuth } from "../../../../contexts/auth/AuthContext.ts";
 import Form from "../../../../components/Form/Form.tsx";
 import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 import React from "react";
+import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 
 export function LinkPasswordToOAuthForm() {
+    const { supabaseConnector } = useDatabase();
     const { openToast } = useAlert();
     const { hasPassword, refreshSession } = useAuth();
 
-    const {
-        control,
-        handleSubmit,
-        reset
-    } = useForm<NewPasswordRequest>(useNewPasswordFormProps());
+    const form = useForm<NewPasswordRequest>(useNewPasswordFormProps());
+    const { reset, handleSubmit } = form;
 
     const submitHandler = handleSubmit(async (request: NewPasswordRequest) => {
         try {
@@ -30,13 +29,14 @@ export function LinkPasswordToOAuthForm() {
             openToast(AddPasswordToast.success());
             await refreshSession();
         } catch(error) {
+            console.log("Link Password error: ", error);
             openToast(getToastMessage({ messages: AddPasswordToast, error }));
         }
     });
 
     return (
         <Form>
-            <PasswordStep control={ control }/>
+            <PasswordStep { ...form } />
             <FormButtons reset={ reset } submit={ submitHandler }/>
         </Form>
     );

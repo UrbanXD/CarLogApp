@@ -7,14 +7,12 @@ import { useMultiStepForm } from "../../../../../contexts/multiStepForm/MultiSte
 import { EmailStep } from "./EmailStep.tsx";
 import { StepProps } from "../../../../../types/index.ts";
 
-export const SignUpFirstStep: React.FC<StepProps> = ({
-    control
-}) => {
+export const SignUpFirstStep: React.FC<StepProps> = (props) => {
     const { next } = useMultiStepForm();
 
     return (
         <Input.Group>
-            <EmailStep control={ control }/>
+            <EmailStep { ...props }/>
             <Button.MultistepFormNext onPress={ next }/>
             <TextDivider
                 title="vagy"
