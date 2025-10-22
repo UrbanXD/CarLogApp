@@ -142,8 +142,8 @@ export function AmountInput({
                             <Input.Text
                                 icon={ ICON_NAMES.money }
                                 placeholder={ amountPlaceholder }
-                                numeric
-                                type={ "secondary" }
+                                keyboardType="numeric"
+                                type="secondary"
                             />
                         </Input.Field>
                     </View>
@@ -154,7 +154,7 @@ export function AmountInput({
                             <Input.Picker.Dropdown
                                 data={ currencies }
                                 title={ "Valuta" }
-                                type={ "secondary" }
+                                type="secondary"
                                 hiddenBackground={ true }
                             />
                             :
@@ -190,7 +190,7 @@ export function AmountInput({
                            </View>
                            <Input.Text
                               placeholder="1.0"
-                              numeric
+                              keyboardType="numeric"
                               containerStyle={ { flexGrow: 1 } }
                               type="secondary"
                            />

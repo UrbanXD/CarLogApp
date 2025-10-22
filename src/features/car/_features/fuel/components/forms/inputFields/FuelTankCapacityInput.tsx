@@ -32,7 +32,7 @@ export function FuelTankCapacityInput({
                     <Input.Text
                         icon={ ICON_NAMES.odometer }
                         placeholder={ "1000" }
-                        numeric
+                        keyboardType="numeric"
                         type="secondary"
                     />
                 </View>

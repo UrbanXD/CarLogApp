@@ -122,7 +122,7 @@ const InputOTP: React.FC<InputOTPProps> = ({
                     onFocus={ onFocus }
                     onBlur={ onBlur }
                     maxLength={ numberOfDigits }
-                    keyboardType="number-pad"
+                    keyboardType="numeric"
                     enterKeyHint="next"
                     style={ styles.hiddenInput }
                 />

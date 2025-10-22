@@ -39,7 +39,7 @@ export function OdometerValueInput({
                     <Input.Text
                         icon={ ICON_NAMES.odometer }
                         placeholder={ placeholder }
-                        numeric
+                        keyboardType="numeric"
                         type="secondary"
                     />
                 </View>

@@ -1,5 +1,6 @@
 import React, { RefObject, useCallback, useState } from "react";
 import {
+    KeyboardType,
     NativeSyntheticEvent,
     StyleSheet,
     TextInput as TextInputRN,
@@ -20,13 +21,13 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-na
 export type TextInputProps = {
     inputRef?: RefObject<TextInputRN | null>
     type?: "primary" | "secondary"
+    keyboardType?: KeyboardType
     value?: string
     setValue?: (text: string) => void
     icon?: string
     actionIcon?: string
     onAction?: () => void
     placeholder?: string
-    numeric?: boolean
     secure?: boolean
     editable?: boolean
     multiline?: boolean
@@ -38,6 +39,7 @@ export type TextInputProps = {
 
 const TextInput: React.FC<TextInputProps> = ({
     inputRef,
+    keyboardType = "default",
     type = "primary",
     value,
     setValue,
@@ -45,7 +47,6 @@ const TextInput: React.FC<TextInputProps> = ({
     actionIcon,
     onAction,
     placeholder,
-    numeric,
     secure: isSecure = false,
     editable,
     multiline,
@@ -153,7 +154,7 @@ const TextInput: React.FC<TextInputProps> = ({
                 value={ fieldValue.toString() }
                 multiline={ multiline }
                 numberOfLines={ numberOfLines }
-                keyboardType={ numeric ? "numeric" : "default" }
+                keyboardType={ keyboardType }
                 secureTextEntry={ secure }
                 onChangeText={ updateFieldValue }
                 onBlur={ onBlur }
