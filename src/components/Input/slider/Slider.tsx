@@ -1,11 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
     GestureResponderEvent,
     Keyboard,
     LayoutChangeEvent,
+    NativeSyntheticEvent,
     Pressable,
     StyleSheet,
     Text,
+    TextInputFocusEventData,
     TouchableWithoutFeedback,
     View
 } from "react-native";
@@ -31,7 +33,7 @@ import { PanGestureChangeEventPayload } from "react-native-gesture-handler/src/h
 import { scheduleOnRN, scheduleOnUI } from "react-native-worklets";
 import { KeyboardController } from "react-native-keyboard-controller";
 import { formTheme } from "../../../ui/form/constants/theme.ts";
-import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import { BottomSheetTextInput, useBottomSheetInternal } from "@gorhom/bottom-sheet";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(BottomSheetTextInput);
 
@@ -82,6 +84,8 @@ const Slider: React.FC<SliderProps> = ({
     tooltipAsInputField = false,
     style = {} as SliderStyle
 }) => {
+    const bottomSheetInternal = useBottomSheetInternal(true);
+
     const tooltipInputRef = useAnimatedRef();
 
     const {
@@ -139,7 +143,6 @@ const Slider: React.FC<SliderProps> = ({
         setCurrentValue(fieldValue);
     }, [inputFieldContext?.field?.value]);
 
-
     useEffect(() => {
         if(!trackLayoutReady) return;
 
@@ -168,6 +171,30 @@ const Slider: React.FC<SliderProps> = ({
 
         bounds.value = { min: minValue, max: maxValue };
     }, [maxValue, minValue]);
+
+    const onFocus = useCallback((args: NativeSyntheticEvent<TextInputFocusEventData>) => {
+        if(!bottomSheetInternal) return; // return if not in a bottom sheet
+        const { animatedKeyboardState } = bottomSheetInternal;
+        const keyboardState = animatedKeyboardState.get();
+
+        animatedKeyboardState.set({
+            ...keyboardState,
+            target: args.nativeEvent.target
+        });
+    }, [bottomSheetInternal?.animatedKeyboardState]);
+
+    const onBlur = useCallback((args: NativeSyntheticEvent<TextInputFocusEventData>) => {
+        if(!bottomSheetInternal) return; // return if not in a bottom sheet
+        const { animatedKeyboardState } = bottomSheetInternal;
+        const keyboardState = animatedKeyboardState.get();
+
+        if(keyboardState.target === args.nativeEvent.target) {
+            animatedKeyboardState.set({
+                ...keyboardState,
+                target: undefined
+            });
+        }
+    }, [bottomSheetInternal?.animatedKeyboardState]);
 
     const setInputValue = () => {
         "worklet";
@@ -523,6 +550,8 @@ const Slider: React.FC<SliderProps> = ({
                                keyboardType="numeric"
                                style={ styles.slider.tooltip.text }
                                onChangeText={ onTooltipTextChange }
+                               onBlur={ onBlur }
+                               onFocus={ onFocus }
                             />
                              { unit && <Text style={ styles.slider.tooltip.text }>{ unit }</Text> }
                          </View>
