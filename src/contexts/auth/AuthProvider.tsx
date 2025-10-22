@@ -98,7 +98,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 email: request.email,
                 password: request.password,
                 options: {
-                    data: { firstname: request.firstname, lastname: request.lastname, avatarColor }
+                    data: { firstname: request.firstname, lastname: request.lastname, avatar_color: avatarColor }
                 }
             });
 
@@ -113,8 +113,8 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 email: supabaseUser.email,
                 firstname: supabaseUser.user_metadata.firstname,
                 lastname: supabaseUser.user_metadata.lastname,
-                avatar: null,
-                avatarColor: supabaseUser.user_metadata.avatarColor
+                avatar_url: null,
+                avatar_color: supabaseUser.user_metadata.avatar_color
             });
         } catch(error) {
             console.error("Signup error: ", error);
