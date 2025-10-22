@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Keyboard, StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import {
     BottomSheetRoutes,
@@ -63,6 +63,12 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
             forceClosed.current = true;
             KeyboardController.dismiss();
             bottomSheetRef.current?.dismiss();
+        });
+    }, []);
+
+    useEffect(() => {
+        Keyboard.addListener("keyboardDidHide", () => {
+            bottomSheetRef.current?.snapToIndex(0);
         });
     }, []);
 
