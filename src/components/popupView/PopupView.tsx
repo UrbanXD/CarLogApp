@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import Animated, {
     SharedValue,
     useAnimatedReaction,
@@ -7,11 +7,12 @@ import Animated, {
     withSpring,
     withTiming
 } from "react-native-reanimated";
-import { StyleSheet, View, ViewStyle } from "react-native";
-import { DEFAULT_SEPARATOR } from "../../constants/index.ts";
+import { Dimensions, Keyboard, LayoutChangeEvent, StyleSheet, View, ViewStyle } from "react-native";
+import { DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { Overlay } from "../overlay/Overlay.tsx";
 import { Portal } from "@gorhom/portal";
 import { scheduleOnRN } from "react-native-worklets";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type PopupViewProps = {
     opened: SharedValue<boolean>
@@ -27,10 +28,30 @@ const SPRING_CONFIG = {
 };
 
 export function PopupView({ opened, dismount = true, children, style }: PopupViewProps) {
+    const { top } = useSafeAreaInsets();
+    const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+
     const popupDisplay = useSharedValue<"flex" | "none">("none");
+    const popupHeight = useSharedValue(0);
+    const keyboardHeight = useSharedValue(0);
     const opacity = useSharedValue(0);
     const scale = useSharedValue(1);
     const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        const showSubscription = Keyboard.addListener("keyboardDidShow", (event) => {
+            keyboardHeight.value = event.endCoordinates.height;
+        });
+
+        const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+            keyboardHeight.value = 0;
+        });
+
+        return () => {
+            showSubscription.remove();
+            hideSubscription.remove();
+        };
+    }, []);
 
     useAnimatedReaction(
         () => opened.value,
@@ -61,11 +82,18 @@ export function PopupView({ opened, dismount = true, children, style }: PopupVie
 
     const close = () => opened.value = false;
 
-    const popupStyle = useAnimatedStyle(() => ({
-        display: popupDisplay.value,
-        opacity: opacity.value,
-        transform: [{ scale: scale.value }]
-    }));
+    const onLayout = useCallback((event: LayoutChangeEvent) => popupHeight.value = event.nativeEvent.layout.height, []);
+
+    const popupStyle = useAnimatedStyle(() => {
+        const maxTranslateY = Math.max(0, SCREEN_HEIGHT - popupHeight.value - SEPARATOR_SIZES.normal - top);
+        const translateY = withTiming(-Math.min(keyboardHeight.value, maxTranslateY) / 2, { duration: 450 });
+
+        return {
+            display: popupDisplay.value,
+            opacity: opacity.value,
+            transform: [{ scale: scale.value }, { translateY }]
+        };
+    });
 
     return (
         <Portal hostName="popup">
@@ -73,7 +101,7 @@ export function PopupView({ opened, dismount = true, children, style }: PopupVie
             {
                 (!dismount || mounted) &&
                <View style={ styles.container } pointerEvents="box-none">
-                  <Animated.View style={ [popupStyle, styles.popup, style] }>
+                  <Animated.View style={ [popupStyle, styles.popup, style] } onLayout={ onLayout }>
                       { children }
                   </Animated.View>
                </View>
