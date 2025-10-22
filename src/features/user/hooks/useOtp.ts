@@ -5,11 +5,11 @@ export const useOtp = () => {
     const { supabaseConnector } = useDatabase();
 
     const verifyOTP = async (args: VerifyEmailOtpParams) => {
-        const { data, error } = await supabaseConnector.client.auth.verifyOtp(args);
+        const { data: { session }, error } = await supabaseConnector.client.auth.verifyOtp(args);
 
         if(error) throw error;
 
-        await supabaseConnector.client.auth.setSession(data.session);
+        if(session) await supabaseConnector.client.auth.setSession(session);
     };
 
     const resendOTP = async (args: ResendParams) => {
