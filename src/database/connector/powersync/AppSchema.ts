@@ -15,6 +15,10 @@ import { odometerLogTypeTable } from "./tables/odometerLogType.ts";
 import { fuelUnitTable } from "./tables/fuelUnit.ts";
 import { currencyTable } from "./tables/currency.ts";
 import { odometerChangeLogTable } from "./tables/odometerChangeLog.ts";
+import { serviceTypeTable } from "./tables/serviceType.ts";
+import { serviceLogTable } from "./tables/serviceLogTable.ts";
+import { serviceItemTable } from "./tables/serviceItemTable.ts";
+import { serviceItemTypeTable } from "./tables/serviceItemType.ts";
 
 export const AppSchema = new Schema({
     attachments: new AttachmentTable(),
@@ -32,7 +36,11 @@ export const AppSchema = new Schema({
     model: modelTable,
     expense: expenseTable,
     expense_type: expenseTypeTable,
-    currency: currencyTable
+    currency: currencyTable,
+    service_log: serviceLogTable,
+    service_type: serviceTypeTable,
+    service_item: serviceItemTable,
+    service_item_type: serviceItemTypeTable
 });
 
 export type DatabaseType = (typeof AppSchema)["types"];
@@ -51,3 +59,7 @@ export type FuelTypeTableRow = DatabaseType["fuel_type"];
 export type ExpenseTableRow = DatabaseType["expense"];
 export type ExpenseTypeTableRow = DatabaseType["expense_type"];
 export type CurrencyTableRow = DatabaseType["currency"];
+export type ServiceLogTableRow = DatabaseType["service_log"];
+export type ServiceTypeTableRow = DatabaseType["service_type"];
+export type ServiceItemTableRow = DatabaseType["service_item"];
+export type ServiceItemTypeTableRow = DatabaseType["service_item_type"];
