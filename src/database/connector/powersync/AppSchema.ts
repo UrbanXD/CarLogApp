@@ -16,8 +16,8 @@ import { fuelUnitTable } from "./tables/fuelUnit.ts";
 import { currencyTable } from "./tables/currency.ts";
 import { odometerChangeLogTable } from "./tables/odometerChangeLog.ts";
 import { serviceTypeTable } from "./tables/serviceType.ts";
-import { serviceLogTable } from "./tables/serviceLogTable.ts";
-import { serviceItemTable } from "./tables/serviceItemTable.ts";
+import { serviceLog } from "./tables/serviceLog.ts";
+import { serviceItem } from "./tables/serviceItem.ts";
 import { serviceItemTypeTable } from "./tables/serviceItemType.ts";
 
 export const AppSchema = new Schema({
@@ -37,9 +37,9 @@ export const AppSchema = new Schema({
     expense: expenseTable,
     expense_type: expenseTypeTable,
     currency: currencyTable,
-    service_log: serviceLogTable,
+    service_log: serviceLog,
     service_type: serviceTypeTable,
-    service_item: serviceItemTable,
+    service_item: serviceItem,
     service_item_type: serviceItemTypeTable
 });
 
