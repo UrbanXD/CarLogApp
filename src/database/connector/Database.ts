@@ -20,6 +20,8 @@ import { OdometerLogTypeDao } from "../../features/car/_features/odometer/model/
 import { ExpenseTypeDao } from "../../features/expense/model/dao/ExpenseTypeDao.ts";
 import { CurrencyDao } from "../../features/_shared/currency/model/dao/CurrencyDao.ts";
 import { FuelLogDao } from "../../features/car/_features/fuel/model/dao/FuelLogDao.ts";
+import { ServiceLogDao } from "../../features/expense/_features/service/model/dao/ServiceLogDao.ts";
+import { ServiceTypeDao } from "../../features/expense/_features/service/model/dao/ServiceTypeDao.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
@@ -41,6 +43,8 @@ export class Database {
     private _odometerUnitDao?: OdometerUnitDao;
     private _odometerLogTypeDao?: OdometerLogTypeDao;
     private _odometerLogDao?: OdometerLogDao;
+    private _serviceLogDao?: ServiceLogDao;
+    private _serviceTypeDao?: ServiceTypeDao;
 
     constructor() {
         this.powersync = new PowerSyncDatabase({
@@ -163,6 +167,29 @@ export class Database {
         );
 
         return this._odometerLogDao;
+    }
+
+    get serviceLogDao(): ServiceLogDao {
+        if(!this._serviceLogDao) {
+            this._serviceLogDao = new ServiceLogDao(
+                this.db,
+                this.expenseDao,
+                this.odometerLogDao,
+                this.serviceTypeDao,
+                this.odometerUnitDao,
+                this.expenseTypeDao
+            );
+        }
+
+        return this._serviceLogDao;
+    }
+
+    get serviceTypeDao(): ServiceTypeDao {
+        if(!this._serviceTypeDao) {
+            this._serviceTypeDao = new ServiceTypeDao(this.db);
+        }
+
+        return this._serviceTypeDao;
     }
 
     get carDao(): CarDao {
