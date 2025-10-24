@@ -30,63 +30,58 @@ export function InfoContainer({
     return (
         <View style={ styles.container }>
             {
-                rows.map((row, rowIndex) => {
-                    const itemWidth = `${ 100 / row.length }%`;
-
-                    return (
-                        <React.Fragment key={ rowIndex }>
-                            <View style={ styles.infoContainer }>
-                                {
-                                    row.map((item, index) => (
-                                        <React.Fragment key={ index }>
-                                            <InfoRow
-                                                { ...item }
-                                                containerStyle={ [
-                                                    { width: itemWidth },
-                                                    flexDirection === "row"
-                                                    ? styles.infoContainer.row
-                                                    : styles.infoContainer.column,
-                                                    item.containerStyle
-                                                ] }
-                                                titleStyle={ [
-                                                    flexDirection === "row"
-                                                    ? styles.infoContainer.row.title
-                                                    : styles.infoContainer.column.title,
-                                                    item.titleStyle
-                                                ] }
-                                                subtitleStyle={ [
-                                                    flexDirection === "row"
-                                                    ? styles.infoContainer.row.subtitle
-                                                    : styles.infoContainer.column.subtitle,
-                                                    item.subtitleStyle
-                                                ] }
-                                            />
-
-                                            {
-                                                index < row.length - 1 &&
-                                               <Divider
-                                                  isVertical
-                                                  color={ dividerColor }
-                                                  size={ heightPercentageToDP(4) }
-                                                  margin={ dividerMargin }
-                                               />
-                                            }
-                                        </React.Fragment>
-                                    ))
-                                }
-                            </View>
+                rows.map((row, rowIndex) => (
+                    <React.Fragment key={ rowIndex }>
+                        <View style={ styles.infoContainer }>
                             {
-                                rowIndex < rows.length - 1 &&
-                               <Divider
-                                  color={ dividerColor }
-                                  size={ flexDirection === "column" ? widthPercentageToDP(40) : "100%" }
-                                  margin={ dividerMargin }
-                               />
+                                row.map((item, index) => (
+                                    <React.Fragment key={ index }>
+                                        <InfoRow
+                                            { ...item }
+                                            containerStyle={ [
+                                                flexDirection === "row"
+                                                ? styles.infoContainer.row
+                                                : styles.infoContainer.column,
+                                                item.containerStyle
+                                            ] }
+                                            titleStyle={ [
+                                                flexDirection === "row"
+                                                ? styles.infoContainer.row.title
+                                                : styles.infoContainer.column.title,
+                                                item.titleStyle
+                                            ] }
+                                            subtitleStyle={ [
+                                                flexDirection === "row"
+                                                ? styles.infoContainer.row.subtitle
+                                                : styles.infoContainer.column.subtitle,
+                                                item.subtitleStyle
+                                            ] }
+                                        />
 
+                                        {
+                                            index < row.length - 1 &&
+                                           <Divider
+                                              isVertical
+                                              color={ dividerColor }
+                                              size={ heightPercentageToDP(4) }
+                                              margin={ dividerMargin }
+                                           />
+                                        }
+                                    </React.Fragment>
+                                ))
                             }
-                        </React.Fragment>
-                    );
-                })
+                        </View>
+                        {
+                            rowIndex < rows.length - 1 &&
+                           <Divider
+                              color={ dividerColor }
+                              size={ flexDirection === "column" ? widthPercentageToDP(40) : "100%" }
+                              margin={ dividerMargin }
+                           />
+
+                        }
+                    </React.Fragment>
+                ))
             }
         </View>
     );
