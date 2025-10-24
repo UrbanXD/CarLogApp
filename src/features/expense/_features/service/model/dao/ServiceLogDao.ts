@@ -13,6 +13,7 @@ import { ODOMETER_LOG_TABLE } from "../../../../../../database/connector/powersy
 import { SERVICE_ITEM_TABLE } from "../../../../../../database/connector/powersync/tables/serviceItem.ts";
 import { OdometerUnitDao } from "../../../../../car/_features/odometer/model/dao/OdometerUnitDao.ts";
 import { ExpenseTypeDao } from "../../../../model/dao/ExpenseTypeDao.ts";
+import { ServiceItemDao } from "./ServiceItemDao.ts";
 
 export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLogMapper> {
     constructor(
@@ -21,15 +22,22 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
         odometerLogDao: OdometerLogDao,
         serviceTypeDao: ServiceTypeDao,
         odometerUnitDao: OdometerUnitDao,
-        expenseTypeDao: ExpenseTypeDao
+        expenseTypeDao: ExpenseTypeDao,
+        serviceItemDao: ServiceItemDao
     ) {
         super(
             db,
             SERVICE_LOG_TABLE,
-            new ServiceLogMapper(expenseDao, odometerLogDao, serviceTypeDao, odometerUnitDao, expenseTypeDao)
+            new ServiceLogMapper(
+                expenseDao,
+                odometerLogDao,
+                serviceTypeDao,
+                odometerUnitDao,
+                expenseTypeDao,
+                serviceItemDao
+            )
         );
     }
-
 
     async create(formResult: ServiceLogFields): Promise<ServiceLog | null> {
         const { serviceLog, serviceItems, expense, odometerLog } = await this.mapper.formResultToEntities(formResult);

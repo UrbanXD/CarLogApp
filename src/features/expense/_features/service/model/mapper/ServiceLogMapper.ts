@@ -19,6 +19,8 @@ import { ExpenseTypeDao } from "../../../../model/dao/ExpenseTypeDao.ts";
 import { numberToFractionDigit } from "../../../../../../utils/numberToFractionDigit.ts";
 import { OdometerLogTypeEnum } from "../../../../../car/_features/odometer/model/enums/odometerLogTypeEnum.ts";
 import { convertOdometerValueToKilometer } from "../../../../../car/_features/odometer/utils/convertOdometerUnit.ts";
+import { ServiceItemDao } from "../dao/ServiceItemDao.ts";
+import { ServiceItem } from "../../schemas/serviceItemSchema.ts";
 
 export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, ServiceLog> {
     private readonly expenseDao: ExpenseDao;
@@ -26,13 +28,15 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
     private readonly serviceTypeDao: ServiceTypeDao;
     private readonly odometerUnitDao: OdometerUnitDao;
     private readonly expenseTypeDao: ExpenseTypeDao;
+    private readonly serviceItemDao: ServiceItemDao;
 
     constructor(
         expenseDao: ExpenseDao,
         odometerLogDao: OdometerLogDao,
         serviceTypeDao: ServiceTypeDao,
         odometerUnitDao: OdometerUnitDao,
-        expenseTypeDao: ExpenseTypeDao
+        expenseTypeDao: ExpenseTypeDao,
+        serviceItemDao: ServiceItemDao
     ) {
         super();
         this.expenseDao = expenseDao;
@@ -40,10 +44,11 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
         this.serviceTypeDao = serviceTypeDao;
         this.odometerUnitDao = odometerUnitDao;
         this.expenseTypeDao = expenseTypeDao;
+        this.serviceItemDao = serviceItemDao;
     }
 
     async toDto(entity: ServiceLogTableRow): Promise<ServiceLog> {
-        const [expense, odometer, serviceType]: [Expense | null, Odometer | null, ServiceType | null] = await Promise.all(
+        const [expense, odometer, serviceType, serviceItems]: [Expense | null, Odometer | null, ServiceType | null, Array<ServiceItem>] = await Promise.all(
             [
                 (async () => {
                     if(!entity.expense_id) return null;
@@ -53,7 +58,8 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
                     if(!entity.odometer_log_id) return null;
                     return this.odometerLogDao.getOdometerByLogId(entity.odometer_log_id, entity.car_id);
                 })(),
-                this.serviceTypeDao.getById(entity.service_type_id)
+                this.serviceTypeDao.getById(entity.service_type_id),
+                this.serviceItemDao.getAll()
             ]);
 
         return serviceLogSchema.parse({
@@ -61,7 +67,8 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
             carId: entity.car_id,
             expense: expense,
             odometer: odometer,
-            serviceType: serviceType//TODO beleszurni a servicelog schemaba az itemeket iss!!!!!!!!!!
+            serviceType: serviceType,
+            items: serviceItems
         });
     }
 

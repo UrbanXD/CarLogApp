@@ -2,6 +2,7 @@ import { z } from "zod";
 import { expenseSchema } from "../../../schemas/expenseSchema.ts";
 import { odometerSchema } from "../../../../car/_features/odometer/schemas/odometerSchema.ts";
 import { serviceTypeSchema } from "./serviceTypeSchema.ts";
+import { serviceItemSchema } from "./serviceItemSchema.ts";
 
 export const serviceLogSchema = z
 .object({
@@ -9,7 +10,8 @@ export const serviceLogSchema = z
     carId: z.string().uuid(),
     expense: expenseSchema,
     odometer: odometerSchema.nullable(),
-    serviceType: serviceTypeSchema
+    serviceType: serviceTypeSchema,
+    items: z.array(serviceItemSchema)
 });
 
 export type ServiceLog = z.infer<typeof serviceLogSchema>

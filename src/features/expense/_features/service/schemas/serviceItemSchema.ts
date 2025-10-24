@@ -7,7 +7,7 @@ export const serviceItemSchema = z
 .object({
     id: z.string().uuid(),
     carId: carSchema.shape.id,
-    serviceLogId: serviceLogSchema.shape.id,
+    serviceLogId: z.lazy(() => serviceLogSchema.shape.id),
     type: serviceItemTypeSchema,
     quantity: z.number().int(),
     pricePerUnit: z.number().min(0)
