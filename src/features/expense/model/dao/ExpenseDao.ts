@@ -11,6 +11,7 @@ import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts"
 import { ExpenseFields } from "../../schemas/form/expenseForm.ts";
 import { SelectQueryBuilder } from "kysely";
 import { FUEL_LOG_TABLE } from "../../../../database/connector/powersync/tables/fuelLog.ts";
+import { SERVICE_LOG_TABLE } from "../../../../database/connector/powersync/tables/serviceLog.ts";
 
 export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, SelectExpenseTableRow> {
     constructor(
@@ -29,10 +30,10 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         return this.db
         .selectFrom(EXPENSE_TABLE)
         .leftJoin(FUEL_LOG_TABLE, `${ FUEL_LOG_TABLE }.expense_id`, `${ EXPENSE_TABLE }.id`)
+        .leftJoin(SERVICE_LOG_TABLE, `${ SERVICE_LOG_TABLE }.expense_id`, `${ EXPENSE_TABLE }.id`)
         .selectAll(EXPENSE_TABLE)
         .select([
-            eb => eb.ref(`${ FUEL_LOG_TABLE }.id`).as("related_id")
-            // eb => eb.fn.coalesce(`${ FUEL_LOG_TABLE }.id`).as("related_id")
+            eb => eb.fn.coalesce(`${ FUEL_LOG_TABLE }.id`, `${ SERVICE_LOG_TABLE }.id`).as("related_id")
         ]);
     }
 
