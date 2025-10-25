@@ -7,6 +7,8 @@ export const serviceItem = new Table({
     car_id: column.text,
     service_log_id: column.text,
     service_item_type_id: column.text,
+    currency_id: column.text,
+    exchange_rate: column.real,
     quantity: column.integer,
     price_per_unit: column.real
 });

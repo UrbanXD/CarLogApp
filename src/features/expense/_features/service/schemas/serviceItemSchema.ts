@@ -2,6 +2,7 @@ import { z } from "zod";
 import { serviceLogSchema } from "./serviceLogSchema.ts";
 import { serviceItemTypeSchema } from "./serviceItemTypeSchema.ts";
 import { carSchema } from "../../../../car/schemas/carSchema.ts";
+import { amountSchema } from "../../../../_shared/currency/schemas/amountSchema.ts";
 
 export const serviceItemSchema = z
 .object({
@@ -10,7 +11,7 @@ export const serviceItemSchema = z
     serviceLogId: z.lazy(() => serviceLogSchema.shape.id),
     type: serviceItemTypeSchema,
     quantity: z.number().int(),
-    pricePerUnit: z.number().min(0)
+    pricePerUnit: amountSchema
 });
 
 export type ServiceItem = z.infer<typeof serviceItemSchema>;
