@@ -21,6 +21,9 @@ import { OdometerLogTypeEnum } from "../../../../../car/_features/odometer/model
 import { convertOdometerValueToKilometer } from "../../../../../car/_features/odometer/utils/convertOdometerUnit.ts";
 import { ServiceItemDao } from "../dao/ServiceItemDao.ts";
 import { ServiceItem } from "../../schemas/serviceItemSchema.ts";
+import { Amount } from "../../../../../_shared/currency/schemas/amountSchema.ts";
+import { OdometerUnit } from "../../../../../car/_features/odometer/schemas/odometerUnitSchema.ts";
+import { CarDao } from "../../../../../car/model/dao/CarDao.ts";
 
 export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, ServiceLog> {
     private readonly expenseDao: ExpenseDao;
@@ -29,6 +32,7 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
     private readonly odometerUnitDao: OdometerUnitDao;
     private readonly expenseTypeDao: ExpenseTypeDao;
     private readonly serviceItemDao: ServiceItemDao;
+    private readonly carDao: CarDao;
 
     constructor(
         expenseDao: ExpenseDao,
@@ -36,7 +40,8 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
         serviceTypeDao: ServiceTypeDao,
         odometerUnitDao: OdometerUnitDao,
         expenseTypeDao: ExpenseTypeDao,
-        serviceItemDao: ServiceItemDao
+        serviceItemDao: ServiceItemDao,
+        carDao: CarDao
     ) {
         super();
         this.expenseDao = expenseDao;
@@ -45,10 +50,11 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
         this.odometerUnitDao = odometerUnitDao;
         this.expenseTypeDao = expenseTypeDao;
         this.serviceItemDao = serviceItemDao;
+        this.carDao = carDao;
     }
 
     async toDto(entity: ServiceLogTableRow): Promise<ServiceLog> {
-        const [expense, odometer, serviceType, serviceItems]: [Expense | null, Odometer | null, ServiceType | null, Array<ServiceItem>] = await Promise.all(
+        const [expense, odometer, serviceType, serviceTotalAmount, serviceItems]: [Expense | null, Odometer | null, ServiceType | null, Array<Amount>, Array<ServiceItem>] = await Promise.all(
             [
                 (async () => {
                     if(!entity.expense_id) return null;
@@ -59,7 +65,8 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
                     return this.odometerLogDao.getOdometerByLogId(entity.odometer_log_id, entity.car_id);
                 })(),
                 this.serviceTypeDao.getById(entity.service_type_id),
-                this.serviceItemDao.getAll()
+                this.serviceItemDao.getTotalAmountByServiceLogId(entity.id),
+                this.serviceItemDao.getAllByServiceLogId(entity.id)
             ]);
 
         return serviceLogSchema.parse({
@@ -68,7 +75,8 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
             expense: expense,
             odometer: odometer,
             serviceType: serviceType,
-            items: serviceItems
+            items: serviceItems,
+            totalAmount: serviceTotalAmount
         });
     }
 
@@ -88,20 +96,13 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
         expense: ExpenseTableRow,
         odometerLog: OdometerLogTableRow | null
     }> {
-        const odometerUnit = await this.odometerUnitDao.getUnitByCarId(formResult.carId);
-        const expenseTypeId = await this.expenseTypeDao.getIdByKey(ExpenseTypeEnum.SERVICE);
 
-        const expense: ExpenseTableRow = {
-            id: formResult.expenseId,
-            car_id: formResult.carId,
-            type_id: expenseTypeId,
-            currency_id: formResult.currencyId,
-            original_amount: numberToFractionDigit(formResult.amount),
-            exchange_rate: formResult.exchangeRate,
-            amount: numberToFractionDigit(formResult.amount * formResult.exchangeRate),
-            note: formResult.note,
-            date: formResult.date
-        };
+        const [odometerUnit, expenseTypeId, carCurrencyId]: [OdometerUnit, string | null, number | null] = await Promise.all(
+            [
+                this.odometerUnitDao.getUnitByCarId(formResult.carId),
+                this.expenseTypeDao.getIdByKey(ExpenseTypeEnum.SERVICE),
+                this.carDao.getCarCurrencyIdById(formResult.carId)
+            ]);
 
         let odometerLog: OdometerLogTableRow | null = null;
         if(!!formResult?.odometerValue) {
@@ -116,23 +117,38 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
         const serviceLog: ServiceLogTableRow = {
             id: formResult.id,
             car_id: formResult.carId,
-            expense_id: expense.id,
+            expense_id: formResult.expenseId,
             odometer_log_id: odometerLog?.id ?? null,
             service_type_id: formResult.serviceTypeId
         };
 
+        let totalAmount = 0;
         const serviceItems = new Map<string, ServiceItemTableRow>();
-
         for(const item of formResult.items) {
+            totalAmount += item.pricePerUnit * item.quantity * item.exchangeRate;
             serviceItems.set(item.id, {
                 id: item.id,
                 car_id: formResult.carId,
                 service_log_id: serviceLog.id,
                 service_item_type_id: item.typeId,
+                currency_id: item.currencyId,
+                exchange_rate: item.exchangeRate,
                 quantity: item.quantity,
                 price_per_unit: item.pricePerUnit
             });
         }
+
+        const expense: ExpenseTableRow = {
+            id: formResult.expenseId,
+            car_id: formResult.carId,
+            type_id: expenseTypeId,
+            currency_id: carCurrencyId,
+            original_amount: numberToFractionDigit(totalAmount),
+            exchange_rate: 1,
+            amount: numberToFractionDigit(totalAmount),
+            note: formResult.note,
+            date: formResult.date
+        };
 
         return {
             serviceLog,

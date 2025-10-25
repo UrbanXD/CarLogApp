@@ -14,6 +14,7 @@ import { SERVICE_ITEM_TABLE } from "../../../../../../database/connector/powersy
 import { OdometerUnitDao } from "../../../../../car/_features/odometer/model/dao/OdometerUnitDao.ts";
 import { ExpenseTypeDao } from "../../../../model/dao/ExpenseTypeDao.ts";
 import { ServiceItemDao } from "./ServiceItemDao.ts";
+import { CarDao } from "../../../../../car/model/dao/CarDao.ts";
 
 export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLogMapper> {
     constructor(
@@ -23,7 +24,8 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
         serviceTypeDao: ServiceTypeDao,
         odometerUnitDao: OdometerUnitDao,
         expenseTypeDao: ExpenseTypeDao,
-        serviceItemDao: ServiceItemDao
+        serviceItemDao: ServiceItemDao,
+        carDao: CarDao
     ) {
         super(
             db,
@@ -34,7 +36,8 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
                 serviceTypeDao,
                 odometerUnitDao,
                 expenseTypeDao,
-                serviceItemDao
+                serviceItemDao,
+                carDao
             )
         );
     }

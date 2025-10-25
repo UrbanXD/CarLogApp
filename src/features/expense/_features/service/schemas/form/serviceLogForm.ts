@@ -6,10 +6,9 @@ import { odometerLogSchema } from "../../../../../car/_features/odometer/schemas
 import { serviceItemForm } from "./serviceItemForm.ts";
 import { Car } from "../../../../../car/schemas/carSchema.ts";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
-import { CurrencyEnum } from "../../../../../_shared/currency/enums/currencyEnum.ts";
 
 const serviceLogForm = expenseForm
-.pick({ currencyId: true, amount: true, exchangeRate: true, date: true, note: true })
+.pick({ date: true, note: true })
 .extend({ expenseId: expenseForm.shape.id })
 .merge(
     serviceLogSchema
@@ -41,10 +40,7 @@ export function userCreateServiceLogForm(car: Car | null) {
         odometerLogId: getUUID(),
         carId: car?.id,
         serviceTypeId: null,
-        currencyId: car?.currency.id ?? CurrencyEnum.EUR,
         items: [],
-        amount: NaN,
-        exchangeRate: 1,
         odometerValue: NaN,
         note: null,
         date: new Date()
