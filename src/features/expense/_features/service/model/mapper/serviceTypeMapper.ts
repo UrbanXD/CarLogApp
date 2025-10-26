@@ -3,6 +3,7 @@ import { ServiceTypeTableRow } from "../../../../../../database/connector/powers
 import { ServiceType, serviceTypeSchema } from "../../schemas/serviceTypeSchema.ts";
 import { ServiceTypeEnum } from "../enums/ServiceTypeEnum.ts";
 import { COLORS, ICON_NAMES } from "../../../../../../constants/index.ts";
+import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
 
 export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, ServiceType> {
     constructor() {
@@ -37,6 +38,13 @@ export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, Servi
             id: dto.id,
             key: dto.key,
             owner_id: dto.ownerId
+        };
+    }
+
+    entityToPickerItem(entity: ServiceTypeTableRow): Promise<PickerItemType> {
+        return {
+            value: entity.id.toString(),
+            title: entity.key
         };
     }
 }

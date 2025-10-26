@@ -4,6 +4,8 @@ import { ServiceType } from "../../schemas/serviceTypeSchema.ts";
 import { ServiceTypeMapper } from "../mapper/serviceTypeMapper.ts";
 import { Kysely } from "@powersync/kysely-driver";
 import { SERVICE_TYPE_TABLE } from "../../../../../../database/connector/powersync/tables/serviceType.ts";
+import { CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
+import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
 
 export class ServiceTypeDao extends Dao<ServiceTypeTableRow, ServiceType, ServiceTypeMapper> {
     constructor(db: Kysely<DatabaseType>) {
@@ -31,5 +33,17 @@ export class ServiceTypeDao extends Dao<ServiceTypeTableRow, ServiceType, Servic
         .executeTakeFirstOrThrow();
 
         return result.id;
+    }
+
+    paginator(perPage?: number = 20): CursorPaginator<ServiceTypeTableRow, PickerItemType> {
+        return new CursorPaginator<ServiceTypeTableRow, PickerItemType>(
+            this.db,
+            SERVICE_TYPE_TABLE,
+            { field: ["key", "id"], order: "asc" },
+            {
+                perPage,
+                mapper: this.mapper.entityToPickerItem.bind(this.mapper)
+            }
+        );
     }
 }
