@@ -21,10 +21,7 @@ export const zNumber = ({
         .string()
         .transform((value) => (value === "" ? (optional ? null : NaN) : Number(value)))
         .refine(
-            (value) => {
-                console.log(value, !isNaN(value));
-                return optional || !isNaN(value);
-            },
+            (value) => optional || !isNaN(value),
             { message: errorMessage?.required ?? "Kérem adjon meg egy számot." }
         )
         .refine(
