@@ -6,6 +6,7 @@ import { odometerLogSchema } from "../../../../../car/_features/odometer/schemas
 import { serviceItemForm } from "./serviceItemForm.ts";
 import { Car } from "../../../../../car/schemas/carSchema.ts";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const serviceLogForm = expenseForm
 .pick({ date: true, note: true })
@@ -33,7 +34,7 @@ const serviceLogForm = expenseForm
 
 export type ServiceLogFields = z.infer<typeof serviceLogForm>;
 
-export function userCreateServiceLogForm(car: Car | null) {
+export function useCreateServiceLogForm(car: Car | null) {
     const defaultValues: ServiceLogFields = {
         id: getUUID(),
         expenseId: getUUID(),
@@ -45,4 +46,6 @@ export function userCreateServiceLogForm(car: Car | null) {
         note: null,
         date: new Date()
     };
+
+    return { defaultValues, resolver: zodResolver(serviceLogForm) };
 }
