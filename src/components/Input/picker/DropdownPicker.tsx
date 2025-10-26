@@ -151,10 +151,11 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
 
     useEffect(() => {
         if(!inputFieldValue || !initialLoadCompleted) return;
+        if(inputFieldValue === "") return setSelectedItem(null);
 
         const item = items.find(item => item.value === inputFieldValue);
-        setSelectedItem(item ?? null);
-    }, [inputFieldValue, initialLoadCompleted, items]);
+        if(item && item !== selectedItem) setSelectedItem(item);
+    }, [inputFieldValue, initialLoadCompleted]);
 
     useEffect(() => {
         if(!data && !paginator) throw new Error("DropdownPicker did not get Data nor Paginator");
