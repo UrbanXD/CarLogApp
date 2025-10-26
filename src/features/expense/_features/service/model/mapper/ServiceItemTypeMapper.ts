@@ -1,6 +1,7 @@
 import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
 import { ServiceItemTypeTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { ServiceItemType, serviceItemTypeSchema } from "../../schemas/serviceItemTypeSchema.ts";
+import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
 
 export class ServiceItemTypeMapper extends AbstractMapper<ServiceItemTypeTableRow, ServiceItemType> {
     async toDto(entity: ServiceItemTypeTableRow): Promise<ServiceItemType> {
@@ -16,6 +17,13 @@ export class ServiceItemTypeMapper extends AbstractMapper<ServiceItemTypeTableRo
             id: dto.id,
             key: dto.key,
             owner_id: dto.ownerId
+        };
+    }
+
+    entityToPickerItem(entity: ServiceItemTypeTableRow): Promise<PickerItemType> {
+        return {
+            value: entity.id.toString(),
+            title: entity.key
         };
     }
 }
