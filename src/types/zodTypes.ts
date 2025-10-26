@@ -16,12 +16,15 @@ export const zNumber = ({
 }: ZodNumberArgs) => {
     const base = z
     .preprocess(
-        (value: any) => value ? value.toString() : "",
+        (value: any) => value?.toString() ? value.toString() : "",
         z
         .string()
         .transform((value) => (value === "" ? (optional ? null : NaN) : Number(value)))
         .refine(
-            (value) => optional || !isNaN(value),
+            (value) => {
+                console.log(value, !isNaN(value));
+                return optional || !isNaN(value);
+            },
             { message: errorMessage?.required ?? "Kérem adjon meg egy számot." }
         )
         .refine(
