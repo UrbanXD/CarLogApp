@@ -55,14 +55,15 @@ export function ServiceItemView({ item, onPress, onDelete }: ServiceItemProps) {
 const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
-        alignItems: "flex-start",
+        alignItems: "center",
         gap: SEPARATOR_SIZES.lightSmall / 2,
         paddingVertical: SEPARATOR_SIZES.lightSmall / 2
     },
     labelContainer: {
         flex: 1,
         flexDirection: "row",
-        alignItems: "center"
+        alignItems: "center",
+        gap: SEPARATOR_SIZES.lightSmall / 2
     },
     itemText: {
         fontFamily: "Gilroy-Medium",
