@@ -1,5 +1,9 @@
-import { serviceItemSchema } from "../serviceItemSchema.ts";
+import { ServiceItem, serviceItemSchema } from "../serviceItemSchema.ts";
 import { zNumber, zPickerRequired } from "../../../../../../types/zodTypes.ts";
+import { getUUID } from "../../../../../../database/utils/uuid.ts";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { CurrencyEnum } from "../../../../../_shared/currency/enums/currencyEnum.ts";
 
 export const serviceItemForm = serviceItemSchema
 .pick({ id: true })
@@ -36,3 +40,21 @@ export const serviceItemForm = serviceItemSchema
         }
     }).pipe(serviceItemSchema.shape.pricePerUnit.shape.exchangeRate)
 });
+
+export type ServiceItemFields = z.infer<typeof serviceItemForm>;
+
+export function useServiceItemFormProps({ carCurrencyId, serviceItem }: {
+    carCurrencyId?: number,
+    serviceItem?: ServiceItem
+}) {
+    const defaultValues: ServiceItemFields = {
+        id: serviceItem?.id ?? getUUID(),
+        typeId: serviceItem?.type?.id ?? null,
+        currencyId: serviceItem?.pricePerUnit?.currency?.id ?? carCurrencyId ?? CurrencyEnum.EUR,
+        quantity: serviceItem?.quantity ?? 1,
+        pricePerUnit: serviceItem?.pricePerUnit?.amount ?? 0,
+        exchangeRate: serviceItem?.pricePerUnit?.exchangeRate ?? 1
+    };
+
+    return { defaultValues, resolver: zodResolver(serviceItemForm) };
+}

@@ -7,6 +7,7 @@ import { CurrencyDao } from "../../../../../_shared/currency/model/dao/CurrencyD
 import { Currency } from "../../../../../_shared/currency/schemas/currencySchema.ts";
 import { ServiceItemType } from "../../schemas/serviceItemTypeSchema.ts";
 import { Amount, amountSchema } from "../../../../../_shared/currency/schemas/amountSchema.ts";
+import { ServiceItemFields } from "../../schemas/form/serviceItemForm.ts";
 
 export type SelectServiceItemTableRow = ServiceItemTableRow & { car_currency_id: number }
 
@@ -86,5 +87,30 @@ export class ServiceItemMapper extends AbstractMapper<ServiceItemTableRow, Servi
         }
 
         return result;
+    }
+
+    async formResultToDto(formResult: ServiceItemFields & {
+        carCurrencyId: number
+    }): Promise<Omit<ServiceItem, "serviceLogId" | "carId">> {
+        const [type, carCurrency, currency]: [ServiceItemType | null, Currency | null, Currency | null] = await Promise.all(
+            [
+                this.serviceItemTypeDao.getById(formResult.typeId),
+                this.currencyDao.getById(formResult.carCurrencyId),
+                this.currencyDao.getById(formResult.currencyId)
+            ]
+        );
+
+        return serviceItemSchema.omit({ serviceLogId: true, carId: true }).parse({
+            id: formResult.id,
+            type: type,
+            quantity: formResult.quantity,
+            pricePerUnit: amountSchema.parse({
+                amount: numberToFractionDigit(formResult.pricePerUnit),
+                exchangedAmount: numberToFractionDigit(formResult.exchangeRate * formResult.pricePerUnit),
+                exchangeRate: numberToFractionDigit(formResult.exchangeRate),
+                currency: currency,
+                exchangeCurrency: carCurrency
+            })
+        });
     }
 }
