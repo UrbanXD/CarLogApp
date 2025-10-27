@@ -4,11 +4,9 @@ import DropdownPickerItems from "./dropdown/DropdownPickerItems.tsx";
 import { Paginator } from "../../../database/paginator/AbstractPaginator.ts";
 import { DatabaseType } from "../../../database/connector/powersync/AppSchema.ts";
 import { PopupView } from "../../popupView/PopupView.tsx";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { useAnimatedReaction, useSharedValue } from "react-native-reanimated";
 import { PickerItemType } from "./PickerItem.tsx";
 import { StyleSheet, TextStyle, View } from "react-native";
-import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { DropdownPickerHeader } from "./dropdown/DropdownPickerHeader.tsx";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { DropdownPickerFooter } from "./dropdown/DropdownPickerFooter.tsx";
@@ -250,11 +248,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
 
 const styles = StyleSheet.create({
     popupContainer: {
-        height: hp(50),
-        backgroundColor: COLORS.black5,
-        paddingHorizontal: SEPARATOR_SIZES.small,
-        paddingVertical: DEFAULT_SEPARATOR,
-        borderRadius: 25
+        // height: hp(50)
     }
 });
 

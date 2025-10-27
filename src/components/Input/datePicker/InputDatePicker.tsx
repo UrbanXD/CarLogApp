@@ -1,9 +1,7 @@
 import { useSharedValue } from "react-native-reanimated";
 import { StyleSheet } from "react-native";
-import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import React, { useEffect, useMemo, useState } from "react";
 import { DateType } from "react-native-ui-datepicker";
-import { heightPercentageToDP } from "react-native-responsive-screen";
 import { DatePicker } from "./DatePicker.tsx";
 import { DatePickerProvider } from "../../../contexts/datePicker/DatePickerProvider.tsx";
 import { PopupView } from "../../popupView/PopupView.tsx";
@@ -15,13 +13,14 @@ import { DatePickerViews } from "../../../contexts/datePicker/DatePickerContext.
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 
 type InputDatePicker = {
+    title?: string
     defaultDate?: DateType
     minDate?: DateType
     maxDate?: DateType
     locale?: string
 }
 
-function InputDatePicker({ defaultDate, maxDate, minDate, locale = "hu" }: InputDatePicker) {
+function InputDatePicker({ title = "Dátum", defaultDate, maxDate, minDate, locale = "hu" }: InputDatePicker) {
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field?.onChange;
     const fieldValue = useMemo(() => {
@@ -77,7 +76,7 @@ function InputDatePicker({ defaultDate, maxDate, minDate, locale = "hu" }: Input
                     onSubmit={ submit }
                     onClose={ close }
                 >
-                    <DatePickerHeader/>
+                    <DatePickerHeader title={ title }/>
                     <DatePicker/>
                     <DatePickerFooter/>
                 </DatePickerProvider>
@@ -88,11 +87,8 @@ function InputDatePicker({ defaultDate, maxDate, minDate, locale = "hu" }: Input
 
 const styles = StyleSheet.create({
     popupContainer: {
-        height: heightPercentageToDP(43),
-        backgroundColor: COLORS.black5,
-        paddingHorizontal: SEPARATOR_SIZES.small,
-        paddingVertical: DEFAULT_SEPARATOR,
-        borderRadius: 25
+
+        // height: heightPercentageToDP(43)
     }
 });
 

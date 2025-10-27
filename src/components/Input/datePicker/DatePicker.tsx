@@ -5,7 +5,6 @@ import { WheelDatePicker } from "./pickerView/WheelDatePicker.tsx";
 import { useDatePicker } from "../../../contexts/datePicker/DatePickerContext.ts";
 import { TimePicker } from "./pickerView/TimePicker.tsx";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import { heightPercentageToDP } from "react-native-responsive-screen";
 import { CalendarHeader } from "./header/CalendarHeader.tsx";
 
 export function DatePicker() {
@@ -48,7 +47,6 @@ const styles = StyleSheet.create({
         gap: 5
     },
     viewContainer: {
-        flex: 1,
-        height: heightPercentageToDP(30)
+        flex: 1
     }
 });

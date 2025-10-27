@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useEffect, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import Animated, {
     SharedValue,
     useAnimatedReaction,
@@ -8,7 +8,7 @@ import Animated, {
     withTiming
 } from "react-native-reanimated";
 import { Dimensions, Keyboard, LayoutChangeEvent, StyleSheet, View, ViewStyle } from "react-native";
-import { DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../../constants/index.ts";
+import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { Overlay } from "../overlay/Overlay.tsx";
 import { Portal } from "@gorhom/portal";
 import { scheduleOnRN } from "react-native-worklets";
@@ -90,6 +90,7 @@ export function PopupView({ opened, dismount = true, children, style }: PopupVie
 
         return {
             display: popupDisplay.value,
+            height: withTiming(popupHeight.value, { duration: 250 }),
             opacity: opacity.value,
             transform: [{ scale: scale.value }, { translateY }]
         };
@@ -100,11 +101,19 @@ export function PopupView({ opened, dismount = true, children, style }: PopupVie
             <Overlay opened={ opened } onPress={ close }/>
             {
                 (!dismount || mounted) &&
-               <View style={ styles.container } pointerEvents="box-none">
-                  <Animated.View style={ [popupStyle, styles.popup, style] } onLayout={ onLayout }>
-                      { children }
-                  </Animated.View>
-               </View>
+               <>
+                  <View style={ styles.container } pointerEvents="box-none">
+                     <View
+                        style={ [styles.popup, style, styles.hiddenElement] }
+                        onLayout={ onLayout }
+                     >
+                         { children }
+                     </View>
+                     <Animated.View style={ [popupStyle, styles.popup, style] }>
+                         { children }
+                     </Animated.View>
+                  </View>
+               </>
             }
         </Portal>
     );
@@ -119,9 +128,19 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginHorizontal: DEFAULT_SEPARATOR
     },
+    hiddenElement: {
+        position: "absolute",
+        opacity: 0,
+        zIndex: -1
+    },
     popup: {
         width: "100%",
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        backgroundColor: COLORS.black5,
+        paddingHorizontal: SEPARATOR_SIZES.small,
+        paddingVertical: DEFAULT_SEPARATOR,
+        borderRadius: 25,
+        overflow: "hidden"
     }
 });

@@ -198,30 +198,30 @@ export function AmountInput({
                      </Text>
                   </View>
                   <View style={ styles.exchangeContainer.inputContainer }>
-                     <Input.Field
-                        control={ control }
-                        fieldName={ exchangeRateFieldName }
-                     >
-                        <Input.Row style={ styles.exchangeContainer.inputContainer.row }>
-                           <View style={ styles.exchangeContainer.inputContainer.label }>
-                              <Text style={ styles.exchangeContainer.inputContainer.label.baseText }>1</Text>
-                              <Text
-                                 style={ styles.exchangeContainer.inputContainer.label.currencyText }>
-                                  { getCurrencyText(formCurrency?.toString()) }
-                              </Text>
-                              <Text style={ styles.exchangeContainer.inputContainer.label.arrow }>⇄</Text>
-                           </View>
+                     <Input.Row style={ styles.exchangeContainer.inputContainer.row }>
+                        <View style={ styles.exchangeContainer.inputContainer.label }>
+                           <Text style={ styles.exchangeContainer.inputContainer.label.baseText }>1</Text>
+                           <Text
+                              style={ styles.exchangeContainer.inputContainer.label.currencyText }>
+                               { getCurrencyText(formCurrency?.toString()) }
+                           </Text>
+                           <Text style={ styles.exchangeContainer.inputContainer.label.arrow }>⇄</Text>
+                        </View>
+                        <Input.Field
+                           control={ control }
+                           fieldName={ exchangeRateFieldName }
+                           style={ { flex: 1 } }
+                        >
                            <Input.Text
                               placeholder="1.0"
                               keyboardType="numeric"
-                              containerStyle={ { flexGrow: 1 } }
                               type="secondary"
                            />
-                           <Text style={ styles.exchangeContainer.inputContainer.label.currencyText }>
-                               { getCurrencyText(defaultCurrency?.toString()) }
-                           </Text>
-                        </Input.Row>
-                     </Input.Field>
+                        </Input.Field>
+                        <Text style={ styles.exchangeContainer.inputContainer.label.currencyText }>
+                            { getCurrencyText(defaultCurrency?.toString()) }
+                        </Text>
+                     </Input.Row>
                   </View>
                </View>
             }
@@ -231,6 +231,7 @@ export function AmountInput({
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         gap: SEPARATOR_SIZES.lightSmall
     },
     isPricePerUnitContainer: {
@@ -244,7 +245,6 @@ const styles = StyleSheet.create({
         }
     },
     quantityAmountContainer: {
-        flex: 1,
         flexDirection: "row",
         gap: SEPARATOR_SIZES.lightSmall
     },
@@ -274,20 +274,21 @@ const styles = StyleSheet.create({
         color: COLORS.gray1
     },
     exchangeContainer: {
-        flex: 1,
+        width: "100%",
         flexDirection: "row",
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "space-between",
         gap: SEPARATOR_SIZES.lightSmall,
 
         textContainer: {
-            flex: 0.60
+            flex: 1
         },
 
         inputContainer: {
-            flex: 0.40,
+            flex: 0.55,
 
             row: {
+                flex: 0,
                 alignItems: "center",
                 gap: 0
             },

@@ -6,25 +6,27 @@ import { StyleSheet, View, ViewStyle } from "react-native";
 import { InputFieldProvider } from "../../../contexts/inputField/InputFieldProvider.tsx";
 import InputError from "./InputError.tsx";
 
-interface InputFieldProps {
-    control: Control<any>;
-    fieldName: string;
-    fieldNameText?: string;
-    fieldInfoText?: string;
-    optional?: boolean;
-    containerStyle?: ViewStyle;
-    children: ReactNode;
+type InputFieldProps = {
+    control: Control<any>
+    fieldName: string
+    fieldNameText?: string
+    fieldInfoText?: string
+    optional?: boolean
+    containerStyle?: ViewStyle
+    style?: ViewStyle
+    children: ReactNode
 }
 
-const InputField: React.FC<InputFieldProps> = ({
+function InputField({
     control,
     fieldName,
     fieldNameText,
     fieldInfoText,
     optional,
     containerStyle,
+    style,
     children
-}) => {
+}: InputFieldProps) {
     const renderControllerInput = (args: UseControllerReturn<any>) => {
         return (
             <InputFieldProvider value={ { ...args, control: control } }>
@@ -37,7 +39,7 @@ const InputField: React.FC<InputFieldProps> = ({
     };
 
     return (
-        <View style={ styles.container }>
+        <View style={ [styles.container, style] }>
             {
                 fieldNameText &&
                <InputTitle
@@ -46,16 +48,14 @@ const InputField: React.FC<InputFieldProps> = ({
                   optional={ optional }
                />
             }
-            {
-                <Controller
-                    control={ control }
-                    name={ fieldName }
-                    render={ renderControllerInput }
-                />
-            }
+            <Controller
+                control={ control }
+                name={ fieldName }
+                render={ renderControllerInput }
+            />
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {

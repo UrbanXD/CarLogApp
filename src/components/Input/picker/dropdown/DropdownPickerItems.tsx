@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import PickerItem, { PickerItemType } from "../PickerItem.tsx";
 import { COLORS, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { heightPercentageToDP, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { FlashList, FlashListRef } from "@shopify/flash-list";
 
 type DropdownPickerElementsProps = {
@@ -130,6 +130,7 @@ function DropdownPickerItems({
             ListEmptyComponent={ renderListEmptyComponent }
             ItemSeparatorComponent={ renderSeparatorComponent }
             nestedScrollEnabled
+            style={ { maxHeight: heightPercentageToDP(31) } }
             scrollEventThrottle={ 16 }
             onStartReached={ onStartReached }
             onStartReachedThreshold={ 0.5 }

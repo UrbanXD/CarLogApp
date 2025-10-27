@@ -5,7 +5,11 @@ import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withTiming
 import Icon from "../../../Icon.tsx";
 import { DatePickerViews, useDatePicker } from "../../../../contexts/datePicker/DatePickerContext.ts";
 
-export function DatePickerHeader() {
+type DatePickerHeaderProps = {
+    title?: string
+}
+
+export function DatePickerHeader({ title }: DatePickerHeaderProps) {
     const { date, currentView, openView } = useDatePicker();
 
     const view = useSharedValue<DatePickerViews>(currentView);
@@ -34,48 +38,63 @@ export function DatePickerHeader() {
 
     return (
         <View style={ styles.container }>
-            <Pressable onPress={ onPressDateSelector } style={ { flexDirection: "row", alignItems: "center" } }>
-                <Icon
-                    icon={ ICON_NAMES.calendar }
-                    size={ FONT_SIZES.p3 * ICON_FONT_SIZE_SCALE }
-                    style={ { marginRight: SEPARATOR_SIZES.lightSmall / 2 } }
-                />
-                <Text style={ styles.label }>{ date.format("YYYY. MMM D.") }</Text>
-                <Animated.View style={ dateArrowStyle }>
+            {
+                title &&
+               <Text style={ styles.title }>{ title }</Text>
+            }
+            <View style={ styles.buttonContainer }>
+                <Pressable onPress={ onPressDateSelector } style={ { flexDirection: "row", alignItems: "center" } }>
                     <Icon
-                        icon={ ICON_NAMES.downArrowHead }
-                        size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
+                        icon={ ICON_NAMES.calendar }
+                        size={ FONT_SIZES.p3 * ICON_FONT_SIZE_SCALE }
+                        style={ { marginRight: SEPARATOR_SIZES.lightSmall / 2 } }
                     />
-                </Animated.View>
-            </Pressable>
-            <Pressable onPress={ onPressTimeSelector } style={ { flexDirection: "row", alignItems: "center" } }>
-                <Icon
-                    icon={ ICON_NAMES.clock }
-                    size={ FONT_SIZES.p3 * ICON_FONT_SIZE_SCALE }
-                    style={ { marginRight: SEPARATOR_SIZES.lightSmall / 2 } }
-                />
-                <Text style={ styles.label }>{ date.format("HH:mm") }</Text>
-                <Animated.View style={ timeArrowStyle }>
+                    <Text style={ styles.label }>{ date.format("YYYY. MMM D.") }</Text>
+                    <Animated.View style={ dateArrowStyle }>
+                        <Icon
+                            icon={ ICON_NAMES.downArrowHead }
+                            size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
+                        />
+                    </Animated.View>
+                </Pressable>
+                <Pressable onPress={ onPressTimeSelector } style={ { flexDirection: "row", alignItems: "center" } }>
                     <Icon
-                        icon={ ICON_NAMES.downArrowHead }
-                        size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
+                        icon={ ICON_NAMES.clock }
+                        size={ FONT_SIZES.p3 * ICON_FONT_SIZE_SCALE }
+                        style={ { marginRight: SEPARATOR_SIZES.lightSmall / 2 } }
                     />
-                </Animated.View>
-            </Pressable>
+                    <Text style={ styles.label }>{ date.format("HH:mm") }</Text>
+                    <Animated.View style={ timeArrowStyle }>
+                        <Icon
+                            icon={ ICON_NAMES.downArrowHead }
+                            size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
+                        />
+                    </Animated.View>
+                </Pressable>
+            </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
+        gap: SEPARATOR_SIZES.lightSmall
+    },
+    buttonContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         width: "100%",
-        borderColor: COLORS.white2,
-        paddingBottom: 5,
-        marginBottom: 5,
-        borderBottomWidth: 1
+        paddingBottom: SEPARATOR_SIZES.lightSmall,
+        marginBottom: SEPARATOR_SIZES.lightSmall,
+        borderBottomWidth: 1,
+        borderColor: COLORS.white2
+    },
+    title: {
+        fontFamily: "Gilroy-Heavy",
+        fontSize: FONT_SIZES.p1,
+        color: COLORS.white,
+        textAlign: "center"
     },
     label: {
         fontFamily: "Gilroy-Heavy",
