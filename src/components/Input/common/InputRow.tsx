@@ -19,6 +19,7 @@ export function InputRow({ children, focused = false, style }: InputRowProps) {
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         flexDirection: "row",
         gap: SEPARATOR_SIZES.small,
         height: formTheme.containerHeight,

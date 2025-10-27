@@ -17,6 +17,7 @@ type AmountInputProps = {
     amountPlaceholder?: string
     amountFieldName: string
     currencyFieldName: string
+    quantityFieldName?: string
     isPricePerUnitFieldName?: string
     exchangeRateFieldName?: string
     exchangeText?: (exchangedAmount: string, isTotalAmount?: boolean) => ReactNode
@@ -38,6 +39,7 @@ export function AmountInput({
     amountPlaceholder = "Összeg",
     amountFieldName,
     currencyFieldName,
+    quantityFieldName,
     isPricePerUnitFieldName,
     exchangeRateFieldName,
     exchangeText,
@@ -111,19 +113,18 @@ export function AmountInput({
 
     return (
         <View style={ styles.container }>
-            <Input.Title title={ title } subtitle={ subtitle }/>
+            {
+                title &&
+               <Input.Title title={ title } subtitle={ subtitle }/>
+            }
             {
                 isPricePerUnitFieldName &&
                <Input.Field control={ control } fieldName={ isPricePerUnitFieldName }>
-                  <View style={ {
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: SEPARATOR_SIZES.lightSmall
-                  } }>
+                  <View style={ styles.isPricePerUnitContainer }>
                      <Input.Switch label={ { on: "Egységár", off: "Összköltség" } }/>
                       {
                           formIsPricePerUnit &&
-                         <View style={ { flexShrink: 1, height: "100%" } }>
+                         <View style={ styles.isPricePerUnitContainer.textContainer }>
                             <Text style={ styles.label }>
                                 { getTotalAmountText() }
                             </Text>
@@ -132,37 +133,59 @@ export function AmountInput({
                   </View>
                </Input.Field>
             }
-            <Input.Row style={ { gap: 0 } }>
-                <View style={ styles.amountContainer }>
-                    <View style={ styles.amountContainer.amount }>
-                        <Input.Field
-                            control={ control }
-                            fieldName={ amountFieldName }
-                        >
-                            <Input.Text
-                                icon={ ICON_NAMES.money }
-                                placeholder={ amountPlaceholder }
-                                keyboardType="numeric"
-                                type="secondary"
-                            />
+            <View style={ styles.quantityAmountContainer }>
+                {
+                    quantityFieldName &&
+                   <View style={ styles.quantityContainer }>
+                      <Input.Row style={ { gap: 0 } }>
+                         <View style={ { flex: 1 } }>
+                            <Input.Field
+                               control={ control }
+                               fieldName={ quantityFieldName }
+                            >
+                               <Input.Text
+                                  placeholder={ "1" }
+                                  keyboardType="numeric"
+                                  type="secondary"
+                               />
+                            </Input.Field>
+                         </View>
+                         <Text style={ styles.quantityContainer.countText }>db</Text>
+                      </Input.Row>
+                   </View>
+                }
+                <Input.Row style={ { gap: 0 } }>
+                    <View style={ styles.amountContainer }>
+                        <View style={ styles.amountContainer.amount }>
+                            <Input.Field
+                                control={ control }
+                                fieldName={ amountFieldName }
+                            >
+                                <Input.Text
+                                    icon={ ICON_NAMES.money }
+                                    placeholder={ amountPlaceholder }
+                                    keyboardType="numeric"
+                                    type="secondary"
+                                />
+                            </Input.Field>
+                        </View>
+                        <Input.Field control={ control } fieldName={ currencyFieldName }>
+                            {
+                                currencies
+                                ?
+                                <Input.Picker.Dropdown
+                                    data={ currencies }
+                                    title={ "Valuta" }
+                                    type="secondary"
+                                    hiddenBackground={ true }
+                                />
+                                :
+                                <MoreDataLoading/>
+                            }
                         </Input.Field>
                     </View>
-                    <Input.Field control={ control } fieldName={ currencyFieldName }>
-                        {
-                            currencies
-                            ?
-                            <Input.Picker.Dropdown
-                                data={ currencies }
-                                title={ "Valuta" }
-                                type="secondary"
-                                hiddenBackground={ true }
-                            />
-                            :
-                            <MoreDataLoading/>
-                        }
-                    </Input.Field>
-                </View>
-            </Input.Row>
+                </Input.Row>
+            </View>
             {
                 showsExchangeRate && exchangeRateFieldName && (formCurrency?.toString() !== defaultCurrency?.toString()) &&
                <View style={ styles.exchangeContainer }>
@@ -210,6 +233,31 @@ const styles = StyleSheet.create({
     container: {
         gap: SEPARATOR_SIZES.lightSmall
     },
+    isPricePerUnitContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: SEPARATOR_SIZES.lightSmall,
+
+        textContainer: {
+            flexShrink: 1,
+            height: "100%"
+        }
+    },
+    quantityAmountContainer: {
+        flex: 1,
+        flexDirection: "row",
+        gap: SEPARATOR_SIZES.lightSmall
+    },
+    quantityContainer: {
+        flex: 0.4,
+
+        countText: {
+            alignSelf: "flex-end",
+            marginBottom: SEPARATOR_SIZES.small,
+            fontSize: formTheme.valueTextFontSize / 1.35,
+            color: COLORS.gray1
+        }
+    },
     amountContainer: {
         flex: 1,
         flexDirection: "row",
@@ -224,7 +272,6 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p3,
         color: COLORS.gray1
-
     },
     exchangeContainer: {
         flex: 1,
