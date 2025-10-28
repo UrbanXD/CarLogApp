@@ -6,6 +6,7 @@ import { useDatePicker } from "../../../contexts/datePicker/DatePickerContext.ts
 import { TimePicker } from "./pickerView/TimePicker.tsx";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { CalendarHeader } from "./header/CalendarHeader.tsx";
+import { heightPercentageToDP } from "react-native-responsive-screen";
 
 export function DatePicker() {
     const { currentView } = useDatePicker();
@@ -42,11 +43,13 @@ export function DatePicker() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
         width: "100%",
+        height: heightPercentageToDP(28),
         gap: 5
     },
     viewContainer: {
-        flex: 1
+        flex: 1,
+        justifyContent: "center"
     }
 });

@@ -1,5 +1,4 @@
 import { useSharedValue } from "react-native-reanimated";
-import { StyleSheet } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import { DateType } from "react-native-ui-datepicker";
 import { DatePicker } from "./DatePicker.tsx";
@@ -63,10 +62,7 @@ function InputDatePicker({ title = "Dátum", defaultDate, maxDate, minDate, loca
     return (
         <>
             <InputDatePickerController date={ date } open={ open } expanded={ false }/>
-            <PopupView
-                opened={ isExpanded }
-                style={ styles.popupContainer }
-            >
+            <PopupView opened={ isExpanded }>
                 <DatePickerProvider
                     initialDate={ date }
                     maxDate={ maxDate }
@@ -84,12 +80,5 @@ function InputDatePicker({ title = "Dátum", defaultDate, maxDate, minDate, loca
         </>
     );
 }
-
-const styles = StyleSheet.create({
-    popupContainer: {
-
-        // height: heightPercentageToDP(43)
-    }
-});
 
 export default InputDatePicker;

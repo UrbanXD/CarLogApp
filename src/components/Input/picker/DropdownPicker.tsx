@@ -6,7 +6,7 @@ import { DatabaseType } from "../../../database/connector/powersync/AppSchema.ts
 import { PopupView } from "../../popupView/PopupView.tsx";
 import { useAnimatedReaction, useSharedValue } from "react-native-reanimated";
 import { PickerItemType } from "./PickerItem.tsx";
-import { StyleSheet, TextStyle, View } from "react-native";
+import { TextStyle } from "react-native";
 import { DropdownPickerHeader } from "./dropdown/DropdownPickerHeader.tsx";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { DropdownPickerFooter } from "./dropdown/DropdownPickerFooter.tsx";
@@ -217,39 +217,31 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
                 hiddenBackground={ hiddenBackground }
                 textInputStyle={ textInputStyle }
             />
-            <PopupView opened={ isOpened } style={ styles.popupContainer }>
-                <View style={ { flex: 1, width: "100%" } }>
-                    <DropdownPickerHeader
-                        title={ title }
-                        searchTerm={ searchTerm }
-                        setSearchTerm={ setSearchTerm }
-                        searchBarEnabled={ searchBarEnabled }
-                        searchBarPlaceholder={ searchBarPlaceholder }
-                    />
-                    <DropdownPickerItems
-                        items={ items }
-                        fetchByScrolling={ IS_STATIC ? null : fetchByScrolling }
-                        fetchingEnabled={ IS_STATIC ? false : initialLoadCompleted }
-                        selectedItem={ tmpSelectedItem }
-                        onSelect={ onSelect }
-                        searchTerm={ searchTerm }
-                        masonry={ masonry }
-                        numColumns={ numColumns }
-                    />
-                    {
-                        !selectWithoutSubmit &&
-                       <DropdownPickerFooter onSubmit={ onSubmit }/>
-                    }
-                </View>
+            <PopupView opened={ isOpened }>
+                <DropdownPickerHeader
+                    title={ title }
+                    searchTerm={ searchTerm }
+                    setSearchTerm={ setSearchTerm }
+                    searchBarEnabled={ searchBarEnabled }
+                    searchBarPlaceholder={ searchBarPlaceholder }
+                />
+                <DropdownPickerItems
+                    items={ items }
+                    fetchByScrolling={ IS_STATIC ? null : fetchByScrolling }
+                    fetchingEnabled={ IS_STATIC ? false : initialLoadCompleted }
+                    selectedItem={ tmpSelectedItem }
+                    onSelect={ onSelect }
+                    searchTerm={ searchTerm }
+                    masonry={ masonry }
+                    numColumns={ numColumns }
+                />
+                {
+                    !selectWithoutSubmit &&
+                   <DropdownPickerFooter onSubmit={ onSubmit }/>
+                }
             </PopupView>
         </>
     );
 };
-
-const styles = StyleSheet.create({
-    popupContainer: {
-        // height: hp(50)
-    }
-});
 
 export default DropdownPicker;

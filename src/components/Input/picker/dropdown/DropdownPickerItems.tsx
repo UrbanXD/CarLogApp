@@ -117,42 +117,36 @@ function DropdownPickerItems({
     );
 
     return (
-        <FlashList
-            ref={ flashListRef }
-            data={ filteredItems }
-            masonry={ masonry }
-            numColumns={ numColumns }
-            stickyHeaderIndices={ STICKY_FIRST_ELEMENT && [0] }
-            renderItem={ renderItem }
-            maintainVisibleContentPosition={ { disabled: true } }
-            drawDistance={ hp(100) }
-            keyExtractor={ keyExtractor }
-            ListEmptyComponent={ renderListEmptyComponent }
-            ItemSeparatorComponent={ renderSeparatorComponent }
-            nestedScrollEnabled
-            style={ { maxHeight: heightPercentageToDP(31) } }
-            scrollEventThrottle={ 16 }
-            onStartReached={ onStartReached }
-            onStartReachedThreshold={ 0.5 }
-            onEndReached={ onEndReached }
-            onEndReachedThreshold={ 0.5 }
-            keyboardDismissMode="on-drag"
-            showsVerticalScrollIndicator={ false }
-            showsHorizontalScrollIndicator={ false }
-        />
+        <View style={ styles.container }>
+            <FlashList
+                ref={ flashListRef }
+                data={ filteredItems }
+                masonry={ masonry }
+                numColumns={ numColumns }
+                stickyHeaderIndices={ STICKY_FIRST_ELEMENT && [0] }
+                renderItem={ renderItem }
+                maintainVisibleContentPosition={ { disabled: true } }
+                drawDistance={ hp(100) }
+                keyExtractor={ keyExtractor }
+                ListEmptyComponent={ renderListEmptyComponent }
+                ItemSeparatorComponent={ renderSeparatorComponent }
+                nestedScrollEnabled
+                scrollEventThrottle={ 16 }
+                onStartReached={ onStartReached }
+                onStartReachedThreshold={ 0.5 }
+                onEndReached={ onEndReached }
+                onEndReachedThreshold={ 0.5 }
+                keyboardDismissMode="on-drag"
+                showsVerticalScrollIndicator={ false }
+                showsHorizontalScrollIndicator={ false }
+            />
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 0.01,
-        overflow: "hidden",
-        backgroundColor: COLORS.gray5,
-        marginHorizontal: SEPARATOR_SIZES.mediumSmall,
-        paddingVertical: SEPARATOR_SIZES.small,
-        paddingHorizontal: SEPARATOR_SIZES.lightSmall,
-        borderBottomLeftRadius: 25,
-        borderBottomRightRadius: 25
+        height: heightPercentageToDP(31)
     },
     notFoundText: {
         ...GLOBAL_STYLE.containerText,
