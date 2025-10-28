@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { expenseForm } from "../../../../schemas/form/expenseForm.ts";
-import { serviceLogSchema } from "../serviceLogSchema.ts";
+import { ServiceLog, serviceLogSchema } from "../serviceLogSchema.ts";
 import { zNumber, zPickerRequired } from "../../../../../../types/zodTypes.ts";
 import { odometerLogSchema } from "../../../../../car/_features/odometer/schemas/odometerLogSchema.ts";
 import { Car } from "../../../../../car/schemas/carSchema.ts";
@@ -45,6 +45,22 @@ export function useCreateServiceLogFormProps(car: Car | null) {
         odometerValue: NaN,
         note: null,
         date: new Date()
+    };
+
+    return { defaultValues, resolver: zodResolver(serviceLogForm) };
+}
+
+export function useEditServiceLogFormProps(serviceLog: ServiceLog) {
+    const defaultValues: ServiceLogFields = {
+        id: serviceLog.id,
+        expenseId: serviceLog.expense.id,
+        odometerLogId: serviceLog.odometer?.id ?? getUUID(),
+        carId: serviceLog.carId,
+        serviceTypeId: serviceLog.serviceType.id,
+        items: serviceLog.items,
+        odometerValue: serviceLog.odometer?.value ?? NaN,
+        note: serviceLog.expense.note,
+        date: serviceLog.expense.date
     };
 
     return { defaultValues, resolver: zodResolver(serviceLogForm) };

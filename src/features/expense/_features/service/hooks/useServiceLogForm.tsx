@@ -37,13 +37,12 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
             render: () => <CarPickerInput control={ control } fieldName="carId"/>,
             editToastMessages: CarEditNameToast
         },
+        [ServiceLogFormFieldsEnum.Type]: {
+            render: () => <ServiceTypeInput control={ control } fieldName="serviceTypeId"/>,
+            editToastMessages: CarEditNameToast
+        },
         [ServiceLogFormFieldsEnum.ServiceItems]: {
-            render: () => (
-                <Input.Group>
-                    <ServiceTypeInput control={ control } fieldName="serviceTypeId"/>
-                    <ServiceItemInput control={ control } fieldName="items" carIdFieldName="carId"/>
-                </Input.Group>
-            ),
+            render: () => <ServiceItemInput control={ control } fieldName="items" carIdFieldName="carId"/>,
             editToastMessages: CarEditNameToast
         },
         [ServiceLogFormFieldsEnum.Date]: {
@@ -96,6 +95,7 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
             fields: ["items", "serviceTypeId"],
             render: () => (
                 <Input.Group>
+                    { fields[ServiceLogFormFieldsEnum.Type].render() }
                     { fields[ServiceLogFormFieldsEnum.ServiceItems].render() }
                 </Input.Group>
             )

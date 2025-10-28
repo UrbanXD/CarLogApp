@@ -14,6 +14,7 @@ import { InfoContainer } from "../../../../../components/info/InfoContainer.tsx"
 import { FloatingDeleteButton } from "../../../../../components/Button/presets/FloatingDeleteButton.tsx";
 import { ServiceLog } from "../schemas/serviceLogSchema.ts";
 import { ServiceItemExpandableList } from "./ServiceItemExpandableList.tsx";
+import { ServiceLogFormFieldsEnum } from "../enums/ServiceLogFormFieldsEnum.ts";
 
 export type ServiceLogViewProps = {
     id: string
@@ -62,21 +63,21 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         if(!serviceLog) return openToast({ type: "warning", title: "Kiadás nem található!" });
 
         openModal({
-            title: `Kiadás napló bejegyzés törlése`,
+            title: `Szervíz napló bejegyzés törlése`,
             body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
             acceptText: "Törlés",
             acceptAction: () => handleDelete(serviceLog)
         });
     }, [serviceLog, handleDelete, openToast, openModal]);
 
-    // const onEdit = useCallback((field?: FuelLogFormFieldsEnum) => {
-    //     if(!fuelLog) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
-    //
-    //     router.push({
-    //         pathname: "/expense/edit/fuel/[id]",
-    //         params: { id: fuelLog.id, field: field }
-    //     });
-    // }, [fuelLog, openToast]);
+    const onEdit = useCallback((field: ServiceLogFormFieldsEnum) => {
+        if(!serviceLog) return openToast({ type: "warning", title: "Szervíz napló bejegyzés nem található!" });
+
+        router.push({
+            pathname: "/expense/edit/service/[id]",
+            params: { id: serviceLog.id, field: field }
+        });
+    }, [serviceLog, openToast]);
 
     const getAmountSubtitle = useCallback(() => {
         let subtitle = `${ serviceLog?.expense.originalAmount } ${ serviceLog?.expense.currency.symbol }`;
@@ -90,8 +91,8 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         {
             icon: ICON_NAMES.car,
             title: car?.name,
-            subtitle: `${ car?.model.make.name } ${ car?.model.name }`
-            // onPress: () => onEdit(FuelLogFormFieldsEnum.Car)
+            subtitle: `${ car?.model.make.name } ${ car?.model.name }`,
+            onPress: () => onEdit(ServiceLogFormFieldsEnum.Car)
         },
         {
             icon: ICON_NAMES.expenseItem,
@@ -104,13 +105,17 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
                totalAmount={ serviceLog.totalAmount }
                expanded={ isServiceItemListExpanded }
                actionIcon={ ICON_NAMES.pencil }
+               onAction={ () => {
+                   setServiceItemListExpanded(false);
+                   onEdit(ServiceLogFormFieldsEnum.ServiceItems);
+               } }
             />
         },
         {
             icon: ICON_NAMES.calendar,
             title: "Dátum",
-            subtitle: dayjs(serviceLog?.expense?.date).format("YYYY. MM DD. HH:mm")
-            // onPress: () => onEdit(FuelLogFormFieldsEnum.Date)
+            subtitle: dayjs(serviceLog?.expense?.date).format("YYYY. MM DD. HH:mm"),
+            onPress: () => onEdit(ServiceLogFormFieldsEnum.Date)
         },
         {
             icon: ICON_NAMES.odometer,
@@ -118,14 +123,14 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
             subtitle: serviceLog?.odometer
                       ? `${ serviceLog.odometer.value } ${ serviceLog.odometer.unit.short }`
                       : "Nincs hozzárendelve",
-            subtitleStyle: !serviceLog?.odometer && { color: COLORS.gray2 }
-            // onPress: () => onEdit(FuelLogFormFieldsEnum.OdometerValue)
+            subtitleStyle: !serviceLog?.odometer && { color: COLORS.gray2 },
+            onPress: () => onEdit(ServiceLogFormFieldsEnum.OdometerValue)
         },
         {
             icon: ICON_NAMES.note,
             subtitle: serviceLog?.expense?.note ?? "Nincs megjegyzés",
-            subtitleStyle: !serviceLog?.expense?.note && { color: COLORS.gray2 }
-            // onPress: () => onEdit(FuelLogFormFieldsEnum.Note)
+            subtitleStyle: !serviceLog?.expense?.note && { color: COLORS.gray2 },
+            onPress: () => onEdit(ServiceLogFormFieldsEnum.Note)
         }
     ]), [car, serviceLog, isServiceItemListExpanded, getAmountSubtitle]);
 
