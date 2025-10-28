@@ -14,4 +14,7 @@ export const serviceItemSchema = z
     pricePerUnit: amountSchema
 });
 
+export const formResultServiceItem = serviceItemSchema.omit({ carId: true, serviceLogId: true });
+
 export type ServiceItem = z.infer<typeof serviceItemSchema>;
+export type FormResultServiceItem = z.infer<typeof formResultServiceItem>;

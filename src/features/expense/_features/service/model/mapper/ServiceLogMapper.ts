@@ -125,16 +125,16 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
         let totalAmount = 0;
         const serviceItems = new Map<string, ServiceItemTableRow>();
         for(const item of formResult.items) {
-            totalAmount += item.pricePerUnit * item.quantity * item.exchangeRate;
+            totalAmount += item.pricePerUnit.amount * item.quantity * item.pricePerUnit.exchangeRate;
             serviceItems.set(item.id, {
                 id: item.id,
                 car_id: formResult.carId,
                 service_log_id: serviceLog.id,
-                service_item_type_id: item.typeId,
-                currency_id: item.currencyId,
-                exchange_rate: item.exchangeRate,
+                service_item_type_id: item.type.id,
+                currency_id: item.pricePerUnit.currency.id,
+                exchange_rate: numberToFractionDigit(item.pricePerUnit.exchangeRate),
                 quantity: item.quantity,
-                price_per_unit: item.pricePerUnit
+                price_per_unit: numberToFractionDigit(item.pricePerUnit.amount)
             });
         }
 

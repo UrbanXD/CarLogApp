@@ -3,10 +3,10 @@ import { expenseForm } from "../../../../schemas/form/expenseForm.ts";
 import { serviceLogSchema } from "../serviceLogSchema.ts";
 import { zNumber, zPickerRequired } from "../../../../../../types/zodTypes.ts";
 import { odometerLogSchema } from "../../../../../car/_features/odometer/schemas/odometerLogSchema.ts";
-import { serviceItemForm } from "./serviceItemForm.ts";
 import { Car } from "../../../../../car/schemas/carSchema.ts";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { formResultServiceItem } from "../serviceItemSchema.ts";
 
 const serviceLogForm = expenseForm
 .pick({ date: true, note: true })
@@ -15,7 +15,7 @@ const serviceLogForm = expenseForm
     serviceLogSchema
     .pick({ id: true, carId: true })
     .extend({
-        items: z.array(serviceItemForm),
+        items: z.array(formResultServiceItem),
         serviceTypeId: zPickerRequired("Kérem válasszon ki egy típust!")
         .pipe(serviceLogSchema.shape.serviceType.shape.id),
         odometerValue: zNumber({
@@ -34,7 +34,7 @@ const serviceLogForm = expenseForm
 
 export type ServiceLogFields = z.infer<typeof serviceLogForm>;
 
-export function useCreateServiceLogForm(car: Car | null) {
+export function useCreateServiceLogFormProps(car: Car | null) {
     const defaultValues: ServiceLogFields = {
         id: getUUID(),
         expenseId: getUUID(),
