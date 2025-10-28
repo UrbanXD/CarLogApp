@@ -10,19 +10,24 @@ import { AmountInput } from "../../../../../_shared/currency/components/AmountIn
 import React, { useCallback } from "react";
 import { SaveButton } from "../../../../../../components/Button/presets/SaveButton.tsx";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
+import Form from "../../../../../../components/Form/Form.tsx";
 
 type ServiceItemFormProps = {
     carCurrencyId: number
     onSubmit: (result: Omit<ServiceItem, "serviceLogId" | "carId">) => void
-    serviceItem?: ServiceItem
+    defaultServiceItem?: ServiceItem
 }
 
-export function ServiceItemForm({ carCurrencyId, serviceItem, onSubmit }: ServiceItemFormProps) {
+export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }: ServiceItemFormProps) {
     const { openToast } = useAlert();
     const { serviceItemDao } = useDatabase();
 
-    const form = useForm<ServiceItemFields>(useServiceItemFormProps({ carCurrencyId, serviceItem }));
-    const { control, setValue, handleSubmit, getValues } = form;
+    const form = useForm<ServiceItemFields>(useServiceItemFormProps({
+        carCurrencyId,
+        serviceItem: defaultServiceItem
+    }));
+
+    const { control, setValue, handleSubmit } = form;
 
     const submitHandler = handleSubmit(
         async (formResult: ServiceItemFields) => {
@@ -57,22 +62,24 @@ export function ServiceItemForm({ carCurrencyId, serviceItem, onSubmit }: Servic
     return (
         <View style={ styles.container }>
             <Text style={ styles.title }>Szervizelési tétel</Text>
-            <ServiceItemTypeInput
-                control={ control }
-                fieldName="typeId"
-            />
-            <AmountInput
-                control={ control }
-                setValue={ setValue }
-                title={ "Egységár" }
-                amountPlaceholder={ "Egységár" }
-                amountFieldName="pricePerUnit"
-                currencyFieldName="currencyId"
-                quantityFieldName="quantity"
-                exchangeRateFieldName="exchangeRate"
-                exchangeText={ amountFieldExchangeText }
-                defaultCurrency={ carCurrencyId }
-            />
+            <Form style={ styles.formContainer }>
+                <ServiceItemTypeInput
+                    control={ control }
+                    fieldName="typeId"
+                />
+                <AmountInput
+                    control={ control }
+                    setValue={ setValue }
+                    title={ "Egységár" }
+                    amountPlaceholder={ "Egységár" }
+                    amountFieldName="pricePerUnit"
+                    currencyFieldName="currencyId"
+                    quantityFieldName="quantity"
+                    exchangeRateFieldName="exchangeRate"
+                    exchangeText={ amountFieldExchangeText }
+                    defaultCurrency={ carCurrencyId }
+                />
+            </Form>
             <SaveButton onPress={ submitHandler }/>
         </View>
     );
@@ -82,8 +89,11 @@ const styles = StyleSheet.create({
     container: {
         width: "100%",
         alignSelf: "center",
-        gap: SEPARATOR_SIZES.lightSmall,
-        paddingBottom: SEPARATOR_SIZES.lightSmall
+        gap: SEPARATOR_SIZES.lightSmall
+    },
+    formContainer: {
+        flex: 1,
+        overflow: "hidden"
     },
     title: {
         fontFamily: "Gilroy-Heavy",
