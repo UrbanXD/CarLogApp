@@ -68,21 +68,25 @@ const styles = StyleSheet.create({
     itemText: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p3,
+        letterSpacing: FONT_SIZES.p3 * 0.025,
         color: COLORS.gray1
     },
     countText: {
-        color: COLORS.gray2
+        color: COLORS.gray2,
+        letterSpacing: FONT_SIZES.p3 * 0.05
     },
     pricePerUnitText: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p4,
+        letterSpacing: FONT_SIZES.p4 * 0.025,
         color: COLORS.gray1,
         maxWidth: "30%",
         textAlign: "right",
 
         exchangedText: {
             color: COLORS.gray2,
-            lineHeight: FONT_SIZES.p4 * 1.25
+            lineHeight: FONT_SIZES.p4 * 1.25,
+            letterSpacing: FONT_SIZES.p4 * 0.025
         }
     }
 });
