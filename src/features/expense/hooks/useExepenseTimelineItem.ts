@@ -20,6 +20,9 @@ export function useExpenseTimelineItem(currency: Currency) {
                 routerPathName = "/expense/fuel/[id]";
                 itemId = expense?.relatedId;
                 break;
+            case ExpenseTypeEnum.SERVICE:
+                routerPathName = "/expense/service/[id]";
+                itemId = expense?.relatedId;
         }
 
         const onPress = () => {

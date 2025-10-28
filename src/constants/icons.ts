@@ -54,7 +54,8 @@ export const ICON_NAMES = {
     insurance: "shield-car",
     registration: "clipboard-text-multiple",
     note: "text",
-    money: "cash"
+    money: "cash",
+    expenseItem: "invoice-text-multiple-outline"
 };
 
 export const ICON_COLORS = {

@@ -164,6 +164,12 @@ const Layout: React.FC = () => {
                 }) }
             />
             <Stack.Screen
+                name="expense/service/[id]"
+                options={ ({ route }) => ({
+                    header: () => <Header.Secondary title={ route.params?.title ?? "Napló bejegyzés" }/>
+                }) }
+            />
+            <Stack.Screen
                 name="expense/create/index"
                 options={ {
                     header: () => <></>,
@@ -174,6 +180,15 @@ const Layout: React.FC = () => {
             />
             <Stack.Screen
                 name="expense/create/fuel"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="expense/create/service"
                 options={ {
                     header: () => <></>,
                     animation: "slide_from_bottom",

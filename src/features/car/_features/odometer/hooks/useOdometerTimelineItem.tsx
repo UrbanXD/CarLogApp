@@ -18,6 +18,10 @@ export const useOdometerTimelineItem = () => {
                 routerPathName = "/expense/fuel/[id]";
                 itemId = odometerLog.relatedId;
                 break;
+            case OdometerLogTypeEnum.SERVICE:
+                routerPathName = "/expense/service/[id]";
+                itemId = odometerLog.relatedId;
+                break;
         }
 
         const onPress = () => {
