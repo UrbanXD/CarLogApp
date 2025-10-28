@@ -14,10 +14,11 @@ type OverlayProps = {
     opened?: SharedValue<boolean>
     color?: Color
     opacity?: number
+    zIndex?: number
     onPress?: () => void
 }
 
-export function Overlay({ opened, color = COLORS.black, opacity = 0.525, onPress }: OverlayProps) {
+export function Overlay({ opened, color = COLORS.black, opacity = 0.525, zIndex = 2, onPress }: OverlayProps) {
     const overlayDisplay = useSharedValue<"flex" | "none">("none");
 
     useAnimatedReaction(
@@ -43,7 +44,7 @@ export function Overlay({ opened, color = COLORS.black, opacity = 0.525, onPress
 
         return {
             display: overlayDisplay.value,
-            zIndex: 2,
+            zIndex: zIndex,
             opacity: overlayOpacity,
             backgroundColor: color
         };

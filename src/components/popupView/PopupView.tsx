@@ -7,12 +7,13 @@ import Animated, {
     withSpring,
     withTiming
 } from "react-native-reanimated";
-import { Dimensions, Keyboard, LayoutChangeEvent, StyleSheet, View, ViewStyle } from "react-native";
+import { Dimensions, Keyboard, LayoutChangeEvent, StyleSheet, ViewStyle } from "react-native";
 import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { Overlay } from "../overlay/Overlay.tsx";
 import { Portal } from "@gorhom/portal";
 import { scheduleOnRN } from "react-native-worklets";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { widthPercentageToDP } from "react-native-responsive-screen";
 
 type PopupViewProps = {
     opened: SharedValue<boolean>
@@ -27,6 +28,8 @@ const SPRING_CONFIG = {
     dampingRatio: 0.8
 };
 
+let popupCounter = 3;
+
 export function PopupView({ opened, dismount = true, children, style }: PopupViewProps) {
     const { top } = useSafeAreaInsets();
     const { height: SCREEN_HEIGHT } = Dimensions.get("window");
@@ -36,6 +39,7 @@ export function PopupView({ opened, dismount = true, children, style }: PopupVie
     const keyboardHeight = useSharedValue(0);
     const opacity = useSharedValue(0);
     const scale = useSharedValue(1);
+    const [zIndex, setZIndex] = useState(3);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -53,6 +57,13 @@ export function PopupView({ opened, dismount = true, children, style }: PopupVie
         };
     }, []);
 
+    useEffect(() => {
+        if(!mounted) return;
+
+        popupCounter += 2;
+        setZIndex(popupCounter);
+    }, [mounted]);
+
     useAnimatedReaction(
         () => opened.value,
         (isOpened, prev) => {
@@ -64,12 +75,12 @@ export function PopupView({ opened, dismount = true, children, style }: PopupVie
                 scheduleOnRN(setMounted, true);
 
                 // animate in
-                opacity.value = withTiming(1, { duration: 250 });
+                opacity.value = withTiming(1, { duration: 350 });
                 scale.value = withSpring(1, SPRING_CONFIG);
             } else {
                 // animate out
-                opacity.value = withTiming(0, { duration: 250 });
-                scale.value = withSpring(1.1, SPRING_CONFIG, (finished) => {
+                opacity.value = withTiming(0, { duration: 350 });
+                scale.value = withSpring(1.025, SPRING_CONFIG, (finished) => {
                     if(!finished) return;
 
                     popupDisplay.value = "none";
@@ -82,38 +93,40 @@ export function PopupView({ opened, dismount = true, children, style }: PopupVie
 
     const close = () => opened.value = false;
 
-    const onLayout = useCallback((event: LayoutChangeEvent) => popupHeight.value = event.nativeEvent.layout.height, []);
+    const onLayout = useCallback(
+        (event: LayoutChangeEvent) => popupHeight.value = event.nativeEvent.layout.height,
+        [style]
+    );
 
     const popupStyle = useAnimatedStyle(() => {
-        const maxTranslateY = Math.max(0, SCREEN_HEIGHT - popupHeight.value - SEPARATOR_SIZES.normal - top);
-        const translateY = withTiming(-Math.min(keyboardHeight.value, maxTranslateY) / 2, { duration: 450 });
+        const baseY = SCREEN_HEIGHT / 2 - popupHeight.value / 2;
+        const popupBottom = baseY + popupHeight.value;
+        const keyboardTop = SCREEN_HEIGHT - keyboardHeight.value;
+
+        const overlap = popupBottom - keyboardTop;
+        const minTranslateY = DEFAULT_SEPARATOR + top;
+
+        let positionY = baseY;
+        if(overlap > 0) positionY = Math.max(minTranslateY, baseY - (overlap + 3 * DEFAULT_SEPARATOR)); // popupview padding + gap
+
+        const translateY = withTiming(positionY, { duration: 250 });
 
         return {
             display: popupDisplay.value,
-            height: withTiming(popupHeight.value, { duration: 250 }),
             opacity: opacity.value,
-            transform: [{ scale: scale.value }, { translateY }]
+            transform: [{ scale: scale.value }, { translateY }],
+            zIndex: zIndex
         };
     });
 
     return (
         <Portal hostName="popup">
-            <Overlay opened={ opened } onPress={ close }/>
+            <Overlay opened={ opened } onPress={ close } zIndex={ zIndex }/>
             {
                 (!dismount || mounted) &&
-               <>
-                  <View style={ styles.container } pointerEvents="box-none">
-                     <View
-                        style={ [styles.popup, style, styles.hiddenElement] }
-                        onLayout={ onLayout }
-                     >
-                         { children }
-                     </View>
-                     <Animated.View style={ [popupStyle, styles.popup, style] }>
-                         { children }
-                     </Animated.View>
-                  </View>
-               </>
+               <Animated.View style={ [styles.container, style, popupStyle] } onLayout={ onLayout }>
+                   { children }
+               </Animated.View>
             }
         </Portal>
     );
@@ -121,22 +134,9 @@ export function PopupView({ opened, dismount = true, children, style }: PopupVie
 
 const styles = StyleSheet.create({
     container: {
-        ...StyleSheet.absoluteFillObject,
-        flex: 1,
-        zIndex: 3,
-        justifyContent: "center",
-        alignItems: "center",
-        marginHorizontal: DEFAULT_SEPARATOR
-    },
-    hiddenElement: {
         position: "absolute",
-        opacity: 0,
-        zIndex: -1
-    },
-    popup: {
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "center",
+        width: widthPercentageToDP(100) - 2 * DEFAULT_SEPARATOR,
+        marginHorizontal: DEFAULT_SEPARATOR,
         backgroundColor: COLORS.black5,
         paddingHorizontal: SEPARATOR_SIZES.small,
         paddingVertical: DEFAULT_SEPARATOR,
