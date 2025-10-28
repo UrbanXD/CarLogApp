@@ -16,7 +16,7 @@ export const zNumber = ({
 }: ZodNumberArgs) => {
     const base = z
     .preprocess(
-        (value: any) => value?.toString() ? value.toString() : "",
+        (value: any) => (value || value === "0" || value === 0) ? value.toString() : "",
         z
         .string()
         .transform((value) => (value === "" ? (optional ? null : NaN) : Number(value)))
