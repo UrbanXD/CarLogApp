@@ -41,7 +41,9 @@ export class ServiceItemDao extends Dao<ServiceItemTableRow, ServiceItem, Servic
         .innerJoin(`${ CAR_TABLE } as c`, "c.id", "si.car_id")
         .select("c.currency_id as car_currency_id")
         .whereRef("si.service_log_id", "=", serviceLogId)
-        .executeTakeFirstOrThrow();
+        .execute();
+
+        if(!!result1) return [];
 
         const result2 = await this.db
         .selectFrom(`${ SERVICE_ITEM_TABLE } as si`)
