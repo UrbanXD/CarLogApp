@@ -39,7 +39,7 @@ export function ServiceItemInput({
 
     const [car, setCar] = useState<Car | null>(null);
     const [totalAmount, setTotalAmount] = useState<Array<Amount>>([]);
-    const [selectedItemIndex, setSelectedItemIndex] = useState<number>(0);
+    const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
 
     const isExpandedAddForm = useSharedValue(false);
     const isExpandedUpdateForm = useSharedValue(false);
