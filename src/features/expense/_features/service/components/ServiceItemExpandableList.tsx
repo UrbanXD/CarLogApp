@@ -1,33 +1,50 @@
 import { DropdownView } from "../../../../../components/dropdownView/DropdownView.tsx";
-import { FlashList } from "@shopify/flash-list";
 import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native";
 import React, { useCallback } from "react";
 import { ServiceItemView } from "./ServiceItemView.tsx";
-import { ServiceItem } from "../schemas/serviceItemSchema.ts";
-import {
-    COLORS,
-    FONT_SIZES,
-    ICON_FONT_SIZE_SCALE,
-    ICON_NAMES,
-    SEPARATOR_SIZES
-} from "../../../../../constants/index.ts";
+import { FormResultServiceItem, ServiceItem } from "../schemas/serviceItemSchema.ts";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import Button from "../../../../../components/Button/Button.ts";
 import { Amount } from "../../../../_shared/currency/schemas/amountSchema.ts";
+import { useBottomSheetInternal, useBottomSheetScrollableCreator } from "@gorhom/bottom-sheet";
+import { FlashList } from "@shopify/flash-list";
 
 type ServiceItemExpandableListProps = {
     expanded: boolean
-    data: Array<ServiceItem>
+    data: Array<FormResultServiceItem>
     totalAmount: Array<Amount>
-    onEdit?: () => void
+    actionIcon?: string
+    onAction?: () => void
+    onItemPress?: (index: number) => void
+    onDeleteItem?: (index: number) => void
 }
 
-export function ServiceItemExpandableList({ expanded, data, totalAmount, onEdit }: ServiceItemExpandableListProps) {
+export function ServiceItemExpandableList({
+    expanded,
+    data,
+    totalAmount,
+    actionIcon,
+    onAction,
+    onItemPress,
+    onDeleteItem
+}: ServiceItemExpandableListProps) {
     const keyExtractor = useCallback((item: ServiceItem) => item.id, []);
 
-    const renderItem = useCallback(({ item }: ListRenderItemInfo<ServiceItem>) => <ServiceItemView item={ item }/>, []);
+    const renderItem = useCallback(
+        ({ item, index }: ListRenderItemInfo<ServiceItem>) => (
+            <ServiceItemView
+                item={ item }
+                onPress={ onItemPress ? () => onItemPress(index) : undefined }
+                onDelete={ onDeleteItem ? () => onDeleteItem(index) : undefined }
+            />
+        ),
+        [onItemPress, onDeleteItem]
+    );
 
     const renderSeparatorComponent = useCallback(() => <View style={ { height: SEPARATOR_SIZES.lightSmall } }/>, []);
+
+    const renderEmptyComponent = useCallback(() => <Text style={ styles.label }>-</Text>);
 
     const getTotalAmountText = useCallback(() => {
         if(!totalAmount?.length) return "ingyen";
@@ -36,7 +53,7 @@ export function ServiceItemExpandableList({ expanded, data, totalAmount, onEdit 
     }, [totalAmount]);
 
     const getTotalExchangedAmountText = useCallback(() => {
-        if(!totalAmount?.length) return "";
+        if(!totalAmount?.length) return "-";
 
         const totalExchanged = totalAmount.reduce((sum, a) => sum + a.exchangedAmount, 0);
         const exchangeCurrency = totalAmount[0].exchangeCurrency.symbol || totalAmount[0].exchangeCurrency.code;
@@ -44,19 +61,22 @@ export function ServiceItemExpandableList({ expanded, data, totalAmount, onEdit 
         return `${ totalExchanged } ${ exchangeCurrency }`;
     });
 
+    const bottomSheetInternal = useBottomSheetInternal(true);
+    const BottomSheetFlashListScrollable = bottomSheetInternal ? useBottomSheetScrollableCreator() : undefined;
+
     return (
         <DropdownView expanded={ expanded }>
             <View style={ styles.topContainer }>
                 {
-                    onEdit &&
+                    onAction && actionIcon &&
                    <Button.Icon
-                      icon={ ICON_NAMES.pencil }
+                      icon={ actionIcon }
                       iconSize={ styles.text.fontSize * ICON_FONT_SIZE_SCALE }
                       iconColor={ styles.text.color }
                       width={ styles.text.fontSize * ICON_FONT_SIZE_SCALE }
                       height={ styles.text.fontSize * ICON_FONT_SIZE_SCALE }
                       backgroundColor="transparent"
-                      onPress={ onEdit }
+                      onPress={ onAction }
                    />
                 }
                 <View style={ styles.topContainer.labelContainer }>
@@ -68,8 +88,10 @@ export function ServiceItemExpandableList({ expanded, data, totalAmount, onEdit 
                 keyExtractor={ keyExtractor }
                 renderItem={ renderItem }
                 ItemSeparatorComponent={ renderSeparatorComponent }
+                ListEmptyComponent={ renderEmptyComponent }
                 showsVerticalScrollIndicator={ false }
                 style={ styles.itemsContainer }
+                renderScrollComponent={ BottomSheetFlashListScrollable }
             />
             <View style={ styles.bottomContainer }>
                 <Text style={ styles.text }>
@@ -95,12 +117,14 @@ const styles = StyleSheet.create({
     label: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p3,
+        letterSpacing: FONT_SIZES.p3 * 0.025,
         color: COLORS.gray2,
         textAlign: "right"
     },
     text: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p3,
+        letterSpacing: FONT_SIZES.p3 * 0.025,
         color: COLORS.gray1,
         textAlign: "right",
 
