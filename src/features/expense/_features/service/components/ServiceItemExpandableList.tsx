@@ -9,6 +9,7 @@ import Button from "../../../../../components/Button/Button.ts";
 import { Amount } from "../../../../_shared/currency/schemas/amountSchema.ts";
 import { useBottomSheetInternal, useBottomSheetScrollableCreator } from "@gorhom/bottom-sheet";
 import { FlashList } from "@shopify/flash-list";
+import { AmountText } from "../../../../../components/AmountText.tsx";
 
 type ServiceItemExpandableListProps = {
     expanded: boolean
@@ -46,21 +47,6 @@ export function ServiceItemExpandableList({
 
     const renderEmptyComponent = useCallback(() => <Text style={ styles.label }>-</Text>);
 
-    const getTotalAmountText = useCallback(() => {
-        if(!totalAmount?.length) return "ingyen";
-
-        return totalAmount.map(a => `${ a.amount } ${ a.currency.symbol || a.currency.code }`).join(" + ");
-    }, [totalAmount]);
-
-    const getTotalExchangedAmountText = useCallback(() => {
-        if(!totalAmount?.length) return "-";
-
-        const totalExchanged = totalAmount.reduce((sum, a) => sum + a.exchangedAmount, 0);
-        const exchangeCurrency = totalAmount[0].exchangeCurrency.symbol || totalAmount[0].exchangeCurrency.code;
-
-        return `${ totalExchanged } ${ exchangeCurrency }`;
-    });
-
     const bottomSheetInternal = useBottomSheetInternal(true);
     const BottomSheetFlashListScrollable = bottomSheetInternal ? useBottomSheetScrollableCreator() : undefined;
 
@@ -94,15 +80,12 @@ export function ServiceItemExpandableList({
                 renderScrollComponent={ BottomSheetFlashListScrollable }
             />
             <View style={ styles.bottomContainer }>
-                <Text style={ styles.text }>
-                    { getTotalExchangedAmountText() }
-                </Text>
-                {
-                    ((totalAmount.length > 1) || (totalAmount.length === 1 && totalAmount[0].currency.id !== totalAmount[0].exchangeCurrency.id)) &&
-                   <Text style={ [styles.text, styles.text.totalAmountText] }>
-                       { getTotalAmountText() }
-                   </Text>
-                }
+                <AmountText
+                    amount={ totalAmount.reduce((sum, a) => sum + a.exchangedAmount, 0) }
+                    currencyText={ totalAmount[0].exchangeCurrency.symbol ?? "e" }
+                    exchangedAmount={ totalAmount.map(a => Number(a.amount ?? 0)) }
+                    exchangeCurrencyText={ totalAmount.map(a => a.currency.symbol ?? "?") }
+                />
                 <Text style={ [styles.label, styles.bottomContainer.label] }>Összköltéség</Text>
             </View>
         </DropdownView>

@@ -14,6 +14,7 @@ import { InfoContainer } from "../../../../../components/info/InfoContainer.tsx"
 import { FuelLog } from "../schemas/fuelLogSchema.ts";
 import { FuelLogFormFieldsEnum } from "../enums/fuelLogFormFields.tsx";
 import { FloatingDeleteButton } from "../../../../../components/Button/presets/FloatingDeleteButton.tsx";
+import { AmountText } from "../../../../../components/AmountText.tsx";
 
 export type FuelLogViewProps = {
     id: string
@@ -77,67 +78,65 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         });
     }, [fuelLog, openToast]);
 
-    const getAmountSubtitle = useCallback(() => {
-        let subtitle = `${ fuelLog?.expense.originalAmount } ${ fuelLog?.expense.currency.symbol }`;
-        if(fuelLog?.expense.currency.id === car?.currency.id && fuelLog?.expense.exchangeRate === 1) return subtitle;
-
-        subtitle += ` (${ fuelLog?.expense.amount } ${ car?.currency.symbol })`;
-        return subtitle;
-    }, [fuelLog, car]);
-
-    const getPricePerUnitSubtitle = useCallback(() => {
-        let subtitle = `${ fuelLog?.originalPricePerUnit } ${ fuelLog?.expense.currency.symbol }/${ fuelLog?.fuelUnit.short }`;
-        if(fuelLog?.expense.currency.id === car?.currency.id && fuelLog?.expense.exchangeRate === 1) return subtitle;
-
-        subtitle += ` (${ fuelLog?.pricePerUnit } ${ car?.currency.symbol }/${ fuelLog?.fuelUnit.short })`;
-        return subtitle;
-    }, [fuelLog, car]);
-
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
             icon: ICON_NAMES.car,
             title: car?.name,
-            subtitle: `${ car?.model.make.name } ${ car?.model.name }`,
+            content: `${ car?.model.make.name } ${ car?.model.name }`,
             onPress: () => onEdit(FuelLogFormFieldsEnum.Car)
         },
         {
             icon: ICON_NAMES.fuelPump,
             title: "Tankolás",
-            subtitle: `${ fuelLog?.quantity } ${ fuelLog?.fuelUnit.short }`,
+            content: `${ fuelLog?.quantity } ${ fuelLog?.fuelUnit.short }`,
             onPress: () => onEdit(FuelLogFormFieldsEnum.Quantity)
         },
         {
             icon: ICON_NAMES.money,
             title: "Ár",
-            subtitle: getAmountSubtitle(),
+            content: (textStyle) => fuelLog &&
+               <AmountText
+                  amount={ fuelLog.expense.originalAmount }
+                  currencyText={ fuelLog.expense.currency.symbol }
+                  exchangedAmount={ fuelLog.expense.originalAmount }
+                  exchangeCurrencyText={ car?.currency.symbol }
+                  amountTextStyle={ textStyle ? [...textStyle, { textAlign: "left" }] : { textAlign: "left" } }
+               />,
             onPress: () => onEdit(FuelLogFormFieldsEnum.Amount),
             secondaryInfo: {
                 title: "Egységár",
-                subtitle: getPricePerUnitSubtitle()
+                content: (textStyle) => fuelLog &&
+                   <AmountText
+                      amount={ fuelLog.originalPricePerUnit }
+                      currencyText={ `${ fuelLog.expense.currency.symbol }/${ fuelLog.fuelUnit.short }` }
+                      exchangedAmount={ fuelLog.pricePerUnit }
+                      exchangeCurrencyText={ `${ car?.currency.symbol }/${ fuelLog.fuelUnit.short }` }
+                      amountTextStyle={ textStyle }
+                   />
             }
         },
         {
             icon: ICON_NAMES.calendar,
             title: "Dátum",
-            subtitle: dayjs(fuelLog?.expense?.date).format("YYYY. MM DD. HH:mm"),
+            content: dayjs(fuelLog?.expense?.date).format("YYYY. MM DD. HH:mm"),
             onPress: () => onEdit(FuelLogFormFieldsEnum.Date)
         },
         {
             icon: ICON_NAMES.odometer,
             title: "Kilométeróra-állás",
-            subtitle: fuelLog?.odometer
-                      ? `${ fuelLog?.odometer?.value } ${ fuelLog.odometer.unit.short }`
-                      : "Nincs hozzárendelve",
-            subtitleStyle: !fuelLog?.odometer && { color: COLORS.gray2 },
+            content: fuelLog?.odometer
+                     ? `${ fuelLog?.odometer?.value } ${ fuelLog.odometer.unit.short }`
+                     : "Nincs hozzárendelve",
+            contentTextStyle: !fuelLog?.odometer && { color: COLORS.gray2 },
             onPress: () => onEdit(FuelLogFormFieldsEnum.OdometerValue)
         },
         {
             icon: ICON_NAMES.note,
-            subtitle: fuelLog?.expense?.note ?? "Nincs megjegyzés",
-            subtitleStyle: !fuelLog?.expense?.note && { color: COLORS.gray2 },
+            content: fuelLog?.expense?.note ?? "Nincs megjegyzés",
+            contentTextStyle: !fuelLog?.expense?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(FuelLogFormFieldsEnum.Note)
         }
-    ]), [car, fuelLog, getAmountSubtitle, getPricePerUnitSubtitle]);
+    ]), [car, fuelLog]);
 
     return (
         <>

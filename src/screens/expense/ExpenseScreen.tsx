@@ -14,6 +14,7 @@ import { InfoContainer } from "../../components/info/InfoContainer.tsx";
 import { ExpenseFormFields } from "../../features/expense/enums/expenseFormFields.ts";
 import { InfoRowProps } from "../../components/info/InfoRow.tsx";
 import { FloatingDeleteButton } from "../../components/Button/presets/FloatingDeleteButton.tsx";
+import { AmountText } from "../../components/AmountText.tsx";
 
 export function ExpenseScreen() {
     const { id } = useLocalSearchParams();
@@ -96,25 +97,32 @@ export function ExpenseScreen() {
         {
             icon: ICON_NAMES.car,
             title: car?.name,
-            subtitle: `${ car?.model.make.name } ${ car?.model.name }`,
+            content: `${ car?.model.make.name } ${ car?.model.name }`,
             onPress: () => onEdit(ExpenseFormFields.Car)
         },
         {
             icon: ICON_NAMES.money,
             title: "Ár",
-            subtitle: getAmountSubtitle(),
+            content: (textStyle) => expense &&
+               <AmountText
+                  amount={ expense.originalAmount }
+                  currencyText={ expense.currency.symbol }
+                  exchangedAmount={ expense.originalAmount }
+                  exchangeCurrencyText={ car?.currency.symbol }
+                  amountTextStyle={ textStyle ? [...textStyle, { textAlign: "left" }] : { textAlign: "left" } }
+               />,
             onPress: () => onEdit(ExpenseFormFields.Amount)
         },
         {
             icon: ICON_NAMES.calendar,
             title: "Dátum",
-            subtitle: dayjs(expense?.date).format("YYYY. MM DD. HH:mm"),
+            content: dayjs(expense?.date).format("YYYY. MM DD. HH:mm"),
             onPress: () => onEdit(ExpenseFormFields.Date)
         },
         {
             icon: ICON_NAMES.note,
-            subtitle: expense?.note ?? "Nincs megjegyzés",
-            subtitleStyle: !expense?.note && { color: COLORS.gray2 },
+            content: expense?.note ?? "Nincs megjegyzés",
+            contentTextStyle: !expense?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(ExpenseFormFields.Note)
         }
     ]), [car, expense, getAmountSubtitle, getPricePerUnitSubtitle]);

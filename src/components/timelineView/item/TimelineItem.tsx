@@ -19,7 +19,7 @@ type TimelineItemProps = {
     iconSize?: number
     iconColor?: Color
     note?: string
-    footerText?: string
+    footerText?: ReactNode
     isFirst: boolean
     isLast: boolean
     onPress?: () => void
@@ -78,8 +78,11 @@ export function TimelineItem({
                    <Text style={ styles.card.note }>{ note }</Text>
                 }
                 {
-                    footerText &&
-                   <Text style={ [styles.card.date, !note && { alignSelf: "flex-end" }] }>{ footerText }</Text>
+                    footerText && (
+                        typeof footerText === "string"
+                        ? <Text style={ styles.card.footerText }></Text>
+                        : footerText
+                    )
                 }
             </Pressable>
         </View>
@@ -118,6 +121,14 @@ const useStyles = (color: Color, dotSize: number, isFirstItem: boolean, isLastIt
         borderTopRightRadius: isFirstItem && 7.5,
         borderBottomLeftRadius: isLastItem && 7.5,
         borderBottomRightRadius: isLastItem && 7.5,
+        shadowColor: COLORS.black,
+        shadowOffset: {
+            width: 0,
+            height: 12
+        },
+        shadowOpacity: 0.58,
+        shadowRadius: 16,
+        elevation: 24,
 
         line: {
             flex: 1,
@@ -155,6 +166,14 @@ const useStyles = (color: Color, dotSize: number, isFirstItem: boolean, isLastIt
         padding: SEPARATOR_SIZES.lightSmall,
         borderRadius: 12.5,
         borderTopLeftRadius: 0,
+        shadowColor: COLORS.black,
+        shadowOffset: {
+            width: 0,
+            height: 12
+        },
+        shadowOpacity: 0.58,
+        shadowRadius: 16,
+        elevation: 24,
 
         title: {
             container: {
@@ -186,7 +205,7 @@ const useStyles = (color: Color, dotSize: number, isFirstItem: boolean, isLastIt
             }
         },
 
-        date: {
+        footerText: {
             alignSelf: "flex-end",
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p4,

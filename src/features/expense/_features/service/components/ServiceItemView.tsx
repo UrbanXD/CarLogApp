@@ -3,6 +3,7 @@ import { ServiceItem } from "../schemas/serviceItemSchema.ts";
 import React from "react";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import Button from "../../../../../components/Button/Button.ts";
+import { AmountText } from "../../../../../components/AmountText.tsx";
 
 type ServiceItemProps = {
     item: ServiceItem
@@ -31,22 +32,12 @@ export function ServiceItemView({ item, onPress, onDelete }: ServiceItemProps) {
                     <Text style={ styles.countText }> (x{ item.quantity })</Text>
                 </Text>
             </View>
-            <Text style={ styles.pricePerUnitText }>
-                {
-                    item.pricePerUnit.amount === 0
-                    ? "ingyen"
-                    : `${ item.pricePerUnit.amount } ${ item.pricePerUnit.currency.symbol }`
-                }
-                {
-                    item.pricePerUnit.exchangeCurrency.id !== item.pricePerUnit.currency.id && item.pricePerUnit.amount !== 0 &&
-                   <>
-                       { "\n" }
-                      <Text style={ styles.pricePerUnitText.exchangedText }>
-                          { item.pricePerUnit.exchangedAmount } { item.pricePerUnit.exchangeCurrency.symbol }
-                      </Text>
-                   </>
-                }
-            </Text>
+            <AmountText
+                amount={ item.pricePerUnit.amount }
+                currencyText={ item.pricePerUnit.currency.symbol }
+                exchangedAmount={ item.pricePerUnit.exchangedAmount }
+                exchangeCurrencyText={ item.pricePerUnit.exchangeCurrency.symbol }
+            />
         </Pressable>
 
     );
@@ -72,21 +63,8 @@ const styles = StyleSheet.create({
         color: COLORS.gray1
     },
     countText: {
-        color: COLORS.gray2,
-        letterSpacing: FONT_SIZES.p3 * 0.05
-    },
-    pricePerUnitText: {
-        fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p4,
-        letterSpacing: FONT_SIZES.p4 * 0.025,
-        color: COLORS.gray1,
-        maxWidth: "30%",
-        textAlign: "right",
-
-        exchangedText: {
-            color: COLORS.gray2,
-            lineHeight: FONT_SIZES.p4 * 1.25,
-            letterSpacing: FONT_SIZES.p4 * 0.025
-        }
+        letterSpacing: FONT_SIZES.p4 * 0.05,
+        color: COLORS.gray2
     }
 });
