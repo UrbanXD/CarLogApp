@@ -37,6 +37,17 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         ]);
     }
 
+    async getLatestExpenses(carId: string, count?: number = 3): Promise<Array<Expense>> {
+        const result = await (
+            this.selectQuery()
+            .whereRef(`${ EXPENSE_TABLE }.car_id`, "=", carId)
+            .orderBy(`${ EXPENSE_TABLE }.date`, "desc")
+            .limit(count).execute()
+        );
+
+        return await this.mapper.toDtoArray(result);
+    }
+
     async create(formResult: ExpenseFields, safe?: boolean): Promise<Expense | null> {
         const expenseEntity = this.mapper.formResultToEntity(formResult);
         return await super.create(expenseEntity, safe);

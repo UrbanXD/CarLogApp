@@ -1,13 +1,13 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE } from "../../../constants/index.ts";
+import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import Garage from "../../../features/car/components/Garage.tsx";
 import UpcomingRidesBlock from "./UpcomingRidesBlock";
 import Divider from "../../../components/Divider";
-import LatestExpensesBlock from "./LatestExpensesBlock";
 import { ScreenScrollView } from "../../../components/screenView/ScreenScrollView.tsx";
 import { useAppSelector } from "../../../hooks/index.ts";
 import { getUser } from "../../../features/user/model/selectors/index.ts";
+import { LatestExpenses } from "../../../features/expense/components/LatestExpense.tsx";
 
 const HomeScreen: React.FC = () => {
     const user = useAppSelector(getUser);
@@ -22,15 +22,17 @@ const HomeScreen: React.FC = () => {
                     Vezzessen számot nálunk az autóiról!
                 </Text>
             </View>
-            <View style={ styles.dividerContainer }>
+            <View style={ styles.contentContainer }>
                 <Divider
                     thickness={ 2.5 }
                     color={ COLORS.gray4 }
                 />
             </View>
             <Garage/>
-            <UpcomingRidesBlock/>
-            <LatestExpensesBlock/>
+            <View style={ styles.contentContainer }>
+                <UpcomingRidesBlock/>
+                <LatestExpenses/>
+            </View>
         </ScreenScrollView>
     );
 };
@@ -38,7 +40,7 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
     titleContainer: {
         ...GLOBAL_STYLE.contentContainer,
-        paddingHorizontal: 0,
+        paddingHorizontal: DEFAULT_SEPARATOR,
         paddingVertical: 0,
         gap: 0,
         backgroundColor: "transparent"
@@ -56,8 +58,9 @@ const styles = StyleSheet.create({
         letterSpacing: FONT_SIZES.p2 * 0.05,
         color: COLORS.gray1
     },
-    dividerContainer: {
-        marginHorizontal: DEFAULT_SEPARATOR
+    contentContainer: {
+        marginHorizontal: DEFAULT_SEPARATOR,
+        gap: SEPARATOR_SIZES.medium
     }
 });
 
