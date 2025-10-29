@@ -91,13 +91,13 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         {
             icon: ICON_NAMES.car,
             title: car?.name,
-            subtitle: `${ car?.model.make.name } ${ car?.model.name }`,
+            content: `${ car?.model.make.name } ${ car?.model.name }`,
             onPress: () => onEdit(ServiceLogFormFieldsEnum.Car)
         },
         {
             icon: ICON_NAMES.expenseItem,
             title: "Szervizelési tételek",
-            subtitle: isServiceItemListExpanded ? " " : getAmountSubtitle(),
+            content: isServiceItemListExpanded ? " " : getAmountSubtitle(),
             secondaryInfo: { icon: isServiceItemListExpanded ? ICON_NAMES.upArrowHead : ICON_NAMES.downArrowHead },
             onPress: () => setServiceItemListExpanded(prevState => !prevState),
             renderContent: () => serviceLog && <ServiceItemExpandableList
@@ -114,22 +114,22 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         {
             icon: ICON_NAMES.calendar,
             title: "Dátum",
-            subtitle: dayjs(serviceLog?.expense?.date).format("YYYY. MM DD. HH:mm"),
+            content: dayjs(serviceLog?.expense?.date).format("YYYY. MM DD. HH:mm"),
             onPress: () => onEdit(ServiceLogFormFieldsEnum.Date)
         },
         {
             icon: ICON_NAMES.odometer,
             title: "Kilométeróra-állás",
-            subtitle: serviceLog?.odometer
-                      ? `${ serviceLog.odometer.value } ${ serviceLog.odometer.unit.short }`
-                      : "Nincs hozzárendelve",
-            subtitleStyle: !serviceLog?.odometer && { color: COLORS.gray2 },
+            content: serviceLog?.odometer
+                     ? `${ serviceLog.odometer.value } ${ serviceLog.odometer.unit.short }`
+                     : "Nincs hozzárendelve",
+            contentTextStyle: !serviceLog?.odometer && { color: COLORS.gray2 },
             onPress: () => onEdit(ServiceLogFormFieldsEnum.OdometerValue)
         },
         {
             icon: ICON_NAMES.note,
-            subtitle: serviceLog?.expense?.note ?? "Nincs megjegyzés",
-            subtitleStyle: !serviceLog?.expense?.note && { color: COLORS.gray2 },
+            content: serviceLog?.expense?.note ?? "Nincs megjegyzés",
+            contentTextStyle: !serviceLog?.expense?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(ServiceLogFormFieldsEnum.Note)
         }
     ]), [car, serviceLog, isServiceItemListExpanded, getAmountSubtitle]);

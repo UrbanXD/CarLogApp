@@ -2,28 +2,30 @@ import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
 import Icon from "../Icon.tsx";
 import { IntelligentMarquee } from "../marquee/IntelligentMarquee.tsx";
-import React from "react";
+import React, { ReactElement } from "react";
 
 export type InfoTextProps = {
     icon?: string
     title?: string
-    subtitle?: string
+    content?: string | ((textStyle?: Array<TextStyle>) => ReactElement)
+    contentFirst?: boolean
     marquee?: boolean
     textContainerStyle?: ViewStyle
     iconStyle?: ViewStyle
     titleStyle?: TextStyle
-    subtitleStyle?: TextStyle
+    contentTextStyle?: TextStyle
 }
 
 export function InfoText({
     icon,
     title,
-    subtitle,
+    content,
+    contentFirst,
     marquee,
     textContainerStyle,
     iconStyle,
     titleStyle,
-    subtitleStyle
+    contentTextStyle
 }: InfoTextProps) {
     return (
         <>
@@ -36,7 +38,7 @@ export function InfoText({
                   style={ iconStyle }
                />
             }
-            <View style={ [styles.container, textContainerStyle] }>
+            <View style={ [styles.container, contentFirst && styles.container.contentFirst, textContainerStyle] }>
                 {
                     title && (
                         marquee
@@ -58,23 +60,27 @@ export function InfoText({
                     )
                 }
                 {
-                    subtitle && (
-                        marquee
-                        ?
-                        <IntelligentMarquee
-                            speed={ 0.65 }
-                            delay={ 800 }
-                            bounceDelay={ 800 }
-                            spacing={ SEPARATOR_SIZES.lightSmall }
-                        >
-                            <Text style={ [styles.subtitle, subtitleStyle] } numberOfLines={ 1 }>
-                                { subtitle }
+                    content && (
+                        typeof content === "string"
+                        ? (
+                            marquee
+                            ?
+                            <IntelligentMarquee
+                                speed={ 0.65 }
+                                delay={ 800 }
+                                bounceDelay={ 800 }
+                                spacing={ SEPARATOR_SIZES.lightSmall }
+                            >
+                                <Text style={ [styles.content, contentTextStyle] } numberOfLines={ 1 }>
+                                    { content }
+                                </Text>
+                            </IntelligentMarquee>
+                            :
+                            <Text style={ [styles.content, contentTextStyle] }>
+                                { content }
                             </Text>
-                        </IntelligentMarquee>
-                        :
-                        <Text style={ [styles.subtitle, subtitleStyle] }>
-                            { subtitle }
-                        </Text>
+                        )
+                        : content([styles.content, contentTextStyle])
                     )
                 }
             </View>
@@ -84,7 +90,11 @@ export function InfoText({
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+
+        contentFirst: {
+            flexDirection: "column-reverse"
+        }
     },
     title: {
         fontFamily: "Gilroy-Heavy",
@@ -92,7 +102,7 @@ const styles = StyleSheet.create({
         letterSpacing: FONT_SIZES.p3 * 0.05,
         color: COLORS.white
     },
-    subtitle: {
+    content: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p3 * 0.9,
         letterSpacing: FONT_SIZES.p3 * 0.9 * 0.05,

@@ -35,23 +35,23 @@ function CarProfileView({
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
             title: car.fuelTank.type.key,
-            subtitle: "Üzemanyag Típus",
+            content: "Üzemanyag Típus",
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelType)
         }, {
             title: car.fuelTank.capacity,
-            subtitle: "Tartálytérfogat",
+            content: "Tartálytérfogat",
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelTankCapacity)
         }, {
             title: car.fuelTank.unit.short,
-            subtitle: "Üzemanyag mértékegység",
+            content: "Üzemanyag mértékegység",
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelUnit)
         }, {
             title: car.odometer.unit.short,
-            subtitle: "Kilométeróra Mértékegység",
+            content: "Kilométeróra Mértékegység",
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.OdometerUnit)
         }, {
             title: car.currency.symbol,
-            subtitle: "Elsődleges Valuta",
+            content: "Elsődleges Valuta",
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.Currency)
         }
     ]), [car, openEditCarStep]);

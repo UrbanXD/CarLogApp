@@ -50,11 +50,11 @@ export function InfoContainer({
                                                 : styles.infoContainer.column.title,
                                                 item.titleStyle
                                             ] }
-                                            subtitleStyle={ [
+                                            contentTextStyle={ [
                                                 flexDirection === "row"
                                                 ? styles.infoContainer.row.subtitle
                                                 : styles.infoContainer.column.subtitle,
-                                                item.subtitleStyle
+                                                item.contentTextStyle
                                             ] }
                                         />
 

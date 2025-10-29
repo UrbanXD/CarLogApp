@@ -1,5 +1,5 @@
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
-import { useExpenseTimelineItem } from "../hooks/useExepenseTimelineItem.ts";
+import { useExpenseTimelineItem } from "../hooks/useExepenseTimelineItem.tsx";
 import React, { useEffect, useMemo } from "react";
 import { TimelineView } from "../../../components/timelineView/TimelineView.tsx";
 import { Title } from "../../../components/Title.tsx";
