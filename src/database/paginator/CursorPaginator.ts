@@ -8,16 +8,21 @@ import { defaultValueToCursorValue } from "./utils/defaultValueToCursorValue.ts"
 
 export type CursorDirection = "initial" | "next" | "prev";
 export type CursorValue<TableItem> = TableItem[keyof TableItem] | null;
-export type CursorOptions<TableField> = {
-    field: TableField | Array<TableField>
-    order?: OrderByDirectionExpression | Array<OrderByDirectionExpression>
+export type Cursor<DB, TableField> = {
+    field: TableField,
+    table?: keyof DB,
+    order?: OrderByDirectionExpression
+}
+export type CursorOptions<DB, TableField> = {
+    cursor: Cursor<DB, TableField> | Array<Cursor<DB, TableField>>,
+    defaultOrder?: OrderByDirectionExpression
 }
 
 export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseType> extends Paginator<TableItem, MappedItem, DB> {
     private prevCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
     private nextCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
     private refreshCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
-    cursorOptions: CursorOptions<keyof TableItem>;
+    cursorOptions: CursorOptions<DB, keyof TableItem>;
 
     constructor(
         database: Kysely<DB>,
@@ -30,26 +35,26 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
     }
 
     private setNextCursor(lastItem: TableItem) {
-        if(Array.isArray(this.cursorOptions.field)) {
-            this.nextCursor = this.cursorOptions.field.map((cursorField) => lastItem[cursorField] ?? null);
+        if(Array.isArray(this.cursorOptions.cursor)) {
+            this.nextCursor = this.cursorOptions.cursor.map((cursor) => lastItem[cursor.field] ?? null);
         } else {
-            this.nextCursor = lastItem[this.cursorOptions.cursorField] ?? null;
+            this.nextCursor = lastItem[this.cursorOptions.cursor.field] ?? null;
         }
     }
 
     private setPreviousCursor(firstItem: TableItem) {
-        if(Array.isArray(this.cursorOptions.field)) {
-            this.prevCursor = this.cursorOptions.field.map((cursorField) => firstItem[cursorField] ?? null);
+        if(Array.isArray(this.cursorOptions.cursor)) {
+            this.prevCursor = this.cursorOptions.cursor.map((cursor) => firstItem[cursor.field] ?? null);
         } else {
-            this.prevCursor = firstItem[this.cursorOptions.field] ?? null;
+            this.prevCursor = firstItem[this.cursorOptions.cursor.field] ?? null;
         }
     }
 
     private setRefreshCursor(item: TableItem) {
-        if(Array.isArray(this.cursorOptions.field)) {
-            this.refreshCursor = this.cursorOptions.field.map((cursorField) => item[cursorField] ?? null);
+        if(Array.isArray(this.cursorOptions.cursor)) {
+            this.refreshCursor = this.cursorOptions.cursor.map((cursor) => item[cursor.field] ?? null);
         } else {
-            this.refreshCursor = item[this.cursorOptions.field] ?? null;
+            this.refreshCursor = item[this.cursorOptions.cursor.field] ?? null;
         }
     }
 
@@ -61,7 +66,7 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         return !!this.prevCursor;
     }
 
-    async changeCursorOptions(options: CursorOptions<keyof TableItem>) {
+    async changeCursorOptions(options: CursorOptions<DB, keyof TableItem>) {
         this.cursorOptions = options;
         return await this.initial();
     }
@@ -103,7 +108,7 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         this.nextCursor = null;
         this.refreshCursor = null;
 
-        const defaultCursor = defaultValueToCursorValue<TableItem>(defaultValue, this.cursorOptions.field);
+        const defaultCursor = defaultValueToCursorValue<TableItem>(defaultValue, this.cursorOptions.cursor);
 
         if(!defaultCursor) {
             let query = this.getBaseQuery();

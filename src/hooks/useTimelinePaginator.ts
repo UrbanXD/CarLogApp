@@ -10,7 +10,7 @@ import { useFocusEffect } from "expo-router";
 type UseTimelinePaginatorProps<TableItem, MappedItem, DB> = {
     paginator: CursorPaginator<TableItem, MappedItem, DB>
     mapper: (item: MappedItem) => TimelineItemType
-    cursorOrderButtons?: Array<{ field: keyof TableItem, title: string }>
+    cursorOrderButtons?: Array<{ field: keyof TableItem, table?: keyof DB | null, title: string }>
 }
 
 export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = DatabaseType>({
@@ -111,10 +111,10 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
 
     const orderButtons: Array<FilterButtonProps> | undefined = cursorOrderButtons?.map(cursor => ({
         title: cursor.title,
-        active: isMainCursor(cursor.field),
-        onPress: () => makeFieldMainCursor(cursor.field),
-        icon: getOrderIconForField(cursor.field),
-        iconOnPress: () => toggleFieldOrder(cursor.field)
+        active: isMainCursor(cursor.field, cursor.table),
+        onPress: () => makeFieldMainCursor(cursor.field, cursor.table),
+        icon: getOrderIconForField(cursor.field, cursor.table),
+        iconOnPress: () => toggleFieldOrder(cursor.field, cursor.table)
     }));
 
     return {

@@ -7,7 +7,7 @@ export function addFilter<TableItem = any, DB = any>(
     query: SelectQueryBuilder<DB, TableItem, any>,
     filterCondition: FilterCondition<TableItem>
 ): SelectQueryBuilder<DB, TableItem, any> {
-    let filterField = `${ table }.${ filterCondition.field }`;
+    let filterField = `${ filterCondition?.table ?? table }.${ filterCondition.field }`;
 
     // @formatter:off
     if(filterCondition.toLowerCase) filterField = sql`lower(${ sql.ref(filterField) })`;

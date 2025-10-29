@@ -1,69 +1,75 @@
 import { useCallback, useState } from "react";
-import { CursorOptions } from "../database/paginator/CursorPaginator.ts";
+import { Cursor, CursorOptions } from "../database/paginator/CursorPaginator.ts";
 import { ExpenseTableRow } from "../database/connector/powersync/AppSchema.ts";
 import { ICON_NAMES } from "../constants/index.ts";
+import { arraySwapByIndex } from "../utils/arraySwapByIndex.ts";
 
-export function useCursor<TableItem>(options: CursorOptions<keyof TableItem>) {
-    const [cursorOptions, setCursorOptions] = useState<CursorOptions<keyof TableItem>>(options);
+export function useCursor<TableItem, DB>(options: CursorOptions<keyof TableItem>) {
+    const [cursorOptions, setCursorOptions] = useState<CursorOptions<DB, keyof TableItem>>(options);
+
+    const findCursorIndex = useCallback((
+        cursors: Array<Cursor<DB, keyof TableItem>>,
+        field: string,
+        table?: keyof DB | null
+    ) => {
+        return cursors.findIndex((cursor) => cursor.field === field && cursor.table === table);
+    });
 
     // first in cursor options if its an array
-    const isMainCursor = useCallback((field: keyof TableItem) => {
+    const isMainCursor = useCallback((field: keyof TableItem, table?: keyof DB | null) => {
         return (
-            Array.isArray(cursorOptions.field)
-            ? cursorOptions.field[0] === field
-            : cursorOptions.field === field
+            Array.isArray(cursorOptions.cursor)
+            ? cursorOptions.cursor[0].field === field && cursorOptions.cursor[0].table === table
+            : cursorOptions.cursor.field === field && cursorOptions.cursor.table === table
         );
     }, [cursorOptions]);
 
-    const makeFieldMainCursor = useCallback((field: keyof TableItem) => {
+    const makeFieldMainCursor = useCallback((field: keyof TableItem, table?: keyof DB | null) => {
         setCursorOptions(prev => {
-            if(!Array.isArray(prev.field)) return prev; // it is not an array so we cannot change the order
+            if(!Array.isArray(prev.cursor)) return prev; // it is not an array so we cannot change the order
 
-            const fieldIndex = prev.field.indexOf(field);
+            const fieldIndex = findCursorIndex(prev.cursor, field, table);
+            console.log(fieldIndex);
             if(fieldIndex === -1) return prev; // field is not cursor field
 
-            const newFields = [...prev.field];
-            const newOrders = [...prev.order];
-
-            const [removedField] = newFields.splice(fieldIndex, 1);
-            const [removedOrder] = newOrders.splice(fieldIndex, 1);
-
-            return {
-                ...prev,
-                field: [removedField, ...newFields],
-                order: [removedOrder, ...newOrders]
-            };
+            return { ...prev, cursor: arraySwapByIndex(prev.cursor, fieldIndex, 0) };
         });
     }, []);
 
-    const toggleFieldOrder = useCallback((field: keyof TableItem) => {
+    const toggleFieldOrder = useCallback((field: keyof TableItem, table?: keyof DB | null) => {
         setCursorOptions(prev => {
-            if(!Array.isArray(prev.field) && prev.field === field) { // cursor is not an array and field equals with cursor field
-                return { field: prev.field, order: prev.order === "asc" ? "desc" : "asc" };
-            } else if(!Array.isArray(prev.field)) {
+            if(!Array.isArray(prev.cursor) && prev.cursor === field && cursor.table === table) { // cursor is not an array and field equals with cursor field
+                const newCursor = { ...prev.cursor };
+                newCursor.order = newCursor.order === "asc" ? "desc" : "asc";
+                return { ...prev, cursor: newCursor };
+            } else if(!Array.isArray(prev.cursor)) {
                 return prev;
             }
 
-            const fieldIndex = prev.field.indexOf(field);
-            if(fieldIndex === -1) return prev;
+            const fieldIndex = findCursorIndex(prev.cursor, field, table);
+            if(fieldIndex === -1) return prev; // field is not cursor field
 
-            const newOrders = [...prev.order];
-            newOrders[fieldIndex] = newOrders[fieldIndex] === "asc" ? "desc" : "asc";
+            const newCursor = [...prev.cursor];
+            newCursor[fieldIndex] = {
+                ...newCursor[fieldIndex],
+                order: newCursor[fieldIndex].order === "asc" ? "desc" : "asc"
+            } as Cursor<DB, keyof TableItem>;
 
-            return { ...prev, order: newOrders };
+            return { ...prev, cursor: newCursor };
         });
     }, []);
 
-    const getOrderIconForField = (field: keyof ExpenseTableRow) => {
-        if(!Array.isArray(cursorOptions.field) && cursorOptions.field === field) { // cursor is not an array and field equals with cursor field
-            return cursorOptions.order === "asc" ? ICON_NAMES.upArrow : ICON_NAMES.downArrow;
-        } else if(!Array.isArray(cursorOptions.field)) {
+    const getOrderIconForField = (field: keyof ExpenseTableRow, table?: keyof DB | null) => {
+        if(!Array.isArray(cursorOptions.cursor) && cursorOptions.cursor.field === field && cursorOptions.cursor.table === table) { // cursor is not an array and field equals with cursor field
+            return cursorOptions.cursor.order === "asc" ? ICON_NAMES.upArrow : ICON_NAMES.downArrow;
+        } else if(!Array.isArray(cursorOptions.cursor)) {
             return "help";
         }
 
-        const idx = cursorOptions.field.indexOf(field);
-        if(idx === -1) return "help"; // default
-        return cursorOptions.order[idx] === "asc"
+        const fieldIndex = findCursorIndex(cursorOptions.cursor, field, table);
+        if(fieldIndex === -1) return "help"; // default
+
+        return cursorOptions.cursor[fieldIndex].order === "asc"
                ? ICON_NAMES.upArrow
                : ICON_NAMES.downArrow;
     };

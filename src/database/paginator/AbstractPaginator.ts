@@ -2,16 +2,17 @@ import { Kysely } from "@powersync/kysely-driver";
 import { ComparisonOperatorExpression, SelectQueryBuilder } from "kysely";
 import { addFilter } from "./utils/addFilter.ts";
 
-export type FilterCondition<TableItem, FieldName = keyof TableItem> = {
+export type FilterCondition<DB, TableItem, FieldName = keyof TableItem> = {
     field: FieldName
     operator: ComparisonOperatorExpression
     value: TableItem[FieldName]
+    table?: keyof DB
     toLowerCase?: boolean
 }
 
-export type PaginatorOptions<TableItem, MappedItem = any> = {
+export type PaginatorOptions<DB, TableItem, MappedItem = any> = {
     baseQuery?: SelectQueryBuilder<TableItem>
-    filterBy?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>
+    filterBy?: FilterCondition<DB, TableItem> | Array<FilterCondition<DB, TableItem>>
     perPage?: number
     mapper?: (tableRow?: TableItem) => Promise<MappedItem>
 }

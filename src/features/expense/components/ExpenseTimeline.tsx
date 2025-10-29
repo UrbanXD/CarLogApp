@@ -19,8 +19,7 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
     const { expenseDao } = useDatabase();
     const { mapper } = useExpenseTimelineItem(car.currency);
     const paginator = useMemo(() => expenseDao.paginator({
-        field: ["date", "amount", "id"],
-        order: ["desc", "desc", "asc"]
+        cursor: [{ field: "date", order: "desc" }, { field: "amount", order: "desc" }, { field: "id" }]
     }, { field: "car_id", operator: "=", value: car.id }, 25), []);
 
     const { typeFilter, filterButtons } = useExpenseTimelineFilter();
