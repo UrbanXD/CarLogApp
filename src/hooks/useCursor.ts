@@ -1,14 +1,14 @@
 import { useCallback, useState } from "react";
 import { Cursor, CursorOptions } from "../database/paginator/CursorPaginator.ts";
-import { ExpenseTableRow } from "../database/connector/powersync/AppSchema.ts";
+import { DatabaseType, ExpenseTableRow } from "../database/connector/powersync/AppSchema.ts";
 import { ICON_NAMES } from "../constants/index.ts";
 import { arraySwapByIndex } from "../utils/arraySwapByIndex.ts";
 
-export function useCursor<TableItem, DB>(options: CursorOptions<keyof TableItem>) {
-    const [cursorOptions, setCursorOptions] = useState<CursorOptions<DB, keyof TableItem>>(options);
+export function useCursor<TableItem, DB = DatabaseType>(options: CursorOptions<keyof TableItem, DB>) {
+    const [cursorOptions, setCursorOptions] = useState<CursorOptions<keyof TableItem, DB>>(options);
 
     const findCursorIndex = useCallback((
-        cursors: Array<Cursor<DB, keyof TableItem>>,
+        cursors: Array<Cursor<keyof TableItem, DB>>,
         field: string,
         table?: keyof DB | null
     ) => {
@@ -53,7 +53,7 @@ export function useCursor<TableItem, DB>(options: CursorOptions<keyof TableItem>
             newCursor[fieldIndex] = {
                 ...newCursor[fieldIndex],
                 order: newCursor[fieldIndex].order === "asc" ? "desc" : "asc"
-            } as Cursor<DB, keyof TableItem>;
+            } as Cursor<keyof TableItem, DB>;
 
             return { ...prev, cursor: newCursor };
         });

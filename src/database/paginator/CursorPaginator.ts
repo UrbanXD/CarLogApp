@@ -1,4 +1,4 @@
-import { FilterCondition, Paginator, PaginatorOptions } from "./AbstractPaginator.ts";
+import { FilterCondition, FilterGroup, Paginator, PaginatorOptions } from "./AbstractPaginator.ts";
 import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 import { Kysely } from "@powersync/kysely-driver";
 import { OrderByDirectionExpression } from "kysely";
@@ -8,13 +8,13 @@ import { defaultValueToCursorValue } from "./utils/defaultValueToCursorValue.ts"
 
 export type CursorDirection = "initial" | "next" | "prev";
 export type CursorValue<TableItem> = TableItem[keyof TableItem] | null;
-export type Cursor<DB, TableField> = {
+export type Cursor<TableField, DB = DatabaseType> = {
     field: TableField,
     table?: keyof DB,
     order?: OrderByDirectionExpression
 }
-export type CursorOptions<DB, TableField> = {
-    cursor: Cursor<DB, TableField> | Array<Cursor<DB, TableField>>,
+export type CursorOptions<TableField, DB = DatabaseType> = {
+    cursor: Cursor<TableField, DB> | Array<Cursor<TableField, DB>>,
     defaultOrder?: OrderByDirectionExpression
 }
 
@@ -22,7 +22,7 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
     private prevCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
     private nextCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
     private refreshCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
-    cursorOptions: CursorOptions<DB, keyof TableItem>;
+    cursorOptions: CursorOptions<keyof TableItem, DB>;
 
     constructor(
         database: Kysely<DB>,
@@ -66,7 +66,7 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         return !!this.prevCursor;
     }
 
-    async changeCursorOptions(options: CursorOptions<DB, keyof TableItem>) {
+    async changeCursorOptions(options: CursorOptions<keyof TableItem, DB>) {
         this.cursorOptions = options;
         return await this.initial();
     }
@@ -98,7 +98,7 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         return refreshMappedResult;
     }
 
-    async filter(filterBy: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>): Promise<Array<MappedItem>> {
+    async filter(filterBy: FilterCondition<TableItem, DB> | Array<FilterGroup<TableItem, DB>>): Promise<Array<MappedItem>> {
         this.setFilter(filterBy);
         return await this.initial();
     }

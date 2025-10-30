@@ -3,11 +3,12 @@ import { addOrder } from "./addOrder.ts";
 import { getCursorOperator } from "./getCursorOperation.ts";
 import { sql } from "@powersync/kysely-driver";
 import { CursorDirection, CursorOptions, CursorValue } from "../CursorPaginator.ts";
+import { DatabaseType } from "../../connector/powersync/AppSchema.ts";
 
-export function addCursor<TableItem, DB>(
+export function addCursor<TableItem, DB = DatabaseType>(
     table: keyof DB,
     query: SelectQueryBuilder<DB, TableItem, any>,
-    cursorOptions: CursorOptions<DB, keyof TableItem>,
+    cursorOptions: CursorOptions<keyof TableItem, DB>,
     value: CursorValue<TableItem> | Array<CursorValue<TableItem>>,
     direction: CursorDirection
 ): SelectQueryBuilder<DB, TableItem, any> {
