@@ -1,6 +1,6 @@
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { TimelineView } from "../../../../../components/timelineView/TimelineView.tsx";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import { StyleSheet, View } from "react-native";
 import useCars from "../../../hooks/useCars.ts";
@@ -28,7 +28,6 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
         cursor: [{ field: "value", order: "desc" }, { field: "id" }]
     }, { field: "car_id", operator: "=", value: car?.id }, 25), []);
 
-    const { typeFilter, filterButtons } = useOdometerLogTimelineFilter();
     const {
         data,
         isInitialFetching,
@@ -36,24 +35,17 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
         isNextFetching,
         fetchPrevious,
         isPreviousFetching,
-        setFilter,
-        removeFilter,
+        filterManagement,
         orderButtons
     } = useTimelinePaginator<OdometerLogTableRow, OdometerLog>({
         paginator,
         mapper,
         cursorOrderButtons: [{ field: "value", title: "Kilométeróra-állás" }]
     });
-
-    useEffect(() => {
-        setFilter("car_id", "=", car?.id);
-    }, [car]);
-
-    useEffect(() => {
-        if(!typeFilter) return removeFilter("type_id");
-
-        setFilter("type_id", "=", typeFilter);
-    }, [typeFilter]);
+    const { filterButtons } = useOdometerLogTimelineFilter({
+        filterManagement,
+        car
+    });
 
     if(!car) return <></>;
 

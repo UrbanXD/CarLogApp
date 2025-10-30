@@ -1,6 +1,6 @@
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useExpenseTimelineItem } from "../hooks/useExepenseTimelineItem.tsx";
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { TimelineView } from "../../../components/timelineView/TimelineView.tsx";
 import { Title } from "../../../components/Title.tsx";
 import { StyleSheet, View } from "react-native";
@@ -22,7 +22,6 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
         cursor: [{ field: "date", order: "desc" }, { field: "amount", order: "desc" }, { field: "id" }]
     }, { field: "car_id", operator: "=", value: car.id }, 25), []);
 
-    const { typeFilter, filterButtons } = useExpenseTimelineFilter();
     const {
         data,
         initialFetchHappened,
@@ -31,24 +30,17 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
         isNextFetching,
         fetchPrevious,
         isPreviousFetching,
-        setFilter,
-        removeFilter,
+        filterManagement,
         orderButtons
     } = useTimelinePaginator<SelectExpenseTableRow, Expense>({
         paginator,
         mapper,
         cursorOrderButtons: [{ field: "date", title: "Dátum" }, { field: "amount", title: "Ár" }]
     });
-
-    useEffect(() => {
-        setFilter("car_id", "=", car.id);
-    }, [car]);
-
-    useEffect(() => {
-        if(!typeFilter) return removeFilter("type_id");
-
-        setFilter("type_id", "=", typeFilter.id);
-    }, [typeFilter]);
+    const { filterButtons } = useExpenseTimelineFilter({
+        filterManagement,
+        car
+    });
 
     if(!car) return <></>;
 

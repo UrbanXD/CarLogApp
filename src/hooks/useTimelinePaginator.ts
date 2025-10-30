@@ -18,7 +18,9 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
     mapper,
     cursorOrderButtons
 }: UseTimelinePaginatorProps<TableItem, MappedItem, DB>) {
-    const { filters, setFilter, removeFilter } = useFilterBy<TableItem>(paginator.filterBy);
+    const filterManagement = useFilterBy<TableItem>();
+    const { filters } = filterManagement;
+
     const {
         cursorOptions,
         isMainCursor,
@@ -62,7 +64,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
     useEffect(() => {
         if(!initialFetchHappened) return;
 
-        paginator.filter(filters).then(result => {
+        paginator.filter(Array.from(filters.values())).then(result => {
             setData((_) => {
                 return result.map(mapper);
             });
@@ -125,8 +127,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
         isNextFetching,
         fetchPrevious,
         isPreviousFetching,
-        setFilter,
-        removeFilter,
+        filterManagement,
         orderButtons
     };
 }

@@ -5,7 +5,7 @@ import { OdometerLogMapper } from "../mapper/odometerLogMapper.ts";
 import { Kysely } from "@powersync/kysely-driver";
 import { ODOMETER_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/odometerLog.ts";
 import { CursorOptions, CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
-import { FilterCondition } from "../../../../../../database/paginator/AbstractPaginator.ts";
+import { FilterCondition, FilterGroup } from "../../../../../../database/paginator/AbstractPaginator.ts";
 import { OdometerChangeLogFormFields } from "../../schemas/form/odometerChangeLogForm.ts";
 import { OdometerUnitDao } from "./OdometerUnitDao.ts";
 import { OdometerLogTypeDao } from "./OdometerLogTypeDao.ts";
@@ -157,7 +157,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
 
     paginator(
         cursorOptions: CursorOptions<keyof SelectOdometerLogTableRow>,
-        filterBy?: FilterCondition<SelectOdometerLogTableRow> | Array<FilterCondition<SelectOdometerLogTableRow>>,
+        filterBy?: FilterCondition<SelectOdometerLogTableRow> | Array<FilterGroup<SelectOdometerLogTableRow>>,
         perPage?: number = 10
     ): CursorPaginator<SelectOdometerLogTableRow, OdometerLog> {
 

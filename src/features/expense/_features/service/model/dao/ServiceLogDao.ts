@@ -1,5 +1,9 @@
 import { Dao } from "../../../../../../database/dao/Dao.ts";
-import { DatabaseType, ServiceLogTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
+import {
+    DatabaseType,
+    ExpenseTableRow,
+    ServiceLogTableRow
+} from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { ServiceLog } from "../../schemas/serviceLogSchema.ts";
 import { ServiceLogMapper } from "../mapper/ServiceLogMapper.ts";
 import { ExpenseDao } from "../../../../model/dao/ExpenseDao.ts";
@@ -15,6 +19,8 @@ import { OdometerUnitDao } from "../../../../../car/_features/odometer/model/dao
 import { ExpenseTypeDao } from "../../../../model/dao/ExpenseTypeDao.ts";
 import { ServiceItemDao } from "./ServiceItemDao.ts";
 import { CarDao } from "../../../../../car/model/dao/CarDao.ts";
+import { CursorOptions, CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
+import { FilterCondition, FilterGroup } from "../../../../../../database/paginator/AbstractPaginator.ts";
 
 export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLogMapper> {
     constructor(
@@ -199,5 +205,28 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
 
             return result.id;
         });
+    }
+
+    paginator(
+        cursorOptions: CursorOptions<keyof ServiceLogTableRow & keyof ExpenseTableRow>,
+        filterBy?: FilterCondition<ServiceLogTableRow & ExpenseTableRow> | Array<FilterGroup<DatabaseType, ServiceLogTableRow & ExpenseTableRow>>,
+        perPage?: number = 10
+    ): CursorPaginator<ServiceLogTableRow & ExpenseTableRow, ServiceLog> {
+        const query = this.db
+        .selectFrom(SERVICE_LOG_TABLE)
+        .innerJoin(EXPENSE_TABLE, `${ EXPENSE_TABLE }.id`, `${ SERVICE_LOG_TABLE }.expense_id`)
+        .selectAll(SERVICE_LOG_TABLE);
+
+        return new CursorPaginator<ServiceLogTableRow & ExpenseTableRow, ServiceLog>(
+            this.db,
+            SERVICE_LOG_TABLE,
+            cursorOptions,
+            {
+                baseQuery: query,
+                perPage,
+                filterBy,
+                mapper: this.mapper.toDto.bind(this.mapper)
+            }
+        );
     }
 }

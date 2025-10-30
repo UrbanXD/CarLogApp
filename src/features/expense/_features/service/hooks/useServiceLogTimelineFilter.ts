@@ -1,21 +1,20 @@
-import { FilterButtonProps } from "../../../components/filter/FilterButton.tsx";
+import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { useEffect, useState } from "react";
-import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
-import { ExpenseType } from "../schemas/expenseTypeSchema.ts";
-import { ExpenseTypeEnum } from "../model/enums/ExpenseTypeEnum.ts";
-import { FilterManagement } from "../../../hooks/useFilterBy.ts";
-import { Car } from "../../car/schemas/carSchema.ts";
-import { SelectExpenseTableRow } from "../model/mapper/expenseMapper.ts";
+import { FilterButtonProps } from "../../../../../components/filter/FilterButton.tsx";
+import { ServiceType } from "../schemas/serviceTypeSchema.ts";
+import { FilterManagement } from "../../../../../hooks/useFilterBy.ts";
+import { Car } from "../../../../car/schemas/carSchema.ts";
+import { ExpenseTableRow, ServiceLogTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
 
 const TYPES_FILTER_KEY = "type_filter";
-const TYPES_FILTER_FIELD_NAME = "type_id";
+const TYPES_FILTER_FIELD_NAME = "service_type_id";
 
-type UseExpenseTimelineFilterProps = {
-    filterManagement: FilterManagement<SelectExpenseTableRow>,
+type UseServiceLogTimelineFilterProps = {
+    filterManagement: FilterManagement<ExpenseTableRow & ServiceLogTableRow>,
     car: Car
 }
 
-export function useExpenseTimelineFilter({
+export function useServiceLogTimelineFilter({
     filterManagement: {
         filters,
         addFilter,
@@ -23,22 +22,18 @@ export function useExpenseTimelineFilter({
         clearFilterGroup
     },
     car
-}: UseExpenseTimelineFilterProps) {
-    const { expenseTypeDao } = useDatabase();
-    const [types, setTypes] = useState<Array<ExpenseType>>([]);
-    const [selectedTypesId, setSelectedTypesId] = useState<Array<ExpenseType["id"]>>([]);
+}: UseServiceLogTimelineFilterProps) {
+    const { serviceTypeDao } = useDatabase();
+    const [types, setTypes] = useState<Array<ServiceType>>([]);
+    const [selectedTypesId, setSelectedTypesId] = useState<Array<ServiceType["id"]>>([]);
 
     useEffect(() => {
         (async () => {
-            const types = await expenseTypeDao.getAll();
+            const types = await serviceTypeDao.getAll();
 
             // sort based on locale
             const sorted = types.sort((a, b) => {
-                //Make other first
-                if(a.key === ExpenseTypeEnum.OTHER) return -1;
-                if(b.key === ExpenseTypeEnum.OTHER) return 1;
-
-                return a.locale.localeCompare(b.locale);
+                return a.key.localeCompare(b.key);
             });
 
 
@@ -78,7 +73,7 @@ export function useExpenseTimelineFilter({
         };
 
         return {
-            title: type.locale,
+            title: type.key,
             active,
             activeColor: type?.primaryColor ?? undefined,
             onPress
