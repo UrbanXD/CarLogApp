@@ -46,11 +46,11 @@ export class ModelDao extends Dao<ModelTableRow, Model, ModelMapper> {
         return new CursorPaginator<ModelTableRow, PickerItemType>(
             this.db,
             MODEL_TABLE,
-            { field: ["name", "id"], order: "asc" },
+            { cursor: [{ field: "name", order: "asc" }, { field: "id" }], defaultOrder: "asc" },
             {
                 perPage,
                 filterBy: makeId ? { field: "make_id", value: makeId, operator: "=" } : undefined,
-                searchBy: "name",
+                // searchBy: "name",
                 mapper: this.mapper.toPickerItem
             }
         );

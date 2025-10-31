@@ -16,7 +16,7 @@ export class MakeDao extends Dao<MakeTableRow, Make, MakeMapper> {
         return new CursorPaginator<MakeTableRow>(
             this.db,
             MAKE_TABLE,
-            { field: ["name", "id"], order: "asc" },
+            { cursor: [{ field: "name", order: "asc" }, { field: "id" }], defaultOrder: "asc" },
             { perPage, mapper: this.mapper.toPickerItem }
         );
     }

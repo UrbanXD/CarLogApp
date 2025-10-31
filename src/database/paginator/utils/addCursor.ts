@@ -28,7 +28,7 @@ export function addCursor<TableItem, DB = DatabaseType>(
             );
         });
     } else {
-        const orderDirection: OrderByDirectionExpression = cursor.order ?? cursorOptions.defaultOrder ?? "asc";
+        const orderDirection: OrderByDirectionExpression = cursorOptions.cursor?.order ?? cursorOptions.defaultOrder ?? "asc";
 
         const tableName = cursorOptions.cursor.table ?? table;
         let fieldName = `${ tableName }.${ cursorOptions.cursor }`;
