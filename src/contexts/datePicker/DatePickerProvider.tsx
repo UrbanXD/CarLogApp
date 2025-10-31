@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import { CalendarViews } from "react-native-ui-datepicker/lib/typescript/enums";
 import { DateType } from "react-native-ui-datepicker";
 import { DatePickerContext, DatePickerViews } from "./DatePickerContext.ts";
+import { MAX_DATE, MIN_DATE } from "../../constants/index.ts";
 
 export type DatePickerProviderProps = {
     children: ReactElement
@@ -19,8 +20,8 @@ export function DatePickerProvider({
     initialDate,
     initialView = "calendar",
     locale = "hu",
-    minDate = "1950-01-01",
-    maxDate = "2050-12-31",
+    minDate = MIN_DATE,
+    maxDate = MAX_DATE,
     onSubmit
 }: DatePickerProviderProps) {
     const [date, setDate] = useState<dayjs.Dayjs>(dayjs(initialDate).locale(locale));

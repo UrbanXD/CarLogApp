@@ -6,6 +6,7 @@ import { ICON_NAMES } from "../../../../../constants/index.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { MakeTableRow, ModelTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
 import { CarFormFields } from "../../../schemas/form/carForm.ts";
+import { YearPicker } from "../../../../../components/Input/_presets/YearPicker.tsx";
 
 type CarModelStepProps<FormFields> = Pick<StepProps<FormFields>, "control" | "resetField" | "setValue">;
 
@@ -84,13 +85,10 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
                 fieldName="model.year"
                 fieldNameText="Évjárat"
             >
-                <Input.Picker.Dropdown
+                <YearPicker
                     title={ "Évjárat" }
-                    data={ modelYears }
-                    searchBarEnable={ false }
-                    masonry
-                    numColumns={ 3 }
                     icon={ ICON_NAMES.calendar }
+                    data={ modelYears }
                     disabled={ !selectedModelId }
                     disabledText="Először válassza ki az autó modelljét!"
                 />
