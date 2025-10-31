@@ -34,11 +34,9 @@ export function YearPicker({
         <Input.Picker.Dropdown
             title={ restProps.title ?? "Év" }
             defaultSelectedItemValue={ defaultYear?.toString() }
-            inputPlaceholder={ restProps.inputPlaceholder ?? defaultYear?.toString() }
             data={ years }
             masonry
             numColumns={ 3 }
-            hiddenBackground={ true }
             { ...restProps }
         />
     );

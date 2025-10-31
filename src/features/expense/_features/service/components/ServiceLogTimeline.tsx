@@ -75,6 +75,8 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
                 <YearPicker
                     containerStyle={ styles.headerContainer.yearPicker }
                     textInputStyle={ styles.headerContainer.yearPicker.label }
+                    inputPlaceholder={ "Év" }
+                    hiddenBackground={ true }
                     setValue={ setYearFilter }
                 />
             </View>
