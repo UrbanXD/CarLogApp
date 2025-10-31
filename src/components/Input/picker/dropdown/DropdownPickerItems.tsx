@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import PickerItem, { PickerItemType } from "../PickerItem.tsx";
-import { COLORS, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { FlashList, FlashListRef } from "@shopify/flash-list";
@@ -32,21 +32,41 @@ function DropdownPickerItems({
     masonry,
     numColumns
 }: DropdownPickerElementsProps) {
-    const STICKY_FIRST_ELEMENT = !masonry && selectedItem && items.length > 7;
+    const STICKY_FIRST_ELEMENT = !masonry && selectedItem && items.length > 15;
 
     const flashListRef = useRef<FlashListRef<PickerItemType>>(null);
     const itemsFiltered = useRef(false); //this is for prevent scrolling to first element if data just fetched (not filtered)
+    const [listReady, setListReady] = useState(false);
 
     useEffect(() => {
         itemsFiltered.current = true;
     }, [searchTerm]);
 
     useEffect(() => {
-        if(!itemsFiltered.current) return;
+        if(!listReady) return;
+        if(itemsFiltered.current || !selectedItem) {
+            return flashListRef.current?.scrollToOffset({
+                offset: 0,
+                animated: false
+            });
+        }
+
+        const index = items.findIndex(i => i.value === selectedItem.value);
+
+        if(index !== -1) {
+            flashListRef.current?.scrollToIndex({ index, animated: false });
+        }
 
         itemsFiltered.current = false;
-        flashListRef.current?.scrollToOffset({ offset: 0, animated: false });
-    }, [items]);
+    }, [listReady, items]);
+
+    useEffect(() => {
+        if(!listReady || !selectedItem) return;
+
+        if(selectedItem) {
+            flashListRef.current?.scrollToItem({ item: selectedItem, animated: true });
+        }
+    }, [listReady, selectedItem]);
 
     const onStartReached = useCallback(() => {
         if(!fetchingEnabled) return;
@@ -71,7 +91,7 @@ function DropdownPickerItems({
 
     const renderItem = useCallback(
         ({ item, index }: ListRenderItemInfo<PickerItemType>) => {
-            const gap = SEPARATOR_SIZES.lightSmall / 2;
+            const gap = SEPARATOR_SIZES.lightSmall;
             const marginLeft = ((index % numColumns) / (numColumns - 1)) * gap;
             const marginRight = gap - marginLeft;
 
@@ -91,7 +111,7 @@ function DropdownPickerItems({
                 </View>
             );
         },
-        [STICKY_FIRST_ELEMENT, masonry, onSelect, selectedItem]
+        [STICKY_FIRST_ELEMENT, masonry, onSelect, selectedItem, items]
     );
 
     const renderSeparatorComponent = useCallback(
@@ -123,6 +143,7 @@ function DropdownPickerItems({
                 data={ filteredItems }
                 masonry={ masonry }
                 numColumns={ numColumns }
+                optimizeItemArrangement={ false }
                 stickyHeaderIndices={ STICKY_FIRST_ELEMENT && [0] }
                 renderItem={ renderItem }
                 maintainVisibleContentPosition={ { disabled: true } }
@@ -139,6 +160,7 @@ function DropdownPickerItems({
                 keyboardDismissMode="on-drag"
                 showsVerticalScrollIndicator={ false }
                 showsHorizontalScrollIndicator={ false }
+                onLayout={ () => setListReady(true) }
             />
         </View>
     );
@@ -149,11 +171,14 @@ const styles = StyleSheet.create({
         height: heightPercentageToDP(31)
     },
     notFoundText: {
-        ...GLOBAL_STYLE.containerText,
         flexGrow: 1,
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p2,
+        color: COLORS.gray1,
+        lineHeight: FONT_SIZES.p2 * 1.2,
+        letterSpacing: FONT_SIZES.p2 * 0.05,
         textAlign: "center",
-        textAlignVertical: "center",
-        lineHeight: GLOBAL_STYLE.containerText.fontSize
+        textAlignVertical: "center"
     },
     stickyItemContainer: {
         backgroundColor: COLORS.gray5,

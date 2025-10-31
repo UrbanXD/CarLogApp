@@ -24,7 +24,6 @@ const PickerItem: React.FC<PickerItemProps> = ({
 }) => (
     <Pressable
         onPress={ onPress }
-        disabled={ selected }
         style={ [styles.itemContainer, selected && styles.selectedItemContainer, style] }
     >
         <View style={ styles.textContainer }>

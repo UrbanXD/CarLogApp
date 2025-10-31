@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import DropdownPickerController from "./dropdown/DropdownPickerController.tsx";
+import DropdownPickerController, { DropdownPickerControllerProps } from "./dropdown/DropdownPickerController.tsx";
 import DropdownPickerItems from "./dropdown/DropdownPickerItems.tsx";
 import { Paginator } from "../../../database/paginator/AbstractPaginator.ts";
 import { DatabaseType } from "../../../database/connector/powersync/AppSchema.ts";
 import { PopupView } from "../../popupView/PopupView.tsx";
 import { useAnimatedReaction, useSharedValue } from "react-native-reanimated";
 import { PickerItemType } from "./PickerItem.tsx";
-import { TextStyle } from "react-native";
 import { DropdownPickerHeader } from "./dropdown/DropdownPickerHeader.tsx";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { DropdownPickerFooter } from "./dropdown/DropdownPickerFooter.tsx";
@@ -31,10 +30,6 @@ type CommonDropdownPickerProps = {
     defaultSelectedItemValue?: string
     /** Callback function for set the selected value outside the dropdown picker **/
     setValue?: (value: string) => void
-    /** When true, the dropdown is disabled and cannot be opened */
-    disabled?: boolean
-    /** Message shown in a toast when trying to open a disabled dropdown */
-    disabledText?: string
     /** When true, the search bar will be displayed above the list */
     searchBarEnabled?: boolean
     /** Placeholder text shown inside the search bar input */
@@ -47,15 +42,7 @@ type CommonDropdownPickerProps = {
     selectWithoutSubmit?: boolean
     /** The title displayed at the top of the dropdown menu */
     title?: string
-    /** The main icon shown in the controller input field */
-    icon?: string
-    /** Placeholder text displayed in the controller when no item is selected */
-    inputPlaceholder?: string
-    /** Controller design type */
-    hiddenBackground?: boolean
-    /** Controller display text style */
-    textInputStyle?: TextStyle
-};
+} & Omit<DropdownPickerControllerProps, "selectedItem" | "toggleDropdown">;
 
 export type DropdownPickerProps<Item, DB> =
     ConditionalDropdownPickerProps<Item, DB> & CommonDropdownPickerProps;
@@ -77,6 +64,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     disabled,
     disabledText,
     hiddenBackground,
+    containerStyle,
     textInputStyle
 }: DropdownPickerProps<Item, DB>) => {
     const inputFieldContext = useInputFieldContext();
@@ -198,8 +186,9 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     const onSelect = useCallback((item: PickerItemType) => {
         if(selectWithoutSubmit) return submit(item);
 
+        if(tmpSelectedItem?.value === item.value) return setTmpSelectedItem(null);
         setTmpSelectedItem(item);
-    }, [selectWithoutSubmit, submit]);
+    }, [selectWithoutSubmit, submit, tmpSelectedItem]);
 
     const onSubmit = useCallback(() => {
         submit(tmpSelectedItem);
@@ -215,6 +204,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
                 disabled={ disabled }
                 disabledText={ disabledText }
                 hiddenBackground={ hiddenBackground }
+                containerStyle={ containerStyle }
                 textInputStyle={ textInputStyle }
             />
             <PopupView opened={ isOpened }>
