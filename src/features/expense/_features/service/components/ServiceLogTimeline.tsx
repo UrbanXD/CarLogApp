@@ -1,16 +1,18 @@
 import { Car } from "../../../../car/schemas/carSchema.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useTimelinePaginator } from "../../../../../hooks/useTimelinePaginator.ts";
 import { StyleSheet, View } from "react-native";
-import { Title } from "../../../../../components/Title.tsx";
 import { TimelineView } from "../../../../../components/timelineView/TimelineView.tsx";
-import { SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../../../constants/index.ts";
 import { EXPENSE_TABLE } from "../../../../../database/connector/powersync/tables/expense.ts";
 import { useServiceLogTimelineFilter } from "../hooks/useServiceLogTimelineFilter.ts";
 import { ExpenseTableRow, ServiceLogTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
 import { ServiceLog } from "../schemas/serviceLogSchema.ts";
 import { useServiceLogTimelineItem } from "../hooks/useServiceLogTimelineItem.tsx";
+import { YearPicker } from "../../../../../components/Input/_presets/YearPicker.tsx";
+import { sql } from "@powersync/kysely-driver";
+import { Title } from "../../../../../components/Title.tsx";
 
 type ServiceLogTimelineProps = {
     car: Car
@@ -50,10 +52,32 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
         car
     });
 
+    const setYearFilter = useCallback((year: string) => {
+        // @formatter:off
+        const customSql = (fieldRef: string) => sql<number>`strftime('%Y', ${ fieldRef })`;
+        // @formatter:on
+        filterManagement.replaceFilter("year", {
+            table: EXPENSE_TABLE,
+            field: "date",
+            operator: "=",
+            value: year,
+            customSql
+        });
+    }, [filterManagement])
 
     return (
         <View style={ styles.container }>
-            <Title title={ "Szervízkönyv" }/>
+            <View style={ styles.headerContainer }>
+                <Title
+                    title={ "Szervízkönyv" }
+                    containerStyle={ styles.headerContainer.titleContainer }
+                />
+                <YearPicker
+                    containerStyle={ styles.headerContainer.yearPicker }
+                    textInputStyle={ styles.headerContainer.yearPicker.label }
+                    setValue={ setYearFilter }
+                />
+            </View>
             <TimelineView
                 data={ data }
                 orderButtons={ orderButtons }
@@ -71,7 +95,26 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         gap: SEPARATOR_SIZES.lightSmall
+    },
+    headerContainer: {
+        flex: 1,
+        justifyContent: "space-between",
+        flexDirection: "row",
+        alignItems: "flex-start",
+
+        titleContainer: {
+            flexShrink: 1
+        },
+
+        yearPicker: {
+            minHeight: 0,
+            height: FONT_SIZES.p1,
+
+            label: {
+                fontFamily: "Gilroy-Heavy",
+                color: COLORS.white
+            }
+        }
     }
 });

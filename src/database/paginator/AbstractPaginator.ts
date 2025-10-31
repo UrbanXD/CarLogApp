@@ -8,6 +8,7 @@ export type FilterCondition<TableItem, DB = DatabaseType, FieldName = keyof Tabl
     value: TableItem[FieldName]
     table?: keyof DB
     toLowerCase?: boolean
+    customSql?: (fieldRef: string) => string
 }
 
 export type FilterGroup<TableItem, DB = DatabaseType> = {
@@ -69,7 +70,11 @@ export abstract class Paginator<TableItem, MappedItem, DB> {
                         filterValue = filterValue.toLowerCase();
                     }
 
-                    expressions.push(eb(filterField, filter.operator, filterValue));
+                    expressions.push(eb(
+                        filter.customSql ? filter.customSql(filterField) : filterField,
+                        filter.operator,
+                        filterValue
+                    ));
                 });
 
                 if(group.logic.toUpperCase() === "OR") {
