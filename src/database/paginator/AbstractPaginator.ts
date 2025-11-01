@@ -7,7 +7,6 @@ export type FilterCondition<TableItem, DB = DatabaseType, FieldName = keyof Tabl
     operator: ComparisonOperatorExpression
     value: TableItem[FieldName]
     table?: keyof DB
-    toLowerCase?: boolean
     customSql?: (fieldRef: string) => string
 }
 
@@ -16,14 +15,14 @@ export type FilterGroup<TableItem, DB = DatabaseType> = {
     filters: Array<FilterCondition<TableItem, DB>>
 }
 
-export type PaginatorOptions<TableItem, MappedItem = any, DB = DatabaseType> = {
+export type PaginatorOptions<TableItem, MappedItem = TableItem, DB = DatabaseType> = {
     baseQuery?: SelectQueryBuilder<DB, TableItem>
     filterBy?: FilterCondition<TableItem, DB> | Array<FilterGroup<TableItem, DB>>
     perPage?: number
     mapper?: (tableRow?: TableItem) => Promise<MappedItem>
 }
 
-export abstract class Paginator<TableItem, MappedItem, DB> {
+export abstract class Paginator<TableItem, MappedItem = TableItem, DB = DatabaseType> {
     private database: Kysely<DB>;
     protected table: keyof DB;
     private baseQuery?: SelectQueryBuilder<DB, TableItem, any>;
@@ -34,7 +33,7 @@ export abstract class Paginator<TableItem, MappedItem, DB> {
     protected constructor(
         database: Kysely<DB>,
         table: keyof DB,
-        options?: PaginatorOptions<TableItem>
+        options?: PaginatorOptions<TableItem, MappedItem, DB>
     ) {
         this.database = database;
         this.table = table;
@@ -50,8 +49,6 @@ export abstract class Paginator<TableItem, MappedItem, DB> {
         .selectFrom(this.table)
         .selectAll();
 
-        query.limit(this.perPage + 1); // add plus 1 for get the cursor element as well
-
         this.filterBy.forEach((group) => {
             if(group.filters.length === 0) return;
 
@@ -60,10 +57,6 @@ export abstract class Paginator<TableItem, MappedItem, DB> {
 
                 group.filters.forEach((filter) => {
                     let filterField = sql.ref(`${ filter?.table ?? this.table }.${ filter.field }`);
-
-                    // @formatter:off
-                    if(filter.toLowerCase) filterField = sql`lower(filterField)`;
-                    // @formatter:on
 
                     let filterValue = filter.value;
                     if(filter.toLowerCase && typeof filterValue === "string") {
@@ -84,6 +77,8 @@ export abstract class Paginator<TableItem, MappedItem, DB> {
                 return eb.and(expressions);
             });
         });
+
+        query = query.limit(this.perPage + 1); // add plus 1 for get the cursor element as well
 
         return query;
     }
