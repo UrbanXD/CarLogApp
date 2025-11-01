@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { odometerUnitSchema } from "./odometerUnitSchema.ts";
 import { odometerLogTypeSchema } from "./odometerLogTypeSchema.ts";
+import { zNote } from "../../../../../types/zodTypes.ts";
 
 export const odometerLogSchema = z
 .object({
@@ -11,7 +12,7 @@ export const odometerLogSchema = z
     valueInKm: z.number().min(0),
     value: z.number().min(0),
     unit: odometerUnitSchema,
-    note: z.string().nullable(),
+    note: zNote(),
     date: z.string()
 });
 

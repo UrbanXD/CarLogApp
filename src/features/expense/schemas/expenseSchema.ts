@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { expenseTypeSchema } from "./expenseTypeSchema.ts";
 import { currencySchema } from "../../_shared/currency/schemas/currencySchema.ts";
+import { zNote } from "../../../types/zodTypes.ts";
 
 export const expenseSchema = z
 .object({
@@ -12,7 +13,7 @@ export const expenseSchema = z
     exchangeRate: z.number().min(0),
     amount: z.number().min(0),
     currency: currencySchema,
-    note: z.string().nullable(),
+    note: zNote(),
     date: z.string()
 });
 

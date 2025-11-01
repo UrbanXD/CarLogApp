@@ -62,3 +62,8 @@ export const zDate = (requiredErrorMessage?: string) => {
         .transform(v => v.toISOString())
     ]);
 };
+
+export const zNote = () => z
+.string()
+.nullable()
+.transform((value) => value?.length > 0 ? value.toString() : null);
