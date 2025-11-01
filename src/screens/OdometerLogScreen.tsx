@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDatabase } from "../contexts/database/DatabaseContext.ts";
 import { Car } from "../features/car/schemas/carSchema.ts";
 import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
-import { InfoRowProps } from "../components/InfoRow.tsx";
+import { InfoRowProps } from "../components/info/InfoRow.tsx";
 import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import { useAlert } from "../ui/alert/hooks/useAlert.ts";
 import { DeleteOdometerLogToast } from "../features/car/_features/odometer/presets/toast/DeleteOdometerLogToast.ts";
@@ -86,25 +86,25 @@ export function OdometerLogScreen() {
         {
             icon: ICON_NAMES.car,
             title: car?.name,
-            subtitle: `${ car?.model.make.name } ${ car?.model.name }`,
+            content: `${ car?.model.make.name } ${ car?.model.name }`,
             onPress: () => onEdit(OdometerLogFormFields.Car)
         },
         {
             icon: ICON_NAMES.odometer,
             title: "Kilométeróra-állás",
-            subtitle: `${ odometerLog?.value } ${ odometerLog?.unit.short }`,
+            content: `${ odometerLog?.value } ${ odometerLog?.unit.short }`,
             onPress: () => onEdit(OdometerLogFormFields.OdometerValue)
         },
         {
             icon: ICON_NAMES.calendar,
             title: "Dátum",
-            subtitle: dayjs(odometerLog?.date).format("YYYY. MM DD. HH:mm"),
+            content: dayjs(odometerLog?.date).format("YYYY. MM DD. HH:mm"),
             onPress: () => onEdit(OdometerLogFormFields.Date)
         },
         {
             icon: ICON_NAMES.note,
-            subtitle: odometerLog?.note ?? "Nincs megjegyzés",
-            subtitleStyle: !odometerLog?.note && { color: COLORS.gray2 },
+            content: odometerLog?.note ?? "Nincs megjegyzés",
+            contentTextStyle: !odometerLog?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(OdometerLogFormFields.Note)
         }
     ]), [car, odometerLog]);
