@@ -87,8 +87,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
         paginator?.filter({
             field: searchBy,
             operator: "like",
-            value: `%${ searchTerm.toLowerCase() }%`,
-            toLowerCase: true
+            value: `%${ searchTerm.toLowerCase() }%`
         }).then(result => setItems(result));
     }, [paginator, searchTerm]);
 
@@ -219,6 +218,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
                     items={ items }
                     fetchByScrolling={ IS_STATIC ? null : fetchByScrolling }
                     fetchingEnabled={ IS_STATIC ? false : initialLoadCompleted }
+                    maintainVisibleContentPosition={ { disabled: true } }
                     selectedItem={ tmpSelectedItem }
                     onSelect={ onSelect }
                     searchTerm={ searchTerm }
