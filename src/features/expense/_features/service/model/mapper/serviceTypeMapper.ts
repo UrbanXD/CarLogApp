@@ -1,8 +1,6 @@
 import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
 import { ServiceTypeTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { ServiceType, serviceTypeSchema } from "../../schemas/serviceTypeSchema.ts";
-import { ServiceTypeEnum } from "../enums/ServiceTypeEnum.ts";
-import { COLORS, ICON_NAMES } from "../../../../../../constants/index.ts";
 import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
 
 export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, ServiceType> {
@@ -15,13 +13,13 @@ export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, Servi
         let primaryColor = null;
         let secondaryColor = null;
 
-        switch(entity.key) {
-            case ServiceTypeEnum.SMALL_SERVICE:
-                icon = ICON_NAMES.service;
-                primaryColor = COLORS.service;
-                secondaryColor = COLORS.service;
-                break;
-        }
+        // switch(entity.key) {
+        //     case ServiceTypeEnum.SMALL_SERVICE:
+        //         icon = ICON_NAMES.service;
+        //         primaryColor = COLORS.service;
+        //         secondaryColor = COLORS.service;
+        //         break;
+        // }
 
         return serviceTypeSchema.parse({
             id: entity.id,
