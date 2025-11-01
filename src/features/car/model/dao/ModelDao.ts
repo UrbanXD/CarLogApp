@@ -49,8 +49,10 @@ export class ModelDao extends Dao<ModelTableRow, Model, ModelMapper> {
             { cursor: [{ field: "name", order: "asc" }, { field: "id" }], defaultOrder: "asc" },
             {
                 perPage,
-                filterBy: makeId ? { field: "make_id", value: makeId, operator: "=" } : undefined,
-                // searchBy: "name",
+                filterBy: makeId ? {
+                    group: "make",
+                    filters: [{ field: "make_id", value: makeId, operator: "=" }]
+                } : undefined,
                 mapper: this.mapper.toPickerItem
             }
         );

@@ -5,7 +5,7 @@ import { EXPENSE_TABLE } from "../../../../database/connector/powersync/tables/e
 import { ExpenseTypeDao } from "./ExpenseTypeDao.ts";
 import { ExpenseMapper, SelectExpenseTableRow } from "../mapper/expenseMapper.ts";
 import { CursorOptions, CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
-import { FilterCondition } from "../../../../database/paginator/AbstractPaginator.ts";
+import { PaginatorOptions } from "../../../../database/paginator/AbstractPaginator.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
 import { ExpenseFields } from "../../schemas/form/expenseForm.ts";
@@ -60,8 +60,8 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
 
     paginator(
         cursorOptions: CursorOptions<keyof SelectExpenseTableRow>,
-        filterBy?: FilterCondition<SelectExpenseTableRow> | Array<FilterCondition<SelectExpenseTableRow>>,
-        perPage?: number = 10
+        filterBy?: PaginatorOptions<SelectExpenseTableRow>["filterBy"],
+        perPage?: number = 25
     ): CursorPaginator<SelectExpenseTableRow, Expense> {
         return new CursorPaginator<SelectExpenseTableRow, Expense>(
             this.db,

@@ -20,7 +20,7 @@ import { ExpenseTypeDao } from "../../../../model/dao/ExpenseTypeDao.ts";
 import { ServiceItemDao } from "./ServiceItemDao.ts";
 import { CarDao } from "../../../../../car/model/dao/CarDao.ts";
 import { CursorOptions, CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
-import { FilterCondition, FilterGroup } from "../../../../../../database/paginator/AbstractPaginator.ts";
+import { PaginatorOptions } from "../../../../../../database/paginator/AbstractPaginator.ts";
 
 export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLogMapper> {
     constructor(
@@ -209,8 +209,8 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
 
     paginator(
         cursorOptions: CursorOptions<keyof ServiceLogTableRow & keyof ExpenseTableRow>,
-        filterBy?: FilterCondition<ServiceLogTableRow & ExpenseTableRow> | Array<FilterGroup<DatabaseType, ServiceLogTableRow & ExpenseTableRow>>,
-        perPage?: number = 10
+        filterBy?: PaginatorOptions<ServiceLogTableRow & ExpenseTableRow>["filterBy"],
+        perPage?: number = 25
     ): CursorPaginator<ServiceLogTableRow & ExpenseTableRow, ServiceLog> {
         const query = this.db
         .selectFrom(SERVICE_LOG_TABLE)

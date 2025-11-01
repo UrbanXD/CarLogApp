@@ -3,24 +3,24 @@ import { useEffect, useState } from "react";
 import { OdometerLogTypeEnum } from "../model/enums/odometerLogTypeEnum.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { OdometerLogType } from "../schemas/odometerLogTypeSchema.ts";
-import { FilterManagement } from "../../../../../hooks/useFilterBy.ts";
 import { Car } from "../../../schemas/carSchema.ts";
-import { OdometerLogTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
+import { SelectOdometerLogTableRow } from "../model/dao/OdometerLogDao.ts";
+import { TimelineFilterManagement } from "../../../../../hooks/useTimelinePaginator.ts";
 
 const TYPES_FILTER_KEY = "type_filter";
 const TYPES_FILTER_FIELD_NAME = "type_id";
 
 type UseOdometerLogTimelineFilterProps = {
-    filterManagement: FilterManagement<OdometerLogTableRow>,
+    timelineFilterManagement: TimelineFilterManagement<SelectOdometerLogTableRow>
     car: Car
 }
 
 export function useOdometerLogTimelineFilter({
-    filterManagement: {
+    timelineFilterManagement: {
         filters,
         addFilter,
         removeFilter,
-        clearFilterGroup
+        clearFilters
     },
     car
 }: UseOdometerLogTimelineFilterProps) {
@@ -47,6 +47,8 @@ export function useOdometerLogTimelineFilter({
     }, []);
 
     useEffect(() => {
+        if(!filters.has(TYPES_FILTER_KEY)) setSelectedTypesId([]);
+
         filters.forEach(((item, key) => {
             switch(key) {
                 case TYPES_FILTER_KEY:
@@ -63,7 +65,7 @@ export function useOdometerLogTimelineFilter({
     }, [filters]);
 
     useEffect(() => {
-        addFilter({ field: "car_id", operator: "=", value: car.id }, "car");
+        addFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: car.id } });
     }, [car]);
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {
@@ -71,9 +73,9 @@ export function useOdometerLogTimelineFilter({
         const filter = { field: TYPES_FILTER_FIELD_NAME, operator: "=", value: type.id };
         const onPress = () => {
             if(!active) {
-                addFilter(filter, TYPES_FILTER_KEY, "or");
+                addFilter({ groupKey: TYPES_FILTER_KEY, filter, logic: "OR" });
             } else {
-                removeFilter(TYPES_FILTER_KEY, filter);
+                removeFilter({ groupKey: TYPES_FILTER_KEY, filter: filter, byValue: true });
             }
         };
 
@@ -88,7 +90,7 @@ export function useOdometerLogTimelineFilter({
     filterButtons.unshift({
         title: "Mind",
         active: selectedTypesId.length === 0,
-        onPress: () => clearFilterGroup(TYPES_FILTER_KEY)
+        onPress: () => clearFilters(TYPES_FILTER_KEY)
     });
 
     return { filterButtons };

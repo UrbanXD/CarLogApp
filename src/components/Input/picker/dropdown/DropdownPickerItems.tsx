@@ -44,28 +44,19 @@ function DropdownPickerItems({
 
     useEffect(() => {
         if(!listReady) return;
-        if(itemsFiltered.current || !selectedItem) {
-            return flashListRef.current?.scrollToOffset({
-                offset: 0,
-                animated: false
-            });
-        }
+        if(!listReady || !itemsFiltered.current) return;
 
-        const index = items.findIndex(i => i.value === selectedItem.value);
-
-        if(index !== -1) {
-            flashListRef.current?.scrollToIndex({ index, animated: false });
-        }
-
+        flashListRef.current?.scrollToOffset({ offset: 0, animated: false });
         itemsFiltered.current = false;
     }, [listReady, items]);
 
     useEffect(() => {
         if(!listReady || !selectedItem) return;
 
-        if(selectedItem) {
-            flashListRef.current?.scrollToItem({ item: selectedItem, animated: true });
-        }
+        const index = items.findIndex(i => i.value === selectedItem?.value);
+        if(index === -1) return;
+
+        flashListRef.current?.scrollToIndex({ index, animated: true });
     }, [listReady, selectedItem]);
 
     const onStartReached = useCallback(() => {
@@ -146,7 +137,7 @@ function DropdownPickerItems({
                 optimizeItemArrangement={ false }
                 stickyHeaderIndices={ STICKY_FIRST_ELEMENT && [0] }
                 renderItem={ renderItem }
-                maintainVisibleContentPosition={ { disabled: true } }
+                // maintainVisibleContentPosition={ { disabled: true } }
                 drawDistance={ hp(100) }
                 keyExtractor={ keyExtractor }
                 ListEmptyComponent={ renderListEmptyComponent }

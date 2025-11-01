@@ -84,10 +84,13 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     const fetchBySearching = useCallback(() => {
         if(!searchBy) return;
 
-        paginator?.filter({
-            field: searchBy,
-            operator: "like",
-            value: `%${ searchTerm.toLowerCase() }%`
+        paginator?.replaceFilter({
+            groupKey: "search",
+            filter: {
+                field: searchBy,
+                operator: "like",
+                value: `%${ searchTerm.toLowerCase() }%`
+            }
         }).then(result => setItems(result));
     }, [paginator, searchTerm]);
 

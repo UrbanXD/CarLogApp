@@ -1,4 +1,4 @@
-import { FilterCondition, FilterGroup, Paginator, PaginatorOptions } from "./AbstractPaginator.ts";
+import { Paginator, PaginatorOptions } from "./AbstractPaginator.ts";
 import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 import { Kysely } from "@powersync/kysely-driver";
 import { OrderByDirectionExpression } from "kysely";
@@ -96,11 +96,6 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         // }
 
         return refreshMappedResult;
-    }
-
-    async filter(filterBy: FilterCondition<TableItem, DB> | Array<FilterGroup<TableItem, DB>>): Promise<Array<MappedItem>> {
-        this.setFilter(filterBy);
-        return await this.initial();
     }
 
     async initial(defaultValue?: TableItem): Promise<Array<MappedItem>> {

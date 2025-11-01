@@ -24,28 +24,40 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
     const { mapper } = useOdometerTimelineItem();
 
     const car = useMemo(() => getCar(carId), [carId, getCar]);
-    const paginator = useMemo(() => odometerLogDao.paginator({
-        cursor: [{ field: "value", order: "desc" }, { field: "id" }]
-    }, { field: "car_id", operator: "=", value: car?.id }, 25), []);
+    const paginator = useMemo(
+        () =>
+            odometerLogDao.paginator(
+                {
+                    cursor: [
+                        { field: "value", order: "desc" },
+                        { field: "id" }
+                    ]
+                },
+                {
+                    group: "car",
+                    filters: [{ field: "car_id", operator: "=", value: car?.id }]
+                },
+                10
+            ),
+        []
+    );
 
     const {
+        ref,
         data,
         isInitialFetching,
         fetchNext,
         isNextFetching,
         fetchPrevious,
         isPreviousFetching,
-        filterManagement,
+        timelineFilterManagement,
         orderButtons
     } = useTimelinePaginator<OdometerLogTableRow, OdometerLog>({
         paginator,
         mapper,
         cursorOrderButtons: [{ field: "value", title: "Kilométeróra-állás" }]
     });
-    const { filterButtons } = useOdometerLogTimelineFilter({
-        filterManagement,
-        car
-    });
+    const { filterButtons } = useOdometerLogTimelineFilter({ timelineFilterManagement, car });
 
     if(!car) return <></>;
 
@@ -64,6 +76,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
                 <Odometer value={ car.odometer.value } unit={ car.odometer.unit.short }/>
             </View>
             <TimelineView
+                ref={ ref }
                 data={ data }
                 orderButtons={ orderButtons }
                 filterButtons={ filterButtons }

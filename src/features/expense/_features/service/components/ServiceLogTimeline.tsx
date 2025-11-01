@@ -21,15 +21,23 @@ type ServiceLogTimelineProps = {
 export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
     const { serviceLogDao } = useDatabase();
     const { mapper } = useServiceLogTimelineItem(car.currency);
-    const paginator = useMemo(() => serviceLogDao.paginator({
-        cursor: [
-            { table: EXPENSE_TABLE, field: "date", order: "desc" },
-            { table: EXPENSE_TABLE, field: "amount", order: "desc" },
-            { field: "id" }
-        ]
-    }, { field: "car_id", operator: "=", value: car.id }, 25), []);
+    const paginator = useMemo(() =>
+        serviceLogDao.paginator(
+            {
+                cursor: [
+                    { table: EXPENSE_TABLE, field: "date", order: "desc" },
+                    { table: EXPENSE_TABLE, field: "amount", order: "desc" },
+                    { field: "id" }
+                ]
+            },
+            {
+                group: "car",
+                filters: [{ field: "car_id", operator: "=", value: car.id }]
+            }
+        ), []);
 
     const {
+        ref,
         data,
         initialFetchHappened,
         isInitialFetching,
@@ -37,7 +45,7 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
         isNextFetching,
         fetchPrevious,
         isPreviousFetching,
-        filterManagement,
+        timelineFilterManagement,
         orderButtons
     } = useTimelinePaginator<ServiceLogTableRow & ExpenseTableRow, ServiceLog>({
         paginator,
@@ -47,23 +55,17 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
             { table: EXPENSE_TABLE, field: "amount", title: "Ár" }
         ]
     });
-    const { filterButtons } = useServiceLogTimelineFilter({
-        filterManagement,
-        car
-    });
+    const { filterButtons } = useServiceLogTimelineFilter({ timelineFilterManagement, car });
 
     const setYearFilter = useCallback((year: string) => {
         // @formatter:off
         const customSql = (fieldRef: string) => sql<number>`strftime('%Y', ${ fieldRef })`;
         // @formatter:on
-        filterManagement.replaceFilter("year", {
-            table: EXPENSE_TABLE,
-            field: "date",
-            operator: "=",
-            value: year,
-            customSql
+        timelineFilterManagement.replaceFilter({
+            groupKey: "year",
+            filter: { table: EXPENSE_TABLE, field: "date", operator: "=", value: year, customSql }
         });
-    }, [filterManagement])
+    }, [timelineFilterManagement])
 
     return (
         <View style={ styles.container }>
@@ -81,6 +83,7 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
                 />
             </View>
             <TimelineView
+                ref={ ref }
                 data={ data }
                 orderButtons={ orderButtons }
                 filterButtons={ filterButtons }

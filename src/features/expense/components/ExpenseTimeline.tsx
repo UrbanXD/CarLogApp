@@ -18,11 +18,23 @@ type ExpenseTimelineProps = {
 export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
     const { expenseDao } = useDatabase();
     const { mapper } = useExpenseTimelineItem(car.currency);
-    const paginator = useMemo(() => expenseDao.paginator({
-        cursor: [{ field: "date", order: "desc" }, { field: "amount", order: "desc" }, { field: "id" }]
-    }, { field: "car_id", operator: "=", value: car.id }, 25), []);
+    const paginator = useMemo(
+        () =>
+            expenseDao.paginator(
+                {
+                    cursor: [
+                        { field: "date", order: "desc" },
+                        { field: "amount", order: "desc" },
+                        { field: "id" }
+                    ]
+                },
+                { field: "car_id", operator: "=", value: car.id }
+            ),
+        []
+    );
 
     const {
+        ref,
         data,
         initialFetchHappened,
         isInitialFetching,
@@ -30,17 +42,14 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
         isNextFetching,
         fetchPrevious,
         isPreviousFetching,
-        filterManagement,
+        timelineFilterManagement,
         orderButtons
     } = useTimelinePaginator<SelectExpenseTableRow, Expense>({
         paginator,
         mapper,
         cursorOrderButtons: [{ field: "date", title: "Dátum" }, { field: "amount", title: "Ár" }]
     });
-    const { filterButtons } = useExpenseTimelineFilter({
-        filterManagement,
-        car
-    });
+    const { filterButtons } = useExpenseTimelineFilter({ timelineFilterManagement, car });
 
     if(!car) return <></>;
 
@@ -51,6 +60,7 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
                 subtitle={ `Az alábbi pénzügyi naplóban különböző kiadásai szerepelnek mely a kiválasztott autójához tartoznak.` }
             />
             <TimelineView
+                ref={ ref }
                 data={ data }
                 orderButtons={ orderButtons }
                 filterButtons={ filterButtons }

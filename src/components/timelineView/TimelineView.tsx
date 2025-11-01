@@ -2,7 +2,7 @@ import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_
 import React, { ReactNode, useCallback, useState } from "react";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { TimelineItem, TimelineItemType } from "./item/TimelineItem.tsx";
-import { ListRenderItem } from "@shopify/flash-list";
+import { FlashListRef, ListRenderItem } from "@shopify/flash-list";
 import { MoreDataLoading } from "../loading/MoreDataLoading.tsx";
 import { AnimatedFlashList } from "../AnimatedComponents/index.ts";
 import { RNNativeScrollEvent } from "react-native-reanimated/lib/typescript/hook/commonTypes";
@@ -11,6 +11,7 @@ import { FilterButton, FilterButtonProps } from "../filter/FilterButton.tsx";
 import { FilterRow } from "../filter/FilterRow.tsx";
 
 type TimelineViewProps = {
+    ref: FlashListRef<TimelineItemType>
     data: Array<TimelineItemType>
     orderButtons?: Array<FilterButtonProps>
     filterButtons?: Array<FilterButtonProps>
@@ -28,6 +29,7 @@ type TimelineViewProps = {
 const DOT_ICON_SIZE = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE;
 
 function ITimelineView({
+    ref,
     data,
     orderButtons,
     filterButtons,
@@ -106,6 +108,7 @@ function ITimelineView({
                 }
             </View>
             <AnimatedFlashList
+                ref={ ref }
                 data={ data }
                 renderItem={ renderItem }
                 drawDistance={ heightPercentageToDP(100) }

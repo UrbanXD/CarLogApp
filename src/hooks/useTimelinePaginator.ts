@@ -1,11 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TimelineItemType } from "../components/timelineView/item/TimelineItem.tsx";
 import { DatabaseType } from "../database/connector/powersync/AppSchema.ts";
-import { useFilterBy } from "./useFilterBy.ts";
 import { useCursor } from "./useCursor.ts";
 import { CursorPaginator } from "../database/paginator/CursorPaginator.ts";
 import { FilterButtonProps } from "../components/filter/FilterButton.tsx";
 import { useFocusEffect } from "expo-router";
+import { FlashListRef } from "@shopify/flash-list";
+import { PickerItemType } from "../components/Input/picker/PickerItem.tsx";
+import {
+    AddFilterArgs,
+    FILTER_CHANGED_EVENT,
+    FilterGroup,
+    RemoveFilterArgs,
+    ReplaceFilterArgs
+} from "../database/paginator/AbstractPaginator.ts";
 
 type UseTimelinePaginatorProps<TableItem, MappedItem, DB> = {
     paginator: CursorPaginator<TableItem, MappedItem, DB>
@@ -18,8 +26,8 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
     mapper,
     cursorOrderButtons
 }: UseTimelinePaginatorProps<TableItem, MappedItem, DB>) {
-    const filterManagement = useFilterBy<TableItem>();
-    const { filters } = filterManagement;
+    const flashListRef = useRef<FlashListRef<PickerItemType>>(null);
+    const firstFocus = useRef(true);
 
     const {
         cursorOptions,
@@ -29,9 +37,8 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
         getOrderIconForField
     } = useCursor<TableItem>(paginator.cursorOptions);
 
-    const firstFocus = useRef(true);
-
     const [data, setData] = useState<Array<TimelineItemType>>([]);
+    const [filters, setFilters] = useState<Map<string, FilterGroup<TableItem, DB>>>(paginator.filterBy);
     const [initialFetchHappened, setInitialFetchHappened] = useState(false);
     const [isInitialFetching, setIsInitialFetching] = useState(true);
     const [isNextFetching, setIsNextFetching] = useState(false);
@@ -44,9 +51,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
                 return;
             }
 
-            paginator.refresh().then(result => {
-                setData(result.map(mapper));
-            });
+            paginator.refresh().then(result => setData(result.map(mapper)));
         }, [])
     );
 
@@ -64,22 +69,22 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
     useEffect(() => {
         if(!initialFetchHappened) return;
 
-        paginator.filter(Array.from(filters.values())).then(result => {
-            setData((_) => {
-                return result.map(mapper);
-            });
-        });
-    }, [filters]);
-
-    useEffect(() => {
-        if(!initialFetchHappened) return;
-
         paginator.changeCursorOptions(cursorOptions).then(result => {
             setData((_) => {
+                setTimeout(() => flashListRef.current?.scrollToTop({ animated: false }), 250);
                 return result.map(mapper);
             });
         });
     }, [cursorOptions]);
+
+    useEffect(() => {
+        const handler = (newFilters: Map<string, FilterGroup<TableItem, DB>>) => {
+            setFilters(newFilters);
+        };
+
+        paginator.on(FILTER_CHANGED_EVENT, handler);
+        return () => paginator.off(FILTER_CHANGED_EVENT, handler);
+    }, [paginator]);
 
     const fetchNext = useCallback(async () => {
         if(!paginator.hasNext()) return;
@@ -111,6 +116,45 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
         });
     }, [paginator]);
 
+    const addFilter = useCallback(async (args: AddFilterArgs<TableItem, DB>) => {
+        const result = await paginator.addFilter(args);
+
+        setData((_) => {
+            setTimeout(() => flashListRef.current?.scrollToTop({ animated: true }), 250);
+            return result.map(mapper);
+        });
+    }, [paginator]);
+
+    const replaceFilter = useCallback(async (args: ReplaceFilterArgs<TableItem, DB>) => {
+        const result = await paginator.replaceFilter(args);
+
+        setData((_) => {
+            setTimeout(() => flashListRef.current?.scrollToTop({ animated: true }), 250);
+            return result.map(mapper);
+        });
+    }, [paginator]);
+
+    const removeFilter = useCallback(async (args: RemoveFilterArgs<TableItem, DB>) => {
+        const result = await paginator.removeFilter(args);
+
+        if(!result) return;
+
+        setData((_) => {
+            setTimeout(() => flashListRef.current?.scrollToTop({ animated: true }), 250);
+            return result.map(mapper);
+        });
+    }, [paginator]);
+
+    const clearFilters = useCallback(async (groupKey?: string) => {
+        const result = await paginator.clearFilters(groupKey);
+        if(!result) return;
+
+        setData((_) => {
+            setTimeout(() => flashListRef.current?.scrollToTop({ animated: true }), 250);
+            return result.map(mapper);
+        });
+    }, [paginator]);
+
     const orderButtons: Array<FilterButtonProps> | undefined = cursorOrderButtons?.map(cursor => ({
         title: cursor.title,
         active: isMainCursor(cursor.field, cursor.table),
@@ -120,6 +164,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
     }));
 
     return {
+        ref: flashListRef,
         data,
         initialFetchHappened,
         isInitialFetching,
@@ -127,7 +172,26 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
         isNextFetching,
         fetchPrevious,
         isPreviousFetching,
-        filterManagement,
+        timelineFilterManagement: {
+            filters,
+            addFilter,
+            replaceFilter,
+            removeFilter,
+            clearFilters
+        },
         orderButtons
     };
 }
+
+export type TimelineFilterManagement<TableItem, DB = DatabaseType> = {
+    filters: Map<string, FilterGroup<TableItem, DB>>
+    addFilter: AddFilter<TableItem, DB>
+    replaceFilter: ReplaceFilter<TableItem, DB>
+    removeFilter: RemoveFilter<TableItem, DB>
+    clearFilters: ClearFilters<TableItem, DB>
+}
+
+export type AddFilter<TableItem, DB = DatabaseType> = (args: AddFilterArgs<TableItem, DB>) => void;
+export type ReplaceFilter<TableItem, DB = DatabaseType> = (args: ReplaceFilterArgs<TableItem, DB>) => void;
+export type RemoveFilter<TableItem, DB = DatabaseType> = (args: RemoveFilterArgs<TableItem, DB>) => void;
+export type ClearFilters<TableItem, DB = DatabaseType> = (groupKey?: string) => void;
