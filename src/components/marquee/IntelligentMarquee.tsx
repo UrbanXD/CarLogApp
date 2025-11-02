@@ -13,11 +13,11 @@ function IMarquee(props: MarqueeProps) {
 
     return (
         <View style={ { width: "100%" } } onLayout={ viewOnLayout }>
-            <View style={ [props.style, { position: "absolute" }] }>
+            <View style={ [props.style, { position: "absolute", zIndex: -1 }] }>
                 <MeasureElement children={ props.children } onLayout={ childrenOnLayout }/>
             </View>
             {
-                childrenWidth <= viewWidth
+                viewWidth - childrenWidth > -0.5
                 ? <View style={ props.style }>{ props.children }</View>
                 : <Marquee children={ props.children } { ...props } />
             }
