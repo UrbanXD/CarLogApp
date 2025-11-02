@@ -72,13 +72,15 @@ export function ServiceItemInput({
 
             const key = currency.key;
 
-            const existing = totals.get(item);
+            const existing = totals.get(key);
             const amount = pricePerUnit.amount * quantity;
             const exchangedAmount = pricePerUnit.exchangedAmount * quantity;
 
             if(existing) {
                 existing.amount += amount;
                 existing.exchangedAmount += exchangedAmount;
+
+                totals.set(key, existing);
             } else {
                 totals.set(key, {
                     amount,
@@ -89,7 +91,6 @@ export function ServiceItemInput({
                 });
             }
         }
-
         setTotalAmount(
             Array.from(totals.values()).sort((a, b) => b.amount - a.amount)
         );
