@@ -90,9 +90,11 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
             if(!route) continue;
             if(!route.name.startsWith("bottomSheet/") && !BottomSheetRoutes.includes(route.name)) {
                 router.dismissTo({ pathname: route.name, params: route.params });
-                break;
+                return;
             }
         }
+
+        router.dismissTo("backToRootIndex");
     }, [navigation]);
 
     const onChangeSnapPoint = useCallback((index: number) => {
