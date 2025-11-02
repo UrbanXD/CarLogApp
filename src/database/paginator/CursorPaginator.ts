@@ -1,7 +1,7 @@
 import { Paginator, PaginatorOptions } from "./AbstractPaginator.ts";
 import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 import { Kysely, sql } from "@powersync/kysely-driver";
-import { OrderByDirectionExpression } from "kysely";
+import { OrderByDirectionExpression, SelectQueryBuilder } from "kysely";
 import { CursorValue } from "react-native";
 import { addCursor } from "./utils/addCursor.ts";
 
@@ -31,6 +31,22 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
     ) {
         super(database, table, options);
         this.cursorOptions = cursorOptions;
+    }
+
+    protected getBaseQuery(): SelectQueryBuilder<DB, TableItem, any> {
+        let query = super.getBaseQuery();
+
+        if(Array.isArray(this.cursorOptions.cursor)) {
+            this.cursorOptions.cursor.map((cursor) => {
+                const cursorField = sql.ref(`${ cursor?.table ?? this.table }.${ cursor.field }`);
+                query = query.select(cursorField);
+            });
+        } else {
+            const cursorField = sql.ref(`${ this.cursorOptions.cursor?.table ?? this.table }.${ this.cursorOptions.cursor.field }`);
+            query = query.select(cursorField);
+        }
+
+        return query;
     }
 
     private setNextCursor(lastItem: TableItem) {
