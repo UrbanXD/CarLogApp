@@ -1,10 +1,9 @@
 import { Paginator, PaginatorOptions } from "./AbstractPaginator.ts";
 import { DatabaseType } from "../connector/powersync/AppSchema.ts";
-import { Kysely } from "@powersync/kysely-driver";
+import { Kysely, sql } from "@powersync/kysely-driver";
 import { OrderByDirectionExpression } from "kysely";
 import { CursorValue } from "react-native";
 import { addCursor } from "./utils/addCursor.ts";
-import { defaultValueToCursorValue } from "./utils/defaultValueToCursorValue.ts";
 
 export type CursorDirection = "initial" | "next" | "prev";
 export type CursorValue<TableItem> = TableItem[keyof TableItem] | null;
@@ -98,12 +97,24 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         return refreshMappedResult;
     }
 
-    async initial(defaultValue?: TableItem): Promise<Array<MappedItem>> {
+    async initial(defaultItemId?: string | number): Promise<Array<MappedItem>> {
         this.prevCursor = null;
         this.nextCursor = null;
         this.refreshCursor = null;
 
-        const defaultCursor = defaultValueToCursorValue<TableItem>(defaultValue, this.cursorOptions.cursor);
+        let defaultCursor = null;
+        let defaultItem = null;
+        if(defaultItemId) {
+            let filterField = sql.ref(`${ this.table }.id`);
+            defaultItem = await this.getBaseQuery().where(filterField, "=", defaultItemId).executeTakeFirst();
+            if(defaultItem) {
+                if(Array.isArray(this.cursorOptions.cursor)) {
+                    defaultCursor = this.cursorOptions.cursor.map((cursorField) => defaultItem?.[cursorField.field]);
+                } else {
+                    defaultCursor = defaultItem?.[this.cursorOptions.cursor.field];
+                }
+            }
+        }
 
         if(!defaultCursor) {
             let query = this.getBaseQuery();
@@ -116,8 +127,6 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
 
             return await super.map(result);
         }
-
-        if(!defaultValue) return;
 
         const halfPage = Math.floor(this.perPage / 2);
 
@@ -132,12 +141,12 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
 
         this.prevCursor = null;
         if(prevResult.length === halfPage + 1) this.setPreviousCursor(prevResult.shift()); // its over the limit that means the first element is a cursor for previous
-        this.setRefreshCursor(prevResult?.[0] ?? defaultValue ?? nextResult?.[0] ?? null);
+        this.setRefreshCursor(prevResult?.[0] ?? defaultItem ?? nextResult?.[0] ?? null);
 
         this.nextCursor = null;
         if(nextResult.length === halfPage + 1) this.setNextCursor(nextResult.pop());  // its over the limit that means the last element is a cursor for next
 
-        const result = [...prevResult, defaultValue, ...nextResult];
+        const result = [...prevResult, defaultItem, ...nextResult];
         this.refreshCursor = null;
         if(result.length !== 0) this.setRefreshCursor(result[0]);
 
