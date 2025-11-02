@@ -116,7 +116,7 @@ const useStyles = (color: Color, dotSize: number, isFirstItem: boolean, isLastIt
 
     timeline: {
         flexDirection: "column",
-        height: !isLastItem ? "100%" : dotSize + SEPARATOR_SIZES.lightSmall,
+        height: !isLastItem ? "100%" : dotSize + SEPARATOR_SIZES.lightSmall * (isFirstItem ? 2 : 1),
         width: dotSize + SEPARATOR_SIZES.lightSmall,
         backgroundColor: COLORS.gray5,
         paddingTop: isFirstItem && SEPARATOR_SIZES.lightSmall,
