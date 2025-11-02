@@ -69,6 +69,7 @@ const styles = StyleSheet.create({
         ...GLOBAL_STYLE.containerText,
         fontSize: GLOBAL_STYLE.containerText.fontSize * 0.8,
         letterSpacing: GLOBAL_STYLE.containerText.letterSpacing * 0.8,
+        lineHeight: GLOBAL_STYLE.containerText.lineHeight * 0.8,
         textAlign: "center"
     }
 });

@@ -176,7 +176,6 @@ export function AmountInput({
                                 <Input.Picker.Dropdown
                                     data={ currencies }
                                     title={ "Valuta" }
-                                    type="secondary"
                                     hiddenBackground={ true }
                                 />
                                 :

@@ -6,6 +6,7 @@ import { PickerDisabledToast } from "../../../../ui/alert/presets/toast/index.ts
 import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { formTheme } from "../../../../ui/form/constants/theme.ts";
 import Icon from "../../../Icon.tsx";
+import { IntelligentMarquee } from "../../../marquee/IntelligentMarquee.tsx";
 
 export type DropdownPickerControllerProps = {
     selectedItem: PickerItemType | null
@@ -67,14 +68,28 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
                     selectedItem
                     ?
                     <>
-                        <Text style={ [styles.titleText, textInputStyle] } numberOfLines={ 1 }>
-                            { selectedItem?.controllerTitle ?? selectedItem?.title ?? "" }
-                        </Text>
+                        <IntelligentMarquee
+                            speed={ 0.65 }
+                            delay={ 800 }
+                            bounceDelay={ 800 }
+                            spacing={ SEPARATOR_SIZES.lightSmall }
+                        >
+                            <Text style={ [styles.titleText, textInputStyle] } numberOfLines={ 1 }>
+                                { selectedItem?.controllerTitle ?? selectedItem?.title ?? "" }
+                            </Text>
+                        </IntelligentMarquee>
                         {
                             selectedItem.subtitle &&
-                           <Text style={ styles.subtitleText } numberOfLines={ 1 }>
-                               { selectedItem.subtitle }
-                           </Text>
+                           <IntelligentMarquee
+                              speed={ 0.65 }
+                              delay={ 800 }
+                              bounceDelay={ 800 }
+                              spacing={ SEPARATOR_SIZES.lightSmall }
+                           >
+                              <Text style={ styles.subtitleText } numberOfLines={ 1 }>
+                                  { selectedItem.subtitle }
+                              </Text>
+                           </IntelligentMarquee>
                         }
                     </>
                     : <Text style={ [styles.titleText, styles.placeholderText] }>{ inputPlaceholder }</Text>
@@ -111,11 +126,12 @@ const styles = StyleSheet.create({
         borderColor: formTheme.errorColor
     },
     formFieldIconContainer: {
-        // width: formTheme.iconSize,
         alignItems: "center"
     },
     textContainer: {
         flexGrow: 1,
+        flexShrink: 1,
+        minWidth: 15,
         gap: SEPARATOR_SIZES.lightSmall / 2,
         justifyContent: "center"
     },

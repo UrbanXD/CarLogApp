@@ -21,8 +21,8 @@ type CarProfileViewProps = {
     openEditOdometerValue?: () => void
 }
 
-const MARQUEE_SPEED = 0.75;
-const MARQUEE_DELAY = 500;
+const MARQUEE_SPEED = 0.65;
+const MARQUEE_DELAY = 0;
 const MARQUEE_BOUNCE_DELAY = 500;
 
 function CarProfileView({
@@ -38,7 +38,7 @@ function CarProfileView({
             content: "Üzemanyag Típus",
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelType)
         }, {
-            title: car.fuelTank.capacity,
+            title: car.fuelTank.capacity.toString(),
             content: "Tartálytérfogat",
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelTankCapacity)
         }, {
