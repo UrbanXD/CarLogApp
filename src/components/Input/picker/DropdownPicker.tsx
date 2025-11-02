@@ -138,12 +138,12 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     });
 
     useEffect(() => {
-        if(!inputFieldValue || !initialLoadCompleted) return;
-        if(inputFieldValue === "") return setSelectedItem(null);
+        if(!initialLoadCompleted) return;
+        if(!inputFieldValue || inputFieldValue === "") return setSelectedItem(null);
 
-        const item = items.find(item => item.value === inputFieldValue);
+        const item = items.find(item => item.value.toString() === inputFieldValue.toString());
         if(item && item !== selectedItem) setSelectedItem(item);
-    }, [inputFieldValue, initialLoadCompleted]);
+    }, [items, inputFieldValue, initialLoadCompleted]);
 
     useEffect(() => {
         if(!data && !paginator) throw new Error("DropdownPicker did not get Data nor Paginator");
@@ -157,12 +157,12 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
         }
 
         if(paginator) {
-            paginator.initial().then(result => {
+            paginator.initial(inputFieldValue).then(result => {
                 setItems(result);
                 if(!initialLoadCompleted) setInitialLoadCompleted(true);
             });
         }
-    }, [data, paginator]);
+    }, [data, paginator, inputFieldValue]);
 
     useEffect(() => {
         if(!initialLoadCompleted) return;

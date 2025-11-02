@@ -8,13 +8,14 @@ import { MakeTableRow, ModelTableRow } from "../../../../../database/connector/p
 import { CarFormFields } from "../../../schemas/form/carForm.ts";
 import { YearPicker } from "../../../../../components/Input/_presets/YearPicker.tsx";
 
-type CarModelStepProps<FormFields> = Pick<StepProps<FormFields>, "control" | "resetField" | "setValue">;
+type CarModelStepProps<FormFields> = Pick<StepProps<FormFields>, "control" | "formState" | "setValue">;
 
-function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValue }: CarModelStepProps<FormFields>) {
+function CarModelStep<FormFields = CarFormFields>({ control, formState, setValue }: CarModelStepProps<FormFields>) {
     const { makeDao, modelDao } = useDatabase();
 
     const selectedMakeId = useWatch({ control, name: "model.makeId" });
     const selectedModelId = useWatch({ control, name: "model.id" });
+    const selectedYear = useWatch({ control, name: "model.year" });
     const [modelYears, setModelYears] = useState<Array<string>>([]);
 
     const [defaultLoadMakeId, setDefaultLoadMakeId] = useState(true);
@@ -33,8 +34,9 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
 
     useEffect(() => {
         if(defaultLoadMakeId) return setDefaultLoadMakeId(false);
+        if(formState.defaultValues?.["model"]?.["makeId"] === selectedMakeId && formState.defaultValues?.["model"]?.["id"] === selectedModelId) return;
 
-        resetField("model.id", { keepError: true, keepDirty: true });
+        setValue("model.id", "", { keepError: true, keepDirty: true });
     }, [selectedMakeId]);
 
     useEffect(() => {
@@ -48,8 +50,8 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
 
         if(selectedModelId) setHiddenInputsValue();
         if(defaultLoadModelId) return setDefaultLoadModelId(false);
-
-        resetField("model.year", { keepError: true, keepDirty: true });
+        if(formState.defaultValues?.["model"]?.["id"] === selectedModelId && formState.defaultValues?.["model"]?.["year"] === selectedYear) return;
+        setValue("model.year", "", { keepError: true, keepDirty: true });
     }, [selectedModelId]);
 
     return (

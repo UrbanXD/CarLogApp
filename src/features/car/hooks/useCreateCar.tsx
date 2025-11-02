@@ -23,12 +23,13 @@ const useCreateCarForm = () => {
         handleSubmit,
         trigger,
         reset,
+        formState,
         resetField,
         setValue,
         getValues
     } = useForm<CarFormFields>(useCreatCarFormProps(user.id));
 
-    const steps = useCarSteps<CarFormFields>({ control, resetField, setValue, getValues });
+    const steps = useCarSteps<CarFormFields>({ control, formState, setValue, getValues });
 
     const submitHandler =
         handleSubmit(async (formResult: CarFormFields) => {

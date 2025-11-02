@@ -9,7 +9,7 @@ import ImageStep from "../components/forms/steps/ImageStep.tsx";
 import { ResultStep } from "../components/forms/steps/ResultStep.tsx";
 import { CarEditNameToast } from "../presets/toast/index.ts";
 
-function useCarSteps({ control, resetField, setValue, getValues }: StepProps<CarFormFields>): UseStepFormResult {
+function useCarSteps({ control, formState, setValue, getValues }: StepProps<CarFormFields>): UseStepFormResult {
     const steps: Steps = [
         {
             title: "Elnevezés",
@@ -20,7 +20,7 @@ function useCarSteps({ control, resetField, setValue, getValues }: StepProps<Car
         {
             title: "Modell",
             fields: ["model.makeId", "model.id", "model.year"],
-            render: () => <CarModelStep control={ control } resetField={ resetField } setValue={ setValue }/>,
+            render: () => <CarModelStep control={ control } formState={ formState } setValue={ setValue }/>,
             editToastMessages: CarEditNameToast
         },
         {

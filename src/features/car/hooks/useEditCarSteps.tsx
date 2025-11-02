@@ -16,7 +16,7 @@ import { CurrencyInput } from "../../_shared/currency/components/CurrencyInput.t
 
 type UseEditCarStepsArgs = UseFormReturn<CarFormFields> & { index: EDIT_CAR_FORM_STEPS, car: Car }
 
-export function useEditCarSteps({ control, resetField, setValue, index, car }: UseEditCarStepsArgs): FormFields {
+export function useEditCarSteps({ control, formState, setValue, index, car }: UseEditCarStepsArgs): FormFields {
     const steps: Record<EDIT_CAR_FORM_STEPS, FormFields> = {
         [EDIT_CAR_FORM_STEPS.Name]: {
             render: () => <NameStep control={ control }/>,
@@ -25,7 +25,7 @@ export function useEditCarSteps({ control, resetField, setValue, index, car }: U
         [EDIT_CAR_FORM_STEPS.CarModel]: {
             render: () => <CarModelStep
                 control={ control }
-                resetField={ resetField }
+                formState={ formState }
                 setValue={ setValue }
             />,
             editToastMessages: CarEditNameToast
