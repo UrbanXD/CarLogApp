@@ -7,8 +7,7 @@ export const fuelTankSchema = z
     id: z.string().uuid(),
     type: fuelTypeSchema,
     unit: fuelUnitSchema,
-    capacity: z.number().min(0),
-    value: z.number().min(0)
+    capacity: z.number().min(0)
 });
 
 export type FuelTank = z.infer<typeof fuelTankSchema>;

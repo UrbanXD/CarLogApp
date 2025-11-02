@@ -1,6 +1,7 @@
 import {
     CarTableRow,
     FuelTankTableRow,
+    OdometerChangeLogTableRow,
     OdometerLogTableRow
 } from "../../../../database/connector/powersync/AppSchema.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
@@ -14,7 +15,6 @@ import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
 import { OdometerLogDao } from "../../_features/odometer/model/dao/OdometerLogDao.ts";
 import { OdometerUnitDao } from "../../_features/odometer/model/dao/OdometerUnitDao.ts";
 import { convertOdometerValueToKilometer } from "../../_features/odometer/utils/convertOdometerUnit.ts";
-import { getUUID } from "../../../../database/utils/uuid.ts";
 import { OdometerLogTypeEnum } from "../../_features/odometer/model/enums/odometerLogTypeEnum.ts";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
@@ -74,7 +74,9 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
     }
 
     async formResultToCarEntities(request: CarFormFields, createdAt?: string): Promise<{
-        car: CarTableRow,
+        car: CarTableRow
+        odometerLog: OdometerLogTableRow
+        odometerChangeLog: OdometerChangeLogTableRow | null,
         fuelTank: FuelTankTableRow
     }> {
         const odometerUnit = await this.odometerUnitDao.getById(request.odometer.unitId);
@@ -92,24 +94,32 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
         };
 
         const odometerLog: OdometerLogTableRow = {
-            id: getUUID(),
+            id: request.odometer.id,
             car_id: request.id,
             type_id: OdometerLogTypeEnum.SIMPLE,
-            value: convertOdometerValueToKilometer(request.odometer.value, odometerUnit?.conversionFactor),
-            note: "Induló Kilométeróra-állás",
-            date: createdAt
+            value: convertOdometerValueToKilometer(request.odometer.value, odometerUnit?.conversionFactor)
         };
+
+        let odometerChangeLog: OdometerChangeLogTableRow | null = null;
+        if(request.odometer.odometerChangeLogId) {
+            odometerChangeLog = {
+                id: request.odometer.odometerChangeLogId,
+                owner_id: request.ownerId,
+                odometer_log_id: odometerLog.id,
+                note: null,
+                date: createdAt
+            };
+        }
 
         const fuelTank: FuelTankTableRow = {
             id: request.fuelTank.id,
             car_id: request.id,
             type_id: request.fuelTank.typeId,
             unit_id: request.fuelTank.unitId,
-            capacity: request.fuelTank.capacity,
-            value: request.fuelTank.value
+            capacity: request.fuelTank.capacity
         };
 
-        return { car, odometerLog, fuelTank };
+        return { car, odometerLog, odometerChangeLog: odometerChangeLog, fuelTank };
     }
 
     dtoToPicker(dtos: Array<Car>): Array<PickerItemType> {

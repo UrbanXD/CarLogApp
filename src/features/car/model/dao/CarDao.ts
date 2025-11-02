@@ -3,6 +3,7 @@ import {
     CarTableRow,
     DatabaseType,
     FuelTankTableRow,
+    OdometerChangeLogTableRow,
     OdometerLogTableRow
 } from "../../../../database/connector/powersync/AppSchema.ts";
 import { ModelDao } from "./ModelDao.ts";
@@ -19,6 +20,7 @@ import { Dao } from "../../../../database/dao/Dao.ts";
 import { OdometerLogDao } from "../../_features/odometer/model/dao/OdometerLogDao.ts";
 import { OdometerUnitDao } from "../../_features/odometer/model/dao/OdometerUnitDao.ts";
 import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
+import { ODOMETER_CHANGE_LOG_TABLE } from "../../../../database/connector/powersync/tables/odometerChangeLog.ts";
 
 export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
     private readonly storage: SupabaseStorageAdapter;
@@ -65,7 +67,12 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
         return result.currency_id;
     }
 
-    async create(car: CarTableRow, odometerLog: OdometerLogTableRow, fuelTank: FuelTankTableRow): Promise<Car> {
+    async create(
+        car: CarTableRow,
+        odometerLog: OdometerLogTableRow,
+        odometerChangeLog: OdometerChangeLogTableRow | null,
+        fuelTank: FuelTankTableRow
+    ): Promise<Car> {
         const insertedCar = await this.db.transaction().execute(async trx => {
             const carRow = await trx
             .insertInto(CAR_TABLE)
@@ -76,11 +83,21 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
             await trx
             .insertInto(ODOMETER_LOG_TABLE)
             .values(odometerLog)
+            .returning("id")
             .executeTakeFirstOrThrow();
+
+            if(odometerChangeLog) {
+                await trx
+                .insertInto(ODOMETER_CHANGE_LOG_TABLE)
+                .values(odometerChangeLog)
+                .returning("id")
+                .executeTakeFirstOrThrow();
+            }
 
             await trx
             .insertInto(FUEL_TANK_TABLE)
             .values(fuelTank)
+            .returning("id")
             .executeTakeFirstOrThrow();
 
             return carRow;
@@ -102,6 +119,7 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
             .updateTable(FUEL_TANK_TABLE)
             .set(fuelTank)
             .where("id", "=", fuelTank.id)
+            .returning("id")
             .executeTakeFirstOrThrow();
 
             return carRow;

@@ -7,6 +7,5 @@ export const fuelTankTable = new Table({
     car_id: column.text,
     type_id: column.integer,
     unit_id: column.integer,
-    capacity: column.integer,
-    value: column.integer
+    capacity: column.integer
 });

@@ -7,6 +7,7 @@ import { getUUID } from "../../../../database/utils/uuid.ts";
 import { currencySchema } from "../../../_shared/currency/schemas/currencySchema.ts";
 import { CurrencyEnum } from "../../../_shared/currency/enums/currencyEnum.ts";
 import { getLocales } from "expo-localization";
+import { odometerChangeLogForm } from "../../_features/odometer/schemas/form/odometerChangeLogForm.ts";
 
 export const carFormSchema = carSchema
 .pick({ id: true, ownerId: true, name: true, image: true })
@@ -18,13 +19,15 @@ export const carFormSchema = carSchema
         makeName: z.string().optional(), // hidden input only for result screen
         year: zPickerRequired("Válasszon ki egy gyártási évet!").pipe(modelSchema.shape.startYear)
     }),
-    odometer: carSchema.shape.odometer.pick({ id: true }).extend({
-        value: zNumber({ bounds: { min: 0 } }).pipe(carSchema.shape.odometer.shape.value),
+    odometer: odometerChangeLogForm(0)
+    .pick({ id: true, value: true })
+    .extend({
+        odometerChangeLogId: odometerChangeLogForm(0).shape.odometerChangeLogId.nullable(),
         unitId: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
         .pipe(carSchema.shape.odometer.shape.unit.shape.id)
     }),
     currencyId: currencySchema.shape.id,
-    fuelTank: carSchema.shape.fuelTank.pick({ id: true, value: true }).extend({
+    fuelTank: carSchema.shape.fuelTank.pick({ id: true }).extend({
         typeId: zPickerRequired("Kérem válasszon ki egy üzemanyag típust!")
         .pipe(carSchema.shape.fuelTank.shape.type.shape.id),
         capacity: zNumber({ bounds: { min: 0 } }).pipe(carSchema.shape.fuelTank.shape.capacity),
@@ -53,6 +56,8 @@ export const useCreatCarFormProps = (userId: string) => {
             year: ""
         },
         odometer: {
+            id: getUUID(),
+            odometerChangeLogId: getUUID(),
             value: NaN,
             unitId: ""
         },
@@ -62,8 +67,7 @@ export const useCreatCarFormProps = (userId: string) => {
             id: getUUID(),
             typeId: "",
             unitId: "",
-            capacity: NaN,
-            value: 0
+            capacity: NaN
         }
     };
 
@@ -84,6 +88,8 @@ export const useEditCarFormProps = (car: Car) => {
             year: car.model.year
         },
         odometer: {
+            id: car.odometer.id,
+            odometerChangeLogId: null, // not changeable by car
             value: car.odometer.value,
             unitId: car.odometer.unit.id
         },
@@ -92,8 +98,7 @@ export const useEditCarFormProps = (car: Car) => {
             id: car.fuelTank.id,
             typeId: car.fuelTank.type.id,
             unitId: car.fuelTank.unit.id,
-            capacity: car.fuelTank.capacity,
-            value: car.fuelTank.value
+            capacity: car.fuelTank.capacity
         }
     };
 

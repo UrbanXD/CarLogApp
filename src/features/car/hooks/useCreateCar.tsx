@@ -39,9 +39,12 @@ const useCreateCarForm = () => {
                 if(dismissBottomSheet) dismissBottomSheet(true);
                 openToast(CarCreateToast.success());
             } catch(e) {
-                console.log(e);
+                console.log("car create error: ", e);
                 openToast(CarCreateToast.error());
             }
+        }, (e) => {
+            openToast(CarCreateToast.error());
+            console.log("car create form validation error: ", e);
         });
 
     return { control, submitHandler, trigger, resetField, steps };

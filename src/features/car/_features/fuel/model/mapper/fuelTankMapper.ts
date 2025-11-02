@@ -22,8 +22,7 @@ export class FuelTankMapper extends AbstractMapper<FuelTankTableRow, FuelTank> {
             id: entity.id,
             type: type,
             unit: unit,
-            capacity: entity.capacity,
-            value: entity.capacity
+            capacity: entity.capacity
         });
     }
 
@@ -32,8 +31,7 @@ export class FuelTankMapper extends AbstractMapper<FuelTankTableRow, FuelTank> {
             id: dto.id,
             type_id: dto.type.id,
             unit_id: dto.unit.id,
-            capacity: dto.capacity,
-            value: dto.value
+            capacity: dto.capacity
         };
     }
 }
