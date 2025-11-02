@@ -15,6 +15,8 @@ import { FloatingDeleteButton } from "../../../../../components/Button/presets/F
 import { ServiceLog } from "../schemas/serviceLogSchema.ts";
 import { ServiceItemExpandableList } from "./ServiceItemExpandableList.tsx";
 import { ServiceLogFormFieldsEnum } from "../enums/ServiceLogFormFieldsEnum.ts";
+import { Odometer } from "../../../../car/_features/odometer/schemas/odometerSchema.ts";
+import { updateCarOdometer } from "../../../../car/model/slice/index.ts";
 
 export type ServiceLogViewProps = {
     id: string
@@ -47,7 +49,12 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         try {
             if(!car) throw new Error("Car not found!");
 
-            await serviceLogDao.delete(serviceLog);
+            const resultId = await serviceLogDao.delete(serviceLog);
+
+            let odometer: Odometer | null = null;
+            if(resultId && serviceLog.odometer?.carId) odometer = await odometerLogDao.getOdometerByCarId(serviceLog.odometer.carId);
+
+            if(odometer) dispatch(updateCarOdometer({ odometer }));
 
             openToast(DeleteExpenseToast.success());
 

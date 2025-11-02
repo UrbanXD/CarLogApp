@@ -15,6 +15,7 @@ import { OdometerLogFormFields } from "../../enums/odometerLogFormFields.ts";
 import { useOdometerLogFormFields } from "../../hooks/useOdometerLogFormFields.tsx";
 import { FormFields } from "../../../../../../types/index.ts";
 import Form from "../../../../../../components/Form/Form.tsx";
+import { Odometer } from "../../schemas/odometerSchema.ts";
 
 type EditOdometerLogFormProps = {
     odometerLog: OdometerLog
@@ -38,9 +39,16 @@ export function EditOdometerChangeLogForm({ odometerLog, field }: EditOdometerLo
         async (formResult: OdometerChangeLogFormFields) => {
             try {
                 const result = await odometerLogDao.updateOdometerChangeLog(formResult);
-                const odometer = await odometerLogDao.getOdometerByCarId(result.carId);
 
-                if(odometer) dispatch(updateCarOdometer({ odometer }));
+                const newCarOdometer = await odometerLogDao.getOdometerByCarId(result.carId);
+
+                let oldCarOdometer: Odometer | null = null;
+                if(newCarOdometer.carId !== odometerLog.carId) {
+                    oldCarOdometer = await odometerLogDao.getOdometerByCarId(odometerLog.carId);
+                }
+
+                dispatch(updateCarOdometer({ odometer: newCarOdometer }));
+                if(oldCarOdometer) dispatch(updateCarOdometer({ odometer: oldCarOdometer }));
 
                 openToast(editFields.editToastMessages.success());
 

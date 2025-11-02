@@ -40,9 +40,16 @@ export function EditServiceLogForm({
             try {
                 const result = await serviceLogDao.update(formResult);
 
-                let odometer: Odometer | null = null;
-                if(result?.odometer) odometer = await odometerLogDao.getOdometerByCarId(result?.odometer?.carId);
-                if(odometer) dispatch(updateCarOdometer({ odometer }));
+                let newCarOdometer: Odometer | null = null;
+                let oldCarOdometer: Odometer | null = null;
+
+                if(result?.odometer) newCarOdometer = await odometerLogDao.getOdometerByCarId(result.odometer.carId);
+                if(serviceLog?.odometer && result?.odometer?.carId !== serviceLog.odometer.carId) {
+                    oldCarOdometer = await odometerLogDao.getOdometerByCarId(serviceLog.odometer.carId);
+                }
+
+                if(newCarOdometer) dispatch(updateCarOdometer({ odometer: newCarOdometer }));
+                if(oldCarOdometer) dispatch(updateCarOdometer({ odometer: oldCarOdometer }));
 
                 openToast(editFields.editToastMessages.success());
 

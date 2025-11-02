@@ -41,9 +41,16 @@ export function EditFuelLogForm({
             try {
                 const result = await fuelLogDao.update(formResult);
 
-                let odometer: Odometer | null = null;
-                if(result?.odometer) odometer = await odometerLogDao.getOdometerByCarId(result?.odometer?.carId);
-                if(odometer) dispatch(updateCarOdometer({ odometer }));
+                let newCarOdometer: Odometer | null = null;
+                let oldCarOdometer: Odometer | null = null;
+
+                if(result?.odometer) newCarOdometer = await odometerLogDao.getOdometerByCarId(result.odometer.carId);
+                if(fuelLog?.odometer && result?.odometer?.carId !== fuelLog.odometer.carId) {
+                    oldCarOdometer = await odometerLogDao.getOdometerByCarId(fuelLog.odometer.carId);
+                }
+
+                if(newCarOdometer) dispatch(updateCarOdometer({ odometer: newCarOdometer }));
+                if(oldCarOdometer) dispatch(updateCarOdometer({ odometer: oldCarOdometer }));
 
                 openToast(editFields.editToastMessages.success());
 

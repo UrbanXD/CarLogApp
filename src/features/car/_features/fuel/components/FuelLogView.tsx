@@ -15,13 +15,15 @@ import { FuelLog } from "../schemas/fuelLogSchema.ts";
 import { FuelLogFormFieldsEnum } from "../enums/fuelLogFormFields.tsx";
 import { FloatingDeleteButton } from "../../../../../components/Button/presets/FloatingDeleteButton.tsx";
 import { AmountText } from "../../../../../components/AmountText.tsx";
+import { updateCarOdometer } from "../../../model/slice/index.ts";
+import { Odometer } from "../../odometer/schemas/odometerSchema.ts";
 
 export type FuelLogViewProps = {
     id: string
 }
 
 export function FuelLogView({ id }: FuelLogViewProps) {
-    const { fuelLogDao } = useDatabase();
+    const { fuelLogDao, odometerLogDao } = useDatabase();
     const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
 
@@ -46,7 +48,12 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         try {
             if(!car) throw new Error("Car not found!");
 
-            await fuelLogDao.delete(fuelLog);
+            const resultId = await fuelLogDao.delete(fuelLog);
+
+            let odometer: Odometer | null = null;
+            if(resultId && fuelLog.odometer?.carId) odometer = await odometerLogDao.getOdometerByLogId(fuelLog.odometer.carId);
+
+            if(odometer) dispatch(updateCarOdometer({ odometer }));
 
             openToast(DeleteExpenseToast.success());
 
@@ -98,7 +105,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
                <AmountText
                   amount={ fuelLog.expense.originalAmount }
                   currencyText={ fuelLog.expense.currency.symbol }
-                  exchangedAmount={ fuelLog.expense.originalAmount }
+                  exchangedAmount={ fuelLog.expense.amount }
                   exchangeCurrencyText={ car?.currency.symbol }
                   amountTextStyle={ textStyle ? [...textStyle, { textAlign: "left" }] : { textAlign: "left" } }
                />,

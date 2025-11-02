@@ -80,6 +80,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         .selectFrom(ODOMETER_LOG_TABLE)
         .selectAll()
         .where("id", "=", logId)
+        .orderBy("value", "desc")
         .executeTakeFirst();
 
         const defaultOdometer: OdometerLogTableRow = { // when no odometer found fallback to 0
