@@ -57,7 +57,10 @@ export function TimelineItem({
                         } }/>
                     }
                 </View>
-                <DashedLine/>
+                {
+                    !isLast &&
+                   <DashedLine/>
+                }
             </View>
             <Pressable onPress={ onPress } disabled={ !onPress } style={ styles.card }>
                 <View style={ styles.card.title.container }>
@@ -113,7 +116,7 @@ const useStyles = (color: Color, dotSize: number, isFirstItem: boolean, isLastIt
 
     timeline: {
         flexDirection: "column",
-        height: "100%",
+        height: !isLastItem ? "100%" : dotSize + SEPARATOR_SIZES.lightSmall,
         width: dotSize + SEPARATOR_SIZES.lightSmall,
         backgroundColor: COLORS.gray5,
         paddingTop: isFirstItem && SEPARATOR_SIZES.lightSmall,
@@ -146,7 +149,7 @@ const useStyles = (color: Color, dotSize: number, isFirstItem: boolean, isLastIt
                 justifyContent: "center",
                 backgroundColor: color,
                 borderColor: COLORS.black2,
-                borderWidth: 1,
+                borderWidth: 0.35,
                 borderRadius: 100
             },
 
@@ -162,7 +165,7 @@ const useStyles = (color: Color, dotSize: number, isFirstItem: boolean, isLastIt
         justifyContent: "space-between",
         gap: SEPARATOR_SIZES.lightSmall,
         backgroundColor: COLORS.gray5,
-        marginTop: SEPARATOR_SIZES.small,
+        marginTop: dotSize / 2.5,
         padding: SEPARATOR_SIZES.lightSmall,
         borderRadius: 12.5,
         borderTopLeftRadius: 0,

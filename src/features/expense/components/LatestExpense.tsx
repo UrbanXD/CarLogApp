@@ -38,7 +38,7 @@ export function LatestExpenses() {
                 key={ expense.id }
                 { ...mapper(expense) }
                 isFirst={ index === 0 }
-                isLast={ index === expenses.length - 1 }
+                isLast={ false }
             />
         );
     };
