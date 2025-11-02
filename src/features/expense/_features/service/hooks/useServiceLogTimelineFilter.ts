@@ -18,6 +18,7 @@ export function useServiceLogTimelineFilter({
     timelineFilterManagement: {
         filters,
         addFilter,
+        replaceFilter,
         removeFilter,
         clearFilters
     },
@@ -60,7 +61,7 @@ export function useServiceLogTimelineFilter({
     }, [filters]);
 
     useEffect(() => {
-        addFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: car.id } });
+        replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: car.id } });
     }, [car]);
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {
