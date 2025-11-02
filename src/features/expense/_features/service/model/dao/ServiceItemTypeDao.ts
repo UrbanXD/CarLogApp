@@ -39,7 +39,7 @@ export class ServiceItemTypeDao extends Dao<ServiceItemTypeTableRow, ServiceItem
         return new CursorPaginator<ServiceItemTypeTableRow, PickerItemType>(
             this.db,
             SERVICE_ITEM_TYPE_TABLE,
-            { field: ["key", "id"], order: "asc" },
+            { cursor: [{ field: "key" }, { field: "id" }], order: "asc" },
             {
                 perPage,
                 mapper: this.mapper.entityToPickerItem.bind(this.mapper)

@@ -82,7 +82,7 @@ export function ServiceItemExpandableList({
             <View style={ styles.bottomContainer }>
                 <AmountText
                     amount={ totalAmount.reduce((sum, a) => sum + a.exchangedAmount, 0) }
-                    currencyText={ totalAmount[0].exchangeCurrency.symbol ?? "e" }
+                    currencyText={ totalAmount[0]?.exchangeCurrency?.symbol ?? "?" }
                     exchangedAmount={ totalAmount.map(a => Number(a.amount ?? 0)) }
                     exchangeCurrencyText={ totalAmount.map(a => a.currency.symbol ?? "?") }
                 />
