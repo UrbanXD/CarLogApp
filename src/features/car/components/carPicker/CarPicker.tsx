@@ -90,7 +90,7 @@ export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
             { duration: 650 }
         );
 
-        return { opacity, transform: [{ translateX }] };
+        return { opacity, transform: [{ translateX }], width: "100%", paddingRight: CLOSE_ICON_SIZE * 1.5 };
     });
 
     const closeIconStyle = useAnimatedStyle(() => {
