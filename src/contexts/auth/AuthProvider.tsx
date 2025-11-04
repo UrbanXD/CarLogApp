@@ -37,6 +37,11 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
 
         const { data: authListener } = supabaseConnector.client.auth.onAuthStateChange(
             (_event, supabaseSession) => {
+                if(!supabaseSession) {
+                    if(router.canDismiss()) router.dismissAll();
+                    router.replace("/backToRootIndex");
+                }
+
                 setAuthenticated(!!supabaseSession);
                 setSession(supabaseSession);
             }
@@ -146,9 +151,6 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             const { error } = await supabaseConnector.client.auth.signOut();
 
             if(error) throw error;
-
-            router.dismissAll();
-            router.push("/backToRootIndex");
 
             if(!disabledToast) openToast(SignOutToast.success());
             await database.disconnect();
