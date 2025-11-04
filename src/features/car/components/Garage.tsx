@@ -10,13 +10,12 @@ import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-nat
 import useGarage from "../hooks/useGarage.tsx";
 
 const Garage: React.FC = () => {
-    const { cars, loading, openNewCarForm, openCarProfile } = useGarage();
+    const { cars, openNewCarForm, openCarProfile } = useGarage();
 
     const renderDefaultElement =
         (size: number, spacerSize: number) =>
             <View style={ styles.defaultElementContainer }>
                 <DefaultElement
-                    loading={ loading }
                     icon={ ICON_NAMES.car }
                     text="Még egy autó se parkol a virtuális garázsában"
                     style={ { width: size - spacerSize / 2 } }

@@ -1,14 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { StyleSheet, Text, View, ViewStyle } from "react-native";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import Icon from "./Icon";
 import { hexToRgba } from "../utils/colors/hexToRgba";
 import { ImageSource } from "../types/index.ts";
-import CarLoadingIndicator from "./loading/CarLoadingIndicator.tsx";
-import Animated, { FadeInLeft } from "react-native-reanimated";
 
 interface DefaultElementProps {
-    loading?: boolean;
     icon?: ImageSource;
     text?: string;
     loadingText?: string;
@@ -16,42 +13,23 @@ interface DefaultElementProps {
 }
 
 const DefaultElement: React.FC<DefaultElementProps> = ({
-    loading = false,
     icon = ICON_NAMES.image,
     text,
-    loadingText = "Adatok betöltése",
     style
 }) => {
-    const [loadingAnimationFinished, setLoadingAnimationFinished] = useState(!loading);
-
     return (
         <View style={ [styles.container, style] }>
-            {
-                !loadingAnimationFinished
-                ? <CarLoadingIndicator
-                    loaded={ !loading }
-                    loadingText={ loadingText }
-                    onAnimationFinished={ () => setLoadingAnimationFinished(true) }
+            <View style={ { alignItems: "center" } }>
+                <Icon
+                    icon={ icon }
+                    size={ FONT_SIZES.title }
+                    color={ COLORS.gray3 }
                 />
-                : <Animated.View
-                    style={ { alignItems: "center" } }
-                    entering={
-                        loading !== loadingAnimationFinished
-                        ? undefined
-                        : FadeInLeft.duration(300)
-                    }
-                >
-                    <Icon
-                        icon={ icon }
-                        size={ FONT_SIZES.title }
-                        color={ COLORS.gray3 }
-                    />
-                    {
-                        text &&
-                       <Text style={ styles.text }>{ text }</Text>
-                    }
-                </Animated.View>
-            }
+                {
+                    text &&
+                   <Text style={ styles.text }>{ text }</Text>
+                }
+            </View>
         </View>
     );
 };
