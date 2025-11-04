@@ -6,19 +6,15 @@ import { useAuth } from "../../../../contexts/auth/AuthContext.ts";
 import { SignUpRequest, useSignUpFormProps } from "../../schemas/form/signUpRequest.ts";
 
 const SignUpForm: React.FC = () => {
-    const {
-        control,
-        handleSubmit,
-        trigger,
-        resetField
-    } = useForm<SignUpRequest>(useSignUpFormProps());
+    const form = useForm<SignUpRequest>(useSignUpFormProps);
+    const { control, handleSubmit, trigger, resetField } = form;
     const { signUp } = useAuth();
 
     const submitHandler = handleSubmit(signUp);
 
     return (
         <MultiStepForm
-            steps={ useSignUpSteps(control) }
+            steps={ useSignUpSteps(form) }
             isFirstCount={ false }
             control={ control }
             submitHandler={ submitHandler }
