@@ -19,6 +19,12 @@ const carsSlice = createSlice({
     name: "cars",
     initialState,
     reducers: {
+        resetCars: (state) => {
+            state.cars = [];
+            state.loading = true;
+            state.loadError = false;
+            state.selectedCar = null;
+        },
         updateCarOdometer: (state, action: PayloadAction<{ odometer: Odometer }>) => {
             const carIndex = state.cars.findIndex(car => car.id === action.payload.odometer.carId);
             if(carIndex === -1) return;
@@ -75,5 +81,5 @@ const carsSlice = createSlice({
     }
 });
 
-export const { updateCarOdometer } = carsSlice.actions;
+export const { updateCarOdometer, resetCars } = carsSlice.actions;
 export const carsReducer = carsSlice.reducer;
