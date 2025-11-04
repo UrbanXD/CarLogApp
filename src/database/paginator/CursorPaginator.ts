@@ -1,38 +1,76 @@
 import { Paginator, PaginatorOptions } from "./AbstractPaginator.ts";
 import { DatabaseType } from "../connector/powersync/AppSchema.ts";
-import { Kysely } from "@powersync/kysely-driver";
-import { SelectQueryBuilder } from "kysely";
+import { Kysely, sql } from "@powersync/kysely-driver";
+import { OrderByDirectionExpression, SelectQueryBuilder } from "kysely";
 import { CursorValue } from "react-native";
+import { addCursor } from "./utils/addCursor.ts";
 
-type CursorOperator = "<" | ">" | ">=";
-type CursorValue<TableItem> = TableItem[keyof TableItem] | null;
+export type CursorDirection = "initial" | "next" | "prev";
+export type CursorValue<TableItem> = TableItem[keyof TableItem] | null;
+export type Cursor<TableField, DB = DatabaseType> = {
+    field: TableField,
+    table?: keyof DB,
+    order?: OrderByDirectionExpression
+}
+export type CursorOptions<TableField, DB = DatabaseType> = {
+    cursor: Cursor<TableField, DB> | Array<Cursor<TableField, DB>>,
+    defaultOrder?: OrderByDirectionExpression
+}
 
-export class CursorPaginator<TableItem, DB = DatabaseType> extends Paginator<TableItem, DB> {
-    private prevCursor: CursorValue<TableItem>;
-    private nextCursor: CursorValue<TableItem>;
-    private readonly cursorFieldName: keyof TableItem;
+export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseType> extends Paginator<TableItem, MappedItem, DB> {
+    private prevCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
+    private nextCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
+    private refreshCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
+    cursorOptions: CursorOptions<keyof TableItem, DB>;
 
     constructor(
         database: Kysely<DB>,
         table: keyof DB,
-        key: keyof TableItem | Array<keyof TableItem>,
-        cursorFieldName: keyof TableItem,
-        options?: PaginatorOptions<keyof TableItem>
+        cursorOptions: CursorOptions<keyof TableItem>,
+        options?: PaginatorOptions<keyof TableItem, MappedItem>
     ) {
-        super(database, table, key, options);
-        this.cursorFieldName = cursorFieldName;
+        super(database, table, options);
+        this.cursorOptions = cursorOptions;
     }
 
-    private addCursorFilter(
-        query: SelectQueryBuilder<DB, TableItem, any>,
-        value: CursorValue<TableItem>,
-        operator: CursorOperator
-    ) {
-        let reverse = false;
-        if(operator === "<") reverse = true;
-        let subQuery = super.addOrder(query, { field: this.cursorFieldName }, reverse);
+    protected getBaseQuery(): SelectQueryBuilder<DB, TableItem, any> {
+        let query = super.getBaseQuery();
 
-        return super.addFilter(subQuery, { field: this.cursorFieldName, value, operator, toLowerCase: true });
+        if(Array.isArray(this.cursorOptions.cursor)) {
+            this.cursorOptions.cursor.map((cursor) => {
+                const cursorField = sql.ref(`${ cursor?.table ?? this.table }.${ cursor.field }`);
+                query = query.select(cursorField);
+            });
+        } else {
+            const cursorField = sql.ref(`${ this.cursorOptions.cursor?.table ?? this.table }.${ this.cursorOptions.cursor.field }`);
+            query = query.select(cursorField);
+        }
+
+        return query;
+    }
+
+    private setNextCursor(lastItem: TableItem) {
+        if(Array.isArray(this.cursorOptions.cursor)) {
+            this.nextCursor = this.cursorOptions.cursor.map((cursor) => lastItem[cursor.field] ?? null);
+        } else {
+            this.nextCursor = lastItem[this.cursorOptions.cursor.field] ?? null;
+        }
+    }
+
+    private setPreviousCursor(firstItem: TableItem) {
+        if(Array.isArray(this.cursorOptions.cursor)) {
+            this.prevCursor = this.cursorOptions.cursor.map((cursor) => firstItem[cursor.field] ?? null);
+        } else {
+            this.prevCursor = firstItem[this.cursorOptions.cursor.field] ?? null;
+        }
+    }
+
+    private setRefreshCursor(item: TableItem) {
+        if(Array.isArray(this.cursorOptions.cursor)) {
+            this.refreshCursor = this.cursorOptions.cursor.map((cursor) => item[cursor.field] ?? null);
+        } else {
+            this.refreshCursor = item[this.cursorOptions.cursor.field] ?? null;
+        }
     }
 
     hasNext(): boolean {
@@ -43,97 +81,127 @@ export class CursorPaginator<TableItem, DB = DatabaseType> extends Paginator<Tab
         return !!this.prevCursor;
     }
 
-    async filter(searchTerm?: string): Promise<Array<TableItem>> {
-        this.prevCursor = null;
-        this.nextCursor = null;
-
-        const result = await super.filter(searchTerm);
-
-        if(result.length !== 0) this.nextCursor = result[result.length - 1][this.cursorFieldName];
-
-        return result;
+    async changeCursorOptions(options: CursorOptions<keyof TableItem, DB>) {
+        this.cursorOptions = options;
+        return await this.initial();
     }
 
-    async initial(defaultValue?: string | number): Promise<Array<TableItem>> {
+    async refresh(): Promise<Array<MappedItem>> {
+        if(!this.refreshCursor) return this.initial();
+
         this.prevCursor = null;
         this.nextCursor = null;
 
-        if(!defaultValue) {
+        let query = this.getBaseQuery().limit(this.perPage + 2);
+        query = addCursor(this.table, query, this.cursorOptions, this.refreshCursor, "next");
+
+        const result = await query.execute() as unknown as Array<TableItem>;
+
+        if(result.length > 1) this.setPreviousCursor(result.shift());
+        if(result.length === 0) return [];
+
+        this.setRefreshCursor(result[0]);
+        if(result.length === this.perPage + 1) this.setNextCursor(result.pop());
+
+        const refreshMappedResult = await super.map(result);
+        //
+        // if(result.length > 0 && result.length < this.perPage + 1) {
+        //     const moreData = await this.previous();
+        //     if(moreData) refreshMappedResult.unshift(...moreData);
+        // }
+
+        return refreshMappedResult;
+    }
+
+    async initial(defaultItemId?: string | number): Promise<Array<MappedItem>> {
+        this.prevCursor = null;
+        this.nextCursor = null;
+        this.refreshCursor = null;
+
+        let defaultCursor = null;
+        let defaultItem = null;
+        if(defaultItemId) {
+            let filterField = sql.ref(`${ this.table }.id`);
+            defaultItem = await this.getBaseQuery().where(filterField, "=", defaultItemId).executeTakeFirst();
+            if(defaultItem) {
+                if(Array.isArray(this.cursorOptions.cursor)) {
+                    defaultCursor = this.cursorOptions.cursor.map((cursorField) => defaultItem?.[cursorField.field]);
+                } else {
+                    defaultCursor = defaultItem?.[this.cursorOptions.cursor.field];
+                }
+            }
+        }
+
+        if(!defaultCursor) {
             let query = this.getBaseQuery();
-            query = super.addOrder(query, { field: this.cursorFieldName, direction: "asc", toLowerCase: true });
+            query = addCursor(this.table, query, this.cursorOptions, null, "initial");
 
             const result = await query.execute() as unknown as Array<TableItem>;
 
-            if(result.length !== 0) this.nextCursor = result[result.length - 1][this.cursorFieldName];
-            return result;
+            if(result.length === this.perPage + 1) this.setNextCursor(result.pop());
+            if(result.length !== 0) this.setRefreshCursor(result[0]);
+
+            return await super.map(result);
         }
 
         const halfPage = Math.floor(this.perPage / 2);
 
-        let prevQuery = super.getBaseQuery(true).limit(halfPage);
-        let nextQuery = super.getBaseQuery().limit(halfPage);
+        let prevQuery = super.getBaseQuery().limit(halfPage + 1);
+        let nextQuery = super.getBaseQuery().limit(halfPage + 1);
 
-        prevQuery = this.addCursorFilter(prevQuery, defaultValue, "<");
-        nextQuery = this.addCursorFilter(nextQuery, defaultValue, ">=");
+        prevQuery = addCursor(this.table, prevQuery, this.cursorOptions, defaultCursor, "prev");
+        nextQuery = addCursor(this.table, nextQuery, this.cursorOptions, defaultCursor, "next");
 
         const prevResult = (await prevQuery.execute()).reverse() as unknown as Array<TableItem>;
         const nextResult = await nextQuery.execute() as unknown as Array<TableItem>;
 
-        if(prevResult.length !== halfPage) {
-            this.prevCursor = null;
-        } else {
-            this.prevCursor = prevResult[0][this.cursorFieldName];
-        }
+        this.prevCursor = null;
+        if(prevResult.length === halfPage + 1) this.setPreviousCursor(prevResult.shift()); // its over the limit that means the first element is a cursor for previous
+        this.setRefreshCursor(prevResult?.[0] ?? defaultItem ?? nextResult?.[0] ?? null);
 
-        if(nextResult.length !== halfPage) {
-            this.nextCursor = null;
-        } else {
-            this.nextCursor = nextResult[nextResult.length - 1][this.cursorFieldName];
-        }
+        this.nextCursor = null;
+        if(nextResult.length === halfPage + 1) this.setNextCursor(nextResult.pop());  // its over the limit that means the last element is a cursor for next
 
-        return [...prevResult, ...nextResult];
+        const result = [...prevResult, defaultItem, ...nextResult];
+        this.refreshCursor = null;
+        if(result.length !== 0) this.setRefreshCursor(result[0]);
+
+        return await super.map(result);
     }
 
-    async next(searchTerm?: string): Promise<Array<TableItem> | null> {
+    async next(): Promise<Array<TableItem> | null> {
         if(!this.hasNext()) return null;
 
         let query = super.getBaseQuery();
-        query = this.addCursorFilter(query, this.nextCursor, ">");
-        query = super.addSearchFilter(query, searchTerm);
+        query = addCursor(this.table, query, this.cursorOptions, this.nextCursor, "next");
+
         const result = await query.execute() as unknown as Array<TableItem>;
 
-        if(result.length !== 0) {
-            this.prevCursor = result[0][this.cursorFieldName];
-        }
+        // if(result.length !== 0) this.setPreviousCursor(result);
 
-        if(result.length !== this.perPage) {
-            this.nextCursor = null;
-        } else {
-            this.nextCursor = result[result.length - 1][this.cursorFieldName];
-        }
+        this.nextCursor = null;
+        this.refreshCursor = null;
+        if(result.length === this.perPage + 1) this.setNextCursor(result.pop());
+        if(result.length !== 0) this.setRefreshCursor(result[0]);
 
-        return result;
+        return await super.map(result);
     }
 
-    async previous(searchTerm?: string): Promise<Array<TableItem> | null> {
+    async previous(): Promise<Array<TableItem> | null> {
         if(!this.hasPrevious()) return null;
 
         let query = this.getBaseQuery(true);
-        query = this.addCursorFilter(query, this.prevCursor, "<");
-        query = super.addSearchFilter(query, searchTerm);
+        query = addCursor(this.table, query, this.cursorOptions, this.prevCursor, "prev");
 
         const result = (await query.execute()).reverse() as unknown as Array<TableItem>;
 
-        if(result.length !== 0) {
-            this.nextCursor = result[result.length - 1][this.cursorFieldName];
-        }
+        // if(result.length !== 0) this.setNextCursor(result);
 
-        if(result.length !== this.perPage) {
-            this.prevCursor = null;
-        } else {
-            this.prevCursor = result[0][this.cursorFieldName];
-        }
+        this.prevCursor = null;
+        this.refreshCursor = null;
+        if(result.length === this.perPage + 1) this.setPreviousCursor(result.shift());
+        if(result.length !== 0) this.setRefreshCursor(result[0]);
 
-        return result;
+        return await super.map(result);
     }
 }

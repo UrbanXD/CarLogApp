@@ -5,57 +5,56 @@ import { MODEL_TABLE } from "../../../../database/connector/powersync/tables/mod
 import { Model } from "../../schemas/modelSchema.ts";
 import { MakeDao } from "./MakeDao.ts";
 import { getToday } from "../../../../utils/getDate.ts";
-import { PaginatorFactory, PaginatorType } from "../../../../database/paginator/PaginatorFactory.ts";
 import { CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
+import { Dao } from "../../../../database/dao/Dao.ts";
+import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 
-export class ModelDao {
-    private readonly db: Kysely<DatabaseType>;
-    readonly mapper: ModelMapper;
-
+export class ModelDao extends Dao<ModelTableRow, Model, ModelMapper> {
     constructor(db: Kysely<DatabaseType>, makeDao: MakeDao) {
-        this.db = db;
-        this.mapper = new ModelMapper(makeDao);
+        super(db, MODEL_TABLE, new ModelMapper(makeDao));
     }
 
-    async getModelById(id: string): Promise<Model> {
-        const modelRow: ModelTableRow = await this.db
-        .selectFrom(MODEL_TABLE)
-        .selectAll()
-        .where("id", "=", id)
-        .executeTakeFirstOrThrow();
-
-        return this.mapper.toModelDto(modelRow);
-    }
-
-    async getModelYearsById(id: string, desc?: boolean): Promise<Array<string>> {
-        const model: Model = await this.getModelById(id);
+    async getModelYearsById(id: string, desc?: boolean): Promise<Array<PickerItemType>> {
+        const model = await this.getById(id);
 
         const years = {
-            start: Number(model.startYear),
+            start: Number(model?.startYear),
             end: !model?.endYear
                  ? getToday().getFullYear()
                  : Number(model.endYear)
         };
 
-        let result = Array.from({ length: years.end - years.start + 1 }, (_, key) => (years.start + key).toString());
+        let result: Array<PickerItemType> = Array.from({ length: years.end - years.start + 1 }, (_, key) => {
+            const year = (years.start + key).toString();
+
+            return {
+                title: year,
+                value: year
+            };
+        });
+
         if(desc) result = result.reverse();
 
         return result;
     }
 
-    paginatorByMakeId(makeId: string | undefined, perPage?: number = 50): CursorPaginator<ModelTableRow> {
-        return PaginatorFactory.createPaginator<ModelTableRow>(
-            PaginatorType.cursor,
+    paginatorByMakeId(
+        makeId: string | undefined,
+        perPage?: number = 50
+    ): CursorPaginator<ModelTableRow, PickerItemType> {
+        console.log(makeId, "paginator ");
+        return new CursorPaginator<ModelTableRow, PickerItemType>(
             this.db,
             MODEL_TABLE,
-            "id",
+            { cursor: [{ field: "name", order: "asc" }, { field: "id" }], defaultOrder: "asc" },
             {
                 perPage,
-                filterBy: makeId ? { field: "make_id", value: makeId, operator: "=" } : undefined,
-                orderBy: { field: "name", direction: "asc", toLowerCase: true },
-                searchBy: "name"
-            },
-            "name"
+                filterBy: makeId ? {
+                    group: "make",
+                    filters: [{ field: "make_id", value: makeId, operator: "=" }]
+                } : undefined,
+                mapper: this.mapper.toPickerItem
+            }
         );
     }
 }

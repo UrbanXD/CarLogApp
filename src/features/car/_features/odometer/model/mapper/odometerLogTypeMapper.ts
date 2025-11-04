@@ -1,0 +1,47 @@
+import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
+import { OdometerLogTypeTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
+import { OdometerLogType, odometerLogTypeSchema } from "../../schemas/odometerLogTypeSchema.ts";
+import { OdometerLogTypeEnum } from "../enums/odometerLogTypeEnum.ts";
+import { COLORS, ICON_NAMES } from "../../../../../../constants/index.ts";
+
+export class OdometerLogTypeMapper extends AbstractMapper<OdometerLogTypeTableRow, OdometerLogType> {
+    constructor() {
+        super();
+    }
+
+    async toDto(entity: OdometerLogTypeTableRow): Promise<OdometerLogType> {
+        let locale = "Kilométeróra-frissítés";
+        let icon = null;
+        let primaryColor = null;
+        let secondaryColor = null;
+
+        switch(Number(entity.id)) {
+            case OdometerLogTypeEnum.FUEL:
+                locale = "Tankolás";
+                icon = ICON_NAMES.fuelPump;
+                primaryColor = COLORS.fuelYellow;
+                break;
+            case OdometerLogTypeEnum.SERVICE:
+                locale = "Szervíz";
+                icon = ICON_NAMES.service;
+                primaryColor = COLORS.service;
+                break;
+        }
+
+        return odometerLogTypeSchema.parse({
+            id: entity.id,
+            key: entity.key,
+            locale,
+            icon: icon,
+            primaryColor,
+            secondaryColor: secondaryColor
+        });
+    }
+
+    async toEntity(dto: OdometerLogType): Promise<OdometerLogTypeTableRow> {
+        return {
+            id: dto.id,
+            key: dto.key
+        };
+    }
+}

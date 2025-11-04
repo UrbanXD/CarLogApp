@@ -3,50 +3,50 @@ import {
     CarTableRow,
     DatabaseType,
     FuelTankTableRow,
-    OdometerTableRow
+    OdometerChangeLogTableRow,
+    OdometerLogTableRow
 } from "../../../../database/connector/powersync/AppSchema.ts";
 import { ModelDao } from "./ModelDao.ts";
 import { MakeDao } from "./MakeDao.ts";
 import { CarMapper } from "../mapper/carMapper.ts";
-import { OdometerDao } from "./OdometerDao.ts";
-import { FuelTankDao } from "./FuelTankDao.ts";
+import { FuelTankDao } from "../../_features/fuel/model/dao/FuelTankDao.ts";
 import { Car } from "../../schemas/carSchema.ts";
-import { ODOMETER_TABLE } from "../../../../database/connector/powersync/tables/odometer.ts";
 import { FUEL_TANK_TABLE } from "../../../../database/connector/powersync/tables/fuelTank.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 import { SupabaseStorageAdapter } from "../../../../database/connector/storage/SupabaseStorageAdapter.ts";
 import { CAR_TABLE } from "../../../../database/connector/powersync/tables/car.ts";
+import { ODOMETER_LOG_TABLE } from "../../../../database/connector/powersync/tables/odometerLog.ts";
+import { Dao } from "../../../../database/dao/Dao.ts";
+import { OdometerLogDao } from "../../_features/odometer/model/dao/OdometerLogDao.ts";
+import { OdometerUnitDao } from "../../_features/odometer/model/dao/OdometerUnitDao.ts";
+import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
+import { ODOMETER_CHANGE_LOG_TABLE } from "../../../../database/connector/powersync/tables/odometerChangeLog.ts";
 
-export class CarDao {
-    private readonly db: Kysely<DatabaseType>;
+export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
     private readonly storage: SupabaseStorageAdapter;
     private readonly attachmentQueue?: PhotoAttachmentQueue;
-    readonly mapper: CarMapper;
 
-    constructor(db: Kysely<DatabaseType>, storage: SupabaseStorageAdapter, attachmentQueue?: PhotoAttachmentQueue) {
-        this.db = db;
+    constructor(
+        db: Kysely<DatabaseType>,
+        storage: SupabaseStorageAdapter,
+        attachmentQueue?: PhotoAttachmentQueue,
+        makeDao: MakeDao,
+        modelDao: ModelDao,
+        odometerLogDao: OdometerLogDao,
+        odometerUnitDao: OdometerUnitDao,
+        fuelTankDao: FuelTankDao,
+        currencyDao: CurrencyDao
+    ) {
+        super(
+            db,
+            CAR_TABLE,
+            new CarMapper(makeDao, modelDao, odometerLogDao, odometerUnitDao, fuelTankDao, currencyDao, attachmentQueue)
+        );
         this.storage = storage;
         this.attachmentQueue = attachmentQueue;
-
-        const makeDao = new MakeDao(this.db);
-        const modelDao = new ModelDao(this.db, makeDao);
-        const odometerDao = new OdometerDao(this.db);
-        const fuelTankDao = new FuelTankDao(this.db);
-
-        this.mapper = new CarMapper(makeDao, modelDao, odometerDao, fuelTankDao, attachmentQueue);
     }
 
-    async getCar(id: string) {
-        const carRow: CarTableRow = await this.db
-        .selectFrom(CAR_TABLE)
-        .selectAll()
-        .where("id", "=", id)
-        .executeTakeFirstOrThrow();
-
-        return this.mapper.toCarDto(carRow);
-    }
-
-    async getCars(): Promise<Array<Car>> {
+    async getAll(): Promise<Array<Car>> {
         const carRowArray: Array<CarTableRow> = await this.db
         .selectFrom(CAR_TABLE)
         .selectAll()
@@ -54,10 +54,25 @@ export class CarDao {
         .orderBy("name")
         .execute();
 
-        return this.mapper.toCarDtoArray(carRowArray);
+        return await this.mapper.toDtoArray(carRowArray);
     }
 
-    async createCar(car: CarTableRow, odometer: OdometerTableRow, fuelTank: FuelTankTableRow): Promise<Car> {
+    async getCarCurrencyIdById(id: string): Promise<number | null> {
+        const result = await this.db
+        .selectFrom(CAR_TABLE)
+        .select("currency_id")
+        .where("id", "=", id)
+        .executeTakeFirstOrThrow();
+
+        return result.currency_id;
+    }
+
+    async create(
+        car: CarTableRow,
+        odometerLog: OdometerLogTableRow,
+        odometerChangeLog: OdometerChangeLogTableRow | null,
+        fuelTank: FuelTankTableRow
+    ): Promise<Car> {
         const insertedCar = await this.db.transaction().execute(async trx => {
             const carRow = await trx
             .insertInto(CAR_TABLE)
@@ -66,22 +81,32 @@ export class CarDao {
             .executeTakeFirstOrThrow();
 
             await trx
-            .insertInto(ODOMETER_TABLE)
-            .values(odometer)
-            .execute();
+            .insertInto(ODOMETER_LOG_TABLE)
+            .values(odometerLog)
+            .returning("id")
+            .executeTakeFirstOrThrow();
+
+            if(odometerChangeLog) {
+                await trx
+                .insertInto(ODOMETER_CHANGE_LOG_TABLE)
+                .values(odometerChangeLog)
+                .returning("id")
+                .executeTakeFirstOrThrow();
+            }
 
             await trx
             .insertInto(FUEL_TANK_TABLE)
             .values(fuelTank)
-            .execute();
+            .returning("id")
+            .executeTakeFirstOrThrow();
 
             return carRow;
         });
 
-        return await this.mapper.toCarDto(insertedCar);
+        return await this.mapper.toDto(insertedCar);
     }
 
-    async editCar(car: CarTableRow, odometer: OdometerTableRow, fuelTank: FuelTankTableRow) {
+    async update(car: CarTableRow, fuelTank: FuelTankTableRow) {
         const updatedCar = await this.db.transaction().execute(async trx => {
             const carRow = await trx
             .updateTable(CAR_TABLE)
@@ -91,26 +116,22 @@ export class CarDao {
             .executeTakeFirstOrThrow();
 
             await trx
-            .updateTable(ODOMETER_TABLE)
-            .set(odometer)
-            .where("id", "=", odometer.id)
-            .execute();
-
-            await trx
             .updateTable(FUEL_TANK_TABLE)
             .set(fuelTank)
             .where("id", "=", fuelTank.id)
-            .execute();
+            .returning("id")
+            .executeTakeFirstOrThrow();
 
             return carRow;
         });
 
-        return await this.mapper.toCarDto(updatedCar);
+        return await this.mapper.toDto(updatedCar);
     }
 
-    async deleteCar(carId: string) {
+    async delete(carId: string) {
         try {
-            const car = await this.getCar(carId);
+            const car = await this.getById(carId);
+
             if(car?.image && this.attachmentQueue) {
                 const imageFilename = attachmentQueue.getLocalFilePathSuffix(car.image);
                 const localImageUri = attachmentQueue.getLocalUri(imageFilename);

@@ -7,13 +7,15 @@ import { render } from "@testing-library/react-native";
 import { ReactNode } from "react";
 import { Provider } from "react-redux";
 import { MockContextConfig, renderRouter } from "expo-router/testing-library";
+import { carLogReducer } from "../../features/carLog/model/slice/index.ts";
 
 const setupStore = (preloadedState?: Partial<RootState>) =>
     configureStore({
         reducer: {
             user: userReducer,
             cars: carsReducer,
-            alert: alertReducer
+            alert: alertReducer,
+            carLog: carLogReducer
         },
         preloadedState,
         middleware: getDefaultMiddleware =>

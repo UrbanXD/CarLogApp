@@ -1,13 +1,6 @@
 import React, { useCallback } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import {
-    COLORS,
-    DEFAULT_SEPARATOR,
-    FONT_SIZES,
-    GLOBAL_STYLE,
-    SECONDARY_COLOR,
-    SEPARATOR_SIZES
-} from "../constants/index.ts";
+import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, SECONDARY_COLOR, SEPARATOR_SIZES } from "../constants/index.ts";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button/Button";
@@ -173,7 +166,7 @@ const useStyles = (top: number, bottom: number) =>
         verificationContainer: {
             position: "absolute",
             top: top * 1.5,
-            right: GLOBAL_STYLE.contentContainer.paddingHorizontal
+            right: DEFAULT_SEPARATOR
         },
         verificationIcon: {
             borderColor: COLORS.gray4,

@@ -5,8 +5,8 @@ import MultiStepFormProgressInfo from "./MultiStepFormProgressInfo.tsx";
 import MultiStepFormContent from "./MultiStepFormContent.tsx";
 import MultiStepFormButtons from "./MultiStepFormButtons.tsx";
 import { StyleSheet, View } from "react-native";
-import { SEPARATOR_SIZES } from "../../constants/index.ts";
 import { ResultStep, Steps } from "../../types/index.ts";
+import { formTheme } from "../../ui/form/constants/theme.ts";
 
 
 interface MultiStepFormProps {
@@ -50,7 +50,7 @@ const MultiStepForm: React.FC<MultiStepFormProps> = ({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        gap: SEPARATOR_SIZES.lightSmall
+        gap: formTheme.gap
     }
 });
 

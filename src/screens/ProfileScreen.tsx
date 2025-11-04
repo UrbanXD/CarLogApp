@@ -19,14 +19,15 @@ import { Redirect, router } from "expo-router";
 import { useAppSelector } from "../hooks/index.ts";
 import { getUser } from "../features/user/model/selectors/index.ts";
 import { EDIT_USER_FORM_TYPE } from "../features/user/presets/bottomSheet/index.ts";
-import { ScreenScrollView } from "../components/ScreenScrollView.tsx";
+import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
 
 const ProfileScreen: React.FC = () => {
     const user = useAppSelector(getUser);
     const { hasPassword, signOut, deleteAccount } = useAuth();
     const { bottom } = useSafeAreaInsets();
 
-    if(!user) return Redirect({ href: "backToRootIndex" });
+    if(!user) return <Redirect href={ "backToRootIndex" }/>;
+
     const name = `${ user.lastname } ${ user.firstname }`;
     const avatarColor = user.avatarColor;
 
@@ -47,7 +48,7 @@ const ProfileScreen: React.FC = () => {
         <ScreenScrollView
             screenHasTabBar={ false }
             safeAreaEdges={ ["top", "left", "right"] }
-            style={ { paddingBottom: 0 } }
+            style={ { paddingBottom: 0, paddingHorizontal: 0 } }
         >
             <View style={ styles.container }>
                 <View style={ styles.informationContainer }>

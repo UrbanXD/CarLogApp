@@ -1,5 +1,4 @@
 import React from "react";
-import EditForm from "../../../../components/Form/EditForm.tsx";
 import { editUserAvatar } from "../../model/actions/editUserAvatar.ts";
 import { EditUserAvatarRequest, useEditUserAvatarFormProps } from "../../schemas/form/editUserAvatarRequest.ts";
 import { useForm } from "react-hook-form";
@@ -11,6 +10,8 @@ import { ChangeNameToast } from "../../presets/toast/index.ts";
 import { router } from "expo-router";
 import { getToastMessage } from "../../../../ui/alert/utils/getToastMessage.ts";
 import { AvatarStep } from "./steps/AvatarStep.tsx";
+import Form from "../../../../components/Form/Form.tsx";
+import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 
 type EditUserAvatarFormProps = { user: UserAccount }
 
@@ -19,14 +20,12 @@ export function EditUserAvatarForm({ user }: EditUserAvatarFormProps) {
     const database = useDatabase();
     const { openToast } = useAlert();
 
-    const {
-        control,
-        handleSubmit,
-        reset
-    } = useForm<EditUserAvatarRequest>(useEditUserAvatarFormProps({
+    const form = useForm<EditUserAvatarRequest>(useEditUserAvatarFormProps({
         avatar: user.avatar,
         avatarColor: user.avatarColor
     }));
+    const { handleSubmit, reset } = form;
+
     const submitHandler = handleSubmit(async (request: EditUserAvatarRequest) => {
         try {
             await dispatch(editUserAvatar({ database, request: { ...request } }));
@@ -39,10 +38,9 @@ export function EditUserAvatarForm({ user }: EditUserAvatarFormProps) {
     });
 
     return (
-        <EditForm
-            renderInputFields={ () => <AvatarStep control={ control }/> }
-            submitHandler={ submitHandler }
-            reset={ reset }
-        />
+        <Form>
+            <AvatarStep { ...form } />
+            <FormButtons reset={ reset } submit={ submitHandler }/>
+        </Form>
     );
 }

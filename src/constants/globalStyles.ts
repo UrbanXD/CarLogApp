@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS } from "./colors.ts";
-import { DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "./separatorSizes.ts";
+import { SEPARATOR_SIZES } from "./separatorSizes.ts";
 import { FONT_SIZES } from "./fontSizes.ts";
 
 export const GLOBAL_STYLE = StyleSheet.create({
@@ -22,13 +22,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
     },
     contentContainer: {
         gap: SEPARATOR_SIZES.small,
-        flexDirection: "column",
-        // marginTop: SEPARATOR_SIZES.mediumSmall,
-        paddingVertical: DEFAULT_SEPARATOR,
-        paddingHorizontal: DEFAULT_SEPARATOR,
-        marginHorizontal: DEFAULT_SEPARATOR,
-        backgroundColor: COLORS.black4,
-        borderRadius: 35
+        flexDirection: "column"
     },
     containerTitleText: {
         fontFamily: "Gilroy-Heavy",

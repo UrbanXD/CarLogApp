@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
-import { SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { formTheme } from "../../../ui/form/constants/theme.ts";
 
 interface InputGroupProps {
     children?: ReactNode;
@@ -18,7 +18,7 @@ const InputGroup: React.FC<InputGroupProps> = ({
 
 const styles = StyleSheet.create({
     container: {
-        gap: SEPARATOR_SIZES.small
+        gap: formTheme.gap
     }
 });
 

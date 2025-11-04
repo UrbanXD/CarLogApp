@@ -4,6 +4,7 @@ import { useAppDispatch } from "../../../hooks/index.ts";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 import { deleteCar } from "../model/actions/deleteCar.ts";
 import { router } from "expo-router";
+import { EDIT_CAR_FORM_STEPS } from "../constants/index.ts";
 
 const useCarProfile = (carId: string) => {
     const dispatch = useAppDispatch();
@@ -24,13 +25,13 @@ const useCarProfile = (carId: string) => {
         });
     };
 
-    const openEditCarStepBottomSheet = (stepIndex: number) => {
+    const openEditCarStep = (stepIndex: EDIT_CAR_FORM_STEPS) => {
         if(!car) return openToast({ type: "warning", title: "Autó nem található!" });
 
-        router.push({ pathname: "bottomSheet/editCar", params: { carId: car.id, stepIndex } });
+        router.push({ pathname: "car/edit/[id]", params: { id: car.id, stepIndex } });
     };
 
-    return { car, handleDeleteCar, openEditCarStepBottomSheet };
+    return { car, handleDeleteCar, openEditCarStep };
 };
 
 export default useCarProfile;

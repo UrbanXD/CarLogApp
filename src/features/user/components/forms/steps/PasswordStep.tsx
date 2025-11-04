@@ -12,7 +12,7 @@ export const PasswordStep: React.FC<StepProps> = ({ control }) =>
         >
             <Input.Text
                 icon={ ICON_NAMES.password }
-                placeholder="*****"
+                placeholder="Jelszó"
                 secure
             />
         </Input.Field>

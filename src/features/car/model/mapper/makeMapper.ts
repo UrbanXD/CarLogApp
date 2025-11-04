@@ -1,20 +1,31 @@
 import { MakeTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
 import { Make, makeSchema } from "../../schemas/makeSchema.ts";
+import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
+import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
 
-export class MakeMapper {
-    constructor() {}
+export class MakeMapper extends AbstractMapper<MakeTableRow, Make> {
+    constructor() {
+        super();
+    }
 
-    toMakeDto(makeRow: MakeTableRow): Make {
+    async toDto(entity: MakeTableRow): Promise<Make> {
         return makeSchema.parse({
-            id: makeRow.id,
-            name: makeRow.name
+            id: entity.id,
+            name: entity.name
         });
     }
 
-    toMakeEntity(make: Make): MakeTableRow {
+    async toEntity(dto: Make): Promise<MakeTableRow> {
         return {
-            id: make.id,
-            name: make.name
+            id: dto.id,
+            name: dto.name
+        };
+    }
+
+    toPickerItem(entity: MakeTableRow): PickerItemType {
+        return {
+            value: entity.id,
+            title: entity.name
         };
     }
 }

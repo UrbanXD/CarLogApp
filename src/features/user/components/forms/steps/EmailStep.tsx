@@ -14,5 +14,6 @@ export const EmailStep: React.FC<StepProps> = ({
         <Input.Text
             icon={ ICON_NAMES.email }
             placeholder="carlog@gmail.com"
+            keyboardType="email-address"
         />
     </Input.Field>;

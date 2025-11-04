@@ -14,7 +14,9 @@ export const ICON_NAMES = {
     leftArrowHead: "chevron-left",
     leftArrow: "arrow-left",
     downArrowHead: "chevron-down",
+    downArrow: "arrow-down",
     upArrowHead: "chevron-up",
+    upArrow: "arrow-up",
     info: "information-outline",
     destinationPointMarker: "map-marker",
     startingPointMarker: "map-marker-outline",
@@ -29,7 +31,8 @@ export const ICON_NAMES = {
     expenses: "account-cash",
     car: "car-outline",
     nametag: "tag-text-outline",
-    odometer: "gauge",
+    odometer: "speedometer", //gauge
+    odometerLow: "speedometer-slow",
     search: "magnify",
     addImage: "image-plus",
     image: "image-outline",
@@ -37,14 +40,22 @@ export const ICON_NAMES = {
     calendar: "calendar-range-outline",
     reset: "refresh",
     upload: "upload-outline",
-    fuelPump: "gas-station-outline",
+    fuelPump: "gas-station",
     fuelCan: "fuel",
     settings: "cog-outline",
     signOut: "logout",
     swap: "swap-horizontal",
     add: "plus",
     receipt: "receipt-text-outline",
-    road: "road-variant"
+    road: "road-variant",
+    carWash: "car-wash",
+    parking: "parking",
+    vehicleInspection: "car-search",
+    insurance: "shield-car",
+    registration: "clipboard-text-multiple",
+    note: "text",
+    money: "cash",
+    expenseItem: "invoice-text-multiple-outline"
 };
 
 export const ICON_COLORS = {

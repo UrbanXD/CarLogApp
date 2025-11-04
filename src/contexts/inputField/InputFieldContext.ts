@@ -1,7 +1,7 @@
 import { Context, createContext, useContext } from "react";
-import { ControllerRenderArgs } from "../../constants/index.ts";
+import { Control, UseControllerReturn } from "react-hook-form";
 
-type InputFieldContextValue = ControllerRenderArgs | null;
+type InputFieldContextValue = (UseControllerReturn & { control: Control<any> }) | null;
 
 export const InputFieldContext = createContext<InputFieldContextValue | null>(null);
 

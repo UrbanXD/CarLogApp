@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     ActivityIndicator,
     Platform,
@@ -9,7 +9,6 @@ import {
     View,
     ViewStyle
 } from "react-native";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
 import Icon from "../Icon";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
@@ -26,6 +25,8 @@ interface TextButtonProps {
     iconRight?: ImageSource;
     textStyle?: TextStyle;
     style?: ViewStyle;
+    iconLeftStyle?: ViewStyle;
+    iconRightStyle?: ViewStyle;
     inverse?: boolean;
     disabled?: boolean;
     loadingIndicator?: boolean;
@@ -34,21 +35,23 @@ interface TextButtonProps {
 
 const TextButton: React.FC<TextButtonProps> = ({
     text,
-    fontSize = FONT_SIZES.h3,
+    fontSize = FONT_SIZES.p1,
     backgroundColor = COLORS.fuelYellow,
     textColor = getContrastingColor(backgroundColor, COLORS.white, COLORS.black),
-    height = hp(6),
+    height = FONT_SIZES.h3 * ICON_FONT_SIZE_SCALE + SEPARATOR_SIZES.lightSmall / 2,
     width,
     iconLeft,
     iconRight,
     style,
     textStyle,
+    iconLeftStyle,
+    iconRightStyle,
     inverse = false,
     disabled = false,
     loadingIndicator = false,
     onPress
 }) => {
-    const [isLoading, setIsLoading] = React.useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const styles = useButtonStyles(
         !inverse ? backgroundColor : textColor,
@@ -59,10 +62,22 @@ const TextButton: React.FC<TextButtonProps> = ({
     );
 
     const handlePress = async () => {
-        setIsLoading(true);
-        await onPress();
-        setIsLoading(false);
+        let didWaitLongEnough = false;
+
+        // if wait time is 250ms then show loading indicator
+        const timer = setTimeout(() => {
+            didWaitLongEnough = true;
+            setIsLoading(true);
+        }, 250);
+
+        try {
+            await onPress();
+        } finally {
+            clearTimeout(timer);
+            if(didWaitLongEnough) setIsLoading(false);
+        }
     };
+
 
     return (
         <TouchableOpacity
@@ -72,21 +87,23 @@ const TextButton: React.FC<TextButtonProps> = ({
         >
             {
                 loadingIndicator && isLoading &&
-               <ActivityIndicator
-                  size={
-                      Platform.OS === "ios"
-                      ? "large"
-                      : styles.buttonContainer.height - SEPARATOR_SIZES.lightSmall
-                  }
-                  color={ !inverse ? textColor : backgroundColor }
-               />
+               <View style={ styles.activityIndicatorContainer }>
+                  <ActivityIndicator
+                     size={
+                         Platform.OS === "ios"
+                         ? "large"
+                         : styles.buttonContainer.minHeight - SEPARATOR_SIZES.lightSmall
+                     }
+                     color={ !inverse ? textColor : backgroundColor }
+                  />
+               </View>
             }
             {
                 text && ((loadingIndicator && !isLoading) || !loadingIndicator) &&
                <>
                    {
                        (iconLeft || iconRight) &&
-                      <View style={ styles.sideSpacerContainer }>
+                      <View style={ [styles.sideSpacerContainer, iconLeftStyle] }>
                           {
                               iconLeft &&
                              <Icon
@@ -102,7 +119,7 @@ const TextButton: React.FC<TextButtonProps> = ({
                   </Text>
                    {
                        (iconLeft || iconRight) &&
-                      <View style={ styles.sideSpacerContainer }>
+                      <View style={ [styles.sideSpacerContainer, iconRightStyle] }>
                           {
                               iconRight &&
                              <Icon
@@ -130,15 +147,21 @@ export const useButtonStyles = (
         buttonContainer: {
             flexDirection: "row",
             alignSelf: "center",
-            justifyContent: "center",
+            justifyContent: "space-between",
             alignItems: "center",
+            gap: SEPARATOR_SIZES.lightSmall,
             paddingHorizontal: SEPARATOR_SIZES.small,
             width: width ?? "100%",
-            height: height,
+            minHeight: height,
             backgroundColor: primaryColor,
             color: secondaryColor,
             borderRadius: 30,
             overflow: "hidden"
+        },
+        activityIndicatorContainer: {
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center"
         },
         buttonText: {
             flex: 1,
@@ -153,7 +176,6 @@ export const useButtonStyles = (
         },
         sideSpacerContainer: {
             flex: 0.15,
-            height: "100%",
             justifyContent: "center",
             alignItems: "center"
         }

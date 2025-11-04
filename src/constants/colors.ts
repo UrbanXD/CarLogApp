@@ -8,10 +8,10 @@ export const COLORS = {
     gray2: "#8a8a8a",
     gray3: "#6c6c6c",
     gray4: "#44474b",
-    gray5: "#343434",
+    gray5: "#383838",
     black: "#191919",
     black2: "#242424",
-    black3: "#24252b",
+    black3: "#292929",
     black4: "#303030",
     black5: "#2f2f2f",
     greenLight: "#4CBB17",
@@ -19,7 +19,15 @@ export const COLORS = {
     blueLight: "#82c8e5",
     redLight: "#f9504f",
     redDark: "#B71C1C",
-    fuelYellow: "#FFDF00"
+
+    fuelYellow: "#FFDF00",
+    service: "#8CCEE8",
+    vehicleInspection: "#2BC92F",
+    wash: "#00BFFF",
+    toll: "#FF8C00",
+    parking: "#E0E0E0",
+    insurance: "#C53535",
+    registration: "#4169E1"
 };
 
 export const PRIMARY_COLOR = COLORS.white;

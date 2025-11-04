@@ -1,21 +1,22 @@
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useForm } from "react-hook-form";
-import EditForm from "../../../../components/Form/EditForm.tsx";
 import { PasswordStep } from "./steps/index.ts";
 import { getToastMessage } from "../../../../ui/alert/utils/getToastMessage.ts";
 import { AddPasswordToast } from "../../presets/toast/index.ts";
 import { NewPasswordRequest, useNewPasswordFormProps } from "../../schemas/form/newPasswordRequest.ts";
 import { useAuth } from "../../../../contexts/auth/AuthContext.ts";
+import Form from "../../../../components/Form/Form.tsx";
+import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
+import React from "react";
+import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 
 export function LinkPasswordToOAuthForm() {
+    const { supabaseConnector } = useDatabase();
     const { openToast } = useAlert();
     const { hasPassword, refreshSession } = useAuth();
 
-    const {
-        control,
-        handleSubmit,
-        reset
-    } = useForm<NewPasswordRequest>(useNewPasswordFormProps());
+    const form = useForm<NewPasswordRequest>(useNewPasswordFormProps());
+    const { reset, handleSubmit } = form;
 
     const submitHandler = handleSubmit(async (request: NewPasswordRequest) => {
         try {
@@ -28,15 +29,15 @@ export function LinkPasswordToOAuthForm() {
             openToast(AddPasswordToast.success());
             await refreshSession();
         } catch(error) {
+            console.log("Link Password error: ", error);
             openToast(getToastMessage({ messages: AddPasswordToast, error }));
         }
     });
 
     return (
-        <EditForm
-            renderInputFields={ () => <PasswordStep control={ control }/> }
-            submitHandler={ submitHandler }
-            reset={ reset }
-        />
+        <Form>
+            <PasswordStep { ...form } />
+            <FormButtons reset={ reset } submit={ submitHandler }/>
+        </Form>
     );
 }

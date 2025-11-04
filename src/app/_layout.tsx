@@ -18,6 +18,7 @@ import ModalManager from "../ui/alert/components/modal/ModalManager.tsx";
 import * as SystemUI from "expo-system-ui";
 import { SystemBars } from "react-native-edge-to-edge";
 import { SECONDARY_COLOR } from "../constants/index.ts";
+import { PortalHost, PortalProvider } from "@gorhom/portal";
 
 
 const Layout: React.FC = () => {
@@ -49,15 +50,6 @@ const Layout: React.FC = () => {
             />
             <Stack.Screen
                 name="bottomSheet/createCar"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="bottomSheet/editCar"
                 options={ {
                     header: () => <></>,
                     animation: "slide_from_bottom",
@@ -117,7 +109,118 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="(edit)/car"
                 options={ {
-                    header: () => <Header.Secondary title="Autó Adatlap"/>
+                    header: () => <Header.Secondary title="Autó adatlap"/>
+                } }
+            />
+            <Stack.Screen
+                name="car/edit/[id]"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="odometer/log"
+                options={ {
+                    header: () => <Header.Secondary title="Kilométeróra-állás napló"/>
+                } }
+            />
+            <Stack.Screen
+                name="odometer/log/[id]"
+                options={ {
+                    header: () => <Header.Secondary title="Napló bejegyzés"/>
+                } }
+            />
+            <Stack.Screen
+                name="odometer/log/create"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="odometer/log/edit/[id]"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="expense/[id]"
+                options={ {
+                    header: () => <Header.Secondary title="Kiadás"/>
+                } }
+            />
+            <Stack.Screen
+                name="expense/fuel/[id]"
+                options={ ({ route }) => ({
+                    header: () => <Header.Secondary title={ route.params?.title ?? "Napló bejegyzés" }/>
+                }) }
+            />
+            <Stack.Screen
+                name="expense/service/[id]"
+                options={ ({ route }) => ({
+                    header: () => <Header.Secondary title={ route.params?.title ?? "Napló bejegyzés" }/>
+                }) }
+            />
+            <Stack.Screen
+                name="expense/create/index"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="expense/create/fuel"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="expense/create/service"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="expense/edit/[id]"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="expense/edit/fuel/[id]"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="expense/edit/service/[id]"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
                 } }
             />
         </Stack>
@@ -132,11 +235,13 @@ const RootLayout: React.FC = () =>
             { Component: KeyboardProvider },
             { Component: ScreenScrollViewProvider },
             { Component: GestureHandlerRootView, props: { style: { flex: 1 } } },
+            { Component: PortalProvider },
             { Component: AuthProvider },
             { Component: ToastManager },
             { Component: ModalManager },
             { Component: BottomSheetModalProvider }
         ] }>
+            <PortalHost name="popup"/>
             <Layout/>
         </Compactor>
     </DatabaseProvider>;

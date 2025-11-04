@@ -4,7 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../constants/index.ts";
 import { Href, router } from "expo-router";
 import CarlogTitle from "../components/CarlogTitle.tsx";
-import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
 type AnimatedSplashScreenProps = {
     loaded: boolean,
@@ -31,9 +32,9 @@ const AnimatedSplashScreen: React.FC<AnimatedSplashScreenProps> = ({ loaded, red
     const onAnimationFinished = () => {
         "worklet";
         if(redirectTo === "/auth") {
-            redirectToAuthAnimation(() => runOnJS(router.replace)(redirectTo));
+            redirectToAuthAnimation(() => scheduleOnRN(router.replace, redirectTo));
         } else {
-            runOnJS(router.replace)(redirectTo);
+            scheduleOnRN(router.replace, redirectTo);
         }
     };
 

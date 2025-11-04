@@ -28,6 +28,7 @@ const SignInForm: React.FC = () => {
                 <Input.Text
                     icon={ ICON_NAMES.email }
                     placeholder="Email"
+                    keyboardType="email-address"
                 />
             </Input.Field>
             <Input.Field

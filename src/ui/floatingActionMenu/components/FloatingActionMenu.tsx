@@ -1,47 +1,35 @@
 import React, { useCallback } from "react";
-import Animated, { useAnimatedReaction, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { StyleSheet, View } from "react-native";
-import {
-    COLORS,
-    DEFAULT_SEPARATOR,
-    FONT_SIZES,
-    SEPARATOR_SIZES,
-    SIMPLE_TABBAR_HEIGHT
-} from "../../../constants/index.ts";
+import Animated, {
+    FadeIn,
+    FadeOut,
+    useAnimatedReaction,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming
+} from "react-native-reanimated";
+import { StyleSheet, View, ViewStyle } from "react-native";
+import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { heightPercentageToDP } from "react-native-responsive-screen";
-import { useScreenScrollView } from "../../../contexts/screenScrollView/ScreenScrollViewContext.ts";
 import { FloatingActionButton } from "./FloatingActionButton.tsx";
 import { AnimatedPressable, AnimatedSafeAreaView } from "../../../components/AnimatedComponents/index.ts";
-import { Action, ACTIONS } from "../constants/index.ts";
+import { Action } from "../constants/index.ts";
+import { Overlay } from "../../../components/overlay/Overlay.tsx";
 
-function FloatingActionMenu() {
-    const { isScrolling } = useScreenScrollView();
+type FloatingActionMenu = {
+    action: (() => void) | Array<Action>
+    containerStyle?: ViewStyle
+}
+
+function FloatingActionMenu({ action, containerStyle }: FloatingActionMenu) {
     const isExpanded = useSharedValue(false);
-    const isAnimating = useSharedValue(false);
-    const overlayDisplay = useSharedValue<"flex" | "none">("none");
     const titleDisplay = useSharedValue<"flex" | "none">("none");
 
     useAnimatedReaction(
-        () => isScrolling.value,
-        (scrolling) => {
-            if(scrolling) isExpanded.value = false;
+        () => isExpanded.value,
+        (expanded) => {
+            if(expanded) titleDisplay.value = "flex";
         }
     );
-
-    const overlayStyle = useAnimatedStyle(() => {
-        const opacity = withTiming(
-            isExpanded.value ? 0.525 : 0,
-            { duration: 400 },
-            (finished) => {
-                if(finished) {
-                    isAnimating.value = false;
-                    overlayDisplay.value = isExpanded.value ? "flex" : "none";
-                }
-            }
-        );
-
-        return { opacity, display: overlayDisplay.value };
-    });
 
     const actionButtonIconStyle = useAnimatedStyle(() => {
         const rotateValue = withTiming(isExpanded.value ? "45deg" : "0deg");
@@ -51,19 +39,10 @@ function FloatingActionMenu() {
     });
 
     const toggle = () => {
-        if(isAnimating.value) return;
-        isAnimating.value = true;
-
-        const expanded = !isExpanded.value;
-        isExpanded.value = expanded;
-
-        if(expanded) overlayDisplay.value = "flex";
-        if(expanded) titleDisplay.value = "flex";
+        isExpanded.value = !isExpanded.value;
     };
 
     const close = () => {
-        if(isAnimating.value) return;
-
         isExpanded.value = false;
     };
 
@@ -87,19 +66,16 @@ function FloatingActionMenu() {
 
     return (
         <>
-            <AnimatedPressable
-                onPress={ close }
-                style={ [styles.overlay, overlayStyle] }
-            />
-            <AnimatedSafeAreaView style={ styles.container }>
+            <Overlay opened={ isExpanded } onPress={ close }/>
+            <AnimatedSafeAreaView entering={ FadeIn } exiting={ FadeOut } style={ [styles.container, containerStyle] }>
                 <View style={ styles.buttonsContainer }>
                     <AnimatedPressable
-                        onPress={ toggle }
+                        onPress={ Array.isArray(action) ? toggle : action }
                         style={ [styles.actionButton] }
                     >
                         <Animated.Text style={ [styles.actionButton.icon, actionButtonIconStyle] }>+</Animated.Text>
                     </AnimatedPressable>
-                    { ACTIONS.map(renderAction) }
+                    { Array.isArray(action) && action.map(renderAction) }
                 </View>
             </AnimatedSafeAreaView>
         </>
@@ -109,14 +85,9 @@ function FloatingActionMenu() {
 export default FloatingActionMenu;
 
 const styles = StyleSheet.create({
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        zIndex: 2,
-        backgroundColor: COLORS.black
-    },
     container: {
         position: "absolute",
-        bottom: SIMPLE_TABBAR_HEIGHT + SEPARATOR_SIZES.normal,
+        bottom: SEPARATOR_SIZES.normal,
         right: DEFAULT_SEPARATOR,
         justifyContent: "flex-end",
         alignItems: "flex-end",

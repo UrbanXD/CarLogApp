@@ -6,20 +6,26 @@ import { ICON_NAMES } from "../../../../../constants/index.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { MakeTableRow, ModelTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
 import { CarFormFields } from "../../../schemas/form/carForm.ts";
+import { YearPicker } from "../../../../../components/Input/_presets/YearPicker.tsx";
 
-type CarModelStepProps<FormFields> = Pick<StepProps<FormFields>, "control" | "resetField" | "setValue">;
+type CarModelStepProps<FormFields> = Pick<StepProps<FormFields>, "control" | "formState" | "setValue">;
 
-function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValue }: CarModelStepProps<FormFields>) {
+function CarModelStep<FormFields = CarFormFields>({ control, formState, setValue }: CarModelStepProps<FormFields>) {
     const { makeDao, modelDao } = useDatabase();
 
     const selectedMakeId = useWatch({ control, name: "model.makeId" });
     const selectedModelId = useWatch({ control, name: "model.id" });
+    const selectedYear = useWatch({ control, name: "model.year" });
     const [modelYears, setModelYears] = useState<Array<string>>([]);
+
+    const [defaultLoadMakeId, setDefaultLoadMakeId] = useState(true);
+    const [defaultLoadModelId, setDefaultLoadModelId] = useState(true);
 
     const makePaginator = useMemo(() => makeDao.paginator(50), []);
     const modelPaginator = useMemo(() => modelDao.paginatorByMakeId(selectedMakeId, 25), [selectedMakeId]);
 
     useEffect(() => {
+        if(defaultLoadModelId) setDefaultLoadModelId(false);
         if(!selectedModelId) return;
 
         const fetchYears = async () => setModelYears(await modelDao.getModelYearsById(selectedModelId, true));
@@ -27,21 +33,25 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
     }, [selectedModelId]);
 
     useEffect(() => {
-        resetField("model.id", { keepError: true, keepDirty: true });
+        if(defaultLoadMakeId) return setDefaultLoadMakeId(false);
+        if(formState.defaultValues?.["model"]?.["makeId"] === selectedMakeId && formState.defaultValues?.["model"]?.["id"] === selectedModelId) return;
+
+        setValue("model.id", "", { keepError: true, keepDirty: true });
     }, [selectedMakeId]);
 
     useEffect(() => {
-        resetField("model.year", { keepError: true, keepDirty: true });
-
         const setHiddenInputsValue = async () => {
-            const model = await modelDao.getModelById(selectedModelId);
-            const make = await makeDao.getMakeById(model.makeId);
+            const model = await modelDao.getById(selectedModelId);
+            const make = await makeDao.getById(model.makeId);
 
             setValue("model.name", model.name);
             setValue("model.makeName", make.name);
         };
 
         if(selectedModelId) setHiddenInputsValue();
+        if(defaultLoadModelId) return setDefaultLoadModelId(false);
+        if(formState.defaultValues?.["model"]?.["id"] === selectedModelId && formState.defaultValues?.["model"]?.["year"] === selectedYear) return;
+        setValue("model.year", "", { keepError: true, keepDirty: true });
     }, [selectedModelId]);
 
     return (
@@ -52,12 +62,10 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
                 fieldNameText="Márka"
             >
                 <Input.Picker.Dropdown<MakeTableRow>
+                    title={ "Márka" }
                     paginator={ makePaginator }
+                    searchBy="name"
                     icon={ ICON_NAMES.car }
-                    dataTransformSelectors={ {
-                        title: "name",
-                        value: "id"
-                    } }
                 />
             </Input.Field>
             <Input.Field
@@ -66,12 +74,10 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
                 fieldNameText="Modell"
             >
                 <Input.Picker.Dropdown<ModelTableRow>
+                    title={ "Modell" }
                     paginator={ modelPaginator }
+                    searchBy="name"
                     icon={ ICON_NAMES.car }
-                    dataTransformSelectors={ {
-                        title: "name",
-                        value: "id"
-                    } }
                     disabled={ !selectedMakeId }
                     disabledText="Először válassza ki az autó márkáját!"
                 />
@@ -81,13 +87,10 @@ function CarModelStep<FormFields = CarFormFields>({ control, resetField, setValu
                 fieldName="model.year"
                 fieldNameText="Évjárat"
             >
-                <Input.Picker.Dropdown<string>
-                    data={ modelYears }
-                    dataTransformSelectors={ {} }
-                    searchBarEnable={ false }
-                    masonry
-                    numColumns={ 3 }
+                <YearPicker
+                    title={ "Évjárat" }
                     icon={ ICON_NAMES.calendar }
+                    data={ modelYears }
                     disabled={ !selectedModelId }
                     disabledText="Először válassza ki az autó modelljét!"
                 />

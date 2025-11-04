@@ -1,4 +1,4 @@
-import React, { ProviderProps, useEffect, useMemo, useRef, useState } from "react";
+import React, { ProviderProps, useEffect, useMemo, useState } from "react";
 import { AuthContext } from "./AuthContext.ts";
 import { useAppDispatch } from "../../hooks/index.ts";
 import { useDatabase } from "../database/DatabaseContext.ts";
@@ -14,6 +14,8 @@ import { SignInRequest } from "../../features/user/schemas/form/signInRequest.ts
 import { SignUpRequest } from "../../features/user/schemas/form/signUpRequest.ts";
 import { OtpVerificationHandlerType } from "../../app/bottomSheet/otpVerification.tsx";
 import { loadCars } from "../../features/car/model/actions/loadCars.ts";
+import { resetCars } from "../../features/car/model/slice/index.ts";
+import { resetUser } from "../../features/user/model/slice/index.ts";
 
 export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     children
@@ -25,9 +27,6 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
 
     const [session, setSession] = useState<Session | null>(null);
     const [authenticated, setAuthenticated] = useState<boolean | null>(null);
-
-    const initialSync = useRef(true);
-
     const [notVerifiedUser, setNotVerifiedUser] = useState<User | null>(null);
 
     useEffect(() => {
@@ -36,34 +35,39 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             setSession(data.session);
         });
 
-        supabaseConnector.client.auth.onAuthStateChange(
+        const { data: authListener } = supabaseConnector.client.auth.onAuthStateChange(
             (_event, supabaseSession) => {
-                setAuthenticated(!!supabaseSession);
-                setSession(supabaseSession);
-
-                if(supabaseSession) {
-                    dispatch(loadUser({ database, userId: supabaseSession.user.id }));
-                    dispatch(loadCars(database));
+                if(!supabaseSession) {
+                    if(router.canDismiss()) router.dismissAll();
+                    router.replace("/backToRootIndex");
                 }
 
-                if(supabaseSession?.user.id === notVerifiedUser?.id) setNotVerifiedUser(null);
+                setAuthenticated(!!supabaseSession);
+                setSession(supabaseSession);
             }
         );
 
-        fetchNotVerifiedUser();
+        return () => authListener.subscription.unsubscribe();
     }, []);
 
     useEffect(() => {
-        dispatch(loadUser({ database, userId: session?.user.id ?? null }));
-        dispatch(loadCars(database));
+        database.init();
 
-        if(!session) return;
+        if(!session) {
+            dispatch(resetUser());
+            dispatch(resetCars());
+        }
+
+        if(session?.user.id === notVerifiedUser?.id) setNotVerifiedUser(null);
+
+        if(powersync.currentStatus.connected && powersync.currentStatus.hasSynced && session) {
+            dispatch(loadUser({ database, userId: session.user.id }));
+            dispatch(loadCars(database));
+        }
 
         return powersync.registerListener({
-            statusChanged: status => {
-                if(status.hasSynced && initialSync.current) {
-                    initialSync.current = false;
-
+            statusChanged: (status) => {
+                if(status.connected && status.hasSynced && !status.dataFlowStatus.downloading && session) {
                     dispatch(loadUser({ database, userId: session.user.id }));
                     dispatch(loadCars(database));
                 }
@@ -98,7 +102,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 email: request.email,
                 password: request.password,
                 options: {
-                    data: { firstname: request.firstname, lastname: request.lastname, avatarColor }
+                    data: { firstname: request.firstname, lastname: request.lastname, avatar_color: avatarColor }
                 }
             });
 
@@ -113,8 +117,8 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 email: supabaseUser.email,
                 firstname: supabaseUser.user_metadata.firstname,
                 lastname: supabaseUser.user_metadata.lastname,
-                avatar: null,
-                avatarColor: supabaseUser.user_metadata.avatarColor
+                avatar_url: null,
+                avatar_color: supabaseUser.user_metadata.avatar_color
             });
         } catch(error) {
             console.error("Signup error: ", error);
@@ -130,7 +134,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         });
 
         if(!error) {
-            router.dismissTo("auth");
+            router.dismissTo("/backToRootIndex");
             openToast(SignInToast.success());
             return;
         }
@@ -147,9 +151,6 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             const { error } = await supabaseConnector.client.auth.signOut();
 
             if(error) throw error;
-
-            router.dismissAll();
-            router.push("/backToRootIndex");
 
             if(!disabledToast) openToast(SignOutToast.success());
             await database.disconnect();

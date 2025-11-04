@@ -23,12 +23,13 @@ const useCreateCarForm = () => {
         handleSubmit,
         trigger,
         reset,
+        formState,
         resetField,
         setValue,
         getValues
     } = useForm<CarFormFields>(useCreatCarFormProps(user.id));
 
-    const steps = useCarSteps<CarFormFields>({ control, resetField, setValue, getValues });
+    const steps = useCarSteps<CarFormFields>({ control, formState, setValue, getValues });
 
     const submitHandler =
         handleSubmit(async (formResult: CarFormFields) => {
@@ -39,9 +40,12 @@ const useCreateCarForm = () => {
                 if(dismissBottomSheet) dismissBottomSheet(true);
                 openToast(CarCreateToast.success());
             } catch(e) {
-                console.log(e);
+                console.log("car create error: ", e);
                 openToast(CarCreateToast.error());
             }
+        }, (e) => {
+            openToast(CarCreateToast.error());
+            console.log("car create form validation error: ", e);
         });
 
     return { control, submitHandler, trigger, resetField, steps };

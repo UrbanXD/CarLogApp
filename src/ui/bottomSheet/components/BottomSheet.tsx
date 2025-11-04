@@ -1,11 +1,18 @@
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Keyboard, StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import {
+    BottomSheetRoutes,
+    COLORS,
+    DEFAULT_SEPARATOR,
+    FONT_SIZES,
+    GLOBAL_STYLE,
+    SEPARATOR_SIZES
+} from "../../../constants/index.ts";
 import { BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
 import BottomSheetBackdrop from "./BottomSheetBackdrop.tsx";
-import { router, useNavigation } from "expo-router";
+import { router, useFocusEffect, useNavigation } from "expo-router";
 import { KeyboardController } from "react-native-keyboard-controller";
 import { BottomSheetLeavingModal } from "../presets/modal/index.ts";
 import { useAlert } from "../../alert/hooks/useAlert.ts";
@@ -21,7 +28,7 @@ export interface BottomSheetProps extends Partial<BottomSheetModalProps> {
 const BottomSheet: React.FC<BottomSheetProps> = ({
     title, content, closeButton, ...restProps
 }) => {
-    const { top, bottom } = useSafeAreaInsets();
+    const { top } = useSafeAreaInsets();
     const { openModal } = useAlert();
     const navigation = useNavigation();
 
@@ -31,25 +38,37 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
 
     const { snapPoints, enableHandlePanningGesture, enableDynamicSizing, enableDismissOnClose } = restProps;
 
-    const isBottomSheet = (pathname?: string) => !!pathname?.startsWith("bottomSheet");
+    const isBottomSheet = (pathname?: string) => !!pathname?.startsWith("bottomSheet") || BottomSheetRoutes.includes(
+        pathname);
 
-    useEffect(() => {
-        if(navigation.isFocused()) return bottomSheetRef.current?.present();
+    useFocusEffect(
+        useCallback(() => {
+            bottomSheetRef.current?.present(); // when route focused
 
-        const stackOfRoutes = navigation.getState()?.routes;
-        const newStackPathname = stackOfRoutes?.[stackOfRoutes?.length - 1]?.name;
+            return () => {
+                // when route not focused
+                const stackOfRoutes = navigation.getState()?.routes;
+                const newStackPathname = stackOfRoutes?.[stackOfRoutes?.length - 1]?.name;
 
-        if(isBottomSheet(newStackPathname)) {
-            manuallyClosed.current = true;
-            bottomSheetRef.current?.forceClose();
-        }
-
-    }, [navigation.isFocused()]);
+                if(isBottomSheet(newStackPathname)) {
+                    manuallyClosed.current = true;
+                    bottomSheetRef.current?.forceClose();
+                }
+            };
+        }, [])
+    );
 
     useEffect(() => {
         return navigation.addListener("beforeRemove", (_event) => {
             forceClosed.current = true;
             KeyboardController.dismiss();
+            bottomSheetRef.current?.dismiss();
+        });
+    }, []);
+
+    useEffect(() => {
+        Keyboard.addListener("keyboardDidHide", () => {
+            bottomSheetRef.current?.snapToIndex(0);
         });
     }, []);
 
@@ -69,13 +88,21 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         while(stackOfRoutes.length > 0) {
             const route = stackOfRoutes.pop();
             if(!route) continue;
-            if(!route.name.startsWith("bottomSheet/") && router.canDismiss()) router.dismissTo(route.name);
+            if(!route.name.startsWith("bottomSheet/") && !BottomSheetRoutes.includes(route.name)) {
+                router.dismissTo({ pathname: route.name, params: route.params });
+                return;
+            }
         }
+
+        router.dismissTo("backToRootIndex");
     }, [navigation]);
 
     const onChangeSnapPoint = useCallback((index: number) => {
-        if(index !== -1) return; // nincs bezarva
+        if(index !== -1) return; // not closed
 
+        KeyboardController.dismiss();
+
+        if(!bottomSheetRef.current) return; // return if already removed from route stack
         if(manuallyClosed.current) return manuallyClosed.current = false;
         if(forceClosed.current) return;
         if(enableDismissOnClose) return dismissBottomSheet();
@@ -92,7 +119,6 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
             ref={ bottomSheetRef }
             { ...restProps }
             topInset={ top }
-            bottomInset={ bottom }
             keyboardBehavior="interactive"
             keyboardBlurBehavior="restore"
             android_keyboardInputMode="adjustPan"

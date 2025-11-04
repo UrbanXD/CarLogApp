@@ -1,21 +1,33 @@
-import React, { RefObject, useEffect, useState } from "react";
-import { StyleSheet, TextInput as TextInputRN, TextStyle, View, ViewStyle } from "react-native";
+import React, { RefObject, useCallback, useState } from "react";
+import {
+    KeyboardType,
+    NativeSyntheticEvent,
+    StyleSheet,
+    TextInput as TextInputRN,
+    TextInputContentSizeChangeEventData,
+    TextInputFocusEventData,
+    TextStyle,
+    View,
+    ViewStyle
+} from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { COLORS, ICON_COLORS, ICON_NAMES } from "../../../constants/index.ts";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import Icon from "../../Icon.tsx";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
+import { formTheme } from "../../../ui/form/constants/theme.ts";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 export type TextInputProps = {
     inputRef?: RefObject<TextInputRN | null>
     type?: "primary" | "secondary"
+    keyboardType?: KeyboardType
     value?: string
     setValue?: (text: string) => void
     icon?: string
     actionIcon?: string
     onAction?: () => void
     placeholder?: string
-    numeric?: boolean
     secure?: boolean
     editable?: boolean
     multiline?: boolean
@@ -27,6 +39,7 @@ export type TextInputProps = {
 
 const TextInput: React.FC<TextInputProps> = ({
     inputRef,
+    keyboardType = "default",
     type = "primary",
     value,
     setValue,
@@ -34,7 +47,6 @@ const TextInput: React.FC<TextInputProps> = ({
     actionIcon,
     onAction,
     placeholder,
-    numeric,
     secure: isSecure = false,
     editable,
     multiline,
@@ -44,33 +56,81 @@ const TextInput: React.FC<TextInputProps> = ({
     textInputStyle
 }) => {
     const bottomSheetInternal = useBottomSheetInternal(true);
-    const shouldHandleKeyboardEvents = bottomSheetInternal?.shouldHandleKeyboardEvents;
 
     const inputFieldContext = allowInputFieldContext ? useInputFieldContext() : null;
     const fieldValue = value || inputFieldContext?.field?.value || "";
     const onChange = inputFieldContext?.field?.onChange;
     const error = inputFieldContext?.fieldState?.error;
 
+    const height = useSharedValue(formTheme.containerHeight);
+
     const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(isSecure);
 
     const changeSecure = () => setSecure(prevState => !prevState);
-    const onFocus = () => setFocused(true);
-    const onBlur = () => setFocused(false);
+    const onFocus = useCallback((args: NativeSyntheticEvent<TextInputFocusEventData>) => {
+        setFocused(true);
+
+        if(!bottomSheetInternal) return; // return if not in a bottom sheet
+        const { animatedKeyboardState } = bottomSheetInternal;
+        const keyboardState = animatedKeyboardState.get();
+
+        animatedKeyboardState.set({
+            ...keyboardState,
+            target: args.nativeEvent.target
+        });
+    }, [bottomSheetInternal?.animatedKeyboardState]);
+    const onBlur = useCallback((args: NativeSyntheticEvent<TextInputFocusEventData>) => {
+        setFocused(false);
+
+        if(!bottomSheetInternal) return; // return if not in a bottom sheet
+        const { animatedKeyboardState } = bottomSheetInternal;
+        const keyboardState = animatedKeyboardState.get();
+
+        if(keyboardState.target === args.nativeEvent.target) {
+            animatedKeyboardState.set({
+                ...keyboardState,
+                target: undefined
+            });
+        }
+    }, [bottomSheetInternal?.animatedKeyboardState]);
 
     const updateFieldValue = (value: string) => {
         if(onChange) onChange(value);
         if(setValue) setValue(value);
     };
 
-    useEffect(() => {
-        if(shouldHandleKeyboardEvents) shouldHandleKeyboardEvents.value = focused;
-    }, [focused, shouldHandleKeyboardEvents]);
+    const numberOfLines = multiline ? 5 : 1;
+    const maxHeight = numberOfLines * formTheme.containerHeight;
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        height: withTiming(height.value, { duration: 250 }),
+        alignItems: height.value > formTheme.containerHeight ? "flex-start" : "center"
+    }));
+
+    const animatedIconStyle = useAnimatedStyle(() => ({
+        paddingTop: withTiming(
+            height.value > formTheme.containerHeight ? SEPARATOR_SIZES.lightSmall : 0,
+            { duration: 250 }
+        )
+    }));
+
+    const actionIconStyle = useAnimatedStyle(() => ({
+        opacity: withTiming(
+            fieldValue.length > 0 ? 1 : 0,
+            { duration: 200 }
+        )
+    }));
+
+    const onContentSizeChange = (event: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
+        height.value = Math.min(event.nativeEvent.contentSize.height, maxHeight);
+    };
 
     return (
-        <View
+        <Animated.View
             style={ [
                 styles.formFieldContainer,
+                animatedStyle,
                 type === "primary" && styles.primaryFormFieldContainer,
                 containerStyle,
                 (focused || alwaysFocused) && styles.activeFormFieldContainer,
@@ -78,13 +138,13 @@ const TextInput: React.FC<TextInputProps> = ({
             ] }>
             {
                 icon &&
-               <View style={ styles.formFieldIconContainer }>
+               <Animated.View style={ [styles.formFieldIconContainer, animatedIconStyle] }>
                   <Icon
                      icon={ icon }
-                     size={ hp(4.5) }
+                     size={ formTheme.iconSize }
                      color={ styles.textInput.color }
                   />
-               </View>
+               </Animated.View>
             }
             <TextInputRN
                 ref={ inputRef }
@@ -93,12 +153,14 @@ const TextInput: React.FC<TextInputProps> = ({
                 placeholderTextColor={ styles.placeholderText.color }
                 value={ fieldValue.toString() }
                 multiline={ multiline }
-                keyboardType={ numeric ? "numeric" : "default" }
+                numberOfLines={ numberOfLines }
+                keyboardType={ keyboardType }
                 secureTextEntry={ secure }
                 onChangeText={ updateFieldValue }
                 onBlur={ onBlur }
                 onFocus={ onFocus }
                 editable={ editable }
+                onContentSizeChange={ multiline ? onContentSizeChange : undefined }
             />
             {
                 isSecure &&
@@ -106,59 +168,61 @@ const TextInput: React.FC<TextInputProps> = ({
                   <Icon
                      icon={ secure ? ICON_NAMES.eyeOff : ICON_NAMES.eye }
                      size={ hp(3.25) }
-                     color={ ICON_COLORS.default }
+                     color={ formTheme.iconColor }
                      onPress={ changeSecure }
                   />
                </View>
             }
             {
                 actionIcon &&
-               <View style={ styles.formFieldIconContainer }>
+               <Animated.View
+                  style={ [styles.formFieldIconContainer, animatedIconStyle, multiline && actionIconStyle] }>
                   <Icon
                      icon={ actionIcon }
-                     size={ hp(4.5) }
-                     color={ ICON_COLORS.default }
+                     size={ formTheme.iconSize }
+                     color={ formTheme.iconColor }
                      onPress={ onAction }
                   />
-               </View>
+               </Animated.View>
             }
-        </View>
+        </Animated.View>
     );
 };
 
 const styles = StyleSheet.create({
     formFieldContainer: {
-        minHeight: hp(6),
-        maxHeight: hp(6),
+        minHeight: formTheme.containerHeight,
         flexDirection: "row",
         alignItems: "center",
-        gap: hp(1.5),
         overflow: "hidden"
     },
     primaryFormFieldContainer: {
-        backgroundColor: COLORS.gray5,
-        paddingHorizontal: hp(1.5),
-        borderRadius: 20,
+        backgroundColor: formTheme.containerBackgroundColor,
+        paddingHorizontal: formTheme.containerPaddingHorizontal,
+        borderRadius: formTheme.borderRadius,
         borderWidth: 1,
-        borderColor: COLORS.gray5
+        borderColor: formTheme.borderColor
     },
     activeFormFieldContainer: {
-        borderColor: COLORS.gray2
+        borderColor: formTheme.activeColor
     },
     errorFormFieldContainer: {
-        borderColor: COLORS.redLight
+        borderColor: formTheme.errorColor
     },
     formFieldIconContainer: {
-        flex: 0.15,
+        width: formTheme.iconSize,
         alignItems: "center"
     },
     textInput: {
         flex: 1,
-        color: COLORS.gray1,
-        fontSize: hp(2.25)
+        color: formTheme.valueTextColor,
+        fontSize: formTheme.valueTextFontSize,
+        // lineHeight: formTheme.valueTextFontSize,
+        alignItems: "center",
+        justifyContent: "center"
     },
     placeholderText: {
-        color: COLORS.gray2
+        color: formTheme.placeHolderColor
     }
 });
 

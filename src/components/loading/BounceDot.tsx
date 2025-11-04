@@ -47,7 +47,7 @@ const BounceDot: React.FC<BounceDotProps> = ({
     });
 
     return (
-        <Animated.Text style={ [dotStyle, style, styles.dot] }>
+        <Animated.Text style={ [dotStyle, styles.dot, style] }>
             .
         </Animated.Text>
     );

@@ -1,41 +1,19 @@
 import React from "react";
 import Input from "../../../../../components/Input/Input.ts";
-import { ICON_NAMES } from "../../../../../constants/index.ts";
-import { FUEL_MEASUREMENTS, FUEL_TYPES } from "../../../constants/index.ts";
 import { StepProps } from "../../../../../types/index.ts";
-import { generatePickerItems } from "../../../../../utils/toPickerItems.ts";
 import { CarFormFields } from "../../../schemas/form/carForm.ts";
+import { FuelTypeInput } from "../../../_features/fuel/components/forms/inputFields/FuelTypeInput.tsx";
+import { FuelUnitInput } from "../../../_features/fuel/components/forms/inputFields/FuelUnitInput.tsx";
+import { FuelTankCapacityInput } from "../../../_features/fuel/components/forms/inputFields/FuelTankCapacityInput.tsx";
 
 type FuelStepProps<FormFields> = Pick<StepProps<FormFields>, "control">
 
 function FuelStep<FormFields = CarFormFields>({ control }: FuelStepProps<FormFields>) {
     return (
         <Input.Group>
-            <Input.Field
-                control={ control }
-                fieldName="fuelTank.capacity"
-                fieldNameText="Tartály mérete"
-            >
-                <Input.Text
-                    icon={ ICON_NAMES.odometer }
-                    placeholder={ "250" }
-                    numeric
-                />
-            </Input.Field>
-            <Input.Field
-                control={ control }
-                fieldName="fuelTank.type"
-                fieldNameText="Típus"
-            >
-                <Input.Picker.Simple items={ generatePickerItems(FUEL_TYPES) }/>
-            </Input.Field>
-            <Input.Field
-                control={ control }
-                fieldName="fuelTank.measurement"
-                fieldNameText="Mértékegység"
-            >
-                <Input.Picker.Simple items={ generatePickerItems(FUEL_MEASUREMENTS) }/>
-            </Input.Field>
+            <FuelTankCapacityInput control={ control } fieldName="fuelTank.capacity"/>
+            <FuelTypeInput control={ control } fieldName="fuelTank.typeId" title={ "Típus" }/>
+            <FuelUnitInput control={ control } fieldName="fuelTank.unitId" title={ "Mértékegység" }/>
         </Input.Group>
     );
 }

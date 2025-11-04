@@ -1,153 +1,235 @@
 import { Kysely, sql } from "@powersync/kysely-driver";
-import { ComparisonOperatorExpression, OrderByDirectionExpression, SelectQueryBuilder } from "kysely";
+import { ComparisonOperatorExpression, SelectQueryBuilder } from "kysely";
+import { DatabaseType } from "../connector/powersync/AppSchema.ts";
+import { EventEmitter } from "events";
 
-export type FilterCondition<TableItem, FieldName = keyof TableItem> = {
+export const FILTER_CHANGED_EVENT = "filterChanged";
+
+export type FilterCondition<TableItem, DB = DatabaseType, FieldName = keyof TableItem> = {
     field: FieldName
     operator: ComparisonOperatorExpression
     value: TableItem[FieldName]
-    toLowerCase?: boolean
+    table?: keyof DB
+    customSql?: (fieldRef: string) => string
 }
 
-export type OrderCondition<FieldName> = {
-    field: FieldName
-    direction?: OrderByDirectionExpression
-    toLowerCase?: boolean
+export type FilterGroup<TableItem, DB = DatabaseType> = {
+    logic: "AND" | "OR"
+    filters: Array<FilterCondition<TableItem, DB>>
 }
 
-export type PaginatorOptions<TableItem> = {
-    filterBy?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>
-    orderBy?: OrderCondition<keyof TableItem> | Array<OrderCondition<keyof TableItem>>
-    searchBy?: keyof TableItem | Array<keyof TableItem>
+export type AddFilterArgs<TableItem, DB = DatabaseType> = {
+    groupKey: string,
+    filter: FilterCondition<TableItem, DB> | Array<FilterCondition<TableItem, DB>>,
+    logic?: "OR" | "AND"
+}
+
+export type ReplaceFilterArgs<TableItem, DB = DatabaseType> = {
+    groupKey: string,
+    filter: FilterCondition<TableItem, DB>,
+    logic?: "OR" | "AND"
+}
+
+export type RemoveFilterArgs<TableItem, DB = DatabaseType> = {
+    groupKey: string,
+    filter: FilterCondition<TableItem, DB>,
+    byValue?: boolean
+}
+
+export type PaginatorOptions<TableItem, MappedItem = TableItem, DB = DatabaseType> = {
+    baseQuery?: SelectQueryBuilder<DB, TableItem>
+    filterBy?: Partial<FilterGroup<TableItem, DB>> & { group?: string }
     perPage?: number
+    mapper?: (tableRow?: TableItem) => Promise<MappedItem>
 }
 
-
-export abstract class Paginator<TableItem, DB> {
+export abstract class Paginator<TableItem, MappedItem = TableItem, DB = DatabaseType> extends EventEmitter {
     private database: Kysely<DB>;
-    private table: keyof DB;
-    private readonly key: keyof TableItem | Array<keyof TableItem>;
-    private readonly filterBy?: FilterCondition<TableItem> | Array<FilterCondition<TableItem>>;
-    private readonly orderBy?: OrderCondition<keyof TableItem> | Array<OrderCondition<keyof TableItem>>;
-    private readonly searchBy?: keyof TableItem | Array<keyof TableItem>;
+    protected table: keyof DB;
+    private readonly baseQuery?: SelectQueryBuilder<DB, TableItem, any>;
+    filterBy: Map<string, FilterGroup<TableItem, DB>> = new Map();
+    private readonly mapper?: (tableRow?: TableItem) => Promise<MappedItem>;
     protected perPage: number;
 
     protected constructor(
         database: Kysely<DB>,
         table: keyof DB,
-        key: keyof TableItem | Array<keyof TableItem>,
-        options?: PaginatorOptions<TableItem>
+        options?: PaginatorOptions<TableItem, MappedItem, DB>
     ) {
+        super();
+
         this.database = database;
         this.table = table;
-        this.key = key;
 
         this.perPage = options?.perPage ?? 15;
-        this.filterBy = options?.filterBy;
-        this.orderBy = options?.orderBy;
-        this.searchBy = options?.searchBy;
+        this.baseQuery = options?.baseQuery;
+        this.mapper = options?.mapper;
+        if(options?.filterBy) {
+            this.filterBy.set(
+                options.filterBy?.group ?? "default",
+                { logic: options.filterBy?.logic ?? "AND", filters: options.filterBy?.filters ?? [] }
+            );
+        }
     }
 
-    protected getBaseQuery(reverseOrder?: boolean) {
-        let query = this.database
+    protected getBaseQuery() {
+        let query = this.baseQuery ?? this.database
         .selectFrom(this.table)
-        .selectAll()
-        .limit(this.perPage);
+        .selectAll();
 
-        if(this.filterBy && Array.isArray(this.filterBy)) {
-            this.filterBy.forEach(filter => {
-                query = this.addFilter(query, filter);
-            });
-        } else if(this.filterBy) {
-            query = this.addFilter(query, this.filterBy);
-        }
+        this.filterBy.forEach((group) => {
+            if(group.filters.length === 0) return;
 
-        if(this.orderBy && Array.isArray(this.orderBy)) {
-            this.orderBy.forEach(order => {
-                query = this.addOrder(query, order, reverseOrder);
-            });
-        } else if(this.orderBy) {
-            query = this.addOrder(query, this.orderBy, reverseOrder);
-        }
+            query = query.where((eb) => {
+                const expressions: Expression<SqlBool>[] = [];
 
-        if(Array.isArray(this.key)) {
-            (this.key as Array<keyof TableItem>).forEach(keyField => {
-                query = this.addOrder(query, { field: keyField, direction: "asc" });
+                group.filters.forEach((filter) => {
+                    let filterField = sql.ref(`${ filter?.table ?? this.table }.${ filter.field }`);
+
+                    let filterValue = filter.value;
+                    if(filter.toLowerCase && typeof filterValue === "string") {
+                        filterValue = filterValue.toLowerCase();
+                    }
+
+                    expressions.push(eb(
+                        filter.customSql ? filter.customSql(filterField) : filterField,
+                        filter.operator,
+                        filterValue
+                    ));
+                });
+
+                if(group.logic.toUpperCase() === "OR") {
+                    return eb.or(expressions);
+                }
+
+                return eb.and(expressions);
             });
-        } else {
-            query = this.addOrder(query, { field: this.key, direction: "asc" });
-        }
+        });
+
+        query = query.limit(this.perPage + 1); // add plus 1 for get the cursor element as well
 
         return query;
     }
 
-    protected addFilter(
-        query: SelectQueryBuilder<DB, TableItem, any>,
-        filterCondition: FilterCondition<TableItem>
-    ): SelectQueryBuilder<DB, TableItem, any> {
-        let filterField = filterCondition.field;
-        if(filterCondition.toLowerCase) {
-            filterField = sql`lower(
-            ${ sql.ref(filterField) }
-            )`;
-        }
+    async map(tableItems: Array<TableItem>): Promise<Array<MappedItem>> {
+        if(!this.mapper) return tableItems;
 
-        let filterValue = filterCondition.value;
-        if(filterCondition.toLowerCase && typeof filterValue === "string") {
-            filterValue = filterValue.toLowerCase();
-        }
-
-        return query.where(filterField, filterCondition.operator, filterValue);
+        return (await Promise.all(tableItems.map(await this.mapper).filter(element => element !== null)));
     }
 
-    protected addSearchFilter(
-        query: SelectQueryBuilder<DB, TableItem, any>,
-        searchTerm?: string
-    ): SelectQueryBuilder<DB, TableItem, any> {
-        if(!searchTerm || searchTerm.length === 0) return query;
+    async addFilter({ groupKey, filter, logic = "AND" }: AddFilterArgs<TableItem, DB>): Promise<Array<MappedItem>> {
+        const group = this.filterBy.get(groupKey);
+        if(!group) {
+            this.filterBy.set(
+                groupKey,
+                { logic, filters: Array.isArray(filter) ? filter : [filter] }
+            );
+            this.emit(FILTER_CHANGED_EVENT, new Map(this.filterBy));
 
-        return this.addFilter(
-            query,
+            return await this.initial();
+        }
+
+        const groupFilters = group.filters;
+        if(Array.isArray(filter)) {
+            groupFilters.push(...filter);
+        } else {
+            groupFilters.push(filter);
+        }
+
+        this.filterBy.set(
+            groupKey,
+            { logic: group?.logic ?? logic, filters: groupFilters }
+        );
+        this.emit(FILTER_CHANGED_EVENT, new Map(this.filterBy));
+
+        return await this.initial();
+    }
+
+    async replaceFilter({
+        groupKey,
+        filter,
+        logic = "AND"
+    }: ReplaceFilterArgs<TableItem, DB>): Promise<Array<MappedItem>> {
+        const group = this.filterBy.get(groupKey);
+        if(!group) {
+            this.filterBy.set(
+                groupKey,
+                { logic, filters: [filter] }
+            );
+            this.emit(FILTER_CHANGED_EVENT, new Map(this.filterBy));
+
+            return await this.initial();
+        }
+
+        const filterExpression = (groupFilter: FilterCondition<TableItem, DB>) =>
+            groupFilter.field !== filter.field ||
+            groupFilter.table !== filter.table ||
+            groupFilter.operator !== filter.operator;
+
+        const groupFilters = group.filters.filter(filterExpression);
+        groupFilters.push(filter);
+
+        this.filterBy.set(
+            groupKey,
+            { logic: group?.logic ?? logic, filters: groupFilters }
+        );
+        this.emit(FILTER_CHANGED_EVENT, new Map(this.filterBy));
+
+        return await this.initial();
+    }
+
+    async removeFilter({
+        groupKey,
+        filter,
+        byValue = true
+    }: RemoveFilterArgs<TableItem, DB>): Promise<Array<MappedItem>> | null {
+        const group = this.filterBy.get(groupKey);
+        if(!group) return null;
+
+        const filterExpression = (groupFilter: FilterCondition<TableItem, DB>) =>
+            groupFilter.field !== filter.field ||
+            groupFilter.table !== filter.table ||
+            groupFilter.operator !== filter.operator ||
+            (!byValue ? false : groupFilter.value !== filter.value);
+
+        this.filterBy.set(
+            groupKey,
             {
-                field: this.searchBy,
-                value: `%${ searchTerm }%`,
-                operator: "like",
-                toLowerCase: true
+                ...group,
+                filters: group.filters.filter(filterExpression)
             }
         );
+        this.emit(FILTER_CHANGED_EVENT, new Map(this.filterBy));
+
+        return await this.initial();
     }
 
-    protected addOrder(
-        query: SelectQueryBuilder<DB, TableItem, any>,
-        orderCondition: OrderCondition<keyof TableItem>,
-        reverse?: boolean
-    ): SelectQueryBuilder<DB, TableItem, any> {
-        let orderDirection = orderCondition?.direction ?? "asc";
-        if(reverse) orderDirection = orderDirection === "asc" ? "desc" : "asc";
+    async clearFilters(groupKey?: string): Promise<Array<MappedItem>> | null {
+        if(!groupKey) { //if undefined then clear all groups
+            this.filterBy.clear();
+            this.emit(FILTER_CHANGED_EVENT, new Map());
 
-        let orderByField = orderCondition.field;
-        if(orderCondition?.toLowerCase) {
-            orderByField = sql`lower(
-            ${ sql.ref(orderByField) }
-            )`;
+            return await this.initial();
         }
 
-        return query.orderBy(orderByField, orderDirection);
-    }
+        const group = this.filterBy.get(groupKey);
+        if(!group) return null;
 
-    async filter(searchTerm?: string): Promise<Array<TableItem>> {
-        let query = this.getBaseQuery();
-        query = this.addSearchFilter(query, searchTerm);
+        this.filterBy.delete(groupKey);
+        this.emit(FILTER_CHANGED_EVENT, new Map(this.filterBy));
 
-        return await query.execute() as unknown as Array<TableItem>;
+        return await this.initial();
     }
 
     abstract hasNext(): boolean;
 
     abstract hasPrevious(): boolean;
 
-    abstract async initial(defaultValue?: string | number): Promise<Array<TableItem>>;
+    abstract async initial(defaultItemId?: string | number): Promise<Array<MappedItem>>;
 
-    abstract async next(searchTerm?: string): Promise<Array<TableItem> | null>;
+    abstract async refresh(): Promise<Array<MappedItem>>;
 
-    abstract async previous(searchTerm?: string): Promise<Array<TableItem> | null>;
+    abstract async next(): Promise<Array<MappedItem> | null>;
+
+    abstract async previous(): Promise<Array<MappedItem> | null>;
 }

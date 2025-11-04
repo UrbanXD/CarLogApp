@@ -2,24 +2,24 @@ import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useForm } from "react-hook-form";
 import { EditUserNameRequest } from "../../schemas/form/editUserNameRequest.ts";
 import { UserAccount } from "../../schemas/userSchema.ts";
-import EditForm from "../../../../components/Form/EditForm.tsx";
 import { EmailStep } from "./steps/index.ts";
 import { router } from "expo-router";
 import { getToastMessage } from "../../../../ui/alert/utils/getToastMessage.ts";
 import { ChangeEmailToast } from "../../presets/toast/index.ts";
 import { OtpVerificationHandlerType } from "../../../../app/bottomSheet/otpVerification.tsx";
 import { ChangeEmailRequest, useChangeEmailFormProps } from "../../schemas/form/changeEmailRequest.ts";
+import Form from "../../../../components/Form/Form.tsx";
+import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
+import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 
 export type ChangeEmailFormProps = { user: UserAccount }
 
 export function ChangeEmailForm({ user }: ChangeEmailFormProps) {
+    const { supabaseConnector } = useDatabase();
     const { openToast } = useAlert();
 
-    const {
-        control,
-        handleSubmit,
-        reset
-    } = useForm<EditUserNameRequest>(useChangeEmailFormProps({ email: user.email }));
+    const form = useForm<EditUserNameRequest>(useChangeEmailFormProps({ email: user.email }));
+    const { reset, handleSubmit } = form;
 
     const submitHandler = handleSubmit(async (request: ChangeEmailRequest) => {
         try {
@@ -38,15 +38,15 @@ export function ChangeEmailForm({ user }: ChangeEmailFormProps) {
                 }
             });
         } catch(error) {
+            console.log("Change Email error: ", error);
             openToast(getToastMessage({ messages: ChangeEmailToast, error }));
         }
     });
 
     return (
-        <EditForm
-            renderInputFields={ () => <EmailStep control={ control }/> }
-            submitHandler={ submitHandler }
-            reset={ reset }
-        />
+        <Form>
+            <EmailStep { ...form }/>
+            <FormButtons reset={ reset } submit={ submitHandler }/>
+        </Form>
     );
 }

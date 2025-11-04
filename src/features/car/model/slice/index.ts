@@ -1,23 +1,40 @@
 import { CarsState } from "../types/index.ts";
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { loadCars } from "../actions/loadCars.ts";
 import { createCar } from "../actions/createCar.ts";
 import { editCar } from "../actions/editCar.ts";
 import { deleteCar } from "../actions/deleteCar.ts";
-import { loadSelectedCar } from "../actions/loadSelectedCar.ts";
 import { selectCar } from "../actions/selectCar.ts";
+import { Car } from "../../schemas/carSchema.ts";
+import { Odometer } from "../../_features/odometer/schemas/odometerSchema.ts";
 
 const initialState: CarsState = {
     loading: true,
     loadError: false,
     cars: [],
-    selectedCarId: ""
+    selectedCar: null
 };
 
 const carsSlice = createSlice({
     name: "cars",
     initialState,
-    reducers: {},
+    reducers: {
+        resetCars: (state) => {
+            state.cars = [];
+            state.loading = true;
+            state.loadError = false;
+            state.selectedCar = null;
+        },
+        updateCarOdometer: (state, action: PayloadAction<{ odometer: Odometer }>) => {
+            const carIndex = state.cars.findIndex(car => car.id === action.payload.odometer.carId);
+            if(carIndex === -1) return;
+
+            const updatedCar: Car = state.cars[carIndex];
+            updatedCar.odometer = action.payload?.odometer;
+
+            state.cars[carIndex] = updatedCar;
+        }
+    },
     extraReducers: builder => {
         builder
         .addCase(loadCars.pending, (state) => {
@@ -29,7 +46,8 @@ const carsSlice = createSlice({
         })
         .addCase(loadCars.fulfilled, (state, action) => {
             state.loading = false;
-            state.cars = action.payload;
+            state.cars = action.payload.cars;
+            state.selectedCar = action.payload.selectedCar;
         })
         .addCase(createCar.fulfilled, (state, action) => {
             if(!action.payload) return;
@@ -54,15 +72,8 @@ const carsSlice = createSlice({
         .addCase(deleteCar.rejected, () => {
             console.log("hiba, delete car, slices");
         })
-        .addCase(loadSelectedCar.fulfilled, (state, action) => {
-            state.selectedCarID = action.payload;
-        })
-        .addCase(loadSelectedCar.rejected, state => {
-            console.log("roosz load car");
-            state.selectedCarID = "";
-        })
         .addCase(selectCar.fulfilled, (state, action) => {
-            state.selectedCarID = action.payload;
+            state.selectedCar = action.payload;
         })
         .addCase(selectCar.rejected, () => {
             console.log("nijncs kivalasztva HIBA");
@@ -70,4 +81,5 @@ const carsSlice = createSlice({
     }
 });
 
+export const { updateCarOdometer, resetCars } = carsSlice.actions;
 export const carsReducer = carsSlice.reducer;

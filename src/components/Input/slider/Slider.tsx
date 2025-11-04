@@ -1,12 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
     GestureResponderEvent,
     Keyboard,
     LayoutChangeEvent,
+    NativeSyntheticEvent,
     Pressable,
     StyleSheet,
     Text,
-    TextInput,
+    TextInputFocusEventData,
     TouchableWithoutFeedback,
     View
 } from "react-native";
@@ -15,8 +16,6 @@ import Animated, {
     dispatchCommand,
     interpolate,
     interpolateColor,
-    runOnJS,
-    runOnUI,
     useAnimatedProps,
     useAnimatedReaction,
     useAnimatedRef,
@@ -31,16 +30,19 @@ import type {
     PanGestureHandlerEventPayload
 } from "react-native-gesture-handler/src/handlers/GestureHandlerEventPayload.ts";
 import { PanGestureChangeEventPayload } from "react-native-gesture-handler/src/handlers/gestures/panGesture.ts";
-import { addMeasurementToValue } from "../../../utils/addMeasurementToValue.ts";
+import { scheduleOnRN, scheduleOnUI } from "react-native-worklets";
+import { KeyboardController } from "react-native-keyboard-controller";
+import { formTheme } from "../../../ui/form/constants/theme.ts";
+import { BottomSheetTextInput, useBottomSheetInternal } from "@gorhom/bottom-sheet";
 
-const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
+const AnimatedTextInput = Animated.createAnimatedComponent(BottomSheetTextInput);
 
 interface SliderProps {
     value?: number;
     setValue?: (value: number) => void;
     minValue?: number;
     maxValue?: number;
-    measurement?: string;
+    unit?: string;
     disabled?: boolean;
     tapToSeek?: boolean;
     tooltipAsInputField?: boolean;
@@ -64,6 +66,7 @@ type SliderStyle = {
     valueTextColor: Color
     boundingValuesTextColor: Color
     showsBoundingValues: boolean
+    showsPercent: boolean
     showsTooltip: boolean
     showsHandle: boolean
     showsTag: boolean
@@ -72,29 +75,25 @@ type SliderStyle = {
 
 const Slider: React.FC<SliderProps> = ({
     minValue = 0,
-    maxValue,
+    maxValue = Number.MAX_SAFE_INTEGER,
     value = minValue,
     setValue,
-    measurement,
+    unit,
     disabled,
     tapToSeek = true,
     tooltipAsInputField = false,
     style = {} as SliderStyle
 }) => {
+    const bottomSheetInternal = useBottomSheetInternal(true);
+
     const tooltipInputRef = useAnimatedRef();
-
-    const [currentValue, setCurrentValue] = useState(value);
-
-    useEffect(() => {
-        setCurrentValue(value);
-    }, [value]);
 
     const {
         borderRadius = 25,
         trackHeight = hp(1),
-        trackColor = COLORS.gray3,
+        trackColor = formTheme.trackColor,
         trackBorderWidth = 0,
-        barColor = COLORS.gray1 as SliderStyle["barColor"],
+        barColor = formTheme.barColor as SliderStyle["barColor"],
         handleHeight = hp(3.5),
         handleWidth = hp(3.5),
         handleColor = COLORS.gray1,
@@ -105,13 +104,14 @@ const Slider: React.FC<SliderProps> = ({
         valueTextColor = COLORS.white,
         boundingValuesTextColor = COLORS.gray1,
         showsBoundingValues = true,
+        showsPercent = false,
         showsTooltip = true,
         showsHandle = true,
         showsTag = false,
         innerTooltip = false
     } = style;
     const minBarWidth = SEPARATOR_SIZES.lightSmall; // csak akkor ha nincs handle
-    const tooltipPaddingVertical = SEPARATOR_SIZES.lightSmall / 2;
+    const tooltipPaddingVertical = 0;
     const tooltipPaddingHorizontal = SEPARATOR_SIZES.small / 2;
     const tooltipBorderRadius = 7.5;
     const tooltipBottomTriangleHeight = 10;
@@ -124,20 +124,89 @@ const Slider: React.FC<SliderProps> = ({
     const trackWidth = useSharedValue(0);
     const thumbOffset = useSharedValue(0);
     const percent = useSharedValue(0);
-    const inputValue = useSharedValue(0);
+    const inputValue = useSharedValue(value ? value.toString() : minValue.toString());
     const bounds = useSharedValue({ min: minValue, max: maxValue });
     const [trackLayoutReady, setTrackLayoutReady] = useState(false);
 
+    const [currentValue, setCurrentValue] = useState(value ?? 0);
+
+    useEffect(() => {
+        if(isNaN(value)) return;
+        setCurrentValue(Math.min(maxValue, Math.max(minValue, Number(value))).toString());
+    }, [value]);
+
+    useEffect(() => {
+        const rawValue = inputFieldContext?.field?.value;
+        const numericValue = (rawValue === "" || rawValue == null) ? NaN : Number(rawValue);
+        const fieldValue = (isNaN(numericValue)) ? minValue : Math.min(maxValue, Math.max(minValue, numericValue));
+
+        setCurrentValue(fieldValue);
+    }, [inputFieldContext?.field?.value]);
+
+    useEffect(() => {
+        if(!trackLayoutReady) return;
+
+        const fieldValueNumber = Number(inputFieldContext?.field?.value ?? 0);
+        if(setValue && currentValue !== fieldValueNumber) setValue(currentValue);
+        if(onChange && currentValue !== fieldValueNumber) onChange(currentValue);
+
+        percent.value = Math.max(
+            0,
+            Math.min(100, (currentValue - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
+        );
+        inputValue.value = currentValue.toString();
+        scheduleOnUI(calculateThumbOffsetByPercent);
+    }, [currentValue, trackLayoutReady]);
+
+    useEffect(() => {
+        const subscription = Keyboard.addListener("keyboardDidHide", () => {
+            scheduleOnUI(dispatchCommand, tooltipInputRef, "blur");
+        });
+
+        return () => subscription.remove();
+    }, []);
+
+    useEffect(() => {
+        if(bounds.value.min === minValue && bounds.value.max === maxValue) return;
+
+        bounds.value = { min: minValue, max: maxValue };
+    }, [maxValue, minValue]);
+
+    const onFocus = useCallback((args: NativeSyntheticEvent<TextInputFocusEventData>) => {
+        if(!bottomSheetInternal) return; // return if not in a bottom sheet
+        const { animatedKeyboardState } = bottomSheetInternal;
+        const keyboardState = animatedKeyboardState.get();
+
+        animatedKeyboardState.set({
+            ...keyboardState,
+            target: args.nativeEvent.target
+        });
+    }, [bottomSheetInternal?.animatedKeyboardState]);
+
+    const onBlur = useCallback((args: NativeSyntheticEvent<TextInputFocusEventData>) => {
+        if(!bottomSheetInternal) return; // return if not in a bottom sheet
+        const { animatedKeyboardState } = bottomSheetInternal;
+        const keyboardState = animatedKeyboardState.get();
+
+        if(keyboardState.target === args.nativeEvent.target) {
+            animatedKeyboardState.set({
+                ...keyboardState,
+                target: undefined
+            });
+        }
+    }, [bottomSheetInternal?.animatedKeyboardState]);
+
     const setInputValue = () => {
         "worklet";
-        inputValue.value = Math.floor(bounds.value.min + ((bounds.value.max - bounds.value.min) * (percent.value / 100)));
+        inputValue.value = Math.floor(bounds.value.min + ((bounds.value.max - bounds.value.min) * (percent.value / 100)))
+        .toString();
     };
 
     const calculatePercentByValue = () => {
         "worklet";
         percent.value = Math.max(
             0,
-            Math.min(100, (inputValue.value - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
+            Math.min(100, (Number(inputValue.value) - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
         );
     };
 
@@ -149,11 +218,15 @@ const Slider: React.FC<SliderProps> = ({
         );
     };
 
+    const calculateThumbOffsetByPercent = () => {
+        thumbOffset.value = percent.value * (trackWidth.value - (showsHandle ? handleWidth : 0)) / 100;
+    };
+
     const calculateOffsetByPercent = () => {
         "worklet";
         calculatePercentByValue();
 
-        thumbOffset.value = percent.value * (trackWidth.value - (showsHandle ? handleWidth : 0)) / 100;
+        calculateThumbOffsetByPercent();
 
         setInputValue();
     };
@@ -169,10 +242,8 @@ const Slider: React.FC<SliderProps> = ({
 
         setInputValue();
 
-        // for set input controller value
-        if(setValue) runOnJS(setValue)(inputValue.value);
-        if(onChange) runOnJS(onChange)(inputValue.value);
-        runOnJS(setCurrentValue)(inputValue.value);
+        const value = Number(inputValue.value);
+        if(!isNaN(value)) scheduleOnRN(setCurrentValue, value);
     };
 
     const calculateOffsetByPanning = (changeX: number) => {
@@ -182,27 +253,6 @@ const Slider: React.FC<SliderProps> = ({
             Math.max(0, thumbOffset.value + changeX)
         );
     };
-
-    useEffect(() => {
-        if(!trackLayoutReady) return;
-
-        inputValue.value = inputFieldContext?.field?.value ?? value;
-        runOnUI(calculateOffsetByPercent)();
-    }, [trackLayoutReady]);
-
-    useEffect(() => {
-        const subscription = Keyboard.addListener("keyboardDidHide", () => {
-            runOnUI(dispatchCommand)(tooltipInputRef, "blur");
-        });
-
-        return () => subscription.remove();
-    }, []);
-
-    useEffect(() => {
-        if(bounds.value.min === minValue && bounds.value.max === maxValue) return;
-
-        bounds.value = { min: minValue, max: maxValue };
-    }, [maxValue, minValue]);
 
     useAnimatedReaction(
         () => bounds.value,
@@ -215,11 +265,15 @@ const Slider: React.FC<SliderProps> = ({
 
     useAnimatedReaction(
         () => trackWidth.value,
-        (newWidth) => runOnJS(setTrackLayoutReady)(newWidth > 0)
+        (newWidth) => scheduleOnRN(setTrackLayoutReady, newWidth > 0)
     );
 
     const onTrackPress = (event: GestureResponderEvent) => {
-        runOnUI(calculateOffsetByTapPosition)(event.nativeEvent.locationX);
+        scheduleOnUI(calculateOffsetByTapPosition, event.nativeEvent.locationX);
+    };
+
+    const panOnStart = () => {
+        scheduleOnRN(KeyboardController.dismiss);
     };
 
     const panOnChange = (event: GestureUpdateEvent<PanGestureHandlerEventPayload & PanGestureChangeEventPayload>) => {
@@ -230,15 +284,14 @@ const Slider: React.FC<SliderProps> = ({
     };
 
     const panOnEnd = () => {
-        "worklet";
-        if(setValue) runOnJS(setValue)(inputValue.value);
-        if(onChange) runOnJS(onChange)(inputValue.value);
-        runOnJS(setCurrentValue)(inputValue.value);
+        const value = Number(inputValue.value);
+        if(!isNaN(value)) scheduleOnRN(setCurrentValue, value);
     };
 
     const barPan = useMemo(
         () => Gesture.Pan()
         .enabled(!showsHandle && !disabled)
+        .onStart(panOnStart)
         .onChange(panOnChange)
         .onEnd(panOnEnd),
         [showsHandle]
@@ -247,6 +300,7 @@ const Slider: React.FC<SliderProps> = ({
     const handlePan = useMemo(
         () => Gesture.Pan()
         .enabled(showsHandle && !disabled)
+        .onStart(panOnStart)
         .onChange(panOnChange)
         .onEnd(panOnEnd),
         [showsHandle]
@@ -255,6 +309,7 @@ const Slider: React.FC<SliderProps> = ({
     const tooltipPan = useMemo(
         () => Gesture.Pan()
         .enabled(showsTooltip && !disabled)
+        .onStart(panOnStart)
         .onChange(panOnChange)
         .onEnd(panOnEnd)
     );
@@ -269,7 +324,7 @@ const Slider: React.FC<SliderProps> = ({
         })
     );
 
-    const tooltipGesture = Gesture.Exclusive(tooltipDoubleTap, tooltipPan);
+    const tooltipGesture = Gesture.Exclusive(tooltipPan, tooltipDoubleTap);
 
     const onTrackLayout = (event: LayoutChangeEvent) => {
         trackWidth.value = (event.nativeEvent.layout.width - 2 * trackBorderWidth);
@@ -286,6 +341,27 @@ const Slider: React.FC<SliderProps> = ({
 
         if(tooltipLayout.width === width && tooltipLayout.height === height) return;
         setTooltipLayout({ width, height });
+    };
+
+    const onTooltipTextChange = (value: string) => {
+        const numericText = value.replace(/[^0-9.,]/g, "").replace(",", ".");
+
+        let number = numericText.length === 0 ? minValue : Number(numericText);
+
+        const clamped = Math.min(maxValue, Math.max(number, minValue));
+        inputValue.value = clamped.toString() + " "; // empty string add to prevent not updating text
+        scheduleOnRN(setTimeout, () => {
+            let clampedText = clamped.toString();
+            if(maxValue !== clamped && numericText.endsWith(".")) clampedText += ".";
+
+            inputValue.value = clampedText;
+        }, 100);
+
+        if(!isNaN(number)) {
+            scheduleOnUI(calculatePercentByValue);
+            scheduleOnUI(calculateThumbOffsetByPercent);
+            scheduleOnRN(setCurrentValue, clamped);
+        }
     };
 
     const sliderBarStyle = useAnimatedStyle(() => {
@@ -435,9 +511,13 @@ const Slider: React.FC<SliderProps> = ({
     }), [trackColor, showsHandle, tooltipLayout, handleHeight]);
 
     const animatedTooltipProps = useAnimatedProps(() => {
-        let text = inputValue.value.toString();
-        if(measurement) text += ` ${ measurement }`;
-        if(setValue) runOnJS(setValue)(inputValue.value);
+        let text = inputValue.value;
+
+        return { text };
+    });
+
+    const animatedPercentTextProps = useAnimatedProps(() => {
+        let text = `${ percent.value.toFixed(2) }%`;
 
         return { text };
     });
@@ -457,16 +537,23 @@ const Slider: React.FC<SliderProps> = ({
                                 style={ [styles.slider.tooltip.bottomTriangle, tooltipBottomTriangleStyle] }
                              />
                           }
-                         <View pointerEvents="none">
+                         <View
+                            onLayout={ onTooltipTextLayout }
+                            pointerEvents="none"
+                            style={ { flexDirection: "row", alignItems: "center" } }
+                         >
                             <AnimatedTextInput
                                ref={ tooltipInputRef }
-                               defaultValue={ addMeasurementToValue(currentValue, measurement) }
+                               defaultValue={ currentValue }
                                editable={ tooltipAsInputField }
                                animatedProps={ animatedTooltipProps }
                                keyboardType="numeric"
                                style={ styles.slider.tooltip.text }
-                               onLayout={ onTooltipTextLayout }
+                               onChangeText={ onTooltipTextChange }
+                               onBlur={ onBlur }
+                               onFocus={ onFocus }
                             />
+                             { unit && <Text style={ styles.slider.tooltip.text }>{ unit }</Text> }
                          </View>
                       </Animated.View>
                    </GestureDetector>
@@ -501,10 +588,25 @@ const Slider: React.FC<SliderProps> = ({
                 </Pressable>
             </View>
             {
-                showsBoundingValues &&
+                (showsBoundingValues || showsPercent) &&
                <View style={ styles.boundingValues }>
-                  <Text style={ styles.boundingValues.text }>{ minValue } { measurement }</Text>
-                  <Text style={ styles.boundingValues.text }>{ maxValue } { measurement }</Text>
+                   {
+                       showsBoundingValues &&
+                      <Text style={ styles.boundingValues.text }>{ minValue } { unit }</Text>
+                   }
+                   {
+                       showsPercent &&
+                      <AnimatedTextInput
+                         defaultValue={ "0%" }
+                         editable={ false }
+                         animatedProps={ animatedPercentTextProps }
+                         style={ [styles.boundingValues.text, { padding: 0 }] }
+                      />
+                   }
+                   {
+                       showsBoundingValues &&
+                      <Text style={ styles.boundingValues.text }>{ maxValue } { unit }</Text>
+                   }
                </View>
             }
         </View>
@@ -555,7 +657,8 @@ const useStyles = ({
         text: {
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p4,
-            color: boundingValuesTextColor
+            color: boundingValuesTextColor,
+            textAlign: "center"
         }
     },
 

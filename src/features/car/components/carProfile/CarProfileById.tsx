@@ -9,7 +9,7 @@ type CarProfileByIdProps = {
 }
 
 const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId, fuelSliderDisabled = false }) => {
-    const { car, handleDeleteCar, openEditCarStepBottomSheet } = useCarProfile(carId);
+    const { car, handleDeleteCar, openEditCarStep } = useCarProfile(carId);
 
     useEffect(() => {
         if(car) return;
@@ -18,6 +18,8 @@ const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId, fuelSliderDisabl
         return router.replace("(main)/index");
     }, [car]);
 
+    const openOdometerLog = () => router.push({ pathname: "/odometer/log", params: { id: carId } });
+
     if(!car) return null;
 
     return (
@@ -25,7 +27,8 @@ const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId, fuelSliderDisabl
             car={ car }
             handleDeleteCar={ handleDeleteCar }
             fuelSliderDisabled={ fuelSliderDisabled }
-            openEditCarStep={ openEditCarStepBottomSheet }
+            openEditCarStep={ openEditCarStep }
+            openOdometerLog={ openOdometerLog }
         />
     );
 };

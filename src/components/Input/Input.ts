@@ -6,6 +6,8 @@ import OTP from "./otp/InputOTP.tsx";
 import Slider from "./slider/Slider.tsx";
 import Field from "./common/InputField.tsx";
 import Picker from "./picker/index.ts";
+import Row from "./common/InputRow.tsx";
+import { Switch } from "./switch/Switch.tsx";
 
 const Input = {
     ImagePicker,
@@ -15,7 +17,9 @@ const Input = {
     OTP,
     Slider,
     Field,
-    Picker
+    Picker,
+    Row,
+    Switch
 };
 
 export default Input;
