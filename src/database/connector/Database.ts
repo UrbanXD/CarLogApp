@@ -233,6 +233,8 @@ export class Database {
     }
 
     async init() {
+        if(this.powersync.connecting || this.powersync.connected) return;
+
         await this.powersync.init();
         await this.powersync.connect(this.supabaseConnector);
 
@@ -242,6 +244,6 @@ export class Database {
     }
 
     async disconnect() {
-        await this.powersync.disconnectAndClear({ clearLocal: true });
+        await this.powersync.disconnect();
     }
 }
