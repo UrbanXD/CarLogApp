@@ -21,8 +21,6 @@ const PrimaryHeader: React.FC = () => {
         router.push("/(profile)/user");
     };
 
-    if(user === null) return null;
-
     return (
         <HeaderView>
             <View style={ { flex: 1 } }>
@@ -32,11 +30,11 @@ const PrimaryHeader: React.FC = () => {
                 !isCarListVisible && (
                     <Animated.View entering={ FadeIn } exiting={ FadeOut }>
                         {
-                            userLoading
+                            userLoading || !user
                             ? <Avatar.Skeleton
                                 avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
                             />
-                            : user?.avatar
+                            : user.avatar
                               ? <Avatar.Image
                                   source={ user.avatar.image }
                                   avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
