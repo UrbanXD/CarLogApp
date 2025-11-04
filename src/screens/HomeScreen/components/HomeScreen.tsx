@@ -15,7 +15,7 @@ const HomeScreen: React.FC = () => {
             <Garage/>
             <View style={ styles.contentContainer }>
                 <UpcomingRidesBlock/>
-                <LatestExpenses car={ null }/>
+                <LatestExpenses car={ selectedCar }/>
             </View>
         </ScreenScrollView>
     );
