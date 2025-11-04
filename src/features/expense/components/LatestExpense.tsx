@@ -3,36 +3,37 @@ import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import React, { useCallback, useState } from "react";
 import { Expense } from "../schemas/expenseSchema.ts";
 import { Text, View } from "react-native";
-import { GLOBAL_STYLE, ICON_NAMES } from "../../../constants/index.ts";
+import { COLORS, GLOBAL_STYLE, ICON_NAMES } from "../../../constants/index.ts";
 import Link from "../../../components/Link.tsx";
-import useCars from "../../car/hooks/useCars.ts";
 import { useExpenseTimelineItem } from "../hooks/useExepenseTimelineItem.tsx";
 import { TimelineItem } from "../../../components/timelineView/item/TimelineItem.tsx";
 import { MoreDataLoading } from "../../../components/loading/MoreDataLoading.tsx";
+import { Car } from "../../car/schemas/carSchema.ts";
 
-export function LatestExpenses() {
+type LatestExpenseProps = {
+    car?: Car | null
+}
+
+export function LatestExpenses({ car }: LatestExpenseProps) {
     const { expenseDao } = useDatabase();
-    const { selectedCar } = useCars();
-    const { mapper } = useExpenseTimelineItem(selectedCar.currency);
+    const { mapper } = useExpenseTimelineItem(car?.currency);
 
     const [expenses, setExpenses] = useState<Array<Expense>>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
     useFocusEffect(
         useCallback(() => {
-            if(!selectedCar) return;
+            if(!car) return;
 
             setIsLoading(true);
-            expenseDao.getLatestExpenses(selectedCar.id).then(result => {
+            expenseDao.getLatestExpenses(car.id).then(result => {
                 setIsLoading(false);
                 setExpenses(result);
             });
-        }, [])
+        }, [car])
     );
 
     const renderExpense = (expense: Expense, index: number) => {
-        if(!selectedCar) return <></>;
-
         return (
             <TimelineItem
                 key={ expense.id }
@@ -43,7 +44,22 @@ export function LatestExpenses() {
         );
     };
 
+    const renderEmptyComponent = useCallback(() => {
+        return (
+            <TimelineItem
+                id="not-found"
+                milestone="Nem található"
+                title={ "Hozzalétre első kiadását ide kattintva" }
+                onPress={ openCreateExpenseBottomSheet }
+                color={ COLORS.gray2 }
+                isFirst
+                isLast
+            />
+        );
+    }, []);
+
     const goToExpensesTab = () => router.push("/(main)/expenses");
+    const openCreateExpenseBottomSheet = () => router.push("/expense/create/");
 
     return (
         <View style={ GLOBAL_STYLE.contentContainer }>
@@ -55,7 +71,9 @@ export function LatestExpenses() {
                 ?
                 <MoreDataLoading/>
                 :
-                <View>{ expenses.map(renderExpense) }</View>
+                expenses.length > 0
+                ? <View>{ expenses.map(renderExpense) }</View>
+                : renderEmptyComponent()
             }
             <Link
                 text="További kiadások"

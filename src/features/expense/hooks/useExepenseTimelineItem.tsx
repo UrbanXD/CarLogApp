@@ -10,7 +10,7 @@ import { AmountText } from "../../../components/AmountText.tsx";
 
 dayjs.extend(utc);
 
-export function useExpenseTimelineItem(currency: Currency) {
+export function useExpenseTimelineItem(currency?: Currency) {
     const mapper = useCallback((expense: Expense): TimelineItemType => {
         const routerPathTitle = "Kiadás";
         let routerPathName = "/expense/[id]";
@@ -40,7 +40,7 @@ export function useExpenseTimelineItem(currency: Currency) {
                 amount={ expense.originalAmount }
                 currencyText={ expense.currency.symbol }
                 exchangedAmount={ expense.amount }
-                exchangeCurrencyText={ currency.symbol }
+                exchangeCurrencyText={ currency?.symbol }
             />
         );
 

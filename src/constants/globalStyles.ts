@@ -22,10 +22,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
     },
     contentContainer: {
         gap: SEPARATOR_SIZES.small,
-        flexDirection: "column",
-        padding: SEPARATOR_SIZES.normal,
-        backgroundColor: COLORS.black5,
-        borderRadius: 35
+        flexDirection: "column"
     },
     containerTitleText: {
         fontFamily: "Gilroy-Heavy",
