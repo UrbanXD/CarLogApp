@@ -89,7 +89,10 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
             const route = stackOfRoutes.pop();
             if(!route) continue;
             if(!route.name.startsWith("bottomSheet/") && !BottomSheetRoutes.includes(route.name)) {
-                router.dismissTo({ pathname: route.name, params: route.params });
+                let pathname = route.name;
+                if(route.name.endsWith("index")) pathname = pathname.slice(0, pathname.length - 5);
+
+                router.dismissTo({ pathname, params: route.params });
                 return;
             }
         }

@@ -24,6 +24,7 @@ import { ServiceLogDao } from "../../features/expense/_features/service/model/da
 import { ServiceTypeDao } from "../../features/expense/_features/service/model/dao/ServiceTypeDao.ts";
 import { ServiceItemDao } from "../../features/expense/_features/service/model/dao/ServiceItemDao.ts";
 import { ServiceItemTypeDao } from "../../features/expense/_features/service/model/dao/ServiceItemTypeDao.ts";
+import { PlaceDao } from "../../features/ride/_features/place/model/dao/placeDao.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
@@ -49,6 +50,7 @@ export class Database {
     private _serviceTypeDao?: ServiceTypeDao;
     private _serviceItemTypeDao?: ServiceItemTypeDao;
     private _serviceItemDao?: ServiceItemDao;
+    private _placeDao?: PlaceDao;
 
     constructor() {
         this.powersync = new PowerSyncDatabase({
@@ -230,6 +232,12 @@ export class Database {
         }
 
         return this._carDao;
+    }
+
+    get placeDao(): PlaceDao {
+        if(!this._placeDao) this._placeDao = new PlaceDao(this.db);
+
+        return this._placeDao;
     }
 
     async init() {

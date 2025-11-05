@@ -7,5 +7,7 @@ export const BottomSheetRoutes = [
     "expense/create/service",
     "expense/edit/[id]",
     "expense/edit/fuel/[id]",
-    "expense/edit/service/[id]"
+    "expense/edit/service/[id]",
+    "ride/place/create",
+    "ride/place/edit/[id]"
 ];

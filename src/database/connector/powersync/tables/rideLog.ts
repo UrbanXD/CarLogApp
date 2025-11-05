@@ -1,4 +1,5 @@
-c;
+import { column, Table } from "@powersync/react-native";
+
 export const rideLogTable = new Table({
     id: column.text,
     car_id: column.text,

@@ -223,6 +223,30 @@ const Layout: React.FC = () => {
                     contentStyle: { backgroundColor: "transparent" }
                 } }
             />
+            <Stack.Screen
+                name="ride/place/index"
+                options={ {
+                    header: () => <Header.Secondary title={ "Helyek" }/>
+                } }
+            />
+            <Stack.Screen
+                name="ride/place/create"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="ride/place/edit/[id]"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
         </Stack>
     );
 };
