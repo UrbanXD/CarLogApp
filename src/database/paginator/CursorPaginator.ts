@@ -17,10 +17,12 @@ export type CursorOptions<TableField, DB = DatabaseType> = {
     defaultOrder?: OrderByDirectionExpression
 }
 
-export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseType> extends Paginator<TableItem, MappedItem, DB> {
+export class CursorPaginator<TableItem extends {
+    id: string | number
+}, MappedItem = TableItem, DB = DatabaseType> extends Paginator<TableItem, MappedItem, DB> {
     private prevCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
     private nextCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
-    private refreshCursor: CursorValue<TableItem> | Array<CursorValue<TableItem>>;
+    private refreshCursorId: string | number | null;
     cursorOptions: CursorOptions<keyof TableItem, DB>;
 
     constructor(
@@ -87,36 +89,13 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
     }
 
     async refresh(): Promise<Array<MappedItem>> {
-        if(!this.refreshCursor) return this.initial();
-
-        this.prevCursor = null;
-        this.nextCursor = null;
-
-        let query = this.getBaseQuery().limit(this.perPage + 2);
-        query = addCursor(this.table, query, this.cursorOptions, this.refreshCursor, "next");
-
-        const result = await query.execute() as unknown as Array<TableItem>;
-
-        if(result.length > 1) this.setPreviousCursor(result.shift());
-        if(result.length === 0) return [];
-
-        this.setRefreshCursor(result[0]);
-        if(result.length === this.perPage + 1) this.setNextCursor(result.pop());
-
-        const refreshMappedResult = await super.map(result);
-        //
-        // if(result.length > 0 && result.length < this.perPage + 1) {
-        //     const moreData = await this.previous();
-        //     if(moreData) refreshMappedResult.unshift(...moreData);
-        // }
-
-        return refreshMappedResult;
+        return await this.initial(this.refreshCursorId);
     }
 
     async initial(defaultItemId?: string | number): Promise<Array<MappedItem>> {
         this.prevCursor = null;
         this.nextCursor = null;
-        this.refreshCursor = null;
+        this.refreshCursorId = null;
 
         let defaultCursor = null;
         let defaultItem = null;
@@ -139,7 +118,7 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
             const result = await query.execute() as unknown as Array<TableItem>;
 
             if(result.length === this.perPage + 1) this.setNextCursor(result.pop());
-            if(result.length !== 0) this.setRefreshCursor(result[0]);
+            if(result.length !== 0) this.refreshCursorId = result[0].id;
 
             return await super.map(result);
         }
@@ -155,16 +134,19 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         const prevResult = (await prevQuery.execute()).reverse() as unknown as Array<TableItem>;
         const nextResult = await nextQuery.execute() as unknown as Array<TableItem>;
 
+        nextResult.shift();
+
         this.prevCursor = null;
         if(prevResult.length === halfPage + 1) this.setPreviousCursor(prevResult.shift()); // its over the limit that means the first element is a cursor for previous
-        this.setRefreshCursor(prevResult?.[0] ?? defaultItem ?? nextResult?.[0] ?? null);
+        this.refreshCursorId = prevResult?.[0].id ?? defaultItem?.id ?? nextResult?.[0].id ?? null;
 
         this.nextCursor = null;
         if(nextResult.length === halfPage + 1) this.setNextCursor(nextResult.pop());  // its over the limit that means the last element is a cursor for next
 
-        const result = [...prevResult, defaultItem, ...nextResult];
-        this.refreshCursor = null;
-        if(result.length !== 0) this.setRefreshCursor(result[0]);
+        const result = [...prevResult, ...nextResult];
+
+        this.refreshCursorId = null;
+        if(result.length !== 0) this.refreshCursorId = result[0].id;
 
         return await super.map(result);
     }
@@ -180,9 +162,9 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         // if(result.length !== 0) this.setPreviousCursor(result);
 
         this.nextCursor = null;
-        this.refreshCursor = null;
+        this.refreshCursorId = null;
         if(result.length === this.perPage + 1) this.setNextCursor(result.pop());
-        if(result.length !== 0) this.setRefreshCursor(result[0]);
+        if(result.length !== 0) this.refreshCursorId = result[0].id;
 
         return await super.map(result);
     }
@@ -198,9 +180,9 @@ export class CursorPaginator<TableItem, MappedItem = TableItem, DB = DatabaseTyp
         // if(result.length !== 0) this.setNextCursor(result);
 
         this.prevCursor = null;
-        this.refreshCursor = null;
+        this.refreshCursorId = null;
         if(result.length === this.perPage + 1) this.setPreviousCursor(result.shift());
-        if(result.length !== 0) this.setRefreshCursor(result[0]);
+        if(result.length !== 0) this.refreshCursorId = result[0].id;
 
         return await super.map(result);
     }
