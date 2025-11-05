@@ -10,6 +10,7 @@ import { Expense } from "../schemas/expenseSchema.ts";
 import { Car } from "../../car/schemas/carSchema.ts";
 import { useExpenseTimelineFilter } from "../hooks/useExpenseTimelineFilter.ts";
 import { SelectExpenseTableRow } from "../model/mapper/expenseMapper.ts";
+import { TimelineItemType } from "../../../components/timelineView/item/TimelineItem.tsx";
 
 type ExpenseTimelineProps = {
     car: Car
@@ -44,7 +45,7 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
         isPreviousFetching,
         timelineFilterManagement,
         orderButtons
-    } = useTimelinePaginator<SelectExpenseTableRow, Expense>({
+    } = useTimelinePaginator<SelectExpenseTableRow, Expense, TimelineItemType>({
         paginator,
         mapper,
         cursorOrderButtons: [{ field: "date", title: "Dátum" }, { field: "amount", title: "Ár" }]

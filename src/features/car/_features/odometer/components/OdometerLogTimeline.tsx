@@ -13,6 +13,7 @@ import { useTimelinePaginator } from "../../../../../hooks/useTimelinePaginator.
 import { OdometerLogTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
 import { OdometerLog } from "../../../schemas/odometerLogSchema.ts";
 import { useOdometerLogTimelineFilter } from "../hooks/useOdometerLogTimelineFilter.ts";
+import { TimelineItemType } from "../../../../../components/timelineView/item/TimelineItem.tsx";
 
 type OdometerLogTimelineProps = {
     carId: string
@@ -52,7 +53,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
         isPreviousFetching,
         timelineFilterManagement,
         orderButtons
-    } = useTimelinePaginator<OdometerLogTableRow, OdometerLog>({
+    } = useTimelinePaginator<OdometerLogTableRow, OdometerLog, TimelineItemType>({
         paginator,
         mapper,
         cursorOrderButtons: [{ field: "value", title: "Kilométeróra-állás" }]

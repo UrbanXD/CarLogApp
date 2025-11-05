@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { TimelineItemType } from "../components/timelineView/item/TimelineItem.tsx";
 import { DatabaseType } from "../database/connector/powersync/AppSchema.ts";
 import { useCursor } from "./useCursor.ts";
 import { CursorPaginator } from "../database/paginator/CursorPaginator.ts";
 import { FilterButtonProps } from "../components/filter/FilterButton.tsx";
 import { useFocusEffect } from "expo-router";
 import { FlashListRef } from "@shopify/flash-list";
-import { PickerItemType } from "../components/Input/picker/PickerItem.tsx";
+
 import {
     AddFilterArgs,
     FILTER_CHANGED_EVENT,
@@ -15,18 +14,18 @@ import {
     ReplaceFilterArgs
 } from "../database/paginator/AbstractPaginator.ts";
 
-type UseTimelinePaginatorProps<TableItem, MappedItem, DB> = {
+type UseTimelinePaginatorProps<TableItem, MappedItem, ResultItem = MappedItem, DB> = {
     paginator: CursorPaginator<TableItem, MappedItem, DB>
-    mapper: (item: MappedItem) => TimelineItemType
+    mapper: (item: MappedItem) => ResultItem
     cursorOrderButtons?: Array<{ field: keyof TableItem, table?: keyof DB | null, title: string }>
 }
 
-export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = DatabaseType>({
+export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultItem = MappedItem, DB = DatabaseType>({
     paginator,
     mapper,
     cursorOrderButtons
 }: UseTimelinePaginatorProps<TableItem, MappedItem, DB>) {
-    const flashListRef = useRef<FlashListRef<PickerItemType>>(null);
+    const flashListRef = useRef<FlashListRef<ResultItem>>(null);
     const firstFocus = useRef(true);
 
     const {
@@ -37,7 +36,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
         getOrderIconForField
     } = useCursor<TableItem>(paginator.cursorOptions);
 
-    const [data, setData] = useState<Array<TimelineItemType>>([]);
+    const [data, setData] = useState<Array<ResultItem>>([]);
     const [filters, setFilters] = useState<Map<string, FilterGroup<TableItem, DB>>>(paginator.filterBy);
     const [initialFetchHappened, setInitialFetchHappened] = useState(false);
     const [isInitialFetching, setIsInitialFetching] = useState(true);
@@ -85,6 +84,11 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
         paginator.on(FILTER_CHANGED_EVENT, handler);
         return () => paginator.off(FILTER_CHANGED_EVENT, handler);
     }, [paginator]);
+
+    const refresh = useCallback(async () => {
+        const result = await paginator.refresh();
+        setData(result.map(mapper));
+    }, [paginator, mapper]);
 
     const fetchNext = useCallback(async () => {
         if(!paginator.hasNext()) return;
@@ -168,6 +172,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, DB = Dat
         data,
         initialFetchHappened,
         isInitialFetching,
+        refresh,
         fetchNext,
         isNextFetching,
         fetchPrevious,

@@ -13,6 +13,7 @@ import { useServiceLogTimelineItem } from "../hooks/useServiceLogTimelineItem.ts
 import { YearPicker } from "../../../../../components/Input/_presets/YearPicker.tsx";
 import { sql } from "@powersync/kysely-driver";
 import { Title } from "../../../../../components/Title.tsx";
+import { TimelineItemType } from "../../../../../components/timelineView/item/TimelineItem.tsx";
 
 type ServiceLogTimelineProps = {
     car: Car
@@ -47,7 +48,7 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
         isPreviousFetching,
         timelineFilterManagement,
         orderButtons
-    } = useTimelinePaginator<ServiceLogTableRow & ExpenseTableRow, ServiceLog>({
+    } = useTimelinePaginator<ServiceLogTableRow & ExpenseTableRow, ServiceLog, TimelineItemType>({
         paginator,
         mapper,
         cursorOrderButtons: [
