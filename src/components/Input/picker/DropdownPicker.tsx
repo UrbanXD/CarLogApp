@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import DropdownPickerController, { DropdownPickerControllerProps } from "./dropdown/DropdownPickerController.tsx";
 import DropdownPickerItems from "./dropdown/DropdownPickerItems.tsx";
 import { Paginator } from "../../../database/paginator/AbstractPaginator.ts";
@@ -17,11 +17,14 @@ type ConditionalDropdownPickerProps<Item, DB> = | {
     paginator: Paginator<Item, PickerItemType, DB>
     /** The key of the item property used for search filtering in the paginator. */
     searchBy?: keyof Item
+    /** Replace search bar and user can add an item to dropdown list */
+    renderCreateItemForm?: (callback: () => void) => ReactElement
     /** Used when the dropdown has static data and no pagination is required */
     data?: never
 } | {
     paginator?: never
     searchBy?: never
+    renderCreateItemForm?: never
     data: Array<PickerItemType>
 }
 
@@ -52,6 +55,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     data,
     paginator,
     searchBy,
+    renderCreateItemForm,
     searchBarEnabled = true,
     selectWithoutSubmit = false,
     icon,
@@ -175,6 +179,10 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
         isOpened.value = true;
     }, []);
 
+    const renderForm = useCallback(() => {
+        return renderCreateItemForm(() => paginator?.refresh().then((result) => setItems(result)));
+    }, [renderCreateItemForm, paginator]);
+
     const submit = useCallback((item: PickerItemType | null) => {
         setSelectedItem(item);
 
@@ -212,6 +220,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
             <PopupView opened={ isOpened }>
                 <DropdownPickerHeader
                     title={ title }
+                    renderCreateItemForm={ renderForm }
                     searchTerm={ searchTerm }
                     setSearchTerm={ setSearchTerm }
                     searchBarEnabled={ searchBarEnabled }

@@ -6,6 +6,7 @@ export const ICON_NAMES = {
     password: "lock-outline",
     user: "account-outline",
     checkMark: "check-circle-outline",
+    check: "check",
     eye: "eye-outline",
     eyeOff: "eye-off-outline",
     pencil: "pencil-outline",
