@@ -10,14 +10,14 @@ export function CreatePlaceForm() {
     const user = useAppSelector(getUser);
     if(!user) return <></>;
 
-    const { form, submitHandler } = useCreatePlace(user.id);
+    const { form, submitHandler } = useCreatePlace({ userId: user.id });
 
     return (
         <Form>
             <Input.Field control={ form.control } fieldName={ "name" } fieldNameText={ "Hely" }>
                 <Input.Text placeholder={ "Hely" }/>
             </Input.Field>
-            <FormButtons submit={ submitHandler }/>
+            <FormButtons submit={ () => submitHandler()() }/>
         </Form>
     );
 }
