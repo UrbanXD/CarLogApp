@@ -56,7 +56,8 @@ export const ICON_NAMES = {
     registration: "clipboard-text-multiple",
     note: "text",
     money: "cash",
-    expenseItem: "invoice-text-multiple-outline"
+    expenseItem: "invoice-text-multiple-outline",
+    passenger: "seat-passenger"
 };
 
 export const ICON_COLORS = {
