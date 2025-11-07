@@ -32,8 +32,8 @@ export function DropdownPickerHeader({
     searchBarPlaceholder
 }: DropdownPickerSearchBarProps) {
     const searchBarOpened = useSharedValue(1);
-    const searchBarHeight = useSharedValue(0);
-    const formHeight = useSharedValue(0);
+    const searchBarHeight = useSharedValue(formTheme.containerHeight);
+    const formHeight = useSharedValue(formTheme.containerHeight);
     const rotated = useDerivedValue(() => {
         return withTiming(
             interpolate(searchBarOpened.value, [0, 1], [45, 0]),
