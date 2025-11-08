@@ -45,6 +45,10 @@ type CommonDropdownPickerProps = {
     selectWithoutSubmit?: boolean
     /** The title displayed at the top of the dropdown menu */
     title?: string
+    /** Show content inside a popup view, default is true */
+    popUpView?: boolean
+    /** Hide the picker controller, if true then content is always visible */
+    hideController?: boolean
 } & Omit<DropdownPickerControllerProps, "selectedItem" | "toggleDropdown">;
 
 export type DropdownPickerProps<Item, DB> =
@@ -65,6 +69,8 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     numColumns,
     defaultSelectedItemValue,
     setValue,
+    popUpView = true,
+    hideController,
     disabled,
     disabledText,
     hiddenBackground,
@@ -169,6 +175,10 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     }, [data, paginator, inputFieldValue]);
 
     useEffect(() => {
+        setTmpSelectedItem(selectedItem);
+    }, [selectedItem]);
+
+    useEffect(() => {
         if(!initialLoadCompleted) return;
 
         debouncedFilter();
@@ -204,44 +214,55 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
         submit(tmpSelectedItem);
     }, [submit, tmpSelectedItem]);
 
+    const renderContent = () => (
+        <>
+            <DropdownPickerHeader
+                title={ title }
+                renderCreateItemForm={ renderCreateItemForm ? renderForm : undefined }
+                searchTerm={ searchTerm }
+                setSearchTerm={ setSearchTerm }
+                searchBarEnabled={ searchBarEnabled }
+                searchBarPlaceholder={ searchBarPlaceholder }
+            />
+            <DropdownPickerItems
+                items={ items }
+                fetchByScrolling={ IS_STATIC ? null : fetchByScrolling }
+                fetchingEnabled={ IS_STATIC ? false : initialLoadCompleted }
+                maintainVisibleContentPosition={ { disabled: true } }
+                selectedItem={ tmpSelectedItem }
+                onSelect={ onSelect }
+                searchTerm={ searchTerm }
+                masonry={ masonry }
+                numColumns={ numColumns }
+            />
+            {
+                !selectWithoutSubmit &&
+               <DropdownPickerFooter onSubmit={ onSubmit }/>
+            }
+        </>
+    );
+
     return (
         <>
-            <DropdownPickerController
-                selectedItem={ selectedItem }
-                toggleDropdown={ togglePopup }
-                icon={ icon }
-                inputPlaceholder={ inputPlaceholder }
-                disabled={ disabled }
-                disabledText={ disabledText }
-                hiddenBackground={ hiddenBackground }
-                containerStyle={ containerStyle }
-                textInputStyle={ textInputStyle }
-            />
-            <PopupView opened={ isOpened }>
-                <DropdownPickerHeader
-                    title={ title }
-                    renderCreateItemForm={ renderCreateItemForm ? renderForm : undefined }
-                    searchTerm={ searchTerm }
-                    setSearchTerm={ setSearchTerm }
-                    searchBarEnabled={ searchBarEnabled }
-                    searchBarPlaceholder={ searchBarPlaceholder }
-                />
-                <DropdownPickerItems
-                    items={ items }
-                    fetchByScrolling={ IS_STATIC ? null : fetchByScrolling }
-                    fetchingEnabled={ IS_STATIC ? false : initialLoadCompleted }
-                    maintainVisibleContentPosition={ { disabled: true } }
-                    selectedItem={ tmpSelectedItem }
-                    onSelect={ onSelect }
-                    searchTerm={ searchTerm }
-                    masonry={ masonry }
-                    numColumns={ numColumns }
-                />
-                {
-                    !selectWithoutSubmit &&
-                   <DropdownPickerFooter onSubmit={ onSubmit }/>
-                }
-            </PopupView>
+            {
+                !hideController &&
+               <DropdownPickerController
+                  selectedItem={ selectedItem }
+                  toggleDropdown={ togglePopup }
+                  icon={ icon }
+                  inputPlaceholder={ inputPlaceholder }
+                  disabled={ disabled }
+                  disabledText={ disabledText }
+                  hiddenBackground={ hiddenBackground }
+                  containerStyle={ containerStyle }
+                  textInputStyle={ textInputStyle }
+               />
+            }
+            {
+                popUpView
+                ? <PopupView opened={ isOpened }>{ renderContent() }</PopupView>
+                : renderContent()
+            }
         </>
     );
 };
