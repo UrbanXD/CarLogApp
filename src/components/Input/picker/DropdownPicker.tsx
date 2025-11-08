@@ -220,7 +220,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
             <PopupView opened={ isOpened }>
                 <DropdownPickerHeader
                     title={ title }
-                    renderCreateItemForm={ renderForm }
+                    renderCreateItemForm={ renderCreateItemForm ? renderForm : undefined }
                     searchTerm={ searchTerm }
                     setSearchTerm={ setSearchTerm }
                     searchBarEnabled={ searchBarEnabled }
