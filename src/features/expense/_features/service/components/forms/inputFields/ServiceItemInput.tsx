@@ -19,7 +19,6 @@ type ServiceItemInputProps = {
     fieldName: string
     carIdFieldName: string
     title?: string
-    subtitle?: string
     maxItemCount?: number
     minItemCount?: number
 }
@@ -30,7 +29,6 @@ export function ServiceItemInput({
     fieldName,
     carIdFieldName,
     title = "Szervizelési tételek",
-    subtitle,
     minItemCount = 0,
     maxItemCount = 5
 }: ServiceItemInputProps) {
@@ -127,10 +125,12 @@ export function ServiceItemInput({
     }, [items.length, minItemCount, remove]);
 
     return (
-        <Input.Field control={ control } fieldName={ fieldName } fieldNameText={ title } fieldInfoText={ subtitle }>
+        <Input.Field control={ control } fieldName={ fieldName }>
             <ExpandableList
                 expanded={ true }
                 data={ items.map(serviceItemToExpandableListItem) }
+                title={ title }
+                subtitle={ "Egységár" }
                 totalAmount={ totalAmount }
                 actionIcon={ ICON_NAMES.add }
                 onAction={ openAddItemForm }

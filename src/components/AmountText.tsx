@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
 
-type AmountTextProps = {
+export type AmountTextProps = {
     amount: string | number
     currencyText: string
     exchangedAmount?: (string | number) | Array<string | number>

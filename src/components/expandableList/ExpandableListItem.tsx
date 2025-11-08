@@ -7,6 +7,7 @@ import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../constants
 export type ExpandableListItemType = {
     id: string | number // for keyExtractor
     title: string
+    subtitle?: string
     count?: number
     amountProps?: AmountTextProps
 }
@@ -18,6 +19,7 @@ export type ExpandableListItemProps = ExpandableListItemType & {
 
 export function ExpandableListItem({
     title,
+    subtitle,
     count,
     amountProps,
     onPress,
@@ -38,10 +40,16 @@ export function ExpandableListItem({
                       onPress={ onRemove }
                    />
                 }
-                <Text style={ styles.itemText }>
-                    { title }
-                    { count && <Text style={ styles.countText }> (x{ count })</Text> }
-                </Text>
+                <View>
+                    <Text style={ styles.itemText }>
+                        { title }
+                    </Text>
+                    {
+                        subtitle &&
+                       <Text style={ [styles.itemText, styles.countText] }>{ subtitle }</Text>
+                    }
+                </View>
+                { count && <Text style={ [styles.itemText, styles.countText] }> (x{ count })</Text> }
             </View>
             {
                 amountProps &&
@@ -62,12 +70,14 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "row",
         alignItems: "center",
+        // backgroundColor: "red",
         gap: SEPARATOR_SIZES.lightSmall / 2
     },
     itemText: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p3,
         letterSpacing: FONT_SIZES.p3 * 0.025,
+        lineHeight: FONT_SIZES.p3,
         color: COLORS.gray1
     },
     countText: {

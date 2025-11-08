@@ -9,10 +9,13 @@ import { FlashList } from "@shopify/flash-list";
 import { AmountText } from "../AmountText.tsx";
 import { ExpandableListItem, ExpandableListItemType } from "./ExpandableListItem.tsx";
 import { DropdownView } from "../dropdownView/DropdownView.tsx";
+import InputTitle from "../Input/common/InputTitle.tsx";
 
 type ExpandableListProps = {
     expanded: boolean
     data: Array<ExpandableListItemType>
+    title?: string
+    subtitle?: string
     totalAmount?: Array<Amount>
     actionIcon?: string
     onAction?: () => void
@@ -23,6 +26,8 @@ type ExpandableListProps = {
 export function ExpandableList({
     expanded,
     data,
+    title,
+    subtitle,
     totalAmount,
     actionIcon,
     onAction,
@@ -52,21 +57,30 @@ export function ExpandableList({
     return (
         <DropdownView expanded={ expanded }>
             <View style={ styles.topContainer }>
-                {
-                    onAction && actionIcon &&
-                   <Button.Icon
-                      icon={ actionIcon }
-                      iconSize={ styles.text.fontSize * ICON_FONT_SIZE_SCALE }
-                      iconColor={ styles.text.color }
-                      width={ styles.text.fontSize * ICON_FONT_SIZE_SCALE }
-                      height={ styles.text.fontSize * ICON_FONT_SIZE_SCALE }
-                      backgroundColor="transparent"
-                      onPress={ onAction }
-                   />
-                }
-                <View style={ styles.topContainer.labelContainer }>
-                    <Text style={ styles.label }>Egységár</Text>
+                <View style={ { flexDirection: "row" } }>
+                    {
+                        title &&
+                       <InputTitle title={ title }/>
+                    }
+                    {
+                        onAction && actionIcon &&
+                       <Button.Icon
+                          icon={ actionIcon }
+                          iconSize={ styles.text.fontSize * ICON_FONT_SIZE_SCALE }
+                          iconColor={ styles.text.color }
+                          width={ styles.text.fontSize * ICON_FONT_SIZE_SCALE }
+                          height={ styles.text.fontSize * ICON_FONT_SIZE_SCALE }
+                          backgroundColor="transparent"
+                          onPress={ onAction }
+                       />
+                    }
                 </View>
+                {
+                    subtitle &&
+                   <View style={ styles.topContainer.labelContainer }>
+                      <Text style={ styles.label }>Egységár</Text>
+                   </View>
+                }
             </View>
             <FlashList
                 data={ data }

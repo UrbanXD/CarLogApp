@@ -102,6 +102,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         return (
             <ExpandableList
                 data={ serviceLog.items.map(serviceItemToExpandableListItem) }
+                subtitle={ "Egységár" }
                 totalAmount={ serviceLog.totalAmount }
                 expanded={ isServiceItemListExpanded }
                 actionIcon={ ICON_NAMES.pencil }

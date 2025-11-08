@@ -7,6 +7,7 @@ export function useServiceItemToExpandableList() {
         return {
             id: item.id,
             title: item.type.key,
+            count: item.quantity,
             amountProps: {
                 amount: item.pricePerUnit.amount,
                 currencyText: item.pricePerUnit.currency.symbol,
