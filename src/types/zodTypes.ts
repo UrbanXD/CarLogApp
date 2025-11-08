@@ -9,6 +9,11 @@ type ZodNumberArgs = {
     errorMessage?: { required?: string, minBound?: (min?: number) => string, maxBound?: (max?: number) => string }
 }
 
+type ZodDateArgs = {
+    optional?: boolean
+    requiredErrorMessage?: string
+} | null
+
 export const zNumber = ({
     optional = false,
     bounds,
@@ -53,14 +58,31 @@ export const zImage = z
 export const zColor = z
 .custom<ColorValue | null>(value => value === null || value instanceof ColorValue);
 
-export const zDate = (requiredErrorMessage?: string) => {
-    const required_error = requiredErrorMessage ?? "Kérem válasszon ki egy dátumot!";
-    return z.union([
+export const zDate = (args: ZodDateArgs = {}) => {
+    const {
+        optional = false,
+        requiredErrorMessage = "Kérem válasszon ki egy dátumot!"
+    } = args;
+    const required_error = requiredErrorMessage;
+
+    let schema = z.union([
         z.string({ required_error })
-        .transform(v => dayjs(v).isValid() ? dayjs(v).toISOString() : null),
-        z.date({ required_error })
-        .transform(v => v.toISOString())
+        .transform(v => {
+            if(v === "" || v == null) return null;
+
+            return dayjs(v).isValid() ? dayjs(v).toISOString() : null;
+        }),
+        z.date({ required_error }).transform(v => v.toISOString())
     ]);
+
+    if(optional) {
+        schema = schema
+        .nullable()
+        .optional()
+        .transform(v => v ?? null);
+    }
+
+    return schema;
 };
 
 export const zNote = () => z
