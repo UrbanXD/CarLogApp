@@ -10,7 +10,7 @@ import { AmountText } from "../AmountText.tsx";
 import { ExpandableListItem, ExpandableListItemType } from "./ExpandableListItem.tsx";
 import { DropdownView } from "../dropdownView/DropdownView.tsx";
 
-type ServiceItemExpandableListProps = {
+type ExpandableListProps = {
     expanded: boolean
     data: Array<ExpandableListItemType>
     totalAmount?: Array<Amount>
@@ -28,7 +28,7 @@ export function ExpandableList({
     onAction,
     onItemPress,
     onRemoveItem
-}: ServiceItemExpandableListProps) {
+}: ExpandableListProps) {
     const keyExtractor = useCallback((item: ExpandableListItemType) => item.id, []);
 
     const renderItem = useCallback(
