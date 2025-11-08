@@ -1,46 +1,45 @@
-import { DropdownView } from "../../../../../components/dropdownView/DropdownView.tsx";
 import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native";
 import React, { useCallback } from "react";
-import { ServiceItemView } from "./ServiceItemView.tsx";
-import { FormResultServiceItem, ServiceItem } from "../schemas/serviceItemSchema.ts";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { heightPercentageToDP } from "react-native-responsive-screen";
-import Button from "../../../../../components/Button/Button.ts";
-import { Amount } from "../../../../_shared/currency/schemas/amountSchema.ts";
+import Button from "../Button/Button.ts";
+import { Amount } from "../../features/_shared/currency/schemas/amountSchema.ts";
 import { useBottomSheetInternal, useBottomSheetScrollableCreator } from "@gorhom/bottom-sheet";
 import { FlashList } from "@shopify/flash-list";
-import { AmountText } from "../../../../../components/AmountText.tsx";
+import { AmountText } from "../AmountText.tsx";
+import { ExpandableListItem, ExpandableListItemType } from "./ExpandableListItem.tsx";
+import { DropdownView } from "../dropdownView/DropdownView.tsx";
 
 type ServiceItemExpandableListProps = {
     expanded: boolean
-    data: Array<FormResultServiceItem>
-    totalAmount: Array<Amount>
+    data: Array<ExpandableListItemType>
+    totalAmount?: Array<Amount>
     actionIcon?: string
     onAction?: () => void
     onItemPress?: (index: number) => void
-    onDeleteItem?: (index: number) => void
+    onRemoveItem?: (index: number) => void
 }
 
-export function ServiceItemExpandableList({
+export function ExpandableList({
     expanded,
     data,
     totalAmount,
     actionIcon,
     onAction,
     onItemPress,
-    onDeleteItem
+    onRemoveItem
 }: ServiceItemExpandableListProps) {
-    const keyExtractor = useCallback((item: ServiceItem) => item.id, []);
+    const keyExtractor = useCallback((item: ExpandableListItemType) => item.id, []);
 
     const renderItem = useCallback(
-        ({ item, index }: ListRenderItemInfo<ServiceItem>) => (
-            <ServiceItemView
-                item={ item }
+        ({ item, index }: ListRenderItemInfo<ExpandableListItemType>) => (
+            <ExpandableListItem
+                { ...item }
                 onPress={ onItemPress ? () => onItemPress(index) : undefined }
-                onDelete={ onDeleteItem ? () => onDeleteItem(index) : undefined }
+                onRemove={ onRemoveItem ? () => onRemoveItem(index) : undefined }
             />
         ),
-        [onItemPress, onDeleteItem]
+        [onItemPress, onRemoveItem]
     );
 
     const renderSeparatorComponent = useCallback(() => <View style={ { height: SEPARATOR_SIZES.lightSmall } }/>, []);
@@ -79,15 +78,18 @@ export function ServiceItemExpandableList({
                 style={ styles.itemsContainer }
                 renderScrollComponent={ BottomSheetFlashListScrollable }
             />
-            <View style={ styles.bottomContainer }>
-                <AmountText
-                    amount={ totalAmount.reduce((sum, a) => sum + a.exchangedAmount, 0) }
-                    currencyText={ totalAmount[0]?.exchangeCurrency?.symbol ?? "?" }
-                    exchangedAmount={ totalAmount.map(a => Number(a.amount ?? 0)) }
-                    exchangeCurrencyText={ totalAmount.map(a => a.currency.symbol ?? "?") }
-                />
-                <Text style={ [styles.label, styles.bottomContainer.label] }>Összköltéség</Text>
-            </View>
+            {
+                totalAmount &&
+               <View style={ styles.bottomContainer }>
+                  <AmountText
+                     amount={ totalAmount.reduce((sum, a) => sum + a.exchangedAmount, 0) }
+                     currencyText={ totalAmount[0]?.exchangeCurrency?.symbol ?? "?" }
+                     exchangedAmount={ totalAmount.map(a => Number(a.amount ?? 0)) }
+                     exchangeCurrencyText={ totalAmount.map(a => a.currency.symbol ?? "?") }
+                  />
+                  <Text style={ [styles.label, styles.bottomContainer.label] }>Összköltéség</Text>
+               </View>
+            }
         </DropdownView>
     );
 }

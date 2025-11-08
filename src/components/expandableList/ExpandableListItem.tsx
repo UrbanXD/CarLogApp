@@ -1,22 +1,33 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import { ServiceItem } from "../schemas/serviceItemSchema.ts";
+import { AmountText, AmountTextProps } from "../AmountText.tsx";
 import React from "react";
-import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
-import Button from "../../../../../components/Button/Button.ts";
-import { AmountText } from "../../../../../components/AmountText.tsx";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import Button from "../Button/Button.ts";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/index.ts";
 
-type ServiceItemProps = {
-    item: ServiceItem
-    onPress?: () => void
-    onDelete?: () => void
+export type ExpandableListItemType = {
+    id: string | number // for keyExtractor
+    title: string
+    count?: number
+    amountProps?: AmountTextProps
 }
 
-export function ServiceItemView({ item, onPress, onDelete }: ServiceItemProps) {
+export type ExpandableListItemProps = ExpandableListItemType & {
+    onPress?: () => void
+    onRemove?: () => void
+}
+
+export function ExpandableListItem({
+    title,
+    count,
+    amountProps,
+    onPress,
+    onRemove
+}: ExpandableListItemProps) {
     return (
         <Pressable onPress={ onPress } disabled={ !onPress } style={ styles.container }>
             <View style={ styles.labelContainer }>
                 {
-                    onDelete &&
+                    onRemove &&
                    <Button.Icon
                       icon={ ICON_NAMES.close }
                       iconSize={ FONT_SIZES.p3 }
@@ -24,22 +35,19 @@ export function ServiceItemView({ item, onPress, onDelete }: ServiceItemProps) {
                       width={ FONT_SIZES.p3 }
                       height={ FONT_SIZES.p3 }
                       backgroundColor="transparent"
-                      onPress={ onDelete }
+                      onPress={ onRemove }
                    />
                 }
                 <Text style={ styles.itemText }>
-                    { item.type.key }
-                    <Text style={ styles.countText }> (x{ item.quantity })</Text>
+                    { title }
+                    { count && <Text style={ styles.countText }> (x{ count })</Text> }
                 </Text>
             </View>
-            <AmountText
-                amount={ item.pricePerUnit.amount }
-                currencyText={ item.pricePerUnit.currency.symbol }
-                exchangedAmount={ item.pricePerUnit.exchangedAmount }
-                exchangeCurrencyText={ item.pricePerUnit.exchangeCurrency.symbol }
-            />
+            {
+                amountProps &&
+               <AmountText { ...amountProps } />
+            }
         </Pressable>
-
     );
 }
 

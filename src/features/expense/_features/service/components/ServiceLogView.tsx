@@ -13,10 +13,11 @@ import { Title } from "../../../../../components/Title.tsx";
 import { InfoContainer } from "../../../../../components/info/InfoContainer.tsx";
 import { FloatingDeleteButton } from "../../../../../components/Button/presets/FloatingDeleteButton.tsx";
 import { ServiceLog } from "../schemas/serviceLogSchema.ts";
-import { ServiceItemExpandableList } from "./ServiceItemExpandableList.tsx";
 import { ServiceLogFormFieldsEnum } from "../enums/ServiceLogFormFieldsEnum.ts";
 import { Odometer } from "../../../../car/_features/odometer/schemas/odometerSchema.ts";
 import { updateCarOdometer } from "../../../../car/model/slice/index.ts";
+import { ExpandableList } from "../../../../../components/expandableList/ExpandableList.tsx";
+import { useServiceItemToExpandableList } from "../hooks/useServiceItemToExpandableList.ts";
 
 export type ServiceLogViewProps = {
     id: string
@@ -26,6 +27,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
     const { serviceLogDao } = useDatabase();
     const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
+    const { serviceItemToExpandableListItem } = useServiceItemToExpandableList();
 
     const [car, setCar] = useState<Car | null>(null);
     const [serviceLog, setServiceLog] = useState<ServiceLog | null>(null);
@@ -94,6 +96,23 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         return subtitle;
     }, [serviceLog, car]);
 
+    const renderServiceItems = useCallback(() => {
+        if(!serviceLog) return <></>;
+
+        return (
+            <ExpandableList
+                data={ serviceLog.items.map(serviceItemToExpandableListItem) }
+                totalAmount={ serviceLog.totalAmount }
+                expanded={ isServiceItemListExpanded }
+                actionIcon={ ICON_NAMES.pencil }
+                onAction={ () => {
+                    setServiceItemListExpanded(false);
+                    onEdit(ServiceLogFormFieldsEnum.ServiceItems);
+                } }
+            />
+        );
+    }, [serviceLog, onEdit, serviceItemToExpandableListItem, isServiceItemListExpanded]);
+
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
             icon: ICON_NAMES.car,
@@ -107,16 +126,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
             content: isServiceItemListExpanded ? " " : getAmountSubtitle(),
             secondaryInfo: { icon: isServiceItemListExpanded ? ICON_NAMES.upArrowHead : ICON_NAMES.downArrowHead },
             onPress: () => setServiceItemListExpanded(prevState => !prevState),
-            renderContent: () => serviceLog && <ServiceItemExpandableList
-               data={ serviceLog.items }
-               totalAmount={ serviceLog.totalAmount }
-               expanded={ isServiceItemListExpanded }
-               actionIcon={ ICON_NAMES.pencil }
-               onAction={ () => {
-                   setServiceItemListExpanded(false);
-                   onEdit(ServiceLogFormFieldsEnum.ServiceItems);
-               } }
-            />
+            renderContent: renderServiceItems
         },
         {
             icon: ICON_NAMES.calendar,

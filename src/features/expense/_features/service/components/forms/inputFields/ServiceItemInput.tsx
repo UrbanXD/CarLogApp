@@ -1,5 +1,4 @@
 import { Control, useFieldArray, useWatch } from "react-hook-form";
-import { ServiceItemExpandableList } from "../../ServiceItemExpandableList.tsx";
 import Input from "../../../../../../../components/Input/Input.ts";
 import React, { useCallback, useEffect, useState } from "react";
 import { FormResultServiceItem } from "../../../schemas/serviceItemSchema.ts";
@@ -12,6 +11,8 @@ import { ICON_NAMES } from "../../../../../../../constants/index.ts";
 import { CurrencyEnum } from "../../../../../../_shared/currency/enums/currencyEnum.ts";
 import { ServiceItemForm } from "../ServiceItemForm.tsx";
 import { Amount } from "../../../../../../_shared/currency/schemas/amountSchema.ts";
+import { useServiceItemToExpandableList } from "../../../hooks/useServiceItemToExpandableList.ts";
+import { ExpandableList } from "../../../../../../../components/expandableList/ExpandableList.tsx";
 
 type ServiceItemInputProps = {
     control: Control<any>
@@ -36,6 +37,7 @@ export function ServiceItemInput({
     if(minItemCount > maxItemCount) maxItemCount = minItemCount;
 
     const { getCar } = useCars();
+    const { serviceItemToExpandableListItem } = useServiceItemToExpandableList();
 
     const [car, setCar] = useState<Car | null>(null);
     const [totalAmount, setTotalAmount] = useState<Array<Amount>>([]);
@@ -126,13 +128,13 @@ export function ServiceItemInput({
 
     return (
         <Input.Field control={ control } fieldName={ fieldName } fieldNameText={ title } fieldInfoText={ subtitle }>
-            <ServiceItemExpandableList
+            <ExpandableList
                 expanded={ true }
-                data={ items }
+                data={ items.map(serviceItemToExpandableListItem) }
                 totalAmount={ totalAmount }
                 actionIcon={ ICON_NAMES.add }
                 onAction={ openAddItemForm }
-                onDeleteItem={ removeItem }
+                onRemoveItem={ removeItem }
                 onItemPress={ openUpdateItemForm }
             />
             <PopupView opened={ isExpandedAddForm }>
