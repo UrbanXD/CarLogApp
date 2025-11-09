@@ -5,9 +5,9 @@ import { useSharedValue } from "react-native-reanimated";
 import { PopupView } from "../../../../../../../components/popupView/PopupView.tsx";
 import { ICON_NAMES } from "../../../../../../../constants/index.ts";
 import { ExpandableList } from "../../../../../../../components/expandableList/ExpandableList.tsx";
-import { useRidePlaceToExpandableList } from "../../../../../hooks/useRidePlaceToExpandableList.ts";
 import { PlaceFormFields } from "../../../schemas/form/placeForm.ts";
 import { RidePlaceForm } from "../RidePlaceForm.tsx";
+import { useRidePlaceToExpandableList } from "../../../hooks/useRidePlaceToExpandableList.ts";
 
 type RidePlaceInputProps = {
     control: Control<any>
