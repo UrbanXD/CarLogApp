@@ -4,7 +4,7 @@ import { z } from "zod";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const passengerForm = passengerSchema
+export const passengerForm = passengerSchema
 .pick({ id: true, ownerId: true })
 .extend({
     name: passengerSchema.shape.name.min(1, "Az utas nevének megadása kötelező.")

@@ -27,6 +27,7 @@ import { ServiceItemTypeDao } from "../../features/expense/_features/service/mod
 import { PlaceDao } from "../../features/ride/_features/place/model/dao/placeDao.ts";
 import { PassengerDao } from "../../features/ride/_features/passenger/model/dao/passengerDao.ts";
 import { RidePlaceDao } from "../../features/ride/_features/place/model/dao/ridePlaceDao.ts";
+import { RidePassengerDao } from "../../features/ride/_features/passenger/model/dao/ridePassengerDao.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
@@ -55,6 +56,7 @@ export class Database {
     private _placeDao?: PlaceDao;
     private _ridePlaceDao?: RidePlaceDao;
     private _passengerDao?: PassengerDao;
+    private _ridePassengerDao?: RidePassengerDao;
 
     constructor() {
         this.powersync = new PowerSyncDatabase({
@@ -254,6 +256,12 @@ export class Database {
         if(!this._passengerDao) this._passengerDao = new PassengerDao(this.db);
 
         return this._passengerDao;
+    }
+
+    get ridePassengerDao(): RidePassengerDao {
+        if(!this._ridePassengerDao) this._ridePassengerDao = new RidePassengerDao(this.db);
+
+        return this._ridePassengerDao;
     }
 
     async init() {

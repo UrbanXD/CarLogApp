@@ -7,6 +7,7 @@ export const ridePassengerSchema = passengerSchema
     id: z.string().uuid(),
     passengerId: passengerSchema.shape.id,
     rideLogId: z.string().uuid(),
+    name: passengerSchema.shape.name,
     order: z.number().int()
 });
 
