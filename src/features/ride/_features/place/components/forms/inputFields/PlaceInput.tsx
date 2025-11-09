@@ -2,7 +2,6 @@ import { Control } from "react-hook-form";
 import { useDatabase } from "../../../../../../../contexts/database/DatabaseContext.ts";
 import React, { useMemo } from "react";
 import Input from "../../../../../../../components/Input/Input.ts";
-import { ICON_NAMES } from "../../../../../../../constants/index.ts";
 import { useCreatePlace } from "../../../hooks/useCreatePlace.ts";
 import { useAppSelector } from "../../../../../../../hooks/index.ts";
 import { getUser } from "../../../../../../user/model/selectors/index.ts";
@@ -12,14 +11,12 @@ type PlaceInputProps = {
     control?: Control<any>
     fieldName?: string
     title?: string
-    subtitle?: string
 }
 
 export function PlaceInput({
     control,
     fieldName,
-    title = "Hely",
-    subtitle
+    title = "Hely"
 }: PlaceInputProps) {
     const { placeDao } = useDatabase();
     const user = useAppSelector(getUser);
@@ -33,8 +30,6 @@ export function PlaceInput({
         <Input.Field
             control={ control }
             fieldName={ fieldName }
-            fieldNameText={ title }
-            fieldInfoText={ subtitle }
         >
             <Input.Picker.Dropdown
                 title={ title }
@@ -48,7 +43,9 @@ export function PlaceInput({
                     />
                 }
                 searchBy="name"
-                icon={ ICON_NAMES.startingPointMarker }
+                hideController
+                selectWithoutSubmit
+                popUpView={ false }
             />
         </Input.Field>
     );

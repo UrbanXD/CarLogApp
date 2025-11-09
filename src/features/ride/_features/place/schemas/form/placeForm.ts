@@ -4,7 +4,7 @@ import { z } from "zod";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const placeForm = placeSchema
+export const placeForm = placeSchema
 .pick({ id: true, ownerId: true })
 .extend({
     name: placeSchema.shape.name.min(1, "A hely megnevezésének megadása kötelező.")
@@ -16,7 +16,7 @@ const getPlaceForm = (placeDao: PlaceDao) => placeForm
         return await placeDao.isNameAlreadyExists(value.id, value.ownerId, value.name);
     },
     {
-        message: "Már létezik ilyen nevű helyed.",
+        message: "Már létezik ilyen nevű hely.",
         path: ["name"]
     }
 );

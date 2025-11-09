@@ -1,25 +1,17 @@
 import { RidePlaceTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
 import { RidePlace, ridePlaceSchema } from "../../schemas/ridePlaceSchema.ts";
-import { PlaceDao } from "../dao/placeDao.ts";
 
-export class RidePlaceMapper extends AbstractMapper<RidePlaceTableRow, RidePlace> {
-    private readonly placeDao: PlaceDao;
+export type SelectRidePlaceTableRow = RidePlaceTableRow & { name: string };
 
-    constructor(placeDao: PlaceDao) {
-        super();
-        this.placeDao = placeDao;
-    }
-
-    async toDto(entity: RidePlaceTableRow): Promise<RidePlace> {
-        const place = await this.placeDao.getById(entity.place_id);
-
+export class RidePlaceMapper extends AbstractMapper<RidePlaceTableRow, RidePlace, SelectRidePlaceTableRow> {
+    toDto(entity: SelectRidePlaceTableRow): RidePlace {
         return ridePlaceSchema.parse({
             id: entity.id,
             ownerId: entity.owner_id,
             rideLogId: entity.ride_log_id,
             placeId: entity.place_id,
-            name: place?.name,
+            name: entity.name,
             order: entity.place_order
         });
     }

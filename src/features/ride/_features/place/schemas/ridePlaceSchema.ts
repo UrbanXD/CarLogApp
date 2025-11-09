@@ -7,6 +7,7 @@ export const ridePlaceSchema = placeSchema
     id: z.string().uuid(),
     placeId: placeSchema.shape.id,
     rideLogId: z.string().uuid(),
+    name: placeSchema.shape.name,
     order: z.number().int()
 });
 
