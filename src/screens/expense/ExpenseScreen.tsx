@@ -67,22 +67,12 @@ export function ExpenseScreen() {
     }, [expense, openToast, openModal]);
 
     const getAmountSubtitle = useCallback(() => {
-        let subtitle = `${ expense?.originalAmount } ${ expense?.currency.symbol }`;
-        if(expense?.currency.id === car?.currency.id && expense?.exchangeRate === 1) return subtitle;
+        let subtitle = `${ expense?.amount.amount } ${ expense?.amount.currency.symbol }`;
+        if(expense?.amount.currency.id === expense?.amount.exchangeCurrency.id && expense?.amount.exchangeRate === 1) return subtitle;
 
-        subtitle += ` (${ expense?.amount } ${ car?.currency.symbol })`;
+        subtitle += ` (${ expense?.amount.exchangedAmount } ${ expense?.amount?.exchangeCurrency.symbol })`;
         return subtitle;
-    }, [expense, car]);
-
-    const getPricePerUnitSubtitle = useCallback(() => {
-        if(!expense?.fuelLog) return "";
-
-        let subtitle = `${ expense.fuelLog.originalPricePerUnit } ${ expense.currency.symbol }`;
-        if(expense?.currency.id === car?.currency.id && expense?.exchangeRate === 1) return subtitle;
-
-        subtitle += ` (${ expense?.fuelLog.pricePerUnit } ${ car?.currency.symbol })`;
-        return subtitle;
-    }, [expense, car]);
+    }, [expense]);
 
     const onEdit = useCallback((field?: ExpenseFormFields) => {
         if(!expense) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
@@ -105,10 +95,10 @@ export function ExpenseScreen() {
             title: "Ár",
             content: (textStyle) => expense &&
                <AmountText
-                  amount={ expense.originalAmount }
-                  currencyText={ expense.currency.symbol }
-                  exchangedAmount={ expense.originalAmount }
-                  exchangeCurrencyText={ car?.currency.symbol }
+                  amount={ expense.amount.amount }
+                  currencyText={ expense.amount.currency.symbol }
+                  exchangedAmount={ expense.amount.exchangedAmount }
+                  exchangeCurrencyText={ expense.amount.exchangeCurrency.symbol }
                   amountTextStyle={ textStyle ? [...textStyle, { textAlign: "left" }] : { textAlign: "left" } }
                />,
             onPress: () => onEdit(ExpenseFormFields.Amount)
@@ -125,7 +115,7 @@ export function ExpenseScreen() {
             contentTextStyle: !expense?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(ExpenseFormFields.Note)
         }
-    ]), [car, expense, getAmountSubtitle, getPricePerUnitSubtitle]);
+    ]), [car, expense, getAmountSubtitle]);
 
     return (
         <>

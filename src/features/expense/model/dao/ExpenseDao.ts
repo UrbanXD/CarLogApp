@@ -12,6 +12,7 @@ import { ExpenseFields } from "../../schemas/form/expenseForm.ts";
 import { SelectQueryBuilder } from "kysely";
 import { FUEL_LOG_TABLE } from "../../../../database/connector/powersync/tables/fuelLog.ts";
 import { SERVICE_LOG_TABLE } from "../../../../database/connector/powersync/tables/serviceLog.ts";
+import { CAR_TABLE } from "../../../../database/connector/powersync/tables/car.ts";
 
 export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, SelectExpenseTableRow> {
     constructor(
@@ -29,11 +30,13 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
     selectQuery(): SelectQueryBuilder<DatabaseType, SelectExpenseTableRow> {
         return this.db
         .selectFrom(EXPENSE_TABLE)
+        .innerJoin(CAR_TABLE, `${ CAR_TABLE }.id`, `${ EXPENSE_TABLE }.car_id`)
         .leftJoin(FUEL_LOG_TABLE, `${ FUEL_LOG_TABLE }.expense_id`, `${ EXPENSE_TABLE }.id`)
         .leftJoin(SERVICE_LOG_TABLE, `${ SERVICE_LOG_TABLE }.expense_id`, `${ EXPENSE_TABLE }.id`)
         .selectAll(EXPENSE_TABLE)
         .select([
-            eb => eb.fn.coalesce(`${ FUEL_LOG_TABLE }.id`, `${ SERVICE_LOG_TABLE }.id`).as("related_id")
+            eb => eb.fn.coalesce(`${ FUEL_LOG_TABLE }.id`, `${ SERVICE_LOG_TABLE }.id`).as("related_id"),
+            `${ CAR_TABLE }.currency_id as car_currency_id`
         ]);
     }
 

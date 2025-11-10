@@ -49,8 +49,6 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
 
     const handleDelete = useCallback(async (serviceLog: ServiceLog) => {
         try {
-            if(!car) throw new Error("Car not found!");
-
             const resultId = await serviceLogDao.delete(serviceLog);
 
             let odometer: Odometer | null = null;
@@ -66,7 +64,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
             console.log(e);
             openToast(DeleteExpenseToast.error());
         }
-    }, [serviceLogDao, car]);
+    }, [serviceLogDao]);
 
     const onDelete = useCallback(() => {
         if(!serviceLog) return openToast({ type: "warning", title: "Kiadás nem található!" });
@@ -89,12 +87,12 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
     }, [serviceLog, openToast]);
 
     const getAmountSubtitle = useCallback(() => {
-        let subtitle = `${ serviceLog?.expense.originalAmount } ${ serviceLog?.expense.currency.symbol }`;
-        if(serviceLog?.expense.currency.id === car?.currency.id && serviceLog?.expense.exchangeRate === 1) return subtitle;
+        let subtitle = `${ serviceLog?.expense.amount.amount } ${ serviceLog?.expense.amount.currency.symbol }`;
+        if(serviceLog?.expense.amount.currency.id === serviceLog?.expense.amount.currency.id && serviceLog?.expense.amount.exchangeRate === 1) return subtitle;
 
-        subtitle += ` (${ serviceLog?.expense.amount } ${ car?.currency.symbol })`;
+        subtitle += ` (${ serviceLog?.expense.amount.exchangedAmount } ${ serviceLog?.expense.amount.exchangeCurrency.symbol })`;
         return subtitle;
-    }, [serviceLog, car]);
+    }, [serviceLog]);
 
     const renderServiceItems = useCallback(() => {
         if(!serviceLog) return <></>;

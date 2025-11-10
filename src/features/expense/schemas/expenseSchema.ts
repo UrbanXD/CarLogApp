@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { expenseTypeSchema } from "./expenseTypeSchema.ts";
-import { currencySchema } from "../../_shared/currency/schemas/currencySchema.ts";
 import { zNote } from "../../../types/zodTypes.ts";
+import { amountSchema } from "../../_shared/currency/schemas/amountSchema.ts";
 
 export const expenseSchema = z
 .object({
@@ -9,10 +9,7 @@ export const expenseSchema = z
     carId: z.string().uuid(),
     relatedId: z.string().uuid().nullable().optional(),
     type: expenseTypeSchema,
-    originalAmount: z.number().min(0),
-    exchangeRate: z.number().min(0),
-    amount: z.number().min(0),
-    currency: currencySchema,
+    amount: amountSchema,
     note: zNote(),
     date: z.string()
 });

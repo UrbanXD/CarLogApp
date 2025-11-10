@@ -16,7 +16,7 @@ type LatestExpenseProps = {
 
 export function LatestExpenses({ car }: LatestExpenseProps) {
     const { expenseDao } = useDatabase();
-    const { mapper } = useExpenseTimelineItem(car?.currency);
+    const { mapper } = useExpenseTimelineItem();
 
     const [expenses, setExpenses] = useState<Array<Expense>>([]);
     const [isLoading, setIsLoading] = useState(false);

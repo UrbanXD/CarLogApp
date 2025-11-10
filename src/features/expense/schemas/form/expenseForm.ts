@@ -12,26 +12,27 @@ export const expenseForm = expenseSchema
 .extend({
     carId: zPickerRequired("Kérem válasszon ki egy autót!").pipe(expenseSchema.shape.carId),
     typeId: zPickerRequired("Kérem válasszon ki egy típust!").pipe(expenseSchema.shape.type.shape.id),
-    currencyId: zPickerRequired("Kérem válasszon ki egy valutát!").pipe(expenseSchema.shape.currency.shape.id),
+    currencyId: zPickerRequired("Kérem válasszon ki egy valutát!")
+    .pipe(expenseSchema.shape.amount.shape.currency.shape.id),
     amount: zNumber({
-        bounds: { min: expenseSchema.shape.amount.minValue ?? 0 },
+        bounds: { min: expenseSchema.shape.amount.shape.amount.minValue ?? 0 },
         errorMessage: {
             required: "Kérem adja meg a költség összegét",
             minBound: (min) => min === 0
                                ? "A költség összege nem lehet negatív szám."
                                : `A költség összegének minimum ${ min } értékűnek lennie kell.`
         }
-    }).pipe(expenseSchema.shape.amount),
+    }).pipe(expenseSchema.shape.amount.shape.amount),
     date: zDate().pipe(expenseSchema.shape.date),
     exchangeRate: zNumber({
-        bounds: { min: expenseSchema.shape.exchangeRate.minValue ?? 0 },
+        bounds: { min: expenseSchema.shape.amount.shape.exchangeRate.minValue ?? 0 },
         errorMessage: {
             required: "Kérem adja meg az átváltási árfolyamot.",
             minBound: (min) => min === 0
                                ? "Az átváltási árfolyam nem lehet negatív szám."
                                : `Az átváltási árfolyamnak minimum legyen legalább ${ min }.`
         }
-    }).pipe(expenseSchema.shape.exchangeRate)
+    }).pipe(expenseSchema.shape.amount.shape.exchangeRate)
 });
 
 export type ExpenseFields = z.infer<typeof expenseForm>;
@@ -56,9 +57,9 @@ export function useEditExpenseFormProps(expense: Expense) {
         id: expense.id,
         carId: expense.carId,
         typeId: expense.type.id,
-        currencyId: expense.currency.id,
-        amount: expense.originalAmount,
-        exchangeRate: expense.exchangeRate,
+        currencyId: expense.amount.currency.id,
+        amount: expense.amount.amount,
+        exchangeRate: expense.amount.exchangeRate,
         note: expense.note,
         date: expense.date
     };

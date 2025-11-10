@@ -63,8 +63,8 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
             fuelUnit: fuelUnit,
             odometer: odometer,
             quantity: entity.quantity,
-            originalPricePerUnit: numberToFractionDigit(expense.originalAmount / entity.quantity),
-            pricePerUnit: numberToFractionDigit(expense.amount / entity.quantity),
+            originalPricePerUnit: numberToFractionDigit(expense.amount.amount / entity.quantity),
+            pricePerUnit: numberToFractionDigit(expense.amount.exchangedAmount / entity.quantity),
             isPricePerUnit: Boolean(entity.is_price_per_unit)
         });
     }

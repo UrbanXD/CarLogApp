@@ -69,7 +69,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         if(!fuelLog) return openToast({ type: "warning", title: "Kiadás nem található!" });
 
         openModal({
-            title: `Kiadás napló bejegyzés törlése`,
+            title: `Tankolási napló bejegyzés törlése`,
             body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
             acceptText: "Törlés",
             acceptAction: () => handleDelete(fuelLog)
@@ -103,10 +103,10 @@ export function FuelLogView({ id }: FuelLogViewProps) {
             title: "Ár",
             content: (textStyle) => fuelLog &&
                <AmountText
-                  amount={ fuelLog.expense.originalAmount }
-                  currencyText={ fuelLog.expense.currency.symbol }
-                  exchangedAmount={ fuelLog.expense.amount }
-                  exchangeCurrencyText={ car?.currency.symbol }
+                  amount={ fuelLog.expense.amount.amount }
+                  currencyText={ fuelLog.expense.amount.currency.symbol }
+                  exchangedAmount={ fuelLog.expense.amount.exchangedAmount }
+                  exchangeCurrencyText={ fuelLog.expense.amount.exchangeCurrency.symbol }
                   amountTextStyle={ textStyle ? [...textStyle, { textAlign: "left" }] : { textAlign: "left" } }
                />,
             onPress: () => onEdit(FuelLogFormFieldsEnum.Amount),
@@ -115,9 +115,9 @@ export function FuelLogView({ id }: FuelLogViewProps) {
                 content: (textStyle) => fuelLog &&
                    <AmountText
                       amount={ fuelLog.originalPricePerUnit }
-                      currencyText={ `${ fuelLog.expense.currency.symbol }/${ fuelLog.fuelUnit.short }` }
+                      currencyText={ `${ fuelLog.expense.amount.currency.symbol }/${ fuelLog.fuelUnit.short }` }
                       exchangedAmount={ fuelLog.pricePerUnit }
-                      exchangeCurrencyText={ `${ car?.currency.symbol }/${ fuelLog.fuelUnit.short }` }
+                      exchangeCurrencyText={ `${ fuelLog.expense.amount.exchangeCurrency.symbol }/${ fuelLog.fuelUnit.short }` }
                       amountTextStyle={ textStyle }
                    />
             }
