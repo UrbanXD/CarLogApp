@@ -24,6 +24,7 @@ import { ridePlaceTable } from "./tables/ridePlace.ts";
 import { ridePassengerTable } from "./tables/ridePassenger.ts";
 import { placeTable } from "./tables/place.ts";
 import { passengerTable } from "./tables/passenger.ts";
+import { rideExpenseTable } from "./tables/rideExpense.ts";
 
 export const AppSchema = new Schema({
     attachments: new AttachmentTable(),
@@ -47,6 +48,7 @@ export const AppSchema = new Schema({
     service_item: serviceItem,
     service_item_type: serviceItemTypeTable,
     ride_log: rideLogTable,
+    ride_expense: rideExpenseTable,
     ride_place: ridePlaceTable,
     ride_passenger: ridePassengerTable,
     place: placeTable,
@@ -74,6 +76,7 @@ export type ServiceTypeTableRow = DatabaseType["service_type"];
 export type ServiceItemTableRow = DatabaseType["service_item"];
 export type ServiceItemTypeTableRow = DatabaseType["service_item_type"];
 export type RideLogTableRow = DatabaseType["ride_log"];
+export type RideExpenseTableRow = DatabaseType["ride_expense"];
 export type RidePlaceTableRow = DatabaseType["ride_place"];
 export type RidePassengerTableRow = DatabaseType["ride_passenger"];
 export type PlaceTableRow = DatabaseType["place"];

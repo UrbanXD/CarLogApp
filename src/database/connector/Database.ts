@@ -28,6 +28,7 @@ import { PlaceDao } from "../../features/ride/_features/place/model/dao/placeDao
 import { PassengerDao } from "../../features/ride/_features/passenger/model/dao/passengerDao.ts";
 import { RidePlaceDao } from "../../features/ride/_features/place/model/dao/ridePlaceDao.ts";
 import { RidePassengerDao } from "../../features/ride/_features/passenger/model/dao/ridePassengerDao.ts";
+import { RideExpenseDao } from "../../features/ride/_features/rideExpense/model/dao/rideExpenseDao.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
@@ -57,6 +58,7 @@ export class Database {
     private _ridePlaceDao?: RidePlaceDao;
     private _passengerDao?: PassengerDao;
     private _ridePassengerDao?: RidePassengerDao;
+    private _rideExpenseDao?: RideExpenseDao;
 
     constructor() {
         this.powersync = new PowerSyncDatabase({
@@ -262,6 +264,12 @@ export class Database {
         if(!this._ridePassengerDao) this._ridePassengerDao = new RidePassengerDao(this.db);
 
         return this._ridePassengerDao;
+    }
+
+    get rideExpenseDao(): RideExpenseDao {
+        if(!this._rideExpenseDao) this._rideExpenseDao = new RideExpenseDao(this.db, this.carDao, this.expenseDao);
+
+        return this._rideExpenseDao;
     }
 
     async init() {
