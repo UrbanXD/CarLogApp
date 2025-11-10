@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
     ActivityIndicator,
     Platform,
@@ -13,6 +13,7 @@ import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../..
 import Icon from "../Icon";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
 import { Color, ImageSource } from "../../types/index.ts";
+import { debounce } from "es-toolkit";
 
 interface TextButtonProps {
     text?: string;
@@ -30,6 +31,7 @@ interface TextButtonProps {
     inverse?: boolean;
     disabled?: boolean;
     loadingIndicator?: boolean;
+    debounceMs?: number;
     onPress: () => void;
 }
 
@@ -49,6 +51,7 @@ const TextButton: React.FC<TextButtonProps> = ({
     inverse = false,
     disabled = false,
     loadingIndicator = false,
+    debounceMs = 350,
     onPress
 }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -78,10 +81,11 @@ const TextButton: React.FC<TextButtonProps> = ({
         }
     };
 
+    const debouncedPress = useMemo(() => debounce(handlePress, debounceMs), [handlePress, debounceMs]);
 
     return (
         <TouchableOpacity
-            onPress={ handlePress }
+            onPress={ debouncedPress }
             disabled={ disabled || isLoading }
             style={ [styles.buttonContainer, style] }
         >

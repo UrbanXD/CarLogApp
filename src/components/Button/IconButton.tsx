@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
 import Icon from "../Icon";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { Color, ImageSource } from "../../types/index.ts";
+import { debounce } from "es-toolkit";
 
 interface IconButtonProps {
     icon: ImageSource;
@@ -14,6 +15,7 @@ interface IconButtonProps {
     style?: ViewStyle;
     inverse?: boolean;
     disabled?: boolean;
+    debounceMs?: number;
     onPress: () => void;
 }
 
@@ -27,6 +29,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
     style,
     inverse = false,
     disabled = false,
+    debounceMs = 350,
     onPress
 }) => {
     const styles = useButtonStyles(
@@ -36,9 +39,11 @@ export const IconButton: React.FC<IconButtonProps> = ({
         height
     );
 
+    const debouncedPress = useMemo(() => debounce(onPress, debounceMs), [handlePress, debounceMs]);
+
     return (
         <TouchableOpacity
-            onPress={ onPress }
+            onPress={ debouncedPress }
             disabled={ disabled }
             style={ [styles.buttonContainer, style] }
         >
