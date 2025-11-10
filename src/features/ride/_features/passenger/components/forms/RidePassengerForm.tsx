@@ -8,7 +8,7 @@ import React, { useEffect } from "react";
 import { CarCreateToast } from "../../../../../car/presets/toast/index.ts";
 import { StyleSheet, View } from "react-native";
 import { SaveButton } from "../../../../../../components/Button/presets/SaveButton.tsx";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
+import { SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
 import { PassengerInput } from "./inputFields/PassengerInput.tsx";
 
 type RidePassengerFormProps = {
@@ -48,6 +48,7 @@ export function RidePassengerForm({ onSubmit, defaultRidePassenger }: RidePassen
             openToast(CarCreateToast.error());
         }
     );
+
     return (
         <View style={ styles.container }>
             <PassengerInput control={ control } fieldName="passengerId" title={ "Utas" }/>
@@ -61,11 +62,5 @@ const styles = StyleSheet.create({
         width: "100%",
         alignSelf: "center",
         gap: SEPARATOR_SIZES.lightSmall
-    },
-    title: {
-        fontFamily: "Gilroy-Heavy",
-        fontSize: FONT_SIZES.p1,
-        color: COLORS.white,
-        textAlign: "center"
     }
 });
