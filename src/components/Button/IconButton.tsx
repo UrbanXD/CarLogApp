@@ -39,7 +39,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
         height
     );
 
-    const debouncedPress = useMemo(() => debounce(onPress, debounceMs), [handlePress, debounceMs]);
+    const debouncedPress = useMemo(() => debounce(onPress, debounceMs), [onPress, debounceMs]);
 
     return (
         <TouchableOpacity
