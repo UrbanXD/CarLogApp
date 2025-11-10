@@ -6,7 +6,7 @@ import { odometerLogSchema } from "../../../../../car/_features/odometer/schemas
 import { Car } from "../../../../../car/schemas/carSchema.ts";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formResultServiceItem } from "../serviceItemSchema.ts";
+import { formResultServiceItemSchema } from "../serviceItemSchema.ts";
 
 const serviceLogForm = expenseForm
 .pick({ date: true, note: true })
@@ -15,7 +15,7 @@ const serviceLogForm = expenseForm
     serviceLogSchema
     .pick({ id: true, carId: true })
     .extend({
-        items: z.array(formResultServiceItem),
+        items: z.array(formResultServiceItemSchema),
         serviceTypeId: zPickerRequired("Kérem válasszon ki egy típust!")
         .pipe(serviceLogSchema.shape.serviceType.shape.id),
         odometerValue: zNumber({

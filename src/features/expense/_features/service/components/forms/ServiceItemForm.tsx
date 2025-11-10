@@ -1,4 +1,4 @@
-import { ServiceItem } from "../../schemas/serviceItemSchema.ts";
+import { FormResultServiceItem, ServiceItem } from "../../schemas/serviceItemSchema.ts";
 import { useForm } from "react-hook-form";
 import { ServiceItemFields, useServiceItemFormProps } from "../../schemas/form/serviceItemForm.ts";
 import { CarCreateToast } from "../../../../../car/presets/toast/index.ts";
@@ -14,7 +14,7 @@ import Form from "../../../../../../components/Form/Form.tsx";
 
 type ServiceItemFormProps = {
     carCurrencyId: number
-    onSubmit: (result: Omit<ServiceItem, "serviceLogId" | "carId">) => void
+    onSubmit: (result: FormResultServiceItem) => void
     defaultServiceItem?: ServiceItem
 }
 

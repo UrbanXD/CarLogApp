@@ -1,6 +1,6 @@
 import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
 import { CarTableRow, ServiceItemTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
-import { ServiceItem, serviceItemSchema } from "../../schemas/serviceItemSchema.ts";
+import { FormResultServiceItem, ServiceItem, serviceItemSchema } from "../../schemas/serviceItemSchema.ts";
 import { ServiceItemTypeDao } from "../dao/ServiceItemTypeDao.ts";
 import { numberToFractionDigit } from "../../../../../../utils/numberToFractionDigit.ts";
 import { CurrencyDao } from "../../../../../_shared/currency/model/dao/CurrencyDao.ts";
@@ -89,9 +89,7 @@ export class ServiceItemMapper extends AbstractMapper<ServiceItemTableRow, Servi
         return result;
     }
 
-    async formResultToDto(formResult: ServiceItemFields & {
-        carCurrencyId: number
-    }): Promise<Omit<ServiceItem, "serviceLogId" | "carId">> {
+    async formResultToDto(formResult: ServiceItemFields & { carCurrencyId: number }): Promise<FormResultServiceItem> {
         const [type, carCurrency, currency]: [ServiceItemType | null, Currency | null, Currency | null] = await Promise.all(
             [
                 this.serviceItemTypeDao.getById(formResult.typeId),
