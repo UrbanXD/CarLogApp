@@ -29,6 +29,7 @@ import { PassengerDao } from "../../features/ride/_features/passenger/model/dao/
 import { RidePlaceDao } from "../../features/ride/_features/place/model/dao/ridePlaceDao.ts";
 import { RidePassengerDao } from "../../features/ride/_features/passenger/model/dao/ridePassengerDao.ts";
 import { RideExpenseDao } from "../../features/ride/_features/rideExpense/model/dao/rideExpenseDao.ts";
+import { RideLogDao } from "../../features/ride/model/dao/rideLogDao.ts";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
@@ -54,6 +55,7 @@ export class Database {
     private _serviceTypeDao?: ServiceTypeDao;
     private _serviceItemTypeDao?: ServiceItemTypeDao;
     private _serviceItemDao?: ServiceItemDao;
+    private _rideLogDao?: RideLogDao;
     private _placeDao?: PlaceDao;
     private _ridePlaceDao?: RidePlaceDao;
     private _passengerDao?: PassengerDao;
@@ -270,6 +272,20 @@ export class Database {
         if(!this._rideExpenseDao) this._rideExpenseDao = new RideExpenseDao(this.db, this.carDao, this.expenseDao);
 
         return this._rideExpenseDao;
+    }
+
+    get rideLogDao(): RideLogDao {
+        if(!this._rideLogDao) this._rideLogDao = new RideLogDao(
+            this.db,
+            this.rideExpenseDao,
+            this.ridePlaceDao,
+            this.ridePassengerDao,
+            this.odometerLogDao,
+            this.odometerUnitDao,
+            this.carDao
+        );
+
+        return this._rideLogDao;
     }
 
     async init() {
