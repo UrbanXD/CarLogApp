@@ -39,7 +39,7 @@ export class PassengerDao extends Dao<PassengerTableRow, Passenger, PassengerMap
         return new CursorPaginator<PassengerTableRow, PickerItemType>(
             this.db,
             PASSENGER_TABLE,
-            { cursor: [{ field: "name", order: "asc" }, { field: "id" }], order: "asc" },
+            { cursor: [{ field: "name", order: "asc", toLowerCase: true }, { field: "id" }], order: "asc" },
             {
                 perPage,
                 mapper: this.mapper.entityToPickerItem.bind(this.mapper)

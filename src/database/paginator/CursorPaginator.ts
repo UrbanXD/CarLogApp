@@ -10,7 +10,8 @@ export type CursorValue<TableItem> = TableItem[keyof TableItem] | null;
 export type Cursor<TableField, DB = DatabaseType> = {
     field: TableField,
     table?: keyof DB,
-    order?: OrderByDirectionExpression
+    order?: OrderByDirectionExpression,
+    toLowerCase?: boolean
 }
 export type CursorOptions<TableField, DB = DatabaseType> = {
     cursor: Cursor<TableField, DB> | Array<Cursor<TableField, DB>>,

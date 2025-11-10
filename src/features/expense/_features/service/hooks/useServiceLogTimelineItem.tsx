@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { Currency } from "../../../../_shared/currency/schemas/currencySchema.ts";
 import React, { ReactNode, useCallback } from "react";
 import { TimelineItemType } from "../../../../../components/timelineView/item/TimelineItem.tsx";
 import { router } from "expo-router";
@@ -9,7 +8,7 @@ import { ServiceLog } from "../schemas/serviceLogSchema.ts";
 
 dayjs.extend(utc);
 
-export function useServiceLogTimelineItem(currency: Currency) {
+export function useServiceLogTimelineItem() {
     const mapper = useCallback((serviceLog: ServiceLog): TimelineItemType => {
         const onPress = () => {
             router.push({
@@ -20,10 +19,10 @@ export function useServiceLogTimelineItem(currency: Currency) {
 
         let footer: ReactNode = (
             <AmountText
-                amount={ serviceLog.expense.originalAmount }
-                currencyText={ serviceLog.expense.currency.symbol }
-                exchangedAmount={ serviceLog.expense.amount }
-                exchangeCurrencyText={ currency.symbol }
+                amount={ serviceLog.expense.amount.amount }
+                currencyText={ serviceLog.expense.amount.currency.symbol }
+                exchangedAmount={ serviceLog.expense.amount.exchangedAmount }
+                exchangeCurrencyText={ serviceLog.expense.amount.exchangeCurrency.symbol }
             />
         );
 
@@ -38,7 +37,7 @@ export function useServiceLogTimelineItem(currency: Currency) {
             footerText: footer,
             onPress
         };
-    }, [currency]);
+    }, []);
 
     return { mapper };
 }

@@ -21,7 +21,7 @@ type ServiceLogTimelineProps = {
 
 export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
     const { serviceLogDao } = useDatabase();
-    const { mapper } = useServiceLogTimelineItem(car.currency);
+    const { mapper } = useServiceLogTimelineItem();
     const paginator = useMemo(() =>
         serviceLogDao.paginator(
             {

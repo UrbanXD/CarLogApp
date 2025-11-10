@@ -4,13 +4,12 @@ import dayjs from "dayjs";
 import { Expense } from "../schemas/expenseSchema.ts";
 import utc from "dayjs/plugin/utc";
 import { router } from "expo-router";
-import { Currency } from "../../_shared/currency/schemas/currencySchema.ts";
 import { ExpenseTypeEnum } from "../model/enums/ExpenseTypeEnum.ts";
 import { AmountText } from "../../../components/AmountText.tsx";
 
 dayjs.extend(utc);
 
-export function useExpenseTimelineItem(currency?: Currency) {
+export function useExpenseTimelineItem() {
     const mapper = useCallback((expense: Expense): TimelineItemType => {
         const routerPathTitle = "Kiadás";
         let routerPathName = "/expense/[id]";
@@ -37,10 +36,10 @@ export function useExpenseTimelineItem(currency?: Currency) {
 
         let footer: ReactNode = (
             <AmountText
-                amount={ expense.originalAmount }
-                currencyText={ expense.currency.symbol }
-                exchangedAmount={ expense.amount }
-                exchangeCurrencyText={ currency?.symbol }
+                amount={ expense.amount.amount }
+                currencyText={ expense.amount.currency.symbol }
+                exchangedAmount={ expense.amount.exchangedAmount }
+                exchangeCurrencyText={ expense.amount.exchangeCurrency.symbol }
             />
         );
 
@@ -55,7 +54,7 @@ export function useExpenseTimelineItem(currency?: Currency) {
             footerText: footer,
             onPress
         };
-    }, [currency]);
+    }, []);
 
     return { mapper };
 }

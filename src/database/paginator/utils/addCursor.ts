@@ -24,7 +24,12 @@ export function addCursor<TableItem, DB = DatabaseType>(
 
             subQuery = addOrder<TableItem, DB>(
                 subQuery,
-                { field: fieldName, direction: orderDirection, reverse: direction === "prev", toLowerCase: true }
+                {
+                    field: fieldName,
+                    direction: orderDirection,
+                    reverse: direction === "prev",
+                    toLowerCase: cursor?.toLowerCase ?? false
+                }
             );
         });
     } else {
@@ -40,7 +45,7 @@ export function addCursor<TableItem, DB = DatabaseType>(
                 field: fieldName,
                 direction: orderDirection,
                 reverse: direction === "prev",
-                toLowerCase: true
+                toLowerCase: cursorOptions.cursor?.toLowerCase ?? false
             }
         );
     }

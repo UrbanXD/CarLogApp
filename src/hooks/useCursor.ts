@@ -29,7 +29,6 @@ export function useCursor<TableItem, DB = DatabaseType>(options: CursorOptions<k
             if(!Array.isArray(prev.cursor)) return prev; // it is not an array so we cannot change the order
 
             const fieldIndex = findCursorIndex(prev.cursor, field, table);
-            console.log(fieldIndex);
             if(fieldIndex === -1) return prev; // field is not cursor field
 
             return { ...prev, cursor: arraySwapByIndex(prev.cursor, fieldIndex, 0) };
