@@ -72,14 +72,15 @@ export function RideExpenseInput({
 
             const existing = totals.get(key);
             if(existing) {
-                existing.amount += item.expense.amount.amount;
-                existing.exchangedAmount += item.expense.amount.exchangedAmount;
+                const newAmount = existing.amount + item.expense.amount.amount;
+                const newExchangedAmount = existing.exchangedAmount + item.expense.amount.exchangedAmount;
 
-                totals.set(key, existing);
+                totals.set(key, { ...existing, amount: newAmount, exchangedAmount: newExchangedAmount });
             } else {
                 totals.set(key, item.expense.amount);
             }
         }
+        
         setTotalAmount(
             Array.from(totals.values()).sort((a, b) => b.amount - a.amount)
         );
@@ -118,7 +119,7 @@ export function RideExpenseInput({
             <ExpandableList
                 expanded={ true }
                 data={ items.map(rideExpenseToExpandableList) }
-                totalAmount={ totalAmount }
+                totalAmount={ items.length >= 1 && totalAmount }
                 title={ title }
                 actionIcon={ ICON_NAMES.add }
                 onAction={ openAddItemForm }

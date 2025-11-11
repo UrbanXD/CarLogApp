@@ -77,10 +77,10 @@ export function ServiceItemInput({
             const exchangedAmount = pricePerUnit.exchangedAmount * quantity;
 
             if(existing) {
-                existing.amount += amount;
-                existing.exchangedAmount += exchangedAmount;
+                const newAmount = existing.amount + amount;
+                const newExchangedAmount = existing.exchangedAmount + exchangedAmount;
 
-                totals.set(key, existing);
+                totals.set(key, { ...existing, amount: newAmount, exchangedAmount: newExchangedAmount });
             } else {
                 totals.set(key, {
                     amount,

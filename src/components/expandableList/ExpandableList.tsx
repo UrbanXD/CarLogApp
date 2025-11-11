@@ -98,7 +98,7 @@ export function ExpandableList({
                   <AmountText
                      amount={ totalAmount.reduce((sum, a) => sum + a.exchangedAmount, 0) }
                      currencyText={ totalAmount[0]?.exchangeCurrency?.symbol ?? "?" }
-                     exchangedAmount={ totalAmount.map(a => Number(a.amount ?? 0)) }
+                     exchangedAmount={ totalAmount.length !== 1 && totalAmount.map(a => Number(a.amount ?? 0)) }
                      exchangeCurrencyText={ totalAmount.map(a => a.currency.symbol ?? "?") }
                   />
                   <Text style={ [styles.label, styles.bottomContainer.label] }>Összköltéség</Text>
