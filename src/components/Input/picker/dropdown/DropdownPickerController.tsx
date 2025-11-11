@@ -16,6 +16,8 @@ export type DropdownPickerControllerProps = {
     icon?: string
     /** Placeholder text displayed in the controller when no item is selected */
     inputPlaceholder?: string
+    /** When true, the controller style change */
+    error?: boolean
     /** When true, the dropdown is disabled and cannot be opened */
     disabled?: boolean
     /** Message shown in a toast when trying to open a disabled dropdown */
@@ -33,6 +35,7 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
     toggleDropdown,
     icon,
     inputPlaceholder = "Válasszon a listából",
+    error,
     disabled,
     disabledText,
     hiddenBackground,
@@ -50,7 +53,12 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
     return (
         <Pressable
             onPress={ onPress }
-            style={ [styles.container, !hiddenBackground && styles.backgroundContainer, containerStyle] }
+            style={ [
+                styles.container,
+                !hiddenBackground && styles.backgroundContainer,
+                error && styles.errorFormFieldContainer,
+                containerStyle
+            ] }
             pointerEvents={ "box-only" }
         >
             {

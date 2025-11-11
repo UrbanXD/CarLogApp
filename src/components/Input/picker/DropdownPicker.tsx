@@ -80,6 +80,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field.onChange;
     const inputFieldValue = inputFieldContext?.field?.value?.toString() ?? defaultSelectedItemValue;
+    const error = inputFieldContext?.fieldState?.error;
 
     const IS_STATIC = !!data;
 
@@ -251,6 +252,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
                   toggleDropdown={ togglePopup }
                   icon={ icon }
                   inputPlaceholder={ inputPlaceholder }
+                  error={ !!error }
                   disabled={ disabled }
                   disabledText={ disabledText }
                   hiddenBackground={ hiddenBackground }
