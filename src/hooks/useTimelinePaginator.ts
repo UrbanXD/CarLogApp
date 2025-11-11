@@ -34,7 +34,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
         makeFieldMainCursor,
         toggleFieldOrder,
         getOrderIconForField
-    } = useCursor<TableItem>(paginator.cursorOptions);
+    } = useCursor<TableItem>(paginator.cursorOptions, paginator.table);
 
     const [data, setData] = useState<Array<ResultItem>>([]);
     const [filters, setFilters] = useState<Map<string, FilterGroup<TableItem, DB>>>(paginator.filterBy);

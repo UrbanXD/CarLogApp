@@ -41,11 +41,13 @@ export class CursorPaginator<TableItem extends {
 
         if(Array.isArray(this.cursorOptions.cursor)) {
             this.cursorOptions.cursor.map((cursor) => {
-                const cursorField = sql.ref(`${ cursor?.table ?? this.table }.${ cursor.field }`);
+                const tableName = cursor?.table === null ? null : cursor?.table ?? this.table;
+                const cursorField = tableName ? sql.ref([tableName, cursor.field].join(".")) : sql.ref(cursor.field);
                 query = query.select(cursorField);
             });
         } else {
-            const cursorField = sql.ref(`${ this.cursorOptions.cursor?.table ?? this.table }.${ this.cursorOptions.cursor.field }`);
+            const tableName = cursor?.table === null ? null : cursor?.table ?? this.table;
+            const cursorField = tableName ? sql.ref([tableName, cursor.field].join(".")) : sql.ref(cursor.field);
             query = query.select(cursorField);
         }
 
@@ -65,14 +67,6 @@ export class CursorPaginator<TableItem extends {
             this.prevCursor = this.cursorOptions.cursor.map((cursor) => firstItem[cursor.field] ?? null);
         } else {
             this.prevCursor = firstItem[this.cursorOptions.cursor.field] ?? null;
-        }
-    }
-
-    private setRefreshCursor(item: TableItem) {
-        if(Array.isArray(this.cursorOptions.cursor)) {
-            this.refreshCursor = this.cursorOptions.cursor.map((cursor) => item[cursor.field] ?? null);
-        } else {
-            this.refreshCursor = item[this.cursorOptions.cursor.field] ?? null;
         }
     }
 

@@ -45,7 +45,7 @@ export type PaginatorOptions<TableItem, MappedItem = TableItem, DB = DatabaseTyp
 
 export abstract class Paginator<TableItem, MappedItem = TableItem, DB = DatabaseType> extends EventEmitter {
     private database: Kysely<DB>;
-    protected table: keyof DB;
+    table: keyof DB;
     private readonly baseQuery?: SelectQueryBuilder<DB, TableItem, any>;
     filterBy: Map<string, FilterGroup<TableItem, DB>> = new Map();
     private readonly mapper?: (tableRow?: TableItem) => Promise<MappedItem>;

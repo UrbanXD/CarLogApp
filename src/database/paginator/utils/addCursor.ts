@@ -18,9 +18,9 @@ export function addCursor<TableItem, DB = DatabaseType>(
         cursorOptions.cursor.map((cursor) => {
             const orderDirection: OrderByDirectionExpression = cursor.order ?? cursorOptions.defaultOrder ?? "asc";
 
-            const tableName = cursor.table ?? table;
-            let fieldName = `${ tableName }.${ cursor.field }`;
-            if(cursor.table === null) fieldName = cursor.field; // if table name is null that means no table name need (if undefined then set default table)
+            // if table name is null that means no table name need (if undefined then set default table)
+            const tableName = cursor?.table === null ? null : cursor?.table ?? table;
+            const fieldName = tableName ? sql.ref([tableName, cursor.field].join(".")) : sql.ref(cursor.field);
 
             subQuery = addOrder<TableItem, DB>(
                 subQuery,
@@ -35,9 +35,8 @@ export function addCursor<TableItem, DB = DatabaseType>(
     } else {
         const orderDirection: OrderByDirectionExpression = cursorOptions.cursor?.order ?? cursorOptions.defaultOrder ?? "asc";
 
-        const tableName = cursorOptions.cursor.table ?? table;
-        let fieldName = `${ tableName }.${ cursorOptions.cursor }`;
-        if(cursor.table === null) fieldName = cursorOptions.cursor;
+        const tableName = cursor?.table === null ? null : cursor?.table ?? table;
+        const fieldName = tableName ? sql.ref([tableName, cursor.field].join(".")) : sql.ref(cursor.field);
 
         subQuery = addOrder<TableItem, DB>(
             subQuery,
@@ -62,7 +61,12 @@ export function addCursor<TableItem, DB = DatabaseType>(
     const cursorOperator = getCursorOperator(cursorOrders, direction);
 
     if(Array.isArray(cursorOptions.cursor) && Array.isArray(value)) {
-        const tupleFields = sql.raw(cursorOptions.cursor.map(cursor => `"${ cursor.table ?? table }"."${ cursor.field }"`)
+        const tupleFields = sql.raw(cursorOptions.cursor.map(cursor => {
+            const tableName = cursor?.table === null ? null : cursor?.table ?? table;
+            const fieldName = tableName ? [tableName, cursor.field].join(".") : cursor.field;
+
+            return fieldName;
+        })
         .join(", "));
         const tupleValues = sql.join(value.map(v => sql`${ v }`));
 
