@@ -89,7 +89,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         };
     }
 
-    formResultToEntities(formResult: RideLogFormFields): {
+    async formResultToEntities(formResult: RideLogFormFields): {
         rideLog: RideLogTableRow,
         expenses: Map<string, ExpenseTableRow>,
         rideExpenses: Map<string, RideExpenseTableRow>,
@@ -98,6 +98,8 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         startOdometerLog: OdometerLogTableRow | null,
         endOdometerLog: OdometerLogTableRow | null
     } {
+        const ownerId = await this.carDao.getCarOwnerById(formResult.carId);
+
         let startOdometerLog: OdometerLogTableRow | null = null;
         if(formResult.startOdometerValue) {
             startOdometerLog = {
@@ -134,7 +136,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         for(const item of formResult.expenses) {
             rideExpenses.set(item.id, {
                 id: item.id,
-                owner_id: formResult.ownerId,
+                owner_id: ownerId,
                 ride_log_id: formResult.id,
                 expense_id: item.expense.id
             });
@@ -159,7 +161,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
             placeOrder += 1;
             ridePlaces.set(item.id, {
                 id: item.id,
-                owner_id: formResult.ownerId,
+                owner_id: ownerId,
                 place_id: item.placeId,
                 ride_log_id: formResult.id,
                 place_order: placeOrder
@@ -173,7 +175,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
             passengerOrder += 1;
             ridePassengers.set(item.id, {
                 id: item.id,
-                owner_id: formResult.ownerId,
+                owner_id: ownerId,
                 passenger_id: item.passengerId,
                 ride_log_id: formResult.id,
                 passenger_order: passengerOrder

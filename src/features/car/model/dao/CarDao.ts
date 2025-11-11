@@ -57,7 +57,7 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
         return await this.mapper.toDtoArray(carRowArray);
     }
 
-    async getCarCurrencyIdById(id: string): Promise<number | null> {
+    async getCarCurrencyIdById(id: string): Promise<number> {
         const result = await this.db
         .selectFrom(CAR_TABLE)
         .select("currency_id")
@@ -65,6 +65,16 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
         .executeTakeFirstOrThrow();
 
         return result.currency_id;
+    }
+
+    async getCarOwnerById(id: string): Promise<string> {
+        const result = await this.db
+        .selectFrom(CAR_TABLE)
+        .select("owner_id")
+        .where("id", "=", id)
+        .executeTakeFirstOrThrow();
+
+        return result.owner_id;
     }
 
     async create(
