@@ -89,7 +89,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         };
     }
 
-    async formResultToEntities(formResult: RideLogFormFields): {
+    async formResultToEntities(formResult: RideLogFormFields): Promise<{
         rideLog: RideLogTableRow,
         expenses: Map<string, ExpenseTableRow>,
         rideExpenses: Map<string, RideExpenseTableRow>,
@@ -97,7 +97,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         ridePassengers: Map<string, RidePassengerTableRow>,
         startOdometerLog: OdometerLogTableRow | null,
         endOdometerLog: OdometerLogTableRow | null
-    } {
+    }> {
         const ownerId = await this.carDao.getCarOwnerById(formResult.carId);
 
         let startOdometerLog: OdometerLogTableRow | null = null;

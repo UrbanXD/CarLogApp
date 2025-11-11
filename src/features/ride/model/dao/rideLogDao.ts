@@ -43,7 +43,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
             ridePassengers,
             startOdometerLog,
             endOdometerLog
-        } = this.mapper.formResultToEntities(formResult);
+        } = await this.mapper.formResultToEntities(formResult);
 
         const insertedRideLogId = await this.db.transaction().execute(async (trx) => {
             if(startOdometerLog) {
