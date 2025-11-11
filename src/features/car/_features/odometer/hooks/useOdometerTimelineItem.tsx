@@ -35,10 +35,9 @@ export const useOdometerTimelineItem = () => {
 
         return {
             id: odometerLog.id,
-            milestone: odometerLog.value.toString(),
-            renderMilestone: (milestone: string) =>
+            milestone:
                 <OdometerText
-                    text={ milestone }
+                    text={ odometerLog.value }
                     unit={ odometerLog.unit.short }
                     textStyle={ { color: COLORS.white } }
                     unitTextStyle={ { color: COLORS.white } }

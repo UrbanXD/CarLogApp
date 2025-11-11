@@ -12,7 +12,7 @@ export type TimelineItemType = Omit<TimelineItemProps, "isFirst" | "isLast" | "i
 
 type TimelineItemProps = {
     id: string
-    milestone: string
+    milestone: ReactNode
     title: string
     color?: Color
     icon?: string
@@ -23,7 +23,6 @@ type TimelineItemProps = {
     isFirst: boolean
     isLast: boolean
     onPress?: () => void
-    renderMilestone?: (milestone: string) => ReactNode
 }
 
 export function TimelineItem({
@@ -37,8 +36,7 @@ export function TimelineItem({
     footerText,
     onPress,
     isFirst,
-    isLast,
-    renderMilestone
+    isLast
 }: TimelineItemProps) {
     const styles = useStyles(color, iconSize, isFirst, isLast);
 
@@ -65,9 +63,9 @@ export function TimelineItem({
             <Pressable onPress={ onPress } disabled={ !onPress } style={ styles.card }>
                 <View style={ styles.card.title.container }>
                     {
-                        renderMilestone
-                        ? renderMilestone(milestone)
-                        : <Text style={ styles.card.title.text }>{ milestone }</Text>
+                        typeof milestone === "string"
+                        ? <Text style={ styles.card.title.text }>{ milestone }</Text>
+                        : milestone
                     }
                     <Text style={ styles.card.subtitle }>{ title }</Text>
                     <Divider
@@ -83,7 +81,7 @@ export function TimelineItem({
                 {
                     footerText && (
                         typeof footerText === "string"
-                        ? <Text style={ styles.card.footerText }></Text>
+                        ? <Text style={ styles.card.footerText }>{ footerText }</Text>
                         : footerText
                     )
                 }
