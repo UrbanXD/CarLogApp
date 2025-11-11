@@ -2,6 +2,7 @@ import React, { ReactElement } from "react";
 import { StyleSheet, View, ViewStyle } from "react-native";
 import { SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { formTheme } from "../../../ui/form/constants/theme.ts";
+import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 
 type InputRowProps = {
     children?: ReactElement
@@ -10,8 +11,11 @@ type InputRowProps = {
 }
 
 export function InputRow({ children, focused = false, style }: InputRowProps) {
+    const inputFieldContext = useInputFieldContext();
+    const error = inputFieldContext?.fieldState?.error;
+
     return (
-        <View style={ [styles.container, focused && styles.focused, style] }>
+        <View style={ [styles.container, focused && styles.focused, error && styles.error, style] }>
             { children }
         </View>
     );
@@ -31,6 +35,9 @@ const styles = StyleSheet.create({
     },
     focused: {
         borderColor: formTheme.activeColor
+    },
+    error: {
+        borderColor: formTheme.errorColor
     }
 });
 
