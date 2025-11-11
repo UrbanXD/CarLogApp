@@ -20,7 +20,7 @@ export function addCursor<TableItem, DB = DatabaseType>(
 
             // if table name is null that means no table name need (if undefined then set default table)
             const tableName = cursor?.table === null ? null : cursor?.table ?? table;
-            const fieldName = tableName ? sql.ref([tableName, cursor.field].join(".")) : sql.ref(cursor.field);
+            const fieldName = tableName ? [tableName, cursor.field].join(".") : cursor.field;
 
             subQuery = addOrder<TableItem, DB>(
                 subQuery,
@@ -36,7 +36,7 @@ export function addCursor<TableItem, DB = DatabaseType>(
         const orderDirection: OrderByDirectionExpression = cursorOptions.cursor?.order ?? cursorOptions.defaultOrder ?? "asc";
 
         const tableName = cursor?.table === null ? null : cursor?.table ?? table;
-        const fieldName = tableName ? sql.ref([tableName, cursor.field].join(".")) : sql.ref(cursor.field);
+        const fieldName = tableName ? [tableName, cursor.field].join(".") : cursor.field;
 
         subQuery = addOrder<TableItem, DB>(
             subQuery,
