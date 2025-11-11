@@ -1,12 +1,11 @@
 import { z } from "zod";
 import { userSchema } from "../../../../user/schemas/userSchema.ts";
-import { rideLogSchema } from "../../../schemas/rideLogSchema.ts";
 import { expenseSchema } from "../../../../expense/schemas/expenseSchema.ts";
 
 export const rideExpenseSchema = z.object({
     id: z.string().uuid(),
     ownerId: userSchema.shape.id,
-    rideLogId: z.lazy(() => rideLogSchema.shape.id),
+    rideLogId: z.string().uuid(),
     expense: expenseSchema
 });
 
