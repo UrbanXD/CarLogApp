@@ -46,21 +46,17 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
         } = await this.mapper.formResultToEntities(formResult);
 
         const insertedRideLogId = await this.db.transaction().execute(async (trx) => {
-            if(startOdometerLog) {
-                await trx
-                .insertInto(ODOMETER_LOG_TABLE)
-                .values(startOdometerLog)
-                .returning("id")
-                .executeTakeFirstOrThrow();
-            }
+            await trx
+            .insertInto(ODOMETER_LOG_TABLE)
+            .values(startOdometerLog)
+            .returning("id")
+            .executeTakeFirstOrThrow();
 
-            if(endOdometerLog) {
-                await trx
-                .insertInto(ODOMETER_LOG_TABLE)
-                .values(endOdometerLog)
-                .returning("id")
-                .executeTakeFirstOrThrow();
-            }
+            await trx
+            .insertInto(ODOMETER_LOG_TABLE)
+            .values(endOdometerLog)
+            .returning("id")
+            .executeTakeFirstOrThrow();
 
             const result = await trx
             .insertInto(RIDE_LOG_TABLE)

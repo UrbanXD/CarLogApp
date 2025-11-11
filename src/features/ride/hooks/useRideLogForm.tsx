@@ -14,22 +14,34 @@ import InputDatePicker from "../../../components/Input/datePicker/InputDatePicke
 import { NoteInput } from "../../../components/Input/_presets/NoteInput.tsx";
 import { RidePassengerInput } from "../_features/passenger/components/forms/inputFields/RidePassengerInput.tsx";
 import { RideExpenseInput } from "../_features/rideExpense/components/forms/inputFields/RideExpenseInput.tsx";
+import dayjs from "dayjs";
 
 type UseRideLogFormFieldsProps = UseFormReturn<RideLogFormFields>
 
 export function useRideLogFormFields(props: UseRideLogFormFieldsProps) {
-    const { control, setValue, clearErrors } = props;
+    const { control, setValue, getFieldState, clearErrors } = props;
     const { getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(null);
 
     const formCarId = useWatch({ control, name: "carId" });
+    const formStartOdometerValue = useWatch({ control, name: "startOdometerValue" });
+    const formStartTime = useWatch({ control, name: "startTime" });
 
     useEffect(() => {
         const car = getCar(formCarId);
         setCar(car ?? null);
+        if(car && !getFieldState("startOdometerValue").isDirty) {
+            setValue("startOdometerValue", car.odometer.value);
+        }
         clearErrors();
     }, [formCarId]);
+
+    useEffect(() => {
+        if(formStartOdometerValue && !getFieldState("endOdometerValue").isDirty) {
+            setValue("endOdometerValue", formStartOdometerValue);
+        }
+    }, [formStartOdometerValue]);
 
     const fields: Record<RideLogFormFieldsEnum, FormFields> = useMemo(() => ({
         [RideLogFormFieldsEnum.Car]: {
@@ -60,7 +72,6 @@ export function useRideLogFormFields(props: UseRideLogFormFieldsProps) {
                 title={ "Induló kilométeróra-állás" }
                 currentOdometerValue={ car?.odometer.value }
                 unitText={ car?.odometer.unit.short }
-                optional
             />,
             editToastMessages: CarEditNameToast
         },
@@ -69,9 +80,8 @@ export function useRideLogFormFields(props: UseRideLogFormFieldsProps) {
                 control={ control }
                 fieldName="endOdometerValue"
                 title={ "Záró kilométeróra-állás" }
-                currentOdometerValue={ car?.odometer.value }
+                subtitle={ `Az induló kilométeróra-állás: ${ formStartOdometerValue } ${ car?.odometer.unit.short }` }
                 unitText={ car?.odometer.unit.short }
-                optional
             />,
             editToastMessages: CarEditNameToast
         },
@@ -93,6 +103,7 @@ export function useRideLogFormFields(props: UseRideLogFormFieldsProps) {
                     control={ control }
                     fieldName="endTime"
                     fieldNameText="Érkezés"
+                    fieldInfoText={ `Az indulás ideje: ${ dayjs(formStartTime).format("YYYY. MM. DD. HH:mm") }` }
                 >
                     <InputDatePicker/>
                 </Input.Field>
@@ -107,7 +118,7 @@ export function useRideLogFormFields(props: UseRideLogFormFieldsProps) {
             />,
             editToastMessages: CarEditNameToast
         }
-    }), [control, setValue, car]);
+    }), [control, setValue, car, formStartOdometerValue, formStartTime]);
 
     const multiStepFormSteps: Steps = [
         {

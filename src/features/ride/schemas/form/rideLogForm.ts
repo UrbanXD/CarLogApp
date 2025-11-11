@@ -12,11 +12,11 @@ import { formResultRideExpenseSchema } from "../../_features/rideExpense/schemas
 const rideLogForm = rideLogSchema
 .pick({ id: true, carId: true, note: true })
 .extend({
-    startTime: zDate({ optional: true }).pipe(rideLogSchema.shape.startTime),
-    endTime: zDate({ optional: true }).pipe(rideLogSchema.shape.endTime),
+    startTime: zDate().pipe(rideLogSchema.shape.startTime),
+    endTime: zDate().pipe(rideLogSchema.shape.endTime),
     startOdometerLogId: odometerSchema.shape.id, // hidden
     startOdometerValue: zNumber({
-        optional: true,
+        optional: false,
         bounds: { min: 0 },
         errorMessage: {
             minBound: (min) =>
@@ -27,7 +27,6 @@ const rideLogForm = rideLogSchema
     }),
     endOdometerLogId: odometerSchema.shape.id, // hidden
     endOdometerValue: zNumber({
-        optional: true,
         bounds: { min: 0 },
         errorMessage: {
             minBound: (min) =>
@@ -37,26 +36,65 @@ const rideLogForm = rideLogSchema
         }
     }),
     expenses: z.array(formResultRideExpenseSchema),
-    places: z.array(ridePlaceForm),
+    places: z.array(ridePlaceForm).min(2, {
+        message: "Legalább meg kell adnia az indulási és érkezési helyet."
+    }),
     passengers: z.array(ridePassengerForm)
+})
+.superRefine((data, ctx) => {
+    if(data.endTime && data.startTime && data.endTime < data.startTime) {
+        ctx.addIssue({
+            path: ["endTime"],
+            message: "Az érkezési időnek későbbinek kell lennie, mint az indulási idő."
+        });
+    }
+
+    if(data.endOdometerValue <= data.startOdometerValue) {
+        ctx.addIssue({
+            path: ["endOdometerValue"],
+            message: "A kilométeróra-állás nem csökkenhet az induláshoz képest."
+        });
+    }
 });
 
 export type RideLogFormFields = z.infer<typeof rideLogForm>;
 
 export function useCreateRideLogFormProps(car: Car | null) {
+    const now = new Date();
+
     const defaultValues: RideLogFormFields = {
         id: getUUID(),
         carId: car?.id,
         startOdometerLogId: getUUID(),
-        startOdometerValue: NaN,
+        startOdometerValue: car?.odometer.value ?? 0,
         endOdometerLogId: getUUID(),
         endOdometerValue: NaN,
         expenses: [],
         places: [],
         passengers: [],
-        startTime: null,
-        endTime: null,
+        startTime: now,
+        endTime: now,
         note: null
+    };
+
+    return { defaultValues, resolver: zodResolver(rideLogForm) };
+}
+
+export function useEditRideLogFormProps(rideLog: RideLog, ownerId: string) {
+    const defaultValues: RideLogFormFields = {
+        id: rideLog.id,
+        carId: rideLog.carId,
+        ownerId: ownerId,
+        startOdometerLogId: rideLog.startOdometer?.id ?? getUUID(),
+        startOdometerValue: rideLog.startOdometer?.value ?? NaN,
+        endOdometerLogId: rideLog.endOdometer?.id ?? getUUID(),
+        endOdometerValue: rideLog.endOdometer?.value ?? NaN,
+        expenses: rideLog.rideExpenses,
+        places: rideLog.ridePlaces,
+        passengers: rideLog.ridePassengers,
+        startTime: rideLog.startTime,
+        endTime: rideLog.endTime,
+        note: rideLog.note
     };
 
     return { defaultValues, resolver: zodResolver(rideLogForm) };

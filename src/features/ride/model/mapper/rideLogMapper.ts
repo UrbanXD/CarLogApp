@@ -95,36 +95,30 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         rideExpenses: Map<string, RideExpenseTableRow>,
         ridePlaces: Map<string, RidePlaceTableRow>,
         ridePassengers: Map<string, RidePassengerTableRow>,
-        startOdometerLog: OdometerLogTableRow | null,
-        endOdometerLog: OdometerLogTableRow | null
+        startOdometerLog: OdometerLogTableRow,
+        endOdometerLog: OdometerLogTableRow
     }> {
         const ownerId = await this.carDao.getCarOwnerById(formResult.carId);
 
-        let startOdometerLog: OdometerLogTableRow | null = null;
-        if(formResult.startOdometerValue) {
-            startOdometerLog = {
-                id: formResult.startOdometerLogId,
-                car_id: formResult.carId,
-                type_id: OdometerLogTypeEnum.SIMPLE,
-                value: formResult.startOdometerValue
-            };
-        }
+        const startOdometerLog: OdometerLogTableRow = {
+            id: formResult.startOdometerLogId,
+            car_id: formResult.carId,
+            type_id: OdometerLogTypeEnum.SIMPLE,
+            value: formResult.startOdometerValue
+        };
 
-        let endOdometerLog: OdometerLogTableRow | null = null;
-        if(formResult.endOdometerValue) {
-            endOdometerLog = {
-                id: formResult.endOdometerLogId,
-                car_id: formResult.carId,
-                type_id: OdometerLogTypeEnum.SIMPLE,
-                value: formResult.endOdometerValue
-            };
-        }
+        const endOdometerLog: OdometerLogTableRow = {
+            id: formResult.endOdometerLogId,
+            car_id: formResult.carId,
+            type_id: OdometerLogTypeEnum.SIMPLE,
+            value: formResult.endOdometerValue
+        };
 
         const rideLog: RideLogTableRow = {
             id: formResult.id,
             car_id: formResult.carId,
-            start_odometer_log_id: startOdometerLog?.id ?? null,
-            end_odometer_log_id: endOdometerLog?.id ?? null,
+            start_odometer_log_id: startOdometerLog.id,
+            end_odometer_log_id: endOdometerLog.id,
             start_time: formResult.startTime,
             end_time: formResult.endTime,
             note: formResult.note

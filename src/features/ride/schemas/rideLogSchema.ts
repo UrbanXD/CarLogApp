@@ -13,10 +13,10 @@ export const rideLogSchema = z
     rideExpenses: z.array(rideExpenseSchema),
     ridePassengers: z.array(ridePassengerSchema),
     ridePlaces: z.array(ridePlaceSchema),
-    startOdometer: odometerSchema.nullable(),
-    endOdometer: odometerSchema.nullable(),
-    startTime: z.string().nullable(),
-    endTime: z.string().nullable(),
+    startOdometer: odometerSchema,
+    endOdometer: odometerSchema,
+    startTime: z.string(),
+    endTime: z.string(),
     note: zNote()
 });
 
