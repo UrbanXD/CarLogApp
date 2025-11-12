@@ -18,12 +18,14 @@ import { Odometer } from "../../../../car/_features/odometer/schemas/odometerSch
 import { updateCarOdometer } from "../../../../car/model/slice/index.ts";
 import { ExpandableList } from "../../../../../components/expandableList/ExpandableList.tsx";
 import { useServiceItemToExpandableList } from "../hooks/useServiceItemToExpandableList.ts";
+import { useAppDispatch } from "../../../../../hooks/index.ts";
 
 export type ServiceLogViewProps = {
     id: string
 }
 
 export function ServiceLogView({ id }: ServiceLogViewProps) {
+    const dispatch = useAppDispatch();
     const { serviceLogDao } = useDatabase();
     const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
@@ -123,7 +125,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
             icon: ICON_NAMES.expenseItem,
             title: "Szervizelési tételek",
             content: isServiceItemListExpanded ? " " : getAmountSubtitle(),
-            secondaryInfo: { icon: isServiceItemListExpanded ? ICON_NAMES.upArrowHead : ICON_NAMES.downArrowHead },
+            actionIcon: isServiceItemListExpanded ? ICON_NAMES.upArrowHead : ICON_NAMES.downArrowHead,
             onPress: () => setServiceItemListExpanded(prevState => !prevState),
             renderContent: renderServiceItems
         },
