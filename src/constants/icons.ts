@@ -57,7 +57,9 @@ export const ICON_NAMES = {
     note: "text",
     money: "cash",
     expenseItem: "invoice-text-multiple-outline",
-    passenger: "seat-passenger"
+    passenger: "account-outline",
+    passengers: "account-multiple-outline",
+    mapMarkers: "map-marker-multiple-outline"
 };
 
 export const ICON_COLORS = {

@@ -2,7 +2,7 @@ import { Dao } from "../../../../database/dao/Dao.ts";
 import { DatabaseType, RideLogTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
 import { RideLog } from "../../schemas/rideLogSchema.ts";
 import { RideLogMapper } from "../mapper/rideLogMapper.ts";
-import { Kysely } from "@powersync/kysely-driver";
+import { Kysely, sql } from "@powersync/kysely-driver";
 import { OdometerLogDao } from "../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
 import { OdometerUnitDao } from "../../../car/_features/odometer/model/dao/OdometerUnitDao.ts";
 import { CarDao } from "../../../car/model/dao/CarDao.ts";
@@ -16,6 +16,10 @@ import { RIDE_EXPENSE_TABLE } from "../../../../database/connector/powersync/tab
 import { RIDE_PLACE_TABLE } from "../../../../database/connector/powersync/tables/ridePlace.ts";
 import { RIDE_PASSENGER_TABLE } from "../../../../database/connector/powersync/tables/ridePassenger.ts";
 import { EXPENSE_TABLE } from "../../../../database/connector/powersync/tables/expense.ts";
+import { CursorOptions, CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
+import { PaginatorOptions } from "../../../../database/paginator/AbstractPaginator.ts";
+import { SERVICE_LOG_TABLE } from "../../../../database/connector/powersync/tables/serviceLog.ts";
+import { SERVICE_ITEM_TABLE } from "../../../../database/connector/powersync/tables/serviceItem.ts";
 
 export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
     constructor(
@@ -104,5 +108,40 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
         });
 
         return await this.getById(insertedRideLogId);
+    }
+    paginator(
+        cursorOptions: CursorOptions<keyof RideLogTableRow | "total_expense" | "duration">,
+        filterBy?: PaginatorOptions<RideLogTableRow & { total_expense: number, duration: number | null }>["filterBy"],
+        perPage?: number = 25
+    ): CursorPaginator<RideLogTableRow & { total_expense: number, duration: number | null }, RideLog> {
+        const query = this.db
+        .with("t1", (db) =>
+            db
+            .selectFrom(RIDE_LOG_TABLE)
+            .leftJoin(RIDE_EXPENSE_TABLE, `${ RIDE_EXPENSE_TABLE }.ride_log_id`, `${ RIDE_LOG_TABLE }.id`)
+            .leftJoin(EXPENSE_TABLE, `${ EXPENSE_TABLE }.id`, `${ RIDE_EXPENSE_TABLE }.expense_id`)
+            .selectAll(RIDE_LOG_TABLE)
+            .select((eb) => [
+                eb.fn.coalesce(eb.fn.sum(`${ EXPENSE_TABLE }.amount`), eb.val(0)).as("total_expense"),
+                // @formatter:off
+                sql<number>`(julianday(end_time) - julianday(start_time))* 86400`.as("duration")
+                // @formatter:on
+            ])
+            .groupBy(`${ RIDE_LOG_TABLE }.id`)
+        )
+        .selectFrom("t1")
+        .selectAll();
+
+        return new CursorPaginator<RideLogTableRow & { total_expense: number }, RideLog>(
+            this.db,
+            "t1",
+            cursorOptions,
+            {
+                baseQuery: query,
+                perPage,
+                filterBy,
+                mapper: this.mapper.toDto.bind(this.mapper)
+            }
+        );
     }
 }
