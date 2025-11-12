@@ -20,6 +20,8 @@ import { RidePlace } from "../../_features/place/schemas/ridePlaceSchema.ts";
 import { RidePassenger } from "../../_features/passenger/schemas/ridePassengerSchema.ts";
 import { RideLogFormFields } from "../../schemas/form/rideLogForm.ts";
 import { OdometerLogTypeEnum } from "../../../car/_features/odometer/model/enums/odometerLogTypeEnum.ts";
+import { convertOdometerValueToKilometer } from "../../../car/_features/odometer/utils/convertOdometerUnit.ts";
+import { OdometerUnit } from "../../../car/_features/odometer/schemas/odometerUnitSchema.ts";
 
 export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
     private readonly rideExpenseDao: RideExpenseDao;
@@ -98,20 +100,23 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         startOdometerLog: OdometerLogTableRow,
         endOdometerLog: OdometerLogTableRow
     }> {
-        const ownerId = await this.carDao.getCarOwnerById(formResult.carId);
+        const [ownerId, odometerUnit]: [string, OdometerUnit] = await Promise.all([
+            (async () => this.carDao.getCarOwnerById(formResult.carId))(),
+            (async () => this.odometerUnitDao.getUnitByCarId(formResult.carId))()
+        ]);
 
         const startOdometerLog: OdometerLogTableRow = {
             id: formResult.startOdometerLogId,
             car_id: formResult.carId,
             type_id: OdometerLogTypeEnum.SIMPLE,
-            value: formResult.startOdometerValue
+            value: convertOdometerValueToKilometer(formResult.startOdometerValue, odometerUnit.conversionFactor)
         };
 
         const endOdometerLog: OdometerLogTableRow = {
             id: formResult.endOdometerLogId,
             car_id: formResult.carId,
             type_id: OdometerLogTypeEnum.SIMPLE,
-            value: formResult.endOdometerValue
+            value: convertOdometerValueToKilometer(formResult.endOdometerValue, odometerUnit.conversionFactor)
         };
 
         const rideLog: RideLogTableRow = {
