@@ -31,7 +31,7 @@ export type RideLogViewProps = {
 
 export function RideLogView({ id }: RideLogViewProps) {
     const dispatch = useAppDispatch();
-    const { rideLogDao } = useDatabase();
+    const { rideLogDao, odometerLogDao } = useDatabase();
     const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
     const { rideExpenseToExpandableList } = useRideExpenseToExpandableList();
