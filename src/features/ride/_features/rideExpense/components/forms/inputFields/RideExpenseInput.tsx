@@ -49,7 +49,8 @@ export function RideExpenseInput({
 
     const { fields: items, append, update, remove } = useFieldArray<FormResultRideExpense>({
         control,
-        name: fieldName
+        name: fieldName,
+        keyName: "fieldId"
     });
 
     useEffect(() => {
@@ -80,7 +81,7 @@ export function RideExpenseInput({
                 totals.set(key, item.expense.amount);
             }
         }
-        
+
         setTotalAmount(
             Array.from(totals.values()).sort((a, b) => b.amount - a.amount)
         );

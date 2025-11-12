@@ -35,7 +35,8 @@ export function RidePassengerInput({
 
     const { fields: items, append, update, remove } = useFieldArray<PassengerFormFields>({
         control,
-        name: fieldName
+        name: fieldName,
+        keyName: "fieldId"
     });
 
     useEffect(() => {

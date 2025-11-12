@@ -35,7 +35,8 @@ export function RidePlaceInput({
 
     const { fields: items, append, update, remove } = useFieldArray<PlaceFormFields>({
         control,
-        name: fieldName
+        name: fieldName,
+        keyName: "fieldId"
     });
 
     useEffect(() => {

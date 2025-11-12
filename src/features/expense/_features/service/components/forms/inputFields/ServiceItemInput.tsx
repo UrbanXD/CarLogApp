@@ -48,7 +48,8 @@ export function ServiceItemInput({
 
     const { fields: items, append, update, remove } = useFieldArray<ServiceLogFields["items"]>({
         control,
-        name: fieldName
+        name: fieldName,
+        keyName: "fieldId"
     });
 
     useEffect(() => {
