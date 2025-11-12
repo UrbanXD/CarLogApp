@@ -12,5 +12,6 @@ export const BottomSheetRoutes = [
     "ride/place/edit/[id]",
     "ride/passenger/create",
     "ride/passenger/edit/[id]",
-    "ride/create"
+    "ride/create",
+    "ride/edit/[id]"
 ];

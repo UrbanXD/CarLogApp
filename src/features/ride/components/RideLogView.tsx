@@ -184,7 +184,7 @@ export function RideLogView({ id }: RideLogViewProps) {
                 icon: ICON_NAMES.calendar,
                 title: "Indulási idő",
                 content: dayjs(rideLog?.startTime).format("YYYY. MM. DD. HH:mm"),
-                onPress: () => onEdit(RideLogFormFieldsEnum.StartTime),
+                onPress: () => onEdit(RideLogFormFieldsEnum.Time),
                 secondaryInfo: {
                     title: "Érkezési idő",
                     content: dayjs(rideLog?.endTime).format("YYYY. MM. HH:mm")
@@ -199,7 +199,7 @@ export function RideLogView({ id }: RideLogViewProps) {
                     title: "Érkezési kilométeróra-állás",
                     content: `${ rideLog?.endOdometer.value } ${ rideLog?.endOdometer.unit.short }`
                 },
-                onPress: () => onEdit(RideLogFormFieldsEnum.StartOdometer)
+                onPress: () => onEdit(RideLogFormFieldsEnum.Odometer)
             },
             {
                 icon: ICON_NAMES.expenseItem,

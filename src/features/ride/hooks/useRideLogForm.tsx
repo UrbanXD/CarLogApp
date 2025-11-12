@@ -16,10 +16,16 @@ import { RidePassengerInput } from "../_features/passenger/components/forms/inpu
 import { RideExpenseInput } from "../_features/rideExpense/components/forms/inputFields/RideExpenseInput.tsx";
 import dayjs from "dayjs";
 
-type UseRideLogFormFieldsProps = UseFormReturn<RideLogFormFields>
+type UseRideLogFormFieldsProps = {
+    form: UseFormReturn<RideLogFormFields>
+    setCarOdometerValueWhenInputNotTouched?: boolean
+}
 
-export function useRideLogFormFields(props: UseRideLogFormFieldsProps) {
-    const { control, setValue, getFieldState, clearErrors } = props;
+export function useRideLogFormFields({
+    form,
+    setCarOdometerValueWhenInputNotTouched = true
+}: UseRideLogFormFieldsProps) {
+    const { control, setValue, getFieldState, clearErrors } = form;
     const { getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(null);
@@ -31,14 +37,14 @@ export function useRideLogFormFields(props: UseRideLogFormFieldsProps) {
     useEffect(() => {
         const car = getCar(formCarId);
         setCar(car ?? null);
-        if(car && !getFieldState("startOdometerValue").isDirty) {
+        if(car && !getFieldState("startOdometerValue").isDirty && setCarOdometerValueWhenInputNotTouched) {
             setValue("startOdometerValue", car.odometer.value);
         }
         clearErrors();
     }, [formCarId]);
 
     useEffect(() => {
-        if(formStartOdometerValue && !getFieldState("endOdometerValue").isDirty) {
+        if(formStartOdometerValue && !getFieldState("endOdometerValue").isDirty && setCarOdometerValueWhenInputNotTouched) {
             setValue("endOdometerValue", formStartOdometerValue);
         }
     }, [formStartOdometerValue]);
@@ -107,6 +113,47 @@ export function useRideLogFormFields(props: UseRideLogFormFieldsProps) {
                 >
                     <InputDatePicker/>
                 </Input.Field>
+            ),
+            editToastMessages: CarEditNameToast
+        },
+        [RideLogFormFieldsEnum.Time]: {
+            render: () => (
+                <Input.Group>
+                    <Input.Field
+                        control={ control }
+                        fieldName="startTime"
+                        fieldNameText="Indulás"
+                    >
+                        <InputDatePicker/>
+                    </Input.Field>
+                    <Input.Field
+                        control={ control }
+                        fieldName="endTime"
+                        fieldNameText="Érkezés"
+                    >
+                        <InputDatePicker/>
+                    </Input.Field>
+                </Input.Group>
+            ),
+            editToastMessages: CarEditNameToast
+        },
+        [RideLogFormFieldsEnum.Odometer]: {
+            render: () => (
+                <Input.Group>
+                    <OdometerValueInput
+                        control={ control }
+                        fieldName="startOdometerValue"
+                        title={ "Induló kilométeróra-állás" }
+                        currentOdometerValue={ car?.odometer.value }
+                        unitText={ car?.odometer.unit.short }
+                    />
+                    <OdometerValueInput
+                        control={ control }
+                        fieldName="endOdometerValue"
+                        title={ "Záró kilométeróra-állás" }
+                        unitText={ car?.odometer.unit.short }
+                    />
+                </Input.Group>
             ),
             editToastMessages: CarEditNameToast
         },
