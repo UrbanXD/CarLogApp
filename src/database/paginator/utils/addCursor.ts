@@ -49,10 +49,14 @@ export function addCursor<TableItem, DB = DatabaseType>(
         );
     }
 
-    if(direction === "initial") return subQuery;
+    if(direction === "initial" || !value) return subQuery;
 
-    if(Array.isArray(cursorOptions.cursor) && !Array.isArray(value)) {
-        throw new Error("If CursorField is array CursorValue must be Array as well to add cursor filter");
+    if(
+        Array.isArray(cursorOptions.cursor) && !Array.isArray(value)
+        ||
+        !Array.isArray(cursorOptions.cursor) && Array.isArray(value)
+    ) {
+        throw new Error("If CursorField is array CursorValue must be Array as well to add cursor filter (vica versa)");
     }
 
     const cursorOrders = Array.isArray(cursorOptions.cursor)
@@ -60,20 +64,29 @@ export function addCursor<TableItem, DB = DatabaseType>(
                          : cursorOptions.cursor.order ?? cursorOptions.defaultOrder ?? "asc";
     const cursorOperator = getCursorOperator(cursorOrders, direction);
 
-    if(Array.isArray(cursorOptions.cursor) && Array.isArray(value)) {
+    if(Array.isArray(cursorOptions.cursor)) {
         const tupleFields = sql.raw(cursorOptions.cursor.map(cursor => {
             const tableName = cursor?.table === null ? null : cursor?.table ?? table;
             const fieldName = tableName ? [tableName, cursor.field].join(".") : cursor.field;
 
+            if(cursor.toLowerCase) return `lower(${ fieldName })`;
             return fieldName;
         })
         .join(", "));
-        const tupleValues = sql.join(value.map(v => sql`${ v }`));
+        const tupleValues = sql.join(value.map((v, index) => {
+            const toLowerCase = cursorOptions.cursor?.[index]?.toLowerCase ?? false;
+            return toLowerCase ? sql`${ v.toLowerCase() }` : sql`${ v }`;
+        }));
 
         // @formatter:off
         return subQuery.where(sql`( ${ tupleFields } ) ${ sql.raw(cursorOperator) } ( ${ tupleValues } )`);
         // @formatter:on
     }
+
+    const tableName = cursorOptions.cursor.table === null ? null : cursorOptions.cursor.table ?? table;
+    const fieldName = tableName ? [tableName, cursorOptions.cursor.field].join(".") : cursorOptions.cursor.field;
+
+    const cursorField = sql.raw(cursorOptions.cursor.toLowerCase ? `lower(${ fieldName })` : fieldName);
 
     return subQuery.where(cursorField, cursorOperator, value);
 }

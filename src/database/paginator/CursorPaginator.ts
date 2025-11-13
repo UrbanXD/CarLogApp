@@ -129,16 +129,14 @@ export class CursorPaginator<TableItem extends {
         const prevResult = (await prevQuery.execute()).reverse() as unknown as Array<TableItem>;
         const nextResult = await nextQuery.execute() as unknown as Array<TableItem>;
 
-        nextResult.shift();
-
         this.prevCursor = null;
         if(prevResult.length === halfPage + 1) this.setPreviousCursor(prevResult.shift()); // its over the limit that means the first element is a cursor for previous
-        this.refreshCursorId = prevResult?.[0].id ?? defaultItem?.id ?? nextResult?.[0].id ?? null;
+        this.refreshCursorId = prevResult?.[0]?.id ?? defaultItem?.id ?? nextResult?.[0]?.id ?? null;
 
         this.nextCursor = null;
         if(nextResult.length === halfPage + 1) this.setNextCursor(nextResult.pop());  // its over the limit that means the last element is a cursor for next
 
-        const result = [...prevResult, ...nextResult];
+        const result = [...prevResult, defaultItem, ...nextResult];
 
         this.refreshCursorId = null;
         if(result.length !== 0) this.refreshCursorId = result[0].id;
@@ -167,7 +165,7 @@ export class CursorPaginator<TableItem extends {
     async previous(): Promise<Array<TableItem> | null> {
         if(!this.hasPrevious()) return null;
 
-        let query = this.getBaseQuery(true);
+        let query = this.getBaseQuery();
         query = addCursor(this.table, query, this.cursorOptions, this.prevCursor, "prev");
 
         const result = (await query.execute()).reverse() as unknown as Array<TableItem>;
