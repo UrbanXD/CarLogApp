@@ -13,7 +13,7 @@ import { RideLog } from "../../schemas/rideLogSchema.ts";
 import { RideLogFormFieldsEnum } from "../../enums/RideLogFormFields.ts";
 import { RideLogFormFields, useEditRideLogFormProps } from "../../schemas/form/rideLogForm.ts";
 import { getUser } from "../../../user/model/selectors/index.ts";
-import { useRideLogFormFields } from "../../hooks/useRideLogForm.tsx";
+import { useRideLogFormFields } from "../../hooks/useRideLogFormFields.tsx";
 
 type EditRideLogFormProps = {
     rideLog: RideLog

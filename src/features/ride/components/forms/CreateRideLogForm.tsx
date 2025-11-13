@@ -5,7 +5,7 @@ import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import useCars from "../../../car/hooks/useCars.ts";
 import { useForm } from "react-hook-form";
 import { RideLogFormFields, useCreateRideLogFormProps } from "../../schemas/form/rideLogForm.ts";
-import { useRideLogFormFields } from "../../hooks/useRideLogForm.tsx";
+import { useRideLogFormFields } from "../../hooks/useRideLogFormFields.tsx";
 import { CarCreateToast } from "../../../car/presets/toast/index.ts";
 import MultiStepForm from "../../../../components/Form/MultiStepForm.tsx";
 import { updateCarOdometer } from "../../../car/model/slice/index.ts";
@@ -20,7 +20,7 @@ export function CreateRideLogForm() {
     const form = useForm<RideLogFormFields>(useCreateRideLogFormProps(selectedCar));
     const { handleSubmit } = form;
 
-    const { multiStepFormSteps } = useRideLogFormFields(form);
+    const { multiStepFormSteps } = useRideLogFormFields({ form });
 
     const submitHandler = handleSubmit(
         async (formResult: RideLogFormFields) => {
