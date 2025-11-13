@@ -131,7 +131,6 @@ export class CursorPaginator<TableItem extends {
 
         this.prevCursor = null;
         if(prevResult.length === halfPage + 1) this.setPreviousCursor(prevResult.shift()); // its over the limit that means the first element is a cursor for previous
-        this.refreshCursorId = prevResult?.[0]?.id ?? defaultItem?.id ?? nextResult?.[0]?.id ?? null;
 
         this.nextCursor = null;
         if(nextResult.length === halfPage + 1) this.setNextCursor(nextResult.pop());  // its over the limit that means the last element is a cursor for next
@@ -139,7 +138,7 @@ export class CursorPaginator<TableItem extends {
         const result = [...prevResult, defaultItem, ...nextResult];
 
         this.refreshCursorId = null;
-        if(result.length !== 0) this.refreshCursorId = result[0].id;
+        if(result.length !== 0) this.refreshCursorId = defaultItem?.id ?? result[0].id;
 
         return await super.map(result);
     }
