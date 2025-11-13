@@ -5,7 +5,6 @@ import { CursorPaginator } from "../database/paginator/CursorPaginator.ts";
 import { FilterButtonProps } from "../components/filter/FilterButton.tsx";
 import { useFocusEffect } from "expo-router";
 import { FlashListRef } from "@shopify/flash-list";
-
 import {
     AddFilterArgs,
     FILTER_CHANGED_EVENT,
@@ -16,7 +15,7 @@ import {
 
 type UseTimelinePaginatorProps<TableItem, MappedItem, ResultItem = MappedItem, DB> = {
     paginator: CursorPaginator<TableItem, MappedItem, DB>
-    mapper: (item: MappedItem) => ResultItem
+    mapper: (item: MappedItem, onPress?: (id: number | string) => void) => ResultItem
     cursorOrderButtons?: Array<{ field: keyof TableItem, table?: keyof DB | null, title: string }>
 }
 
@@ -24,7 +23,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
     paginator,
     mapper,
     cursorOrderButtons
-}: UseTimelinePaginatorProps<TableItem, MappedItem, DB>) {
+}: UseTimelinePaginatorProps<TableItem, MappedItem, ResultItem, DB>) {
     const flashListRef = useRef<FlashListRef<ResultItem>>(null);
     const firstFocus = useRef(true);
 
@@ -43,6 +42,9 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
     const [isNextFetching, setIsNextFetching] = useState(false);
     const [isPreviousFetching, setIsPreviousFetching] = useState(false);
 
+    const scrollToItemId = useRef<number | string | null>(null);
+    const scrollToItem = useRef<boolean>(false);
+
     useFocusEffect(
         useCallback(() => {
             if(firstFocus.current) {
@@ -50,17 +52,49 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
                 return;
             }
 
-            paginator.refresh().then(result => setData(result.map(mapper)));
+            paginator.refresh().then(result => {
+                const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id)); // Assuming mapper now takes only 'item'
+                scrollToItem.current = true;
+
+                setData(newData);
+            });
         }, [])
     );
 
     useEffect(() => {
+        if(firstFocus.current) return;
+        if(!scrollToItem.current) return;
+        if(!scrollToItemId.current) return;
+
+        const itemToScrollTo = data.find(item => item.id === scrollToItemId.current);
+
+        scrollToItem.current = false;
+
+        if(itemToScrollTo) {
+            scrollToItemId.current = null;
+            setTimeout(
+                () => {
+                    flashListRef.current?.scrollToItem({
+                        item: itemToScrollTo,
+                        animated: false,
+                        viewPosition: 0.5
+                    });
+                },
+                150
+            );
+        } else {
+            setTimeout(() => flashListRef.current?.scrollToTop({ animated: false }), 150);
+        }
+    }, [data]);
+
+    useEffect(() => {
         setInitialFetchHappened(false);
+
         paginator.initial().then(result => {
             setData((_) => {
                 setInitialFetchHappened(true);
                 setIsInitialFetching(false);
-                return result.map(mapper);
+                return result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
             });
         });
     }, []);
@@ -69,10 +103,8 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
         if(!initialFetchHappened) return;
 
         paginator.changeCursorOptions(cursorOptions).then(result => {
-            setData((_) => {
-                setTimeout(() => flashListRef.current?.scrollToTop({ animated: false }), 250);
-                return result.map(mapper);
-            });
+            const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+            setData(newData);
         });
     }, [cursorOptions]);
 
@@ -87,7 +119,8 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
 
     const refresh = useCallback(async () => {
         const result = await paginator.refresh();
-        setData(result.map(mapper));
+
+        return result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
     }, [paginator, mapper]);
 
     const fetchNext = useCallback(async () => {
@@ -97,7 +130,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
         const result = await paginator.next();
         if(!result) return setIsNextFetching(false);
 
-        const newData = result.map(mapper);
+        const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
 
         setData(prevState => {
             setIsNextFetching(false);
@@ -113,7 +146,8 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
 
         if(!result) return setIsPreviousFetching(false);
 
-        const newData = result.map(mapper);
+        const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+
         setData(prevState => {
             setIsPreviousFetching(false);
             return [...newData, ...prevState];
@@ -123,19 +157,15 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
     const addFilter = useCallback(async (args: AddFilterArgs<TableItem, DB>) => {
         const result = await paginator.addFilter(args);
 
-        setData((_) => {
-            setTimeout(() => flashListRef.current?.scrollToTop({ animated: true }), 250);
-            return result.map(mapper);
-        });
+        const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+        setData(newData);
     }, [paginator]);
 
     const replaceFilter = useCallback(async (args: ReplaceFilterArgs<TableItem, DB>) => {
         const result = await paginator.replaceFilter(args);
 
-        setData((_) => {
-            setTimeout(() => flashListRef.current?.scrollToTop({ animated: true }), 250);
-            return result.map(mapper);
-        });
+        const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+        setData(newData);
     }, [paginator]);
 
     const removeFilter = useCallback(async (args: RemoveFilterArgs<TableItem, DB>) => {
@@ -143,20 +173,16 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
 
         if(!result) return;
 
-        setData((_) => {
-            setTimeout(() => flashListRef.current?.scrollToTop({ animated: true }), 250);
-            return result.map(mapper);
-        });
+        const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+        setData(newData);
     }, [paginator]);
 
     const clearFilters = useCallback(async (groupKey?: string) => {
         const result = await paginator.clearFilters(groupKey);
         if(!result) return;
 
-        setData((_) => {
-            setTimeout(() => flashListRef.current?.scrollToTop({ animated: true }), 250);
-            return result.map(mapper);
-        });
+        const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+        setData(newData);
     }, [paginator]);
 
     const orderButtons: Array<FilterButtonProps> | undefined = cursorOrderButtons?.map(cursor => ({
