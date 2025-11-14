@@ -10,7 +10,7 @@ import { AmountText } from "../../../components/AmountText.tsx";
 dayjs.extend(utc);
 
 export function useExpenseTimelineItem() {
-    const mapper = useCallback((expense: Expense): TimelineItemType => {
+    const mapper = useCallback((expense: Expense, callback?: (id: string | number) => void): TimelineItemType => {
         const routerPathTitle = "Kiadás";
         let routerPathName = "/expense/[id]";
         let itemId = expense.id;
@@ -28,6 +28,7 @@ export function useExpenseTimelineItem() {
         const onPress = () => {
             if(!itemId) return;
 
+            callback?.();
             router.push({
                 pathname: routerPathName,
                 params: { id: itemId, title: routerPathTitle }

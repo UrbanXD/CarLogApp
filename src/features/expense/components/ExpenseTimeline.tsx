@@ -31,7 +31,7 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
                 },
                 { field: "car_id", operator: "=", value: car.id }
             ),
-        []
+        [car.id]
     );
 
     const {

@@ -9,8 +9,13 @@ import { ServiceLog } from "../schemas/serviceLogSchema.ts";
 dayjs.extend(utc);
 
 export function useServiceLogTimelineItem() {
-    const mapper = useCallback((serviceLog: ServiceLog): TimelineItemType => {
+    const mapper = useCallback((
+        serviceLog: ServiceLog,
+        callback?: (id: string | number) => void
+    ): TimelineItemType => {
         const onPress = () => {
+            callback?.();
+
             router.push({
                 pathname: "/expense/service/[id]",
                 params: { id: serviceLog.id, title: "Szervíz-napló bejegyzés" }

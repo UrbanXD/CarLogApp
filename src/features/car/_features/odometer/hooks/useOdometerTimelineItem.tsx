@@ -8,7 +8,10 @@ import { OdometerLog } from "../schemas/odometerLogSchema.ts";
 import { OdometerLogTypeEnum } from "../model/enums/odometerLogTypeEnum.ts";
 
 export const useOdometerTimelineItem = () => {
-    const mapper = useCallback((odometerLog: OdometerLog): TimelineItemType => {
+    const mapper = useCallback((
+        odometerLog: OdometerLog,
+        callback?: (id: string | number) => void
+    ): TimelineItemType => {
         const routerPathTitle = "Napló bejegyzés";
         let routerPathName = "/odometer/log/[id]";
         let itemId = odometerLog.id;
@@ -25,11 +28,13 @@ export const useOdometerTimelineItem = () => {
             case OdometerLogTypeEnum.RIDE:
                 routerPathName = "/ride/[id]";
                 itemId = odometerLog.relatedId;
+                break;
         }
 
         const onPress = () => {
             if(!itemId) return;
 
+            callback?.();
             router.push({
                 pathname: routerPathName,
                 params: { id: itemId, title: routerPathTitle }

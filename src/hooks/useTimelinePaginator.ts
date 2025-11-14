@@ -15,7 +15,7 @@ import {
 
 type UseTimelinePaginatorProps<TableItem, MappedItem, ResultItem = MappedItem, DB> = {
     paginator: CursorPaginator<TableItem, MappedItem, DB>
-    mapper: (item: MappedItem, onPress?: (id: number | string) => void) => ResultItem
+    mapper: (item: MappedItem, callback?: (id: number | string) => void) => ResultItem
     cursorOrderButtons?: Array<{ field: keyof TableItem, table?: keyof DB | null, title: string }>
 }
 
@@ -52,8 +52,8 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
                 return;
             }
 
-            paginator.refresh().then(result => {
-                const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id)); // Assuming mapper now takes only 'item'
+            paginator.initial(scrollToItemId.current).then(result => {
+                const newData = result.map((item) => mapper(item, () => scrollToItemId.current = item.id));
                 scrollToItem.current = true;
 
                 setData(newData);
@@ -66,25 +66,26 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
         if(!scrollToItem.current) return;
         if(!scrollToItemId.current) return;
 
-        const itemToScrollTo = data.find(item => item.id === scrollToItemId.current);
-
         scrollToItem.current = false;
 
-        if(itemToScrollTo) {
-            scrollToItemId.current = null;
-            setTimeout(
-                () => {
+        setTimeout(
+            () => {
+                const itemToScrollTo = data.find(item => item.id === scrollToItemId.current);
+
+                if(itemToScrollTo) {
+                    scrollToItemId.current = null;
+
                     flashListRef.current?.scrollToItem({
                         item: itemToScrollTo,
-                        animated: false,
-                        viewPosition: 0.5
+                        animated: true,
+                        viewPosition: 0.25
                     });
-                },
-                150
-            );
-        } else {
-            setTimeout(() => flashListRef.current?.scrollToTop({ animated: false }), 150);
-        }
+                } else {
+                    flashListRef.current?.scrollToTop({ animated: false });
+                }
+            },
+            75
+        );
     }, [data]);
 
     useEffect(() => {
