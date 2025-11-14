@@ -1,7 +1,7 @@
 import { Car } from "../../car/schemas/carSchema.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useRideLogTimelineItem } from "../hooks/useRideLogTimelineItem.tsx";
-import React, { useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useTimelinePaginator } from "../../../hooks/useTimelinePaginator.ts";
 import { RideLogTableRow } from "../../../database/connector/powersync/AppSchema.ts";
 import { TimelineItemType } from "../../../components/timelineView/item/TimelineItem.tsx";
@@ -10,6 +10,8 @@ import { StyleSheet, View } from "react-native";
 import { Title } from "../../../components/Title.tsx";
 import { TimelineView } from "../../../components/timelineView/TimelineView.tsx";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
+import { YearPicker } from "../../../components/Input/_presets/YearPicker.tsx";
+import { sql } from "@powersync/kysely-driver";
 
 type RideLogTimelineProps = {
     car: Car
@@ -24,7 +26,7 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
                 cursor: [
                     { table: null, field: "total_expense", order: "desc" },
                     { field: "start_time", order: "desc" },
-                    { field: "end_time", order: "asc" },
+                    { field: "end_time", order: "desc" },
                     { table: null, field: "duration", order: "desc" },
                     { field: "id" }
                 ]
@@ -33,7 +35,7 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
                 group: "car",
                 filters: [{ field: "car_id", operator: "=", value: car.id }]
             }
-        ), []);
+        ), [car.id]);
 
     const {
         ref,
@@ -56,7 +58,23 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
             { table: null, field: "duration", title: "Idő hossz" }
         ]
     });
-    // const { filterButtons } = useServiceLogTimelineFilter({ timelineFilterManagement, car });
+
+    useEffect(() => {
+        timelineFilterManagement.replaceFilter({
+            groupKey: "car",
+            filter: { field: "car_id", operator: "=", value: car.id }
+        });
+    }, [car.id]);
+
+    const setYearFilter = useCallback((year: string) => {
+        // @formatter:off
+        const customSql = (fieldRef: string) => sql<number>`strftime('%Y', ${ fieldRef })`;
+        // @formatter:on
+        timelineFilterManagement.replaceFilter({
+            groupKey: "year",
+            filter: { field: "start_time", operator: "=", value: year, customSql }
+        });
+    }, [timelineFilterManagement]);
 
     return (
         <View style={ styles.container }>
@@ -65,19 +83,18 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
                     title={ "Menetkönyv" }
                     containerStyle={ styles.headerContainer.titleContainer }
                 />
-                {/*<YearPicker*/ }
-                {/*    containerStyle={ styles.headerContainer.yearPicker }*/ }
-                {/*    textInputStyle={ styles.headerContainer.yearPicker.label }*/ }
-                {/*    inputPlaceholder={ "Év" }*/ }
-                {/*    hiddenBackground={ true }*/ }
-                {/*    setValue={ setYearFilter }*/ }
-                {/*/>*/ }
+                <YearPicker
+                    containerStyle={ styles.headerContainer.yearPicker }
+                    textInputStyle={ styles.headerContainer.yearPicker.label }
+                    inputPlaceholder={ "Év" }
+                    hiddenBackground={ true }
+                    setValue={ setYearFilter }
+                />
             </View>
             <TimelineView
                 ref={ ref }
                 data={ data }
                 orderButtons={ orderButtons }
-                // filterButtons={ filterButtons }
                 isInitialFetching={ isInitialFetching }
                 fetchNext={ initialFetchHappened && paginator.hasNext() && fetchNext }
                 fetchPrevious={ initialFetchHappened && paginator.hasPrevious() && fetchPrevious }
