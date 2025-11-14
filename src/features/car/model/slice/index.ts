@@ -65,9 +65,11 @@ const carsSlice = createSlice({
             if(index === -1) return;
 
             state.cars[index] = editedCar;
+            if(state.selectedCar.id === editedCar?.id) state.selectedCar = editedCar;
         })
         .addCase(deleteCar.fulfilled, (state, action) => {
             state.cars = state.cars.filter((car) => car.id !== action.payload);
+            if(action.payload && state.selectedCar?.id === action.payload) state.selectedCar = null;
         })
         .addCase(deleteCar.rejected, () => {
             console.log("hiba, delete car, slices");
