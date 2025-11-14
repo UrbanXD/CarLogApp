@@ -1,4 +1,4 @@
-import React, { ProviderProps, useEffect, useMemo, useState } from "react";
+import React, { ProviderProps, useEffect, useMemo, useRef, useState } from "react";
 import { AuthContext } from "./AuthContext.ts";
 import { useAppDispatch } from "../../hooks/index.ts";
 import { useDatabase } from "../database/DatabaseContext.ts";
@@ -29,6 +29,8 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     const [authenticated, setAuthenticated] = useState<boolean | null>(null);
     const [notVerifiedUser, setNotVerifiedUser] = useState<User | null>(null);
 
+    const sessionDataFetched = useRef<boolean>(false);
+
     useEffect(() => {
         supabaseConnector.client.auth.getSession().then(({ data }) => {
             setAuthenticated(!!data.session);
@@ -56,6 +58,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         if(!session) {
             dispatch(resetUser());
             dispatch(resetCars());
+            sessionDataFetched.current = false;
         }
 
         if(session?.user.id === notVerifiedUser?.id) setNotVerifiedUser(null);
@@ -67,9 +70,10 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
 
         return powersync.registerListener({
             statusChanged: (status) => {
-                if(status.connected && status.hasSynced && !status.dataFlowStatus.downloading && session) {
+                if(status.connected && status.hasSynced && !status.dataFlowStatus.downloading && session && !sessionDataFetched.current) {
                     dispatch(loadUser({ database, userId: session.user.id }));
                     dispatch(loadCars(database));
+                    sessionDataFetched.current = true;
                 }
             }
         });
