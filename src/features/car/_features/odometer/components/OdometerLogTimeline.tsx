@@ -36,11 +36,10 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
                 },
                 {
                     group: "car",
-                    filters: [{ field: "car_id", operator: "=", value: car?.id }]
-                },
-                10
+                    filters: [{ field: "car_id", operator: "=", value: carId }]
+                }
             ),
-        []
+        [carId]
     );
 
     const {
@@ -65,7 +64,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
     const openCreateOdometerLog = useCallback(() => router.push({
         pathname: "/odometer/log/create",
         params: { carId: car.id }
-    }), []);
+    }), [car]);
 
     return (
         <View style={ styles.container }>

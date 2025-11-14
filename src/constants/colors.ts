@@ -20,6 +20,7 @@ export const COLORS = {
     redLight: "#f9504f",
     redDark: "#B71C1C",
 
+    ride: "#fdfdfd",
     fuelYellow: "#FFDF00",
     service: "#8CCEE8",
     vehicleInspection: "#2BC92F",

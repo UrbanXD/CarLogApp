@@ -257,7 +257,7 @@ export function RideLogView({ id }: RideLogViewProps) {
                 <Title
                     title={ "Út" }
                     dividerStyle={ {
-                        backgroundColor: COLORS.white,
+                        backgroundColor: COLORS.ride,
                         marginBottom: SEPARATOR_SIZES.normal
                     } }
                 />

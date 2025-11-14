@@ -26,6 +26,11 @@ export class OdometerLogTypeMapper extends AbstractMapper<OdometerLogTypeTableRo
                 icon = ICON_NAMES.service;
                 primaryColor = COLORS.service;
                 break;
+            case OdometerLogTypeEnum.RIDE:
+                locale = "Út";
+                icon = ICON_NAMES.road;
+                primaryColor = COLORS.ride;
+                break;
         }
 
         return odometerLogTypeSchema.parse({

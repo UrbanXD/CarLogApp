@@ -17,6 +17,7 @@ import { SelectQueryBuilder } from "kysely";
 import { OdometerLogTypeEnum } from "../enums/odometerLogTypeEnum.ts";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { SERVICE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/serviceLog.ts";
+import { RIDE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/rideLog.ts";
 
 export type SelectOdometerLogTableRow = OdometerLogTableRow & {
     note: string | null,
@@ -39,6 +40,8 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         )
         .leftJoin(FUEL_LOG_TABLE, `${ FUEL_LOG_TABLE }.odometer_log_id`, `${ ODOMETER_LOG_TABLE }.id`)
         .leftJoin(SERVICE_LOG_TABLE, `${ SERVICE_LOG_TABLE }.odometer_log_id`, `${ ODOMETER_LOG_TABLE }.id`)
+        .leftJoin(`${ RIDE_LOG_TABLE } as rl1`, "rl1.start_odometer_log_id", `${ ODOMETER_LOG_TABLE }.id`)
+        .leftJoin(`${ RIDE_LOG_TABLE } as rl2`, "rl2.end_odometer_log_id", `${ ODOMETER_LOG_TABLE }.id`)
         .leftJoin(`${ EXPENSE_TABLE } as e1`, "e1.id", `${ FUEL_LOG_TABLE }.expense_id`)
         .leftJoin(`${ EXPENSE_TABLE } as e2`, "e2.id", `${ SERVICE_LOG_TABLE }.expense_id`)
         .select([
@@ -46,13 +49,25 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
             `${ ODOMETER_LOG_TABLE }.car_id`,
             `${ ODOMETER_LOG_TABLE }.value`,
             `${ ODOMETER_LOG_TABLE }.type_id`,
-            eb => eb.fn.coalesce("e1.date", "e2.date", `${ ODOMETER_CHANGE_LOG_TABLE }.date`, eb.val("1970-01-01")).as(
-                "date"),
-            eb => eb.fn.coalesce("e1.note", "e2.note", `${ ODOMETER_CHANGE_LOG_TABLE }.note`).as("note"),
+            eb => eb.fn.coalesce(
+                "e1.date",
+                "e2.date",
+                `${ ODOMETER_CHANGE_LOG_TABLE }.date`,
+                "rl1.start_time",
+                "rl2.end_time",
+                eb.val("1970-01-01")
+            ).as("date"),
+            eb => eb.fn.coalesce(
+                "e1.note",
+                "e2.note",
+                `${ ODOMETER_CHANGE_LOG_TABLE }.note`
+            ).as("note"),
             eb => eb.fn.coalesce(
                 `${ FUEL_LOG_TABLE }.id`,
                 `${ ODOMETER_CHANGE_LOG_TABLE }.id`,
-                `${ SERVICE_LOG_TABLE }.id`
+                `${ SERVICE_LOG_TABLE }.id`,
+                "rl1.id",
+                "rl2.id"
             ).as("related_id")
         ]);
     }

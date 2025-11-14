@@ -14,13 +14,13 @@ export function useRideLogTimelineItem() {
                 params: { id: rideLog.id, title: "Menet-napló bejegyzés" }
             });
         };
-        console.log(rideLog.endOdometer?.value, rideLog.startOdometer?.value);
+
         return {
             id: rideLog.id,
             milestone: <RideTime startTime={ dayjs(rideLog.startTime) } endTime={ dayjs(rideLog.endTime) }/>,
             title: rideLog.ridePlaces.map(ridePlace => ridePlace.name).join(" - "),
             icon: ICON_NAMES.road,
-            color: COLORS.white,
+            color: COLORS.ride,
             note: rideLog.note,
             footerText: (rideLog.startOdometer && rideLog.endOdometer)
                         ? `${ rideLog.endOdometer.value - rideLog.startOdometer.value } ${ rideLog.endOdometer.unit.short }`
