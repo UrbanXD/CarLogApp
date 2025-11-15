@@ -36,6 +36,16 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
         );
     }
 
+    async getUpcomingRides(carId: string, startTime: string): Promise<Array<RideLog>> {
+        const result = await this.selectQuery()
+        .where("car_id", "=", carId)
+        .where("start_time", ">=", startTime)
+        .orderBy("start_time", "asc")
+        .execute();
+
+        return await this.mapper.toDtoArray(result);
+    }
+
     async create(formResult: RideLogFormFields): Promise<RideLog | null> {
         const {
             rideLog,

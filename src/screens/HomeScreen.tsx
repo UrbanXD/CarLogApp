@@ -1,20 +1,20 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import Garage from "../../../features/car/components/Garage.tsx";
-import UpcomingRidesBlock from "./UpcomingRidesBlock";
-import { ScreenScrollView } from "../../../components/screenView/ScreenScrollView.tsx";
-import useCars from "../../../features/car/hooks/useCars.ts";
-import { LatestExpenses } from "../../../features/expense/components/LatestExpense.tsx";
+import useCars from "../features/car/hooks/useCars.ts";
+import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
+import Garage from "../features/car/components/Garage.tsx";
+import { UpcomingRides } from "../features/ride/components/UpcomingRides.tsx";
+import { LatestExpenses } from "../features/expense/components/LatestExpense.tsx";
+import { DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants/index.ts";
 
-const HomeScreen: React.FC = () => {
+export function HomeScreen() {
     const { selectedCar } = useCars();
 
     return (
         <ScreenScrollView style={ { paddingHorizontal: 0 } }>
             <Garage/>
             <View style={ styles.contentContainer }>
-                <UpcomingRidesBlock/>
+                <UpcomingRides car={ selectedCar }/>
                 <LatestExpenses car={ selectedCar }/>
             </View>
         </ScreenScrollView>
@@ -34,5 +34,3 @@ const styles = StyleSheet.create({
         gap: SEPARATOR_SIZES.medium
     }
 });
-
-export default HomeScreen;
