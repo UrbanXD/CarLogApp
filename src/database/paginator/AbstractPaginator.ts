@@ -21,19 +21,22 @@ export type FilterGroup<TableItem, DB = DatabaseType> = {
 export type AddFilterArgs<TableItem, DB = DatabaseType> = {
     groupKey: string,
     filter: FilterCondition<TableItem, DB> | Array<FilterCondition<TableItem, DB>>,
-    logic?: "OR" | "AND"
+    logic?: "OR" | "AND",
+    defaultItemId?: string | number
 }
 
 export type ReplaceFilterArgs<TableItem, DB = DatabaseType> = {
     groupKey: string,
     filter: FilterCondition<TableItem, DB>,
-    logic?: "OR" | "AND"
+    logic?: "OR" | "AND",
+    defaultItemId?: string | number
 }
 
 export type RemoveFilterArgs<TableItem, DB = DatabaseType> = {
     groupKey: string,
     filter: FilterCondition<TableItem, DB>,
-    byValue?: boolean
+    byValue?: boolean,
+    defaultItemId?: string | number
 }
 
 export type PaginatorOptions<TableItem, MappedItem = TableItem, DB = DatabaseType> = {
@@ -117,7 +120,12 @@ export abstract class Paginator<TableItem, MappedItem = TableItem, DB = Database
         return (await Promise.all(tableItems.map(await this.mapper).filter(element => element !== null)));
     }
 
-    async addFilter({ groupKey, filter, logic = "AND" }: AddFilterArgs<TableItem, DB>): Promise<Array<MappedItem>> {
+    async addFilter({
+        groupKey,
+        filter,
+        logic = "AND",
+        defaultItemId
+    }: AddFilterArgs<TableItem, DB>): Promise<Array<MappedItem>> {
         const group = this.filterBy.get(groupKey);
         if(!group) {
             this.filterBy.set(
@@ -126,7 +134,7 @@ export abstract class Paginator<TableItem, MappedItem = TableItem, DB = Database
             );
             this.emit(FILTER_CHANGED_EVENT, new Map(this.filterBy));
 
-            return await this.initial();
+            return await this.initial(defaultItemId);
         }
 
         const groupFilters = group.filters;
@@ -142,13 +150,14 @@ export abstract class Paginator<TableItem, MappedItem = TableItem, DB = Database
         );
         this.emit(FILTER_CHANGED_EVENT, new Map(this.filterBy));
 
-        return await this.initial();
+        return await this.initial(defaultItemId);
     }
 
     async replaceFilter({
         groupKey,
         filter,
-        logic = "AND"
+        logic = "AND",
+        defaultItemId
     }: ReplaceFilterArgs<TableItem, DB>): Promise<Array<MappedItem>> {
         const group = this.filterBy.get(groupKey);
         if(!group) {
@@ -158,7 +167,7 @@ export abstract class Paginator<TableItem, MappedItem = TableItem, DB = Database
             );
             this.emit(FILTER_CHANGED_EVENT, new Map(this.filterBy));
 
-            return await this.initial();
+            return await this.initial(defaultItemId);
         }
 
         const filterExpression = (groupFilter: FilterCondition<TableItem, DB>) =>
@@ -175,13 +184,14 @@ export abstract class Paginator<TableItem, MappedItem = TableItem, DB = Database
         );
         this.emit(FILTER_CHANGED_EVENT, new Map(this.filterBy));
 
-        return await this.initial();
+        return await this.initial(defaultItemId);
     }
 
     async removeFilter({
         groupKey,
         filter,
-        byValue = true
+        byValue = true,
+        defaultItemId
     }: RemoveFilterArgs<TableItem, DB>): Promise<Array<MappedItem>> | null {
         const group = this.filterBy.get(groupKey);
         if(!group) return null;
@@ -201,15 +211,15 @@ export abstract class Paginator<TableItem, MappedItem = TableItem, DB = Database
         );
         this.emit(FILTER_CHANGED_EVENT, new Map(this.filterBy));
 
-        return await this.initial();
+        return await this.initial(defaultItemId);
     }
 
-    async clearFilters(groupKey?: string): Promise<Array<MappedItem>> | null {
+    async clearFilters(groupKey?: string, defaultItemId?: string | number): Promise<Array<MappedItem>> | null {
         if(!groupKey) { //if undefined then clear all groups
             this.filterBy.clear();
             this.emit(FILTER_CHANGED_EVENT, new Map());
 
-            return await this.initial();
+            return await this.initial(defaultItemId);
         }
 
         const group = this.filterBy.get(groupKey);
