@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
+import React, { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import DropdownPickerController, { DropdownPickerControllerProps } from "./dropdown/DropdownPickerController.tsx";
 import DropdownPickerItems from "./dropdown/DropdownPickerItems.tsx";
 import { Paginator } from "../../../database/paginator/AbstractPaginator.ts";
@@ -84,10 +84,12 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
 
     const IS_STATIC = !!data;
 
+    const userSearching = useRef(false);
+
     const [initialLoadCompleted, setInitialLoadCompleted] = useState(false);
     const [items, setItems] = useState<Array<PickerItemType>>([]);
     const [selectedItem, setSelectedItem] = useState<PickerItemType | null>(null);
-    const [tmpSelectedItem, setTmpSelectedItem] = useState<PickerItemType | null>(selectedItem);
+    const [tmpSelectedItem, setTmpSelectedItem] = useState<PickerItemType | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
 
     const isOpened = useSharedValue(false);
@@ -101,9 +103,12 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
                 field: searchBy,
                 operator: "like",
                 value: `%${ searchTerm.toLowerCase() }%`
-            }
+            },
+            defaultItemId: userSearching.current ? undefined : selectedItem?.value
         }).then(result => setItems(result));
-    }, [paginator, searchTerm]);
+
+        userSearching.current = true;
+    }, [paginator, selectedItem, searchTerm]);
 
     const staticSearching = useCallback(() => {
         if(!IS_STATIC || !data) return;
@@ -134,7 +139,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
                 case "prev":
                     return [...result, ...prevState];
                 default:
-                    return [...prevState];
+                    return prevState;
             }
         });
     }, [initialLoadCompleted, paginator]);
@@ -153,13 +158,16 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
         if(!inputFieldValue || inputFieldValue === "") return setSelectedItem(null);
 
         const item = items.find(item => item.value.toString() === inputFieldValue.toString());
-        if(item && item !== selectedItem) setSelectedItem(item);
+        if(item && item.value !== selectedItem?.value) setSelectedItem(item);
     }, [items, inputFieldValue, initialLoadCompleted]);
 
     useEffect(() => {
         if(!data && !paginator) throw new Error("DropdownPicker did not get Data nor Paginator");
 
-        if(searchTerm !== "") setSearchTerm("");
+        if(searchTerm !== "") {
+            userSearching.current = false;
+            setSearchTerm("");
+        }
 
         if(IS_STATIC && data) {
             setItems(data);
@@ -176,6 +184,8 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     }, [data, paginator, inputFieldValue]);
 
     useEffect(() => {
+        if(selectedItem?.value === tmpSelectedItem?.value) return;
+
         setTmpSelectedItem(selectedItem);
     }, [selectedItem]);
 
@@ -208,7 +218,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
         if(selectWithoutSubmit) return submit(item);
 
         if(tmpSelectedItem?.value === item.value) return setTmpSelectedItem(null);
-        setTmpSelectedItem(item);
+        if(tmpSelectedItem?.value !== item.value) setTmpSelectedItem(item);
     }, [selectWithoutSubmit, submit, tmpSelectedItem]);
 
     const onSubmit = useCallback(() => {
@@ -229,7 +239,6 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
                 items={ items }
                 fetchByScrolling={ IS_STATIC ? null : fetchByScrolling }
                 fetchingEnabled={ IS_STATIC ? false : initialLoadCompleted }
-                maintainVisibleContentPosition={ { disabled: true } }
                 selectedItem={ tmpSelectedItem }
                 onSelect={ onSelect }
                 searchTerm={ searchTerm }

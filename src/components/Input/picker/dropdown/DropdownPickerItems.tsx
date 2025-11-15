@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import PickerItem, { PickerItemType } from "../PickerItem.tsx";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native";
@@ -32,8 +32,6 @@ function DropdownPickerItems({
     masonry,
     numColumns
 }: DropdownPickerElementsProps) {
-    const STICKY_FIRST_ELEMENT = !masonry && selectedItem && items.length > 15;
-
     const flashListRef = useRef<FlashListRef<PickerItemType>>(null);
     const itemsFiltered = useRef(false); //this is for prevent scrolling to first element if data just fetched (not filtered)
     const [listReady, setListReady] = useState(false);
@@ -43,7 +41,6 @@ function DropdownPickerItems({
     }, [searchTerm]);
 
     useEffect(() => {
-        if(!listReady) return;
         if(!listReady || !itemsFiltered.current) return;
 
         flashListRef.current?.scrollToOffset({ offset: 0, animated: false });
@@ -60,10 +57,10 @@ function DropdownPickerItems({
     }, [listReady, selectedItem]);
 
     const onStartReached = useCallback(() => {
-        if(!fetchingEnabled) return;
+        if((flashListRef.current.getAbsoluteLastScrollOffset() === 0 && selectedItem) || !fetchingEnabled) return;
 
         fetchByScrolling("prev");
-    }, [fetchingEnabled, fetchByScrolling]);
+    }, [fetchingEnabled, selectedItem, fetchByScrolling]);
 
     const onEndReached = useCallback(() => {
         if(!fetchingEnabled) return;
@@ -87,22 +84,18 @@ function DropdownPickerItems({
             const marginRight = gap - marginLeft;
 
             return (
-                <View
-                    style={ (STICKY_FIRST_ELEMENT && item.value === selectedItem?.value) && styles.stickyItemContainer }
-                >
-                    <PickerItem
-                        item={ item }
-                        onPress={ () => onSelect(item) }
-                        selected={ item.value === selectedItem?.value }
-                        style={ [
-                            { paddingVertical: SEPARATOR_SIZES.lightSmall },
-                            masonry && { marginLeft, marginRight }
-                        ] }
-                    />
-                </View>
+                <PickerItem
+                    item={ item }
+                    onPress={ () => onSelect(item) }
+                    selected={ item.value === selectedItem?.value }
+                    style={ [
+                        { paddingVertical: SEPARATOR_SIZES.lightSmall },
+                        masonry && { marginLeft, marginRight }
+                    ] }
+                />
             );
         },
-        [STICKY_FIRST_ELEMENT, masonry, onSelect, selectedItem, items]
+        [masonry, onSelect, selectedItem, items]
     );
 
     const renderSeparatorComponent = useCallback(
@@ -115,29 +108,15 @@ function DropdownPickerItems({
         [selectedItem]
     );
 
-    const filteredItems = useMemo(
-        () => {
-            if(!STICKY_FIRST_ELEMENT) return items;
-
-            const filtered = items.filter(item => item.value !== selectedItem?.value);
-            filtered.unshift(selectedItem);
-
-            return filtered;
-        },
-        [STICKY_FIRST_ELEMENT, items, selectedItem]
-    );
-
     return (
         <View style={ styles.container }>
             <FlashList
                 ref={ flashListRef }
-                data={ filteredItems }
+                data={ items }
                 masonry={ masonry }
                 numColumns={ numColumns }
                 optimizeItemArrangement={ false }
-                stickyHeaderIndices={ STICKY_FIRST_ELEMENT && [0] }
                 renderItem={ renderItem }
-                // maintainVisibleContentPosition={ { disabled: true } }
                 drawDistance={ hp(100) }
                 keyExtractor={ keyExtractor }
                 ListEmptyComponent={ renderListEmptyComponent }
