@@ -27,7 +27,7 @@ const TabLayout: React.FC = () => {
             <Tabs.Screen
                 name="workbook"
                 options={ {
-                    title: "Munkakönyv",
+                    title: "Menetkönyv",
                     tabBarIcon: () =>
                         JSON.stringify({
                             "inactive": ICON_NAMES.notebookOutline,
