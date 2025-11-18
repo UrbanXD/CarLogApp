@@ -1,6 +1,5 @@
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useForm } from "react-hook-form";
-import { EditUserNameRequest } from "../../schemas/form/editUserNameRequest.ts";
 import { UserAccount } from "../../schemas/userSchema.ts";
 import { EmailStep } from "./steps/index.ts";
 import { router } from "expo-router";
@@ -18,7 +17,7 @@ export function ChangeEmailForm({ user }: ChangeEmailFormProps) {
     const { supabaseConnector } = useDatabase();
     const { openToast } = useAlert();
 
-    const form = useForm<EditUserNameRequest>(useChangeEmailFormProps({ email: user.email }));
+    const form = useForm<ChangeEmailRequest>(useChangeEmailFormProps({ email: user.email }));
     const { reset, handleSubmit } = form;
 
     const submitHandler = handleSubmit(async (request: ChangeEmailRequest) => {

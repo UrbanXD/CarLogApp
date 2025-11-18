@@ -2,57 +2,54 @@ import { UserAccount, userSchema } from "../../schemas/userSchema.ts";
 import { UserTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 import { getImageFromAttachmentQueue } from "../../../../database/utils/getImageFromAttachmentQueue.ts";
+import { Currency } from "../../../_shared/currency/schemas/currencySchema.ts";
+import { Image } from "../../../../types/index.ts";
+import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
+import { getUserLocalCurrency } from "../../../_shared/currency/utils/getUserLocalCurrency.ts";
+import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
 
-export class UserMapper {
-    constructor(private readonly attachmentQueue?: PhotoAttachmentQueue) {}
+export class UserMapper extends AbstractMapper<UserTableRow, UserAccount> {
+    private readonly currencyDao: CurrencyDao;
+    private readonly attachmentQueue?: PhotoAttachmentQueue;
 
-    async toUserDto(userRow: UserTableRow): Promise<UserAccount> {
-        let avatar = await getImageFromAttachmentQueue(this.attachmentQueue, userRow.avatar_url);
+    constructor(currencyDao: CurrencyDao, attachmentQueue?: PhotoAttachmentQueue) {
+        super();
+        this.currencyDao = currencyDao;
+        this.attachmentQueue = attachmentQueue;
+    }
+
+    async toDto(entity: UserTableRow): Promise<UserAccount> {
+        const [currency, avatar]: [Currency | null, Image | null] = await Promise.all([
+            this.currencyDao.getById(entity.currency_id, false),
+            getImageFromAttachmentQueue(this.attachmentQueue, entity.avatar_url)
+        ]);
+
+
+        let localCurrency;
+        if(!currency) {
+            localCurrency = await this.currencyDao.getById(getUserLocalCurrency());
+        }
 
         return userSchema.parse({
-            id: userRow.id,
-            email: userRow.email,
-            firstname: userRow.firstname,
-            lastname: userRow.lastname,
-            avatarColor: userRow.avatar_color,
-            avatar
+            id: entity.id,
+            email: entity.email,
+            firstname: entity.firstname,
+            lastname: entity.lastname,
+            currency: currency ?? localCurrency,
+            avatarColor: entity.avatar_color,
+            avatar: avatar
         });
     }
 
-    toUserEntity(user: UserAccount): UserTableRow {
+    async toEntity(dto: UserAccount): Promise<UserTableRow> {
         return {
-            id: user.id,
-            email: user.email,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            avatar_color: user.avatarColor,
-            avatar_url: user.avatar?.path ?? null
+            id: dto.id,
+            email: dto.email,
+            firstname: dto.firstname,
+            lastname: dto.lastname,
+            currency_id: dto.currency.id,
+            avatar_color: dto.avatarColor,
+            avatar_url: dto.avatar?.path ?? null
         };
     }
 }
-
-export const toUserDto = async (userRow?: UserTableRow, attachmentQueue?: PhotoAttachmentQueue): UserAccount | null => {
-    if(!userRow) return null;
-
-    let avatar = await getImageFromAttachmentQueue(attachmentQueue, userRow.avatar_url);
-
-    return userSchema.parse({
-        id: userRow.id,
-        email: userRow.email,
-        firstname: userRow.firstname,
-        lastname: userRow.lastname,
-        avatarColor: userRow.avatar_color,
-        avatar
-    });
-};
-
-export const toUserEntity = (user: UserAccount): UserTableRow => {
-    return {
-        id: user.id,
-        email: user.email,
-        firstname: user.firstname,
-        lastname: user.lastname,
-        avatar_color: user.avatarColor,
-        avatar_url: user.avatar?.path ?? null
-    };
-};

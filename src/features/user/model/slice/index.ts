@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { loadUser } from "../actions/loadUser.ts";
-import { editUserName } from "../actions/editUserName.ts";
+import { editUserInformation } from "../actions/editUserInformation.ts";
 import { UserAccount } from "../../schemas/userSchema.ts";
 
 export type UserState = {
@@ -32,11 +32,11 @@ const userSlice = createSlice({
             state.loading = false;
             state.user = null;
         })
-        .addCase(editUserName.fulfilled, (state, action) => {
+        .addCase(editUserInformation.fulfilled, (state, action) => {
             state.user = action.payload;
         })
-        .addCase(editUserName.rejected, (state, action) => {
-            console.log("Edit User Name Error");
+        .addCase(editUserInformation.rejected, (state, action) => {
+            console.log("Edit User Information Error");
         });
     }
 });

@@ -16,7 +16,7 @@ export const loadUser =
             if(!userId) return null;
 
             try {
-                return await userDao.getUser(userId);
+                return await userDao.getById(userId);
             } catch(error) {
                 console.log("Load user error: ", error);
                 return rejectWithValue();

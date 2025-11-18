@@ -36,7 +36,7 @@ const ProfileScreen: React.FC = () => {
         params: { type }
     });
 
-    const openEditName = () => openEditUser(EDIT_USER_FORM_TYPE.EditName);
+    const openEditUserInformation = () => openEditUser(EDIT_USER_FORM_TYPE.EditUserInformation);
     const openLinkPasswordToOAuth = () => openEditUser(EDIT_USER_FORM_TYPE.LinkPasswordToOAuth);
     const openResetPassword = () => openEditUser(EDIT_USER_FORM_TYPE.ResetPassword);
     const openChangeEmail = () => openEditUser(EDIT_USER_FORM_TYPE.ChangeEmail);
@@ -85,7 +85,7 @@ const ProfileScreen: React.FC = () => {
                         iconRight={ ICON_NAMES.rightArrowHead }
                         text="Személyes adatok"
                         textStyle={ { textAlign: "left" } }
-                        onPress={ openEditName }
+                        onPress={ openEditUserInformation }
                         backgroundColor="transparent"
                         fontSize={ FONT_SIZES.p1 }
                         loadingIndicator

@@ -7,6 +7,7 @@ export const userTable = new Table({
     email: column.text,
     lastname: column.text,
     firstname: column.text,
+    currency_id: column.integer,
     avatar_url: column.text,
     avatar_color: column.text
 });

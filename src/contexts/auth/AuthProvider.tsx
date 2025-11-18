@@ -16,6 +16,7 @@ import { OtpVerificationHandlerType } from "../../app/bottomSheet/otpVerificatio
 import { loadCars } from "../../features/car/model/actions/loadCars.ts";
 import { resetCars } from "../../features/car/model/slice/index.ts";
 import { resetUser } from "../../features/user/model/slice/index.ts";
+import { getUserLocalCurrency } from "../../features/_shared/currency/utils/getUserLocalCurrency.ts";
 
 export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     children
@@ -116,11 +117,12 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             updateNotVerifiedUser(supabaseUser).catch(console.error);
 
             openAccountVerification(supabaseUser.email);
-            await userDao.insertUser({
+            await userDao.create({
                 id: supabaseUser.id,
                 email: supabaseUser.email,
                 firstname: supabaseUser.user_metadata.firstname,
                 lastname: supabaseUser.user_metadata.lastname,
+                currency_id: getUserLocalCurrency(),
                 avatar_url: null,
                 avatar_color: supabaseUser.user_metadata.avatar_color
             });

@@ -1,7 +1,7 @@
 import React from "react";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
-import { EditUserNameForm } from "../../components/forms/EditUserNameForm.tsx";
+import { EditUserInformationForm } from "../../components/forms/EditUserInformationForm.tsx";
 import { UserAccount } from "../../schemas/userSchema.ts";
 import { EditUserAvatarForm } from "../../components/forms/EditUserAvatarForm.tsx";
 import { ChangeEmailForm } from "../../components/forms/ChangeEmailForm.tsx";
@@ -10,7 +10,7 @@ import { LinkPasswordToOAuthForm } from "../../components/forms/LinkPasswordToOA
 
 export enum EDIT_USER_FORM_TYPE {
     ChangeEmail,
-    EditName,
+    EditUserInformation,
     EditAvatar,
     ResetPassword,
     LinkPasswordToOAuth
@@ -25,8 +25,8 @@ const EditUserBottomSheet: React.FC<EditUserBottomSheetProps> = ({ user, type })
     let CONTENT = null;
 
     switch(type) {
-        case EDIT_USER_FORM_TYPE.EditName:
-            CONTENT = <EditUserNameForm user={ user }/>;
+        case EDIT_USER_FORM_TYPE.EditUserInformation:
+            CONTENT = <EditUserInformationForm user={ user }/>;
             break;
         case EDIT_USER_FORM_TYPE.EditAvatar:
             CONTENT = <EditUserAvatarForm user={ user }/>;

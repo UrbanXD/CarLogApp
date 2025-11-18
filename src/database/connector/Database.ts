@@ -94,8 +94,14 @@ export class Database {
         }
     }
 
+    get currencyDao(): CurrencyDao {
+        if(!this._currencyDao) this._currencyDao = new CurrencyDao(this.db);
+
+        return this._currencyDao;
+    }
+
     get userDao(): UserDao {
-        if(!this._userDao) this._userDao = new UserDao(this.db, this.attachmentQueue);
+        if(!this._userDao) this._userDao = new UserDao(this.db, this.currencyDao, this.attachmentQueue);
 
         return this._userDao;
     }
@@ -110,12 +116,6 @@ export class Database {
         if(!this._modelDao) this._modelDao = new ModelDao(this.db, this.makeDao);
 
         return this._modelDao;
-    }
-
-    get currencyDao(): CurrencyDao {
-        if(!this._currencyDao) this._currencyDao = new CurrencyDao(this.db);
-
-        return this._currencyDao;
     }
 
     get expenseTypeDao(): ExpenseTypeDao {
