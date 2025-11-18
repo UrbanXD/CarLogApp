@@ -18,5 +18,7 @@ export const ACTIONS: Array<Action> = [
         icon: ICON_NAMES.odometer,
         label: "Kilóméteróra-állás frissítés",
         onPress: () => router.push("odometer/log/create")
-    }
+    },
+    { icon: ICON_NAMES.destinationPointMarker, label: "Helyek", onPress: () => router.push("ride/place") },
+    { icon: ICON_NAMES.passenger, label: "Utasok", onPress: () => router.push("ride/passenger") }
 ];
