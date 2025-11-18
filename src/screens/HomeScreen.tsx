@@ -6,7 +6,7 @@ import Garage from "../features/car/components/Garage.tsx";
 import { UpcomingRides } from "../features/ride/components/UpcomingRides.tsx";
 import { LatestExpenses } from "../features/expense/components/LatestExpense.tsx";
 import { DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants/index.ts";
-import { BasicStatistics } from "../features/statistics/components/BasicStatistics.tsx";
+import { BasicCarStatistics } from "../features/statistics/components/BasicCarStatistics.tsx";
 
 export function HomeScreen() {
     const { selectedCar } = useCars();
@@ -17,7 +17,7 @@ export function HomeScreen() {
             <View style={ styles.contentContainer }>
                 <UpcomingRides car={ selectedCar }/>
                 <LatestExpenses car={ selectedCar }/>
-                <BasicStatistics/>
+                <BasicCarStatistics/>
             </View>
         </ScreenScrollView>
     );
