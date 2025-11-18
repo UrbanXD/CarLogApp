@@ -23,10 +23,11 @@ export function PlaceScreen() {
         []
     );
 
-    const mapper = (item: PickerItemType): InfoTimelineItem => {
+    const mapper = (item: PickerItemType, callback?: () => void): InfoTimelineItem => {
         return ({
             id: item.value,
-            text: item.title
+            text: item.title,
+            callback: callback
         });
     };
 
@@ -47,16 +48,23 @@ export function PlaceScreen() {
 
     const openCreateForm = () => router.push("/ride/place/create");
 
-    const onEdit = (id: string) => router.push({
-        pathname: "/ride/place/edit/[id]",
-        params: { id }
-    });
+    const onEdit = (id: string, callback?: () => void) => {
+        if(!id) return;
+        console.log(!!callback, "hi");
 
-    const handleDelete = useCallback(async (id: string) => {
+        callback?.();
+        router.push({
+            pathname: "/ride/place/edit/[id]",
+            params: { id }
+        });
+    };
+
+    const handleDelete = useCallback(async (id: string, callback?: () => void) => {
         try {
             await placeDao.delete(id);
 
             openToast(DeleteExpenseToast.success());
+            callback?.();
             await refresh();
             requestAnimationFrame(() => {
                 ref.current?.clearLayoutCacheOnUpdate(); // vagy adott kezdő index

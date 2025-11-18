@@ -38,6 +38,7 @@ export const editUserAvatar =
                 avatarColor: request.avatarColor
             };
 
-            return await userDao.editUser(user);
+            return oldUser;
+            // return await userDao.update(user); //TODO fixalni
         }
     );

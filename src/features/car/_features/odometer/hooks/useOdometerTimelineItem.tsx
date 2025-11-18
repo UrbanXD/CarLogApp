@@ -10,7 +10,7 @@ import { OdometerLogTypeEnum } from "../model/enums/odometerLogTypeEnum.ts";
 export const useOdometerTimelineItem = () => {
     const mapper = useCallback((
         odometerLog: OdometerLog,
-        callback?: (id: string | number) => void
+        callback?: () => void
     ): TimelineItemType => {
         const routerPathTitle = "Napló bejegyzés";
         let routerPathName = "/odometer/log/[id]";

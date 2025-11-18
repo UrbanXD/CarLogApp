@@ -20,10 +20,12 @@ export function PassengerScreen() {
 
     const paginator = useMemo(() => passengerDao.paginator(), []);
 
-    const mapper = (item: PickerItemType): InfoTimelineItem => {
+    const mapper = (item: PickerItemType, callback?: () => void): InfoTimelineItem => {
+        console.log(item.value, " fesas");
         return ({
             id: item.value,
-            text: item.title
+            text: item.title,
+            callback: callback
         });
     };
 
@@ -44,16 +46,23 @@ export function PassengerScreen() {
 
     const openCreateForm = () => router.push("/ride/passenger/create");
 
-    const onEdit = (id: string) => router.push({
-        pathname: "/ride/passenger/edit/[id]",
-        params: { id }
-    });
+    const onEdit = (id: string, callback?: () => void) => {
+        console.log(id);
+        if(!id) return;
+        console.log(!!callback, "hi");
+        callback?.();
+        router.push({
+            pathname: "/ride/passenger/edit/[id]",
+            params: { id }
+        });
+    };
 
-    const handleDelete = useCallback(async (id: string) => {
+    const handleDelete = useCallback(async (id: string, callback?: () => void) => {
         try {
             await passengerDao.delete(id);
 
             openToast(DeleteExpenseToast.success());
+            callback?.();
             await refresh();
             requestAnimationFrame(() => {
                 ref.current?.clearLayoutCacheOnUpdate();

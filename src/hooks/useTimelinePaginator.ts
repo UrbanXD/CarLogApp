@@ -15,7 +15,7 @@ import {
 
 type UseTimelinePaginatorProps<TableItem, MappedItem, ResultItem = MappedItem, DB> = {
     paginator: CursorPaginator<TableItem, MappedItem, DB>
-    mapper: (item: MappedItem, callback?: (id: number | string) => void) => ResultItem
+    mapper: (item: MappedItem, callback?: () => void) => ResultItem
     cursorOrderButtons?: Array<{ field: keyof TableItem, table?: keyof DB | null, title: string }>
 }
 
@@ -52,7 +52,9 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
                 return;
             }
 
+            console.log(scrollToItemId.current);
             paginator.initial(scrollToItemId.current).then(result => {
+                //TODO PLACE ES PESSANGERBE ez itt most value lenne
                 const newData = result.map((item) => mapper(item, () => scrollToItemId.current = item.id));
                 scrollToItem.current = true;
 
@@ -95,7 +97,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
             setData((_) => {
                 setInitialFetchHappened(true);
                 setIsInitialFetching(false);
-                return result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+                return result.map((item) => mapper(item, () => scrollToItemId.current = item.id));
             });
         });
     }, []);
@@ -104,7 +106,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
         if(!initialFetchHappened) return;
 
         paginator.changeCursorOptions(cursorOptions).then(result => {
-            const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+            const newData = result.map((item) => mapper(item, () => scrollToItemId.current = item.id));
             setData(newData);
         });
     }, [cursorOptions]);
@@ -121,7 +123,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
     const refresh = useCallback(async () => {
         const result = await paginator.refresh();
 
-        return result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+        return result.map((item) => mapper(item, () => scrollToItemId.current = item.id));
     }, [paginator, mapper]);
 
     const fetchNext = useCallback(async () => {
@@ -131,7 +133,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
         const result = await paginator.next();
         if(!result) return setIsNextFetching(false);
 
-        const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+        const newData = result.map((item) => mapper(item, () => scrollToItemId.current = item.id));
 
         setData(prevState => {
             setIsNextFetching(false);
@@ -147,7 +149,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
 
         if(!result) return setIsPreviousFetching(false);
 
-        const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+        const newData = result.map((item) => mapper(item, () => scrollToItemId.current = item.id));
 
         setData(prevState => {
             setIsPreviousFetching(false);
@@ -158,14 +160,14 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
     const addFilter = useCallback(async (args: AddFilterArgs<TableItem, DB>) => {
         const result = await paginator.addFilter(args);
 
-        const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+        const newData = result.map((item) => mapper(item, () => scrollToItemId.current = item.id));
         setData(newData);
     }, [paginator]);
 
     const replaceFilter = useCallback(async (args: ReplaceFilterArgs<TableItem, DB>) => {
         const result = await paginator.replaceFilter(args);
 
-        const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+        const newData = result.map((item) => mapper(item, () => scrollToItemId.current = item.id));
         setData(newData);
     }, [paginator]);
 
@@ -174,7 +176,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
 
         if(!result) return;
 
-        const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+        const newData = result.map((item) => mapper(item, () => scrollToItemId.current = item.id));
         setData(newData);
     }, [paginator]);
 
@@ -182,7 +184,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
         const result = await paginator.clearFilters(groupKey);
         if(!result) return;
 
-        const newData = result.map((item) => mapper(item, (id) => scrollToItemId.current = id));
+        const newData = result.map((item) => mapper(item, () => scrollToItemId.current = item.id));
         setData(newData);
     }, [paginator]);
 

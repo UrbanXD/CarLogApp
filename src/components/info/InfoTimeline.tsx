@@ -13,14 +13,15 @@ import FloatingActionMenu from "../../ui/floatingActionMenu/components/FloatingA
 export type InfoTimelineItem = {
     id: string | number
     text: string
+    callback?: () => void
 }
 
 type InfoTimelineProps = {
     ref: FlashListRef<InfoTimelineItem>
     data: Array<InfoTimelineItem>
     openCreateForm: () => void
-    onEdit: (id: string | number) => void
-    onDelete: (id: string | number) => void
+    onEdit: (id: string | number, callback?: () => void) => void
+    onDelete: (id: string | number, callback?: () => void) => void
     isInitialFetching?: boolean
     fetchNext?: () => Promise<void>
     fetchPrevious?: () => Promise<void>
@@ -54,13 +55,13 @@ function IInfoTimeline({
                     icon={ ICON_NAMES.pencil }
                     color={ COLORS.gray1 }
                     size={ FONT_SIZES.p3 * ICON_FONT_SIZE_SCALE }
-                    onPress={ () => onEdit(item.id) }
+                    onPress={ () => onEdit(item?.id, item.callback) }
                 />
                 <Icon
                     icon={ ICON_NAMES.trashCan }
                     color={ COLORS.redLight }
                     size={ FONT_SIZES.p3 * ICON_FONT_SIZE_SCALE }
-                    onPress={ () => onDelete(item.id) }
+                    onPress={ () => onDelete(item?.id, item.callback) }
                 />
             </View>
         </View>
@@ -94,7 +95,8 @@ function IInfoTimeline({
         );
     });
 
-    const keyExtractor = useCallback((item: InfoTimelineItem) => item.id, []);
+    //TODO fixelni nem kell  az index de valamiert hiba jon  elo
+    const keyExtractor = useCallback((item: InfoTimelineItem, index: number) => item?.id ?? index, []);
 
     return (
         <>

@@ -7,8 +7,11 @@ import dayjs from "dayjs";
 import { RideTime } from "../components/RideTime.tsx";
 
 export function useRideLogTimelineItem() {
-    const mapper = useCallback((rideLog: RideLog): TimelineItemType => {
+    const mapper = useCallback((rideLog: RideLog, callback?: () => void): TimelineItemType => {
         const onPress = () => {
+            if(!rideLog.id) return;
+
+            callback?.();
             router.push({
                 pathname: "/ride/[id]",
                 params: { id: rideLog.id, title: "Menet-napló bejegyzés" }

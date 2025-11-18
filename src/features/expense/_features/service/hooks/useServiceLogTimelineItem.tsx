@@ -11,7 +11,7 @@ dayjs.extend(utc);
 export function useServiceLogTimelineItem() {
     const mapper = useCallback((
         serviceLog: ServiceLog,
-        callback?: (id: string | number) => void
+        callback?: () => void
     ): TimelineItemType => {
         const onPress = () => {
             callback?.();
