@@ -23,6 +23,11 @@ export type TopListItemStat = {
     count: number
 }
 
+export type StatFunctionOptions = {
+    carId?: string | null,
+    type?: "year" | "month"
+}
+
 export const formatDate = (options?: {
     base?: string
     startOf?: "month" | "year" | "day",
@@ -111,7 +116,7 @@ export class StatisticsDao {
         this.db = db;
     }
 
-    async getFuelCostTrend(carId?: string, type?: "year" | "month"): Promise<TrendStat> {
+    async getFuelCostTrend({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
         const { currentTrendDateLimit, previousTrendDateLimit, dateLimitSql } = getTrendDateLimit("t2.date", type);
 
         let query = this.db
@@ -137,7 +142,7 @@ export class StatisticsDao {
         } as TrendStat;
     }
 
-    async getServiceCostTrend(carId: string, type?: "year" | "month"): Promise<TrendStat> {
+    async getServiceCostTrend({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
         const { currentTrendDateLimit, previousTrendDateLimit, dateLimitSql } = getTrendDateLimit("t2.date", type);
 
         let query = this.db
@@ -163,7 +168,7 @@ export class StatisticsDao {
         } as TrendStat;
     }
 
-    async getTotalCostTrend(carId?: string, type?: "year" | "month"): Promise<TrendStat> {
+    async getTotalCostTrend({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
         const { currentTrendDateLimit, previousTrendDateLimit, dateLimitSql } = getTrendDateLimit("date", type);
 
         let query = this.db
@@ -188,7 +193,7 @@ export class StatisticsDao {
         } as TrendStat;
     }
 
-    async getDistanceTrend(carId?: string, type?: "year" | "month"): Promise<TrendStat> {
+    async getDistanceTrend({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
         const { currentTrendDateLimit, previousTrendDateLimit } = getTrendDateLimit("t2.date", type);
 
         let currQuery = (db: QueryCreator<DatabaseType>) => {
@@ -241,8 +246,8 @@ export class StatisticsDao {
         } as TrendStat;
     }
 
-    async getFuelConsumption(carId?: string, type?: "year" | "month"): Promise<TrendStat> {
-        const distance = await this.getDistanceTrend(carId, type);
+    async getFuelConsumption({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
+        const distance = await this.getDistanceTrend({ carId: carId, type: type });
 
         const { currentTrendDateLimit, previousTrendDateLimit, dateLimitSql } = getTrendDateLimit("t2.date", type);
 
@@ -277,9 +282,9 @@ export class StatisticsDao {
         return { current, previous } as TrendStat;
     }
 
-    async getCostPerDistance(carId?: string, type?: "year" | "month"): Promise<TrendStat> {
-        const totalCost = await this.getTotalCostTrend(carId, type);
-        const distance = await this.getDistanceTrend(carId, type);
+    async getCostPerDistance(options: StatFunctionOptions): Promise<TrendStat> {
+        const totalCost = await this.getTotalCostTrend(options);
+        const distance = await this.getDistanceTrend(options);
 
         return {
             current: distance.current === 0
@@ -291,7 +296,7 @@ export class StatisticsDao {
         } as TrendStat;
     }
 
-    async getLongestRideDistance(carId?: string, type?: "year" | "month"): Promise<TrendStat> {
+    async getLongestRideDistance({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
         const { currentTrendDateLimit, previousTrendDateLimit, dateLimitSql } = getTrendDateLimit(
             "t1.start_time",
             type
@@ -317,10 +322,13 @@ export class StatisticsDao {
 
         const result = await query.executeTakeFirst();
 
-        return result as TrendStat;
+        return {
+            current: numberToFractionDigit(result?.current),
+            previous: numberToFractionDigit(result?.previous)
+        } as TrendStat;
     }
 
-    async getAverageRideDistance(carId?: string, type?: "year" | "month"): Promise<TrendStat> {
+    async getAverageRideDistance({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
         const { currentTrendDateLimit, previousTrendDateLimit, dateLimitSql } = getTrendDateLimit(
             "t1.start_time",
             type
@@ -346,10 +354,13 @@ export class StatisticsDao {
 
         const result = await query.executeTakeFirst();
 
-        return result as TrendStat;
+        return {
+            current: numberToFractionDigit(result?.current),
+            previous: numberToFractionDigit(result?.previous)
+        } as TrendStat;
     }
 
-    async getLongestRideDuration(carId?: string, type?: "year" | "month"): Promise<TrendStat> {
+    async getLongestRideDuration({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
         const { currentTrendDateLimit, previousTrendDateLimit, dateLimitSql } = getTrendDateLimit(
             "t1.start_time",
             type
@@ -372,7 +383,7 @@ export class StatisticsDao {
         return await query.executeTakeFirst() as TrendStat;
     }
 
-    async getAverageRideDuration(carId?: string, type?: "year" | "month"): Promise<TrendStat> {
+    async getAverageRideDuration({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
         const { currentTrendDateLimit, previousTrendDateLimit, dateLimitSql } = getTrendDateLimit(
             "t1.start_time",
             type
@@ -395,7 +406,7 @@ export class StatisticsDao {
         return await query.executeTakeFirst() as TrendStat;
     }
 
-    async getMostVisitedPlaces(carId?: string, type?: "year" | "month"): Promise<Array<TopListItemStat>> {
+    async getTopVisitedPlaces({ carId, type }: StatFunctionOptions): Promise<Array<TopListItemStat>> {
         const dateLimit = getTopDateLimit("t2.start_time", type);
 
         let query = this.db

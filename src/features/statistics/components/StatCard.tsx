@@ -1,15 +1,16 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 
 export type StatCardProps = {
-    label: string
-    value: string
+    label: ReactNode
+    value: ReactNode
     trend?: string
+    trendDescription?: string
     isPositive?: boolean
 }
 
-export function StatCard({ label, value, trend, isPositive }: StatCardProps) {
+export function StatCard({ label, value, trend, trendDescription, isPositive }: StatCardProps) {
     const trendColor = trend
                        ? isPositive === true
                          ? COLORS.greenLight
@@ -26,9 +27,23 @@ export function StatCard({ label, value, trend, isPositive }: StatCardProps) {
             </View>
             {
                 trend &&
-               <Text style={ [styles.trend, { color: trendColor }] }>
-                   { trend }
-               </Text>
+               <View>
+                  <Text style={ [styles.trend, { color: trendColor }] }>
+                      { trend }
+                  </Text>
+                   {
+                       trendDescription &&
+                      <Text
+                         style={ [
+                             styles.trend,
+                             styles.trendDescription,
+                             { color: trendColor }
+                         ] }
+                      >
+                          { trendDescription }
+                      </Text>
+                   }
+               </View>
             }
         </View>
     );
@@ -53,11 +68,13 @@ const styles = StyleSheet.create({
     label: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p4 * 0.9,
+        lineHeight: FONT_SIZES.p4 * 0.9 * 1.25,
         color: COLORS.gray1
     },
     value: {
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.p2,
+        lineHeight: FONT_SIZES.p2 * 1.25,
         color: COLORS.white
     },
     trend: {
@@ -65,5 +82,9 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZES.p4 * 0.9,
         lineHeight: FONT_SIZES.p4 * 0.9 * 1.25,
         marginTop: SEPARATOR_SIZES.small
+    },
+    trendDescription: {
+        fontSize: FONT_SIZES.p4 * 0.825,
+        marginTop: 0
     }
 });

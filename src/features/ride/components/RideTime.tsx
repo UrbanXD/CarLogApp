@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/hu";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { secondsToTimeText } from "../../../utils/secondsToTimeDuration.ts";
 
 dayjs.locale("hu");
 
@@ -11,29 +12,14 @@ type RideTimeProps = {
     endTime: Dayjs
 };
 
-const formatDuration = (minutes: number): string => {
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
-    let text = "";
-
-    if(h > 0) text += `${ h } óra`;
-
-    if(h > 0 && m > 0) text += " ";
-
-    if(m > 0) text += `${ m } perc`;
-
-    return text || "néhány másodperc";
-};
-
-
 export function RideTime({
     startTime,
     endTime
 }: RideTimeProps) {
     const isSameDay = startTime.isSame(endTime, "day");
 
-    const duration = endTime.diff(startTime, "minute");
-    const durationText = (isNaN(duration) || duration === 0) ? null : formatDuration(duration);
+    const duration = endTime.diff(startTime, "second");
+    const durationText = (isNaN(duration) || duration === 0) ? null : secondsToTimeText(duration);
 
     return (
         <View style={ styles.container }>
