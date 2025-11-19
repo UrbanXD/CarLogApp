@@ -35,7 +35,7 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
                 group: "car",
                 filters: [{ field: "car_id", operator: "=", value: car.id }]
             }
-        ), [car.id]);
+        ), []);
 
     const {
         ref,
@@ -60,11 +60,13 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
     });
 
     useEffect(() => {
+        if(!car) return;
+
         timelineFilterManagement.replaceFilter({
             groupKey: "car",
             filter: { field: "car_id", operator: "=", value: car.id }
         });
-    }, [car.id]);
+    }, [car]);
 
     const setYearFilter = useCallback((year: string) => {
         // @formatter:off

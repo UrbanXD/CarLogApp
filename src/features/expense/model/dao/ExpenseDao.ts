@@ -73,7 +73,7 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
             {
                 baseQuery: this.selectQuery(),
                 perPage,
-                filterBy,
+                filterBy: filterBy,
                 mapper: this.mapper.toDto.bind(this.mapper)
             }
         );

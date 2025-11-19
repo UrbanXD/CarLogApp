@@ -66,7 +66,7 @@ export function useExpenseTimelineFilter({
     }, [filters]);
 
     useEffect(() => {
-        replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: car.id } });
+        if(car) replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: car.id } });
     }, [car]);
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {

@@ -370,7 +370,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
             {
                 baseQuery: query,
                 perPage,
-                filterBy,
+                filterBy: filterBy,
                 mapper: this.mapper.toDto.bind(this.mapper)
             }
         );

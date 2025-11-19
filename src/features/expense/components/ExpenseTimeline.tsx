@@ -29,9 +29,12 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
                         { field: "id" }
                     ]
                 },
-                { field: "car_id", operator: "=", value: car.id }
+                {
+                    group: "car",
+                    filters: [{ field: "car_id", operator: "=", value: car.id }]
+                }
             ),
-        [car.id]
+        []
     );
 
     const {

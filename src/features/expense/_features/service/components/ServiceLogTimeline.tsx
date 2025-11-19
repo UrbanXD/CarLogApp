@@ -22,20 +22,23 @@ type ServiceLogTimelineProps = {
 export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
     const { serviceLogDao } = useDatabase();
     const { mapper } = useServiceLogTimelineItem();
-    const paginator = useMemo(() =>
-        serviceLogDao.paginator(
-            {
-                cursor: [
-                    { table: EXPENSE_TABLE, field: "date", order: "desc" },
-                    { table: EXPENSE_TABLE, field: "amount", order: "desc" },
-                    { field: "id" }
-                ]
-            },
-            {
-                group: "car",
-                filters: [{ field: "car_id", operator: "=", value: car.id }]
-            }
-        ), []);
+    const paginator = useMemo(
+        () =>
+            serviceLogDao.paginator(
+                {
+                    cursor: [
+                        { table: EXPENSE_TABLE, field: "date", order: "desc" },
+                        { table: EXPENSE_TABLE, field: "amount", order: "desc" },
+                        { field: "id" }
+                    ]
+                },
+                {
+                    group: "car",
+                    filters: [{ field: "car_id", operator: "=", value: car.id }]
+                }
+            ),
+        []
+    );
 
     const {
         ref,
