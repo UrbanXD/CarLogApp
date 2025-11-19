@@ -49,7 +49,6 @@
     "expo-system-ui": "~6.0.8",
     "jest": "29.7.0",
     "jest-expo": "~54.0.13",
-    "kysely-paginate": "^0.3.1",
     "pods": "^2.0.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
