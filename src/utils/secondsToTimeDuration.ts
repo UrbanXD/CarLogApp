@@ -1,9 +1,18 @@
-export function secondsToTimeText(seconds: number): string {
-    if(seconds < 1) return "néhány másodperc";
+export function secondsToTimeText(seconds: number, showsSeconds?: boolean = false): string {
+    if(!showsSeconds && seconds < 59) return "néhány másodperc";
 
-    const days = Math.floor(seconds / 86400);
-    const hours = Math.floor((seconds % 86400) / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
+    let remaining = seconds;
+
+    const days = Math.floor(remaining / 86400);
+    remaining %= 86400;
+
+    const hours = Math.floor(remaining / 3600);
+    remaining %= 3600;
+
+    const minutes = Math.floor(remaining / 60);
+    remaining %= 60;
+
+    const remainingSeconds = remaining;
 
     let text = "";
 
@@ -17,6 +26,11 @@ export function secondsToTimeText(seconds: number): string {
     if(minutes > 0) {
         if(text) text += " ";
         text += `${ minutes } perc`;
+    }
+
+    if(showsSeconds && remainingSeconds > 0) {
+        if(text) text += " ";
+        text += `${ remainingSeconds } másodperc`;
     }
 
     return text || "néhány másodperc";

@@ -20,9 +20,11 @@ export function calculateTrend(current?: number = 0, previous?: number = 0, opti
     if(diffFormat === "percent") {
         if(previous === 0) {
             const rawPercent = (diff === 0) ? 0 : 100;
+
             trend = `${ numberToFractionDigit(rawPercent, 2) }%`;
         } else {
             const rawPercent = (diff / previous) * 100;
+
             trend = `${ numberToFractionDigit(Math.abs(rawPercent), 1) }%`;
         }
     } else {
@@ -31,8 +33,14 @@ export function calculateTrend(current?: number = 0, previous?: number = 0, opti
                 : absoluteDiff.toLocaleString("hu-HU", { notation: diffFormat, maximumFractionDigits: 2 });
     }
 
-    const trendSymbol = diff > 0 ? trendSymbols?.positive ?? "↑" : diff < 0 ? trendSymbols?.negative ?? "↓" : "=";
-    const isTrendPositive = diff < 0;
+    const trendSymbol =
+        diff > 0
+        ? trendSymbols?.positive ?? "↑"
+        : diff < 0
+          ? trendSymbols?.negative ?? "↓"
+          : trendSymbols?.equal ?? "≈";
+
+    const isTrendPositive = diff > 0 ? true : diff < 0 ? false : undefined;
 
     return { trend, trendSymbol, isTrendPositive };
 }

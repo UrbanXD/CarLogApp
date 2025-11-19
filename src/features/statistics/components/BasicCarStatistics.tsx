@@ -192,8 +192,8 @@ export function BasicCarStatistics() {
 
         return {
             label: "Havi átlag menetidő",
-            value: secondsToTimeText(averageRideDuration?.current ?? 0),
-            trend: `${ trendSymbol } ${ secondsToTimeText(Number(trend)) }`,
+            value: averageRideDuration?.current ? secondsToTimeText(averageRideDuration.current) : "-",
+            trend: `${ trendSymbol } ${ trend === 0 ? "-" : secondsToTimeText(Number(trend)) }`,
             trendDescription: "előző hónaphoz képest"
         };
     }, [averageRideDuration, selectedCar]);
@@ -222,8 +222,8 @@ export function BasicCarStatistics() {
 
         return {
             label: "Havi leghosszabb menetidő",
-            value: secondsToTimeText(longestRideDuration?.current ?? 0),
-            trend: `${ trendSymbol } ${ secondsToTimeText(trend) }`,
+            value: longestRideDuration?.current ? secondsToTimeText(longestRideDuration.current) : "-",
+            trend: `${ trendSymbol } ${ trend === 0 ? "-" : secondsToTimeText(Number(trend)) }`,
             trendDescription: "előző hónaphoz képest"
         };
     }, [longestRideDuration]);

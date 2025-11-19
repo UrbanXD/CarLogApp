@@ -323,8 +323,8 @@ export class StatisticsDao {
         const result = await query.executeTakeFirst();
 
         return {
-            current: numberToFractionDigit(result?.current),
-            previous: numberToFractionDigit(result?.previous)
+            current: numberToFractionDigit(result?.current ?? 0),
+            previous: numberToFractionDigit(result?.previous ?? 0)
         } as TrendStat;
     }
 
@@ -355,8 +355,8 @@ export class StatisticsDao {
         const result = await query.executeTakeFirst();
 
         return {
-            current: numberToFractionDigit(result?.current),
-            previous: numberToFractionDigit(result?.previous)
+            current: numberToFractionDigit(result?.current ?? 0),
+            previous: numberToFractionDigit(result?.previous ?? 0)
         } as TrendStat;
     }
 
@@ -380,7 +380,12 @@ export class StatisticsDao {
         if(carId) query = query.where("t1.car_id", "=", carId);
         if(dateLimitSql) query = query.where("t1.start_time", ">=", dateLimitSql);
 
-        return await query.executeTakeFirst() as TrendStat;
+        const result = await query.executeTakeFirst();
+
+        return {
+            current: numberToFractionDigit(result?.current ?? 0),
+            previous: numberToFractionDigit(result?.previous ?? 0)
+        } as TrendStat;
     }
 
     async getAverageRideDuration({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
@@ -403,7 +408,12 @@ export class StatisticsDao {
         if(carId) query = query.where("t1.car_id", "=", carId);
         if(dateLimitSql) query = query.where("t1.start_time", ">=", dateLimitSql);
 
-        return await query.executeTakeFirst() as TrendStat;
+        const result = await query.executeTakeFirst();
+
+        return {
+            current: numberToFractionDigit(result?.current ?? 0),
+            previous: numberToFractionDigit(result?.previous ?? 0)
+        } as TrendStat;
     }
 
     async getTopVisitedPlaces({ carId, type }: StatFunctionOptions): Promise<Array<TopListItemStat>> {
