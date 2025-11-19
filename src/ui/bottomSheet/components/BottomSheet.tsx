@@ -1,5 +1,5 @@
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
-import { Keyboard, StyleSheet, Text, View } from "react-native";
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Keyboard, Platform, StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import {
     BottomSheetRoutes,
@@ -28,13 +28,15 @@ export interface BottomSheetProps extends Partial<BottomSheetModalProps> {
 const BottomSheet: React.FC<BottomSheetProps> = ({
     title, content, closeButton, ...restProps
 }) => {
-    const { top } = useSafeAreaInsets();
+    const { top, bottom } = useSafeAreaInsets();
     const { openModal } = useAlert();
     const navigation = useNavigation();
 
     const bottomSheetRef = useRef<BottomSheetModal>(null);
     const manuallyClosed = useRef(false);
     const forceClosed = useRef(false);
+
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
 
     const { snapPoints, enableHandlePanningGesture, enableDynamicSizing, enableDismissOnClose } = restProps;
 
@@ -67,9 +69,19 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     }, []);
 
     useEffect(() => {
-        Keyboard.addListener("keyboardDidHide", () => {
+        const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+        const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+        const showSubscription = Keyboard.addListener(showEvent, () => setKeyboardVisible(true));
+        const hideSubscription = Keyboard.addListener(hideEvent, () => {
             bottomSheetRef.current?.snapToIndex(0);
+            setKeyboardVisible(false);
         });
+
+        return () => {
+            showSubscription.remove();
+            hideSubscription.remove();
+        };
     }, []);
 
     const reopenBottomSheet = useCallback(() => {
@@ -115,7 +127,13 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
 
     const renderBackdrop = useMemo(() => (props: BottomSheetBackdropProps) => <BottomSheetBackdrop { ...props }/>);
 
-    const styles = useStyles(snapPoints?.[0] === "100%", !!enableHandlePanningGesture, !!enableDynamicSizing);
+    const styles = useStyles(
+        snapPoints?.[0] === "100%",
+        !!enableHandlePanningGesture,
+        !!enableDynamicSizing,
+        keyboardVisible,
+        bottom
+    );
 
     return (
         <BottomSheetModal
@@ -152,14 +170,18 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
 const useStyles = (
     isFullScreen: boolean,
     isHandlePanningGesture: boolean,
-    enableDynamicSizing: number
+    enableDynamicSizing: number,
+    keyboardVisible: boolean,
+    bottom: number
 ) => StyleSheet.create({
     container: {
         flex: 1,
         height: enableDynamicSizing ? undefined : "100%",
         gap: DEFAULT_SEPARATOR,
         paddingHorizontal: DEFAULT_SEPARATOR,
-        paddingBottom: SEPARATOR_SIZES.small
+        paddingBottom: keyboardVisible
+                       ? SEPARATOR_SIZES.small
+                       : SEPARATOR_SIZES.small + bottom
     },
     containerBackground: {
         backgroundColor: COLORS.black2,

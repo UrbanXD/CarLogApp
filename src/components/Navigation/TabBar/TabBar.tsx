@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import TabBarIcon from "./TabBarIcon.tsx";
 import {
     COLORS,
@@ -9,20 +9,21 @@ import {
     SIMPLE_TABBAR_HEIGHT
 } from "../../../constants/index.ts";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
 import { LinearGradient } from "expo-linear-gradient";
 import FloatingActionMenu from "../../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
 import { ACTIONS } from "../../../ui/floatingActionMenu/constants/index.ts";
 
 function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
+    const styles = useStyles(insets.bottom);
+
     return (
         <>
             <FloatingActionMenu
                 action={ ACTIONS }
-                containerStyle={ { bottom: SIMPLE_TABBAR_HEIGHT + SEPARATOR_SIZES.normal } }
+                containerStyle={ { bottom: SIMPLE_TABBAR_HEIGHT + SEPARATOR_SIZES.small + insets.bottom } }
             />
-            <SafeAreaView style={ [styles.container, { paddingBottom: insets.bottom }] }>
+            <View style={ [styles.container] }>
                 <LinearGradient
                     locations={ [0, 0.75] }
                     colors={ [
@@ -66,12 +67,12 @@ function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
                         );
                     })
                 }
-            </SafeAreaView>
+            </View>
         </>
     );
-};
+}
 
-const styles = StyleSheet.create({
+const useStyles = (bottom: number) => StyleSheet.create({
     container: {
         position: "absolute",
         left: 0,
@@ -81,7 +82,8 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         justifyContent: "space-between",
         alignItems: "center",
-        height: SIMPLE_TABBAR_HEIGHT,
+        height: SIMPLE_TABBAR_HEIGHT + bottom,
+        paddingBottom: bottom,
         gap: SEPARATOR_SIZES.small,
         width: "100%",
         backgroundColor: "transparent"
