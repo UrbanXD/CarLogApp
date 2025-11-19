@@ -27,7 +27,7 @@ const useCreateCarForm = () => {
         resetField,
         setValue,
         getValues
-    } = useForm<CarFormFields>(useCreatCarFormProps(user.id));
+    } = useForm<CarFormFields>(useCreatCarFormProps(user));
 
     const steps = useCarSteps<CarFormFields>({ control, formState, setValue, getValues });
 
