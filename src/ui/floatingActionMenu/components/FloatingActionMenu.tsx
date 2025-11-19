@@ -14,6 +14,7 @@ import { FloatingActionButton } from "./FloatingActionButton.tsx";
 import { AnimatedPressable, AnimatedSafeAreaView } from "../../../components/AnimatedComponents/index.ts";
 import { Action } from "../constants/index.ts";
 import { Overlay } from "../../../components/overlay/Overlay.tsx";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type FloatingActionMenu = {
     action: (() => void) | Array<Action>
@@ -21,6 +22,8 @@ type FloatingActionMenu = {
 }
 
 function FloatingActionMenu({ action, containerStyle }: FloatingActionMenu) {
+    const { bottom } = useSafeAreaInsets();
+
     const isExpanded = useSharedValue(false);
     const titleDisplay = useSharedValue<"flex" | "none">("none");
 
@@ -64,6 +67,8 @@ function FloatingActionMenu({ action, containerStyle }: FloatingActionMenu) {
         );
     }, []);
 
+    const styles = useStyles(bottom);
+
     return (
         <>
             <Overlay opened={ isExpanded } onPress={ close }/>
@@ -84,10 +89,10 @@ function FloatingActionMenu({ action, containerStyle }: FloatingActionMenu) {
 
 export default FloatingActionMenu;
 
-const styles = StyleSheet.create({
+const useStyles = (bottom: number) => StyleSheet.create({
     container: {
         position: "absolute",
-        bottom: SEPARATOR_SIZES.normal,
+        bottom: bottom + SEPARATOR_SIZES.small,
         right: DEFAULT_SEPARATOR,
         justifyContent: "flex-end",
         alignItems: "flex-end",
