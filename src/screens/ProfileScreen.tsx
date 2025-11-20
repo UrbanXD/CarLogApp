@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
+    BaseConfig,
     COLORS,
     DEFAULT_SEPARATOR,
     FONT_SIZES,
@@ -20,11 +21,20 @@ import { useAppSelector } from "../hooks/index.ts";
 import { getUser } from "../features/user/model/selectors/index.ts";
 import { EDIT_USER_FORM_TYPE } from "../features/user/presets/bottomSheet/index.ts";
 import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
+import { FlagUs } from "../components/flags/FlagUs.tsx";
+import { FlagHu } from "../components/flags/FlagHu.tsx";
+import { useTranslation } from "react-i18next";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AnimatedPressable } from "../components/AnimatedComponents/index.ts";
+import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 const ProfileScreen: React.FC = () => {
+    const { t, i18n } = useTranslation();
     const user = useAppSelector(getUser);
     const { hasPassword, signOut, deleteAccount } = useAuth();
     const { bottom } = useSafeAreaInsets();
+
+    const selectedLanguage = useSharedValue(i18n.language);
 
     if(!user) return <Redirect href={ "backToRootIndex" }/>;
 
@@ -41,6 +51,30 @@ const ProfileScreen: React.FC = () => {
     const openResetPassword = () => openEditUser(EDIT_USER_FORM_TYPE.ResetPassword);
     const openChangeEmail = () => openEditUser(EDIT_USER_FORM_TYPE.ChangeEmail);
     const openEditAvatar = () => openEditUser(EDIT_USER_FORM_TYPE.EditAvatar);
+
+    const changeLanguage = async (language: string) => {
+        try {
+            await i18n.changeLanguage(language);
+            selectedLanguage.value = language;
+            await AsyncStorage.setItem(BaseConfig.LOCAL_STORAGE_KEY_LANGUAGE, language);
+        } catch(error) {
+            console.error("Error changing language:", error);
+        }
+    };
+
+    const useFlagStyle = (language: Array<string> | string) => useAnimatedStyle(() => {
+        const languages = typeof language === "string" ? [language] : language;
+
+        return ({
+            transform: [
+                {
+                    scale: withTiming(languages.includes(selectedLanguage.value) ? 1.175 : 1, {
+                        duration: 200
+                    })
+                }
+            ]
+        });
+    });
 
     const styles = useStyles(bottom);
 
@@ -77,6 +111,20 @@ const ProfileScreen: React.FC = () => {
                         <Text style={ styles.emailText }>
                             { user?.email }
                         </Text>
+                        <View style={ styles.flagContainer }>
+                            <AnimatedPressable
+                                style={ useFlagStyle(["en", "en-US"]) }
+                                onPress={ () => changeLanguage("en-US") }
+                            >
+                                <FlagUs width={ 36 } height={ 36 }/>
+                            </AnimatedPressable>
+                            <AnimatedPressable
+                                style={ useFlagStyle(["hu", "hu-HU"]) }
+                                onPress={ () => changeLanguage("hu-HU") }
+                            >
+                                <FlagHu width={ 36 } height={ 36 }/>
+                            </AnimatedPressable>
+                        </View>
                     </View>
                 </View>
                 <View style={ styles.actionButtonsContainer }>
@@ -196,6 +244,11 @@ const useStyles = (bottom: number) => StyleSheet.create({
         ...GLOBAL_STYLE.containerText,
         lineHeight: GLOBAL_STYLE.containerText.fontSize,
         textAlign: "center"
+    },
+    flagContainer: {
+        flexDirection: "row",
+        gap: SEPARATOR_SIZES.mediumSmall,
+        alignSelf: "center"
     },
     actionButtonsContainer: {
         top: -hp(10) //4.5

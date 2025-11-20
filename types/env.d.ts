@@ -7,4 +7,5 @@ declare module "@env" {
     export const GOOGLE_WEBCLIENTID: string;
     export const LOCAL_STORAGE_KEY_SELECTED_CAR_INDEX: string;
     export const LOCAL_STORAGE_KEY_NOT_VERIFIED_USER: string;
+    export const LOCAL_STORAGE_KEY_LANGUAGE: string;
 }

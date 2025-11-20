@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
+// import * as ScreenOrientation from "expo-screen-orientation";
 import { useAuth } from "../contexts/auth/AuthContext.ts";
 import { useFonts } from "expo-font";
 import AnimatedSplashScreen from "../screens/AnimatedSplashScreen.tsx";
+import "../i18n/index.ts";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -17,9 +19,11 @@ const App: React.FC = () => {
     const { authenticated } = useAuth();
 
     useEffect(() => {
-        if((fontsLoaded || fontsLoadError) && authenticated !== null) {
-            SplashScreen.hideAsync();
-        }
+        (async () => {
+            if((fontsLoaded || fontsLoadError) && authenticated !== null) {
+                await SplashScreen.hideAsync();
+            }
+        })();
     }, [fontsLoaded, fontsLoadError, authenticated]);
 
     if(!fontsLoaded) return null;
