@@ -4,6 +4,7 @@ import Input from "../Input.ts";
 import { PickerItemType } from "../picker/PickerItem.tsx";
 import dayjs from "dayjs";
 import { DropdownPickerProps } from "../picker/DropdownPicker.tsx";
+import { useTranslation } from "react-i18next";
 
 export type YearPickerProps = {
     defaultYear?: number
@@ -19,6 +20,8 @@ export function YearPicker({
     desc = true,
     ...restProps
 }: YearPickerProps) {
+    const { t } = useTranslation();
+
     const [years, setYears] = useState<Array<PickerItemType>>([]);
 
     useEffect(() => {
@@ -32,7 +35,7 @@ export function YearPicker({
 
     return (
         <Input.Picker.Dropdown
-            title={ restProps.title ?? "Év" }
+            title={ restProps.title ?? t("form.date_picker.year") }
             defaultSelectedItemValue={ defaultYear?.toString() }
             data={ years }
             masonry

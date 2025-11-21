@@ -5,6 +5,7 @@ import { ServiceType } from "../schemas/serviceTypeSchema.ts";
 import { Car } from "../../../../car/schemas/carSchema.ts";
 import { ExpenseTableRow, ServiceLogTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
 import { TimelineFilterManagement } from "../../../../../hooks/useTimelinePaginator.ts";
+import { useTranslation } from "react-i18next";
 
 const TYPES_FILTER_KEY = "type_filter";
 const TYPES_FILTER_FIELD_NAME = "service_type_id";
@@ -24,7 +25,9 @@ export function useServiceLogTimelineFilter({
     },
     car
 }: UseServiceLogTimelineFilterProps) {
+    const { t } = useTranslation();
     const { serviceTypeDao } = useDatabase();
+
     const [types, setTypes] = useState<Array<ServiceType>>([]);
     const [selectedTypesId, setSelectedTypesId] = useState<Array<ServiceType["id"]>>([]);
 
@@ -34,7 +37,7 @@ export function useServiceLogTimelineFilter({
 
             // sort based on locale
             const sorted = types.sort((a, b) => {
-                return a.key.localeCompare(b.key);
+                return t(`service.types.${ a.key }`).localeCompare(t(`service.types.${ b.key }`));
             });
 
 
@@ -76,7 +79,7 @@ export function useServiceLogTimelineFilter({
         };
 
         return {
-            title: type.key,
+            title: t(`service.types.${ type.key }`),
             active,
             activeColor: type?.primaryColor ?? undefined,
             onPress
@@ -84,7 +87,7 @@ export function useServiceLogTimelineFilter({
     });
 
     filterButtons.unshift({
-        title: "Mind",
+        title: t("common.all"),
         active: selectedTypesId.length === 0,
         onPress: () => clearFilters(TYPES_FILTER_KEY)
     });

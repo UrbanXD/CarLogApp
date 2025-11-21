@@ -58,7 +58,7 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
         mapper,
         cursorOrderButtons: [
             { table: EXPENSE_TABLE, field: "date", title: t("date.text") },
-            { table: EXPENSE_TABLE, field: "amount", title: t("expenses.price") }
+            { table: EXPENSE_TABLE, field: "amount", title: t("currency.price") }
         ]
     });
     const { filterButtons } = useServiceLogTimelineFilter({ timelineFilterManagement, car });

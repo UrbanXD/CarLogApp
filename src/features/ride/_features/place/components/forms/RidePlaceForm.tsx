@@ -9,6 +9,7 @@ import { SaveButton } from "../../../../../../components/Button/presets/SaveButt
 import React, { useEffect } from "react";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
+import { useTranslation } from "react-i18next";
 
 type RidePlaceFormProps = {
     onSubmit: (result: RidePlaceFormFields) => void
@@ -16,6 +17,7 @@ type RidePlaceFormProps = {
 }
 
 export function RidePlaceForm({ onSubmit, defaultRidePlace }: RidePlaceFormProps) {
+    const { t } = useTranslation();
     const { openToast } = useAlert();
     const { placeDao } = useDatabase();
 
@@ -50,7 +52,7 @@ export function RidePlaceForm({ onSubmit, defaultRidePlace }: RidePlaceFormProps
 
     return (
         <View style={ styles.container }>
-            <PlaceInput control={ control } fieldName="placeId" title={ "Hely" }/>
+            <PlaceInput control={ control } fieldName="placeId" title={ t("places.title_singular") }/>
             <SaveButton onPress={ submitHandler }/>
         </View>
     );

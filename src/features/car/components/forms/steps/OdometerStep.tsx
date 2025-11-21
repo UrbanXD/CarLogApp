@@ -20,7 +20,7 @@ function OdometerStep<FormFields = CarFormFields>({ control }: OdometerStepProps
             <OdometerUnitInput
                 control={ control }
                 fieldName="odometer.unitId"
-                title={ t("common.unit") }
+                title={ t("car.steps.odometer.unit_field.title") }
             />
         </Input.Group>
     );

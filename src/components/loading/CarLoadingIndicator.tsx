@@ -15,7 +15,7 @@ import Animated, {
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
 import BounceDot from "./BounceDot.tsx";
 import { AnimatedPath, AnimatedSvg } from "../AnimatedComponents/index.ts";
-import i18n from "../../i18n/index.ts";
+import { useTranslation } from "react-i18next";
 
 type CarLoadingIndicatorProps = {
     loaded: boolean,
@@ -25,9 +25,11 @@ type CarLoadingIndicatorProps = {
 
 const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({
     loaded,
-    loadingText = i18n.t("common.loading"),
+    loadingText,
     onAnimationFinished
 }) => {
+    const { t } = useTranslation();
+
     const ROAD_HEIGHT = hp(0.25);
     const ROAD_ANIMATION_DURATION = 1000;
     const ROAD_STROKE_DASH = [20, 5];
@@ -205,7 +207,7 @@ const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({
                 </AnimatedSvg>
             </Animated.View>
             <View style={ styles.loadingTextContainer }>
-                <Text style={ styles.loadingTextContainer.text }>{ loadingText }</Text>
+                <Text style={ styles.loadingTextContainer.text }>{ loadingText ?? t("common.loading") }</Text>
                 <BounceDot delay={ 0 }/>
                 <BounceDot delay={ 200 }/>
                 <BounceDot delay={ 400 }/>

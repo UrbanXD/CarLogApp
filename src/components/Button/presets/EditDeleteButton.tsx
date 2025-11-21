@@ -3,7 +3,7 @@ import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } fr
 import Button from "../Button.ts";
 import React from "react";
 import { DeleteButton } from "./DeleteButton.tsx";
-import i18n from "../../../i18n/index.ts";
+import { useTranslation } from "react-i18next";
 
 type EditDeleteButton = {
     deleteIcon?: string
@@ -17,13 +17,15 @@ type EditDeleteButton = {
 
 export function EditDeleteButton({
     deleteIcon = ICON_NAMES.trashCan,
-    editText = i18n.t("form_button.edit"),
+    editText,
     onDeletePress,
     onEditPress,
     buttonContainerStyle,
     deleteButtonStyle,
     editButtonStyle
 }: EditDeleteButton) {
+    const { t } = useTranslation();
+
     return (
         <Button.Row style={ [styles.buttonContainer, buttonContainerStyle] }>
             {
@@ -37,7 +39,7 @@ export function EditDeleteButton({
             {
                 onEditPress &&
                <Button.Text
-                  text={ editText }
+                  text={ editText ?? t("form_button.edit") }
                   fontSize={ FONT_SIZES.p1 }
                   onPress={ onEditPress }
                   style={ [styles.editButton, editButtonStyle] }

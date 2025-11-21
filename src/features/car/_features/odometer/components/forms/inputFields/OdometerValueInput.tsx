@@ -4,7 +4,7 @@ import Input from "../../../../../../../components/Input/Input.ts";
 import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../../../../constants/index.ts";
 import { View } from "react-native";
 import { UnitText } from "../../../../../../../components/UnitText.tsx";
-import i18n from "../../../../../../../i18n/index.ts";
+import { useTranslation } from "react-i18next";
 
 type OdometerValueInputProps = {
     control: Control<any>
@@ -20,18 +20,20 @@ type OdometerValueInputProps = {
 export function OdometerValueInput({
     control,
     fieldName,
-    title = i18n.t("odometer.value"),
+    title,
     subtitle,
     optional,
     placeholder = "100000",
     currentOdometerValue,
     unitText
 }: OdometerValueInputProps) {
+    const { t } = useTranslation();
+
     return (
         <Input.Field
             control={ control }
             fieldName={ fieldName }
-            fieldNameText={ title }
+            fieldNameText={ title ?? t("odometer.value") }
             fieldInfoText={ subtitle ?? (currentOdometerValue && `A jelenlegi kilométeróra-állás: ${ currentOdometerValue } ${ unitText }`) }
             optional={ optional }
         >

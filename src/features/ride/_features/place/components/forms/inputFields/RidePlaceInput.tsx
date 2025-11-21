@@ -8,6 +8,7 @@ import { ExpandableList } from "../../../../../../../components/expandableList/E
 import { PlaceFormFields } from "../../../schemas/form/placeForm.ts";
 import { RidePlaceForm } from "../RidePlaceForm.tsx";
 import { useRidePlaceToExpandableList } from "../../../hooks/useRidePlaceToExpandableList.ts";
+import { useTranslation } from "react-i18next";
 
 type RidePlaceInputProps = {
     control: Control<any>
@@ -20,12 +21,13 @@ type RidePlaceInputProps = {
 export function RidePlaceInput({
     control,
     fieldName,
-    title = "Helyszínek",
+    title,
     minItemCount = 0,
     maxItemCount = 8
 }: RidePlaceInputProps) {
     if(minItemCount > maxItemCount) maxItemCount = minItemCount;
 
+    const { t } = useTranslation();
     const { ridePlaceToExpandableList } = useRidePlaceToExpandableList();
 
     const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
@@ -79,7 +81,7 @@ export function RidePlaceInput({
             <ExpandableList
                 expanded={ true }
                 data={ items.map(ridePlaceToExpandableList) }
-                title={ title }
+                title={ title ?? t("places.title") }
                 actionIcon={ ICON_NAMES.add }
                 onAction={ openAddItemForm }
                 onRemoveItem={ removeItem }

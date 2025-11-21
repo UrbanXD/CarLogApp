@@ -4,7 +4,7 @@ import { PickerItemType } from "../../../../components/Input/picker/PickerItem.t
 import Input from "../../../../components/Input/Input.ts";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 import { Control } from "react-hook-form";
-import i18n from "../../../../i18n/index.ts";
+import { useTranslation } from "react-i18next";
 
 type CurrencyInputProps = {
     control: Control<any>
@@ -16,9 +16,10 @@ type CurrencyInputProps = {
 export function CurrencyInput({
     control,
     fieldName,
-    title = i18n.t("currency.text"),
+    title,
     subtitle
 }: CurrencyInputProps) {
+    const { t } = useTranslation();
     const { currencyDao } = useDatabase();
 
     const [currencies, setCurrencies] = useState<Array<PickerItemType> | null>(null);
@@ -31,11 +32,16 @@ export function CurrencyInput({
     }, []);
 
     return (
-        <Input.Field control={ control } fieldName={ fieldName } fieldNameText={ title } fieldInfoText={ subtitle }>
+        <Input.Field
+            control={ control }
+            fieldName={ fieldName }
+            fieldNameText={ title ?? t("currency.text") }
+            fieldInfoText={ subtitle }
+        >
             {
                 currencies
                 ?
-                <Input.Picker.Dropdown data={ currencies } title={ title }/>
+                <Input.Picker.Dropdown data={ currencies } title={ title ?? t("currency.text") }/>
                 :
                 <MoreDataLoading/>
             }

@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleSheet, Text, TextStyle, View, ViewStyle } from 
 import { Color } from "../../types/index.ts";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../constants/index.ts";
 import BounceDot from "./BounceDot.tsx";
-import i18n from "../../i18n/index.ts";
+import { useTranslation } from "react-i18next";
 
 type MoreDataLoadingProps = {
     text?: string
@@ -15,18 +15,20 @@ type MoreDataLoadingProps = {
 }
 
 export function MoreDataLoading({
-    text = i18n.t("common.data_loading"),
+    text,
     activityIndicatorSize = "small",
     activityIndicatorColor = COLORS.gray2,
     containerStyle,
     textStyle,
     withBounceDot = true
 }: MoreDataLoadingProps) {
+    const { t } = useTranslation();
+
     return (
         <View style={ [styles.container, containerStyle] }>
             <ActivityIndicator size={ activityIndicatorSize } color={ activityIndicatorColor }/>
             <View style={ styles.textContainer }>
-                <Text style={ [styles.text, textStyle] }>{ text }</Text>
+                <Text style={ [styles.text, textStyle] }>{ text ?? t("common.data_loading") }</Text>
                 {
                     withBounceDot &&
                    <>

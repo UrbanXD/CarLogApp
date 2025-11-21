@@ -3,6 +3,7 @@ import { useDatabase } from "../../../../../../../contexts/database/DatabaseCont
 import React, { useMemo } from "react";
 import Input from "../../../../../../../components/Input/Input.ts";
 import { ICON_NAMES } from "../../../../../../../constants/index.ts";
+import { useTranslation } from "react-i18next";
 
 type FuelTypeInputProps = {
     control: Control<any>
@@ -14,21 +15,23 @@ type FuelTypeInputProps = {
 export function ServiceItemTypeInput({
     control,
     fieldName,
-    title = "Tétel típus",
+    title,
     subtitle
 }: FuelTypeInputProps) {
+    const { t } = useTranslation();
     const { serviceItemTypeDao } = useDatabase();
+
     const paginator = useMemo(() => serviceItemTypeDao.paginator(), []);
 
     return (
         <Input.Field
             control={ control }
             fieldName={ fieldName }
-            fieldNameText={ title }
+            fieldNameText={ title ?? t("service.items.type") }
             fieldInfoText={ subtitle }
         >
             <Input.Picker.Dropdown
-                title={ title }
+                title={ title ?? t("service.items.type") }
                 paginator={ paginator }
                 searchBy="key"
                 icon={ ICON_NAMES.serviceOutline }

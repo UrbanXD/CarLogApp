@@ -6,7 +6,6 @@ import Icon from "../../../../components/Icon.tsx";
 import Button from "../../../../components/Button/Button.ts";
 import { Color } from "../../../../types/index.ts";
 import { useTranslation } from "react-i18next";
-import i18n from "../../../../i18n/index.ts";
 
 export interface AlertModalProps {
     icon?: string;
@@ -25,9 +24,9 @@ const AlertModal: React.FC<AlertModalProps> = ({
     body,
     color = COLORS.fuelYellow,
     accept = () => {},
-    acceptText = i18n.t("modal.accept"),
+    acceptText,
     dismiss = () => {},
-    dismissText = i18n.t("modal.dismiss")
+    dismissText
 }) => {
     const { t } = useTranslation();
 
@@ -65,14 +64,14 @@ const AlertModal: React.FC<AlertModalProps> = ({
                 </View>
                 <View style={ styles.buttonContainer }>
                     <Button.Text
-                        text={ acceptText }
+                        text={ acceptText ?? t("modal.accept") }
                         fontSize={ FONT_SIZES.p2 }
                         backgroundColor={ color }
                         height={ hp(5.5) }
                         onPress={ accept }
                     />
                     <Button.Text
-                        text={ dismissText }
+                        text={ dismissText ?? t("modal.dismiss") }
                         height={ hp(5.5) }
                         backgroundColor={ "transparent" }
                         fontSize={ FONT_SIZES.p2 }

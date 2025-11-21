@@ -9,12 +9,14 @@ import React from "react";
 import Input from "../../../../../../components/Input/Input.ts";
 import { useBottomSheet } from "../../../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { Place } from "../../schemas/placeSchema.ts";
+import { useTranslation } from "react-i18next";
 
 type EditPlaceFormProps = {
     place: Place
 }
 
 export function EditPlaceForm({ place }: EditPlaceFormProps) {
+    const { t } = useTranslation();
     const { openToast } = useAlert();
     const { placeDao } = useDatabase();
     const { dismissBottomSheet } = useBottomSheet();
@@ -41,8 +43,8 @@ export function EditPlaceForm({ place }: EditPlaceFormProps) {
 
     return (
         <Form>
-            <Input.Field control={ control } fieldName={ "name" } fieldNameText={ "Hely" }>
-                <Input.Text placeholder={ "Hely" }/>
+            <Input.Field control={ control } fieldName={ "name" } fieldNameText={ t("places.title_singular") }>
+                <Input.Text placeholder={ t("places.singular") }/>
             </Input.Field>
             <FormButtons reset={ reset } submit={ submitHandler }/>
         </Form>

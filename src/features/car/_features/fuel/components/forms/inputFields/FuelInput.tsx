@@ -4,7 +4,7 @@ import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../../consta
 import Input from "../../../../../../../components/Input/Input.ts";
 import { Control, UseFormSetValue, useWatch } from "react-hook-form";
 import { formTheme } from "../../../../../../../ui/form/constants/theme.ts";
-import i18n from "../../../../../../../i18n/index.ts";
+import { useTranslation } from "react-i18next";
 
 type FuelInputProps = {
     control: Control<any>
@@ -21,12 +21,14 @@ export function FuelInput({
     control,
     setValue,
     fieldName,
-    title = i18n.t("fuel.tank"),
+    title,
     subtitle,
     capacity,
     fuelTypeText,
     unitText
 }: FuelInputProps) {
+    const { t } = useTranslation();
+
     const fuelValue = useWatch({ control, name: fieldName });
 
     const fuelingToFull = useCallback(() => {
@@ -44,13 +46,13 @@ export function FuelInput({
     });
 
     const getFieldNameText = useCallback(() => {
-        let fieldNameText = title;
+        let fieldNameText = title ?? t("fuel.tank");
         if(!fieldNameText && fuelTypeText) fieldNameText = fuelTypeText;
         if(fieldNameText && fuelTypeText) fieldNameText += ` (${ fuelTypeText })`;
 
 
         return fieldNameText;
-    }, [title, fuelTypeText]);
+    }, [t, title, fuelTypeText]);
 
     const stepperButtons = [-10, -1, +1, +10];
 

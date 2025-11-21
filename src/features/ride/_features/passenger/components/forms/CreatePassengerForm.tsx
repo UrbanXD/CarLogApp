@@ -5,8 +5,10 @@ import { FormButtons } from "../../../../../../components/Button/presets/FormBut
 import React from "react";
 import Input from "../../../../../../components/Input/Input.ts";
 import { useCreatePassenger } from "../../hooks/useCreatePassenger.ts";
+import { useTranslation } from "react-i18next";
 
 export function CreatePassengerForm() {
+    const { t } = useTranslation();
     const user = useAppSelector(getUser);
     if(!user) return <></>;
 
@@ -14,8 +16,8 @@ export function CreatePassengerForm() {
 
     return (
         <Form>
-            <Input.Field control={ form.control } fieldName={ "name" } fieldNameText={ "Utas" }>
-                <Input.Text placeholder={ "Új utas" }/>
+            <Input.Field control={ form.control } fieldName={ "name" } fieldNameText={ t("passengers.title_singular") }>
+                <Input.Text placeholder={ t("passengers.new") }/>
             </Input.Field>
             <FormButtons submit={ () => submitHandler()() }/>
         </Form>

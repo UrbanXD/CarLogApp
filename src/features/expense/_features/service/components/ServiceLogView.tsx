@@ -79,8 +79,8 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         }
 
         openModal({
-            title: t("service.modal.delete"),
-            body: t("modal.delete_message"),
+            title: t("service.modal.delete.title"),
+            body: t("service.modal.delete.body"),
             acceptText: t("form_button.delete"),
             acceptAction: () => handleDelete(serviceLog)
         });

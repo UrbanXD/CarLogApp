@@ -2,7 +2,7 @@ import { Control, UseFormReturn } from "react-hook-form";
 import Input from "../Input.ts";
 import { ICON_NAMES } from "../../../constants/index.ts";
 import React from "react";
-import i18n from "../../../i18n/index.ts";
+import { useTranslation } from "react-i18next";
 
 type NoteInputProps = {
     control: Control<any>
@@ -18,22 +18,24 @@ export function NoteInput({
     control,
     setValue,
     fieldName,
-    title = i18n.t("common.note"),
+    title,
     subtitle,
     placeholder = title,
     optional = true
 }: NoteInputProps) {
+    const { t } = useTranslation();
+
     return (
         <Input.Field
             control={ control }
             fieldName={ fieldName }
-            fieldNameText={ title }
+            fieldNameText={ title ?? t("common.note") }
             fieldInfoText={ subtitle }
             optional={ optional }
         >
             <Input.Text
                 icon={ ICON_NAMES.note }
-                placeholder={ placeholder }
+                placeholder={ placeholder ?? t("common.note") }
                 multiline
                 actionIcon={ ICON_NAMES.close }
                 onAction={ () => setValue("note", null) }

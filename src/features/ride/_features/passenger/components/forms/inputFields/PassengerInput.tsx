@@ -6,6 +6,7 @@ import { useCreatePassenger } from "../../../hooks/useCreatePassenger.ts";
 import { useAppSelector } from "../../../../../../../hooks/index.ts";
 import { getUser } from "../../../../../../user/model/selectors/index.ts";
 import { AddItemToDropdownInput } from "../../../../../../../components/Input/_presets/AddItemToDropdownInput.tsx";
+import { useTranslation } from "react-i18next";
 
 type PlaceInputProps = {
     control?: Control<any>
@@ -16,8 +17,9 @@ type PlaceInputProps = {
 export function PassengerInput({
     control,
     fieldName,
-    title = "Utas"
+    title
 }: PlaceInputProps) {
+    const { t } = useTranslation();
     const { passengerDao } = useDatabase();
     const user = useAppSelector(getUser);
     if(!user) return <></>;
@@ -32,14 +34,14 @@ export function PassengerInput({
             fieldName={ fieldName }
         >
             <Input.Picker.Dropdown
-                title={ title }
+                title={ title ?? t("passengers.title_singular") }
                 paginator={ paginator }
                 renderCreateItemForm={
                     (callback) => <AddItemToDropdownInput
                         control={ form.control }
                         fieldName={ "name" }
                         submitHandler={ () => submitHandler(callback)() }
-                        placeholder={ "Új utas" }
+                        placeholder={ t("passengers.new") }
                     />
                 }
                 searchBy="name"

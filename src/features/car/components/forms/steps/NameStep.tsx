@@ -3,20 +3,23 @@ import Input from "../../../../../components/Input/Input.ts";
 import { ICON_NAMES } from "../../../../../constants/index.ts";
 import { StepProps } from "../../../../../types/index.ts";
 import { CarFormFields } from "../../../schemas/form/carForm.ts";
+import { useTranslation } from "react-i18next";
 
 type NameStepProps<FormFieldsType> = Pick<StepProps<FormFieldsType>, "control">;
 
 function NameStep<FormFieldsType = CarFormFields>({ control }: NameStepProps<FormFieldsType>) {
+    const { t } = useTranslation();
+
     return (
         <Input.Field
             control={ control }
             fieldName="name"
-            fieldNameText="Autó azonosító"
-            fieldInfoText="Az autó elnevezése, azonosítója mely az Ön számára lehet fontos autója azonosításakor."
+            fieldNameText={ t("steps.name.name_field.title") }
+            fieldInfoText={ t("steps.name.name_field.info") }
         >
             <Input.Text
                 icon={ ICON_NAMES.nametag }
-                placeholder="Új Autóm"
+                placeholder={ t("steps.name.name_field.placeholder") }
             />
         </Input.Field>
     );

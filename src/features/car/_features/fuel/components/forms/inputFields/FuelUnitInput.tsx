@@ -4,7 +4,7 @@ import Input from "../../../../../../../components/Input/Input.ts";
 import { MoreDataLoading } from "../../../../../../../components/loading/MoreDataLoading.tsx";
 import { PickerItemType } from "../../../../../../../components/Input/picker/PickerItem.tsx";
 import { Control } from "react-hook-form";
-import i18n from "../../../../../../../i18n/index.ts";
+import { useTranslation } from "react-i18next";
 
 type FuelUnitInputProps = {
     control: Control<any>
@@ -16,9 +16,10 @@ type FuelUnitInputProps = {
 export function FuelUnitInput({
     control,
     fieldName,
-    title = i18n.t("fuel.unit"),
+    title,
     subtitle
 }: FuelUnitInputProps) {
+    const { t } = useTranslation();
     const { fuelUnitDao } = useDatabase();
 
     const [fuelUnits, setFuelUnits] = useState<Array<PickerItemType>>();
@@ -34,7 +35,7 @@ export function FuelUnitInput({
         <Input.Field
             control={ control }
             fieldName={ fieldName }
-            fieldNameText={ title }
+            fieldNameText={ title ?? t("fuel.unit") }
             fieldInfoText={ subtitle }
         >
             {

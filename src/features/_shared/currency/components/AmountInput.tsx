@@ -8,7 +8,6 @@ import { PickerItemType } from "../../../../components/Input/picker/PickerItem.t
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { formTheme } from "../../../..//ui/form/constants/theme.ts";
 import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
-import i18n from "../../../../i18n/index.ts";
 import { useTranslation } from "react-i18next";
 
 type AmountInputProps = {
@@ -36,9 +35,9 @@ type AmountInputProps = {
 export function AmountInput({
     control,
     setValue,
-    title = i18n.t("currency.cost"),
+    title,
     subtitle,
-    amountPlaceholder = i18n.t("currency.cost"),
+    amountPlaceholder,
     amountFieldName,
     currencyFieldName,
     quantityFieldName,
@@ -116,10 +115,7 @@ export function AmountInput({
 
     return (
         <View style={ styles.container }>
-            {
-                title &&
-               <Input.Title title={ title } subtitle={ subtitle }/>
-            }
+            <Input.Title title={ title ?? t("currency.cost") } subtitle={ subtitle }/>
             {
                 isPricePerUnitFieldName &&
                <Input.Field control={ control } fieldName={ isPricePerUnitFieldName }>
@@ -166,7 +162,7 @@ export function AmountInput({
                             >
                                 <Input.Text
                                     icon={ ICON_NAMES.money }
-                                    placeholder={ amountPlaceholder }
+                                    placeholder={ amountPlaceholder ?? t("currency.cost") }
                                     keyboardType="numeric"
                                     type="secondary"
                                 />

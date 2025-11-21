@@ -15,11 +15,13 @@ import { ServiceLogFields } from "../schemas/form/serviceLogForm.ts";
 import { ServiceLogFormFieldsEnum } from "../enums/ServiceLogFormFieldsEnum.ts";
 import { ServiceTypeInput } from "../components/forms/inputFields/ServiceTypeInput.tsx";
 import { ServiceItemInput } from "../components/forms/inputFields/ServiceItemInput.tsx";
+import { useTranslation } from "react-i18next";
 
 type UseServiceLogFormFieldsProps = UseFormReturn<ServiceLogFields>
 
 export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
     const { control, setValue, clearErrors } = props;
+    const { t } = useTranslation();
     const { getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(null);
@@ -50,7 +52,7 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
                 <Input.Field
                     control={ control }
                     fieldName="date"
-                    fieldNameText="Dátum"
+                    fieldNameText={ t("date.text") }
                 >
                     <InputDatePicker/>
                 </Input.Field>
@@ -79,7 +81,7 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
 
     const multiStepFormSteps: Steps = [
         {
-            title: "Alap információk",
+            title: t("service.steps.basic_information"),
             fields: ["carId", "date", "odometerValue", "note"],
             render: () => (
                 <Input.Group>
@@ -91,7 +93,7 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
             )
         },
         {
-            title: "Szervizelési tételek",
+            title: t("service.steps.items"),
             fields: ["items", "serviceTypeId"],
             render: () => (
                 <Input.Group>

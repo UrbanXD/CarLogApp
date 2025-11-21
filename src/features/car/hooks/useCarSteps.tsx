@@ -8,35 +8,38 @@ import FuelStep from "../components/forms/steps/FuelStep.tsx";
 import ImageStep from "../components/forms/steps/ImageStep.tsx";
 import { ResultStep } from "../components/forms/steps/ResultStep.tsx";
 import { CarEditNameToast } from "../presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
 
 function useCarSteps({ control, formState, setValue, getValues }: StepProps<CarFormFields>): UseStepFormResult {
+    const { t } = useTranslation();
+
     const steps: Steps = [
         {
-            title: "Elnevezés",
+            title: t("car.steps.name.title"),
             fields: ["name"],
             render: () => <NameStep control={ control }/>,
             editToastMessages: CarEditNameToast
         },
         {
-            title: "Modell",
+            title: t("car.steps.model.title"),
             fields: ["model.makeId", "model.id", "model.year"],
             render: () => <CarModelStep control={ control } formState={ formState } setValue={ setValue }/>,
             editToastMessages: CarEditNameToast
         },
         {
-            title: "Kilométeróra",
+            title: t("car.steps.odometer.title"),
             fields: ["odometer.value", "odometer.unitId"],
             render: () => <OdometerStep control={ control }/>,
             editToastMessages: CarEditNameToast
         },
         {
-            title: "Üzemanyag",
+            title: t("car.steps.fuel.title"),
             fields: ["fuelTank.typeId", "fuelTank.unitId", "fuelTank.capacity"],
             render: () => <FuelStep control={ control }/>,
             editToastMessages: CarEditNameToast
         },
         {
-            title: "Kép",
+            title: t("car.steps.image.title"),
             fields: ["image"],
             render: () => <ImageStep control={ control }/>,
             editToastMessages: CarEditNameToast

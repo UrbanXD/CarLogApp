@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import { InputDatePickerController } from "./InputDatePickerController.tsx";
 import { DatePickerViews } from "../../../contexts/datePicker/DatePickerContext.ts";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
+import { useTranslation } from "react-i18next";
 
 type InputDatePicker = {
     title?: string
@@ -19,7 +20,15 @@ type InputDatePicker = {
     locale?: string
 }
 
-function InputDatePicker({ title = "Dátum", defaultDate, maxDate, minDate, locale = "hu" }: InputDatePicker) {
+function InputDatePicker({
+    title,
+    defaultDate,
+    maxDate,
+    minDate,
+    locale = "hu"
+}: InputDatePicker) {
+    const { t } = useTranslation();
+
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field?.onChange;
     const fieldValue = useMemo(() => {
@@ -72,7 +81,7 @@ function InputDatePicker({ title = "Dátum", defaultDate, maxDate, minDate, loca
                     onSubmit={ submit }
                     onClose={ close }
                 >
-                    <DatePickerHeader title={ title }/>
+                    <DatePickerHeader title={ title ?? t("form.date_picker.title") }/>
                     <DatePicker/>
                     <DatePickerFooter/>
                 </DatePickerProvider>

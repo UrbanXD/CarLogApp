@@ -9,12 +9,14 @@ import React from "react";
 import Input from "../../../../../../components/Input/Input.ts";
 import { useBottomSheet } from "../../../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { Passenger } from "../../schemas/passengerSchema.ts";
+import { useTranslation } from "react-i18next";
 
 type EditPassengerFormProps = {
     passenger: Passenger
 }
 
 export function EditPassengerForm({ passenger }: EditPassengerFormProps) {
+    const { t } = useTranslation();
     const { openToast } = useAlert();
     const { passengerDao } = useDatabase();
     const { dismissBottomSheet } = useBottomSheet();
@@ -41,8 +43,8 @@ export function EditPassengerForm({ passenger }: EditPassengerFormProps) {
 
     return (
         <Form>
-            <Input.Field control={ control } fieldName={ "name" } fieldNameText={ "Utas" }>
-                <Input.Text placeholder={ "Utas" }/>
+            <Input.Field control={ control } fieldName={ "name" } fieldNameText={ t("passengers.title_singular") }>
+                <Input.Text placeholder={ t("passengers.title_singular") }/>
             </Input.Field>
             <FormButtons reset={ reset } submit={ submitHandler }/>
         </Form>

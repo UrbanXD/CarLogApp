@@ -5,6 +5,7 @@ import { TimelineItemType } from "../../../../../components/timelineView/item/Ti
 import { router } from "expo-router";
 import { AmountText } from "../../../../../components/AmountText.tsx";
 import { ServiceLog } from "../schemas/serviceLogSchema.ts";
+import { useTranslation } from "react-i18next";
 
 dayjs.extend(utc);
 
@@ -13,12 +14,14 @@ export function useServiceLogTimelineItem() {
         serviceLog: ServiceLog,
         callback?: () => void
     ): TimelineItemType => {
+        const { t } = useTranslation();
+
         const onPress = () => {
             callback?.();
 
             router.push({
                 pathname: "/expense/service/[id]",
-                params: { id: serviceLog.id, title: "Szervíz-napló bejegyzés" }
+                params: { id: serviceLog.id, title: t("service.log") }
             });
         };
 
@@ -34,7 +37,7 @@ export function useServiceLogTimelineItem() {
         return {
             id: serviceLog.id,
             milestone: dayjs(serviceLog.expense.date).format("YYYY. MM DD. HH:mm"),
-            title: serviceLog.serviceType.key,
+            title: t(`service.types.${ serviceLog.serviceType.key }`),
             icon: serviceLog.expense.type.icon,
             color: serviceLog.expense.type.primaryColor ?? undefined,
             iconColor: serviceLog.expense.type.secondaryColor ?? undefined,

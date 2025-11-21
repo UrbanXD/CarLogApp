@@ -9,7 +9,6 @@ import { AnimatedFlashList } from "../AnimatedComponents/index.ts";
 import Divider from "../Divider.tsx";
 import Icon from "../Icon.tsx";
 import FloatingActionMenu from "../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
-import i18n from "../../i18n/index.ts";
 
 export type InfoTimelineItem = {
     id: string | number
@@ -45,7 +44,7 @@ function IInfoTimeline({
     isNextFetching,
     isPreviousFetching,
     scrollHandler,
-    notFoundText = i18n.t("Nem található adat"),
+    notFoundText,
     style
 }: InfoTimelineProps) {
     const renderItem = useCallback(({ item }: ListRenderItemInfo<InfoTimelineItem>) => (
@@ -71,7 +70,7 @@ function IInfoTimeline({
     const renderListEmptyComponent = useCallback(() => {
         if(isInitialFetching) return <MoreDataLoading/>;
 
-        return <Text style={ styles.notFoundText }>{ notFoundText }</Text>;
+        return <Text style={ styles.notFoundText }>{ notFoundText ?? t("common.no_data_found") }</Text>;
     }, [isInitialFetching]);
 
     const renderHeader = useCallback(() => {

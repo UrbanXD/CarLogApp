@@ -10,6 +10,7 @@ import { StyleSheet, View } from "react-native";
 import { SaveButton } from "../../../../../../components/Button/presets/SaveButton.tsx";
 import { SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
 import { PassengerInput } from "./inputFields/PassengerInput.tsx";
+import { useTranslation } from "react-i18next";
 
 type RidePassengerFormProps = {
     onSubmit: (result: RidePassengerFormFields) => void
@@ -17,6 +18,7 @@ type RidePassengerFormProps = {
 }
 
 export function RidePassengerForm({ onSubmit, defaultRidePassenger }: RidePassengerFormProps) {
+    const { t } = useTranslation();
     const { openToast } = useAlert();
     const { passengerDao } = useDatabase();
 
@@ -51,7 +53,7 @@ export function RidePassengerForm({ onSubmit, defaultRidePassenger }: RidePassen
 
     return (
         <View style={ styles.container }>
-            <PassengerInput control={ control } fieldName="passengerId" title={ "Utas" }/>
+            <PassengerInput control={ control } fieldName="passengerId" title={ t("passengers.title_singular") }/>
             <SaveButton onPress={ submitHandler }/>
         </View>
     );

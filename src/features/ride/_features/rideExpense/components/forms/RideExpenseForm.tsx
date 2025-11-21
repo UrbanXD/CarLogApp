@@ -15,6 +15,7 @@ import { Car } from "../../../../../car/schemas/carSchema.ts";
 import Input from "../../../../../../components/Input/Input.ts";
 import InputDatePicker from "../../../../../../components/Input/datePicker/InputDatePicker.tsx";
 import { NoteInput } from "../../../../../../components/Input/_presets/NoteInput.tsx";
+import { useTranslation } from "react-i18next";
 
 type RideExpenseFormProps = {
     car: Car
@@ -24,6 +25,7 @@ type RideExpenseFormProps = {
 }
 
 export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate }: RideExpenseFormProps) {
+    const { t } = useTranslation();
     const { openToast } = useAlert();
     const { rideExpenseDao } = useDatabase();
 
@@ -58,7 +60,7 @@ export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate
     const amountFieldExchangeText = useCallback((exchangedAmount: string) => {
         return (
             <>
-                Az autó alapvalutájában számolt összeg{ " " }
+                { `${ t("currency.in_car_currency") } ` }
                 <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
             </>
         );
@@ -66,7 +68,7 @@ export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate
 
     return (
         <View style={ styles.container }>
-            <Text style={ styles.title }>Egyéb kiadás</Text>
+            <Text style={ styles.title }>{ t("rides.other_expense") }</Text>
             <Form style={ styles.formContainer }>
                 <ExpenseTypeInput
                     control={ control }
@@ -84,7 +86,7 @@ export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate
                 <Input.Field
                     control={ control }
                     fieldName="date"
-                    fieldNameText="Dátum"
+                    fieldNameText={ t("date.text") }
                 >
                     <InputDatePicker/>
                 </Input.Field>

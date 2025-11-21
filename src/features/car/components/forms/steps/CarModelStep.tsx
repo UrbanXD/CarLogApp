@@ -7,10 +7,12 @@ import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts
 import { MakeTableRow, ModelTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
 import { CarFormFields } from "../../../schemas/form/carForm.ts";
 import { YearPicker } from "../../../../../components/Input/_presets/YearPicker.tsx";
+import { useTranslation } from "react-i18next";
 
 type CarModelStepProps<FormFields> = Pick<StepProps<FormFields>, "control" | "formState" | "setValue">;
 
 function CarModelStep<FormFields = CarFormFields>({ control, formState, setValue }: CarModelStepProps<FormFields>) {
+    const { t } = useTranslation();
     const { makeDao, modelDao } = useDatabase();
 
     const selectedMakeId = useWatch({ control, name: "model.makeId" });
@@ -59,10 +61,10 @@ function CarModelStep<FormFields = CarFormFields>({ control, formState, setValue
             <Input.Field
                 control={ control }
                 fieldName="model.makeId"
-                fieldNameText="Márka"
+                fieldNameText={ t("car.steps.model.make_field.title") }
             >
                 <Input.Picker.Dropdown<MakeTableRow>
-                    title={ "Márka" }
+                    title={ t("car.steps.model.make_field.title") }
                     paginator={ makePaginator }
                     searchBy="name"
                     icon={ ICON_NAMES.car }
@@ -71,28 +73,28 @@ function CarModelStep<FormFields = CarFormFields>({ control, formState, setValue
             <Input.Field
                 control={ control }
                 fieldName="model.id"
-                fieldNameText="Modell"
+                fieldNameText={ t("car.steps.model.model_field.title") }
             >
                 <Input.Picker.Dropdown<ModelTableRow>
-                    title={ "Modell" }
+                    title={ t("car.steps.model.model_field.title") }
                     paginator={ modelPaginator }
                     searchBy="name"
                     icon={ ICON_NAMES.car }
                     disabled={ !selectedMakeId }
-                    disabledText="Először válassza ki az autó márkáját!"
+                    disabledText={ t("car.steps.model.model_field.disabled_text") }
                 />
             </Input.Field>
             <Input.Field
                 control={ control }
                 fieldName="model.year"
-                fieldNameText="Évjárat"
+                fieldNameText={ t("car.steps.model.model_year_field.title") }
             >
                 <YearPicker
-                    title={ "Évjárat" }
+                    title={ t("car.steps.model.model_year_field.title") }
                     icon={ ICON_NAMES.calendar }
                     data={ modelYears }
                     disabled={ !selectedModelId }
-                    disabledText="Először válassza ki az autó modelljét!"
+                    disabledText={ t("car.steps.model.model_year_field.disabled_text") }
                 />
             </Input.Field>
         </Input.Group>

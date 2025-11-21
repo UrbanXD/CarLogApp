@@ -11,6 +11,7 @@ import React, { useCallback } from "react";
 import { SaveButton } from "../../../../../../components/Button/presets/SaveButton.tsx";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
 import Form from "../../../../../../components/Form/Form.tsx";
+import { useTranslation } from "react-i18next";
 
 type ServiceItemFormProps = {
     carCurrencyId: number
@@ -19,6 +20,7 @@ type ServiceItemFormProps = {
 }
 
 export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }: ServiceItemFormProps) {
+    const { t } = useTranslation();
     const { openToast } = useAlert();
     const { serviceItemDao } = useDatabase();
 
@@ -53,7 +55,7 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
     const amountFieldExchangeText = useCallback((exchangedAmount: string) => {
         return (
             <>
-                Az autó alapvalutájában számolt egységár{ " " }
+                { `${ t("currency.in_car_currency") } ` }
                 <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
             </>
         );
@@ -61,7 +63,7 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
 
     return (
         <View style={ styles.container }>
-            <Text style={ styles.title }>Szervizelési tétel</Text>
+            <Text style={ styles.title }>{ t("service.items.item") }</Text>
             <Form style={ styles.formContainer }>
                 <ServiceItemTypeInput
                     control={ control }
@@ -70,8 +72,8 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
                 <AmountInput
                     control={ control }
                     setValue={ setValue }
-                    title={ "Egységár" }
-                    amountPlaceholder={ "Egységár" }
+                    title={ t("currency.price_per_unit") }
+                    amountPlaceholder={ t("currency.price_per_unit") }
                     amountFieldName="pricePerUnit"
                     currencyFieldName="currencyId"
                     quantityFieldName="quantity"

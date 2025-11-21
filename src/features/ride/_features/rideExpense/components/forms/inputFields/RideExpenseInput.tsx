@@ -12,6 +12,7 @@ import useCars from "../../../../../../car/hooks/useCars.ts";
 import { useRideExpenseToExpandableList } from "../../../hooks/useRideExpenseToExpandableList.ts";
 import { RideExpenseForm } from "../RideExpenseForm.tsx";
 import { FormResultRideExpense } from "../../../schemas/rideExpenseSchema.ts";
+import { useTranslation } from "react-i18next";
 
 type RideExpenseInputProps = {
     control: Control<any>
@@ -28,12 +29,13 @@ export function RideExpenseInput({
     fieldName,
     carIdFieldName,
     startTimeFieldName,
-    title = "Egyéb kiadások",
+    title,
     minItemCount = 0,
     maxItemCount = 8
 }: RideExpenseInputProps) {
     if(minItemCount > maxItemCount) maxItemCount = minItemCount;
 
+    const { t } = useTranslation();
     const { getCar } = useCars();
     const { rideExpenseToExpandableList } = useRideExpenseToExpandableList();
 
@@ -121,7 +123,7 @@ export function RideExpenseInput({
                 expanded={ true }
                 data={ items.map(rideExpenseToExpandableList) }
                 totalAmount={ items.length >= 1 && totalAmount }
-                title={ title }
+                title={ title ?? t("rides.other_expenses") }
                 actionIcon={ ICON_NAMES.add }
                 onAction={ openAddItemForm }
                 onRemoveItem={ removeItem }

@@ -6,6 +6,7 @@
     "note": "Megjegyzés",
     "unknown": "Ismeretlen",
     "data_loading": "Adatok betöltése",
+    "no_data_found": "Nem található adat",
     "loading": "Betöltés",
     "or": "vagy",
     "log_title": "Napló bejegyzés",
@@ -13,7 +14,9 @@
     "filters": {
       "all": "Mind"
     },
-    "unit": "Mértékegység"
+    "unit": "Mértékegység",
+    "type": "Típus",
+    "image": "Kép"
   },
   "form_button": {
     "edit": "Módosítás",
@@ -31,6 +34,17 @@
     "optional": "opcionális",
     "searchbar": {
       "placeholder": "Keresés..."
+    },
+    "picker": {
+      "choose": "Válasszon a listából",
+      "new_item": "Új elem"
+    },
+    "image_picker": {
+      "selectable_images": "Kiválasztható képek"
+    },
+    "date_picker": {
+      "title": "$t(date.text)",
+      "year": "$t(date.year)"
     }
   },
   "modal": {
@@ -92,6 +106,7 @@
   },
   "car": {
     "title": "Autó adatlap",
+    "text": "Autó",
     "make": "Gyártó",
     "model": "Model",
     "model_year": "Évjárat",
@@ -100,10 +115,62 @@
       "title": "Autó",
       "placeholder": "Válasszon autót",
       "no_cars": "Kattintson ide és adja hozzá első autóját"
+    },
+    "steps": {
+      "name": {
+        "title": "Elnevezés",
+        "name_field": {
+          "title": "Autó azonosító",
+          "info": "Az autó elnevezése, azonosítója mely az Ön számára lehet fontos autója azonosításakor.",
+          "placeholder": "Új autóm"
+        }
+      },
+      "model": {
+        "title": "$t(car.model)",
+        "make_field": {
+          "title": "$t(car.make)"
+        },
+        "model_field": {
+          "title": "$t(car.model)",
+          "disabled_text": "Először válassza ki az autó gyártóját!"
+        },
+        "model_year_field": {
+          "title": "$t(car.model_year)",
+          "disabled_text": "Először válassza ki az autó modelljét!"
+        }
+      },
+      "odometer": {
+        "title": "$t(odometer.text)",
+        "unit_field": {
+          "title": "$t(common.unit)"
+        }
+      },
+      "fuel": {
+        "title": "$t(fuel.text)",
+        "type_field": {
+          "title": "$t(common.type)"
+        },
+        "unit_field": {
+          "title": "$t(common.unit)"
+        }
+      },
+      "image": {
+        "title": "$t(common.image)",
+        "image_field": {
+          "title": "Autó profilkép"
+        }
+      }
+    },
+    "modal": {
+      "delete": {
+        "title": "A(z) {{name}} nevű autó törlése",
+        "body": "$t(modal.delete_message)"
+      }
     }
   },
   "fuel": {
     "title": "Tankolási napló",
+    "text": "Üzemanyag",
     "fueling": "Tankolás",
     "type": "Üzemanyag Típus",
     "tank": "Üzemanyagóra",
@@ -111,7 +178,7 @@
     "full_tank": "Tele tank",
     "unit": "Üzemanyag mértékegység",
     "unit_types": {
-      "liter": ""
+      "liter": "liter"
     }
   },
   "odometer": {
@@ -156,26 +223,47 @@
   },
   "service": {
     "title": "Szervízkönyv",
-    "items": "Szervizelési tételek",
+    "items": {
+      "title": "Szervizelési tételek",
+      "item": "Szervizelési tétel",
+      "type": "Tétel típus"
+    },
     "log": "Szervíz napló bejegyzés",
     "types": {
+      "title": "Szerviz tipus",
       "undefined": "Ismeretlen",
       "small_service": "Kis szerviz"
     },
+    "steps": {
+      "basic_information": "Alap információk",
+      "items": "$t(service.items.title)"
+    },
     "modal": {
-      "delete": "Szervíz napló bejegyzés törlése"
+      "delete": {
+        "title": "$t(service.log) törlése",
+        "body": "$t(modal.delete_message)"
+      }
     }
   },
   "places": {
     "title": "Helyek",
+    "title_singular": "Hely",
+    "new": "Új hely",
+    "start": "Indulás",
+    "stop": "Megálló {{index}}",
+    "end": "Érkezés",
     "modal": {
-      "delete": "Hely törlése"
+      "delete": {
+        "title": "$t(places.title_singular) törlése"
+      }
     }
   },
   "passengers": {
     "title": "Utasok",
+    "title_singular": "Utas",
+    "new": "Új utas",
     "modal": {
-      "delete": "Utas törlése"
+      "delete": "$t(passengers.title_singular) törlése"
     }
   },
   "rides": {
@@ -196,6 +284,8 @@
     "start_odometer_value": "Az indulási kilométeróra-állás: {{value}}",
     "end_odometer": "Érkezési kilométeróra-állás",
     "expenses": "Kiadások",
+    "other_expenses": "Egyéb kiadások",
+    "other_expense": "Egyéb kiadás",
     "route": "Útvonal",
     "passengers": "Utas lista",
     "steps": {

@@ -7,6 +7,7 @@ import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { formTheme } from "../../../../ui/form/constants/theme.ts";
 import Icon from "../../../Icon.tsx";
 import { IntelligentMarquee } from "../../../marquee/IntelligentMarquee.tsx";
+import { useTranslation } from "react-i18next";
 
 export type DropdownPickerControllerProps = {
     selectedItem: PickerItemType | null
@@ -34,7 +35,7 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
     selectedItem,
     toggleDropdown,
     icon,
-    inputPlaceholder = "Válasszon a listából",
+    inputPlaceholder,
     error,
     disabled,
     disabledText,
@@ -42,6 +43,7 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
     containerStyle,
     textInputStyle
 }) => {
+    const { t } = useTranslation();
     const { openToast } = useAlert();
 
     const onPress = () => {
@@ -100,7 +102,8 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
                            </IntelligentMarquee>
                         }
                     </>
-                    : <Text style={ [styles.titleText, styles.placeholderText] }>{ inputPlaceholder }</Text>
+                    : <Text style={ [styles.titleText, styles.placeholderText] }>{ inputPlaceholder ?? t(
+                        "form.picker.choose") }</Text>
                 }
             </View>
             <View style={ styles.formFieldIconContainer }>

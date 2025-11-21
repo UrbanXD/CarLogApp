@@ -47,7 +47,8 @@ export async function initI18n() {
                 default: ["en-US"]
             },
             interpolation: {
-                escapeValue: false
+                escapeValue: false,
+                skipOnVariables: false
             },
             react: {
                 useSuspense: false

@@ -8,6 +8,7 @@ import { ICON_NAMES } from "../../../../../../../constants/index.ts";
 import { PopupView } from "../../../../../../../components/popupView/PopupView.tsx";
 import Input from "../../../../../../../components/Input/Input.ts";
 import { RidePassengerForm } from "../RidePassengerForm.tsx";
+import { useTranslation } from "react-i18next";
 
 type RidePassengerInputProps = {
     control: Control<any>
@@ -20,12 +21,13 @@ type RidePassengerInputProps = {
 export function RidePassengerInput({
     control,
     fieldName,
-    title = "Utasok",
+    title,
     minItemCount = 0,
     maxItemCount = 8
 }: RidePassengerInputProps) {
     if(minItemCount > maxItemCount) maxItemCount = minItemCount;
 
+    const { t } = useTranslation();
     const { ridePassengerToExpandableList } = useRidePassengerToExpandableList();
 
     const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
@@ -79,7 +81,7 @@ export function RidePassengerInput({
             <ExpandableList
                 expanded={ true }
                 data={ items.map(ridePassengerToExpandableList) }
-                title={ title }
+                title={ title ?? t("passengers.title") }
                 actionIcon={ ICON_NAMES.add }
                 onAction={ openAddItemForm }
                 onRemoveItem={ removeItem }

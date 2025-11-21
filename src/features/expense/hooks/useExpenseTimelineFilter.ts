@@ -28,6 +28,7 @@ export function useExpenseTimelineFilter({
 }: UseExpenseTimelineFilterProps) {
     const { t, i18n } = useTranslation();
     const { expenseTypeDao } = useDatabase();
+
     const [types, setTypes] = useState<Array<ExpenseType>>([]);
     const [selectedTypesId, setSelectedTypesId] = useState<Array<ExpenseType["id"]>>([]);
 

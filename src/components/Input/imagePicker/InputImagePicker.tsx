@@ -14,6 +14,7 @@ import DefaultElement from "../../DefaultElement.tsx";
 import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
 import Image from "../../Image.tsx";
 import { ImageSource } from "../../../types/index.ts";
+import { useTranslation } from "react-i18next";
 
 interface InputImagePickerProps {
     control: Control<any>;
@@ -34,6 +35,8 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
     limitOfImages = 5,
     multipleSelection = false
 }) => {
+    const { t } = useTranslation();
+
     const [selectedImage, setSelectedImage] = useState<ImageSourcePropType | string | undefined>(defaultImages.length === 0 || multipleSelection
                                                                                                  ? undefined
                                                                                                  : defaultImages[0]);
@@ -164,7 +167,7 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                          source={ selectedImage }
                          imageStyle={ [styles.chosenImage, { height: size.height * 1.25 }] }
                       />
-                      <InputTitle title="Kiválasztható képek"/>
+                      <InputTitle title={ t("form.image_picker.selectable_images") }/>
                    </>
                 }
                 <View style={ styles.secondRowContainer }>

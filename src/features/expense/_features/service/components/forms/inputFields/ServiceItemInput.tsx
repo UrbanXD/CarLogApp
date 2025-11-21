@@ -13,6 +13,7 @@ import { ServiceItemForm } from "../ServiceItemForm.tsx";
 import { Amount } from "../../../../../../_shared/currency/schemas/amountSchema.ts";
 import { useServiceItemToExpandableList } from "../../../hooks/useServiceItemToExpandableList.ts";
 import { ExpandableList } from "../../../../../../../components/expandableList/ExpandableList.tsx";
+import { useTranslation } from "react-i18next";
 
 type ServiceItemInputProps = {
     control: Control<any>
@@ -28,12 +29,13 @@ export function ServiceItemInput({
     control,
     fieldName,
     carIdFieldName,
-    title = "Szervizelési tételek",
+    title,
     minItemCount = 0,
     maxItemCount = 5
 }: ServiceItemInputProps) {
     if(minItemCount > maxItemCount) maxItemCount = minItemCount;
 
+    const { t } = useTranslation();
     const { getCar } = useCars();
     const { serviceItemToExpandableListItem } = useServiceItemToExpandableList();
 
@@ -130,8 +132,8 @@ export function ServiceItemInput({
             <ExpandableList
                 expanded={ true }
                 data={ items.map(serviceItemToExpandableListItem) }
-                title={ title }
-                subtitle={ "Egységár" }
+                title={ title ?? t("service.items.title") }
+                subtitle={ t("currency.price_per_unit") }
                 totalAmount={ totalAmount }
                 actionIcon={ ICON_NAMES.add }
                 onAction={ openAddItemForm }

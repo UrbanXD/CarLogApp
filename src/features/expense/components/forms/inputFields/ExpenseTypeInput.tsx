@@ -5,7 +5,7 @@ import { MoreDataLoading } from "../../../../../components/loading/MoreDataLoadi
 import React, { useEffect, useState } from "react";
 import { PickerItemType } from "../../../../../components/Input/picker/PickerItem.tsx";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
-import i18n from "../../../../../i18n/index.ts";
+import { useTranslation } from "react-i18next";
 
 type ExpenseTypeInputProps = {
     control: Control<any>
@@ -17,10 +17,12 @@ type ExpenseTypeInputProps = {
 export function ExpenseTypeInput({
     control,
     fieldName,
-    title = i18n.t("expenses.types.title"),
+    title,
     subtitle
 }: ExpenseTypeInputProps) {
+    const { t } = useTranslation();
     const { expenseTypeDao } = useDatabase();
+
     const [expenseTypes, setExpenseTypes] = useState<Array<PickerItemType> | null>(null);
 
     useEffect(() => {
@@ -34,14 +36,14 @@ export function ExpenseTypeInput({
         <Input.Field
             control={ control }
             fieldName={ fieldName }
-            fieldNameText={ title }
+            fieldNameText={ title ?? t("expenses.types.title") }
             fieldInfoText={ subtitle }
         >
             {
                 expenseTypes
                 ?
                 <Input.Picker.Dropdown
-                    title={ title }
+                    title={ title ?? t("expenses.types.title") }
                     icon={ ICON_NAMES.nametag }
                     data={ expenseTypes }
                 />

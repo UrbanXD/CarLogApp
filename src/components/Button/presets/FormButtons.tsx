@@ -2,7 +2,7 @@ import Button from "../Button.ts";
 import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import i18n from "../../../i18n/index.ts";
+import { useTranslation } from "react-i18next";
 
 type FormButtonsProps = {
     submit: () => Promise<void>
@@ -13,8 +13,10 @@ type FormButtonsProps = {
 export function FormButtons({
     submit,
     reset,
-    submitText = i18n.t("form_button.save")
+    submitText
 }: FormButtonsProps) {
+    const { t } = useTranslation();
+
     return (
         <Button.Row
             style={ { paddingTop: SEPARATOR_SIZES.lightSmall, justifyContent: !reset ? "flex-end" : "space-between" } }>
@@ -26,7 +28,7 @@ export function FormButtons({
                />
             }
             <Button.Text
-                text={ submitText }
+                text={ submitText ?? t("form_button.save") }
                 onPress={ submit }
                 style={ { flex: reset ? 1 : 0.8 } }
                 loadingIndicator
