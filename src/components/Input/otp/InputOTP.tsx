@@ -10,6 +10,7 @@ import Animated, {
     withTiming
 } from "react-native-reanimated";
 import Button from "../../Button/Button.ts";
+import { useTranslation } from "react-i18next";
 
 interface InputOTPProps {
     numberOfDigits?: number;
@@ -20,6 +21,8 @@ const InputOTP: React.FC<InputOTPProps> = ({
     numberOfDigits = 6,
     onSubmit
 }) => {
+    const { t } = useTranslation();
+
     const hiddenInputRef = useRef<TextInput>(null);
 
     const [code, setCode] = useState<string>("");
@@ -128,7 +131,7 @@ const InputOTP: React.FC<InputOTPProps> = ({
                 />
             </View>
             <Button.Text
-                text="Tovább"
+                text={ t("otp_next") }
                 width={ wp(75) }
                 disabled={ code.length !== numberOfDigits }
                 onPress={ () => onSubmit(code) }

@@ -10,6 +10,7 @@ import { AmountText } from "../AmountText.tsx";
 import { ExpandableListItem, ExpandableListItemType } from "./ExpandableListItem.tsx";
 import { DropdownView } from "../dropdownView/DropdownView.tsx";
 import InputTitle from "../Input/common/InputTitle.tsx";
+import { useTranslation } from "react-i18next";
 
 type ExpandableListProps = {
     expanded: boolean
@@ -34,6 +35,7 @@ export function ExpandableList({
     onItemPress,
     onRemoveItem
 }: ExpandableListProps) {
+    const { t } = useTranslation();
     const keyExtractor = useCallback((item: ExpandableListItemType) => item.id, []);
 
     const renderItem = useCallback(
@@ -78,7 +80,7 @@ export function ExpandableList({
                 {
                     subtitle &&
                    <View style={ styles.topContainer.labelContainer }>
-                      <Text style={ styles.label }>Egységár</Text>
+                      <Text style={ styles.label }>{ subtitle }</Text>
                    </View>
                 }
             </View>
@@ -101,7 +103,7 @@ export function ExpandableList({
                      exchangedAmount={ totalAmount.length !== 1 && totalAmount.map(a => Number(a.amount ?? 0)) }
                      exchangeCurrencyText={ totalAmount.map(a => a.currency.symbol ?? "?") }
                   />
-                  <Text style={ [styles.label, styles.bottomContainer.label] }>Összköltéség</Text>
+                  <Text style={ [styles.label, styles.bottomContainer.label] }>{ t("currency.total_cost") }</Text>
                </View>
             }
         </DropdownView>

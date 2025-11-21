@@ -1,5 +1,6 @@
 import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
+import { useTranslation } from "react-i18next";
 
 export type AmountTextProps = {
     amount: string | number
@@ -20,12 +21,14 @@ export function AmountText({
     amountTextStyle,
     exchangedAmountTextStyle
 }: AmountTextProps) {
+    const { t } = useTranslation();
+
     return (
         <View style={ [styles.container, containerStyle] }>
             <Text style={ [styles.text, amountTextStyle] }>
                 {
                     amount == 0
-                    ? "ingyen"
+                    ? t("currency.free")
                     : `${ amount } ${ currencyText }`
                 }
             </Text>

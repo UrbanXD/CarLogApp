@@ -17,12 +17,14 @@ import { FloatingDeleteButton } from "../../../../../components/Button/presets/F
 import { AmountText } from "../../../../../components/AmountText.tsx";
 import { updateCarOdometer } from "../../../model/slice/index.ts";
 import { Odometer } from "../../odometer/schemas/odometerSchema.ts";
+import { useTranslation } from "react-i18next";
 
 export type FuelLogViewProps = {
     id: string
 }
 
 export function FuelLogView({ id }: FuelLogViewProps) {
+    const { t } = useTranslation();
     const { fuelLogDao, odometerLogDao } = useDatabase();
     const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
@@ -66,12 +68,12 @@ export function FuelLogView({ id }: FuelLogViewProps) {
     }, [fuelLog, car]);
 
     const onDelete = useCallback(() => {
-        if(!fuelLog) return openToast({ type: "warning", title: "Kiadás nem található!" });
+        if(!fuelLog) return openToast({ type: "warning", title: t("modal.not_found", { name: t("fuel.title") }) });
 
         openModal({
-            title: `Tankolási napló bejegyzés törlése`,
-            body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
-            acceptText: "Törlés",
+            title: t("log.delete", { name: "fuel.fueling" }),
+            body: t("modal.delete_message"),
+            acceptText: t("form_button.delete"),
             acceptAction: () => handleDelete(fuelLog)
         });
     }, [fuelLog, openToast, openModal]);
@@ -94,13 +96,13 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         },
         {
             icon: ICON_NAMES.fuelPump,
-            title: "Tankolás",
+            title: t("fuel.fueling"),
             content: `${ fuelLog?.quantity } ${ fuelLog?.fuelUnit.short }`,
             onPress: () => onEdit(FuelLogFormFieldsEnum.Quantity)
         },
         {
             icon: ICON_NAMES.money,
-            title: "Ár",
+            title: t("expenses.price"),
             content: (textStyle) => fuelLog &&
                <AmountText
                   amount={ fuelLog.expense.amount.amount }
@@ -111,7 +113,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
                />,
             onPress: () => onEdit(FuelLogFormFieldsEnum.Amount),
             secondaryInfo: {
-                title: "Egységár",
+                title: t("expenses.price_per_unit"),
                 content: (textStyle) => fuelLog &&
                    <AmountText
                       amount={ fuelLog.originalPricePerUnit }
@@ -124,22 +126,22 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         },
         {
             icon: ICON_NAMES.calendar,
-            title: "Dátum",
+            title: t("date.text"),
             content: dayjs(fuelLog?.expense?.date).format("YYYY. MM DD. HH:mm"),
             onPress: () => onEdit(FuelLogFormFieldsEnum.Date)
         },
         {
             icon: ICON_NAMES.odometer,
-            title: "Kilométeróra-állás",
+            title: t("odometer.value"),
             content: fuelLog?.odometer
                      ? `${ fuelLog?.odometer?.value } ${ fuelLog.odometer.unit.short }`
-                     : "Nincs hozzárendelve",
+                     : t("common.not_assigned"),
             contentTextStyle: !fuelLog?.odometer && { color: COLORS.gray2 },
             onPress: () => onEdit(FuelLogFormFieldsEnum.OdometerValue)
         },
         {
             icon: ICON_NAMES.note,
-            content: fuelLog?.expense?.note ?? "Nincs megjegyzés",
+            content: fuelLog?.expense?.note ?? t("common.no_notes"),
             contentTextStyle: !fuelLog?.expense?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(FuelLogFormFieldsEnum.Note)
         }
@@ -149,7 +151,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         <>
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
                 <Title
-                    title={ fuelLog?.expense.type?.locale }
+                    title={ t("expenses.types.fuel") }
                     dividerStyle={ {
                         backgroundColor: fuelLog?.expense.type?.primaryColor ?? COLORS.gray2,
                         marginBottom: SEPARATOR_SIZES.normal

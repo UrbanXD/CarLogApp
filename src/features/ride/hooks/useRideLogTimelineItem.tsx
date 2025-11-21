@@ -5,8 +5,11 @@ import { RideLog } from "../schemas/rideLogSchema.ts";
 import { COLORS, ICON_NAMES } from "../../../constants/index.ts";
 import dayjs from "dayjs";
 import { RideTime } from "../components/RideTime.tsx";
+import { useTranslation } from "react-i18next";
 
 export function useRideLogTimelineItem() {
+    const { t } = useTranslation();
+
     const mapper = useCallback((rideLog: RideLog, callback?: () => void): TimelineItemType => {
         const onPress = () => {
             if(!rideLog.id) return;
@@ -14,7 +17,7 @@ export function useRideLogTimelineItem() {
             callback?.();
             router.push({
                 pathname: "/ride/[id]",
-                params: { id: rideLog.id, title: "Menet-napló bejegyzés" }
+                params: { id: rideLog.id, title: t("rides.log") }
             });
         };
 

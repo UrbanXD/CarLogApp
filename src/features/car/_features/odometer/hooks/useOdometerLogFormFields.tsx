@@ -53,7 +53,7 @@ export function useOdometerLogFormFields({
     const getOdometerLogSubtitle = useCallback(() => {
         if(!odometerLog) return undefined;
 
-        let subtitle = `A bejegyzés eredeti kilométeróra-állása ${ odometerLog.value } ${ odometerLog.unit.short }`;
+        let subtitle = t("odometer.original_value", { value: `${ odometerLog.value } ${ odometerLog.unit.short }` });
         if(car && odometerLog.unit.id !== car.odometer.unit.id) {
             const odometerValueConvertToCarOdometerUnit = convertOdometerValueFromKilometer(
                 odometerLog.valueInKm,
@@ -85,7 +85,7 @@ export function useOdometerLogFormFields({
                 <Input.Field
                     control={ control }
                     fieldName="date"
-                    fieldNameText="Dátum"
+                    fieldNameText={ t("date.year") }
                 >
                     <InputDatePicker/>
                 </Input.Field>

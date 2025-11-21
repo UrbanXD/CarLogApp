@@ -6,13 +6,16 @@ import dayjs from "dayjs";
 import { router } from "expo-router";
 import { OdometerLog } from "../schemas/odometerLogSchema.ts";
 import { OdometerLogTypeEnum } from "../model/enums/odometerLogTypeEnum.ts";
+import { useTranslation } from "react-i18next";
 
 export const useOdometerTimelineItem = () => {
+    const { t } = useTranslation();
+
     const mapper = useCallback((
         odometerLog: OdometerLog,
         callback?: () => void
     ): TimelineItemType => {
-        const routerPathTitle = "Napló bejegyzés";
+        const routerPathTitle = t("log.title");
         let routerPathName = "/odometer/log/[id]";
         let itemId = odometerLog.id;
 
@@ -50,7 +53,7 @@ export const useOdometerTimelineItem = () => {
                     textStyle={ { color: COLORS.white } }
                     unitTextStyle={ { color: COLORS.white } }
                 />,
-            title: odometerLog.type.locale,
+            title: t(`odometer.types.${ odometerLog.type.key }`),
             icon: odometerLog.type.icon,
             color: odometerLog.type.primaryColor ?? undefined,
             iconColor: odometerLog.type.secondaryColor ?? undefined,

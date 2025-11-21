@@ -19,10 +19,12 @@ import * as SystemUI from "expo-system-ui";
 import { SystemBars } from "react-native-edge-to-edge";
 import { SECONDARY_COLOR } from "../constants/index.ts";
 import { PortalHost, PortalProvider } from "@gorhom/portal";
+import { useTranslation } from "react-i18next";
 
 
 const Layout: React.FC = () => {
     const database = useDatabase();
+    const { t } = useTranslation();
 
     useEffect(() => {
         SystemUI.setBackgroundColorAsync(SECONDARY_COLOR);
@@ -103,13 +105,13 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="(profile)/user"
                 options={ {
-                    header: () => <Header.Secondary title="Profil"/>
+                    header: () => <Header.Secondary title={ t("profile.title") }/>
                 } }
             />
             <Stack.Screen
                 name="(edit)/car"
                 options={ {
-                    header: () => <Header.Secondary title="Autó adatlap"/>
+                    header: () => <Header.Secondary title={ t("car.title") }/>
                 } }
             />
             <Stack.Screen
@@ -124,13 +126,13 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="odometer/log"
                 options={ {
-                    header: () => <Header.Secondary title="Kilométeróra-állás napló"/>
+                    header: () => <Header.Secondary title={ t("odometer.title") }/>
                 } }
             />
             <Stack.Screen
                 name="odometer/log/[id]"
                 options={ {
-                    header: () => <Header.Secondary title="Napló bejegyzés"/>
+                    header: () => <Header.Secondary title={ t("common.log_title") }/>
                 } }
             />
             <Stack.Screen
@@ -154,19 +156,19 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="expense/[id]"
                 options={ {
-                    header: () => <Header.Secondary title="Kiadás"/>
+                    header: () => <Header.Secondary title={ t("expenses.item_title") }/>
                 } }
             />
             <Stack.Screen
                 name="expense/fuel/[id]"
                 options={ ({ route }) => ({
-                    header: () => <Header.Secondary title={ route.params?.title ?? "Napló bejegyzés" }/>
+                    header: () => <Header.Secondary title={ route.params?.title ?? t("common.log_title") }/>
                 }) }
             />
             <Stack.Screen
                 name="expense/service/[id]"
                 options={ ({ route }) => ({
-                    header: () => <Header.Secondary title={ route.params?.title ?? "Napló bejegyzés" }/>
+                    header: () => <Header.Secondary title={ route.params?.title ?? t("common.log_title") }/>
                 }) }
             />
             <Stack.Screen
@@ -226,7 +228,7 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="ride/place/index"
                 options={ {
-                    header: () => <Header.Secondary title={ "Helyek" }/>
+                    header: () => <Header.Secondary title={ t("places.title") }/>
                 } }
             />
             <Stack.Screen
@@ -250,7 +252,7 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="ride/passenger/index"
                 options={ {
-                    header: () => <Header.Secondary title={ "Utasok" }/>
+                    header: () => <Header.Secondary title={ t("passengers.title") }/>
                 } }
             />
             <Stack.Screen

@@ -15,8 +15,10 @@ import { ExpenseFormFields } from "../../features/expense/enums/expenseFormField
 import { InfoRowProps } from "../../components/info/InfoRow.tsx";
 import { FloatingDeleteButton } from "../../components/Button/presets/FloatingDeleteButton.tsx";
 import { AmountText } from "../../components/AmountText.tsx";
+import { useTranslation } from "react-i18next";
 
 export function ExpenseScreen() {
+    const { t } = useTranslation();
     const { id } = useLocalSearchParams();
     const { expenseDao } = useDatabase();
     const { getCar } = useCars();
@@ -56,12 +58,15 @@ export function ExpenseScreen() {
     }, [expenseDao, car]);
 
     const onDelete = useCallback(() => {
-        if(!expense) return openToast({ type: "warning", title: "Kiadás nem található!" });
+        if(!expense) return openToast({
+            type: "warning",
+            title: t("modal.not_found", { name: t("expenses.item_title") })
+        });
 
         openModal({
-            title: `Kiadás napló bejegyzés törlése`,
-            body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
-            acceptText: "Törlés",
+            title: t("modal.log_delete_title", { name: t("expenses.item_title") }),
+            body: t("modal.delete_message"),
+            acceptText: t("form_button.delete"),
             acceptAction: () => handleDelete(expense.id)
         });
     }, [expense, openToast, openModal]);
@@ -75,7 +80,10 @@ export function ExpenseScreen() {
     }, [expense]);
 
     const onEdit = useCallback((field?: ExpenseFormFields) => {
-        if(!expense) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
+        if(!expense) return openToast({
+            type: "warning",
+            title: t("modal.not_found", { name: t("expenses.item_title") })
+        });
 
         router.push({
             pathname: "/expense/edit/[id]",
@@ -92,7 +100,7 @@ export function ExpenseScreen() {
         },
         {
             icon: ICON_NAMES.money,
-            title: "Ár",
+            title: t("expenses.price"),
             content: (textStyle) => expense &&
                <AmountText
                   amount={ expense.amount.amount }
@@ -105,13 +113,13 @@ export function ExpenseScreen() {
         },
         {
             icon: ICON_NAMES.calendar,
-            title: "Dátum",
+            title: t("date.text"),
             content: dayjs(expense?.date).format("YYYY. MM DD. HH:mm"),
             onPress: () => onEdit(ExpenseFormFields.Date)
         },
         {
             icon: ICON_NAMES.note,
-            content: expense?.note ?? "Nincs megjegyzés",
+            content: expense?.note ?? t("common.no_notes"),
             contentTextStyle: !expense?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(ExpenseFormFields.Note)
         }
@@ -121,7 +129,7 @@ export function ExpenseScreen() {
         <>
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
                 <Title
-                    title={ expense?.type.locale }
+                    title={ t(`expenses.types.${ expense?.type.key }`) }
                     dividerStyle={ {
                         backgroundColor: expense?.type?.primaryColor ?? COLORS.gray2,
                         marginBottom: SEPARATOR_SIZES.normal

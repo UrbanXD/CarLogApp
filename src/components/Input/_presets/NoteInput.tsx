@@ -2,6 +2,7 @@ import { Control, UseFormReturn } from "react-hook-form";
 import Input from "../Input.ts";
 import { ICON_NAMES } from "../../../constants/index.ts";
 import React from "react";
+import i18n from "../../../i18n/index.ts";
 
 type NoteInputProps = {
     control: Control<any>
@@ -17,7 +18,7 @@ export function NoteInput({
     control,
     setValue,
     fieldName,
-    title = "Megjegyzés",
+    title = i18n.t("common.note"),
     subtitle,
     placeholder = title,
     optional = true

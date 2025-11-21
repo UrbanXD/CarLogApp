@@ -23,6 +23,7 @@ import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { router } from "expo-router";
 import useCars from "../../hooks/useCars.ts";
 import { SelectedCar } from "./SelectedCar.tsx";
+import { useTranslation } from "react-i18next";
 
 const CLOSE_ICON_SIZE = FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE;
 const MAX_TRANSLATE = widthPercentageToDP(100);
@@ -32,6 +33,7 @@ type CarPickerProps = {
 }
 
 export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
+    const { t } = useTranslation();
     const database = useDatabase();
     const { cars, selectedCar } = useCars();
     const dispatch = useAppDispatch();
@@ -115,9 +117,9 @@ export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
                >
                   <SelectedCar
                      car={ selectedCar }
-                     placeholder={ "Válasszon autót" }
+                     placeholder={ t("car.picker.placeholder") }
                      userDontHaveCars={ cars.length === 0 }
-                     userDontHaveCarsPlaceholder={ "Kattintson ide és adja hozzá első autóját" }
+                     userDontHaveCarsPlaceholder={ t("car.picker.no_cars") }
                   />
                </AnimatedPressable>
             }

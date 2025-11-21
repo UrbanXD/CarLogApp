@@ -12,6 +12,7 @@ import { IntelligentMarquee } from "../../../../components/marquee/IntelligentMa
 import Link from "../../../../components/Link.tsx";
 import { InfoContainer } from "../../../../components/info/InfoContainer.tsx";
 import { InfoRowProps } from "../../../../components/info/InfoRow.tsx";
+import { useTranslation } from "react-i18next";
 
 type CarProfileViewProps = {
     car: Car
@@ -32,26 +33,28 @@ function CarProfileView({
     openOdometerLog,
     openEditOdometerValue
 }: CarProfileViewProps) {
+    const { t } = useTranslation();
+
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
             title: car.fuelTank.type.key,
-            content: "Üzemanyag Típus",
+            content: t("fuel.type"),
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelType)
         }, {
             title: car.fuelTank.capacity.toString(),
-            content: "Tartálytérfogat",
+            content: t("fuel.tank_capacity"),
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelTankCapacity)
         }, {
             title: car.fuelTank.unit.short,
-            content: "Üzemanyag mértékegység",
+            content: t("fuel.unit"),
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelUnit)
         }, {
             title: car.odometer.unit.short,
-            content: "Kilométeróra Mértékegység",
+            content: t("odometer.unit"),
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.OdometerUnit)
         }, {
             title: car.currency.symbol,
-            content: "Elsődleges Valuta",
+            content: t("currency.primary"),
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.Currency)
         }
     ]), [car, openEditCarStep]);
@@ -105,7 +108,7 @@ function CarProfileView({
                     margin={ SEPARATOR_SIZES.lightSmall / 2.5 }
                 />
                 <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoRow.title }>Gyártó</Text>
+                    <Text style={ styles.carInfoRow.title }>{ t("car.make") }</Text>
                     <View style={ styles.carInfoRow.infoContainer }>
                         <IntelligentMarquee
                             speed={ MARQUEE_SPEED }
@@ -119,7 +122,7 @@ function CarProfileView({
                     </View>
                 </View>
                 <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoRow.title }>Model</Text>
+                    <Text style={ styles.carInfoRow.title }>{ t("car.model") }</Text>
                     <View style={ styles.carInfoRow.infoContainer }>
                         <IntelligentMarquee
                             speed={ 0.75 }
@@ -133,7 +136,7 @@ function CarProfileView({
                     </View>
                 </View>
                 <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoRow.title }>Évjárat</Text>
+                    <Text style={ styles.carInfoRow.title }>{ t("car.model_year") }</Text>
                     <View style={ styles.carInfoRow.infoContainer }>
                         <IntelligentMarquee
                             speed={ MARQUEE_SPEED }
@@ -146,10 +149,12 @@ function CarProfileView({
                         </IntelligentMarquee>
                     </View>
                 </View>
-                <Button.Row style={ {
-                    marginTop: SEPARATOR_SIZES.mediumSmall,
-                    justifyContent: handleDeleteCar ? "space-between" : "center"
-                } }>
+                <Button.Row
+                    style={ {
+                        marginTop: SEPARATOR_SIZES.mediumSmall,
+                        justifyContent: handleDeleteCar ? "space-between" : "center"
+                    } }
+                >
                     {
                         handleDeleteCar &&
                        <Button.Icon
@@ -162,7 +167,7 @@ function CarProfileView({
                        />
                     }
                     <Button.Text
-                        text="Módosítás"
+                        text={ t("form_button.edit") }
                         textColor={ COLORS.gray1 }
                         fontSize={ FONT_SIZES.p2 }
                         height={ FONT_SIZES.p2 * 2 }
@@ -173,19 +178,21 @@ function CarProfileView({
                 </Button.Row>
             </View>
             <View style={ styles.block }>
-                <Text style={ styles.block.title }>Alap információk</Text>
+                <Text style={ styles.block.title }>{ t("car.basic_information") }</Text>
                 <InfoContainer data={ infos } flexDirection={ "column" } maxItemInRow={ 3 }/>
             </View>
             <View style={ styles.block }>
-                <View style={ {
-                    flexDirection: "row",
-                    justifyContent: openEditOdometerValue ? "space-between" : "center"
-                } }>
+                <View
+                    style={ {
+                        flexDirection: "row",
+                        justifyContent: openEditOdometerValue ? "space-between" : "center"
+                    } }
+                >
                     {
                         openEditOdometerValue &&
                        <View style={ { width: FONT_SIZES.h3, height: FONT_SIZES.h3, backgroundColor: "transparent" } }/>
                     }
-                    <Text style={ styles.block.title }>Kilóméteróra</Text>
+                    <Text style={ styles.block.title }>{ t("odometer.text") }</Text>
                     {
                         openEditOdometerValue &&
                        <Button.Icon
@@ -203,7 +210,7 @@ function CarProfileView({
                 {
                     openOdometerLog &&
                    <Link
-                      text="Kilométeróra-állás napló"
+                      text={ t("odometer.open_log") }
                       icon={ ICON_NAMES.rightArrowHead }
                       onPress={ openOdometerLog }
                    />

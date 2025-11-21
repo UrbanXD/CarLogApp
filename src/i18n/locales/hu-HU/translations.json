@@ -1,7 +1,229 @@
 {
+  "common": {
+    "main_screen": "Főoldal",
+    "unassigned": "Nincs hozzárendelve",
+    "no_notes": "Nincs megjegyzés",
+    "note": "Megjegyzés",
+    "unknown": "Ismeretlen",
+    "data_loading": "Adatok betöltése",
+    "loading": "Betöltés",
+    "or": "vagy",
+    "log_title": "Napló bejegyzés",
+    "count": "db",
+    "filters": {
+      "all": "Mind"
+    },
+    "unit": "Mértékegység"
+  },
+  "form_button": {
+    "edit": "Módosítás",
+    "save": "Mentés",
+    "delete": "Törlés",
+    "google_auth": "Folytatás Google fiókkal",
+    "otp_next": "Tovább"
+  },
+  "multistep_form": {
+    "go_to_next_step": "Következő",
+    "submit_multistep_form": "Befejezés",
+    "next_step": "Következik: {{step}}"
+  },
+  "form": {
+    "optional": "opcionális",
+    "searchbar": {
+      "placeholder": "Keresés..."
+    }
+  },
+  "modal": {
+    "accept": "Folytatás",
+    "dismiss": "Mégse",
+    "log_delete_title": "{{name}} napló bejegyzés törlése",
+    "delete_message": "A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet",
+    "not_found": "{{name}} nem található!",
+    "log_not_found": "Napló bejegyzés nem található!"
+  },
+  "auth": {
+    "description": "Kezelje nálunk autóit",
+    "sign_up": "Regisztráció",
+    "sign_in": "Bejelentkezés",
+    "forgot_your_password": "Elfelejtette jelszavát?",
+    "already_have_account": "Már rendelkezel felhasználóval?",
+    "sign_in_now": "Jelentkezz be",
+    "resume_verification": "Hitelesítés\nfolytatása",
+    "email_verification": "Email cím hitelesítés",
+    "delete_account": "Fiók törlése"
+  },
+  "log": {
+    "title": "Napló bejegyzés",
+    "item_not_found": "Nem található bejegyzés",
+    "item_not_found_description": "Rögzítse első adatát itt...",
+    "loading": "Napló adatok olvasása",
+    "previous_data_loading": "Korábbi napló adatok olvasása",
+    "next_data_loading": "Régebbi napló adatok olvasása",
+    "delete": "{{name}} bejegyzés törlése"
+  },
+  "profile": {
+    "title": "Profil",
+    "personal_information": "Személyes adatok",
+    "change_email": "Email csere",
+    "change_password": "Jelszó csere",
+    "add_password": "Jelszó hozzáadás",
+    "delete_account": "Fiók törlése",
+    "sign_out": "Kijelentkezés"
+  },
+  "currency": {
+    "primary": "Elsődleges Valuta",
+    "text": "Valuta",
+    "price": "Ár",
+    "price_per_unit": "Egységár",
+    "cost": "Összeg",
+    "total_cost": "Összköltéség",
+    "free": "ingyenes",
+    "in_car_currency": "Az autó alapvalutájában számolt összeg"
+  },
+  "date": {
+    "text": "Dátum",
+    "year": "Év",
+    "today": "ma",
+    "days": "{{value}} nap",
+    "hours": "{{value}} óra",
+    "minutes": "{{value}} perc",
+    "seconds": "{{value}} másodperc",
+    "few_seconds": "néhány másodperc"
+  },
+  "car": {
+    "title": "Autó adatlap",
+    "make": "Gyártó",
+    "model": "Model",
+    "model_year": "Évjárat",
+    "basic_information": "Alap információk",
+    "picker": {
+      "title": "Autó",
+      "placeholder": "Válasszon autót",
+      "no_cars": "Kattintson ide és adja hozzá első autóját"
+    }
+  },
+  "fuel": {
+    "title": "Tankolási napló",
+    "fueling": "Tankolás",
+    "type": "Üzemanyag Típus",
+    "tank": "Üzemanyagóra",
+    "tank_capacity": "Tartálytérfogat",
+    "full_tank": "Tele tank",
+    "unit": "Üzemanyag mértékegység",
+    "unit_types": {
+      "liter": ""
+    }
+  },
+  "odometer": {
+    "title": "Kilométeróra-állás napló",
+    "text": "Kilométeróra",
+    "value": "Kilométeróra-állás",
+    "unit": "Kilométeróra Mértékegység",
+    "open_log": "Kilométeróra-állás napló",
+    "original_value": "A bejegyzés eredeti kilométeróra-állása {{value}}",
+    "types": {
+      "simple": "Kilométeróra-frissítés",
+      "fuel": "Tankolás",
+      "service": "Szervíz",
+      "ride": "Út"
+    }
+  },
+  "expenses": {
+    "title": "Pénzügyek",
+    "text": "Kiadások",
+    "item_title": "Kiadás",
+    "price": "Ár",
+    "price_per_unit": "Egységár",
+    "total_cost": "Összköltéség",
+    "description": "Az alábbi pénzügyi naplóban különböző kiadásai szerepelnek mely a kiválasztott autójához tartoznak.",
+    "not_found": "Nem található kiadás",
+    "not_found_action_call": "Hozzalétre első kiadását ide kattintva",
+    "latest": "Legutóbbi kiadások",
+    "more": "További kiadások",
+    "types": {
+      "title": "Kiadás típusa",
+      "undefined": "Ismeretlen",
+      "other": "Egyéb",
+      "fuel": "Tankolás",
+      "service": "Szervíz",
+      "vehicle_inspection": "Műszaki vizsgálat",
+      "wash": "Autómosás",
+      "toll": "Útdíj",
+      "parking": "Parkolás",
+      "insurance": "Biztosítás",
+      "registration": "Regisztráció"
+    }
+  },
+  "service": {
+    "title": "Szervízkönyv",
+    "items": "Szervizelési tételek",
+    "log": "Szervíz napló bejegyzés",
+    "types": {
+      "undefined": "Ismeretlen",
+      "small_service": "Kis szerviz"
+    },
+    "modal": {
+      "delete": "Szervíz napló bejegyzés törlése"
+    }
+  },
+  "places": {
+    "title": "Helyek",
+    "modal": {
+      "delete": "Hely törlése"
+    }
+  },
+  "passengers": {
+    "title": "Utasok",
+    "modal": {
+      "delete": "Utas törlése"
+    }
+  },
+  "rides": {
+    "title": "Menetkönyv",
+    "item": "Út",
+    "log": "Menet-napló bejegyzés",
+    "upcoming": "Közelgő utak",
+    "more": "További utak",
+    "not_found": "Nem található út",
+    "not_found_upcoming_rides_action_call": "Hozzalétre a következő útját",
+    "start": "Indulás",
+    "end": "Érkezés",
+    "start_time": "Indulási idő",
+    "start_time_value": "Az indulás ideje: {{value}}",
+    "end_time": "Érkezési idő",
+    "duration": "Idő hossz",
+    "start_odometer": "Indulási kilométeróra-állás",
+    "start_odometer_value": "Az indulási kilométeróra-állás: {{value}}",
+    "end_odometer": "Érkezési kilométeróra-állás",
+    "expenses": "Kiadások",
+    "route": "Útvonal",
+    "passengers": "Utas lista",
+    "steps": {
+      "car_and_start": "Autó és indulás",
+      "end": "Érkezés",
+      "note": "Megjegyzés"
+    }
+  },
   "garage": {
-    "garage": "Garázss",
+    "garage": "Garázs",
     "use_garage": "Rendelkezzen a virutális garázsában parkoló autókról!",
-    "add_new_car": "Autó hozzáadás"
+    "add_new_car": "Autó hozzáadás",
+    "empty_car_list": "Még egy autó se parkol a virtuális garázsában"
+  },
+  "statistics": {
+    "basic_car_title": "Autó statisztikák",
+    "monthly_fuel_cost": "Havi üzemanyagköltség",
+    "monthly_service_cost": "Havi szervizköltség",
+    "monthly_total_cost": "Havi összköltség",
+    "monthly_distance": "Havi megtett távolság",
+    "fuel_consumption": "Átlagfogyasztás\n(100 {{unit}})",
+    "cost_per_distance": "Átlag költség\n(100 {{unit}})",
+    "avg_ride_distance": "Havi átlag út hossza",
+    "avg_ride_duration": "Havi átlag menetidő",
+    "longest_ride_distance": "Havi leghosszabb út",
+    "longest_ride_duration": "Havi leghosszabb menetidő",
+    "top_visited_places": "Havi felkapott helyek",
+    "compared_to_previous_month": "előző hónaphoz képest",
+    "compared_to_previous_30_days": "előző 30 naphoz képest"
   }
 }

@@ -9,8 +9,10 @@ import { TopListItemStat, TrendStat } from "../model/dao/statisticsDao.ts";
 import { COLORS, FONT_SIZES, GLOBAL_STYLE } from "../../../constants/index.ts";
 import { secondsToTimeText } from "../../../utils/secondsToTimeDuration.ts";
 import { calculateTrend } from "../utils/calculateTrend.ts";
+import { useTranslation } from "react-i18next";
 
 export function BasicCarStatistics() {
+    const { t } = useTranslation();
     const { statisticsDao } = useDatabase();
     const { selectedCar } = useCars();
 
@@ -43,32 +45,19 @@ export function BasicCarStatistics() {
                     monthlyAverageRideDistance,
                     monthlyAverageRideDuration,
                     monthlyLongestRideDuration
-                ]: [
-                    TrendStat,
-                    TrendStat,
-                    TrendStat,
-                    TrendStat,
-                    TrendStat,
-                    TrendStat,
-                    TrendStat,
-                    Array<TopListItemStat>,
-                    TrendStat,
-                    TrendStat,
-                    TrendStat
-                ] = await Promise.all(
-                    [
-                        statisticsDao.getFuelCostTrend({ carId: selectedCar.id, type: "month" }),
-                        statisticsDao.getServiceCostTrend({ carId: selectedCar.id, type: "month" }),
-                        statisticsDao.getTotalCostTrend({ carId: selectedCar.id, type: "month" }),
-                        statisticsDao.getDistanceTrend({ carId: selectedCar.id, type: "month" }),
-                        statisticsDao.getFuelConsumption({ carId: selectedCar.id, type: "month" }),
-                        statisticsDao.getCostPerDistance({ carId: selectedCar.id, type: "month" }),
-                        statisticsDao.getLongestRideDistance({ carId: selectedCar.id, type: "month" }),
-                        statisticsDao.getTopVisitedPlaces({ carId: selectedCar.id, type: "month" }),
-                        statisticsDao.getAverageRideDistance({ carId: selectedCar.id, type: "month" }),
-                        statisticsDao.getAverageRideDuration({ carId: selectedCar.id, type: "month" }),
-                        statisticsDao.getLongestRideDuration({ carId: selectedCar.id, type: "month" })
-                    ]);
+                ] = await Promise.all([
+                    statisticsDao.getFuelCostTrend({ carId: selectedCar.id, type: "month" }),
+                    statisticsDao.getServiceCostTrend({ carId: selectedCar.id, type: "month" }),
+                    statisticsDao.getTotalCostTrend({ carId: selectedCar.id, type: "month" }),
+                    statisticsDao.getDistanceTrend({ carId: selectedCar.id, type: "month" }),
+                    statisticsDao.getFuelConsumption({ carId: selectedCar.id, type: "month" }),
+                    statisticsDao.getCostPerDistance({ carId: selectedCar.id, type: "month" }),
+                    statisticsDao.getLongestRideDistance({ carId: selectedCar.id, type: "month" }),
+                    statisticsDao.getTopVisitedPlaces({ carId: selectedCar.id, type: "month" }),
+                    statisticsDao.getAverageRideDistance({ carId: selectedCar.id, type: "month" }),
+                    statisticsDao.getAverageRideDuration({ carId: selectedCar.id, type: "month" }),
+                    statisticsDao.getLongestRideDuration({ carId: selectedCar.id, type: "month" })
+                ]);
 
                 setFuelCost(monthlyFuelCost);
                 setServiceCost(monthlyServiceCost);
@@ -91,37 +80,37 @@ export function BasicCarStatistics() {
         const { trend, trendSymbol, isTrendPositive } = calculateTrend(fuelCost?.current, fuelCost?.previous);
 
         return {
-            label: "Havi üzemanyagköltség",
+            label: t("statistics.monthly_fuel_cost"),
             value: `${ fuelCost?.current } ${ selectedCar?.currency.symbol }`,
             trend: `${ trendSymbol } ${ trend }`,
-            trendDescription: "előző hónaphoz képest",
+            trendDescription: t("statistics.compared_to_previous_month"),
             isPositive: isTrendPositive
         };
-    }, [fuelCost, selectedCar]);
+    }, [fuelCost, selectedCar, t]);
 
     const getMonthlyServiceCost = useCallback(() => {
         const { trend, trendSymbol, isTrendPositive } = calculateTrend(serviceCost?.current, serviceCost?.previous);
 
         return {
-            label: "Havi szervízköltség",
+            label: t("statistics.monthly_service_cost"),
             value: `${ serviceCost?.current } ${ selectedCar?.currency.symbol }`,
             trend: `${ trendSymbol } ${ trend }`,
-            trendDescription: "előző hónaphoz képest",
+            trendDescription: t("statistics.compared_to_previous_month"),
             isPositive: isTrendPositive
         };
-    }, [serviceCost, selectedCar]);
+    }, [serviceCost, selectedCar, t]);
 
     const getMonthlyTotalCost = useCallback(() => {
         const { trend, trendSymbol, isTrendPositive } = calculateTrend(totalCost?.current, totalCost?.previous);
 
         return {
-            label: "Havi összköltség",
+            label: t("statistics.monthly_total_cost"),
             value: `${ totalCost?.current } ${ selectedCar?.currency.symbol }`,
             trend: `${ trendSymbol } ${ trend }`,
-            trendDescription: "előző hónaphoz képest",
+            trendDescription: t("statistics.compared_to_previous_month"),
             isPositive: isTrendPositive
         };
-    }, [totalCost, selectedCar]);
+    }, [totalCost, selectedCar, t]);
 
     const getMonthlyDistance = useCallback(() => {
         const { trend, trendSymbol } = calculateTrend(
@@ -131,12 +120,12 @@ export function BasicCarStatistics() {
         );
 
         return {
-            label: "Havi megtett távolság",
+            label: t("statistics.monthly_distance"),
             value: `${ distance?.current } ${ selectedCar?.odometer?.unit?.short }`,
             trend: `${ trendSymbol } ${ trend }`,
-            trendDescription: "előző hónaphoz képest"
+            trendDescription: t("statistics.compared_to_previous_month")
         };
-    }, [distance, selectedCar]);
+    }, [distance, selectedCar, t]);
 
     const getMonthlyFuelConsumption = useCallback(() => {
         const { trend, trendSymbol, isTrendPositive } = calculateTrend(
@@ -145,13 +134,13 @@ export function BasicCarStatistics() {
         );
 
         return {
-            label: `Átlagfogyasztás\n(100 ${ selectedCar?.odometer.unit.short })`,
+            label: t("statistics.fuel_consumption", { unit: selectedCar?.odometer.unit.short }),
             value: `${ fuelConsumption?.current } ${ selectedCar?.fuelTank.unit.short }`,
             trend: `${ trendSymbol } ${ trend }`,
-            trendDescription: "előző 30 naphoz képest",
+            trendDescription: t("statistics.compared_to_previous_30_days"),
             isPositive: isTrendPositive
         };
-    }, [fuelConsumption, selectedCar]);
+    }, [fuelConsumption, selectedCar, t]);
 
     const getMonthlyCostPerDistance = useCallback(() => {
         const { trend, trendSymbol, isTrendPositive } = calculateTrend(
@@ -160,13 +149,13 @@ export function BasicCarStatistics() {
         );
 
         return {
-            label: `Átlag költség \n(100 ${ selectedCar?.odometer.unit.short })`,
+            label: t("statistics.cost_per_distance", { unit: selectedCar?.odometer.unit.short }),
             value: `${ costPerDistance?.current } ${ selectedCar?.currency.symbol }`,
             trend: `${ trendSymbol } ${ trend }`,
-            trendDescription: "előző 30 naphoz képest",
+            trendDescription: t("statistics.compared_to_previous_30_days"),
             isPositive: isTrendPositive
         };
-    }, [costPerDistance, selectedCar]);
+    }, [costPerDistance, selectedCar, t]);
 
     const getMonthlyAverageRideDistance = useCallback(() => {
         const { trend, trendSymbol } = calculateTrend(
@@ -176,12 +165,12 @@ export function BasicCarStatistics() {
         );
 
         return {
-            label: "Havi átlag út hossz",
+            label: t("statistics.avg_ride_distance"),
             value: `${ averageRideDistance?.current } ${ selectedCar?.odometer?.unit?.short }`,
             trend: `${ trendSymbol } ${ trend }`,
-            trendDescription: "előző hónaphoz képest"
+            trendDescription: t("statistics.compared_to_previous_month")
         };
-    }, [averageRideDistance, selectedCar]);
+    }, [averageRideDistance, selectedCar, t]);
 
     const getMonthlyAverageRideDuration = useCallback(() => {
         const { trend, trendSymbol } = calculateTrend(
@@ -191,12 +180,12 @@ export function BasicCarStatistics() {
         );
 
         return {
-            label: "Havi átlag menetidő",
+            label: t("statistics.avg_ride_duration"),
             value: averageRideDuration?.current ? secondsToTimeText(averageRideDuration.current) : "-",
             trend: `${ trendSymbol } ${ trend === 0 ? "-" : secondsToTimeText(Number(trend)) }`,
-            trendDescription: "előző hónaphoz képest"
+            trendDescription: t("statistics.compared_to_previous_month")
         };
-    }, [averageRideDuration, selectedCar]);
+    }, [averageRideDuration, selectedCar, t]);
 
     const getMonthlyLongestRide = useCallback(() => {
         const { trend, trendSymbol } = calculateTrend(
@@ -206,12 +195,12 @@ export function BasicCarStatistics() {
         );
 
         return {
-            label: "Havi leghosszabb út",
+            label: t("statistics.longest_ride_distance"),
             value: `${ longestRideDistance?.current } ${ selectedCar?.odometer.unit.short }`,
             trend: `${ trendSymbol } ${ trend }`,
-            trendDescription: "előző hónaphoz képest"
+            trendDescription: t("statistics.compared_to_previous_month")
         };
-    }, [longestRideDistance, selectedCar]);
+    }, [longestRideDistance, selectedCar, t]);
 
     const getMonthlyLongestRideDuration = useCallback(() => {
         const { trend, trendSymbol } = calculateTrend(
@@ -221,12 +210,12 @@ export function BasicCarStatistics() {
         );
 
         return {
-            label: "Havi leghosszabb menetidő",
+            label: t("statistics.longest_ride_duration"),
             value: longestRideDuration?.current ? secondsToTimeText(longestRideDuration.current) : "-",
             trend: `${ trendSymbol } ${ trend === 0 ? "-" : secondsToTimeText(Number(trend)) }`,
-            trendDescription: "előző hónaphoz képest"
+            trendDescription: t("statistics.compared_to_previous_month")
         };
-    }, [longestRideDuration]);
+    }, [longestRideDuration, t]);
 
     const getMonthlyTopPlace = useCallback(() => {
         let value: React.ReactNode = "-";
@@ -234,38 +223,39 @@ export function BasicCarStatistics() {
         if(mostVisitedPlaces.length > 0) {
             value = (
                 <>
-                    {
-                        mostVisitedPlaces.map((place, index) => (
-                            <React.Fragment key={ place.name + index }>
-                                { place.name }{ " " }
-                                <Text
-                                    style={ {
-                                        fontFamily: "Gilroy-Medium",
-                                        fontSize: FONT_SIZES.p3,
-                                        color: COLORS.gray1
-                                    } }
-                                >
-                                    (x{ place.count })
-                                </Text>
-                                { mostVisitedPlaces.length - 1 !== index && "\n" }
-                            </React.Fragment>
-                        ))
-                    }
+                    { mostVisitedPlaces.map((place, index) => (
+                        <React.Fragment key={ place.name + index }>
+                            { place.name }{ " " }
+                            <Text
+                                style={ {
+                                    fontFamily: "Gilroy-Medium",
+                                    fontSize: FONT_SIZES.p3,
+                                    color: COLORS.gray1
+                                } }
+                            >
+                                (x{ place.count })
+                            </Text>
+                            { mostVisitedPlaces.length - 1 !== index && "\n" }
+                        </React.Fragment>
+                    )) }
                 </>
             );
         }
 
         return {
-            label: "Havi felkapott helyek",
-            value: value
+            label: t("statistics.top_visited_places"),
+            value
         };
-    }, [mostVisitedPlaces]);
+    }, [mostVisitedPlaces, t]);
 
-    if(!selectedCar) return;
+    if(!selectedCar) return null;
 
     return (
         <View style={ GLOBAL_STYLE.contentContainer }>
-            <Text style={ GLOBAL_STYLE.containerTitleText }>Autó statisztikák</Text>
+            <Text style={ GLOBAL_STYLE.containerTitleText }>
+                { t("statistics.basic_car_title") }
+            </Text>
+
             <MasonryStatView
                 column1={ [
                     getMonthlyFuelCost(),
@@ -277,7 +267,9 @@ export function BasicCarStatistics() {
                     getMonthlyCostPerDistance()
                 ] }
             />
+
             <StatCard { ...getMonthlyTopPlace() } />
+
             <MasonryStatView
                 column1={ [
                     getMonthlyDistance(),

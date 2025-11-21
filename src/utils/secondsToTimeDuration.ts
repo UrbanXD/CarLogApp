@@ -1,5 +1,7 @@
+import i18n from "../i18n/index.ts";
+
 export function secondsToTimeText(seconds: number, showsSeconds?: boolean = false): string {
-    if(!showsSeconds && seconds < 59) return "néhány másodperc";
+    if(!showsSeconds && seconds < 59) return i18n.t("date.few_seconds");
 
     let remaining = seconds;
 
@@ -16,22 +18,22 @@ export function secondsToTimeText(seconds: number, showsSeconds?: boolean = fals
 
     let text = "";
 
-    if(days > 0) text += `${ days } nap`;
+    if(days > 0) text += i18n.t("date.days", { value: days });
 
     if(hours > 0) {
         if(text) text += " ";
-        text += `${ hours } óra`;
+        text += i18n.t("date.hours", { value: hours });
     }
 
     if(minutes > 0) {
         if(text) text += " ";
-        text += `${ minutes } perc`;
+        text += i18n.t("date.minutes", { value: minutes });
     }
 
     if(showsSeconds && remainingSeconds > 0) {
         if(text) text += " ";
-        text += `${ remainingSeconds } másodperc`;
+        text += i18n.t("date.seconds", { value: remainingSeconds });
     }
 
-    return text || "néhány másodperc";
+    return text ?? i18n.t("date.few_seconds");
 }

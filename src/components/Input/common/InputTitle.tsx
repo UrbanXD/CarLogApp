@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { useTranslation } from "react-i18next";
 
 interface InputTitleProps {
     title: string,
@@ -13,17 +14,17 @@ const InputTitle: React.FC<InputTitleProps> = ({
     subtitle,
     optional = false
 }) => {
+    const { t } = useTranslation();
+
     return (
         <View style={ styles.container }>
             <View>
                 <Text style={ styles.inputNameText }>
-                    {
-                        `${ title } `
-                    }
+                    { title }
                     {
                         optional &&
                        <Text style={ styles.optionalText }>
-                          (opcionális)
+                          ({ t("form.optional") })
                        </Text>
                     }
                 </Text>

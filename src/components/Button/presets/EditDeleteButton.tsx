@@ -3,6 +3,7 @@ import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } fr
 import Button from "../Button.ts";
 import React from "react";
 import { DeleteButton } from "./DeleteButton.tsx";
+import i18n from "../../../i18n/index.ts";
 
 type EditDeleteButton = {
     deleteIcon?: string
@@ -16,7 +17,7 @@ type EditDeleteButton = {
 
 export function EditDeleteButton({
     deleteIcon = ICON_NAMES.trashCan,
-    editText = "Módosítás",
+    editText = i18n.t("form_button.edit"),
     onDeletePress,
     onEditPress,
     buttonContainerStyle,

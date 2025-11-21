@@ -16,8 +16,10 @@ import useCars from "../features/car/hooks/useCars.ts";
 import { InfoContainer } from "../components/info/InfoContainer.tsx";
 import { OdometerLogFormFields } from "../features/car/_features/odometer/enums/odometerLogFormFields.ts";
 import { FloatingDeleteButton } from "../components/Button/presets/FloatingDeleteButton.tsx";
+import { useTranslation } from "react-i18next";
 
 export function OdometerLogScreen() {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const { id } = useLocalSearchParams();
     const { getCar } = useCars();
@@ -64,17 +66,17 @@ export function OdometerLogScreen() {
     }, [odometerLogDao, car]);
 
     const onDelete = useCallback(() => {
-        if(!odometerLog) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
+        if(!odometerLog) return openToast({ type: "warning", title: t("modal.log_not_found") });
         openModal({
-            title: `Kilométeróra-állás napló bejegyzés  törlése`,
-            body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
-            acceptText: "Törlés",
+            title: t("modal.log_delete_title", { name: t("odometer.title") }),
+            body: t("modal.delete_message"),
+            acceptText: t("form_button.delete"),
             acceptAction: () => handleDelete(odometerLog)
         });
     }, [odometerLog, openToast, openModal]);
 
     const onEdit = useCallback((field?: OdometerLogFormFields) => {
-        if(!odometerLog) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
+        if(!odometerLog) return openToast({ type: "warning", title: t("modal.log_not_found") });
 
         router.push({
             pathname: "/odometer/log/edit/[id]",
@@ -91,19 +93,19 @@ export function OdometerLogScreen() {
         },
         {
             icon: ICON_NAMES.odometer,
-            title: "Kilométeróra-állás",
+            title: t("odometer.title"),
             content: `${ odometerLog?.value } ${ odometerLog?.unit.short }`,
             onPress: () => onEdit(OdometerLogFormFields.OdometerValue)
         },
         {
             icon: ICON_NAMES.calendar,
-            title: "Dátum",
+            title: t("date.text"),
             content: dayjs(odometerLog?.date).format("YYYY. MM DD. HH:mm"),
             onPress: () => onEdit(OdometerLogFormFields.Date)
         },
         {
             icon: ICON_NAMES.note,
-            content: odometerLog?.note ?? "Nincs megjegyzés",
+            content: odometerLog?.note ?? t("common.no_notes"),
             contentTextStyle: !odometerLog?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(OdometerLogFormFields.Note)
         }

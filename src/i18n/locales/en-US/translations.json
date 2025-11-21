@@ -1,7 +1,226 @@
 {
+  "common": {
+    "main_screen": "Main Screen",
+    "unassigned": "Unassigned",
+    "no_notes": "No notes",
+    "note": "Note",
+    "unknown": "Unknown",
+    "data_loading": "Loading data",
+    "loading": "Loading",
+    "or": "or",
+    "log_title": "Log entry",
+    "count": "pcs",
+    "filters": {
+      "all": "All"
+    },
+    "unit": "Unit"
+  },
+  "form_button": {
+    "edit": "Edit",
+    "save": "Save",
+    "delete": "Delete",
+    "google_auth": "Continue with Google account",
+    "otp_next": "Next"
+  },
+  "multistep_form": {
+    "go_to_next_step": "Next",
+    "submit_multistep_form": "Finish",
+    "next_step": "Next: {{step}}"
+  },
+  "form": {
+    "optional": "optional",
+    "searchbar": {
+      "placeholder": "Search..."
+    }
+  },
+  "modal": {
+    "accept": "Continue",
+    "dismiss": "Cancel",
+    "log_delete_title": "Delete {{name}} log entry",
+    "delete_message": "Deleting is irreversible. Make sure you want to continue.",
+    "not_found": "{{name}} not found!",
+    "log_not_found": "Log entry not found!"
+  },
+  "auth": {
+    "description": "Manage your cars with us",
+    "sign_up": "Sign Up",
+    "sign_in": "Sign In",
+    "forgot_your_password": "Forgot your password?",
+    "already_have_account": "Already have an account?",
+    "sign_in_now": "Sign in now",
+    "resume_verification": "Resume\nverification",
+    "email_verification": "Email verification",
+    "delete_account": "Delete account"
+  },
+  "log": {
+    "title": "Log entry",
+    "item_not_found": "Item not found",
+    "item_not_found_description": "Add your first data here...",
+    "loading": "Loading log data",
+    "previous_data_loading": "Loading previous log data",
+    "next_data_loading": "Loading older log data",
+    "delete": "Delete {{name}} entry"
+  },
+  "profile": {
+    "title": "Profile",
+    "personal_information": "Personal information",
+    "change_email": "Change email",
+    "change_password": "Change password",
+    "add_password": "Add password",
+    "delete_account": "Delete account",
+    "sign_out": "Sign out"
+  },
+  "currency": {
+    "primary": "Primary currency",
+    "text": "Currency",
+    "price": "Price",
+    "price_per_unit": "Unit price",
+    "cost": "Cost",
+    "total_cost": "Total cost",
+    "free": "Free",
+    "in_car_currency": "Amount in car's main currency"
+  },
+  "date": {
+    "text": "Date",
+    "year": "Year",
+    "today": "today",
+    "days": "{{value}} day",
+    "hours": "{{value}} hour",
+    "minutes": "{{value}} minute",
+    "seconds": "{{value}} second",
+    "few_seconds": "a few seconds"
+  },
+  "car": {
+    "title": "Car profile",
+    "make": "Make",
+    "model": "Model",
+    "model_year": "Year",
+    "basic_information": "Basic information",
+    "picker": {
+      "title": "Car",
+      "placeholder": "Select a car",
+      "no_cars": "Click here to add your first car"
+    }
+  },
+  "fuel": {
+    "title": "Fuel log",
+    "fueling": "Fueling",
+    "type": "Fuel type",
+    "tank": "Fuel gauge",
+    "tank_capacity": "Tank capacity",
+    "unit": "Fuel unit",
+    "full_tank": "Full tank"
+  },
+  "odometer": {
+    "title": "Odometer log",
+    "text": "Odometer",
+    "value": "Odometer value",
+    "unit": "Odometer unit",
+    "open_log": "Open odometer log",
+    "original_value": "Original odometer value {{value}}",
+    "types": {
+      "simple": "Odometer update",
+      "fuel": "Fueling",
+      "service": "Service",
+      "ride": "Ride"
+    }
+  },
+  "expenses": {
+    "title": "Expenses",
+    "text": "Expenses",
+    "item_title": "Expense",
+    "price": "Price",
+    "price_per_unit": "Unit price",
+    "total_cost": "Total cost",
+    "description": "The following financial log shows various expenses related to your selected car.",
+    "not_found": "No expenses found",
+    "not_found_action_call": "Create your first expense here",
+    "latest": "Latest expenses",
+    "more": "More expenses",
+    "types": {
+      "title": "Expense type",
+      "undefined": "Unknown",
+      "other": "Other",
+      "fuel": "Fueling",
+      "service": "Service",
+      "vehicle_inspection": "Vehicle inspection",
+      "wash": "Car wash",
+      "toll": "Toll",
+      "parking": "Parking",
+      "insurance": "Insurance",
+      "registration": "Registration"
+    }
+  },
+  "service": {
+    "title": "Service book",
+    "items": "Service items",
+    "log": "Service log entry",
+    "types": {
+      "undefined": "Unknown",
+      "small_service": "Small service"
+    },
+    "modal": {
+      "delete": "Delete service log entry"
+    }
+  },
+  "places": {
+    "title": "Places",
+    "modal": {
+      "delete": "Delete place"
+    }
+  },
+  "passengers": {
+    "title": "Passengers",
+    "modal": {
+      "delete": "Delete passenger"
+    }
+  },
+  "rides": {
+    "title": "Ride log",
+    "item": "Ride",
+    "log": "Ride log entry",
+    "upcoming": "Upcoming rides",
+    "more": "More rides",
+    "not_found": "No rides found",
+    "not_found_upcoming_rides_action_call": "Create your next ride",
+    "start": "Start",
+    "end": "End",
+    "start_time": "Start time",
+    "start_time_value": "Start time: {{value}}",
+    "end_time": "End time",
+    "duration": "Duration",
+    "start_odometer": "Start odometer",
+    "start_odometer_value": "Start odometer: {{value}}",
+    "end_odometer": "End odometer",
+    "expenses": "Expenses",
+    "route": "Route",
+    "passengers": "Passenger list",
+    "steps": {
+      "car_and_start": "Car & start",
+      "end": "End",
+      "note": "Note"
+    }
+  },
   "garage": {
     "garage": "Garage",
-    "use_garage": "Rendelkezzen a virutális garázsában parkoló autókról!",
-    "add_new_car": "Autó hozzáadás"
+    "use_garage": "Manage cars parked in your virtual garage!",
+    "add_new_car": "Add new car",
+    "empty_car_list": "No car is parked in your virtual garage yet"
+  },
+  "statistics": {
+    "basic_car_title": "Car statistics",
+    "monthly_fuel_cost": "Monthly fuel cost",
+    "monthly_service_cost": "Monthly service cost",
+    "monthly_total_cost": "Monthly total cost",
+    "monthly_distance": "Monthly distance traveled",
+    "fuel_consumption": "Average consumption\n(100 {{unit}})",
+    "cost_per_distance": "Average cost\n(100 {{unit}})",
+    "avg_ride_distance": "Average ride distance",
+    "avg_ride_duration": "Average ride duration",
+    "longest_ride_distance": "Longest ride distance",
+    "longest_ride_duration": "Longest ride duration",
+    "top_visited_places": "Most visited places",
+    "compared_to_previous_month": "compared to previous month",
+    "compared_to_previous_30_days": "compared to previous 30 days"
   }
 }

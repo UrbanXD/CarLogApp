@@ -15,6 +15,7 @@ import { NoteInput } from "../../../components/Input/_presets/NoteInput.tsx";
 import { RidePassengerInput } from "../_features/passenger/components/forms/inputFields/RidePassengerInput.tsx";
 import { RideExpenseInput } from "../_features/rideExpense/components/forms/inputFields/RideExpenseInput.tsx";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 type UseRideLogFormFieldsProps = {
     form: UseFormReturn<RideLogFormFields>
@@ -26,6 +27,7 @@ export function useRideLogFormFields({
     setCarOdometerValueWhenInputNotTouched = true
 }: UseRideLogFormFieldsProps) {
     const { control, setValue, getFieldState, clearErrors } = form;
+    const { t } = useTranslation();
     const { getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(null);
@@ -75,7 +77,7 @@ export function useRideLogFormFields({
             render: () => <OdometerValueInput
                 control={ control }
                 fieldName="startOdometerValue"
-                title={ "Induló kilométeróra-állás" }
+                title={ t("rides.start_odometer") }
                 currentOdometerValue={ car?.odometer.value }
                 unitText={ car?.odometer.unit.short }
             />,
@@ -85,8 +87,11 @@ export function useRideLogFormFields({
             render: () => <OdometerValueInput
                 control={ control }
                 fieldName="endOdometerValue"
-                title={ "Záró kilométeróra-állás" }
-                subtitle={ `Az induló kilométeróra-állás: ${ formStartOdometerValue } ${ car?.odometer.unit.short }` }
+                title={ t("rides.end_odometer") }
+                subtitle={ t(
+                    "rides.start_odometer_value",
+                    { value: `${ formStartOdometerValue } ${ car?.odometer.unit.short }` }
+                ) }
                 unitText={ car?.odometer.unit.short }
             />,
             editToastMessages: CarEditNameToast
@@ -96,7 +101,7 @@ export function useRideLogFormFields({
                 <Input.Field
                     control={ control }
                     fieldName="startTime"
-                    fieldNameText="Indulás"
+                    fieldNameText={ t("rides.start") }
                 >
                     <InputDatePicker/>
                 </Input.Field>
@@ -108,8 +113,11 @@ export function useRideLogFormFields({
                 <Input.Field
                     control={ control }
                     fieldName="endTime"
-                    fieldNameText="Érkezés"
-                    fieldInfoText={ `Az indulás ideje: ${ dayjs(formStartTime).format("YYYY. MM. DD. HH:mm") }` }
+                    fieldNameText={ t("rides.end") }
+                    fieldInfoText={ t(
+                        "rides.start_time_value",
+                        { value: `${ dayjs(formStartTime).format("YYYY. MM. DD. HH:mm") }` }
+                    ) }
                 >
                     <InputDatePicker/>
                 </Input.Field>
@@ -122,14 +130,14 @@ export function useRideLogFormFields({
                     <Input.Field
                         control={ control }
                         fieldName="startTime"
-                        fieldNameText="Indulás"
+                        fieldNameText={ t("rides.start") }
                     >
                         <InputDatePicker/>
                     </Input.Field>
                     <Input.Field
                         control={ control }
                         fieldName="endTime"
-                        fieldNameText="Érkezés"
+                        fieldNameText={ t("rides.end") }
                     >
                         <InputDatePicker/>
                     </Input.Field>
@@ -143,14 +151,14 @@ export function useRideLogFormFields({
                     <OdometerValueInput
                         control={ control }
                         fieldName="startOdometerValue"
-                        title={ "Induló kilométeróra-állás" }
+                        title={ t("rides.start_odometer") }
                         currentOdometerValue={ car?.odometer.value }
                         unitText={ car?.odometer.unit.short }
                     />
                     <OdometerValueInput
                         control={ control }
                         fieldName="endOdometerValue"
-                        title={ "Záró kilométeróra-állás" }
+                        title={ t("rides.end_odometer") }
                         unitText={ car?.odometer.unit.short }
                     />
                 </Input.Group>
@@ -169,7 +177,7 @@ export function useRideLogFormFields({
 
     const multiStepFormSteps: Steps = [
         {
-            title: "Autó és indulás",
+            title: t("rides.steps.car_and_start"),
             fields: ["carId", "startTime", "startOdometerValue"],
             render: () => (
                 <Input.Group>
@@ -180,7 +188,7 @@ export function useRideLogFormFields({
             )
         },
         {
-            title: "Útvonal",
+            title: t("rides.route"),
             fields: ["places"],
             render: () => (
                 <Input.Group>
@@ -189,7 +197,7 @@ export function useRideLogFormFields({
             )
         },
         {
-            title: "Utas lista",
+            title: t("rides.passengers"),
             fields: ["passengers"],
             render: () => (
                 <Input.Group>
@@ -198,7 +206,7 @@ export function useRideLogFormFields({
             )
         },
         {
-            title: "Érkezés",
+            title: t("rides.steps.end"),
             fields: ["endTime", "endOdometerValue"],
             render: () => (
                 <Input.Group>
@@ -208,7 +216,7 @@ export function useRideLogFormFields({
             )
         },
         {
-            title: "Kiadási lista",
+            title: t("rides.expenses"),
             fields: ["expenses"],
             render: () => (
                 <Input.Group>
@@ -217,7 +225,7 @@ export function useRideLogFormFields({
             )
         },
         {
-            title: "Megjegyzés",
+            title: t("common.note"),
             fields: ["note"],
             render: () => <>{ fields[RideLogFormFieldsEnum.Note].render() }</>
         }

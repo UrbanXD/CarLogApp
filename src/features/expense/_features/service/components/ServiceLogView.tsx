@@ -19,6 +19,7 @@ import { updateCarOdometer } from "../../../../car/model/slice/index.ts";
 import { ExpandableList } from "../../../../../components/expandableList/ExpandableList.tsx";
 import { useServiceItemToExpandableList } from "../hooks/useServiceItemToExpandableList.ts";
 import { useAppDispatch } from "../../../../../hooks/index.ts";
+import { useTranslation } from "react-i18next";
 
 export type ServiceLogViewProps = {
     id: string
@@ -26,6 +27,7 @@ export type ServiceLogViewProps = {
 
 export function ServiceLogView({ id }: ServiceLogViewProps) {
     const dispatch = useAppDispatch();
+    const { t } = useTranslation();
     const { serviceLogDao } = useDatabase();
     const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
@@ -69,19 +71,28 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
     }, [serviceLogDao]);
 
     const onDelete = useCallback(() => {
-        if(!serviceLog) return openToast({ type: "warning", title: "Kiadás nem található!" });
+        if(!serviceLog) {
+            return openToast({
+                type: "warning",
+                title: `${ t("modal.not_found", { name: t("service.log") }) }`
+            });
+        }
 
         openModal({
-            title: `Szervíz napló bejegyzés törlése`,
-            body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
-            acceptText: "Törlés",
+            title: t("service.modal.delete"),
+            body: t("modal.delete_message"),
+            acceptText: t("form_button.delete"),
             acceptAction: () => handleDelete(serviceLog)
         });
     }, [serviceLog, handleDelete, openToast, openModal]);
 
     const onEdit = useCallback((field: ServiceLogFormFieldsEnum) => {
-        if(!serviceLog) return openToast({ type: "warning", title: "Szervíz napló bejegyzés nem található!" });
-
+        if(!serviceLog) {
+            return openToast({
+                type: "warning",
+                title: `${ t("modal.not_found", { name: t("service.log") }) }`
+            });
+        }
         router.push({
             pathname: "/expense/edit/service/[id]",
             params: { id: serviceLog.id, field: field }
@@ -102,7 +113,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         return (
             <ExpandableList
                 data={ serviceLog.items.map(serviceItemToExpandableListItem) }
-                subtitle={ "Egységár" }
+                subtitle={ t("currency.price_per_unit") }
                 totalAmount={ serviceLog.totalAmount }
                 expanded={ isServiceItemListExpanded }
                 actionIcon={ ICON_NAMES.pencil }
@@ -123,7 +134,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         },
         {
             icon: ICON_NAMES.expenseItem,
-            title: "Szervizelési tételek",
+            title: t("service.items"),
             content: isServiceItemListExpanded ? " " : getAmountSubtitle(),
             actionIcon: isServiceItemListExpanded ? ICON_NAMES.upArrowHead : ICON_NAMES.downArrowHead,
             onPress: () => setServiceItemListExpanded(prevState => !prevState),
@@ -131,22 +142,22 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         },
         {
             icon: ICON_NAMES.calendar,
-            title: "Dátum",
+            title: t("date.text"),
             content: dayjs(serviceLog?.expense?.date).format("YYYY. MM DD. HH:mm"),
             onPress: () => onEdit(ServiceLogFormFieldsEnum.Date)
         },
         {
             icon: ICON_NAMES.odometer,
-            title: "Kilométeróra-állás",
+            title: t("car.odometer.value"),
             content: serviceLog?.odometer
                      ? `${ serviceLog.odometer.value } ${ serviceLog.odometer.unit.short }`
-                     : "Nincs hozzárendelve",
+                     : t("common.unassigned"),
             contentTextStyle: !serviceLog?.odometer && { color: COLORS.gray2 },
             onPress: () => onEdit(ServiceLogFormFieldsEnum.OdometerValue)
         },
         {
             icon: ICON_NAMES.note,
-            content: serviceLog?.expense?.note ?? "Nincs megjegyzés",
+            content: serviceLog?.expense?.note ?? t("common.no_notes"),
             contentTextStyle: !serviceLog?.expense?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(ServiceLogFormFieldsEnum.Note)
         }
@@ -156,7 +167,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         <>
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
                 <Title
-                    title={ serviceLog?.serviceType.key }
+                    title={ t(`service.types.${ serviceLog?.serviceType.key }`) }
                     dividerStyle={ {
                         backgroundColor: serviceLog?.expense.type?.primaryColor ?? COLORS.gray2,
                         marginBottom: SEPARATOR_SIZES.normal

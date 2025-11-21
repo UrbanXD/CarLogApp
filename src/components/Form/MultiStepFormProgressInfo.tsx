@@ -4,8 +4,10 @@ import { useSharedValue, withTiming } from "react-native-reanimated";
 import { useFont } from "@shopify/react-native-skia";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import ProgressInfo from "../ProgressInfo.tsx";
+import { useTranslation } from "react-i18next";
 
 const MultiStepFormProgressInfo: React.FC = () => {
+    const { t } = useTranslation();
     const {
         steps,
         currentStep,
@@ -39,10 +41,12 @@ const MultiStepFormProgressInfo: React.FC = () => {
                   end={ end }
                   font={ font }
                   statusText={ `${ realStepsCount } / ${ currentStepText }` }
-                  stepTitle={ steps[currentStep]?.title || "" }
-                  stepSubtitle={ steps[currentStep + 1]?.title !== undefined
-                                 ? `Következik: ${ steps[currentStep + 1].title }`
-                                 : undefined }
+                  stepTitle={ t(steps[currentStep]?.title ?? "common.unknown") }
+                  stepSubtitle={
+                      steps[currentStep + 1]?.title !== undefined
+                      ? t("multistep_form.next_step", { step: t(steps[currentStep + 1].title) })
+                      : undefined
+                  }
                />
             }
         </>

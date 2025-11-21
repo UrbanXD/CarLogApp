@@ -15,6 +15,7 @@ import Animated, {
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
 import BounceDot from "./BounceDot.tsx";
 import { AnimatedPath, AnimatedSvg } from "../AnimatedComponents/index.ts";
+import i18n from "../../i18n/index.ts";
 
 type CarLoadingIndicatorProps = {
     loaded: boolean,
@@ -24,7 +25,7 @@ type CarLoadingIndicatorProps = {
 
 const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({
     loaded,
-    loadingText = "Betöltés",
+    loadingText = i18n.t("common.loading"),
     onAnimationFinished
 }) => {
     const ROAD_HEIGHT = hp(0.25);

@@ -11,8 +11,10 @@ import Animated, { FadeIn, SlideInRight } from "react-native-reanimated";
 import Divider from "../components/Divider.tsx";
 import CarlogTitle from "../components/CarlogTitle.tsx";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 const AuthScreen: React.FC = () => {
+    const { t } = useTranslation();
     const { top, bottom } = useSafeAreaInsets();
     const { authenticated, notVerifiedUser, openAccountVerification } = useAuth();
 
@@ -55,7 +57,7 @@ const AuthScreen: React.FC = () => {
                             thickness={ 2 }
                             color={ COLORS.gray2 }
                         />
-                        <Text style={ styles.subtitle }>Kezelje nálunk autóit</Text>
+                        <Text style={ styles.subtitle }>{ t("auth.description") }</Text>
                     </Animated.View>
                 </View>
                 <Animated.View
@@ -63,17 +65,17 @@ const AuthScreen: React.FC = () => {
                     style={ styles.actionContainer }
                 >
                     <Button.Text
-                        text="Regisztráció"
+                        text={ t("auth.sign_up") }
                         onPress={ openSignUp }
                     />
                     <Text style={ styles.underButtonText }>
-                        Már rendelkezel felhasználóval?
+                        { t("auth.already_have_account") }
                         { "\n" }
                         <Text
                             style={ styles.linkText }
                             onPress={ openSignIn }
                         >
-                            Jelentkezz be
+                            { t("auth.sign_in_now") }
                         </Text>
                     </Text>
                 </Animated.View>
@@ -93,7 +95,7 @@ const AuthScreen: React.FC = () => {
                      onPress={ openVerification }
                      style={ styles.verificationText }
                   >
-                     Hitelesítés{ "\n" }folytatása
+                      { t("auth.resume_verification") }
                   </Text>
                </Animated.View>
             }
@@ -177,7 +179,8 @@ const useStyles = (top: number, bottom: number) =>
             fontSize: FONT_SIZES.p3,
             color: COLORS.white,
             textShadowColor: COLORS.black,
-            textShadowRadius: 15
+            textShadowRadius: 15,
+            flexWrap: "wrap"
         }
     });
 

@@ -8,8 +8,10 @@ import DefaultElement from "../../../components/DefaultElement.tsx";
 import Button from "../../../components/Button/Button.ts";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import useGarage from "../hooks/useGarage.tsx";
+import { useTranslation } from "react-i18next";
 
 const Garage: React.FC = () => {
+    const { t } = useTranslation();
     const { cars, openNewCarForm, openCarProfile } = useGarage();
 
     const renderDefaultElement =
@@ -17,7 +19,7 @@ const Garage: React.FC = () => {
             <View style={ styles.defaultElementContainer }>
                 <DefaultElement
                     icon={ ICON_NAMES.car }
-                    text="Még egy autó se parkol a virtuális garázsában"
+                    text={ t("garage.empty_car_list") }
                     style={ { width: size - spacerSize / 2 } }
                 />
             </View>;
@@ -37,10 +39,10 @@ const Garage: React.FC = () => {
         <View style={ styles.contentContainer }>
             <View style={ { paddingHorizontal: DEFAULT_SEPARATOR } }>
                 <Text style={ GLOBAL_STYLE.containerTitleText }>
-                    Garázs
+                    { t("garage.garage") }
                 </Text>
                 <Text style={ GLOBAL_STYLE.containerText }>
-                    Rendelkezzen a virutális garázsában parkoló autókról!
+                    { t("garage.use_garage") }
                 </Text>
             </View>
             <View style={ styles.carouselContainer }>
@@ -51,7 +53,7 @@ const Garage: React.FC = () => {
                 />
             </View>
             <Button.Text
-                text="Autó hozzáadás"
+                text={ t("garage.add_new_car") }
                 width={ wp(75) }
                 onPress={ openNewCarForm }
             />

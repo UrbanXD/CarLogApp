@@ -12,12 +12,14 @@ import { TimelineView } from "../../../components/timelineView/TimelineView.tsx"
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
 import { YearPicker } from "../../../components/Input/_presets/YearPicker.tsx";
 import { sql } from "@powersync/kysely-driver";
+import { useTranslation } from "react-i18next";
 
 type RideLogTimelineProps = {
     car: Car
 };
 
 export function RideLogTimeline({ car }: RideLogTimelineProps) {
+    const { t } = useTranslation();
     const { rideLogDao } = useDatabase();
     const { mapper } = useRideLogTimelineItem();
     const paginator = useMemo(() =>
@@ -52,10 +54,10 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
         paginator,
         mapper,
         cursorOrderButtons: [
-            { table: null, field: "total_expense", title: "Ár" },
-            { field: "start_time", title: "Indulási idő" },
-            { field: "end_time", title: "Érkezési idő" },
-            { table: null, field: "duration", title: "Idő hossz" }
+            { table: null, field: "total_expense", title: t("currency.price") },
+            { field: "start_time", title: t("rides.start_time") },
+            { field: "end_time", title: t("rides.end_time") },
+            { table: null, field: "duration", title: t("rides.duration") }
         ]
     });
 
@@ -82,13 +84,13 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
         <View style={ styles.container }>
             <View style={ styles.headerContainer }>
                 <Title
-                    title={ "Menetkönyv" }
+                    title={ t("rides.title") }
                     containerStyle={ styles.headerContainer.titleContainer }
                 />
                 <YearPicker
                     containerStyle={ styles.headerContainer.yearPicker }
                     textInputStyle={ styles.headerContainer.yearPicker.label }
-                    inputPlaceholder={ "Év" }
+                    inputPlaceholder={ t("date.year") }
                     hiddenBackground={ true }
                     setValue={ setYearFilter }
                 />

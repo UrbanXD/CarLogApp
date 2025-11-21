@@ -5,6 +5,7 @@ import { MoreDataLoading } from "../../../../../components/loading/MoreDataLoadi
 import React, { useEffect, useState } from "react";
 import { PickerItemType } from "../../../../../components/Input/picker/PickerItem.tsx";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
+import i18n from "../../../../../i18n/index.ts";
 
 type ExpenseTypeInputProps = {
     control: Control<any>
@@ -16,7 +17,7 @@ type ExpenseTypeInputProps = {
 export function ExpenseTypeInput({
     control,
     fieldName,
-    title = "Kiadás típusa",
+    title = i18n.t("expenses.types.title"),
     subtitle
 }: ExpenseTypeInputProps) {
     const { expenseTypeDao } = useDatabase();

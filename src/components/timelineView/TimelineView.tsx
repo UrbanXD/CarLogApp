@@ -9,6 +9,7 @@ import { RNNativeScrollEvent } from "react-native-reanimated/lib/typescript/hook
 import { LayoutChangeEvent, StyleSheet, View, ViewStyle } from "react-native";
 import { FilterButton, FilterButtonProps } from "../filter/FilterButton.tsx";
 import { FilterRow } from "../filter/FilterRow.tsx";
+import { useTranslation } from "react-i18next";
 
 type TimelineViewProps = {
     ref: FlashListRef<TimelineItemType>
@@ -43,6 +44,8 @@ function ITimelineView({
     style,
     filtersContainerStyle
 }: TimelineViewProps) {
+    const { t } = useTranslation();
+
     const [filterRowsHeight, setFilterRowsHeight] = useState(0);
 
     const renderItem = useCallback(({ item, index }: ListRenderItem<TimelineItemType>) => (
@@ -56,13 +59,13 @@ function ITimelineView({
     ), [renderMilestone, data]);
 
     const renderListEmptyComponent = useCallback(() => {
-        if(isInitialFetching) return <MoreDataLoading text={ "Napló adatok olvasása" }/>;
+        if(isInitialFetching) return <MoreDataLoading text={ t("log.loading") }/>;
 
         return (
             <TimelineItem
                 id="not-found"
-                milestone="Nem található adat"
-                title="Rögzítse első adatát itt..."
+                milestone={ t("log.item_not_found") }
+                title={ t("log.item_not_found_description") }
                 color={ COLORS.gray2 }
                 isFirst
                 isLast
@@ -73,13 +76,13 @@ function ITimelineView({
     const renderHeader = useCallback(() => {
         if(!isPreviousFetching) return <></>;
 
-        return <MoreDataLoading text={ "Korábbi napló adatok olvasása" }/>;
+        return <MoreDataLoading text={ t("log.previous_data_loading") }/>;
     }, [isPreviousFetching]);
 
     const renderFooter = useCallback(() => {
         if(!isNextFetching) return <></>;
 
-        return <MoreDataLoading text={ "Régebbi napló adatok olvasása" }/>;
+        return <MoreDataLoading text={ t("log.next_data_loading") }/>;
     }, [isNextFetching]);
 
     const keyExtractor = useCallback((item: TimelineItemType) => item.id, []);

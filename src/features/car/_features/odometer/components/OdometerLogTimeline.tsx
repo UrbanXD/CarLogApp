@@ -14,12 +14,14 @@ import { OdometerLogTableRow } from "../../../../../database/connector/powersync
 import { OdometerLog } from "../../../schemas/odometerLogSchema.ts";
 import { useOdometerLogTimelineFilter } from "../hooks/useOdometerLogTimelineFilter.ts";
 import { TimelineItemType } from "../../../../../components/timelineView/item/TimelineItem.tsx";
+import { useTranslation } from "react-i18next";
 
 type OdometerLogTimelineProps = {
     carId: string
 };
 
 export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
+    const { t } = useTranslation();
     const { odometerLogDao } = useDatabase();
     const { getCar } = useCars();
     const { mapper } = useOdometerTimelineItem();
@@ -55,7 +57,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
     } = useTimelinePaginator<OdometerLogTableRow, OdometerLog, TimelineItemType>({
         paginator,
         mapper,
-        cursorOrderButtons: [{ field: "value", title: "Kilométeróra-állás" }]
+        cursorOrderButtons: [{ field: "value", title: t("odometer.value") }]
     });
     const { filterButtons } = useOdometerLogTimelineFilter({ timelineFilterManagement, car });
 

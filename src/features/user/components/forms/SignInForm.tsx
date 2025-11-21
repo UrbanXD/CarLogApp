@@ -43,15 +43,15 @@ const SignInForm: React.FC = () => {
                 />
             </Input.Field>
             <Text style={ GLOBAL_STYLE.formLinkText }>
-                Elfelejtette jelszavát?
+                { t("auth.forgot_your_password") }
             </Text>
             <Button.Text
-                text="Bejelentkezés"
+                text={ t("auth.sign_in") }
                 loadingIndicator
                 onPress={ submitHandler }
             />
             <TextDivider
-                title="vagy"
+                title={ t("common.or") }
                 color={ COLORS.gray1 }
                 lineHeight={ 1 }
                 marginVertical={ GLOBAL_STYLE.formContainer.gap }

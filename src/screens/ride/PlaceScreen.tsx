@@ -10,8 +10,10 @@ import { PickerItemType } from "../../components/Input/picker/PickerItem.tsx";
 import { router } from "expo-router";
 import { DeleteExpenseToast } from "../../features/expense/presets/toasts/DeleteExpenseToast.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
+import { useTranslation } from "react-i18next";
 
 export function PlaceScreen() {
+    const { t } = useTranslation();
     const { placeDao } = useDatabase();
     const { openModal, openToast } = useAlert();
     const user = useAppSelector(getUser);
@@ -77,9 +79,9 @@ export function PlaceScreen() {
 
     const onDelete = useCallback((id: string) => {
         openModal({
-            title: `Kiadás napló bejegyzés törlése`,
-            body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
-            acceptText: "Törlés",
+            title: t("places.modal.delete"),
+            body: t("modal.delete_message"),
+            acceptText: t("form_button.delete"),
             acceptAction: () => handleDelete(id)
         });
     }, [openToast, openModal]);

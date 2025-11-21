@@ -8,6 +8,8 @@ import { PickerItemType } from "../../../../components/Input/picker/PickerItem.t
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { formTheme } from "../../../..//ui/form/constants/theme.ts";
 import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
+import i18n from "../../../../i18n/index.ts";
+import { useTranslation } from "react-i18next";
 
 type AmountInputProps = {
     control: Control<any>
@@ -34,9 +36,9 @@ type AmountInputProps = {
 export function AmountInput({
     control,
     setValue,
-    title = "Összeg",
+    title = i18n.t("currency.cost"),
     subtitle,
-    amountPlaceholder = "Összeg",
+    amountPlaceholder = i18n.t("currency.cost"),
     amountFieldName,
     currencyFieldName,
     quantityFieldName,
@@ -47,6 +49,7 @@ export function AmountInput({
     showsExchangeRate = !!exchangeRateFieldName,
     defaultCurrency
 }: AmountInputProps) {
+    const { t } = useTranslation();
     const { currencyDao } = useDatabase();
 
     const [currencies, setCurrencies] = useState<Array<PickerItemType> | null>(null);
@@ -121,7 +124,7 @@ export function AmountInput({
                 isPricePerUnitFieldName &&
                <Input.Field control={ control } fieldName={ isPricePerUnitFieldName }>
                   <View style={ styles.isPricePerUnitContainer }>
-                     <Input.Switch label={ { on: "Egységár", off: "Összköltség" } }/>
+                     <Input.Switch label={ { on: t("currency.price_per_unit"), off: t("currency.total_cost") } }/>
                       {
                           formIsPricePerUnit &&
                          <View style={ styles.isPricePerUnitContainer.textContainer }>
@@ -147,10 +150,10 @@ export function AmountInput({
                                   placeholder={ "1" }
                                   keyboardType="numeric"
                                   type="secondary"
-                               />
+                               />r
                             </Input.Field>
                          </View>
-                         <Text style={ styles.quantityContainer.countText }>db</Text>
+                         <Text style={ styles.quantityContainer.countText }>{ t("common.count") }</Text>
                       </Input.Row>
                    </View>
                 }
@@ -175,7 +178,7 @@ export function AmountInput({
                                 ?
                                 <Input.Picker.Dropdown
                                     data={ currencies }
-                                    title={ "Valuta" }
+                                    title={ t("currency.text") }
                                     hiddenBackground={ true }
                                 />
                                 :

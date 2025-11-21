@@ -4,6 +4,7 @@ import Input from "../../../../../../../components/Input/Input.ts";
 import { MoreDataLoading } from "../../../../../../../components/loading/MoreDataLoading.tsx";
 import { PickerItemType } from "../../../../../../../components/Input/picker/PickerItem.tsx";
 import { Control } from "react-hook-form";
+import i18n from "../../../../../../../i18n/index.ts";
 
 type FuelUnitInputProps = {
     control: Control<any>
@@ -15,7 +16,7 @@ type FuelUnitInputProps = {
 export function FuelUnitInput({
     control,
     fieldName,
-    title = "Üzemanyag Mértékegység",
+    title = i18n.t("fuel.unit"),
     subtitle
 }: FuelUnitInputProps) {
     const { fuelUnitDao } = useDatabase();

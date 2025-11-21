@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Control } from "react-hook-form";
 import { useDatabase } from "../../../../../../../contexts/database/DatabaseContext.ts";
 import { PickerItemType } from "../../../../../../../components/Input/picker/PickerItem.tsx";
+import i18n from "../../../../../../../i18n/index.ts";
 
 type FuelTypeInputProps = {
     control: Control<any>
@@ -15,7 +16,7 @@ type FuelTypeInputProps = {
 export function FuelTypeInput({
     control,
     fieldName,
-    title = "Üzemanyag Típus",
+    title = i18n.t("fuel.type"),
     subtitle
 }: FuelTypeInputProps) {
     const { fuelTypeDao } = useDatabase();

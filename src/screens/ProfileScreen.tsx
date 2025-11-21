@@ -131,7 +131,7 @@ const ProfileScreen: React.FC = () => {
                     <Button.Text
                         iconLeft={ ICON_NAMES.settings }
                         iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Személyes adatok"
+                        text={ t("profile.personal_information") }
                         textStyle={ { textAlign: "left" } }
                         onPress={ openEditUserInformation }
                         backgroundColor="transparent"
@@ -154,7 +154,7 @@ const ProfileScreen: React.FC = () => {
                     <Button.Text
                         iconLeft={ ICON_NAMES.email }
                         iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Email csere"
+                        text={ t("profile.change_email") }
                         textStyle={ { textAlign: "left" } }
                         onPress={ openChangeEmail }
                         backgroundColor="transparent"
@@ -165,7 +165,7 @@ const ProfileScreen: React.FC = () => {
                     <Button.Text
                         iconLeft={ ICON_NAMES.password }
                         iconRight={ ICON_NAMES.rightArrowHead }
-                        text={ hasPassword ? "Jelszó csere" : "Jelszó hozzáadás" }
+                        text={ hasPassword ? t("profile.change_password") : t("profile.add_password") }
                         textStyle={ { textAlign: "left" } }
                         onPress={ hasPassword ? openResetPassword : openLinkPasswordToOAuth }
                         backgroundColor="transparent"
@@ -176,7 +176,7 @@ const ProfileScreen: React.FC = () => {
                     <Button.Text
                         iconLeft={ ICON_NAMES.trashCan }
                         iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Fiók törlése"
+                        text={ t("profile.delete_account") }
                         onPress={ deleteAccount }
                         textStyle={ { textAlign: "left" } }
                         backgroundColor="transparent"
@@ -187,7 +187,7 @@ const ProfileScreen: React.FC = () => {
                 </View>
                 <Button.Text
                     iconLeft={ ICON_NAMES.signOut }
-                    text="Kijelentkezés"
+                    text={ t("profile.sign_out") }
                     onPress={ signOut }
                     backgroundColor={ COLORS.googleRed }
                     textColor={ COLORS.black2 }

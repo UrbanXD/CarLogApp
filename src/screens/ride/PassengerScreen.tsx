@@ -10,8 +10,10 @@ import { PickerItemType } from "../../components/Input/picker/PickerItem.tsx";
 import { router } from "expo-router";
 import { DeleteExpenseToast } from "../../features/expense/presets/toasts/DeleteExpenseToast.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
+import { useTranslation } from "react-i18next";
 
 export function PassengerScreen() {
+    const { t } = useTranslation();
     const { passengerDao } = useDatabase();
     const { openModal, openToast } = useAlert();
     const user = useAppSelector(getUser);
@@ -21,7 +23,6 @@ export function PassengerScreen() {
     const paginator = useMemo(() => passengerDao.paginator(), []);
 
     const mapper = (item: PickerItemType, callback?: () => void): InfoTimelineItem => {
-        console.log(item.value, " fesas");
         return ({
             id: item.value,
             text: item.title,
@@ -47,9 +48,8 @@ export function PassengerScreen() {
     const openCreateForm = () => router.push("/ride/passenger/create");
 
     const onEdit = (id: string, callback?: () => void) => {
-        console.log(id);
         if(!id) return;
-        console.log(!!callback, "hi");
+
         callback?.();
         router.push({
             pathname: "/ride/passenger/edit/[id]",
@@ -75,9 +75,9 @@ export function PassengerScreen() {
 
     const onDelete = useCallback((id: string) => {
         openModal({
-            title: `Utas törlése`,
-            body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
-            acceptText: "Törlés",
+            title: t("passengers.modal.delete"),
+            body: t("modal.delete_message"),
+            acceptText: t("form_button.delete"),
             acceptAction: () => handleDelete(id)
         });
     }, [openToast, openModal]);

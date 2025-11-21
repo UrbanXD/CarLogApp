@@ -6,6 +6,7 @@ import { Control } from "react-hook-form";
 import { PickerItemType } from "../../../../../components/Input/picker/PickerItem.tsx";
 import useCars from "../../../hooks/useCars.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
+import i18n from "../../../../../i18n/index.ts";
 
 type CarPickerInputProps = {
     control: Control<any>
@@ -17,7 +18,7 @@ type CarPickerInputProps = {
 export function CarPickerInput({
     control,
     fieldName,
-    title = "Autó",
+    title = i18n.t("car.picker.title"),
     subtitle
 }: CarPickerInputProps) {
     const { cars } = useCars();

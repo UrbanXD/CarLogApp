@@ -3,6 +3,7 @@ import { ActivityIndicator, StyleSheet, Text, TextStyle, View, ViewStyle } from 
 import { Color } from "../../types/index.ts";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../constants/index.ts";
 import BounceDot from "./BounceDot.tsx";
+import i18n from "../../i18n/index.ts";
 
 type MoreDataLoadingProps = {
     text?: string
@@ -14,7 +15,7 @@ type MoreDataLoadingProps = {
 }
 
 export function MoreDataLoading({
-    text = "Adatok betöltése",
+    text = i18n.t("common.data_loading"),
     activityIndicatorSize = "small",
     activityIndicatorColor = COLORS.gray2,
     containerStyle,

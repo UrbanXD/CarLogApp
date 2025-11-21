@@ -17,10 +17,12 @@ import { loadCars } from "../../features/car/model/actions/loadCars.ts";
 import { resetCars } from "../../features/car/model/slice/index.ts";
 import { resetUser } from "../../features/user/model/slice/index.ts";
 import { getUserLocalCurrency } from "../../features/_shared/currency/utils/getUserLocalCurrency.ts";
+import { useTranslation } from "react-i18next";
 
 export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     children
 }) => {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const { openToast } = useAlert();
     const database = useDatabase();
@@ -85,7 +87,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             pathname: "bottomSheet/otpVerification",
             params: {
                 type: "signup",
-                title: "Email cím hitelesítés",
+                title: t("auth.email_verification"),
                 email,
                 handlerType: OtpVerificationHandlerType.SignUp
             }
@@ -186,7 +188,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 pathname: "bottomSheet/otpVerification",
                 params: {
                     type: "magiclink", // magiclink viselkedik ugy mint ha torlest verifyolna *mivel supabasebe nincs implementalva ez meg*
-                    title: "Fiók törlése",
+                    title: t("auth.delete_account"),
                     email: emailParams.email,
                     userId: session?.user.id,
                     handlerType: OtpVerificationHandlerType.UserDelete

@@ -2,6 +2,7 @@ import Button from "../Button.ts";
 import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
+import i18n from "../../../i18n/index.ts";
 
 type FormButtonsProps = {
     submit: () => Promise<void>
@@ -9,7 +10,11 @@ type FormButtonsProps = {
     submitText?: string
 }
 
-export function FormButtons({ submit, reset, submitText = "Mentés" }: FormButtonsProps) {
+export function FormButtons({
+    submit,
+    reset,
+    submitText = i18n.t("form_button.save")
+}: FormButtonsProps) {
     return (
         <Button.Row
             style={ { paddingTop: SEPARATOR_SIZES.lightSmall, justifyContent: !reset ? "flex-end" : "space-between" } }>

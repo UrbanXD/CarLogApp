@@ -7,16 +7,16 @@ import React from "react";
 
 type SelectedCarProps = {
     car: Car | null
-    placeholder?: string
-    userDontHaveCars?: boolean
-    userDontHaveCarsPlaceholder?: string
+    placeholder: string
+    userDontHaveCars: boolean
+    userDontHaveCarsPlaceholder: string
 }
 
 export function SelectedCar({
     car,
-    placeholder = "Nincs kiválasztott autója",
+    placeholder,
     userDontHaveCars,
-    userDontHaveCarsPlaceholder = "Önnek még nincs autója"
+    userDontHaveCarsPlaceholder
 }: SelectedCarProps) {
     return (
         <View style={ styles.container }>

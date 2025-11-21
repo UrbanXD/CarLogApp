@@ -24,6 +24,7 @@ import { Title } from "../../../components/Title.tsx";
 import { InfoContainer } from "../../../components/info/InfoContainer.tsx";
 import { FloatingDeleteButton } from "../../../components/Button/presets/FloatingDeleteButton.tsx";
 import { AmountText } from "../../../components/AmountText.tsx";
+import { useTranslation } from "react-i18next";
 
 export type RideLogViewProps = {
     id: string
@@ -31,6 +32,7 @@ export type RideLogViewProps = {
 
 export function RideLogView({ id }: RideLogViewProps) {
     const dispatch = useAppDispatch();
+    const { t } = useTranslation();
     const { rideLogDao, odometerLogDao } = useDatabase();
     const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
@@ -103,12 +105,16 @@ export function RideLogView({ id }: RideLogViewProps) {
     }, [rideLogDao]);
 
     const onDelete = useCallback(() => {
-        if(!rideLog) return openToast({ type: "warning", title: "Menet-napló bejegyzés nem található!" });
-
+        if(!rideLog) {
+            return openToast({
+                type: "warning",
+                title: `${ t("modal.not_found", { name: t("rides.log") }) }`
+            });
+        }
         openModal({
-            title: `Menet-napló bejegyzés törlése`,
-            body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
-            acceptText: "Törlés",
+            title: t("modal.log_delete_title", { name: t("rides.log") }),
+            body: t("modal.delete_message"),
+            acceptText: t("form_button.delete"),
             acceptAction: () => handleDelete(rideLog)
         });
     }, [rideLog, handleDelete, openToast, openModal]);
@@ -128,7 +134,7 @@ export function RideLogView({ id }: RideLogViewProps) {
         return (
             <ExpandableList
                 data={ rideLog.rideExpenses.map(rideExpenseToExpandableList) }
-                subtitle={ "Ár" }
+                subtitle={ t("expenses.price") }
                 totalAmount={ totalAmount }
                 expanded={ isExpenseListExpanded }
                 actionIcon={ ICON_NAMES.pencil }
@@ -182,28 +188,28 @@ export function RideLogView({ id }: RideLogViewProps) {
             },
             {
                 icon: ICON_NAMES.calendar,
-                title: "Indulási idő",
+                title: t("rides.start_time"),
                 content: dayjs(rideLog?.startTime).format("YYYY. MM. DD. HH:mm"),
                 onPress: () => onEdit(RideLogFormFieldsEnum.Time),
                 secondaryInfo: {
-                    title: "Érkezési idő",
+                    title: t("rides.end_time"),
                     content: dayjs(rideLog?.endTime).format("YYYY. MM. HH:mm")
                 }
             },
             {
                 icon: ICON_NAMES.odometer,
-                title: "Indulási kilométeróra-állás",
+                title: t("rides.start_odometer"),
                 content: `${ rideLog?.startOdometer.value } ${ rideLog?.startOdometer.unit.short }`,
                 row: false,
                 secondaryInfo: {
-                    title: "Érkezési kilométeróra-állás",
+                    title: t("rides.end_odometer"),
                     content: `${ rideLog?.endOdometer.value } ${ rideLog?.endOdometer.unit.short }`
                 },
                 onPress: () => onEdit(RideLogFormFieldsEnum.Odometer)
             },
             {
                 icon: ICON_NAMES.expenseItem,
-                title: "Kiadások",
+                title: t("ride.expenses"),
                 content: isExpenseListExpanded
                          ? " "
                          : (textStyle) =>
@@ -220,21 +226,21 @@ export function RideLogView({ id }: RideLogViewProps) {
             },
             {
                 icon: ICON_NAMES.mapMarkers,
-                title: "Útvonal",
+                title: t("rides.route"),
                 actionIcon: isPlaceListExpanded ? ICON_NAMES.upArrowHead : ICON_NAMES.downArrowHead,
                 onPress: () => setPlaceListExpanded(prevState => !prevState),
                 renderContent: renderRidePlaces
             },
             {
                 icon: ICON_NAMES.passengers,
-                title: "Utas lista",
+                title: t("rides.passengers"),
                 actionIcon: isPassengerListExpanded ? ICON_NAMES.upArrowHead : ICON_NAMES.downArrowHead,
                 onPress: () => setPassengerListExpanded(prevState => !prevState),
                 renderContent: renderRidePassengers
             },
             {
                 icon: ICON_NAMES.note,
-                content: rideLog?.note ?? "Nincs megjegyzés",
+                content: rideLog?.note ?? t("common.no_notes"),
                 contentTextStyle: !rideLog?.note && { color: COLORS.gray2 },
                 onPress: () => onEdit(RideLogFormFieldsEnum.Note)
             }
@@ -255,7 +261,7 @@ export function RideLogView({ id }: RideLogViewProps) {
         <>
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
                 <Title
-                    title={ "Út" }
+                    title={ t("rides.item") }
                     dividerStyle={ {
                         backgroundColor: COLORS.ride,
                         marginBottom: SEPARATOR_SIZES.normal

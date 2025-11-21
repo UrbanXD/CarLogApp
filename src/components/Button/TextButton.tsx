@@ -14,6 +14,7 @@ import Icon from "../Icon";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
 import { Color, ImageSource } from "../../types/index.ts";
 import { debounce } from "es-toolkit";
+import { useTranslation } from "react-i18next";
 
 interface TextButtonProps {
     text?: string;
@@ -54,6 +55,8 @@ const TextButton: React.FC<TextButtonProps> = ({
     debounceMs = 350,
     onPress
 }) => {
+    const { t } = useTranslation();
+
     const [isLoading, setIsLoading] = useState(false);
 
     const styles = useButtonStyles(
@@ -119,7 +122,7 @@ const TextButton: React.FC<TextButtonProps> = ({
                       </View>
                    }
                   <Text numberOfLines={ 2 } style={ [styles.buttonText, textStyle] }>
-                      { text }
+                      { t(text) }
                   </Text>
                    {
                        (iconLeft || iconRight) &&

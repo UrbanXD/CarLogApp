@@ -11,12 +11,14 @@ import { Car } from "../../car/schemas/carSchema.ts";
 import { useExpenseTimelineFilter } from "../hooks/useExpenseTimelineFilter.ts";
 import { SelectExpenseTableRow } from "../model/mapper/expenseMapper.ts";
 import { TimelineItemType } from "../../../components/timelineView/item/TimelineItem.tsx";
+import { useTranslation } from "react-i18next";
 
 type ExpenseTimelineProps = {
     car: Car
 };
 
 export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
+    const { t } = useTranslation();
     const { expenseDao } = useDatabase();
     const { mapper } = useExpenseTimelineItem();
     const paginator = useMemo(
@@ -51,7 +53,7 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
     } = useTimelinePaginator<SelectExpenseTableRow, Expense, TimelineItemType>({
         paginator,
         mapper,
-        cursorOrderButtons: [{ field: "date", title: "Dátum" }, { field: "amount", title: "Ár" }]
+        cursorOrderButtons: [{ field: "date", title: t("date.text") }, { field: "amount", title: t("expenses.price") }]
     });
     const { filterButtons } = useExpenseTimelineFilter({ timelineFilterManagement, car });
 
@@ -60,8 +62,8 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
     return (
         <View style={ styles.container }>
             <Title
-                title={ "Pénzügyek" }
-                subtitle={ `Az alábbi pénzügyi naplóban különböző kiadásai szerepelnek mely a kiválasztott autójához tartoznak.` }
+                title={ t("expenses.title") }
+                subtitle={ t("expenses.description") }
             />
             <TimelineView
                 ref={ ref }

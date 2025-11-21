@@ -10,27 +10,14 @@ import { TimelineItem } from "../../../components/timelineView/item/TimelineItem
 import { MoreDataLoading } from "../../../components/loading/MoreDataLoading.tsx";
 import Link from "../../../components/Link.tsx";
 import dayjs from "dayjs";
-
-type RideType = {
-    carUID: string
-    carOwnerUID: string
-    dateTitle: string
-    dateSubtitle: string
-    time: string
-    locations: Array<{
-        city: string,
-        place?: string
-    }>
-    client: string,
-    passengerCount?: number,
-    comment?: string
-}
+import { useTranslation } from "react-i18next";
 
 type UpcomingRidesProps = {
     car: Car | null
 }
 
 export function UpcomingRides({ car }: UpcomingRidesProps) {
+    const { t } = useTranslation();
     const { rideLogDao } = useDatabase();
     const { mapper } = useRideLogTimelineItem();
 
@@ -65,8 +52,8 @@ export function UpcomingRides({ car }: UpcomingRidesProps) {
         return (
             <TimelineItem
                 id="not-found"
-                milestone="Nem található"
-                title={ "Hozzalétre a következő útját!" }
+                milestone={ t("rides.not_found") }
+                title={ t("rides.not_found_upcoming_rides_action_call") }
                 onPress={ openCreateRideLogBottomSheet }
                 color={ COLORS.gray2 }
                 isFirst
@@ -82,10 +69,10 @@ export function UpcomingRides({ car }: UpcomingRidesProps) {
         <View style={ GLOBAL_STYLE.contentContainer }>
             <View>
                 <Text style={ GLOBAL_STYLE.containerTitleText }>
-                    Közelgő utak
+                    { t("rides.upcoming") }
                 </Text>
                 <Text style={ GLOBAL_STYLE.containerText }>
-                    { today.format("YYYY. MM. DD. - dddd") } (ma)
+                    { today.format("YYYY. MM. DD. - dddd") } ({ t("date.today") })
                 </Text>
             </View>
             {
@@ -98,7 +85,7 @@ export function UpcomingRides({ car }: UpcomingRidesProps) {
                 : renderEmptyComponent()
             }
             <Link
-                text="További utak"
+                text={ t("rides.more") }
                 icon={ ICON_NAMES.rightArrowHead }
                 onPress={ goToRideLogTab }
             />

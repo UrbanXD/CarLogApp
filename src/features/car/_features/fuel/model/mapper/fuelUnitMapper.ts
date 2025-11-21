@@ -2,6 +2,7 @@ import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts
 import { FuelUnitTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { FuelUnit, fuelUnitSchema } from "../../schemas/fuelUnitSchema.ts";
 import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
+import i18n from "../../../../../../i18n/index.ts";
 
 export class FuelUnitMapper extends AbstractMapper<FuelUnitTableRow, FuelUnit> {
     constructor() {
@@ -30,7 +31,7 @@ export class FuelUnitMapper extends AbstractMapper<FuelUnitTableRow, FuelUnit> {
     dtoToPicker(dtos: Array<FuelUnit>): Promise<Array<PickerItemType>> {
         return dtos.map(dto => ({
             value: dto.id.toString(),
-            title: `${ dto.locale } (${ dto.short })`
+            title: `${ i18n.t(`fuel.unit_types.${ dto.key }`) } (${ dto.short })`
         }));
     }
 }

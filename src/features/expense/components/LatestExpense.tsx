@@ -9,12 +9,14 @@ import { useExpenseTimelineItem } from "../hooks/useExepenseTimelineItem.tsx";
 import { TimelineItem } from "../../../components/timelineView/item/TimelineItem.tsx";
 import { MoreDataLoading } from "../../../components/loading/MoreDataLoading.tsx";
 import { Car } from "../../car/schemas/carSchema.ts";
+import { useTranslation } from "react-i18next";
 
 type LatestExpenseProps = {
     car?: Car | null
 }
 
 export function LatestExpenses({ car }: LatestExpenseProps) {
+    const { t } = useTranslation();
     const { expenseDao } = useDatabase();
     const { mapper } = useExpenseTimelineItem();
 
@@ -48,8 +50,8 @@ export function LatestExpenses({ car }: LatestExpenseProps) {
         return (
             <TimelineItem
                 id="not-found"
-                milestone="Nem található"
-                title={ "Hozzalétre első kiadását ide kattintva" }
+                milestone={ t("expenses.not_found") }
+                title={ t("expenses.not_found_action_call") }
                 onPress={ openCreateExpenseBottomSheet }
                 color={ COLORS.gray2 }
                 isFirst
@@ -64,7 +66,7 @@ export function LatestExpenses({ car }: LatestExpenseProps) {
     return (
         <View style={ GLOBAL_STYLE.contentContainer }>
             <Text style={ GLOBAL_STYLE.containerTitleText }>
-                Legutóbbi kiadások
+                { t("expenses.latest") }
             </Text>
             {
                 isLoading
@@ -76,7 +78,7 @@ export function LatestExpenses({ car }: LatestExpenseProps) {
                 : renderEmptyComponent()
             }
             <Link
-                text="További kiadások"
+                text={ t("expenses.more") }
                 icon={ ICON_NAMES.rightArrowHead }
                 onPress={ goToExpensesTab }
             />

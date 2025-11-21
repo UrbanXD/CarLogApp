@@ -6,12 +6,15 @@ import utc from "dayjs/plugin/utc";
 import { router } from "expo-router";
 import { ExpenseTypeEnum } from "../model/enums/ExpenseTypeEnum.ts";
 import { AmountText } from "../../../components/AmountText.tsx";
+import { useTranslation } from "react-i18next";
 
 dayjs.extend(utc);
 
 export function useExpenseTimelineItem() {
+    const { t } = useTranslation();
+
     const mapper = useCallback((expense: Expense, callback?: () => void): TimelineItemType => {
-        const routerPathTitle = "Kiadás";
+        const routerPathTitle = t("expenses.item_title");
         let routerPathName = "/expense/[id]";
         let itemId = expense.id;
 
@@ -47,7 +50,7 @@ export function useExpenseTimelineItem() {
         return {
             id: expense.id,
             milestone: dayjs(expense.date).format("YYYY. MM DD. HH:mm"),
-            title: expense.type.locale,
+            title: t(`expenses.types.${ expense.type.key }`),
             icon: expense.type.icon,
             color: expense.type.primaryColor ?? undefined,
             iconColor: expense.type.secondaryColor ?? undefined,

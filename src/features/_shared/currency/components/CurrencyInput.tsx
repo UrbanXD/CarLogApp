@@ -4,6 +4,7 @@ import { PickerItemType } from "../../../../components/Input/picker/PickerItem.t
 import Input from "../../../../components/Input/Input.ts";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 import { Control } from "react-hook-form";
+import i18n from "../../../../i18n/index.ts";
 
 type CurrencyInputProps = {
     control: Control<any>
@@ -15,7 +16,7 @@ type CurrencyInputProps = {
 export function CurrencyInput({
     control,
     fieldName,
-    title = "Valuta",
+    title = i18n.t("currency.text"),
     subtitle
 }: CurrencyInputProps) {
     const { currencyDao } = useDatabase();

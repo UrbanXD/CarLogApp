@@ -33,7 +33,7 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
     const amountFieldExchangeText = useCallback((exchangedAmount: string) => {
         return (
             <>
-                Az autó alapvalutájában számolt összeg{ " " }
+                { `${ t("currency.in_car_currency") } ` }
                 <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
             </>
         );
@@ -65,7 +65,7 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
                 <Input.Field
                     control={ control }
                     fieldName="date"
-                    fieldNameText="Dátum"
+                    fieldNameText={ t("date.text") }
                 >
                     <InputDatePicker/>
                 </Input.Field>

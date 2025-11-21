@@ -4,6 +4,7 @@ import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../../consta
 import Input from "../../../../../../../components/Input/Input.ts";
 import { Control, UseFormSetValue, useWatch } from "react-hook-form";
 import { formTheme } from "../../../../../../../ui/form/constants/theme.ts";
+import i18n from "../../../../../../../i18n/index.ts";
 
 type FuelInputProps = {
     control: Control<any>
@@ -20,7 +21,7 @@ export function FuelInput({
     control,
     setValue,
     fieldName,
-    title = "Üzemanyagóra",
+    title = i18n.t("fuel.tank"),
     subtitle,
     capacity,
     fuelTypeText,
@@ -96,7 +97,7 @@ export function FuelInput({
                         styles.actionContainer.stepperButtons.fullTankButton.text
                     ] }
                     >
-                        Tele tank
+                        { t("fuel.full_tank") }
                     </Text>
                 </Pressable>
             </View>

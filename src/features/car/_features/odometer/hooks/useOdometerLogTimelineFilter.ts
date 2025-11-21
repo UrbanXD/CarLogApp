@@ -6,6 +6,8 @@ import { OdometerLogType } from "../schemas/odometerLogTypeSchema.ts";
 import { Car } from "../../../schemas/carSchema.ts";
 import { SelectOdometerLogTableRow } from "../model/dao/OdometerLogDao.ts";
 import { TimelineFilterManagement } from "../../../../../hooks/useTimelinePaginator.ts";
+import { useTranslation } from "react-i18next";
+import i18n from "../../../../../i18n/index.ts";
 
 const TYPES_FILTER_KEY = "type_filter";
 const TYPES_FILTER_FIELD_NAME = "type_id";
@@ -25,7 +27,9 @@ export function useOdometerLogTimelineFilter({
     },
     car
 }: UseOdometerLogTimelineFilterProps) {
+    const { t } = useTranslation();
     const { odometerLogTypeDao } = useDatabase();
+
     const [types, setTypes] = useState<Array<OdometerLogType>>([]);
     const [selectedTypesId, setSelectedTypesId] = useState<Array<OdometerLogType["id"]>>([]);
 
@@ -39,13 +43,12 @@ export function useOdometerLogTimelineFilter({
                 if(a.id === OdometerLogTypeEnum.SIMPLE) return -1;
                 if(b.id === OdometerLogTypeEnum.SIMPLE) return 1;
 
-                return a.locale.localeCompare(b.locale);
+                return t(`fuel.types.${ a.key }`).localeCompare(t(`fuel.types.${ a.key }`));
             });
-
 
             setTypes(sorted);
         })();
-    }, []);
+    }, [i18n.language]);
 
     useEffect(() => {
         if(!filters.has(TYPES_FILTER_KEY)) setSelectedTypesId([]);
@@ -81,7 +84,7 @@ export function useOdometerLogTimelineFilter({
         };
 
         return {
-            title: type.locale,
+            title: t(`odometer.types.${ type.key }`),
             active,
             activeColor: type?.primaryColor ?? undefined,
             onPress
@@ -89,7 +92,7 @@ export function useOdometerLogTimelineFilter({
     });
 
     filterButtons.unshift({
-        title: "Mind",
+        title: t("common.filters.all"),
         active: selectedTypesId.length === 0,
         onPress: () => clearFilters(TYPES_FILTER_KEY)
     });

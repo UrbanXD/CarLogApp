@@ -4,6 +4,7 @@ import { OdometerUnit } from "../../../schemas/odometerUnitSchema.ts";
 import { Control } from "react-hook-form";
 import Input from "../../../../../../../components/Input/Input.ts";
 import { MoreDataLoading } from "../../../../../../../components/loading/MoreDataLoading.tsx";
+import i18n from "../../../../../../../i18n/index.ts";
 
 type OdometerUnitInputProps = {
     control: Control<any>
@@ -15,7 +16,7 @@ type OdometerUnitInputProps = {
 export function OdometerUnitInput({
     control,
     fieldName,
-    title = "Kilométeróra Mértékegység",
+    title = i18n.t("odometer.unit"),
     subtitle
 }: OdometerUnitInputProps) {
     const { odometerUnitDao } = useDatabase();

@@ -14,12 +14,14 @@ import { YearPicker } from "../../../../../components/Input/_presets/YearPicker.
 import { sql } from "@powersync/kysely-driver";
 import { Title } from "../../../../../components/Title.tsx";
 import { TimelineItemType } from "../../../../../components/timelineView/item/TimelineItem.tsx";
+import { useTranslation } from "react-i18next";
 
 type ServiceLogTimelineProps = {
     car: Car
 };
 
 export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
+    const { t } = useTranslation();
     const { serviceLogDao } = useDatabase();
     const { mapper } = useServiceLogTimelineItem();
     const paginator = useMemo(
@@ -55,8 +57,8 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
         paginator,
         mapper,
         cursorOrderButtons: [
-            { table: EXPENSE_TABLE, field: "date", title: "Dátum" },
-            { table: EXPENSE_TABLE, field: "amount", title: "Ár" }
+            { table: EXPENSE_TABLE, field: "date", title: t("date.text") },
+            { table: EXPENSE_TABLE, field: "amount", title: t("expenses.price") }
         ]
     });
     const { filterButtons } = useServiceLogTimelineFilter({ timelineFilterManagement, car });
@@ -75,13 +77,13 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
         <View style={ styles.container }>
             <View style={ styles.headerContainer }>
                 <Title
-                    title={ "Szervízkönyv" }
+                    title={ t("service.title") }
                     containerStyle={ styles.headerContainer.titleContainer }
                 />
                 <YearPicker
                     containerStyle={ styles.headerContainer.yearPicker }
                     textInputStyle={ styles.headerContainer.yearPicker.label }
-                    inputPlaceholder={ "Év" }
+                    inputPlaceholder={ t("date.year") }
                     hiddenBackground={ true }
                     setValue={ setYearFilter }
                 />
