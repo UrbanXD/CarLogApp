@@ -5,6 +5,7 @@ import { AuthApiError, EmailOtpType } from "@supabase/supabase-js";
 import Divider from "../../../../components/Divider.tsx";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { useOtp } from "../../hooks/useOtp.ts";
+import { Trans } from "react-i18next";
 
 export type HandleVerificationOtpType = (errorCode?: string) => (Promise<void> | void)
 
@@ -29,8 +30,14 @@ const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
 
     const defaultSubtitle = () =>
         <Text style={ styles.subtitleText }>
-            Ehhez használja azt a kódódot amely a(z) <Text style={ styles.subtitleEmailText }>{ email }</Text> címre
-            került kiküldésre.
+            <Trans
+                i18nKey="auth.otp_verification.use_otp_code_for_verification"
+                values={ { email } }
+                parent={ Text }
+                components={ {
+                    email: <Text style={ styles.subtitleEmailText }/>
+                } }
+            />
         </Text>;
 
     const onSubmit = async (token: string) => {
@@ -71,9 +78,10 @@ const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
                 color={ COLORS.gray3 }
             />
             <Text style={ styles.didntReceivedCodeText }>
-                Nem érkezett meg a kód az adott email címére, esetleg a kód már lejárt?
+                { t("auth.otp_verification.expired_or_didnt_received") }
                 { "\n" }
-                <Text style={ styles.didntReceivedCodeLinkText } onPress={ resend }>Újra küldés</Text>
+                <Text style={ styles.didntReceivedCodeLinkText }
+                      onPress={ resend }>{ t("auth.otp_verification.resend") }</Text>
             </Text>
         </View>
     );

@@ -58,11 +58,16 @@
       "warning": "Warning",
       "error": "Error"
     },
+    "default_error": "An unexpected error occurred!",
+    "picker_disabled": {
+      "default_body": "Operation not possible! Something is missing."
+    },
     "not_found": {
       "body": "{{name}} not found"
     },
     "invalid_form": {
-      "body": "Invalid form value"
+      "title": "Invalid data",
+      "body": "Please check the provided information!"
     },
     "create": {
       "success": {
@@ -90,10 +95,10 @@
     },
     "array_input": {
       "limit": {
-        "body": "Maximum reached, cannot add more items"
+        "body": "Upper limit reached, no more items can be added"
       },
       "error": {
-        "body": "Unexpected error occurred"
+        "body": "An unexpected error occurred"
       }
     }
   },
@@ -113,6 +118,16 @@
     "log_delete_title": "Delete log entry {{name}}",
     "not_found": "{{name}} not found!",
     "log_not_found": "Log entry not found!"
+  },
+  "action_menu": {
+    "create_car": "Create car",
+    "create_service": "Service",
+    "create_fuel_log": "Refueling",
+    "create_expense": "Other expenses",
+    "create_ride": "Ride planning",
+    "create_odometer_log": "Update odometer",
+    "places": "Places",
+    "passengers": "Passengers"
   },
   "auth": {
     "description": "Manage your cars with us",

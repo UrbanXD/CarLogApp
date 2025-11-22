@@ -12,15 +12,16 @@ import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
 import { LinearGradient } from "expo-linear-gradient";
 import FloatingActionMenu from "../../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
-import { ACTIONS } from "../../../ui/floatingActionMenu/constants/index.ts";
+import { useActions } from "../../../ui/floatingActionMenu/hooks/useActions.ts";
 
 function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
+    const { actions } = useActions();
     const styles = useStyles(insets.bottom);
 
     return (
         <>
             <FloatingActionMenu
-                action={ ACTIONS }
+                action={ actions }
                 containerStyle={ { bottom: SIMPLE_TABBAR_HEIGHT + SEPARATOR_SIZES.small + insets.bottom } }
             />
             <View style={ [styles.container] }>

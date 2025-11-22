@@ -87,7 +87,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             pathname: "bottomSheet/otpVerification",
             params: {
                 type: "signup",
-                title: t("auth.email_verification"),
+                title: t("auth.otp_verification.email"),
                 email,
                 handlerType: OtpVerificationHandlerType.SignUp
             }
@@ -188,7 +188,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 pathname: "bottomSheet/otpVerification",
                 params: {
                     type: "magiclink", // magiclink viselkedik ugy mint ha torlest verifyolna *mivel supabasebe nincs implementalva ez meg*
-                    title: t("auth.delete_account"),
+                    title: t("auth.otp_verification.delete_account"),
                     email: emailParams.email,
                     userId: session?.user.id,
                     handlerType: OtpVerificationHandlerType.UserDelete

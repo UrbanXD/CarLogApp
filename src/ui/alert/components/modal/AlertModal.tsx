@@ -30,7 +30,7 @@ const AlertModal: React.FC<AlertModalProps> = ({
 }) => {
     const { t } = useTranslation();
 
-    const iconSize = hp(11.5);
+    const iconSize = hp(10);
 
     const styles = useStyles(iconSize);
 
@@ -67,12 +67,10 @@ const AlertModal: React.FC<AlertModalProps> = ({
                         text={ acceptText ?? t("modal.accept") }
                         fontSize={ FONT_SIZES.p2 }
                         backgroundColor={ color }
-                        height={ hp(5.5) }
                         onPress={ accept }
                     />
                     <Button.Text
                         text={ dismissText ?? t("modal.dismiss") }
-                        height={ hp(5.5) }
                         backgroundColor={ "transparent" }
                         fontSize={ FONT_SIZES.p2 }
                         textColor={ color }

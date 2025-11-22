@@ -13,16 +13,15 @@ import CarlogTitle from "../components/CarlogTitle.tsx";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 
+const ENTERING_ANIMATION_DURATION = 300;
+
 const AuthScreen: React.FC = () => {
     const { t } = useTranslation();
     const { top, bottom } = useSafeAreaInsets();
     const { authenticated, notVerifiedUser, openAccountVerification } = useAuth();
 
-    const ENTERING_ANIMATION_DURATION = 300;
-
     const openSignUp = () => router.push("bottomSheet/signUp");
     const openSignIn = () => router.push("bottomSheet/signIn");
-
 
     const openVerification = useCallback(() => {
         if(notVerifiedUser && notVerifiedUser.email) openAccountVerification(notVerifiedUser.email);
@@ -65,7 +64,7 @@ const AuthScreen: React.FC = () => {
                     style={ styles.actionContainer }
                 >
                     <Button.Text
-                        text={ t("auth.sign_up") }
+                        text={ t("auth.sign_up.title") }
                         onPress={ openSignUp }
                     />
                     <Text style={ styles.underButtonText }>

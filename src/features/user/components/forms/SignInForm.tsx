@@ -8,6 +8,7 @@ import Form from "../../../../components/Form/Form.tsx";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../../../contexts/auth/AuthContext.ts";
 import { SignInRequest, useSignInFormProps } from "../../schemas/form/signInRequest.ts";
+import { useTranslation } from "react-i18next";
 
 const SignInForm: React.FC = () => {
     const {
@@ -15,6 +16,7 @@ const SignInForm: React.FC = () => {
         handleSubmit
     } = useForm<SignInRequest>(useSignInFormProps);
 
+    const { t } = useTranslation();
     const { signIn } = useAuth();
     const submitHandler = handleSubmit(signIn);
 
@@ -23,22 +25,22 @@ const SignInForm: React.FC = () => {
             <Input.Field
                 control={ control }
                 fieldName="email"
-                fieldNameText="Email cím"
+                fieldNameText={ t("auth.user.email") }
             >
                 <Input.Text
                     icon={ ICON_NAMES.email }
-                    placeholder="Email"
+                    placeholder={ t("auth.user.email_placeholder") }
                     keyboardType="email-address"
                 />
             </Input.Field>
             <Input.Field
                 control={ control }
                 fieldName="password"
-                fieldNameText="Jelszó"
+                fieldNameText={ t("auth.user.password") }
             >
                 <Input.Text
                     icon={ ICON_NAMES.password }
-                    placeholder="Jelszó"
+                    placeholder={ t("auth.user.password_placeholder") }
                     secure
                 />
             </Input.Field>

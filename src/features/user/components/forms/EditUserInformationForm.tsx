@@ -6,7 +6,7 @@ import { NameStep } from "./steps/index.ts";
 import { router } from "expo-router";
 import { getToastMessage } from "../../../../ui/alert/utils/getToastMessage.ts";
 import { editUserInformation } from "../../model/actions/editUserInformation.ts";
-import { ChangeNameToast } from "../../presets/toast/index.ts";
+import { ChangePersonalInformationToast } from "../../presets/toast/index.ts";
 import { useAppDispatch } from "../../../../hooks/index.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import Form from "../../../../components/Form/Form.tsx";
@@ -32,10 +32,10 @@ export function EditUserInformationForm({ user }: EditUserInformationFormProps) 
         try {
             await dispatch(editUserInformation({ database, request }));
 
-            openToast(ChangeNameToast.success());
+            openToast(ChangePersonalInformationToast.success());
             router.dismissTo("(profile)/user");
         } catch(error) {
-            openToast(getToastMessage({ messages: ChangeNameToast, error }));
+            openToast(getToastMessage({ messages: ChangePersonalInformationToast, error }));
         }
     });
 

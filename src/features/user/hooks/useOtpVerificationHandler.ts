@@ -6,9 +6,11 @@ import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 import { OtpVerificationHandlerType } from "../../../app/bottomSheet/otpVerification.tsx";
 import { useAuth } from "../../../contexts/auth/AuthContext.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
+import { useTranslation } from "react-i18next";
 
 
 export const useOtpVerificationHandler = () => {
+    const { t } = useTranslation();
     const { supabaseConnector } = useDatabase();
     const { openToast } = useAlert();
     const { signOut } = useAuth();
@@ -60,7 +62,7 @@ export const useOtpVerificationHandler = () => {
                 pathname: "bottomSheet/otpVerification",
                 params: {
                     type: "email_change",
-                    title: "Új email cím hitelesítés",
+                    title: t("auth.otp_verification.new_email"),
                     email,
                     handlerType: OtpVerificationHandlerType.NewEmailChange
                 }

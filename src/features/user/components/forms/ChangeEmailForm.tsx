@@ -10,10 +10,12 @@ import { ChangeEmailRequest, useChangeEmailFormProps } from "../../schemas/form/
 import Form from "../../../../components/Form/Form.tsx";
 import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
+import { useTranslation } from "react-i18next";
 
 export type ChangeEmailFormProps = { user: UserAccount }
 
 export function ChangeEmailForm({ user }: ChangeEmailFormProps) {
+    const { t } = useTranslation();
     const { supabaseConnector } = useDatabase();
     const { openToast } = useAlert();
 
@@ -30,7 +32,7 @@ export function ChangeEmailForm({ user }: ChangeEmailFormProps) {
                 pathname: "bottomSheet/otpVerification",
                 params: {
                     type: "email_change",
-                    title: "Email módosítási kérelem hitelesítés",
+                    title: t("auth.otp_verification.email_change"),
                     email: user.email, //current email
                     newEmail: request.email,
                     handlerType: OtpVerificationHandlerType.CurrentEmailChange

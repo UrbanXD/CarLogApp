@@ -14,6 +14,8 @@ export const useAlert = () => {
     const { t } = useTranslation();
 
     const openToast = (toast: Partial<Toast>) => {
+        if(!toast) return;
+
         dispatch(
             openToastAction({
                 id: Date.now().toString(),
@@ -30,6 +32,8 @@ export const useAlert = () => {
     };
 
     const openModal = (modal: Partial<Modal>) => {
+        if(!modal) return;
+
         dispatch(
             openModalAction({
                 color: COLORS.fuelYellow,

@@ -131,7 +131,7 @@ const InputOTP: React.FC<InputOTPProps> = ({
                 />
             </View>
             <Button.Text
-                text={ t("otp_next") }
+                text={ t("form_button.otp_next") }
                 width={ wp(75) }
                 disabled={ code.length !== numberOfDigits }
                 onPress={ () => onSubmit(code) }

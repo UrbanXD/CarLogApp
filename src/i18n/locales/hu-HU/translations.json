@@ -58,6 +58,7 @@
       "warning": "Figyelmeztetés",
       "error": "Hiba"
     },
+    "default_error": "Váratlan hiba lépett fel!",
     "picker_disabled": {
       "default_body": "Nem lehetséges művelet! Valami kimaradt."
     },
@@ -65,7 +66,8 @@
       "body": "{{name}} nem található"
     },
     "invalid_form": {
-      "body": "Hibas form value"
+      "title": "Érvénytelen adatok",
+      "body": "Kérjük, ellenőrizze a megadott adatokat!"
     },
     "create": {
       "success": {
@@ -117,16 +119,148 @@
     "not_found": "{{name}} nem található!",
     "log_not_found": "Napló bejegyzés nem található!"
   },
+  "action_menu": {
+    "create_car": "Autó létrehozás",
+    "create_service": "Szervizelés",
+    "create_fuel_log": "Tankolás",
+    "create_expense": "Egyéb kiadások",
+    "create_ride": "Út tervezés",
+    "create_odometer_log": "Kilóméteróra-állás frissítés",
+    "places": "Helyek",
+    "passengers": "Utasok"
+  },
   "auth": {
     "description": "Kezelje nálunk autóit",
-    "sign_up": "Regisztráció",
-    "sign_in": "Bejelentkezés",
     "forgot_your_password": "Elfelejtette jelszavát?",
     "already_have_account": "Már rendelkezel felhasználóval?",
     "sign_in_now": "Jelentkezz be",
     "resume_verification": "Hitelesítés\nfolytatása",
-    "email_verification": "Email cím hitelesítés",
-    "delete_account": "Fiók törlése"
+    "sign_in": "Bejelentkezés",
+    "sign_up": {
+      "title": "Regisztráció",
+      "steps": {
+        "personal_information": "Személyes adatok",
+        "password": "$t(auth.user.password)"
+      }
+    },
+    "otp_verification": {
+      "use_otp_code_for_verification": "Ehhez használja azt a kódot amely a(z) <email>{{email}}</email> címre került kiküldésre.",
+      "expired_or_didnt_received": "Nem érkezett meg a kód az adott email címére, esetleg a kód már lejárt?",
+      "resend": "Újra küldés",
+      "email": "Email cím hitelesítés",
+      "new_email": "Új email cím hitelesítése",
+      "email_change": "Email módosítási kérelem hitelesítés",
+      "password_reset": "Jelszó módosítása",
+      "delete_account": "Fiók törlése"
+    },
+    "user": {
+      "firstname": "Keresztnév",
+      "firstname_placeholder": "János",
+      "lastname": "Vezetéknév",
+      "lastname_placeholder": "Kovács",
+      "profile_picture": "Profilkép",
+      "email": "Email cím",
+      "email_placeholder": "carlog@gmail.com",
+      "password": "Jelszó",
+      "password_placeholder": "Jelszó",
+      "repeat_password": "Jelszó újra",
+      "repeat_password_placeholder": "Jelszó újra"
+    },
+    "toast": {
+      "otp": {
+        "expired": {
+          "body": "Az Ön által megadott kód érvénytelen, esetleg lejárt."
+        },
+        "over_email_send_rate_limit": {
+          "title": "Várjon egy kicsit!",
+          "body": "Túl sok email kérelem rövid időn belül, kérjük várjon {{seconds}} másodpercet."
+        }
+      },
+      "google": {
+        "auth_flow_cancelled": {
+          "body": "Megszakadt a Google autentikáció folyamata!"
+        },
+        "already_in_progress": {
+          "body": "Már folyamatban van egy Google autentikáció, várjon egy kicsit!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépetett fel a Google autentikáció során!"
+        }
+      },
+      "sign_in": {
+        "success": {
+          "title": "Sikeres bejelentkezés!"
+        },
+        "invalid_credentials": {
+          "body": "Helytelen email cím és/vagy jelszó!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel a bejelentkezés során!"
+        }
+      },
+      "sign_up": {
+        "success": {
+          "title": "Sikeres regisztráció!"
+        },
+        "email_exists": {
+          "body": "Az Ön által megadott email címmel már regisztráltak korábban!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel a regisztráció során!"
+        },
+        "otp_error": {
+          "body": "Váratlan hiba lépett fel a fiók hitelesítése során!"
+        }
+      },
+      "sign_out": {
+        "success": {
+          "title": "Sikeres kijelentkezés!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel a kijelentkezés során!"
+        }
+      },
+      "reset_password": {
+        "success": {
+          "title": "Jelszó módosítva!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel a jelszó módosítása közben!"
+        }
+      },
+      "add_password": {
+        "success": {
+          "title": "Sikeres jelszó hozzárendelés!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel a jelszó hozzárendelés során!"
+        }
+      },
+      "change_email": {
+        "success": {
+          "title": "Email cím módosítva!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel az email cím módosítása közben!"
+        }
+      },
+      "change_personal_information": {
+        "success": {
+          "title": "Személyes adatok módosítva"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel a személyes adatok módosítása során!"
+        }
+      },
+      "delete_user": {
+        "success": {
+          "title": "Felhasználói fiók törölve!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel a felhasználói fiók törlése közben!"
+        }
+      }
+    }
   },
   "log": {
     "title": "Naplóbejegyzés",

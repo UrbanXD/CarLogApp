@@ -6,7 +6,7 @@ import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { useAppDispatch } from "../../../../hooks/index.ts";
 import { UserAccount } from "../../schemas/userSchema.ts";
-import { ChangeNameToast } from "../../presets/toast/index.ts";
+import { ChangePersonalInformationToast } from "../../presets/toast/index.ts";
 import { router } from "expo-router";
 import { getToastMessage } from "../../../../ui/alert/utils/getToastMessage.ts";
 import { AvatarStep } from "./steps/AvatarStep.tsx";
@@ -30,10 +30,10 @@ export function EditUserAvatarForm({ user }: EditUserAvatarFormProps) {
         try {
             await dispatch(editUserAvatar({ database, request: { ...request } }));
 
-            openToast(ChangeNameToast.success());
+            openToast(ChangePersonalInformationToast.success());
             router.dismissTo("(profile)/user");
         } catch(error) {
-            openToast(getToastMessage({ messages: ChangeNameToast, error }));
+            openToast(getToastMessage({ messages: ChangePersonalInformationToast, error }));
         }
     });
 

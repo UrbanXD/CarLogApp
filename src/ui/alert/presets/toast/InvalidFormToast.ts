@@ -4,6 +4,7 @@ import i18n from "../../../../i18n/index.ts";
 const warning: ToastMessage = () => {
     return {
         type: "warning",
+        title: i18n.t("toast.invalid_form.title"),
         body: i18n.t("toast.invalid_form.body")
     };
 };

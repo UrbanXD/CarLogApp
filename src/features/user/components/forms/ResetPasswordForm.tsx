@@ -11,10 +11,12 @@ import Form from "../../../../components/Form/Form.tsx";
 import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 import React from "react";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
+import { useTranslation } from "react-i18next";
 
 export type ResetPasswordFormProps = { user: UserAccount }
 
 export function ResetPasswordForm({ user }: ResetPasswordFormProps) {
+    const { t } = useTranslation();
     const { supabaseConnector } = useDatabase();
     const { openToast } = useAlert();
 
@@ -31,7 +33,7 @@ export function ResetPasswordForm({ user }: ResetPasswordFormProps) {
                 pathname: "bottomSheet/otpVerification",
                 params: {
                     type: "recovery",
-                    title: "Jelszó módosítása",
+                    title: t("auth.otp_verification.password_reset"),
                     newPassword: request.password,
                     email: user.email,
                     handlerType: OtpVerificationHandlerType.PasswordReset

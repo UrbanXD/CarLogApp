@@ -12,9 +12,9 @@ import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, SEPARATOR_SIZES } from "../../..
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { FloatingActionButton } from "./FloatingActionButton.tsx";
 import { AnimatedPressable, AnimatedSafeAreaView } from "../../../components/AnimatedComponents/index.ts";
-import { Action } from "../constants/index.ts";
 import { Overlay } from "../../../components/overlay/Overlay.tsx";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Action } from "../hooks/useActions.ts";
 
 type FloatingActionMenu = {
     action: (() => void) | Array<Action>
