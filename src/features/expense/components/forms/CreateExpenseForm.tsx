@@ -5,10 +5,10 @@ import { ExpenseFields, useCreateExpenseFormProps } from "../../schemas/form/exp
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
-import { CarCreateToast } from "../../../car/presets/toast/index.ts";
 import { useExpenseFormFields } from "../../hooks/useExpenseFormFields.tsx";
 import Form from "../../../../components/Form/Form.tsx";
 import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
+import { CreateToast, InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
 
 export function CreateExpenseForm() {
     const { openToast } = useAlert();
@@ -26,17 +26,17 @@ export function CreateExpenseForm() {
             try {
                 await expenseDao.create(formResult, true);
 
-                openToast(CarCreateToast.success());
+                openToast(CreateToast.success(t("expenses.title_singular")));
 
                 if(dismissBottomSheet) dismissBottomSheet(true);
             } catch(e) {
-                openToast(CarCreateToast.error());
+                openToast(CreateToast.error(t("fuel.title_singular")));
                 console.error("Hiba a submitHandler-ben log:", e);
             }
         },
         (errors) => {
             console.log("Create expense validation errors", errors);
-            openToast(CarCreateToast.error());
+            openToast(InvalidFormToast.warning());
         }
     );
 

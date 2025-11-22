@@ -4,7 +4,6 @@ import useCars from "../../../hooks/useCars.ts";
 import { useAlert } from "../../../../../ui/alert/hooks/useAlert.ts";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Car } from "../../../schemas/carSchema.ts";
-import { DeleteExpenseToast } from "../../../../expense/presets/toasts/DeleteExpenseToast.ts";
 import { InfoRowProps } from "../../../../../components/info/InfoRow.tsx";
 import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import dayjs from "dayjs";
@@ -18,6 +17,9 @@ import { AmountText } from "../../../../../components/AmountText.tsx";
 import { updateCarOdometer } from "../../../model/slice/index.ts";
 import { Odometer } from "../../odometer/schemas/odometerSchema.ts";
 import { useTranslation } from "react-i18next";
+import { DeleteToast, NotFoundToast } from "../../../../../ui/alert/presets/toast/index.ts";
+import { DeleteModal } from "../../../../../ui/alert/presets/modal/index.ts";
+import { useAppDispatch } from "../../../../../hooks/index.ts";
 
 export type FuelLogViewProps = {
     id: string
@@ -25,6 +27,7 @@ export type FuelLogViewProps = {
 
 export function FuelLogView({ id }: FuelLogViewProps) {
     const { t } = useTranslation();
+    const dispatch = useAppDispatch();
     const { fuelLogDao, odometerLogDao } = useDatabase();
     const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
@@ -57,29 +60,31 @@ export function FuelLogView({ id }: FuelLogViewProps) {
 
             if(odometer) dispatch(updateCarOdometer({ odometer }));
 
-            openToast(DeleteExpenseToast.success());
+            openToast(DeleteToast.success(t("fuel.log")));
 
             if(router.canGoBack()) return router.back();
             router.replace("/(main)/expense");
         } catch(e) {
             console.log(e);
-            openToast(DeleteExpenseToast.error());
+            openToast(DeleteToast.error(t("fuel.log")));
         }
     }, [fuelLog, car]);
 
     const onDelete = useCallback(() => {
-        if(!fuelLog) return openToast({ type: "warning", title: t("modal.not_found", { name: t("fuel.title") }) });
+        if(!fuelLog) {
+            return openToast(NotFoundToast.warning(t("fuel.log")));
+        }
 
-        openModal({
-            title: t("log.delete", { name: "fuel.fueling" }),
-            body: t("modal.delete_message"),
-            acceptText: t("form_button.delete"),
+        openModal(DeleteModal({
+            name: t("fuel.log"),
             acceptAction: () => handleDelete(fuelLog)
-        });
+        }));
     }, [fuelLog, openToast, openModal]);
 
     const onEdit = useCallback((field?: FuelLogFormFieldsEnum) => {
-        if(!fuelLog) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
+        if(!fuelLog) {
+            return openToast(NotFoundToast.warning(t("fuel.log")));
+        }
 
         router.push({
             pathname: "/expense/edit/fuel/[id]",
@@ -102,7 +107,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         },
         {
             icon: ICON_NAMES.money,
-            title: t("expenses.price"),
+            title: t("currency.price"),
             content: (textStyle) => fuelLog &&
                <AmountText
                   amount={ fuelLog.expense.amount.amount }
@@ -113,7 +118,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
                />,
             onPress: () => onEdit(FuelLogFormFieldsEnum.Amount),
             secondaryInfo: {
-                title: t("expenses.price_per_unit"),
+                title: t("currency.price_per_unit"),
                 content: (textStyle) => fuelLog &&
                    <AmountText
                       amount={ fuelLog.originalPricePerUnit }

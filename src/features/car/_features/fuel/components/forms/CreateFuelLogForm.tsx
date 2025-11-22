@@ -5,14 +5,16 @@ import { useBottomSheet } from "../../../../../../ui/bottomSheet/contexts/Bottom
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import useCars from "../../../../hooks/useCars.ts";
 import { useForm } from "react-hook-form";
-import { CarCreateToast } from "../../../../presets/toast/index.ts";
 import { useFuelLogFormFields } from "../../hooks/useFuelLogForm.tsx";
 import { FuelLogFields, useCreateFuelLogFormProps } from "../../schemas/form/fuelLogForm.ts";
 import { updateCarOdometer } from "../../../../model/slice/index.ts";
 import { useAppDispatch } from "../../../../../../hooks/index.ts";
+import { CreateToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
 
 export function CreateFuelLogForm() {
     const dispatch = useAppDispatch();
+    const { t } = useTranslation();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
     const { fuelLogDao } = useDatabase();
@@ -29,17 +31,17 @@ export function CreateFuelLogForm() {
                 const result = await fuelLogDao.create(formResult);
                 if(result?.odometer) dispatch(updateCarOdometer({ odometer: result.odometer }));
 
-                openToast(CarCreateToast.success());
+                openToast(CreateToast.success(t("fuel.log")));
 
                 if(dismissBottomSheet) dismissBottomSheet(true);
             } catch(e) {
-                openToast(CarCreateToast.error());
+                openToast(CreateToast.error(t("fuel.log")));
                 console.error("Hiba a submitHandler-ben log:", e);
             }
         },
         (errors) => {
             console.log("Create expense validation errors", errors);
-            openToast(CarCreateToast.error());
+            openToast(InvalidFormToast.warning());
         }
     );
 

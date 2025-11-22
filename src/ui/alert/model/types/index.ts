@@ -39,6 +39,12 @@ export type Modal = {
     dismissText: string
 }
 
+export type ModalAction = ({ name, acceptAction, dismissAction }: {
+    name?: string,
+    acceptAction?: () => void;
+    dismissAction?: () => void
+}) => Partial<Modal>
+
 export type AlertState = {
     toasts: Array<Toast>
     modal: Modal

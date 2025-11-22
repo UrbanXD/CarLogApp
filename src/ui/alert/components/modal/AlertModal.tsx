@@ -52,13 +52,13 @@ const AlertModal: React.FC<AlertModalProps> = ({
                     {
                         title &&
                        <Text style={ styles.titleText }>
-                           { t(title) }
+                           { title }
                        </Text>
                     }
                     {
                         body &&
                        <Text style={ styles.text }>
-                           { t(body) }
+                           { body }
                        </Text>
                     }
                 </View>

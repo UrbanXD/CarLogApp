@@ -53,7 +53,7 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
     } = useTimelinePaginator<SelectExpenseTableRow, Expense, TimelineItemType>({
         paginator,
         mapper,
-        cursorOrderButtons: [{ field: "date", title: t("date.text") }, { field: "amount", title: t("expenses.price") }]
+        cursorOrderButtons: [{ field: "date", title: t("date.text") }, { field: "amount", title: t("currency.price") }]
     });
     const { filterButtons } = useExpenseTimelineFilter({ timelineFilterManagement, car });
 

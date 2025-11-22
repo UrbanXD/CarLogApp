@@ -4,7 +4,6 @@ import { Car } from "../../../schemas/carSchema.ts";
 import useCars from "../../../hooks/useCars.ts";
 import { FormFields } from "../../../../../types/index.ts";
 import { CarPickerInput } from "../../../components/forms/inputFields/CarPickerInput.tsx";
-import { CarEditNameToast } from "../../../presets/toast/index.ts";
 import Input from "../../../../../components/Input/Input.ts";
 import InputDatePicker from "../../../../../components/Input/datePicker/InputDatePicker.tsx";
 import { NoteInput } from "../../../../../components/Input/_presets/NoteInput.tsx";
@@ -13,6 +12,7 @@ import { OdometerValueInput } from "../components/forms/inputFields/OdometerValu
 import { OdometerLog } from "../schemas/odometerLogSchema.ts";
 import { OdometerChangeLogFormFields } from "../schemas/form/odometerChangeLogForm.ts";
 import { convertOdometerValueFromKilometer } from "../utils/convertOdometerUnit.ts";
+import { EditToast } from "../../../../../ui/alert/presets/toast/EditToast.ts";
 
 type UseOdometerLogFormFieldsProps = UseFormReturn<OdometerChangeLogFormFields> & {
     odometerLog?: OdometerLog
@@ -68,7 +68,7 @@ export function useOdometerLogFormFields({
     const fields: Record<OdometerLogFormFields, FormFields> = useMemo(() => ({
         [OdometerLogFormFields.Car]: {
             render: () => <CarPickerInput control={ control } fieldName="carId"/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [OdometerLogFormFields.OdometerValue]: {
             render: () => <OdometerValueInput
@@ -78,7 +78,7 @@ export function useOdometerLogFormFields({
                 currentOdometerValue={ car?.odometer.value }
                 unitText={ car?.odometer.unit.short }
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [OdometerLogFormFields.Date]: {
             render: () => (
@@ -90,7 +90,7 @@ export function useOdometerLogFormFields({
                     <InputDatePicker/>
                 </Input.Field>
             ),
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [OdometerLogFormFields.Note]: {
             render: () => <NoteInput
@@ -98,7 +98,7 @@ export function useOdometerLogFormFields({
                 setValue={ setValue }
                 fieldName="note"
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         }
     }), [control, setValue, car, getOdometerLogSubtitle]);
 
@@ -109,7 +109,7 @@ export function useOdometerLogFormFields({
             <React.Fragment key="date">{ fields[OdometerLogFormFields.Date].render() }</React.Fragment>,
             <React.Fragment key="note">{ fields[OdometerLogFormFields.Note].render() }</React.Fragment>
         ]),
-        editToastMessages: CarEditNameToast
+        editToastMessages: EditToast
     };
 
     return { fields, fullForm };

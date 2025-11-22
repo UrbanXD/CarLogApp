@@ -8,9 +8,10 @@ import { InfoTimeline, InfoTimelineItem } from "../../components/info/InfoTimeli
 import { ScreenView } from "../../components/screenView/ScreenView.tsx";
 import { PickerItemType } from "../../components/Input/picker/PickerItem.tsx";
 import { router } from "expo-router";
-import { DeleteExpenseToast } from "../../features/expense/presets/toasts/DeleteExpenseToast.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { useTranslation } from "react-i18next";
+import { DeleteModal } from "../../ui/alert/presets/modal/index.ts";
+import { DeleteToast, NotFoundToast } from "../../ui/alert/presets/toast/index.ts";
 
 export function PlaceScreen() {
     const { t } = useTranslation();
@@ -52,7 +53,6 @@ export function PlaceScreen() {
 
     const onEdit = (id: string, callback?: () => void) => {
         if(!id) return;
-        console.log(!!callback, "hi");
 
         callback?.();
         router.push({
@@ -62,28 +62,25 @@ export function PlaceScreen() {
     };
 
     const handleDelete = useCallback(async (id: string, callback?: () => void) => {
+        if(!id) return openToast(NotFoundToast.warning(t("places.title_singular")));
+
         try {
             await placeDao.delete(id);
 
-            openToast(DeleteExpenseToast.success());
+            openToast(DeleteToast.success(t("places.title_singular")));
             callback?.();
             await refresh();
             requestAnimationFrame(() => {
-                ref.current?.clearLayoutCacheOnUpdate(); // vagy adott kezdő index
+                ref.current?.clearLayoutCacheOnUpdate();
             });
         } catch(e) {
             console.log(e);
-            openToast(DeleteExpenseToast.error());
+            openToast(DeleteToast.error(t("places.title_singular")));
         }
     }, [placeDao]);
 
-    const onDelete = useCallback((id: string) => {
-        openModal({
-            title: t("places.modal.delete"),
-            body: t("modal.delete_message"),
-            acceptText: t("form_button.delete"),
-            acceptAction: () => handleDelete(id)
-        });
+    const onDelete = useCallback((id: string, callback?: () => void) => {
+        openModal(DeleteModal({ name: t("places.title_singular"), acceptAction: () => handleDelete(id, callback) }));
     }, [openToast, openModal]);
 
     return (

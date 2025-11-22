@@ -10,7 +10,6 @@ import { RideLog } from "../schemas/rideLogSchema.ts";
 import { router, useFocusEffect } from "expo-router";
 import { Odometer } from "../../car/_features/odometer/schemas/odometerSchema.ts";
 import { useAppDispatch } from "../../../hooks/index.ts";
-import { DeleteExpenseToast } from "../../expense/presets/toasts/DeleteExpenseToast.ts";
 import { updateCarOdometer } from "../../car/model/slice/index.ts";
 import { RideLogFormFieldsEnum } from "../enums/RideLogFormFields.ts";
 import { ExpandableList } from "../../../components/expandableList/ExpandableList.tsx";
@@ -25,6 +24,8 @@ import { InfoContainer } from "../../../components/info/InfoContainer.tsx";
 import { FloatingDeleteButton } from "../../../components/Button/presets/FloatingDeleteButton.tsx";
 import { AmountText } from "../../../components/AmountText.tsx";
 import { useTranslation } from "react-i18next";
+import { DeleteToast, NotFoundToast } from "../../../ui/alert/presets/toast/index.ts";
+import { DeleteModal } from "../../../ui/alert/presets/modal/index.ts";
 
 export type RideLogViewProps = {
     id: string
@@ -94,13 +95,13 @@ export function RideLogView({ id }: RideLogViewProps) {
 
             if(odometer) dispatch(updateCarOdometer({ odometer }));
 
-            openToast(DeleteExpenseToast.success());
+            openToast(DeleteToast.success(t("rides.log")));
 
             if(router.canGoBack()) return router.back();
             router.replace("/(main)/workbook");
         } catch(e) {
             console.log(e);
-            openToast(DeleteExpenseToast.error());
+            openToast(DeleteToast.error(t("rides.log")));
         }
     }, [rideLogDao]);
 
@@ -111,16 +112,15 @@ export function RideLogView({ id }: RideLogViewProps) {
                 title: `${ t("modal.not_found", { name: t("rides.log") }) }`
             });
         }
-        openModal({
-            title: t("modal.log_delete_title", { name: t("rides.log") }),
-            body: t("modal.delete_message"),
-            acceptText: t("form_button.delete"),
+
+        openModal(DeleteModal({
+            name: t("rides.log"),
             acceptAction: () => handleDelete(rideLog)
-        });
+        }));
     }, [rideLog, handleDelete, openToast, openModal]);
 
     const onEdit = useCallback((field: RideLogFormFieldsEnum) => {
-        if(!rideLog) return openToast({ type: "warning", title: "Menet-napló bejegyzés nem található!" });
+        if(!rideLog) return openToast(NotFoundToast.warning(t("rides.log")));
 
         router.push({
             pathname: "/ride/edit/[id]",
@@ -134,7 +134,7 @@ export function RideLogView({ id }: RideLogViewProps) {
         return (
             <ExpandableList
                 data={ rideLog.rideExpenses.map(rideExpenseToExpandableList) }
-                subtitle={ t("expenses.price") }
+                subtitle={ t("currency.price") }
                 totalAmount={ totalAmount }
                 expanded={ isExpenseListExpanded }
                 actionIcon={ ICON_NAMES.pencil }

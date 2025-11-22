@@ -35,7 +35,7 @@ export function FuelTypeInput({
         <Input.Field
             control={ control }
             fieldName={ fieldName }
-            fieldNameText={ title ?? t("fuel.type") }
+            fieldNameText={ title ?? t("fuel.types.title") }
             fieldInfoText={ subtitle }
         >
             {

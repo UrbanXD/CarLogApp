@@ -9,6 +9,8 @@ import { PlaceFormFields } from "../../../schemas/form/placeForm.ts";
 import { RidePlaceForm } from "../RidePlaceForm.tsx";
 import { useRidePlaceToExpandableList } from "../../../hooks/useRidePlaceToExpandableList.ts";
 import { useTranslation } from "react-i18next";
+import { ArrayInputToast } from "../../../../../../../ui/alert/presets/toast/index.ts";
+import { useAlert } from "../../../../../../../ui/alert/hooks/useAlert.ts";
 
 type RidePlaceInputProps = {
     control: Control<any>
@@ -29,6 +31,7 @@ export function RidePlaceInput({
 
     const { t } = useTranslation();
     const { ridePlaceToExpandableList } = useRidePlaceToExpandableList();
+    const { openToast } = useAlert();
 
     const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
 
@@ -58,7 +61,7 @@ export function RidePlaceInput({
     });
 
     const addItem = useCallback((item: PlaceFormFields) => {
-        if(items.length >= maxItemCount) return;
+        if(items.length >= maxItemCount) return openToast(ArrayInputToast.limit());
 
         append(item);
         isExpandedAddForm.value = false;
@@ -71,8 +74,6 @@ export function RidePlaceInput({
     }, [update]);
 
     const removeItem = useCallback((index: number) => {
-        if(items.length <= minItemCount) return;
-
         remove(index);
     }, [items.length, minItemCount, remove]);
 

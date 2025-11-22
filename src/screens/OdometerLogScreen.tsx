@@ -6,7 +6,6 @@ import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx"
 import { InfoRowProps } from "../components/info/InfoRow.tsx";
 import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import { useAlert } from "../ui/alert/hooks/useAlert.ts";
-import { DeleteOdometerLogToast } from "../features/car/_features/odometer/presets/toast/DeleteOdometerLogToast.ts";
 import { OdometerLog } from "../features/car/_features/odometer/schemas/odometerLogSchema.ts";
 import dayjs from "dayjs";
 import { Title } from "../components/Title.tsx";
@@ -17,6 +16,8 @@ import { InfoContainer } from "../components/info/InfoContainer.tsx";
 import { OdometerLogFormFields } from "../features/car/_features/odometer/enums/odometerLogFormFields.ts";
 import { FloatingDeleteButton } from "../components/Button/presets/FloatingDeleteButton.tsx";
 import { useTranslation } from "react-i18next";
+import { DeleteToast, NotFoundToast } from "../ui/alert/presets/toast/index.ts";
+import { DeleteModal } from "../ui/alert/presets/modal/index.ts";
 
 export function OdometerLogScreen() {
     const { t } = useTranslation();
@@ -55,28 +56,27 @@ export function OdometerLogScreen() {
 
             dispatch(updateCarOdometer({ odometer }));
 
-            openToast(DeleteOdometerLogToast.success());
+            openToast(DeleteToast.success(t("odometer.log")));
 
             if(router.canGoBack()) return router.back();
             router.replace("/odometer/log");
         } catch(e) {
             console.log(e);
-            openToast(DeleteOdometerLogToast.error());
+            openToast(DeleteToast.error(t("odometer.log")));
         }
     }, [odometerLogDao, car]);
 
     const onDelete = useCallback(() => {
-        if(!odometerLog) return openToast({ type: "warning", title: t("modal.log_not_found") });
-        openModal({
-            title: t("modal.log_delete_title", { name: t("odometer.title") }),
-            body: t("modal.delete_message"),
-            acceptText: t("form_button.delete"),
+        if(!odometerLog) return openToast(NotFoundToast.warning(t("odometer.log")));
+
+        openModal(DeleteModal({
+            name: t("odometer.log"),
             acceptAction: () => handleDelete(odometerLog)
-        });
+        }));
     }, [odometerLog, openToast, openModal]);
 
     const onEdit = useCallback((field?: OdometerLogFormFields) => {
-        if(!odometerLog) return openToast({ type: "warning", title: t("modal.log_not_found") });
+        if(!odometerLog) return openToast(NotFoundToast.warning(t("odometer.log")));
 
         router.push({
             pathname: "/odometer/log/edit/[id]",
@@ -93,7 +93,7 @@ export function OdometerLogScreen() {
         },
         {
             icon: ICON_NAMES.odometer,
-            title: t("odometer.title"),
+            title: t("odometer.value"),
             content: `${ odometerLog?.value } ${ odometerLog?.unit.short }`,
             onPress: () => onEdit(OdometerLogFormFields.OdometerValue)
         },
@@ -115,7 +115,7 @@ export function OdometerLogScreen() {
         <>
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
                 <Title
-                    title={ odometerLog?.type.locale }
+                    title={ t(`odometer.types.${ odometerLog?.type.key }`) }
                     dividerStyle={ {
                         backgroundColor: odometerLog?.type.primaryColor ?? COLORS.gray2,
                         marginBottom: SEPARATOR_SIZES.normal

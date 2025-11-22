@@ -8,13 +8,14 @@ import {
     useCreateOdometerChangeLogFormProps
 } from "../../schemas/form/odometerChangeLogForm.ts";
 import { updateCarOdometer } from "../../../../model/slice/index.ts";
-import { CarCreateToast } from "../../../../presets/toast/index.ts";
 import { useForm, useWatch } from "react-hook-form";
 import useCars from "../../../../hooks/useCars.ts";
 import { Car } from "../../../../schemas/carSchema.ts";
 import { useOdometerLogFormFields } from "../../hooks/useOdometerLogFormFields.tsx";
 import Form from "../../../../../../components/Form/Form.tsx";
 import { FormButtons } from "../../../../../../components/Button/presets/FormButtons.tsx";
+import { CreateToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
 
 type CreateOdometerLogFormProps = {
     defaultCarId?: string
@@ -22,6 +23,7 @@ type CreateOdometerLogFormProps = {
 
 export function CreateOdometerChangeLogForm({ defaultCarId }: CreateOdometerLogFormProps) {
     const dispatch = useAppDispatch();
+    const { t } = useTranslation();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
     const { odometerLogDao } = useDatabase();
@@ -57,24 +59,24 @@ export function CreateOdometerChangeLogForm({ defaultCarId }: CreateOdometerLogF
 
                 dispatch(updateCarOdometer({ odometer }));
 
-                openToast(CarCreateToast.success());
+                openToast(CreateToast.success(t("odometer.log")));
 
                 if(dismissBottomSheet) dismissBottomSheet(true);
             } catch(e) {
-                openToast(CarCreateToast.error());
+                openToast(CreateToast.error(t("odometer.log")));
                 console.error("Hiba a submitHandler-ben log:", e);
             }
         },
         (errors) => {
             console.log("Create odometer log validation errors", errors);
-            openToast(CarCreateToast.error());
+            openToast(InvalidFormToast.warning());
         }
     );
 
     return (
         <Form>
             { fullForm.render() }
-            <FormButtons submit={ submitHandler } submitText={ "Rögzítés" }/>
+            <FormButtons submit={ submitHandler } submitText={ t("form_button.record") }/>
         </Form>
     );
 }

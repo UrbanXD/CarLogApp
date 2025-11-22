@@ -13,6 +13,8 @@ import { useRideExpenseToExpandableList } from "../../../hooks/useRideExpenseToE
 import { RideExpenseForm } from "../RideExpenseForm.tsx";
 import { FormResultRideExpense } from "../../../schemas/rideExpenseSchema.ts";
 import { useTranslation } from "react-i18next";
+import { useAlert } from "../../../../../../../ui/alert/hooks/useAlert.ts";
+import { ArrayInputToast } from "../../../../../../../ui/alert/presets/toast/index.ts";
 
 type RideExpenseInputProps = {
     control: Control<any>
@@ -38,6 +40,7 @@ export function RideExpenseInput({
     const { t } = useTranslation();
     const { getCar } = useCars();
     const { rideExpenseToExpandableList } = useRideExpenseToExpandableList();
+    const { openToast } = useAlert();
 
     const [car, setCar] = useState<Car | null>(null);
     const [totalAmount, setTotalAmount] = useState<Array<Amount>>([]);
@@ -99,7 +102,7 @@ export function RideExpenseInput({
     });
 
     const addItem = useCallback((item: PlaceFormFields) => {
-        if(items.length >= maxItemCount) return;
+        if(items.length >= maxItemCount) return openToast(ArrayInputToast.limit());
 
         append(item);
         isExpandedAddForm.value = false;
@@ -112,10 +115,8 @@ export function RideExpenseInput({
     }, [update]);
 
     const removeItem = useCallback((index: number) => {
-        if(items.length <= minItemCount) return;
-
         remove(index);
-    }, [items.length, minItemCount, remove]);
+    }, [items.length, remove]);
 
     return (
         <Input.Field control={ control } fieldName={ fieldName }>

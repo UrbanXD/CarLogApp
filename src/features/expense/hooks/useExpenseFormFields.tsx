@@ -4,7 +4,6 @@ import { ExpenseFormFields } from "../enums/expenseFormFields.ts";
 import { ExpenseFields } from "../schemas/form/expenseForm.ts";
 import { FormFields } from "../../../types/index.ts";
 import { CarPickerInput } from "../../car/components/forms/inputFields/CarPickerInput.tsx";
-import { CarEditNameToast } from "../../car/presets/toast/index.ts";
 import { ExpenseTypeInput } from "../components/forms/inputFields/ExpenseTypeInput.tsx";
 import { AmountInput } from "../../_shared/currency/components/AmountInput.tsx";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -13,6 +12,7 @@ import Input from "../../../components/Input/Input.ts";
 import { NoteInput } from "../../../components/Input/_presets/NoteInput.tsx";
 import useCars from "../../car/hooks/useCars.ts";
 import { Text } from "react-native";
+import { EditToast } from "../../../ui/alert/presets/toast/EditToast.ts";
 
 type UseExpenseFormFieldsProps = UseFormReturn<ExpenseFields>
 
@@ -33,7 +33,7 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
     const amountFieldExchangeText = useCallback((exchangedAmount: string) => {
         return (
             <>
-                { `${ t("currency.in_car_currency") } ` }
+                { `${ t("currency.cost_in_car_currency") } ` }
                 <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
             </>
         );
@@ -42,11 +42,11 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
     const fields: Record<ExpenseFormFields, FormFields> = useMemo(() => ({
         [ExpenseFormFields.Car]: {
             render: () => <CarPickerInput control={ control } fieldName="carId"/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [ExpenseFormFields.Type]: {
             render: () => <ExpenseTypeInput control={ control } fieldName="typeId"/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [ExpenseFormFields.Amount]: {
             render: () => <AmountInput
@@ -58,7 +58,7 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
                 exchangeText={ amountFieldExchangeText }
                 defaultCurrency={ car?.currency.id }
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [ExpenseFormFields.Date]: {
             render: () => (
@@ -70,7 +70,7 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
                     <InputDatePicker/>
                 </Input.Field>
             ),
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [ExpenseFormFields.Note]: {
             render: () => <NoteInput
@@ -78,7 +78,7 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
                 setValue={ setValue }
                 fieldName="note"
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         }
     }), [control, setValue, car]);
 
@@ -90,7 +90,7 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
             <React.Fragment key="date">{ fields[ExpenseFormFields.Date].render() }</React.Fragment>,
             <React.Fragment key="note">{ fields[ExpenseFormFields.Note].render() }</React.Fragment>
         ]),
-        editToastMessages: CarEditNameToast
+        editToastMessages: EditToast
     };
 
     return { fields, fullForm };

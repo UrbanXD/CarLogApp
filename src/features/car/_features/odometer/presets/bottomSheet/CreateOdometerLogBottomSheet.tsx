@@ -3,11 +3,13 @@ import BottomSheet from "../../../../../../ui/bottomSheet/components/BottomSheet
 import { useLocalSearchParams } from "expo-router";
 import { CreateOdometerChangeLogForm } from "../../components/forms/CreateOdometerChangeLogForm.tsx";
 import { heightPercentageToDP } from "react-native-responsive-screen";
+import { useTranslation } from "react-i18next";
 
 export function CreateOdometerLogBottomSheet() {
+    const { t } = useTranslation();
     const { carId } = useLocalSearchParams();
 
-    const TITLE = "Kilométeróra-állás rögzítése";
+    const TITLE = t("odometer.create");
     const CONTENT = <CreateOdometerChangeLogForm defaultCarId={ carId }/>;
     const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
 

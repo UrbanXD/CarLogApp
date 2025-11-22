@@ -1,10 +1,11 @@
 import { useForm } from "react-hook-form";
 import { PassengerFormFields, useCreatePassengerFormProps } from "../schemas/form/passengerForm.ts";
-import { CarCreateToast } from "../../../../car/presets/toast/index.ts";
 import { useAlert } from "../../../../../ui/alert/hooks/useAlert.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { useBottomSheet } from "../../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { getUUID } from "../../../../../database/utils/uuid.ts";
+import { CreateToast, InvalidFormToast } from "../../../../../ui/alert/presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
 
 type UseCreatePassengerProps = {
     userId: string
@@ -12,6 +13,7 @@ type UseCreatePassengerProps = {
 }
 
 export function useCreatePassenger({ userId, dismissSheet = true }: UseCreatePassengerProps) {
+    const { t } = useTranslation();
     const { openToast } = useAlert();
     const { passengerDao } = useDatabase();
     const { dismissBottomSheet } = useBottomSheet();
@@ -24,19 +26,20 @@ export function useCreatePassenger({ userId, dismissSheet = true }: UseCreatePas
             async (formResult: PassengerFormFields) => {
                 try {
                     await passengerDao.create(formResult);
+                    openToast(CreateToast.success(t("passengers.title_singular")));
 
                     onDone?.();
                     reset({ id: getUUID(), name: "", ownerId: userId });
 
                     if(dismissBottomSheet && dismissSheet) dismissBottomSheet(true);
                 } catch(e) {
-                    openToast(CarCreateToast.error());
+                    openToast(CreateToast.error(t("passengers.title_singular")));
                     console.error("Hiba a submitHandler-ben passenger form:", e);
                 }
             },
             (errors) => {
                 console.log("Passenger form validation errors", errors);
-                openToast(CarCreateToast.error());
+                openToast(InvalidFormToast.warning());
             }
         );
 

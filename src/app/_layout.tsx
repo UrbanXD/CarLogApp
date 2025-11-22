@@ -156,19 +156,19 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="expense/[id]"
                 options={ {
-                    header: () => <Header.Secondary title={ t("expenses.item_title") }/>
+                    header: () => <Header.Secondary title={ t("expenses.title_singular") }/>
                 } }
             />
             <Stack.Screen
                 name="expense/fuel/[id]"
                 options={ ({ route }) => ({
-                    header: () => <Header.Secondary title={ route.params?.title ?? t("common.log_title") }/>
+                    header: () => <Header.Secondary title={ route.params?.title ?? t("log.title") }/>
                 }) }
             />
             <Stack.Screen
                 name="expense/service/[id]"
                 options={ ({ route }) => ({
-                    header: () => <Header.Secondary title={ route.params?.title ?? t("common.log_title") }/>
+                    header: () => <Header.Secondary title={ route.params?.title ?? t("log.title") }/>
                 }) }
             />
             <Stack.Screen
@@ -294,7 +294,7 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="ride/[id]"
                 options={ {
-                    header: () => <Header.Secondary title="Menet-bejegyzés"/>
+                    header: () => <Header.Secondary title={ t("rides.log") }/>
                 } }
             />
         </Stack>

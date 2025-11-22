@@ -11,7 +11,7 @@ export function useRideExpenseToExpandableList() {
     ): ExpandableListItemProps => {
         return {
             id: item.id,
-            title: item.expense.type.key ?? t("common.unknown"),
+            title: item.expense.type.key ? t(`expenses.types.${ item.expense.type.key }`) : t("common.unknown"),
             amountProps: {
                 amount: item.expense.amount.amount,
                 currencyText: item.expense.amount.currency.symbol,

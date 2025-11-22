@@ -9,13 +9,14 @@ import { Car } from "../../features/car/schemas/carSchema.ts";
 import useCars from "../../features/car/hooks/useCars.ts";
 import dayjs from "dayjs";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
-import { DeleteExpenseToast } from "../../features/expense/presets/toasts/DeleteExpenseToast.ts";
 import { InfoContainer } from "../../components/info/InfoContainer.tsx";
 import { ExpenseFormFields } from "../../features/expense/enums/expenseFormFields.ts";
 import { InfoRowProps } from "../../components/info/InfoRow.tsx";
 import { FloatingDeleteButton } from "../../components/Button/presets/FloatingDeleteButton.tsx";
 import { AmountText } from "../../components/AmountText.tsx";
 import { useTranslation } from "react-i18next";
+import { DeleteToast, NotFoundToast } from "../../ui/alert/presets/toast/index.ts";
+import { DeleteModal } from "../../ui/alert/presets/modal/index.ts";
 
 export function ExpenseScreen() {
     const { t } = useTranslation();
@@ -43,32 +44,22 @@ export function ExpenseScreen() {
 
     const handleDelete = useCallback(async (id: string) => {
         try {
-            if(!car) throw new Error("Car not found!");
-
             await expenseDao.delete(id);
 
-            openToast(DeleteExpenseToast.success());
+            openToast(DeleteToast.success(t("expenses.title_singular")));
 
             if(router.canGoBack()) return router.back();
             router.replace("/(main)/expense");
         } catch(e) {
             console.log(e);
-            openToast(DeleteExpenseToast.error());
+            openToast(DeleteToast.error(t("expenses.title_singular")));
         }
-    }, [expenseDao, car]);
+    }, [expenseDao]);
 
     const onDelete = useCallback(() => {
-        if(!expense) return openToast({
-            type: "warning",
-            title: t("modal.not_found", { name: t("expenses.item_title") })
-        });
+        if(!expense) return openToast(NotFoundToast.warning(t("expenses.title_singular")));
 
-        openModal({
-            title: t("modal.log_delete_title", { name: t("expenses.item_title") }),
-            body: t("modal.delete_message"),
-            acceptText: t("form_button.delete"),
-            acceptAction: () => handleDelete(expense.id)
-        });
+        openModal(DeleteModal({ name: t("expenses.title_singular"), acceptAction: handleDelete(expense.id) }));
     }, [expense, openToast, openModal]);
 
     const getAmountSubtitle = useCallback(() => {
@@ -80,10 +71,7 @@ export function ExpenseScreen() {
     }, [expense]);
 
     const onEdit = useCallback((field?: ExpenseFormFields) => {
-        if(!expense) return openToast({
-            type: "warning",
-            title: t("modal.not_found", { name: t("expenses.item_title") })
-        });
+        if(!expense) return openToast(NotFoundToast.warning(t("expenses.title_singular")));
 
         router.push({
             pathname: "/expense/edit/[id]",
@@ -100,7 +88,7 @@ export function ExpenseScreen() {
         },
         {
             icon: ICON_NAMES.money,
-            title: t("expenses.price"),
+            title: t("currency.price"),
             content: (textStyle) => expense &&
                <AmountText
                   amount={ expense.amount.amount }

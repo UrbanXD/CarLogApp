@@ -14,7 +14,7 @@ export function useExpenseTimelineItem() {
     const { t } = useTranslation();
 
     const mapper = useCallback((expense: Expense, callback?: () => void): TimelineItemType => {
-        const routerPathTitle = t("expenses.item_title");
+        const routerPathTitle = t("expenses.title_singular");
         let routerPathName = "/expense/[id]";
         let itemId = expense.id;
 

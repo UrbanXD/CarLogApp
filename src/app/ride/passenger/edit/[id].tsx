@@ -6,8 +6,11 @@ import { Passenger } from "../../../../features/ride/_features/passenger/schemas
 import {
     PassengerBottomSheet
 } from "../../../../features/ride/_features/passenger/presets/bottomSheet/PassengerBottomSheet.tsx";
+import { NotFoundToast } from "../../../../ui/alert/presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
 
 function Page() {
+    const { t } = useTranslation();
     const { id } = useLocalSearchParams();
     const { passengerDao } = useDatabase();
     const { openToast } = useAlert();
@@ -24,7 +27,7 @@ function Page() {
             try {
                 setPassenger(await passengerDao.getById(id));
             } catch(e) {
-                openToast({ type: "error", title: "not-found" });
+                openToast(NotFoundToast.warning(t("passengers.title_singular")));
 
                 if(router.canGoBack()) return router.back();
                 router.replace("(main)/index");

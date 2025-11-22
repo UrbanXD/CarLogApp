@@ -14,12 +14,12 @@ function NameStep<FormFieldsType = CarFormFields>({ control }: NameStepProps<For
         <Input.Field
             control={ control }
             fieldName="name"
-            fieldNameText={ t("steps.name.name_field.title") }
-            fieldInfoText={ t("steps.name.name_field.info") }
+            fieldNameText={ t("car.steps.name.name_field.title") }
+            fieldInfoText={ t("car.steps.name.name_field.info") }
         >
             <Input.Text
                 icon={ ICON_NAMES.nametag }
-                placeholder={ t("steps.name.name_field.placeholder") }
+                placeholder={ t("car.steps.name.name_field.placeholder") }
             />
         </Input.Field>
     );

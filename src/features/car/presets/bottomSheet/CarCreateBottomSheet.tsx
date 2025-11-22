@@ -1,9 +1,12 @@
 import CreateCarForm from "../../components/forms/CreateCarForm.tsx";
 import React from "react";
 import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
+import { useTranslation } from "react-i18next";
 
 const CreateCarBottomSheet: React.FC = () => {
-    const TITLE = "Autó létrehozás";
+    const { t } = useTranslation();
+
+    const TITLE = t("car.create");
     const CONTENT = <CreateCarForm/>;
     const SNAP_POINTS = ["90%"];
 

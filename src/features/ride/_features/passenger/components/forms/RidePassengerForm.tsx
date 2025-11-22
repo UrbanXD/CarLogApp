@@ -5,12 +5,12 @@ import { useDatabase } from "../../../../../../contexts/database/DatabaseContext
 import { useForm, useWatch } from "react-hook-form";
 import { RidePlaceFormFields } from "../../../place/schemas/form/ridePlaceForm.ts";
 import React, { useEffect } from "react";
-import { CarCreateToast } from "../../../../../car/presets/toast/index.ts";
 import { StyleSheet, View } from "react-native";
 import { SaveButton } from "../../../../../../components/Button/presets/SaveButton.tsx";
 import { SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
 import { PassengerInput } from "./inputFields/PassengerInput.tsx";
 import { useTranslation } from "react-i18next";
+import { ArrayInputToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
 
 type RidePassengerFormProps = {
     onSubmit: (result: RidePassengerFormFields) => void
@@ -41,13 +41,13 @@ export function RidePassengerForm({ onSubmit, defaultRidePassenger }: RidePassen
             try {
                 onSubmit(formResult);
             } catch(e) {
-                openToast(CarCreateToast.error());
+                openToast(ArrayInputToast.error());
                 console.error("Hiba a submitHandler-ben ride passenger:", e);
             }
         },
         (errors) => {
             console.log("Ride passenger form validation errors", errors);
-            openToast(CarCreateToast.error());
+            openToast(InvalidFormToast.warning());
         }
     );
 

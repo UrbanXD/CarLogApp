@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Car } from "../../../schemas/carSchema.ts";
 import { FormFields, Steps } from "../../../../../types/index.ts";
 import { CarPickerInput } from "../../../components/forms/inputFields/CarPickerInput.tsx";
-import { CarEditNameToast } from "../../../presets/toast/index.ts";
 import { AmountInput } from "../../../../_shared/currency/components/AmountInput.tsx";
 import Input from "../../../../../components/Input/Input.ts";
 import InputDatePicker from "../../../../../components/Input/datePicker/InputDatePicker.tsx";
@@ -14,10 +13,13 @@ import { FuelLogFields } from "../schemas/form/fuelLogForm.ts";
 import { OdometerValueInput } from "../../odometer/components/forms/inputFields/OdometerValueInput.tsx";
 import { FuelInput } from "../components/forms/inputFields/FuelInput.tsx";
 import { Text } from "react-native";
+import { EditToast } from "../../../../../ui/alert/presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
 
 type UseFuelLogFormFieldsProps = UseFormReturn<FuelLogFields>
 
 export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
+    const { t } = useTranslation();
     const { control, setValue, clearErrors } = props;
     const { getCar } = useCars();
 
@@ -37,7 +39,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
     const amountFieldExchangeText = useCallback((exchangedAmount: string, isTotalAmount?: boolean) => {
         return (
             <>
-                Az autó alapvalutájában számolt { isTotalAmount ? "összeg " : "egységár " }
+                { `${ t(isTotalAmount ? "cost_in_car_currency" : "price_per_unit_in_car_currency") } ` }
                 <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
             </>
         );
@@ -54,14 +56,14 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
 
         return (
             <>
-                Az egyésgár szerinti összköltség{ " " }
+                { `${ t("price_per_unit_based_on_total_cost") } ` }
                 <Text style={ { fontWeight: "bold" } }>
                     { amount * quantity } { currencyText }
                 </Text>
                 {
                     currencyText !== defaultCurrencyText &&
                    <>
-                      , az autó alapvalutájában számítva{ " " }
+                       { `${ t("cost_in_car_currency_based_on_price_per_unit") } ` }
                       <Text style={ { fontWeight: "bold" } }>
                           { exchangedAmount * quantity }{ "\u00A0" }{ defaultCurrencyText } {/* ${ "\u00A0" } for prevent currency wrap to the next line without amount */ }
                       </Text>
@@ -74,7 +76,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
     const fields: Record<FuelLogFormFieldsEnum, FormFields> = useMemo(() => ({
         [FuelLogFormFieldsEnum.Car]: {
             render: () => <CarPickerInput control={ control } fieldName="carId"/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [FuelLogFormFieldsEnum.Quantity]: {
             render: () => <FuelInput
@@ -85,7 +87,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
                 fuelTypeText={ car?.fuelTank.type.key }
                 unitText={ car?.fuelTank.unit.short }
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [FuelLogFormFieldsEnum.Amount]: {
             render: () => <AmountInput
@@ -99,19 +101,19 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
                 totalAmountText={ amountFieldTotalAmountText }
                 defaultCurrency={ car?.currency.id }
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [FuelLogFormFieldsEnum.Date]: {
             render: () => (
                 <Input.Field
                     control={ control }
                     fieldName="date"
-                    fieldNameText="Dátum"
+                    fieldNameText={ t("date.text") }
                 >
                     <InputDatePicker/>
                 </Input.Field>
             ),
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [FuelLogFormFieldsEnum.OdometerValue]: {
             render: () => <OdometerValueInput
@@ -121,7 +123,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
                 unitText={ car?.odometer.unit.short }
                 optional
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [FuelLogFormFieldsEnum.Note]: {
             render: () => <NoteInput
@@ -129,13 +131,13 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
                 setValue={ setValue }
                 fieldName="note"
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         }
     }), [control, setValue, car, amountFieldTotalAmountText, amountFieldExchangeText]);
 
     const multiStepFormSteps: Steps = [
         {
-            title: "Alap információk",
+            title: t("fuel.steps.basic_information"),
             fields: ["carId", "date", "odometerValue", "note"],
             render: () => (
                 <Input.Group>
@@ -147,7 +149,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             )
         },
         {
-            title: "Tankolás infók",
+            title: t("fuel.steps.fueling_information"),
             fields: ["quantity", "amount", "exchangeRate", "currencyId"],
             render: () => (
                 <Input.Group>

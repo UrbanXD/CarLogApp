@@ -1,7 +1,6 @@
 import { FormResultServiceItem, ServiceItem } from "../../schemas/serviceItemSchema.ts";
 import { useForm } from "react-hook-form";
 import { ServiceItemFields, useServiceItemFormProps } from "../../schemas/form/serviceItemForm.ts";
-import { CarCreateToast } from "../../../../../car/presets/toast/index.ts";
 import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import { StyleSheet, Text, View } from "react-native";
@@ -12,6 +11,7 @@ import { SaveButton } from "../../../../../../components/Button/presets/SaveButt
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
 import Form from "../../../../../../components/Form/Form.tsx";
 import { useTranslation } from "react-i18next";
+import { ArrayInputToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
 
 type ServiceItemFormProps = {
     carCurrencyId: number
@@ -40,22 +40,21 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
                 });
 
                 onSubmit(result);
-
             } catch(e) {
-                openToast(CarCreateToast.error());
+                openToast(ArrayInputToast.error());
                 console.error("Hiba a submitHandler-ben log:", e);
             }
         },
         (errors) => {
             console.log("Service item form validation errors", errors);
-            openToast(CarCreateToast.error());
+            openToast(InvalidFormToast.warning());
         }
     );
 
     const amountFieldExchangeText = useCallback((exchangedAmount: string) => {
         return (
             <>
-                { `${ t("currency.in_car_currency") } ` }
+                { `${ t("currency.cost_in_car_currency") } ` }
                 <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
             </>
         );
@@ -63,7 +62,7 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
 
     return (
         <View style={ styles.container }>
-            <Text style={ styles.title }>{ t("service.items.item") }</Text>
+            <Text style={ styles.title }>{ t("service.items.title_singular") }</Text>
             <Form style={ styles.formContainer }>
                 <ServiceItemTypeInput
                     control={ control }

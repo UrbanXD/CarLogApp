@@ -9,6 +9,8 @@ import { PopupView } from "../../../../../../../components/popupView/PopupView.t
 import Input from "../../../../../../../components/Input/Input.ts";
 import { RidePassengerForm } from "../RidePassengerForm.tsx";
 import { useTranslation } from "react-i18next";
+import { ArrayInputToast } from "../../../../../../../ui/alert/presets/toast/index.ts";
+import { useAlert } from "../../../../../../../ui/alert/hooks/useAlert.ts";
 
 type RidePassengerInputProps = {
     control: Control<any>
@@ -29,6 +31,7 @@ export function RidePassengerInput({
 
     const { t } = useTranslation();
     const { ridePassengerToExpandableList } = useRidePassengerToExpandableList();
+    const { openToast } = useAlert();
 
     const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
 
@@ -58,7 +61,7 @@ export function RidePassengerInput({
     });
 
     const addItem = useCallback((item: PassengerFormFields) => {
-        if(items.length >= maxItemCount) return;
+        if(items.length >= maxItemCount) return openToast(ArrayInputToast.limit());
 
         append(item);
         isExpandedAddForm.value = false;
@@ -71,8 +74,6 @@ export function RidePassengerInput({
     }, [update]);
 
     const removeItem = useCallback((index: number) => {
-        if(items.length <= minItemCount) return;
-
         remove(index);
     }, [items.length, minItemCount, remove]);
 

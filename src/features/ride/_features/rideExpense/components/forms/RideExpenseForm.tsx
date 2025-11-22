@@ -3,7 +3,6 @@ import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import { useForm } from "react-hook-form";
 import { RideExpenseFormFields, useRideExpenseFormProps } from "../../schemas/form/rideExpenseForm.ts";
-import { CarCreateToast } from "../../../../../car/presets/toast/index.ts";
 import { StyleSheet, Text, View } from "react-native";
 import { ExpenseTypeInput } from "../../../../../expense/components/forms/inputFields/ExpenseTypeInput.tsx";
 import React, { useCallback } from "react";
@@ -16,6 +15,7 @@ import Input from "../../../../../../components/Input/Input.ts";
 import InputDatePicker from "../../../../../../components/Input/datePicker/InputDatePicker.tsx";
 import { NoteInput } from "../../../../../../components/Input/_presets/NoteInput.tsx";
 import { useTranslation } from "react-i18next";
+import { ArrayInputToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
 
 type RideExpenseFormProps = {
     car: Car
@@ -47,20 +47,20 @@ export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate
                 onSubmit(result);
 
             } catch(e) {
-                openToast(CarCreateToast.error());
+                openToast(ArrayInputToast.error());
                 console.error("Hiba a submitHandler-ben log:", e);
             }
         },
         (errors) => {
             console.log("Ride expense form validation errors", errors);
-            openToast(CarCreateToast.error());
+            openToast(InvalidFormToast.warning());
         }
     );
 
     const amountFieldExchangeText = useCallback((exchangedAmount: string) => {
         return (
             <>
-                { `${ t("currency.in_car_currency") } ` }
+                { `${ t("currency.cost_in_car_currency") } ` }
                 <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
             </>
         );

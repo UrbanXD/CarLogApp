@@ -6,6 +6,7 @@ import { heightPercentageToDP } from "react-native-responsive-screen";
 import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
 import { FuelLog } from "../../../../features/car/_features/fuel/schemas/fuelLogSchema.ts";
 import { EditFuelLogForm } from "../../../../features/car/_features/fuel/components/forms/EditFuelLogForm.tsx";
+import { NotFoundToast } from "../../../../ui/alert/presets/toast/index.ts";
 
 function Page() {
     const { id, field } = useLocalSearchParams();
@@ -24,7 +25,7 @@ function Page() {
             try {
                 setFuelLog(await fuelLogDao.getById(id));
             } catch(e) {
-                openToast({ type: "error", title: "not-found" });
+                openToast(NotFoundToast.warning(t("fuel.log")));
 
                 if(router.canGoBack()) return router.back();
                 router.replace("(main)/index");

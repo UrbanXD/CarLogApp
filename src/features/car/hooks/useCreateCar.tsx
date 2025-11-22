@@ -8,6 +8,7 @@ import { useBottomSheet } from "../../../ui/bottomSheet/contexts/BottomSheetCont
 import { useAppDispatch, useAppSelector } from "../../../hooks/index.ts";
 import { CarFormFields, useCreatCarFormProps } from "../schemas/form/carForm.ts";
 import { getUser } from "../../user/model/selectors/index.ts";
+import { InvalidFormToast } from "../../../ui/alert/presets/toast/index.ts";
 
 const useCreateCarForm = () => {
     const database = useDatabase();
@@ -44,7 +45,7 @@ const useCreateCarForm = () => {
                 openToast(CarCreateToast.error());
             }
         }, (e) => {
-            openToast(CarCreateToast.error());
+            openToast(InvalidFormToast.warning());
             console.log("car create form validation error: ", e);
         });
 

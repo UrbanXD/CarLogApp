@@ -37,8 +37,8 @@ function CarProfileView({
 
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
-            title: car.fuelTank.type.key,
-            content: t("fuel.type"),
+            title: t(`fuel.types.${ car.fuelTank.type.key }`),
+            content: t("fuel.types.title"),
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelType)
         }, {
             title: car.fuelTank.capacity.toString(),
@@ -46,11 +46,11 @@ function CarProfileView({
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelTankCapacity)
         }, {
             title: car.fuelTank.unit.short,
-            content: t("fuel.unit"),
+            content: t("fuel.unit_types.title"),
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelUnit)
         }, {
             title: car.odometer.unit.short,
-            content: t("odometer.unit"),
+            content: t("odometer.unit_types.title"),
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.OdometerUnit)
         }, {
             title: car.currency.symbol,

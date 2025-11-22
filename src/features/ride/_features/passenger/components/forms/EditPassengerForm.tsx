@@ -2,7 +2,6 @@ import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import { useForm } from "react-hook-form";
 import { PassengerFormFields, useEditPassengerFormProps } from "../../schemas/form/passengerForm.ts";
-import { CarCreateToast } from "../../../../../car/presets/toast/index.ts";
 import Form from "../../../../../../components/Form/Form.tsx";
 import { FormButtons } from "../../../../../../components/Button/presets/FormButtons.tsx";
 import React from "react";
@@ -10,6 +9,7 @@ import Input from "../../../../../../components/Input/Input.ts";
 import { useBottomSheet } from "../../../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { Passenger } from "../../schemas/passengerSchema.ts";
 import { useTranslation } from "react-i18next";
+import { EditToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
 
 type EditPassengerFormProps = {
     passenger: Passenger
@@ -28,16 +28,17 @@ export function EditPassengerForm({ passenger }: EditPassengerFormProps) {
         async (formResult: PassengerFormFields) => {
             try {
                 await passengerDao.update(formResult);
+                openToast(EditToast.success());
 
                 if(dismissBottomSheet) dismissBottomSheet(true);
             } catch(e) {
-                openToast(CarCreateToast.error());
+                openToast(EditToast.error());
                 console.error("Hiba a submitHandler-ben passenger form:", e);
             }
         },
         (errors) => {
             console.log("Passenger form validation errors", errors);
-            openToast(CarCreateToast.error());
+            openToast(InvalidFormToast.warning());
         }
     );
 

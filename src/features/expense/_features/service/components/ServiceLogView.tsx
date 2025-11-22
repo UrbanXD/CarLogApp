@@ -4,7 +4,6 @@ import useCars from "../../../../car/hooks/useCars.ts";
 import { useAlert } from "../../../../../ui/alert/hooks/useAlert.ts";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Car } from "../../../../car/schemas/carSchema.ts";
-import { DeleteExpenseToast } from "../../../presets/toasts/DeleteExpenseToast.ts";
 import { InfoRowProps } from "../../../../../components/info/InfoRow.tsx";
 import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import dayjs from "dayjs";
@@ -20,6 +19,8 @@ import { ExpandableList } from "../../../../../components/expandableList/Expanda
 import { useServiceItemToExpandableList } from "../hooks/useServiceItemToExpandableList.ts";
 import { useAppDispatch } from "../../../../../hooks/index.ts";
 import { useTranslation } from "react-i18next";
+import { DeleteToast, NotFoundToast } from "../../../../../ui/alert/presets/toast/index.ts";
+import { DeleteModal } from "../../../../../ui/alert/presets/modal/index.ts";
 
 export type ServiceLogViewProps = {
     id: string
@@ -60,39 +61,25 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
 
             if(odometer) dispatch(updateCarOdometer({ odometer }));
 
-            openToast(DeleteExpenseToast.success());
+            openToast(DeleteToast.success(t("service.log")));
 
             if(router.canGoBack()) return router.back();
             router.replace("/(main)/expense");
         } catch(e) {
             console.log(e);
-            openToast(DeleteExpenseToast.error());
+            openToast(DeleteToast.error(t("service.log")));
         }
     }, [serviceLogDao]);
 
     const onDelete = useCallback(() => {
-        if(!serviceLog) {
-            return openToast({
-                type: "warning",
-                title: `${ t("modal.not_found", { name: t("service.log") }) }`
-            });
-        }
+        if(!serviceLog) return openToast(NotFoundToast.warning(t("service.log")));
 
-        openModal({
-            title: t("service.modal.delete.title"),
-            body: t("service.modal.delete.body"),
-            acceptText: t("form_button.delete"),
-            acceptAction: () => handleDelete(serviceLog)
-        });
+        openModal(DeleteModal({ name: t("service.log"), acceptAction: () => handleDelete(serviceLog) }));
     }, [serviceLog, handleDelete, openToast, openModal]);
 
     const onEdit = useCallback((field: ServiceLogFormFieldsEnum) => {
-        if(!serviceLog) {
-            return openToast({
-                type: "warning",
-                title: `${ t("modal.not_found", { name: t("service.log") }) }`
-            });
-        }
+        if(!serviceLog) return openToast(NotFoundToast.warning(t("service.log")));
+
         router.push({
             pathname: "/expense/edit/service/[id]",
             params: { id: serviceLog.id, field: field }
@@ -134,7 +121,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         },
         {
             icon: ICON_NAMES.expenseItem,
-            title: t("service.items"),
+            title: t("service.items.title"),
             content: isServiceItemListExpanded ? " " : getAmountSubtitle(),
             actionIcon: isServiceItemListExpanded ? ICON_NAMES.upArrowHead : ICON_NAMES.downArrowHead,
             onPress: () => setServiceItemListExpanded(prevState => !prevState),

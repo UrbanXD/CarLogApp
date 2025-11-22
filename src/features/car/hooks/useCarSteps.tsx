@@ -7,8 +7,8 @@ import OdometerStep from "../components/forms/steps/OdometerStep.tsx";
 import FuelStep from "../components/forms/steps/FuelStep.tsx";
 import ImageStep from "../components/forms/steps/ImageStep.tsx";
 import { ResultStep } from "../components/forms/steps/ResultStep.tsx";
-import { CarEditNameToast } from "../presets/toast/index.ts";
 import { useTranslation } from "react-i18next";
+import { EditToast } from "../../../ui/alert/presets/toast/EditToast.ts";
 
 function useCarSteps({ control, formState, setValue, getValues }: StepProps<CarFormFields>): UseStepFormResult {
     const { t } = useTranslation();
@@ -18,31 +18,31 @@ function useCarSteps({ control, formState, setValue, getValues }: StepProps<CarF
             title: t("car.steps.name.title"),
             fields: ["name"],
             render: () => <NameStep control={ control }/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         {
             title: t("car.steps.model.title"),
             fields: ["model.makeId", "model.id", "model.year"],
             render: () => <CarModelStep control={ control } formState={ formState } setValue={ setValue }/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         {
             title: t("car.steps.odometer.title"),
             fields: ["odometer.value", "odometer.unitId"],
             render: () => <OdometerStep control={ control }/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         {
             title: t("car.steps.fuel.title"),
             fields: ["fuelTank.typeId", "fuelTank.unitId", "fuelTank.capacity"],
             render: () => <FuelStep control={ control }/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         {
             title: t("car.steps.image.title"),
             fields: ["image"],
             render: () => <ImageStep control={ control }/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         }
     ];
 

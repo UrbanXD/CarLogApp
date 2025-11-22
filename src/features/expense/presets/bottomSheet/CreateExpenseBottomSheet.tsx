@@ -1,9 +1,12 @@
 import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
 import React from "react";
 import { CreateExpenseForm } from "../../components/forms/CreateExpenseForm.tsx";
+import { useTranslation } from "react-i18next";
 
 export function CreateExpenseBottomSheet() {
-    const TITLE = "Kiadás rögzítése";
+    const { t } = useTranslation();
+
+    const TITLE = t("expenses.create");
     const CONTENT = <CreateExpenseForm/>;
     const SNAP_POINTS = ["90%"];
 

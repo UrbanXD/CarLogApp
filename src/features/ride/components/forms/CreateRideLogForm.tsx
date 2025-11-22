@@ -6,9 +6,9 @@ import useCars from "../../../car/hooks/useCars.ts";
 import { useForm } from "react-hook-form";
 import { RideLogFormFields, useCreateRideLogFormProps } from "../../schemas/form/rideLogForm.ts";
 import { useRideLogFormFields } from "../../hooks/useRideLogFormFields.tsx";
-import { CarCreateToast } from "../../../car/presets/toast/index.ts";
 import MultiStepForm from "../../../../components/Form/MultiStepForm.tsx";
 import { updateCarOdometer } from "../../../car/model/slice/index.ts";
+import { CreateToast, InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
 
 export function CreateRideLogForm() {
     const dispatch = useAppDispatch();
@@ -28,17 +28,17 @@ export function CreateRideLogForm() {
                 const result = await rideLogDao.create(formResult);
                 if(result?.odometer) dispatch(updateCarOdometer({ odometer: result.odometer }));
 
-                openToast(CarCreateToast.success());
+                openToast(CreateToast.success(t("rides.log")));
 
                 if(dismissBottomSheet) dismissBottomSheet(true);
             } catch(e) {
-                openToast(CarCreateToast.error());
+                openToast(CreateToast.error(t("rides.log")));
                 console.error("Hiba a submitHandler-ben log:", e);
             }
         },
         (errors) => {
             console.log("Create service log validation errors", errors);
-            openToast(CarCreateToast.error());
+            openToast(InvalidFormToast.warning());
         }
     );
 

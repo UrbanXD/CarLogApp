@@ -4,8 +4,11 @@ import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 import React, { useEffect, useState } from "react";
 import { RideLog } from "../../../features/ride/schemas/rideLogSchema.ts";
 import { EditRideLogBottomSheet } from "../../../features/ride/presets/bottomSheet/EditRideLogBottomSheet.tsx";
+import { NotFoundToast } from "../../../ui/alert/presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
 
 function Page() {
+    const { t } = useTranslation();
     const { id, field } = useLocalSearchParams();
     const { rideLogDao } = useDatabase();
     const { openToast } = useAlert();
@@ -22,7 +25,7 @@ function Page() {
             try {
                 setRideLog(await rideLogDao.getById(id));
             } catch(e) {
-                openToast({ type: "error", title: "not-found" });
+                openToast(NotFoundToast.warning(t("rides.log")));
 
                 if(router.canGoBack()) return router.back();
                 router.replace("(workbook)/index");

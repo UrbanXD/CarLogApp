@@ -4,7 +4,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Car } from "../../../../car/schemas/carSchema.ts";
 import { FormFields, Steps } from "../../../../../types/index.ts";
 import { CarPickerInput } from "../../../../car/components/forms/inputFields/CarPickerInput.tsx";
-import { CarEditNameToast } from "../../../../car/presets/toast/index.ts";
 import Input from "../../../../../components/Input/Input.ts";
 import InputDatePicker from "../../../../../components/Input/datePicker/InputDatePicker.tsx";
 import {
@@ -16,6 +15,7 @@ import { ServiceLogFormFieldsEnum } from "../enums/ServiceLogFormFieldsEnum.ts";
 import { ServiceTypeInput } from "../components/forms/inputFields/ServiceTypeInput.tsx";
 import { ServiceItemInput } from "../components/forms/inputFields/ServiceItemInput.tsx";
 import { useTranslation } from "react-i18next";
+import { EditToast } from "../../../../../ui/alert/presets/toast/EditToast.ts";
 
 type UseServiceLogFormFieldsProps = UseFormReturn<ServiceLogFields>
 
@@ -37,15 +37,15 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
     const fields: Record<ServiceLogFormFieldsEnum, FormFields> = useMemo(() => ({
         [ServiceLogFormFieldsEnum.Car]: {
             render: () => <CarPickerInput control={ control } fieldName="carId"/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [ServiceLogFormFieldsEnum.Type]: {
             render: () => <ServiceTypeInput control={ control } fieldName="serviceTypeId"/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [ServiceLogFormFieldsEnum.ServiceItems]: {
             render: () => <ServiceItemInput control={ control } fieldName="items" carIdFieldName="carId"/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [ServiceLogFormFieldsEnum.Date]: {
             render: () => (
@@ -57,7 +57,7 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
                     <InputDatePicker/>
                 </Input.Field>
             ),
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [ServiceLogFormFieldsEnum.OdometerValue]: {
             render: () => <OdometerValueInput
@@ -67,7 +67,7 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
                 unitText={ car?.odometer.unit.short }
                 optional
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [ServiceLogFormFieldsEnum.Note]: {
             render: () => <NoteInput
@@ -75,7 +75,7 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
                 setValue={ setValue }
                 fieldName="note"
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         }
     }), [control, setValue, car]);
 

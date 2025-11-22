@@ -6,6 +6,7 @@ import { ServiceLog } from "../../../../features/expense/_features/service/schem
 import {
     EditServiceLogBottomSheet
 } from "../../../../features/expense/_features/service/presets/bottomSheet/EditServiceLogBottomSheet.tsx";
+import { NotFoundToast } from "../../../../ui/alert/presets/toast/index.ts";
 
 function Page() {
     const { id, field } = useLocalSearchParams();
@@ -24,7 +25,7 @@ function Page() {
             try {
                 setServiceLog(await serviceLogDao.getById(id));
             } catch(e) {
-                openToast({ type: "error", title: "not-found" });
+                openToast(NotFoundToast.warning(t("service.log")));
 
                 if(router.canGoBack()) return router.back();
                 router.replace("(main)/index");

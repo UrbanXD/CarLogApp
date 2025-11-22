@@ -6,7 +6,6 @@ import useCars from "../../car/hooks/useCars.ts";
 import { RideLogFormFieldsEnum } from "../enums/RideLogFormFields.ts";
 import { FormFields, Steps } from "../../../types/index.ts";
 import { CarPickerInput } from "../../car/components/forms/inputFields/CarPickerInput.tsx";
-import { CarEditNameToast } from "../../car/presets/toast/index.ts";
 import { RidePlaceInput } from "../_features/place/components/forms/inputFields/RidePlaceInput.tsx";
 import { OdometerValueInput } from "../../car/_features/odometer/components/forms/inputFields/OdometerValueInput.tsx";
 import Input from "../../../components/Input/Input.ts";
@@ -16,6 +15,7 @@ import { RidePassengerInput } from "../_features/passenger/components/forms/inpu
 import { RideExpenseInput } from "../_features/rideExpense/components/forms/inputFields/RideExpenseInput.tsx";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
+import { EditToast } from "../../../ui/alert/presets/toast/EditToast.ts";
 
 type UseRideLogFormFieldsProps = {
     form: UseFormReturn<RideLogFormFields>
@@ -54,7 +54,7 @@ export function useRideLogFormFields({
     const fields: Record<RideLogFormFieldsEnum, FormFields> = useMemo(() => ({
         [RideLogFormFieldsEnum.Car]: {
             render: () => <CarPickerInput control={ control } fieldName="carId"/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [RideLogFormFieldsEnum.Expenses]: {
             render: () => <RideExpenseInput
@@ -63,15 +63,15 @@ export function useRideLogFormFields({
                 carIdFieldName="carId"
                 startTimeFieldName="startTime"
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [RideLogFormFieldsEnum.Places]: {
             render: () => <RidePlaceInput control={ control } fieldName="places"/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [RideLogFormFieldsEnum.Passengers]: {
             render: () => <RidePassengerInput control={ control } fieldName="passengers"/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [RideLogFormFieldsEnum.StartOdometer]: {
             render: () => <OdometerValueInput
@@ -81,7 +81,7 @@ export function useRideLogFormFields({
                 currentOdometerValue={ car?.odometer.value }
                 unitText={ car?.odometer.unit.short }
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [RideLogFormFieldsEnum.EndOdometer]: {
             render: () => <OdometerValueInput
@@ -94,7 +94,7 @@ export function useRideLogFormFields({
                 ) }
                 unitText={ car?.odometer.unit.short }
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [RideLogFormFieldsEnum.StartTime]: {
             render: () => (
@@ -106,7 +106,7 @@ export function useRideLogFormFields({
                     <InputDatePicker/>
                 </Input.Field>
             ),
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [RideLogFormFieldsEnum.EndTime]: {
             render: () => (
@@ -122,7 +122,7 @@ export function useRideLogFormFields({
                     <InputDatePicker/>
                 </Input.Field>
             ),
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [RideLogFormFieldsEnum.Time]: {
             render: () => (
@@ -143,7 +143,7 @@ export function useRideLogFormFields({
                     </Input.Field>
                 </Input.Group>
             ),
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [RideLogFormFieldsEnum.Odometer]: {
             render: () => (
@@ -163,7 +163,7 @@ export function useRideLogFormFields({
                     />
                 </Input.Group>
             ),
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [RideLogFormFieldsEnum.Note]: {
             render: () => <NoteInput
@@ -171,7 +171,7 @@ export function useRideLogFormFields({
                 setValue={ setValue }
                 fieldName="note"
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         }
     }), [control, setValue, car, formStartOdometerValue, formStartTime]);
 

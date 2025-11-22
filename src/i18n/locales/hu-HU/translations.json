@@ -16,12 +16,16 @@
     },
     "unit": "Mértékegység",
     "type": "Típus",
-    "image": "Kép"
+    "image": "Kép",
+    "element": "Elem"
   },
   "form_button": {
     "edit": "Módosítás",
     "save": "Mentés",
     "delete": "Törlés",
+    "record": "Rögzítés",
+    "continue": "Folytatás",
+    "cancel": "Mégse",
     "google_auth": "Folytatás Google fiókkal",
     "otp_next": "Tovább"
   },
@@ -47,11 +51,69 @@
       "year": "$t(date.year)"
     }
   },
+  "toast": {
+    "types": {
+      "success": "Sikeres művelet",
+      "info": "Információ",
+      "warning": "Figyelmeztetés",
+      "error": "Hiba"
+    },
+    "picker_disabled": {
+      "default_body": "Nem lehetséges művelet! Valami kimaradt."
+    },
+    "not_found": {
+      "body": "{{name}} nem található"
+    },
+    "invalid_form": {
+      "body": "Hibas form value"
+    },
+    "create": {
+      "success": {
+        "body": "{{name}} létrehozva"
+      },
+      "error": {
+        "body": "{{name}} létrehozása sikertelen"
+      }
+    },
+    "edit": {
+      "success": {
+        "body": "Változtatások mentve"
+      },
+      "error": {
+        "body": "Nem sikerült elmenteni a változtatásokat"
+      }
+    },
+    "delete": {
+      "success": {
+        "body": "{{name}} törölve"
+      },
+      "error": {
+        "body": "{{name}} törlése sikertelen"
+      }
+    },
+    "array_input": {
+      "limit": {
+        "body": "Felső határ elérve, nem adható több elem hozzá"
+      },
+      "error": {
+        "body": "Váratlan hiba lépett fel"
+      }
+    }
+  },
   "modal": {
     "accept": "Folytatás",
     "dismiss": "Mégse",
+    "bottom_sheet_leaving": {
+      "title": "Az adatok elveszhetnek!",
+      "body": "Ha most bezárja az űrlapot, akkor a rajta elvégzett változtatások elvesznek. Biztosan beszeretné zárni az űrlapot?",
+      "accept": "Űrlap bezárása"
+    },
+    "delete": {
+      "title": "{{name}} törlése",
+      "body": "A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet",
+      "accept": "$t(form_button.delete)"
+    },
     "log_delete_title": "{{name}} napló bejegyzés törlése",
-    "delete_message": "A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet",
     "not_found": "{{name}} nem található!",
     "log_not_found": "Napló bejegyzés nem található!"
   },
@@ -67,7 +129,7 @@
     "delete_account": "Fiók törlése"
   },
   "log": {
-    "title": "Napló bejegyzés",
+    "title": "Naplóbejegyzés",
     "item_not_found": "Nem található bejegyzés",
     "item_not_found_description": "Rögzítse első adatát itt...",
     "loading": "Napló adatok olvasása",
@@ -92,7 +154,10 @@
     "cost": "Összeg",
     "total_cost": "Összköltéség",
     "free": "ingyenes",
-    "in_car_currency": "Az autó alapvalutájában számolt összeg"
+    "cost_in_car_currency": "Az autó alapvalutájában számolt összeg",
+    "price_per_unit_in_car_currency": "Az autó alapvalutájában számolt egységár",
+    "price_per_unit_based_on_total_cost": "Az egyésgár szerinti összköltség",
+    "cost_in_car_currency_based_on_price_per_unit": ", az autó alapvalutájában számítva"
   },
   "date": {
     "text": "Dátum",
@@ -161,78 +226,113 @@
         }
       }
     },
-    "modal": {
-      "delete": {
-        "title": "A(z) {{name}} nevű autó törlése",
-        "body": "$t(modal.delete_message)"
+    "create": "Autó létrehozás",
+    "car_name": "{{name}} nevű autó",
+    "toast": {
+      "create": {
+        "success": {
+          "body": "Az autó már be is parkolt az Ön virtuális garázsába!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel az új autó létrehozása során, próbálja újra!"
+        }
       }
     }
   },
   "fuel": {
     "title": "Tankolási napló",
+    "log": "Tankolás-naplóbejegyzés",
     "text": "Üzemanyag",
     "fueling": "Tankolás",
-    "type": "Üzemanyag Típus",
+    "create": "Tankolás rögzítése",
+    "types": {
+      "title": "Üzemanyag Típus",
+      "undefined": "$t(common.unknown)",
+      "GASOLINE": "Benzin",
+      "DIESEL": "Dízel",
+      "ELECTRIC": "Elektromos",
+      "HYBRID": "Hibrid"
+    },
     "tank": "Üzemanyagóra",
     "tank_capacity": "Tartálytérfogat",
     "full_tank": "Tele tank",
-    "unit": "Üzemanyag mértékegység",
     "unit_types": {
-      "liter": "liter"
+      "title": "Üzemanyag mértékegység",
+      "undefined": "$t(common.unknown)",
+      "LITER": "Liter",
+      "GALLON": "Gallon",
+      "CUBIC_METER": "Köbméter",
+      "KWH": "kWh"
+    },
+    "steps": {
+      "basic_information": "Alap információk",
+      "fueling_information": "$t(fueling)"
     }
   },
   "odometer": {
     "title": "Kilométeróra-állás napló",
+    "log": "Kilométeróra-állás naplóbejegyzés",
     "text": "Kilométeróra",
     "value": "Kilométeróra-állás",
-    "unit": "Kilométeróra Mértékegység",
+    "create": "Kilométeróra-állás rögzítése",
     "open_log": "Kilométeróra-állás napló",
     "original_value": "A bejegyzés eredeti kilométeróra-állása {{value}}",
+    "unit_types": {
+      "title": "Kilométeróra mértékegység",
+      "undefined": "$t(common.unknown)",
+      "KILOMETER": "Kilométer",
+      "MILE": "Mérföld"
+    },
     "types": {
-      "simple": "Kilométeróra-frissítés",
-      "fuel": "Tankolás",
-      "service": "Szervíz",
-      "ride": "Út"
+      "undefined": "$t(common.unknown)",
+      "SIMPLE": "Kilométeróra-frissítés",
+      "FUEL": "Tankolás",
+      "SERVICE": "Szervíz",
+      "RIDE": "Út"
     }
   },
   "expenses": {
-    "title": "Pénzügyek",
-    "text": "Kiadások",
-    "item_title": "Kiadás",
-    "price": "Ár",
-    "price_per_unit": "Egységár",
-    "total_cost": "Összköltéség",
+    "title": "Kiadások",
+    "title_singular": "Kiadás",
     "description": "Az alábbi pénzügyi naplóban különböző kiadásai szerepelnek mely a kiválasztott autójához tartoznak.",
     "not_found": "Nem található kiadás",
     "not_found_action_call": "Hozzalétre első kiadását ide kattintva",
+    "create": "Kiadás rögzítése",
     "latest": "Legutóbbi kiadások",
     "more": "További kiadások",
     "types": {
       "title": "Kiadás típusa",
       "undefined": "Ismeretlen",
-      "other": "Egyéb",
-      "fuel": "Tankolás",
-      "service": "Szervíz",
-      "vehicle_inspection": "Műszaki vizsgálat",
-      "wash": "Autómosás",
-      "toll": "Útdíj",
-      "parking": "Parkolás",
-      "insurance": "Biztosítás",
-      "registration": "Regisztráció"
+      "OTHER": "Egyéb",
+      "FUEL": "Tankolás",
+      "SERVICE": "Szervíz",
+      "VEHICLE_INSPECTION": "Műszaki vizsgálat",
+      "WASH": "Autómosás",
+      "TOLL": "Útdíj",
+      "PARKING": "Parkolás",
+      "INSURANCE": "Biztosítás",
+      "REGISTRATION": "Regisztráció"
     }
   },
   "service": {
     "title": "Szervízkönyv",
+    "log": "Szervíz-naplóbejegyzés",
+    "create": "Szerviz rögzítése",
     "items": {
       "title": "Szervizelési tételek",
-      "item": "Szervizelési tétel",
+      "title_singular": "Szervizelési tétel",
       "type": "Tétel típus"
     },
-    "log": "Szervíz napló bejegyzés",
     "types": {
       "title": "Szerviz tipus",
-      "undefined": "Ismeretlen",
-      "small_service": "Kis szerviz"
+      "undefined": "$t(common.unknown)",
+      "TIRE_CHANGE": "Gumicsere",
+      "SMALL_SERVICE": "Kis szerviz",
+      "REPAIR": "Javítás",
+      "MAJOR_SERVICE": "Nagy szerviz",
+      "DIAGNOSTICS": "Diagnosztika",
+      "HOME_MAINTENANCE": "Otthoni karbantartás",
+      "INSPECTION": "Átvizsgálás"
     },
     "steps": {
       "basic_information": "Alap információk",
@@ -249,6 +349,7 @@
     "title": "Helyek",
     "title_singular": "Hely",
     "new": "Új hely",
+    "create": "Hely létrehozása",
     "start": "Indulás",
     "stop": "Megálló {{index}}",
     "end": "Érkezés",
@@ -262,6 +363,7 @@
     "title": "Utasok",
     "title_singular": "Utas",
     "new": "Új utas",
+    "create": "Utas létrehozása",
     "modal": {
       "delete": "$t(passengers.title_singular) törlése"
     }
@@ -269,7 +371,8 @@
   "rides": {
     "title": "Menetkönyv",
     "item": "Út",
-    "log": "Menet-napló bejegyzés",
+    "log_prefix": "Menet",
+    "log": "Menet-naplóbejegyzés",
     "upcoming": "Közelgő utak",
     "more": "További utak",
     "not_found": "Nem található út",
