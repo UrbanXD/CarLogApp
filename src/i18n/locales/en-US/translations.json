@@ -383,7 +383,7 @@
   "rides": {
     "title": "Ride log",
     "item": "Ride",
-    "log_prefix": "Ride",
+    "ride_planning": "Ride planning",
     "log": "Ride log entry",
     "upcoming": "Upcoming rides",
     "more": "More rides",

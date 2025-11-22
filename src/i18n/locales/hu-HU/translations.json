@@ -505,7 +505,7 @@
   "rides": {
     "title": "Menetkönyv",
     "item": "Út",
-    "log_prefix": "Menet",
+    "ride_planning": "Út tervezése",
     "log": "Menet-naplóbejegyzés",
     "upcoming": "Közelgő utak",
     "more": "További utak",
