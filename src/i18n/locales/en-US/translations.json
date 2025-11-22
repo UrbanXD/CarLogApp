@@ -41,7 +41,8 @@
     },
     "picker": {
       "choose": "Choose from the list",
-      "new_item": "New item"
+      "new_item": "New item",
+      "no_item_found": "No items found"
     },
     "image_picker": {
       "selectable_images": "Selectable images"

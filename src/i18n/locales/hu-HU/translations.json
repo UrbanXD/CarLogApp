@@ -41,7 +41,8 @@
     },
     "picker": {
       "choose": "Válasszon a listából",
-      "new_item": "Új elem"
+      "new_item": "Új elem",
+      "no_item_found": "Nem található elem"
     },
     "image_picker": {
       "selectable_images": "Kiválasztható képek"

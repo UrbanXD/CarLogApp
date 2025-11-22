@@ -4,6 +4,7 @@ import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index
 import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { FlashList, FlashListRef } from "@shopify/flash-list";
+import { useTranslation } from "react-i18next";
 
 type DropdownPickerElementsProps = {
     items: Array<PickerItemType>
@@ -32,6 +33,8 @@ function DropdownPickerItems({
     masonry,
     numColumns
 }: DropdownPickerElementsProps) {
+    const { t } = useTranslation();
+
     const flashListRef = useRef<FlashListRef<PickerItemType>>(null);
     const itemsFiltered = useRef(false); //this is for prevent scrolling to first element if data just fetched (not filtered)
     const [listReady, setListReady] = useState(false);
@@ -104,8 +107,8 @@ function DropdownPickerItems({
     );
 
     const renderListEmptyComponent = useCallback(
-        () => <Text style={ styles.notFoundText }>Nem található elem...</Text>,
-        [selectedItem]
+        () => <Text style={ styles.notFoundText }>{ t("form.picker.no_item_found") }</Text>,
+        []
     );
 
     return (
