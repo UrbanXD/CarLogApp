@@ -22,4 +22,3 @@ export const ScreenScrollViewProvider: React.FC<ScreenScrollViewProviderProps> =
         </ScreenScrollViewContext.Provider>
     );
 };
-//TODO INPUT es Screen illetve features

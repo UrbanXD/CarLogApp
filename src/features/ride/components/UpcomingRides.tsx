@@ -11,19 +11,21 @@ import { MoreDataLoading } from "../../../components/loading/MoreDataLoading.tsx
 import Link from "../../../components/Link.tsx";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
+import "dayjs/locale/en";
+import "dayjs/locale/hu";
 
 type UpcomingRidesProps = {
     car: Car | null
 }
 
 export function UpcomingRides({ car }: UpcomingRidesProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { rideLogDao } = useDatabase();
     const { mapper } = useRideLogTimelineItem();
 
     const [rides, setRides] = useState<Array<RideLog>>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [today] = useState(dayjs().hour(0).minute(0).second(0));
+    const [today] = useState(dayjs().hour(0).minute(0).second(0).toDate());
 
     useFocusEffect(
         useCallback(() => {
@@ -60,7 +62,7 @@ export function UpcomingRides({ car }: UpcomingRidesProps) {
                 isLast
             />
         );
-    }, []);
+    }, [t]);
 
     const goToRideLogTab = () => router.push("/(main)/workbook");
     const openCreateRideLogBottomSheet = () => router.push("/ride/create/");
@@ -72,7 +74,7 @@ export function UpcomingRides({ car }: UpcomingRidesProps) {
                     { t("rides.upcoming") }
                 </Text>
                 <Text style={ GLOBAL_STYLE.containerText }>
-                    { today.format("YYYY. MM. DD. - dddd") } ({ t("date.today") })
+                    { dayjs(today).format("dddd") }, { dayjs(today).format("LL") } ({ t("date.today") })
                 </Text>
             </View>
             {

@@ -49,7 +49,7 @@ export function useExpenseTimelineItem() {
 
         return {
             id: expense.id,
-            milestone: dayjs(expense.date).format("YYYY. MM DD. HH:mm"),
+            milestone: dayjs(expense.date).format("LLL"),
             title: t(`expenses.types.${ expense.type.key }`),
             icon: expense.type.icon,
             color: expense.type.primaryColor ?? undefined,
@@ -58,7 +58,7 @@ export function useExpenseTimelineItem() {
             footerText: footer,
             onPress
         };
-    }, []);
+    }, [t]);
 
     return { mapper };
 }

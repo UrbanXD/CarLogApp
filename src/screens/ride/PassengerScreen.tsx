@@ -6,12 +6,12 @@ import { useAppSelector } from "../../hooks/index.ts";
 import { getUser } from "../../features/user/model/selectors/index.ts";
 import { InfoTimeline, InfoTimelineItem } from "../../components/info/InfoTimeline.tsx";
 import { ScreenView } from "../../components/screenView/ScreenView.tsx";
-import { PickerItemType } from "../../components/Input/picker/PickerItem.tsx";
 import { router } from "expo-router";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { useTranslation } from "react-i18next";
 import { DeleteToast, NotFoundToast } from "../../ui/alert/presets/toast/index.ts";
 import { DeleteModal } from "../../ui/alert/presets/modal/index.ts";
+import { Passenger } from "../../features/ride/_features/passenger/schemas/passengerSchema.ts";
 
 export function PassengerScreen() {
     const { t } = useTranslation();
@@ -23,13 +23,13 @@ export function PassengerScreen() {
 
     const paginator = useMemo(() => passengerDao.paginator(), []);
 
-    const mapper = (item: PickerItemType, callback?: () => void): InfoTimelineItem => {
-        return ({
-            id: item.value,
-            text: item.title,
+    const mapper = useCallback((item: Passenger, callback?: () => void): InfoTimelineItem => {
+        return {
+            id: item.id,
+            text: item.name,
             callback: callback
-        });
-    };
+        };
+    }, []);
 
     const {
         ref,
@@ -41,14 +41,14 @@ export function PassengerScreen() {
         isNextFetching,
         fetchPrevious,
         isPreviousFetching
-    } = useTimelinePaginator<PassengerTableRow, PickerItemType, InfoTimelineItem>({
+    } = useTimelinePaginator<PassengerTableRow, Passenger, InfoTimelineItem>({
         paginator,
         mapper
     });
 
     const openCreateForm = () => router.push("/ride/passenger/create");
 
-    const onEdit = (id: string, callback?: () => void) => {
+    const onEdit = useCallback((id: string, callback?: () => void) => {
         if(!id) return openToast(NotFoundToast.warning(t("passengers.title_singular")));
 
         callback?.();
@@ -56,7 +56,7 @@ export function PassengerScreen() {
             pathname: "/ride/passenger/edit/[id]",
             params: { id }
         });
-    };
+    }, [openToast, t]);
 
     const handleDelete = useCallback(async (id: string, callback?: () => void) => {
         if(!id) return openToast(NotFoundToast.warning(t("passengers.title_singular")));
@@ -74,14 +74,14 @@ export function PassengerScreen() {
             console.log(e);
             openToast(DeleteToast.error(t("passengers.title_singular")));
         }
-    }, [passengerDao]);
+    }, [passengerDao, openToast, t]);
 
     const onDelete = useCallback((id: string, callback?: () => void) => {
         openModal(DeleteModal({
             name: t("passengers.title_singular"),
             acceptAction: () => handleDelete(id, callback)
         }));
-    }, [openToast, openModal]);
+    }, [openModal, t]);
 
     return (
         <ScreenView>

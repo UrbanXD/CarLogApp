@@ -9,8 +9,10 @@ import { useExpenseFormFields } from "../../hooks/useExpenseFormFields.tsx";
 import Form from "../../../../components/Form/Form.tsx";
 import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 import { CreateToast, InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
 
 export function CreateExpenseForm() {
+    const { t } = useTranslation();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
     const { expenseDao } = useDatabase();

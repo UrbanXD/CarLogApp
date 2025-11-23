@@ -1,7 +1,7 @@
 {
   "common": {
     "main_screen": "Főoldal",
-    "unassigned": "Nincs hozzárendelve",
+    "not_assigned": "Nincs hozzárendelve",
     "no_notes": "Nincs megjegyzés",
     "note": "Megjegyzés",
     "unknown": "Ismeretlen",
@@ -49,7 +49,8 @@
     },
     "date_picker": {
       "title": "$t(date.text)",
-      "year": "$t(date.year)"
+      "year": "$t(date.year)",
+      "date_placeholder": "$t(date.text)"
     }
   },
   "toast": {

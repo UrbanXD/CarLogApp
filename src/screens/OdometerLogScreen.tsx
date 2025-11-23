@@ -64,7 +64,7 @@ export function OdometerLogScreen() {
             console.log(e);
             openToast(DeleteToast.error(t("odometer.log")));
         }
-    }, [odometerLogDao, car]);
+    }, [odometerLogDao, car, t]);
 
     const onDelete = useCallback(() => {
         if(!odometerLog) return openToast(NotFoundToast.warning(t("odometer.log")));
@@ -73,7 +73,7 @@ export function OdometerLogScreen() {
             name: t("odometer.log"),
             acceptAction: () => handleDelete(odometerLog)
         }));
-    }, [odometerLog, openToast, openModal]);
+    }, [odometerLog, openToast, openModal, t]);
 
     const onEdit = useCallback((field?: OdometerLogFormFields) => {
         if(!odometerLog) return openToast(NotFoundToast.warning(t("odometer.log")));
@@ -82,7 +82,7 @@ export function OdometerLogScreen() {
             pathname: "/odometer/log/edit/[id]",
             params: { id: odometerLog.id, field: field }
         });
-    });
+    }, [t]);
 
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
@@ -100,7 +100,7 @@ export function OdometerLogScreen() {
         {
             icon: ICON_NAMES.calendar,
             title: t("date.text"),
-            content: dayjs(odometerLog?.date).format("YYYY. MM DD. HH:mm"),
+            content: dayjs(odometerLog?.date).format("LLL"),
             onPress: () => onEdit(OdometerLogFormFields.Date)
         },
         {
@@ -109,7 +109,7 @@ export function OdometerLogScreen() {
             contentTextStyle: !odometerLog?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(OdometerLogFormFields.Note)
         }
-    ]), [car, odometerLog]);
+    ]), [car, odometerLog, t]);
 
     return (
         <>

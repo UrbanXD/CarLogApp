@@ -222,7 +222,7 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                 </View>
             </View>
         );
-    }, [selectedImage, history, size, multipleSelection]);
+    }, [selectedImage, history, size, multipleSelection, t]);
 
     return (
         <Controller

@@ -69,13 +69,13 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
             console.log(e);
             openToast(DeleteToast.error(t("service.log")));
         }
-    }, [serviceLogDao]);
+    }, [serviceLogDao, t]);
 
     const onDelete = useCallback(() => {
         if(!serviceLog) return openToast(NotFoundToast.warning(t("service.log")));
 
         openModal(DeleteModal({ name: t("service.log"), acceptAction: () => handleDelete(serviceLog) }));
-    }, [serviceLog, handleDelete, openToast, openModal]);
+    }, [serviceLog, handleDelete, openToast, openModal, t]);
 
     const onEdit = useCallback((field: ServiceLogFormFieldsEnum) => {
         if(!serviceLog) return openToast(NotFoundToast.warning(t("service.log")));
@@ -84,7 +84,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
             pathname: "/expense/edit/service/[id]",
             params: { id: serviceLog.id, field: field }
         });
-    }, [serviceLog, openToast]);
+    }, [serviceLog, openToast, t]);
 
     const getAmountSubtitle = useCallback(() => {
         let subtitle = `${ serviceLog?.expense.amount.amount } ${ serviceLog?.expense.amount.currency.symbol }`;
@@ -110,7 +110,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
                 } }
             />
         );
-    }, [serviceLog, onEdit, serviceItemToExpandableListItem, isServiceItemListExpanded]);
+    }, [serviceLog, onEdit, serviceItemToExpandableListItem, isServiceItemListExpanded, t]);
 
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
@@ -130,7 +130,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         {
             icon: ICON_NAMES.calendar,
             title: t("date.text"),
-            content: dayjs(serviceLog?.expense?.date).format("YYYY. MM DD. HH:mm"),
+            content: dayjs(serviceLog?.expense?.date).format("LLL"),
             onPress: () => onEdit(ServiceLogFormFieldsEnum.Date)
         },
         {
@@ -138,7 +138,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
             title: t("car.odometer.value"),
             content: serviceLog?.odometer
                      ? `${ serviceLog.odometer.value } ${ serviceLog.odometer.unit.short }`
-                     : t("common.unassigned"),
+                     : t("common.not_assigned"),
             contentTextStyle: !serviceLog?.odometer && { color: COLORS.gray2 },
             onPress: () => onEdit(ServiceLogFormFieldsEnum.OdometerValue)
         },
@@ -148,7 +148,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
             contentTextStyle: !serviceLog?.expense?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(ServiceLogFormFieldsEnum.Note)
         }
-    ]), [car, serviceLog, isServiceItemListExpanded, getAmountSubtitle]);
+    ]), [car, serviceLog, isServiceItemListExpanded, getAmountSubtitle, t]);
 
     return (
         <>

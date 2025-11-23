@@ -43,7 +43,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
                 <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
             </>
         );
-    }, []);
+    }, [t]);
 
     const amountFieldTotalAmountText = useCallback((
         amount: number,
@@ -71,7 +71,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
                 }
             </>
         );
-    }, [formQuantity]);
+    }, [formQuantity, t]);
 
     const fields: Record<FuelLogFormFieldsEnum, FormFields> = useMemo(() => ({
         [FuelLogFormFieldsEnum.Car]: {
@@ -133,7 +133,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             />,
             editToastMessages: EditToast
         }
-    }), [control, setValue, car, amountFieldTotalAmountText, amountFieldExchangeText]);
+    }), [control, setValue, car, amountFieldTotalAmountText, amountFieldExchangeText, t]);
 
     const multiStepFormSteps: Steps = [
         {

@@ -6,12 +6,12 @@ import { useAppSelector } from "../../hooks/index.ts";
 import { getUser } from "../../features/user/model/selectors/index.ts";
 import { InfoTimeline, InfoTimelineItem } from "../../components/info/InfoTimeline.tsx";
 import { ScreenView } from "../../components/screenView/ScreenView.tsx";
-import { PickerItemType } from "../../components/Input/picker/PickerItem.tsx";
 import { router } from "expo-router";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { useTranslation } from "react-i18next";
 import { DeleteModal } from "../../ui/alert/presets/modal/index.ts";
 import { DeleteToast, NotFoundToast } from "../../ui/alert/presets/toast/index.ts";
+import { Place } from "../../features/ride/_features/place/schemas/placeSchema.ts";
 
 export function PlaceScreen() {
     const { t } = useTranslation();
@@ -21,18 +21,15 @@ export function PlaceScreen() {
 
     if(!user) return <></>;
 
-    const paginator = useMemo(
-        () => placeDao.paginator(),
-        []
-    );
+    const paginator = useMemo(() => placeDao.paginator(), []);
 
-    const mapper = (item: PickerItemType, callback?: () => void): InfoTimelineItem => {
-        return ({
-            id: item.value,
-            text: item.title,
+    const mapper = useCallback((item: Place, callback?: () => void): InfoTimelineItem => {
+        return {
+            id: item.id,
+            text: item.name,
             callback: callback
-        });
-    };
+        };
+    }, []);
 
     const {
         ref,
@@ -44,22 +41,22 @@ export function PlaceScreen() {
         isNextFetching,
         fetchPrevious,
         isPreviousFetching
-    } = useTimelinePaginator<PlaceTableRow, PickerItemType, InfoTimelineItem>({
+    } = useTimelinePaginator<PlaceTableRow, Place, InfoTimelineItem>({
         paginator,
         mapper
     });
 
     const openCreateForm = () => router.push("/ride/place/create");
 
-    const onEdit = (id: string, callback?: () => void) => {
-        if(!id) return;
+    const onEdit = useCallback((id: string, callback?: () => void) => {
+        if(!id) return openToast(NotFoundToast.warning(t("places.title_singular")));
 
         callback?.();
         router.push({
             pathname: "/ride/place/edit/[id]",
             params: { id }
         });
-    };
+    }, []);
 
     const handleDelete = useCallback(async (id: string, callback?: () => void) => {
         if(!id) return openToast(NotFoundToast.warning(t("places.title_singular")));
@@ -77,11 +74,11 @@ export function PlaceScreen() {
             console.log(e);
             openToast(DeleteToast.error(t("places.title_singular")));
         }
-    }, [placeDao]);
+    }, [placeDao, openToast, t]);
 
     const onDelete = useCallback((id: string, callback?: () => void) => {
         openModal(DeleteModal({ name: t("places.title_singular"), acceptAction: () => handleDelete(id, callback) }));
-    }, [openToast, openModal]);
+    }, [openModal, t]);
 
     return (
         <ScreenView>

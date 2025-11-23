@@ -58,7 +58,7 @@ export function LatestExpenses({ car }: LatestExpenseProps) {
                 isLast
             />
         );
-    }, []);
+    }, [t]);
 
     const goToExpensesTab = () => router.push("/(main)/expenses");
     const openCreateExpenseBottomSheet = () => router.push("/expense/create/");

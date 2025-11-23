@@ -1,52 +1,102 @@
-import { Pressable } from "react-native";
-import { ICON_NAMES } from "../../../constants/index.ts";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { InputRow } from "../common/InputRow.tsx";
-import TextInput from "../text/TextInput.tsx";
 import React, { useCallback } from "react";
 import Divider from "../../Divider.tsx";
 import { formTheme } from "../../../ui/form/constants/theme.ts";
 import { DatePickerViews } from "../../../contexts/datePicker/DatePickerContext.ts";
 import dayjs from "dayjs";
+import Icon from "../../Icon.tsx";
+import { useTranslation } from "react-i18next";
 
 type InputDatePickerControllerProps = {
-    date: dayjs.Dayjs
+    date: Date
     open: (view: DatePickerViews) => void
     expanded: boolean
 }
 
 export function InputDatePickerController({ date, open }: InputDatePickerControllerProps) {
+    const { t } = useTranslation();
+
+    const is12HourFormat = dayjs().localeData().longDateFormat("LT").includes("A");
+
     const onPressDate = useCallback(() => open("calendar"));
     const onPressTime = useCallback(() => open("time"));
+
+    const styles = useStyles(is12HourFormat);
 
     return (
         <InputRow>
             <Pressable
                 onPress={ onPressDate }
-                style={ { flex: 1 } }
+                style={ [styles.container, styles.dateContainer] }
             >
-                <TextInput
-                    value={ date.format("YYYY. MMM DD.") }
-                    type="secondary"
-                    icon={ ICON_NAMES.calendar }
-                    editable={ false }
-                    alwaysFocused={ true }
-                />
+                <View style={ styles.iconContainer }>
+                    <Icon icon={ ICON_NAMES.calendar } size={ formTheme.iconSize } color={ formTheme.valueTextColor }/>
+                </View>
+                <Text
+                    numberOfLines={ 1 }
+                    adjustsFontSizeToFit
+                    style={ [styles.text, !date && styles.placeholder] }
+                >
+                    {
+                        date
+                        ? dayjs(date).format("LL")
+                        : t("form.date_picker.date_placeholder")
+                    }
+                </Text>
             </Pressable>
             <Divider isVertical size={ formTheme.containerHeight } color={ formTheme.activeColor }/>
             <Pressable
                 onPress={ onPressTime }
-                style={ { flex: 0.45 } }
+                style={ [styles.container, styles.timeContainer] }
             >
-                <TextInput
-                    value={ date.format("HH:mm") }
-                    placeholder="00:00"
-                    type="secondary"
-                    actionIcon={ ICON_NAMES.clock }
-                    textInputStyle={ { textAlign: "right" } }
-                    editable={ false }
-                    alwaysFocused={ true }
-                />
+                <Text
+                    numberOfLines={ 1 }
+                    adjustsFontSizeToFit
+                    style={ [styles.text, !date && styles.placeholder] }
+                >
+                    {
+                        date
+                        ? dayjs(date).format("LT")
+                        : dayjs().hour(0).minute(0).format("LT") //placeholder
+                    }
+                </Text>
+                <View style={ styles.iconContainer }>
+                    <Icon icon={ ICON_NAMES.clock } size={ formTheme.iconSize } color={ formTheme.valueTextColor }/>
+                </View>
             </Pressable>
         </InputRow>
     );
 }
+
+const useStyles = (is12HourFormat: boolean) => StyleSheet.create({
+    container: {
+        flexDirection: "row",
+        gap: SEPARATOR_SIZES.lightSmall / 2,
+        alignItems: "center",
+        justifyContent: "flex-start",
+        overflow: "hidden"
+    },
+    dateContainer: {
+        flex: 1
+    },
+    timeContainer: {
+        flex: is12HourFormat ? 0.55 : 0.45,
+        justifyContent: "flex-end"
+    },
+    text: {
+        color: formTheme.valueTextColor,
+        fontSize: formTheme.valueTextFontSize,
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 1
+    },
+    placeholder: {
+        color: formTheme.placeHolderColor
+    },
+    iconContainer: {
+        width: formTheme.iconSize,
+        alignItems: "center"
+    }
+});

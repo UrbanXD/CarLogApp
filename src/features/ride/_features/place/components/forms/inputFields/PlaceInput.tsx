@@ -24,7 +24,7 @@ export function PlaceInput({
     const user = useAppSelector(getUser);
     if(!user) return <></>;
 
-    const paginator = useMemo(() => placeDao.paginator(), []);
+    const paginator = useMemo(() => placeDao.pickerPaginator(), []);
 
     const { form, submitHandler } = useCreatePlace({ userId: user.id, dismissSheet: false });
 

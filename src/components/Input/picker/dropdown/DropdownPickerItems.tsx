@@ -108,7 +108,7 @@ function DropdownPickerItems({
 
     const renderListEmptyComponent = useCallback(
         () => <Text style={ styles.notFoundText }>{ t("form.picker.no_item_found") }</Text>,
-        []
+        [t]
     );
 
     return (

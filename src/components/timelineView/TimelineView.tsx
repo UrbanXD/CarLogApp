@@ -71,19 +71,19 @@ function ITimelineView({
                 isLast
             />
         );
-    }, [isInitialFetching]);
+    }, [isInitialFetching, t]);
 
     const renderHeader = useCallback(() => {
         if(!isPreviousFetching) return <></>;
 
         return <MoreDataLoading text={ t("log.previous_data_loading") }/>;
-    }, [isPreviousFetching]);
+    }, [isPreviousFetching, t]);
 
     const renderFooter = useCallback(() => {
         if(!isNextFetching) return <></>;
 
         return <MoreDataLoading text={ t("log.next_data_loading") }/>;
-    }, [isNextFetching]);
+    }, [isNextFetching, t]);
 
     const keyExtractor = useCallback((item: TimelineItemType) => item.id, []);
 

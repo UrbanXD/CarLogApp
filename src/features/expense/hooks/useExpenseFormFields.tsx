@@ -12,12 +12,14 @@ import Input from "../../../components/Input/Input.ts";
 import { NoteInput } from "../../../components/Input/_presets/NoteInput.tsx";
 import useCars from "../../car/hooks/useCars.ts";
 import { Text } from "react-native";
-import { EditToast } from "../../../ui/alert/presets/toast/EditToast.ts";
+import { EditToast } from "../../../ui/alert/presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
 
 type UseExpenseFormFieldsProps = UseFormReturn<ExpenseFields>
 
 export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
     const { control, setValue, clearErrors } = props;
+    const { t } = useTranslation();
     const { getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(null);
@@ -37,7 +39,7 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
                 <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
             </>
         );
-    }, []);
+    }, [t]);
 
     const fields: Record<ExpenseFormFields, FormFields> = useMemo(() => ({
         [ExpenseFormFields.Car]: {

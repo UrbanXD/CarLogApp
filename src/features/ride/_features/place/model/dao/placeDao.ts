@@ -35,7 +35,19 @@ export class PlaceDao extends Dao<PlaceTableRow, Place, PlaceMapper> {
         return super.update(entity, safe);
     }
 
-    paginator(perPage?: number = 30): CursorPaginator<PlaceTableRow, PickerItemType> {
+    paginator(perPage?: number = 30): CursorPaginator<PlaceTableRow, Place> {
+        return new CursorPaginator<PlaceTableRow, Place>(
+            this.db,
+            PLACE_TABLE,
+            { cursor: [{ field: "name", order: "asc", toLowerCase: true }, { field: "id" }], defaultOrder: "asc" },
+            {
+                perPage,
+                mapper: this.mapper.toDto.bind(this.mapper)
+            }
+        );
+    }
+
+    pickerPaginator(perPage?: number = 30): CursorPaginator<PlaceTableRow, PickerItemType> {
         return new CursorPaginator<PlaceTableRow, PickerItemType>(
             this.db,
             PLACE_TABLE,

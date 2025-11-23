@@ -9,7 +9,6 @@ export type DatePickerProviderProps = {
     children: ReactElement
     initialDate?: DateType
     initialView?: DatePickerViews
-    locale?: string
     minDate?: DateType
     maxDate?: DateType
     onSubmit: (date: dayjs.Dayjs) => void
@@ -19,13 +18,12 @@ export function DatePickerProvider({
     children,
     initialDate,
     initialView = "calendar",
-    locale = "hu",
     minDate = MIN_DATE,
     maxDate = MAX_DATE,
     onSubmit
 }: DatePickerProviderProps) {
-    const [date, setDate] = useState<dayjs.Dayjs>(dayjs(initialDate).locale(locale));
-    const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs(initialDate).locale(locale));
+    const [date, setDate] = useState<Date>(dayjs(initialDate).toDate());
+    const [calendarDate, setCalendarDate] = useState<Date>(dayjs(initialDate).toDate());
     const [view, setView] = useState<CalendarViews>(initialView);
 
     useEffect(() => {
@@ -37,11 +35,11 @@ export function DatePickerProvider({
     }, [initialView]);
 
     const nextMonthInCalendar = () => {
-        setCalendarDate(prevState => prevState.add(1, "month"));
+        setCalendarDate(prevState => dayjs(prevState).add(1, "month").toDate());
     };
 
     const previousMonthInCalendar = () => {
-        setCalendarDate(prevState => prevState.subtract(1, "month"));
+        setCalendarDate(prevState => dayjs(prevState).subtract(1, "month").toDate());
     };
 
     const openView = (view: DatePickerViews) => setView(view);
@@ -60,9 +58,8 @@ export function DatePickerProvider({
                 previousMonthInCalendar,
                 currentView: view,
                 openView,
-                locale,
-                minDate: dayjs(minDate),
-                maxDate: dayjs(maxDate),
+                minDate: dayjs(minDate).toDate(),
+                maxDate: dayjs(maxDate).toDate(),
                 submit
             } }
         >

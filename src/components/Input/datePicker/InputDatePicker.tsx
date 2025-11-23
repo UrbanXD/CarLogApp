@@ -17,15 +17,13 @@ type InputDatePicker = {
     defaultDate?: DateType
     minDate?: DateType
     maxDate?: DateType
-    locale?: string
 }
 
 function InputDatePicker({
     title,
     defaultDate,
     maxDate,
-    minDate,
-    locale = "hu"
+    minDate
 }: InputDatePicker) {
     const { t } = useTranslation();
 
@@ -34,22 +32,22 @@ function InputDatePicker({
     const fieldValue = useMemo(() => {
         const rawValue = inputFieldContext?.field.value;
 
-        if(rawValue && dayjs(rawValue).isValid()) return dayjs(rawValue).locale(locale);
+        if(rawValue && dayjs(rawValue).isValid()) return dayjs(rawValue).toDate();
 
-        return dayjs(defaultDate).locale(locale);
-    }, [inputFieldContext?.field.value, locale, defaultDate]);
+        return dayjs(defaultDate).toDate();
+    }, [inputFieldContext?.field.value, defaultDate]);
 
     const isExpanded = useSharedValue(false);
 
-    const [date, setDate] = useState<dayjs.Dayjs>(fieldValue);
+    const [date, setDate] = useState<Date>(fieldValue);
     const [view, setView] = useState<DatePickerViews>("calendar");
 
     useEffect(() => {
-        if(onChange) onChange(date.toDate());
+        if(onChange) onChange(date);
     }, [date]);
 
     useEffect(() => {
-        if(date.isSame(fieldValue)) return;
+        if(dayjs(date).isSame(fieldValue)) return;
 
         setDate(fieldValue);
     }, [fieldValue]);
@@ -64,7 +62,7 @@ function InputDatePicker({
     };
 
     const submit = (date: DateType) => {
-        setDate(dayjs(date).locale(locale));
+        setDate(dayjs(date).toDate());
         isExpanded.value = false;
     };
 
@@ -77,7 +75,6 @@ function InputDatePicker({
                     maxDate={ maxDate }
                     minDate={ minDate }
                     initialView={ view }
-                    locale={ locale }
                     onSubmit={ submit }
                     onClose={ close }
                 >

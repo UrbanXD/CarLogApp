@@ -77,7 +77,7 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
             />,
             editToastMessages: EditToast
         }
-    }), [control, setValue, car]);
+    }), [control, setValue, car, t]);
 
     const multiStepFormSteps: Steps = [
         {

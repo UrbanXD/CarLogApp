@@ -9,7 +9,7 @@ import { DateNodeType } from "@quidone/react-native-wheel-picker/dest/typescript
 import { heightPercentageToDP } from "react-native-responsive-screen";
 
 export function WheelDatePicker() {
-    const { date, setDate, maxDate, minDate, locale } = useDatePicker();
+    const { date, setDate, maxDate, minDate } = useDatePicker();
 
     const renderDate = useCallback(() => (
         <DatePicker.Date renderItem={ renderDateText } enableScrollByTapOnItem/>
@@ -28,19 +28,20 @@ export function WheelDatePicker() {
     const onDateChanged = useCallback((event: { date: OnlyDateFormat }) => {
         const newDate = dayjs(event.date);
 
-        setDate(prevState => prevState
+        setDate(prevState => dayjs(prevState)
             .set("year", newDate.year())
             .set("month", newDate.month())
             .set("date", newDate.date())
+            .toDate()
         );
     }, []);
 
     return (
         <DatePicker
-            date={ date.format("YYYY-MM-DD") }
-            minDate={ minDate.format("YYYY-MM-DD") }
-            maxDate={ maxDate.format("YYYY-MM-DD") }
-            locale={ locale }
+            date={ dayjs(date).format("YYYY-MM-DD") }
+            minDate={ dayjs(minDate).format("YYYY-MM-DD") }
+            maxDate={ dayjs(maxDate).format("YYYY-MM-DD") }
+            locale={ dayjs.locale() }
             enableScrollByTapOnItem
             scrollEventThrottle={ 16 }
             pickerStyle={ styles.picker }

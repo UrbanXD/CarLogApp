@@ -1,11 +1,8 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import dayjs, { Dayjs } from "dayjs";
-import "dayjs/locale/hu";
+import { Dayjs } from "dayjs";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { secondsToTimeText } from "../../../utils/secondsToTimeDuration.ts";
-
-dayjs.locale("hu");
 
 type RideTimeProps = {
     startTime: Dayjs

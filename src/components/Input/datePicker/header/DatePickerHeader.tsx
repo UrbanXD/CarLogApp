@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated";
 import Icon from "../../../Icon.tsx";
 import { DatePickerViews, useDatePicker } from "../../../../contexts/datePicker/DatePickerContext.ts";
+import dayjs from "dayjs";
 
 type DatePickerHeaderProps = {
     title?: string
@@ -49,7 +50,7 @@ export function DatePickerHeader({ title }: DatePickerHeaderProps) {
                         size={ FONT_SIZES.p3 * ICON_FONT_SIZE_SCALE }
                         style={ { marginRight: SEPARATOR_SIZES.lightSmall / 2 } }
                     />
-                    <Text style={ styles.label }>{ date.format("YYYY. MMM D.") }</Text>
+                    <Text style={ styles.label }>{ dayjs(date).format("LL") }</Text>
                     <Animated.View style={ dateArrowStyle }>
                         <Icon
                             icon={ ICON_NAMES.downArrowHead }
@@ -57,13 +58,18 @@ export function DatePickerHeader({ title }: DatePickerHeaderProps) {
                         />
                     </Animated.View>
                 </Pressable>
-                <Pressable onPress={ onPressTimeSelector } style={ { flexDirection: "row", alignItems: "center" } }>
+                <Pressable
+                    onPress={ onPressTimeSelector }
+                    style={ { flexDirection: "row", alignItems: "center", flexShrink: 1 } }
+                >
                     <Icon
                         icon={ ICON_NAMES.clock }
                         size={ FONT_SIZES.p3 * ICON_FONT_SIZE_SCALE }
                         style={ { marginRight: SEPARATOR_SIZES.lightSmall / 2 } }
                     />
-                    <Text style={ styles.label }>{ date.format("HH:mm") }</Text>
+                    <Text numberOfLines={ 1 } adjustsFontSizeToFit style={ styles.label }>
+                        { dayjs(date).format("LT") }
+                    </Text>
                     <Animated.View style={ timeArrowStyle }>
                         <Icon
                             icon={ ICON_NAMES.downArrowHead }
@@ -88,7 +94,8 @@ const styles = StyleSheet.create({
         paddingBottom: SEPARATOR_SIZES.lightSmall,
         marginBottom: SEPARATOR_SIZES.lightSmall,
         borderBottomWidth: 1,
-        borderColor: COLORS.white2
+        borderColor: COLORS.white2,
+        overflow: "hidden"
     },
     title: {
         fontFamily: "Gilroy-Heavy",
@@ -100,6 +107,8 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.p3,
         color: COLORS.white2,
-        textTransform: "capitalize"
+        textTransform: "capitalize",
+        flexShrink: 1,
+        minWidth: 0
     }
 });

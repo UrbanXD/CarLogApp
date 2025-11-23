@@ -1,7 +1,7 @@
 {
   "common": {
     "main_screen": "Home",
-    "unassigned": "Unassigned",
+    "not_assigned": "Not assigned",
     "no_notes": "No notes",
     "note": "Note",
     "unknown": "Unknown",

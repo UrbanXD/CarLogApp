@@ -5,6 +5,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import translationEn from "./locales/en-US/translations.json";
 import translationHu from "./locales/hu-HU/translations.json";
 import { BaseConfig } from "../constants/index.ts";
+import dayjs from "dayjs";
+import weekday from "dayjs/plugin/weekday";
+import "dayjs/locale/en";
+import "dayjs/locale/hu";
+
+dayjs.extend(weekday);
 
 const resources = {
     "en-US": { translation: translationEn },
@@ -73,5 +79,9 @@ export async function initI18n() {
 }
 
 initI18n();
+
+i18n.on("languageChanged", (lng) => {
+    dayjs.locale(lng.slice(0, 2));
+});
 
 export default i18n;

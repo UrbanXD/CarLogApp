@@ -87,7 +87,7 @@ export function useServiceLogTimelineFilter({
     });
 
     filterButtons.unshift({
-        title: t("common.all"),
+        title: t("common.filters.all"),
         active: selectedTypesId.length === 0,
         onPress: () => clearFilters(TYPES_FILTER_KEY)
     });

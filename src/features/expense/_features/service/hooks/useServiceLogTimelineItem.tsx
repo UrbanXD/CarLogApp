@@ -10,12 +10,12 @@ import { useTranslation } from "react-i18next";
 dayjs.extend(utc);
 
 export function useServiceLogTimelineItem() {
+    const { t } = useTranslation();
+
     const mapper = useCallback((
         serviceLog: ServiceLog,
         callback?: () => void
     ): TimelineItemType => {
-        const { t } = useTranslation();
-
         const onPress = () => {
             callback?.();
 
@@ -36,7 +36,7 @@ export function useServiceLogTimelineItem() {
 
         return {
             id: serviceLog.id,
-            milestone: dayjs(serviceLog.expense.date).format("YYYY. MM DD. HH:mm"),
+            milestone: dayjs(serviceLog.expense.date).format("LLL"),
             title: t(`service.types.${ serviceLog.serviceType.key }`),
             icon: serviceLog.expense.type.icon,
             color: serviceLog.expense.type.primaryColor ?? undefined,
@@ -45,7 +45,7 @@ export function useServiceLogTimelineItem() {
             footerText: footer,
             onPress
         };
-    }, []);
+    }, [t]);
 
     return { mapper };
 }

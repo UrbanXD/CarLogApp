@@ -35,7 +35,19 @@ export class PassengerDao extends Dao<PassengerTableRow, Passenger, PassengerMap
         return super.update(entity, safe);
     }
 
-    paginator(perPage?: number = 30): CursorPaginator<PassengerTableRow, PickerItemType> {
+    paginator(perPage?: number = 30): CursorPaginator<PassengerTableRow, Passenger> {
+        return new CursorPaginator<PassengerTableRow, Passenger>(
+            this.db,
+            PASSENGER_TABLE,
+            { cursor: [{ field: "name", order: "asc", toLowerCase: true }, { field: "id" }], order: "asc" },
+            {
+                perPage,
+                mapper: this.mapper.toDto.bind(this.mapper)
+            }
+        );
+    }
+
+    pickerPaginator(perPage?: number = 30): CursorPaginator<PassengerTableRow, PickerItemType> {
         return new CursorPaginator<PassengerTableRow, PickerItemType>(
             this.db,
             PASSENGER_TABLE,

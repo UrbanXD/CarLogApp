@@ -9,9 +9,11 @@ import { useRideLogFormFields } from "../../hooks/useRideLogFormFields.tsx";
 import MultiStepForm from "../../../../components/Form/MultiStepForm.tsx";
 import { updateCarOdometer } from "../../../car/model/slice/index.ts";
 import { CreateToast, InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
 
 export function CreateRideLogForm() {
     const dispatch = useAppDispatch();
+    const { t } = useTranslation();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
     const { rideLogDao } = useDatabase();

@@ -57,7 +57,7 @@ function CarProfileView({
             content: t("currency.primary"),
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.Currency)
         }
-    ]), [car, openEditCarStep]);
+    ]), [car, openEditCarStep, t]);
 
     return (
         <View style={ styles.container }>

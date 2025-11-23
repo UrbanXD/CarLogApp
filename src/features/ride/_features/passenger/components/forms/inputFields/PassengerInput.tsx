@@ -24,7 +24,7 @@ export function PassengerInput({
     const user = useAppSelector(getUser);
     if(!user) return <></>;
 
-    const paginator = useMemo(() => passengerDao.paginator(), []);
+    const paginator = useMemo(() => passengerDao.pickerPaginator(), []);
 
     const { form, submitHandler } = useCreatePassenger({ userId: user.id, dismissSheet: false });
 

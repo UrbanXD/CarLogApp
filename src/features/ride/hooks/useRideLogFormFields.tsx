@@ -15,7 +15,7 @@ import { RidePassengerInput } from "../_features/passenger/components/forms/inpu
 import { RideExpenseInput } from "../_features/rideExpense/components/forms/inputFields/RideExpenseInput.tsx";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
-import { EditToast } from "../../../ui/alert/presets/toast/EditToast.ts";
+import { EditToast } from "../../../ui/alert/presets/toast/index.ts";
 
 type UseRideLogFormFieldsProps = {
     form: UseFormReturn<RideLogFormFields>
@@ -116,7 +116,7 @@ export function useRideLogFormFields({
                     fieldNameText={ t("rides.end") }
                     fieldInfoText={ t(
                         "rides.start_time_value",
-                        { value: `${ dayjs(formStartTime).format("YYYY. MM. DD. HH:mm") }` }
+                        { value: `${ dayjs(formStartTime).format("LLL") }` }
                     ) }
                 >
                     <InputDatePicker/>
@@ -173,7 +173,7 @@ export function useRideLogFormFields({
             />,
             editToastMessages: EditToast
         }
-    }), [control, setValue, car, formStartOdometerValue, formStartTime]);
+    }), [control, setValue, car, formStartOdometerValue, formStartTime, t]);
 
     const multiStepFormSteps: Steps = [
         {

@@ -9,6 +9,7 @@ import { AnimatedFlashList } from "../AnimatedComponents/index.ts";
 import Divider from "../Divider.tsx";
 import Icon from "../Icon.tsx";
 import FloatingActionMenu from "../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
+import { useTranslation } from "react-i18next";
 
 export type InfoTimelineItem = {
     id: string | number
@@ -47,6 +48,8 @@ function IInfoTimeline({
     notFoundText,
     style
 }: InfoTimelineProps) {
+    const { t } = useTranslation();
+
     const renderItem = useCallback(({ item }: ListRenderItemInfo<InfoTimelineItem>) => (
         <View style={ itemStyles.container }>
             <Text style={ itemStyles.text }>{ item.text }</Text>
@@ -71,7 +74,7 @@ function IInfoTimeline({
         if(isInitialFetching) return <MoreDataLoading/>;
 
         return <Text style={ styles.notFoundText }>{ notFoundText ?? t("common.no_data_found") }</Text>;
-    }, [isInitialFetching]);
+    }, [isInitialFetching, t]);
 
     const renderHeader = useCallback(() => {
         if(!isPreviousFetching) return <></>;
@@ -93,10 +96,9 @@ function IInfoTimeline({
                 margin={ SEPARATOR_SIZES.lightSmall }
             />
         );
-    });
+    }, []);
 
-    //TODO fixelni nem kell  az index de valamiert hiba jon  elo
-    const keyExtractor = useCallback((item: InfoTimelineItem, index: number) => item?.id ?? index, []);
+    const keyExtractor = useCallback((item: InfoTimelineItem) => item.id, []);
 
     return (
         <>

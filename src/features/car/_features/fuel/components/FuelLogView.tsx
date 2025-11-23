@@ -68,7 +68,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
             console.log(e);
             openToast(DeleteToast.error(t("fuel.log")));
         }
-    }, [fuelLog, car]);
+    }, [fuelLog, car, t]);
 
     const onDelete = useCallback(() => {
         if(!fuelLog) {
@@ -79,7 +79,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
             name: t("fuel.log"),
             acceptAction: () => handleDelete(fuelLog)
         }));
-    }, [fuelLog, openToast, openModal]);
+    }, [fuelLog, openToast, openModal, t]);
 
     const onEdit = useCallback((field?: FuelLogFormFieldsEnum) => {
         if(!fuelLog) {
@@ -90,7 +90,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
             pathname: "/expense/edit/fuel/[id]",
             params: { id: fuelLog.id, field: field }
         });
-    }, [fuelLog, openToast]);
+    }, [fuelLog, openToast, t]);
 
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
@@ -132,7 +132,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         {
             icon: ICON_NAMES.calendar,
             title: t("date.text"),
-            content: dayjs(fuelLog?.expense?.date).format("YYYY. MM DD. HH:mm"),
+            content: dayjs(fuelLog?.expense?.date).format("LLL"),
             onPress: () => onEdit(FuelLogFormFieldsEnum.Date)
         },
         {
@@ -150,7 +150,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
             contentTextStyle: !fuelLog?.expense?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(FuelLogFormFieldsEnum.Note)
         }
-    ]), [car, fuelLog]);
+    ]), [car, fuelLog, t]);
 
     return (
         <>

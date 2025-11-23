@@ -5,6 +5,7 @@ import React from "react";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import Button from "../../../Button/Button.ts";
 import { formTheme } from "../../../../ui/form/constants/theme.ts";
+import dayjs from "dayjs";
 
 export function CalendarHeader() {
     const { calendarDate, previousMonthInCalendar, nextMonthInCalendar } = useDatePicker();
@@ -20,7 +21,7 @@ export function CalendarHeader() {
                 backgroundColor="transparent"
                 onPress={ previousMonthInCalendar }
             />
-            <Text style={ styles.label }>{ calendarDate.format("YYYY MMMM") }</Text>
+            <Text style={ styles.label }>{ dayjs(calendarDate).format("YYYY MMMM") }</Text>
             <Button.Icon
                 icon={ ICON_NAMES.rightArrowHead }
                 iconSize={ FONT_SIZES.h3 }

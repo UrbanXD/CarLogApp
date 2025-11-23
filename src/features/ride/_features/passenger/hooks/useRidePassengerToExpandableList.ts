@@ -11,7 +11,7 @@ export function useRidePassengerToExpandableList() {
             id: item.id,
             title: item.name ?? t("common.unknown")
         };
-    });
+    }, [t]);
 
     return { ridePassengerToExpandableList };
 }

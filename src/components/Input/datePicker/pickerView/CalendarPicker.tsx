@@ -8,22 +8,24 @@ import { StyleSheet } from "react-native";
 import { COLORS, FONT_SIZES } from "../../../../constants/index.ts";
 
 export function CalendarPicker() {
-    const { date, setDate, calendarDate, locale } = useDatePicker();
+    const { date, setDate, calendarDate } = useDatePicker();
     const defaultStyles = useDefaultStyles("dark");
 
-    const [year, setYear] = useState(calendarDate.year());
+    const [year, setYear] = useState(dayjs(calendarDate).year());
 
     useEffect(() => {
-        setYear(calendarDate.year());
+        setYear(dayjs(calendarDate).year());
     }, [calendarDate]);
 
     const onDateChange: SingleChange = ({ date: newDateObj }) => {
         const newDate = dayjs(newDateObj);
 
-        setDate(prevState => prevState
+        setDate(prevState =>
+            dayjs(prevState)
             .set("year", newDate.year())
             .set("month", newDate.month())
             .set("date", newDate.date())
+            .toDate()
         );
     };
 
@@ -48,14 +50,14 @@ export function CalendarPicker() {
             hideHeader
             disableMonthPicker
             disableYearPicker
-            firstDayOfWeek={ 1 } // start with Monday (1) | Sunday is 0
+            firstDayOfWeek={ dayjs().weekday(0).get("day") } // start with Monday (1) | Sunday is 0
             weekdaysFormat="min"
             showOutsideDays
             date={ date }
             year={ year }
-            month={ calendarDate.month() }
+            month={ dayjs(calendarDate).month() }
             onChange={ onDateChange }
-            locale={ locale }
+            locale={ dayjs.locale() }
             containerHeight={ heightPercentageToDP(25) }
             styles={ datePickerStyles }
         />

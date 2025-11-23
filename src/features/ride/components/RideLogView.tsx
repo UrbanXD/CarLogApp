@@ -103,7 +103,7 @@ export function RideLogView({ id }: RideLogViewProps) {
             console.log(e);
             openToast(DeleteToast.error(t("rides.log")));
         }
-    }, [rideLogDao]);
+    }, [rideLogDao, t]);
 
     const onDelete = useCallback(() => {
         if(!rideLog) {
@@ -117,7 +117,7 @@ export function RideLogView({ id }: RideLogViewProps) {
             name: t("rides.log"),
             acceptAction: () => handleDelete(rideLog)
         }));
-    }, [rideLog, handleDelete, openToast, openModal]);
+    }, [rideLog, handleDelete, openToast, openModal, t]);
 
     const onEdit = useCallback((field: RideLogFormFieldsEnum) => {
         if(!rideLog) return openToast(NotFoundToast.warning(t("rides.log")));
@@ -126,7 +126,7 @@ export function RideLogView({ id }: RideLogViewProps) {
             pathname: "/ride/edit/[id]",
             params: { id: rideLog.id, field: field }
         });
-    }, [rideLog, openToast]);
+    }, [rideLog, openToast, t]);
 
     const renderRideExpenses = useCallback(() => {
         if(!rideLog) return <></>;
@@ -144,7 +144,7 @@ export function RideLogView({ id }: RideLogViewProps) {
                 } }
             />
         );
-    }, [rideLog, onEdit, rideExpenseToExpandableList, isExpenseListExpanded]);
+    }, [rideLog, onEdit, rideExpenseToExpandableList, isExpenseListExpanded, t]);
 
     const renderRidePlaces = useCallback(() => {
         if(!rideLog) return <></>;
@@ -253,7 +253,8 @@ export function RideLogView({ id }: RideLogViewProps) {
             isPassengerListExpanded,
             renderRideExpenses,
             renderRidePlaces,
-            renderRidePassengers
+            renderRidePassengers,
+            t
         ]
     );
 

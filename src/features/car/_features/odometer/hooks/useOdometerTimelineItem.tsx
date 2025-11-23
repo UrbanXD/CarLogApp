@@ -58,10 +58,10 @@ export const useOdometerTimelineItem = () => {
             color: odometerLog.type.primaryColor ?? undefined,
             iconColor: odometerLog.type.secondaryColor ?? undefined,
             note: odometerLog.note,
-            footerText: dayjs(odometerLog.date).format("YYYY. MM DD. HH:mm"),
+            footerText: dayjs(odometerLog.date).format("LLL"),
             onPress
         };
-    });
+    }, [t]);
 
     return { mapper };
 };

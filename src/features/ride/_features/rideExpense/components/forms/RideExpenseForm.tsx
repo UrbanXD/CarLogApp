@@ -64,7 +64,7 @@ export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate
                 <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
             </>
         );
-    }, []);
+    }, [t]);
 
     return (
         <View style={ styles.container }>

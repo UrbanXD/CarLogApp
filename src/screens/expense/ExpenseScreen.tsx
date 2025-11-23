@@ -54,13 +54,13 @@ export function ExpenseScreen() {
             console.log(e);
             openToast(DeleteToast.error(t("expenses.title_singular")));
         }
-    }, [expenseDao]);
+    }, [expenseDao, t]);
 
     const onDelete = useCallback(() => {
         if(!expense) return openToast(NotFoundToast.warning(t("expenses.title_singular")));
 
         openModal(DeleteModal({ name: t("expenses.title_singular"), acceptAction: handleDelete(expense.id) }));
-    }, [expense, openToast, openModal]);
+    }, [expense, openToast, openModal, t]);
 
     const getAmountSubtitle = useCallback(() => {
         let subtitle = `${ expense?.amount.amount } ${ expense?.amount.currency.symbol }`;
@@ -68,7 +68,7 @@ export function ExpenseScreen() {
 
         subtitle += ` (${ expense?.amount.exchangedAmount } ${ expense?.amount?.exchangeCurrency.symbol })`;
         return subtitle;
-    }, [expense]);
+    }, [expense, t]);
 
     const onEdit = useCallback((field?: ExpenseFormFields) => {
         if(!expense) return openToast(NotFoundToast.warning(t("expenses.title_singular")));
@@ -77,7 +77,7 @@ export function ExpenseScreen() {
             pathname: "/expense/edit/[id]",
             params: { id: expense.id, field: field }
         });
-    }, [expense, openToast]);
+    }, [expense, openToast, t]);
 
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
@@ -102,7 +102,7 @@ export function ExpenseScreen() {
         {
             icon: ICON_NAMES.calendar,
             title: t("date.text"),
-            content: dayjs(expense?.date).format("YYYY. MM DD. HH:mm"),
+            content: dayjs(expense?.date).format("LLL"),
             onPress: () => onEdit(ExpenseFormFields.Date)
         },
         {
@@ -111,7 +111,7 @@ export function ExpenseScreen() {
             contentTextStyle: !expense?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(ExpenseFormFields.Note)
         }
-    ]), [car, expense, getAmountSubtitle]);
+    ]), [car, expense, getAmountSubtitle, t]);
 
     return (
         <>

@@ -19,7 +19,7 @@ export function useRideExpenseToExpandableList() {
                 exchangeCurrencyText: item.expense.amount.exchangeCurrency.symbol
             }
         };
-    });
+    }, [t]);
 
     return { rideExpenseToExpandableList };
 }

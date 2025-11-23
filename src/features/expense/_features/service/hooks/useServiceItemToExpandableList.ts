@@ -18,7 +18,7 @@ export function useServiceItemToExpandableList() {
                 exchangeCurrencyText: item.pricePerUnit.exchangeCurrency.symbol
             }
         };
-    }, []);
+    }, [t]);
 
     return { serviceItemToExpandableListItem };
 }

@@ -20,7 +20,7 @@ export function useRidePlaceToExpandableList() {
             title: item.name ?? t("common.unknown"),
             subtitle
         };
-    });
+    }, [t]);
 
     return { ridePlaceToExpandableList };
 }

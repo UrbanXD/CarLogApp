@@ -12,7 +12,8 @@ import { OdometerValueInput } from "../components/forms/inputFields/OdometerValu
 import { OdometerLog } from "../schemas/odometerLogSchema.ts";
 import { OdometerChangeLogFormFields } from "../schemas/form/odometerChangeLogForm.ts";
 import { convertOdometerValueFromKilometer } from "../utils/convertOdometerUnit.ts";
-import { EditToast } from "../../../../../ui/alert/presets/toast/EditToast.ts";
+import { EditToast } from "../../../../../ui/alert/presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
 
 type UseOdometerLogFormFieldsProps = UseFormReturn<OdometerChangeLogFormFields> & {
     odometerLog?: OdometerLog
@@ -25,6 +26,7 @@ export function useOdometerLogFormFields({
     ...restProps
 }: UseOdometerLogFormFieldsProps) {
     const { control, setValue, clearErrors, getFieldState } = restProps;
+    const { t } = useTranslation();
     const { selectedCar, getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(
@@ -63,7 +65,7 @@ export function useOdometerLogFormFields({
         }
 
         return subtitle;
-    }, [odometerLog, car]);
+    }, [odometerLog, car, t]);
 
     const fields: Record<OdometerLogFormFields, FormFields> = useMemo(() => ({
         [OdometerLogFormFields.Car]: {
@@ -100,7 +102,7 @@ export function useOdometerLogFormFields({
             />,
             editToastMessages: EditToast
         }
-    }), [control, setValue, car, getOdometerLogSubtitle]);
+    }), [control, setValue, car, getOdometerLogSubtitle, t]);
 
     const fullForm: FormFields = {
         render: () => ([

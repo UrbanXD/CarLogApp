@@ -7,7 +7,6 @@ import { Car } from "../../../schemas/carSchema.ts";
 import { SelectOdometerLogTableRow } from "../model/dao/OdometerLogDao.ts";
 import { TimelineFilterManagement } from "../../../../../hooks/useTimelinePaginator.ts";
 import { useTranslation } from "react-i18next";
-import i18n from "../../../../../i18n/index.ts";
 
 const TYPES_FILTER_KEY = "type_filter";
 const TYPES_FILTER_FIELD_NAME = "type_id";
@@ -48,7 +47,7 @@ export function useOdometerLogTimelineFilter({
 
             setTypes(sorted);
         })();
-    }, [i18n.language]);
+    }, [t]);
 
     useEffect(() => {
         if(!filters.has(TYPES_FILTER_KEY)) setSelectedTypesId([]);

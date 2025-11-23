@@ -58,7 +58,7 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
                 <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
             </>
         );
-    }, []);
+    }, [t]);
 
     return (
         <View style={ styles.container }>

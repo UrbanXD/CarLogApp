@@ -33,7 +33,7 @@ export function useRideLogTimelineItem() {
                         : " - ",
             onPress
         };
-    }, []);
+    }, [t]);
 
     return { mapper };
 }
