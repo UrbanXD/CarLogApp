@@ -86,7 +86,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
                 setValue={ setValue }
                 fieldName="quantity"
                 capacity={ car?.fuelTank.capacity }
-                fuelTypeText={ car?.fuelTank.type.key }
+                fuelTypeText={ t(`fuel.types.${ car?.fuelTank.type.key }`) }
                 unitText={ car?.fuelTank.unit.short }
             />,
             editToastMessages: EditToast

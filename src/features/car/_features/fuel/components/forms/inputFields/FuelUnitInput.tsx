@@ -5,6 +5,7 @@ import { MoreDataLoading } from "../../../../../../../components/loading/MoreDat
 import { PickerItemType } from "../../../../../../../components/Input/picker/PickerItem.tsx";
 import { Control } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { FuelUnit } from "../../../schemas/fuelUnitSchema.ts";
 
 type FuelUnitInputProps = {
     control: Control<any>
@@ -22,14 +23,23 @@ export function FuelUnitInput({
     const { t } = useTranslation();
     const { fuelUnitDao } = useDatabase();
 
-    const [fuelUnits, setFuelUnits] = useState<Array<PickerItemType>>();
+    const [rawFuelUnits, setRawFuelUnits] = useState<Array<FuelUnit> | null>(null);
+    const [fuelUnits, setFuelUnits] = useState<Array<PickerItemType>>([]);
 
     useEffect(() => {
         (async () => {
-            const fuelUnitsDto = await fuelUnitDao.getAll();
-            setFuelUnits(fuelUnitDao.mapper.dtoToPicker(fuelUnitsDto));
+            setRawFuelUnits(await fuelUnitDao.getAll());
         })();
     }, []);
+
+    useEffect(() => {
+        if(!rawFuelUnits) return;
+
+        setFuelUnits(fuelUnitDao.mapper.dtoToPicker(
+            rawFuelUnits,
+            (dto) => `${ t(`fuel.unit_types.${ dto.key }`) } (${ dto.short })`
+        ));
+    }, [rawFuelUnits, t]);
 
     return (
         <Input.Field
@@ -39,7 +49,7 @@ export function FuelUnitInput({
             fieldInfoText={ subtitle }
         >
             {
-                fuelUnits
+                rawFuelUnits
                 ?
                 <Input.Picker.Simple items={ fuelUnits }/>
                 :

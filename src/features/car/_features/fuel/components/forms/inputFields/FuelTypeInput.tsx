@@ -5,6 +5,7 @@ import { Control } from "react-hook-form";
 import { useDatabase } from "../../../../../../../contexts/database/DatabaseContext.ts";
 import { PickerItemType } from "../../../../../../../components/Input/picker/PickerItem.tsx";
 import { useTranslation } from "react-i18next";
+import { FuelType } from "../../../schemas/fuelTypeSchema.ts";
 
 type FuelTypeInputProps = {
     control: Control<any>
@@ -22,14 +23,23 @@ export function FuelTypeInput({
     const { t } = useTranslation();
     const { fuelTypeDao } = useDatabase();
 
-    const [fuelTypes, setFuelTypes] = useState<Array<PickerItemType>>();
+    const [rawFuelTypes, setRawFuelTypes] = useState<Array<FuelType> | null>(null);
+    const [fuelTypes, setFuelTypes] = useState<Array<PickerItemType>>([]);
 
     useEffect(() => {
         (async () => {
-            const fuelTypesDto = await fuelTypeDao.getAll();
-            setFuelTypes(fuelTypeDao.mapper.dtoToPicker(fuelTypesDto));
+            setRawFuelTypes(await fuelTypeDao.getAll());
         })();
     }, []);
+
+    useEffect(() => {
+        if(!rawFuelTypes) return;
+
+        setFuelTypes(fuelTypeDao.mapper.dtoToPicker(
+            rawFuelTypes,
+            (dto) => t(`fuel.types.${ dto.key }`)
+        ));
+    }, [rawFuelTypes, t]);
 
     return (
         <Input.Field
