@@ -9,6 +9,7 @@ import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { formTheme } from "../../../..//ui/form/constants/theme.ts";
 import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
 import { useTranslation } from "react-i18next";
+import { Currency } from "../schemas/currencySchema.ts";
 
 type AmountInputProps = {
     control: Control<any>
@@ -51,7 +52,8 @@ export function AmountInput({
     const { t } = useTranslation();
     const { currencyDao } = useDatabase();
 
-    const [currencies, setCurrencies] = useState<Array<PickerItemType> | null>(null);
+    const [rawCurrencies, setRawCurrencies] = useState<Array<Currency> | null>(null);
+    const [currencies, setCurrencies] = useState<Array<PickerItemType>>([]);
 
     const latestExchangeRate = useRef(1);
 
@@ -62,10 +64,22 @@ export function AmountInput({
 
     useEffect(() => {
         (async () => {
-            const currenciesDto = await currencyDao.getAll();
-            setCurrencies(currencyDao.mapper.dtoToPicker(currenciesDto));
+            setRawCurrencies(await currencyDao.getAll());
         })();
     }, []);
+
+    useEffect(() => {
+        if(!rawCurrencies) return;
+
+        setCurrencies(
+            currencyDao.mapper.dtoToPicker({
+                dtos: rawCurrencies,
+                getControllerTitle: (dto) => dto.symbol,
+                getTitle: (dto) => `${ t(`currency.names.${ dto.key }`) } - ${ dto.symbol }`
+            })
+        );
+
+    }, [rawCurrencies, t]);
 
     useEffect(() => {
         if(!exchangeRateFieldName) return;

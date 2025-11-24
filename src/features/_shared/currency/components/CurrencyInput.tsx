@@ -5,6 +5,7 @@ import Input from "../../../../components/Input/Input.ts";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 import { Control } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { Currency } from "../schemas/currencySchema.ts";
 
 type CurrencyInputProps = {
     control: Control<any>
@@ -22,14 +23,29 @@ export function CurrencyInput({
     const { t } = useTranslation();
     const { currencyDao } = useDatabase();
 
-    const [currencies, setCurrencies] = useState<Array<PickerItemType> | null>(null);
+    const [rawCurrencies, setRawCurrencies] = useState<Array<Currency> | null>(null);
+    const [currencies, setCurrencies] = useState<Array<PickerItemType>>([]);
 
     useEffect(() => {
         (async () => {
-            const currenciesDto = await currencyDao.getAll();
-            setCurrencies(currencyDao.mapper.dtoToPicker(currenciesDto, (dto) => `${ dto.key } - ${ dto.symbol }`));
+            setRawCurrencies(await currencyDao.getAll());
         })();
     }, []);
+
+    useEffect(() => {
+        if(!rawCurrencies) return;
+
+        setCurrencies(
+            currencyDao.mapper.dtoToPicker({
+                dtos: rawCurrencies,
+                getControllerTitle: (dto) => `${ t(`currency.names.${ dto.key }`) } - ${ dto.symbol }`
+            })
+        );
+    }, [rawCurrencies, t]);
+
+    useEffect(() => {
+        console.log(currencies);
+    }, [currencies]);
 
     return (
         <Input.Field
@@ -39,7 +55,7 @@ export function CurrencyInput({
             fieldInfoText={ subtitle }
         >
             {
-                currencies
+                rawCurrencies
                 ?
                 <Input.Picker.Dropdown data={ currencies } title={ title ?? t("currency.text") }/>
                 :

@@ -39,7 +39,9 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
     const amountFieldExchangeText = useCallback((exchangedAmount: string, isTotalAmount?: boolean) => {
         return (
             <>
-                { `${ t(isTotalAmount ? "cost_in_car_currency" : "price_per_unit_in_car_currency") } ` }
+                { `${ t(isTotalAmount
+                        ? "currency.cost_in_car_currency"
+                        : "currency.price_per_unit_in_car_currency") } ` }
                 <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
             </>
         );
@@ -56,14 +58,14 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
 
         return (
             <>
-                { `${ t("price_per_unit_based_on_total_cost") } ` }
+                { `${ t("currency.price_per_unit_based_on_total_cost") } ` }
                 <Text style={ { fontWeight: "bold" } }>
                     { amount * quantity } { currencyText }
                 </Text>
                 {
                     currencyText !== defaultCurrencyText &&
                    <>
-                       { `${ t("cost_in_car_currency_based_on_price_per_unit") } ` }
+                       { `${ t("currency.cost_in_car_currency_based_on_price_per_unit") } ` }
                       <Text style={ { fontWeight: "bold" } }>
                           { exchangedAmount * quantity }{ "\u00A0" }{ defaultCurrencyText } {/* ${ "\u00A0" } for prevent currency wrap to the next line without amount */ }
                       </Text>

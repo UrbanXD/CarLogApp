@@ -293,7 +293,14 @@
     "cost_in_car_currency": "Az autó alapvalutájában számolt összeg",
     "price_per_unit_in_car_currency": "Az autó alapvalutájában számolt egységár",
     "price_per_unit_based_on_total_cost": "Az egyésgár szerinti összköltség",
-    "cost_in_car_currency_based_on_price_per_unit": ", az autó alapvalutájában számítva"
+    "cost_in_car_currency_based_on_price_per_unit": ", az autó alapvalutájában számítva",
+    "names": {
+      "HUF": "Magyar forint",
+      "RSD": "Szerb dínár",
+      "EUR": "Euró",
+      "USD": "Amerikai dollár",
+      "GBP": "Angol font"
+    }
   },
   "date": {
     "text": "Dátum",

@@ -293,7 +293,14 @@
     "cost_in_car_currency": "Amount in car's base currency",
     "price_per_unit_in_car_currency": "Unit price in car's base currency",
     "price_per_unit_based_on_total_cost": "Unit price based on total cost",
-    "cost_in_car_currency_based_on_price_per_unit": "Amount in car's base currency calculated"
+    "cost_in_car_currency_based_on_price_per_unit": "Amount in car's base currency calculated",
+    "names": {
+      "HUF": "Hungarian forint",
+      "RSD": "Serbian Dinar",
+      "EUR": "Euro",
+      "USD": "US Dollar",
+      "GBP": "British Pound"
+    }
   },
   "date": {
     "text": "Date",
