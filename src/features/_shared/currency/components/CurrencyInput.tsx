@@ -43,10 +43,6 @@ export function CurrencyInput({
         );
     }, [rawCurrencies, t]);
 
-    useEffect(() => {
-        console.log(currencies);
-    }, [currencies]);
-
     return (
         <Input.Field
             control={ control }
