@@ -10,24 +10,20 @@ export class OdometerLogTypeMapper extends AbstractMapper<OdometerLogTypeTableRo
     }
 
     async toDto(entity: OdometerLogTypeTableRow): Promise<OdometerLogType> {
-        let locale = "Kilométeróra-frissítés";
         let icon = null;
         let primaryColor = null;
         let secondaryColor = null;
 
         switch(Number(entity.id)) {
             case OdometerLogTypeEnum.FUEL:
-                locale = "Tankolás";
                 icon = ICON_NAMES.fuelPump;
                 primaryColor = COLORS.fuelYellow;
                 break;
             case OdometerLogTypeEnum.SERVICE:
-                locale = "Szervíz";
                 icon = ICON_NAMES.service;
                 primaryColor = COLORS.service;
                 break;
             case OdometerLogTypeEnum.RIDE:
-                locale = "Út";
                 icon = ICON_NAMES.road;
                 primaryColor = COLORS.ride;
                 break;
@@ -36,7 +32,6 @@ export class OdometerLogTypeMapper extends AbstractMapper<OdometerLogTypeTableRo
         return odometerLogTypeSchema.parse({
             id: entity.id,
             key: entity.key,
-            locale,
             icon: icon,
             primaryColor,
             secondaryColor: secondaryColor
