@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { PickerItemType } from "../../../../../components/Input/picker/PickerItem.tsx";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { useTranslation } from "react-i18next";
+import { ExpenseType } from "../../../schemas/expenseTypeSchema.ts";
 
 type ExpenseTypeInputProps = {
     control: Control<any>
@@ -23,14 +24,27 @@ export function ExpenseTypeInput({
     const { t } = useTranslation();
     const { expenseTypeDao } = useDatabase();
 
-    const [expenseTypes, setExpenseTypes] = useState<Array<PickerItemType> | null>(null);
+    const [rawExpenseTypes, setRawExpenseTypes] = useState<Array<ExpenseType> | null>(null);
+    const [expenseTypes, setExpenseTypes] = useState<Array<PickerItemType>>([]);
 
     useEffect(() => {
         (async () => {
-            const expenseTypesDto = await expenseTypeDao.getAllOtherExpenseType();
-            setExpenseTypes(expenseTypeDao.mapper.dtoToPicker(expenseTypesDto));
+            setRawExpenseTypes(await expenseTypesDao.getAllOtherExpenseType());
         })();
     }, []);
+
+    useEffect(() => {
+        if(!rawExpenseTypes) return;
+
+        setExpenseTypes(
+            expenseTypeDao.mapper.dtoToPicker({
+                dtos: rawCurrencies,
+                getControllerTitle: (dto) => dto.symbol,
+                getTitle: (dto) => `${ t(`expenses.types.${ dto.key }`) } - ${ dto.symbol }`
+            })
+        );
+
+    }, [rawExpenseTypes, t]);
 
     return (
         <Input.Field
@@ -40,7 +54,7 @@ export function ExpenseTypeInput({
             fieldInfoText={ subtitle }
         >
             {
-                expenseTypes
+                rawExpenseTypes
                 ?
                 <Input.Picker.Dropdown
                     title={ title ?? t("expenses.types.title") }

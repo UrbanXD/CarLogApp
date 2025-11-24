@@ -4,7 +4,6 @@ export const expenseTypeSchema = z
 .object({
     id: z.string().uuid(),
     key: z.string().max(64),
-    locale: z.string().max(64),
     icon: z.string().nullable(),
     primaryColor: z.string().nullable(),
     secondaryColor: z.string().nullable(),
