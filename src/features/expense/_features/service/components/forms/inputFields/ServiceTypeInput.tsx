@@ -21,7 +21,9 @@ export function ServiceTypeInput({
     const { t } = useTranslation();
     const { serviceTypeDao } = useDatabase();
 
-    const paginator = useMemo(() => serviceTypeDao.paginator(50), []);
+    const paginator = useMemo(() => serviceTypeDao.paginator({
+        getTitle: (entity) => t(`service.types.${ entity.key }`)
+    }), [t]);
 
     return (
         <Input.Field

@@ -2,7 +2,7 @@ import Input from "../../../../components/Input/Input.ts";
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
-import React, { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Control, UseFormSetValue, useWatch } from "react-hook-form";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
@@ -10,6 +10,8 @@ import { formTheme } from "../../../..//ui/form/constants/theme.ts";
 import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
 import { useTranslation } from "react-i18next";
 import { Currency } from "../schemas/currencySchema.ts";
+import { AmountInCarCurrency } from "./AmountInCarCurrency.tsx";
+import { PricePerUnitTotalCostInCarCurrency } from "./PricePerUnitTotalCostInCarCurrency.tsx";
 
 type AmountInputProps = {
     control: Control<any>
@@ -22,15 +24,10 @@ type AmountInputProps = {
     quantityFieldName?: string
     isPricePerUnitFieldName?: string
     exchangeRateFieldName?: string
-    exchangeText?: (exchangedAmount: string, isTotalAmount?: boolean) => ReactNode
-    totalAmountText?: (
-        amount: number,
-        exchangedAmount: number,
-        defaultCurrencyText: string,
-        currencyText: string
-    ) => ReactNode
     showsExchangeRate?: boolean
+    showsQuantityInput?: boolean
     defaultCurrency?: string | number
+    isPricePerUnitFallback?: boolean
 }
 
 export function AmountInput({
@@ -44,10 +41,10 @@ export function AmountInput({
     quantityFieldName,
     isPricePerUnitFieldName,
     exchangeRateFieldName,
-    exchangeText,
-    totalAmountText,
     showsExchangeRate = !!exchangeRateFieldName,
-    defaultCurrency
+    showsQuantityInput = !!quantityFieldName,
+    defaultCurrency,
+    isPricePerUnitFallback = false
 }: AmountInputProps) {
     const { t } = useTranslation();
     const { currencyDao } = useDatabase();
@@ -59,8 +56,11 @@ export function AmountInput({
 
     const formCurrency = useWatch({ control, name: currencyFieldName });
     const formAmount = useWatch({ control, name: amountFieldName });
+    const formQuantity = useWatch({ control, name: quantityFieldName });
     const formExchangeRate = exchangeRateFieldName ? useWatch({ control, name: exchangeRateFieldName }) : null;
-    const formIsPricePerUnit = isPricePerUnitFieldName ? useWatch({ control, name: isPricePerUnitFieldName }) : null;
+    const formIsPricePerUnit = isPricePerUnitFieldName
+                               ? useWatch({ control, name: isPricePerUnitFieldName })
+                               : isPricePerUnitFallback;
 
     useEffect(() => {
         (async () => {
@@ -110,8 +110,9 @@ export function AmountInput({
         return `${ exchangedAmount }${ "\u00A0" }${ defaultCurrencyText }`; // "\u00A0" - for prevent only currency wrap to the next line
     }, [formAmount, formExchangeRate, defaultCurrency, getCurrencyText]);
 
-    const getTotalAmountText = useCallback(() => {
-        if(!totalAmountText) return;
+    const getTotalAmountTextByPricePerUnit = useCallback(() => {
+        let quantity = quantityFieldName ? 0 : 1;
+        if(formQuantity && !isNaN(Number(formQuantity))) quantity = Number(formQuantity);
 
         const defaultCurrencyText = getCurrencyText(defaultCurrency?.toString());
         const currencyText = getCurrencyText(formCurrency?.toString());
@@ -124,12 +125,27 @@ export function AmountInput({
             exchangedAmount = amount * Number(formExchangeRate ?? 1);
         }
 
-        return totalAmountText(amount, exchangedAmount, defaultCurrencyText, currencyText);
-    }, [formAmount, formExchangeRate, formCurrency, defaultCurrency, totalAmountText, getCurrencyText]);
+        return (
+            <PricePerUnitTotalCostInCarCurrency
+                amountText={ `${ quantity * amount } ${ currencyText }` }
+                carAmountText={ defaultCurrency !== formCurrency && `${ quantity * exchangedAmount } ${ defaultCurrencyText }` }
+            />
+        );
+    }, [formAmount, formQuantity, formExchangeRate, formCurrency, defaultCurrency, getCurrencyText]);
 
     return (
         <View style={ styles.container }>
             <Input.Title title={ title ?? t("currency.cost") } subtitle={ subtitle }/>
+            {
+                (
+                    !isPricePerUnitFieldName &&
+                    isPricePerUnitFallback &&
+                    (!isNaN(Number(formQuantity)) && Number(formQuantity) > 1)
+                ) &&
+               <Text style={ styles.label }>
+                   { getTotalAmountTextByPricePerUnit() }
+               </Text>
+            }
             {
                 isPricePerUnitFieldName &&
                <Input.Field control={ control } fieldName={ isPricePerUnitFieldName }>
@@ -139,7 +155,7 @@ export function AmountInput({
                           formIsPricePerUnit &&
                          <View style={ styles.isPricePerUnitContainer.textContainer }>
                             <Text style={ styles.label }>
-                                { getTotalAmountText() }
+                                { getTotalAmountTextByPricePerUnit() }
                             </Text>
                          </View>
                       }
@@ -148,7 +164,7 @@ export function AmountInput({
             }
             <View style={ styles.quantityAmountContainer }>
                 {
-                    quantityFieldName &&
+                    (showsQuantityInput && quantityFieldName) &&
                    <View style={ styles.quantityContainer }>
                       <Input.Row style={ { gap: 0 } }>
                          <View style={ { flex: 1 } }>
@@ -160,7 +176,7 @@ export function AmountInput({
                                   placeholder={ "1" }
                                   keyboardType="numeric"
                                   type="secondary"
-                               />r
+                               />
                             </Input.Field>
                          </View>
                          <Text style={ styles.quantityContainer.countText }>{ t("common.count") }</Text>
@@ -203,10 +219,7 @@ export function AmountInput({
                <View style={ styles.exchangeContainer }>
                   <View style={ styles.exchangeContainer.textContainer }>
                      <Text style={ styles.label }>
-                         {
-                             exchangeText &&
-                             exchangeText(getExchangedAmount(), !formIsPricePerUnit)
-                         }
+                        <AmountInCarCurrency amountText={ getExchangedAmount() } isPricePerUnit={ formIsPricePerUnit }/>
                      </Text>
                   </View>
                   <View style={ styles.exchangeContainer.inputContainer }>

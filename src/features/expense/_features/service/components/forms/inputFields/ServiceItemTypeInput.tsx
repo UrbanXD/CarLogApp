@@ -21,17 +21,19 @@ export function ServiceItemTypeInput({
     const { t } = useTranslation();
     const { serviceItemTypeDao } = useDatabase();
 
-    const paginator = useMemo(() => serviceItemTypeDao.paginator(), []);
+    const paginator = useMemo(() => serviceItemTypeDao.paginator({
+        getTitle: (entity) => t(`service.items.types.${ entity.key }`)
+    }), [t]);
 
     return (
         <Input.Field
             control={ control }
             fieldName={ fieldName }
-            fieldNameText={ title ?? t("service.items.type") }
+            fieldNameText={ title ?? t("service.items.types.title") }
             fieldInfoText={ subtitle }
         >
             <Input.Picker.Dropdown
-                title={ title ?? t("service.items.type") }
+                title={ title ?? t("service.items.types.title") }
                 paginator={ paginator }
                 searchBy="key"
                 icon={ ICON_NAMES.serviceOutline }

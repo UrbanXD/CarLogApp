@@ -464,7 +464,27 @@
     "items": {
       "title": "Service items",
       "title_singular": "Service item",
-      "type": "Item type"
+      "types": {
+        "title": "Item type",
+        "undefined": "$t(common.unknown)",
+        "TRANSMISSION_FLUID": "Transmission fluid",
+        "FUEL_FILTER": "Fuel filter",
+        "BRAKE_FLUID": "Brake fluid",
+        "LIGHT_BULB": "Light bulb",
+        "WIPER_BLADES": "Wiper blades",
+        "DIAGNOSTICS": "Diagnostics",
+        "OIL": "Oil",
+        "COOLANT": "Coolant",
+        "CABIN_FILTER": "Cabin filter",
+        "OIL_FILTER": "Oil filter",
+        "BRAKE_DISCS": "Brake discs",
+        "BATTERY": "Battery",
+        "SPARK_PLUGS": "Spark plugs",
+        "SOFTWARE_UPDATE": "Software update",
+        "BRAKE_PADS": "Brake pads",
+        "TIRES": "Tires",
+        "AIR_FILTER": "Air filter"
+      }
     },
     "types": {
       "title": "Service type",

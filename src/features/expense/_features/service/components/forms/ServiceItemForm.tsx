@@ -6,7 +6,7 @@ import { useDatabase } from "../../../../../../contexts/database/DatabaseContext
 import { StyleSheet, Text, View } from "react-native";
 import { ServiceItemTypeInput } from "./inputFields/ServiceItemTypeInput.tsx";
 import { AmountInput } from "../../../../../_shared/currency/components/AmountInput.tsx";
-import React, { useCallback } from "react";
+import React from "react";
 import { SaveButton } from "../../../../../../components/Button/presets/SaveButton.tsx";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
 import Form from "../../../../../../components/Form/Form.tsx";
@@ -51,15 +51,6 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
         }
     );
 
-    const amountFieldExchangeText = useCallback((exchangedAmount: string) => {
-        return (
-            <>
-                { `${ t("currency.cost_in_car_currency") } ` }
-                <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
-            </>
-        );
-    }, [t]);
-
     return (
         <View style={ styles.container }>
             <Text style={ styles.title }>{ t("service.items.title_singular") }</Text>
@@ -77,8 +68,8 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
                     currencyFieldName="currencyId"
                     quantityFieldName="quantity"
                     exchangeRateFieldName="exchangeRate"
-                    exchangeText={ amountFieldExchangeText }
                     defaultCurrency={ carCurrencyId }
+                    isPricePerUnitFallback={ true }
                 />
             </Form>
             <SaveButton onPress={ submitHandler }/>

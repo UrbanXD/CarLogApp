@@ -39,10 +39,13 @@ export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, Servi
         };
     }
 
-    entityToPickerItem(entity: ServiceTypeTableRow): Promise<PickerItemType> {
+    entityToPickerItem(
+        entity: ServiceTypeTableRow,
+        getTitle?: (entity: ServiceTypeTableRow) => string
+    ): Promise<PickerItemType> {
         return {
             value: entity.id.toString(),
-            title: entity.key
+            title: getTitle?.(entity) ?? entity.key
         };
     }
 }

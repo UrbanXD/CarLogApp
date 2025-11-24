@@ -9,7 +9,7 @@ export function useServiceItemToExpandableList() {
     const serviceItemToExpandableListItem = useCallback((item: ServiceItem): ExpandableListItemProps => {
         return {
             id: item.id,
-            title: t(`service.types.${ item.type.key }`),
+            title: t(`service.items.types.${ item.type.key }`),
             count: item.quantity,
             amountProps: {
                 amount: item.pricePerUnit.amount,

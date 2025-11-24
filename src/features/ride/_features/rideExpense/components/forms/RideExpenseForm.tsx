@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { RideExpenseFormFields, useRideExpenseFormProps } from "../../schemas/form/rideExpenseForm.ts";
 import { StyleSheet, Text, View } from "react-native";
 import { ExpenseTypeInput } from "../../../../../expense/components/forms/inputFields/ExpenseTypeInput.tsx";
-import React, { useCallback } from "react";
+import React from "react";
 import { SaveButton } from "../../../../../../components/Button/presets/SaveButton.tsx";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
 import Form from "../../../../../../components/Form/Form.tsx";
@@ -57,15 +57,6 @@ export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate
         }
     );
 
-    const amountFieldExchangeText = useCallback((exchangedAmount: string) => {
-        return (
-            <>
-                { `${ t("currency.cost_in_car_currency") } ` }
-                <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
-            </>
-        );
-    }, [t]);
-
     return (
         <View style={ styles.container }>
             <Text style={ styles.title }>{ t("rides.other_expense") }</Text>
@@ -80,7 +71,6 @@ export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate
                     amountFieldName="amount"
                     currencyFieldName="currencyId"
                     exchangeRateFieldName="exchangeRate"
-                    exchangeText={ amountFieldExchangeText }
                     defaultCurrency={ car.currency.id }
                 />
                 <Input.Field

@@ -290,10 +290,10 @@
     "cost": "Összeg",
     "total_cost": "Összköltéség",
     "free": "ingyenes",
-    "cost_in_car_currency": "Az autó alapvalutájában számolt összeg",
-    "price_per_unit_in_car_currency": "Az autó alapvalutájában számolt egységár",
-    "price_per_unit_based_on_total_cost": "Az egyésgár szerinti összköltség",
-    "cost_in_car_currency_based_on_price_per_unit": ", az autó alapvalutájában számítva",
+    "cost_in_car_currency": "Az autó alapvalutájában számolt összeg <amount>{{amount}}</amount>",
+    "price_per_unit_in_car_currency": "Az autó alapvalutájában számolt egységár <amount>{{amount}}</amount>",
+    "price_per_unit_based_on_total_cost": "Az egyésgár szerinti összköltség <amount>{{amount}}</amount>, az autó alapvalutájában számítva <amount>{{carAmount}}</amount>",
+    "price_per_unit_based_on_total_cost_in_car_currency": "Az egyésgár szerinti összköltség <amount>{{amount}}</amount>",
     "names": {
       "HUF": "Magyar forint",
       "RSD": "Szerb dínár",
@@ -464,7 +464,27 @@
     "items": {
       "title": "Szervizelési tételek",
       "title_singular": "Szervizelési tétel",
-      "type": "Tétel típus"
+      "types": {
+        "title": "Tétel típus",
+        "undefined": "$t(common.unknown)",
+        "TRANSMISSION_FLUID": "Váltóolaj",
+        "FUEL_FILTER": "Üzemanyagszűrő",
+        "BRAKE_FLUID": "Fékolaj",
+        "LIGHT_BULB": "Izzó",
+        "WIPER_BLADES": "Ablaktörlő lapátok",
+        "DIAGNOSTICS": "Diagnosztika",
+        "OIL": "Olaj",
+        "COOLANT": "Hűtőfolyadék",
+        "CABIN_FILTER": "Pollenszűrő",
+        "OIL_FILTER": "Olajszűrő",
+        "BRAKE_DISCS": "Féktárcsák",
+        "BATTERY": "Akkumulátor",
+        "SPARK_PLUGS": "Gyújtógyertyák",
+        "SOFTWARE_UPDATE": "Szoftverfrissítés",
+        "BRAKE_PADS": "Fékbetétek",
+        "TIRES": "Gumik",
+        "AIR_FILTER": "Légszűrő"
+      }
     },
     "types": {
       "title": "Szerviz tipus",

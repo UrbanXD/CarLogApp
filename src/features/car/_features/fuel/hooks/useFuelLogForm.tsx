@@ -1,6 +1,6 @@
 import { UseFormReturn, useWatch } from "react-hook-form";
 import useCars from "../../../hooks/useCars.ts";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Car } from "../../../schemas/carSchema.ts";
 import { FormFields, Steps } from "../../../../../types/index.ts";
 import { CarPickerInput } from "../../../components/forms/inputFields/CarPickerInput.tsx";
@@ -12,7 +12,6 @@ import { FuelLogFormFieldsEnum } from "../enums/fuelLogFormFields.tsx";
 import { FuelLogFields } from "../schemas/form/fuelLogForm.ts";
 import { OdometerValueInput } from "../../odometer/components/forms/inputFields/OdometerValueInput.tsx";
 import { FuelInput } from "../components/forms/inputFields/FuelInput.tsx";
-import { Text } from "react-native";
 import { EditToast } from "../../../../../ui/alert/presets/toast/index.ts";
 import { useTranslation } from "react-i18next";
 
@@ -26,7 +25,6 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
     const [car, setCar] = useState<Car | null>(null);
 
     const formCarId = useWatch({ control, name: "carId" });
-    const formQuantity = useWatch({ control, name: "quantity" });
 
     useEffect(() => {
         const car = getCar(formCarId);
@@ -35,45 +33,6 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
         setValue("fuelUnitId", car?.fuelTank.unit.id);
         clearErrors();
     }, [formCarId]);
-
-    const amountFieldExchangeText = useCallback((exchangedAmount: string, isTotalAmount?: boolean) => {
-        return (
-            <>
-                { `${ t(isTotalAmount
-                        ? "currency.cost_in_car_currency"
-                        : "currency.price_per_unit_in_car_currency") } ` }
-                <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
-            </>
-        );
-    }, [t]);
-
-    const amountFieldTotalAmountText = useCallback((
-        amount: number,
-        exchangedAmount: number,
-        defaultCurrencyText: string,
-        currencyText: string
-    ) => {
-        let quantity = 0;
-        if(!isNaN(Number(formQuantity))) quantity = Number(formQuantity);
-
-        return (
-            <>
-                { `${ t("currency.price_per_unit_based_on_total_cost") } ` }
-                <Text style={ { fontWeight: "bold" } }>
-                    { amount * quantity } { currencyText }
-                </Text>
-                {
-                    currencyText !== defaultCurrencyText &&
-                   <>
-                       { `${ t("currency.cost_in_car_currency_based_on_price_per_unit") } ` }
-                      <Text style={ { fontWeight: "bold" } }>
-                          { exchangedAmount * quantity }{ "\u00A0" }{ defaultCurrencyText } {/* ${ "\u00A0" } for prevent currency wrap to the next line without amount */ }
-                      </Text>
-                   </>
-                }
-            </>
-        );
-    }, [formQuantity, t]);
 
     const fields: Record<FuelLogFormFieldsEnum, FormFields> = useMemo(() => ({
         [FuelLogFormFieldsEnum.Car]: {
@@ -96,11 +55,11 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
                 control={ control }
                 setValue={ setValue }
                 amountFieldName="amount"
+                quantityFieldName="quantity"
                 currencyFieldName="currencyId"
                 isPricePerUnitFieldName="isPricePerUnit"
                 exchangeRateFieldName="exchangeRate"
-                exchangeText={ amountFieldExchangeText }
-                totalAmountText={ amountFieldTotalAmountText }
+                showsQuantityInput={ false }
                 defaultCurrency={ car?.currency.id }
             />,
             editToastMessages: EditToast
@@ -135,7 +94,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             />,
             editToastMessages: EditToast
         }
-    }), [control, setValue, car, amountFieldTotalAmountText, amountFieldExchangeText, t]);
+    }), [control, setValue, car, t]);
 
     const multiStepFormSteps: Steps = [
         {

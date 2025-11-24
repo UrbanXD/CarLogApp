@@ -1,6 +1,10 @@
 import { Dao } from "../../../../../../database/dao/Dao.ts";
 import { ServiceItemType } from "../../schemas/serviceItemTypeSchema.ts";
-import { DatabaseType, ServiceItemTypeTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
+import {
+    DatabaseType,
+    ServiceItemTypeTableRow,
+    ServiceTypeTableRow
+} from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { ServiceItemTypeMapper } from "../mapper/ServiceItemTypeMapper.ts";
 import { SERVICE_ITEM_TYPE_TABLE } from "../../../../../../database/connector/powersync/tables/serviceItemType.ts";
 import { Kysely } from "@powersync/kysely-driver";
@@ -35,14 +39,17 @@ export class ServiceItemTypeDao extends Dao<ServiceItemTypeTableRow, ServiceItem
         return result.id;
     }
 
-    paginator(perPage?: number = 20): CursorPaginator<ServiceItemTypeTableRow, PickerItemType> {
+    paginator({ perPage = 20, getTitle }: {
+        perPage?: number,
+        getTitle?: (entity: ServiceTypeTableRow) => string
+    }): CursorPaginator<ServiceItemTypeTableRow, PickerItemType> {
         return new CursorPaginator<ServiceItemTypeTableRow, PickerItemType>(
             this.db,
             SERVICE_ITEM_TYPE_TABLE,
             { cursor: [{ field: "key" }, { field: "id" }], order: "asc" },
             {
                 perPage,
-                mapper: this.mapper.entityToPickerItem.bind(this.mapper)
+                mapper: (entity) => this.mapper.entityToPickerItem(entity, getTitle)
             }
         );
     }
