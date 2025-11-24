@@ -17,7 +17,7 @@
     "unit": "Unit",
     "type": "Type",
     "image": "Image",
-    "element": "Element"
+    "element": "Item"
   },
   "form_button": {
     "edit": "Edit",
@@ -40,28 +40,29 @@
       "placeholder": "Search..."
     },
     "picker": {
-      "choose": "Choose from the list",
+      "choose": "Select from the list",
       "new_item": "New item",
       "no_item_found": "No items found"
     },
     "image_picker": {
-      "selectable_images": "Selectable images"
+      "selectable_images": "Available images"
     },
     "date_picker": {
       "title": "$t(date.text)",
-      "year": "$t(date.year)"
+      "year": "$t(date.year)",
+      "date_placeholder": "$t(date.text)"
     }
   },
   "toast": {
     "types": {
-      "success": "Successful operation",
+      "success": "Success",
       "info": "Information",
       "warning": "Warning",
       "error": "Error"
     },
-    "default_error": "An unexpected error occurred!",
+    "default_error": "An unexpected error has occurred!",
     "picker_disabled": {
-      "default_body": "Operation not possible! Something is missing."
+      "default_body": "Action not possible! Something is missing."
     },
     "not_found": {
       "body": "{{name}} not found"
@@ -99,7 +100,7 @@
         "body": "Upper limit reached, no more items can be added"
       },
       "error": {
-        "body": "An unexpected error occurred"
+        "body": "An unexpected error has occurred"
       }
     }
   },
@@ -107,39 +108,161 @@
     "accept": "Continue",
     "dismiss": "Cancel",
     "bottom_sheet_leaving": {
-      "title": "Data may be lost!",
-      "body": "If you close the form now, any changes you made will be lost. Are you sure you want to close the form?",
-      "accept": "Close Form"
+      "title": "Your data may be lost!",
+      "body": "If you close the form now, the changes you made will be lost. Are you sure you want to close it?",
+      "accept": "Close form"
     },
     "delete": {
       "title": "Delete {{name}}",
-      "body": "This deletion is irreversible, make sure you want to continue",
+      "body": "Deletion is irreversible. Please make sure you wish to continue.",
       "accept": "$t(form_button.delete)"
     },
-    "log_delete_title": "Delete log entry {{name}}",
+    "log_delete_title": "Delete {{name}} log entry",
     "not_found": "{{name}} not found!",
     "log_not_found": "Log entry not found!"
   },
   "action_menu": {
-    "create_car": "Create car",
+    "create_car": "Add car",
     "create_service": "Service",
-    "create_fuel_log": "Refueling",
-    "create_expense": "Other expenses",
-    "create_ride": "Ride planning",
-    "create_odometer_log": "Update odometer",
+    "create_fuel_log": "Fuel log",
+    "create_expense": "Expense",
+    "create_ride": "Plan trip",
+    "create_odometer_log": "Odometer update",
     "places": "Places",
     "passengers": "Passengers"
   },
   "auth": {
     "description": "Manage your cars with us",
-    "sign_up": "Sign Up",
-    "sign_in": "Sign In",
     "forgot_your_password": "Forgot your password?",
     "already_have_account": "Already have an account?",
-    "sign_in_now": "Sign in now",
-    "resume_verification": "Resume verification",
-    "email_verification": "Email verification",
-    "delete_account": "Delete account"
+    "sign_in_now": "Sign in",
+    "resume_verification": "Resume\nverification",
+    "sign_in": "Sign in",
+    "sign_up": {
+      "title": "Sign Up",
+      "steps": {
+        "personal_information": "Personal Information",
+        "password": "$t(auth.user.password)"
+      }
+    },
+    "otp_verification": {
+      "use_otp_code_for_verification": "Use the code sent to <email>{{email}}</email> for verification.",
+      "expired_or_didnt_received": "Did not receive the code or has it expired?",
+      "resend": "Resend",
+      "email": "Email verification",
+      "new_email": "Verify new email",
+      "email_change": "Email change verification",
+      "password_reset": "Reset password",
+      "delete_account": "Delete account"
+    },
+    "user": {
+      "firstname": "First Name",
+      "firstname_placeholder": "John",
+      "lastname": "Last Name",
+      "lastname_placeholder": "Doe",
+      "profile_picture": "Profile Picture",
+      "email": "Email",
+      "email_placeholder": "carlog@gmail.com",
+      "password": "Password",
+      "password_placeholder": "Password",
+      "repeat_password": "Repeat Password",
+      "repeat_password_placeholder": "Repeat Password"
+    },
+    "toast": {
+      "otp": {
+        "expired": {
+          "body": "The code you entered is invalid or has expired."
+        },
+        "over_email_send_rate_limit": {
+          "title": "Please wait!",
+          "body": "Too many email requests in a short period. Please wait {{seconds}} seconds."
+        }
+      },
+      "google": {
+        "auth_flow_cancelled": {
+          "body": "Google authentication process was cancelled!"
+        },
+        "already_in_progress": {
+          "body": "A Google authentication is already in progress. Please wait!"
+        },
+        "error": {
+          "body": "An unexpected error occurred during Google authentication!"
+        }
+      },
+      "sign_in": {
+        "success": {
+          "title": "Successfully signed in!"
+        },
+        "invalid_credentials": {
+          "body": "Incorrect email and/or password!"
+        },
+        "error": {
+          "body": "An unexpected error occurred during sign in!"
+        }
+      },
+      "sign_up": {
+        "success": {
+          "title": "Successfully registered!"
+        },
+        "email_exists": {
+          "body": "The email you provided is already registered!"
+        },
+        "error": {
+          "body": "An unexpected error occurred during registration!"
+        },
+        "otp_error": {
+          "body": "An unexpected error occurred while verifying your account!"
+        }
+      },
+      "sign_out": {
+        "success": {
+          "title": "Successfully signed out!"
+        },
+        "error": {
+          "body": "An unexpected error occurred during sign out!"
+        }
+      },
+      "reset_password": {
+        "success": {
+          "title": "Password updated!"
+        },
+        "error": {
+          "body": "An unexpected error occurred while resetting the password!"
+        }
+      },
+      "add_password": {
+        "success": {
+          "title": "Password successfully added!"
+        },
+        "error": {
+          "body": "An unexpected error occurred while adding the password!"
+        }
+      },
+      "change_email": {
+        "success": {
+          "title": "Email updated!"
+        },
+        "error": {
+          "body": "An unexpected error occurred while updating the email!"
+        }
+      },
+      "change_personal_information": {
+        "success": {
+          "title": "Personal information updated"
+        },
+        "error": {
+          "body": "An unexpected error occurred while updating personal information!"
+        }
+      },
+      "delete_user": {
+        "success": {
+          "title": "User account deleted!"
+        },
+        "error": {
+          "body": "An unexpected error occurred while deleting the user account!"
+        }
+      }
+    }
   },
   "log": {
     "title": "Log entry",
