@@ -12,7 +12,10 @@ export function WheelDatePicker() {
     const { date, setDate, maxDate, minDate } = useDatePicker();
 
     const renderDate = useCallback(() => (
-        <DatePicker.Date renderItem={ renderDateText } enableScrollByTapOnItem/>
+        <DatePicker.Date
+            renderItem={ renderDateText }
+            // enableScrollByTapOnItem
+        />
     ), []);
 
     const renderDateText = useCallback((props: RenderItemProps<number>) => (
@@ -42,7 +45,7 @@ export function WheelDatePicker() {
             minDate={ dayjs(minDate).format("YYYY-MM-DD") }
             maxDate={ dayjs(maxDate).format("YYYY-MM-DD") }
             locale={ dayjs.locale() }
-            enableScrollByTapOnItem
+            // enableScrollByTapOnItem
             scrollEventThrottle={ 16 }
             pickerStyle={ styles.picker }
             itemTextStyle={ styles.label }
