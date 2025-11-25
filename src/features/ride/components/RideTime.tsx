@@ -21,7 +21,7 @@ export function RideTime({
     return (
         <View style={ styles.container }>
             <Text style={ styles.timeText }>
-                { startTime.format("YYYY. MM. DD. ddd HH:mm") }
+                { startTime.format("LLLL") }
                 {
                     isSameDay
                     ? <Text style={ styles.separator }> – </Text>
@@ -29,8 +29,8 @@ export function RideTime({
                 }
                 {
                     isSameDay
-                    ? endTime.format("HH:mm")
-                    : endTime.format("YYYY. MM. DD. ddd HH:mm")
+                    ? endTime.format("LT")
+                    : endTime.format("LLLL")
                 }
             </Text>
             {

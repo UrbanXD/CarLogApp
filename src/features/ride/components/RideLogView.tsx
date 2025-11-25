@@ -189,11 +189,11 @@ export function RideLogView({ id }: RideLogViewProps) {
             {
                 icon: ICON_NAMES.calendar,
                 title: t("rides.start_time"),
-                content: dayjs(rideLog?.startTime).format("YYYY. MM. DD. HH:mm"),
+                content: dayjs(rideLog?.startTime).format("LLL"),
                 onPress: () => onEdit(RideLogFormFieldsEnum.Time),
                 secondaryInfo: {
                     title: t("rides.end_time"),
-                    content: dayjs(rideLog?.endTime).format("YYYY. MM. HH:mm")
+                    content: dayjs(rideLog?.endTime).format("LLL")
                 }
             },
             {
