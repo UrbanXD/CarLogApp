@@ -29,7 +29,7 @@ export function ExpenseTypeInput({
 
     useEffect(() => {
         (async () => {
-            setRawExpenseTypes(await expenseTypesDao.getAllOtherExpenseType());
+            setRawExpenseTypes(await expenseTypeDao.getAllOtherExpenseType());
         })();
     }, []);
 
@@ -38,9 +38,9 @@ export function ExpenseTypeInput({
 
         setExpenseTypes(
             expenseTypeDao.mapper.dtoToPicker({
-                dtos: rawCurrencies,
+                dtos: rawExpenseTypes,
                 getControllerTitle: (dto) => dto.symbol,
-                getTitle: (dto) => `${ t(`expenses.types.${ dto.key }`) } - ${ dto.symbol }`
+                getTitle: (dto) => t(`expenses.types.${ dto.key }`)
             })
         );
 

@@ -9,9 +9,9 @@ export const carSchema = z
 .object({
     id: z.string().uuid(),
     ownerId: z.string().uuid(),
-    name: z.string().min(1, "Kérem adjon meg egy azonosítót az autója számára!").max(
+    name: z.string().min(1, "error.car_name_required").max(
         24,
-        "Az autó azonosítója maximum 24 karakter lehet!"
+        "error.car_name_max_limit;24"
     ),
     model: carModelSchema,
     odometer: odometerSchema,

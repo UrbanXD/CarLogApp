@@ -6,31 +6,30 @@ import { getUUID } from "../../../../database/utils/uuid.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CurrencyEnum } from "../../../_shared/currency/enums/currencyEnum.ts";
 
-
 export const expenseForm = expenseSchema
 .pick({ id: true, note: true })
 .extend({
-    carId: zPickerRequired("Kérem válasszon ki egy autót!").pipe(expenseSchema.shape.carId),
-    typeId: zPickerRequired("Kérem válasszon ki egy típust!").pipe(expenseSchema.shape.type.shape.id),
-    currencyId: zPickerRequired("Kérem válasszon ki egy valutát!")
+    carId: zPickerRequired("error.car_picker_required").pipe(expenseSchema.shape.carId),
+    typeId: zPickerRequired("error.type_picker_required").pipe(expenseSchema.shape.type.shape.id),
+    currencyId: zPickerRequired("error.currency_picker_required")
     .pipe(expenseSchema.shape.amount.shape.currency.shape.id),
     amount: zNumber({
         bounds: { min: expenseSchema.shape.amount.shape.amount.minValue ?? 0 },
         errorMessage: {
-            required: "Kérem adja meg a költség összegét",
+            required: "error.expense_amount_required",
             minBound: (min) => min === 0
-                               ? "A költség összege nem lehet negatív szám."
-                               : `A költség összegének minimum ${ min } értékűnek lennie kell.`
+                               ? "error.expense_amount_non_negative"
+                               : `error.expense_amount_min_limit;${ min }`
         }
     }).pipe(expenseSchema.shape.amount.shape.amount),
     date: zDate().pipe(expenseSchema.shape.date),
     exchangeRate: zNumber({
         bounds: { min: expenseSchema.shape.amount.shape.exchangeRate.minValue ?? 0 },
         errorMessage: {
-            required: "Kérem adja meg az átváltási árfolyamot.",
+            required: "error.exchange_rate_required",
             minBound: (min) => min === 0
-                               ? "Az átváltási árfolyam nem lehet negatív szám."
-                               : `Az átváltási árfolyamnak minimum legyen legalább ${ min }.`
+                               ? "error.exchange_rate_non_negative"
+                               : `error;${ min }`
         }
     }).pipe(expenseSchema.shape.amount.shape.exchangeRate)
 });
@@ -40,13 +39,13 @@ export type ExpenseFields = z.infer<typeof expenseForm>;
 export function useCreateExpenseFormProps(car: Car | null) {
     const defaultValues: ExpenseFields = {
         id: getUUID(),
-        carId: car?.id,
+        carId: "",
         typeId: null,
         currencyId: car?.currency.id ?? CurrencyEnum.EUR,
         amount: NaN,
         exchangeRate: 1,
         note: null,
-        date: new Date()
+        date: new Date().toISOString()
     };
 
     return { defaultValues, resolver: zodResolver(expenseForm) };

@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 export const placeForm = placeSchema
 .pick({ id: true, ownerId: true })
 .extend({
-    name: placeSchema.shape.name.min(1, "A hely megnevezésének megadása kötelező.")
+    name: placeSchema.shape.name.min(1, "error.place_name_required")
 });
 
 const getPlaceForm = (placeDao: PlaceDao) => placeForm
@@ -16,7 +16,7 @@ const getPlaceForm = (placeDao: PlaceDao) => placeForm
         return await placeDao.isNameAlreadyExists(value.id, value.ownerId, value.name);
     },
     {
-        message: "Már létezik ilyen nevű hely.",
+        message: "error.place_name_already_exists",
         path: ["name"]
     }
 );

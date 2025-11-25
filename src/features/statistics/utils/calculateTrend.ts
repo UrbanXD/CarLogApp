@@ -1,4 +1,5 @@
 import { numberToFractionDigit } from "../../../utils/numberToFractionDigit.ts";
+import i18n from "../../../i18n/index.ts";
 
 type Options = {
     diffFormat?: "compact" | "standard" | "percent" | null,
@@ -30,7 +31,7 @@ export function calculateTrend(current?: number = 0, previous?: number = 0, opti
     } else {
         trend = !diffFormat
                 ? absoluteDiff
-                : absoluteDiff.toLocaleString("hu-HU", { notation: diffFormat, maximumFractionDigits: 2 });
+                : absoluteDiff.toLocaleString(i18n.language, { notation: diffFormat, maximumFractionDigits: 2 });
     }
 
     const trendSymbol =

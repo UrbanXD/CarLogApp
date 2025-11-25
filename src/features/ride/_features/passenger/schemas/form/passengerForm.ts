@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 export const passengerForm = passengerSchema
 .pick({ id: true, ownerId: true })
 .extend({
-    name: passengerSchema.shape.name.min(1, "Az utas nevének megadása kötelező.")
+    name: passengerSchema.shape.name.min(1, "error.passenger_name_required")
 });
 
 const getPassengerForm = (passengerDao: PassengerDao) => passengerForm
@@ -16,7 +16,7 @@ const getPassengerForm = (passengerDao: PassengerDao) => passengerForm
         return await passengerDao.isNameAlreadyExists(value.id, value.ownerId, value.name);
     },
     {
-        message: "Már létezik ilyen nevű utas.",
+        message: "error.passenger_name_already_exists",
         path: ["name"]
     }
 );

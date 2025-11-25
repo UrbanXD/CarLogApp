@@ -45,7 +45,7 @@ export function CreateExpenseForm() {
     return (
         <Form>
             { fullForm.render() }
-            <FormButtons submit={ submitHandler } submitText={ "Rögzítés" }/>
+            <FormButtons submit={ submitHandler } submitText={ "form_button.record" }/>
         </Form>
     );
 }

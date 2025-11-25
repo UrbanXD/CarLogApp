@@ -16,16 +16,16 @@ const serviceLogForm = expenseForm
     .pick({ id: true, carId: true })
     .extend({
         items: z.array(formResultServiceItemSchema),
-        serviceTypeId: zPickerRequired("Kérem válasszon ki egy típust!")
+        serviceTypeId: zPickerRequired("error.service_type_required")
         .pipe(serviceLogSchema.shape.serviceType.shape.id),
         odometerValue: zNumber({
-            optional: true,
             bounds: { min: 0 },
             errorMessage: {
+                required: "error.odometer_value_required",
                 minBound: (min) =>
                     min === 0
-                    ? "A kilométeróra-állás nem lehet negatív szám"
-                    : `Visszafelé nem pöröghet a kilométeróra, a jelenlegi állás ${ min }.`
+                    ? "error.odometer_value_non_negative"
+                    : "error.odometer_value_min_limit"
             }
         }),
         odometerLogId: odometerLogSchema.shape.id //hidden

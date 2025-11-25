@@ -12,25 +12,25 @@ export const carFormSchema = carSchema
 .pick({ id: true, ownerId: true, name: true, image: true })
 .extend({
     model: z.object({
-        id: zPickerRequired("Válasszon ki egy modellt!").pipe(modelSchema.shape.id),
+        id: zPickerRequired("error.car_model_picker_required").pipe(modelSchema.shape.id),
         name: z.string().optional(), // hidden input only for result screen
-        makeId: zPickerRequired("Válasszon ki egy gyártót!").pipe(modelSchema.shape.makeId),
+        makeId: zPickerRequired("error.car_make_picker_required").pipe(modelSchema.shape.makeId),
         makeName: z.string().optional(), // hidden input only for result screen
-        year: zPickerRequired("Válasszon ki egy gyártási évet!").pipe(modelSchema.shape.startYear)
+        year: zPickerRequired("error.car_model_year_picker_required").pipe(modelSchema.shape.startYear)
     }),
     odometer: odometerChangeLogForm(0)
     .pick({ id: true, value: true })
     .extend({
         odometerChangeLogId: odometerChangeLogForm(0).shape.odometerChangeLogId.nullable(),
-        unitId: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
+        unitId: zPickerRequired("error.unit_picker_required")
         .pipe(carSchema.shape.odometer.shape.unit.shape.id)
     }),
     currencyId: currencySchema.shape.id,
     fuelTank: carSchema.shape.fuelTank.pick({ id: true }).extend({
-        typeId: zPickerRequired("Kérem válasszon ki egy üzemanyag típust!")
+        typeId: zPickerRequired("error.fuel_type_picker_required")
         .pipe(carSchema.shape.fuelTank.shape.type.shape.id),
         capacity: zNumber({ bounds: { min: 0 } }).pipe(carSchema.shape.fuelTank.shape.capacity),
-        unitId: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
+        unitId: zPickerRequired("error.unit_picker_required")
         .pipe(carSchema.shape.fuelTank.shape.unit.shape.id)
     })
 });

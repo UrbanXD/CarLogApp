@@ -9,15 +9,17 @@ import { odometerUnitSchema } from "../odometerUnitSchema.ts";
 export const odometerChangeLogForm = (highestOdometerValue?: number = 0) => odometerLogSchema
 .pick({ id: true, note: true })
 .extend({
-    carId: zPickerRequired("Kérem válasszon ki egy autót!").pipe(odometerLogSchema.shape.carId),
+    carId: zPickerRequired("error.car_picker_required").pipe(odometerLogSchema.shape.carId),
     ownerId: carSchema.shape.ownerId, //hidden
     odometerChangeLogId: z.string().uuid(), //hidden
     value: zNumber({
             bounds: { min: highestOdometerValue },
             errorMessage: {
-                minBound: (min) => min === 0
-                                   ? "A kilométeróra-állás nem lehet negatív szám"
-                                   : `Visszafelé nem pöröghet a kilométeróra, a jelenlegi állás ${ min }.`
+                required: "error.odometer_value_required",
+                minBound: (min) =>
+                    min === 0
+                    ? "error.odometer_value_non_negative"
+                    : "error.odometer_value_min_limit"
             }
         }
     ).pipe(odometerLogSchema.shape.value),

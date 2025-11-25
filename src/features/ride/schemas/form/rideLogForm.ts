@@ -19,25 +19,28 @@ const rideLogForm = rideLogSchema
         optional: false,
         bounds: { min: 0 },
         errorMessage: {
+            required: "error.odometer_value_required",
             minBound: (min) =>
                 min === 0
-                ? "A kilométeróra-állás nem lehet negatív szám"
-                : `Visszafelé nem pöröghet a kilométeróra, a jelenlegi állás ${ min }.`
+                ? "error.odometer_value_non_negative"
+                : "error.odometer_value_min_limit"
         }
     }),
     endOdometerLogId: odometerSchema.shape.id, // hidden
     endOdometerValue: zNumber({
+        optional: false,
         bounds: { min: 0 },
         errorMessage: {
+            required: "error.odometer_value_required",
             minBound: (min) =>
                 min === 0
-                ? "A kilométeróra-állás nem lehet negatív szám"
-                : `Visszafelé nem pöröghet a kilométeróra, a jelenlegi állás ${ min }.`
+                ? "error.odometer_value_non_negative"
+                : "error.odometer_value_min_limit"
         }
     }),
     expenses: z.array(formResultRideExpenseSchema),
     places: z.array(ridePlaceForm).min(2, {
-        message: "Legalább meg kell adnia az indulási és érkezési helyet."
+        message: "error.start_and_end_place_required"
     }),
     passengers: z.array(ridePassengerForm)
 })
@@ -45,14 +48,14 @@ const rideLogForm = rideLogSchema
     if(data.endTime && data.startTime && data.endTime < data.startTime) {
         ctx.addIssue({
             path: ["endTime"],
-            message: "Az érkezési időnek későbbinek kell lennie, mint az indulási idő."
+            message: "error.ride_end_time_must_be_later_than_start_time"
         });
     }
 
     if(data.endOdometerValue <= data.startOdometerValue) {
         ctx.addIssue({
             path: ["endOdometerValue"],
-            message: "A kilométeróra-állás nem csökkenhet az induláshoz képest."
+            message: "error.ride_odometer_end_must_be_bigger_than_start_odometer"
         });
     }
 });

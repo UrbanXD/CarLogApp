@@ -16,11 +16,11 @@ const fuelLogForm = expenseForm
         quantity: zNumber({
             bounds: { min: fuelLogSchema.shape.quantity.minValue ?? 0 },
             errorMessage: {
-                required: "Kérem adja meg mennyit tankolt",
+                required: "error.fuel_quantity_required",
                 minBound: (min) =>
                     min === 0
-                    ? "A tankolt mennyiség nem lehet negatív szám."
-                    : `A tankolt mennyiségnek minimum ${ min } értékűnek lennie kell.`
+                    ? "error.fuel_quantity_non_negative"
+                    : `error.fuel_quantity_min_limit;${ min }`
             }
         }).pipe(fuelLogSchema.shape.quantity),
         odometerValue: zNumber({
@@ -29,8 +29,8 @@ const fuelLogForm = expenseForm
             errorMessage: {
                 minBound: (min) =>
                     min === 0
-                    ? "A kilométeróra-állás nem lehet negatív szám"
-                    : `Visszafelé nem pöröghet a kilométeróra, a jelenlegi állás ${ min }.`
+                    ? "error.odometer_value_non_negative"
+                    : "error.odometer_value_min_limit"
             }
         }),
         fuelUnitId: fuelLogSchema.shape.fuelUnit.shape.id, // hidden

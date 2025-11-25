@@ -6,9 +6,9 @@ export const signUpRequestSchema =
     userSchema
     .pick({ email: true, firstname: true, lastname: true })
     .extend({
-        password: z.string().min(6, "Legalább 6 karakter hosszúnak kell lennie a jelszónak").regex(
+        password: z.string().min(6, "error.password_min_length;6").regex(
             /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*?[#?!@$%^.&*-]).+$/,
-            "A jelszónak legalább tartalmaznia kell egy kis- és nagybetűt, egy számot és egy speciális karaktert"
+            "error.password_format"
         ),
         rpassword: z.string()
     });
@@ -27,7 +27,7 @@ export const useSignUpFormProps = () => {
     const signUpSchema = signUpRequestSchema.refine(
         data => data.password === data.rpassword,
         {
-            message: "A két jelszó nem egyezik",
+            message: "error.passwords_not_equals",
             path: ["rpassword"]
         }
     );

@@ -27,22 +27,22 @@ export const zNumber = ({
         .transform((value) => (value === "" ? (optional ? null : NaN) : Number(value)))
         .refine(
             (value) => optional || !isNaN(value),
-            { message: errorMessage?.required ?? "Kérem adjon meg egy számot." }
+            { message: errorMessage?.required ?? "error.number_required" }
         )
         .refine(
             (value) => bounds?.min !== undefined ? ((optional && value === null) || value >= bounds.min) : true,
-            { message: errorMessage?.minBound?.(bounds?.min) ?? `A számnak nagyobbnak vagy egyenlőnek kell lennie mint ${ bounds?.min }.` }
+            { message: errorMessage?.minBound?.(bounds?.min) ?? `error.number_min_limit;${ bounds?.min }` }
         )
         .refine(
             (value) => bounds?.max !== undefined ? ((optional && value === null) || value < bounds.max) : true,
-            { message: errorMessage?.maxBound?.(bounds?.max) ?? `A számnak kisebbnek kell lennie mint ${ bounds?.max }.` }
+            { message: errorMessage?.maxBound?.(bounds?.max) ?? `error.number_max_limit;${ bounds?.max }` }
         )
     );
 
     return optional ? base.optional().nullable() : base;
 };
 
-export const zPickerRequired = (errorMessage?: string = "Válasszon ki egy elemet!") => z.union([
+export const zPickerRequired = (errorMessage?: string = "error.picker_required") => z.union([
     z.string({ required_error: errorMessage }).min(1, errorMessage),
     z.number({ required_error: errorMessage })
 ]);
@@ -61,7 +61,7 @@ export const zColor = z
 export const zDate = (args: ZodDateArgs = {}) => {
     const {
         optional = false,
-        requiredErrorMessage = "Kérem válasszon ki egy dátumot!"
+        requiredErrorMessage = "error.date_required"
     } = args;
     const required_error = requiredErrorMessage;
 
