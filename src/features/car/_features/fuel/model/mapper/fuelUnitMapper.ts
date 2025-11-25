@@ -29,7 +29,7 @@ export class FuelUnitMapper extends AbstractMapper<FuelUnitTableRow, FuelUnit> {
     dtoToPicker(dtos: Array<FuelUnit>, getTitle?: (dto: FuelUnit) => string): Promise<Array<PickerItemType>> {
         return dtos.map(dto => ({
             value: dto.id.toString(),
-            title: getTitle?.() ?? dto.short
+            title: getTitle?.(dto) ?? dto.short
         }));
     }
 }
