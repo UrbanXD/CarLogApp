@@ -50,7 +50,8 @@
     "date_picker": {
       "title": "$t(date.text)",
       "year": "$t(date.year)",
-      "date_placeholder": "$t(date.text)"
+      "date_placeholder": "$t(date.text)",
+      "time_placeholder": "$t(date.time)"
     }
   },
   "toast": {
@@ -351,13 +352,15 @@
   },
   "date": {
     "text": "Dátum",
+    "time": "Idő",
     "year": "Év",
     "today": "ma",
     "days": "{{value}} nap",
     "hours": "{{value}} óra",
     "minutes": "{{value}} perc",
     "seconds": "{{value}} másodperc",
-    "few_seconds": "néhány másodperc"
+    "few_seconds": "néhány másodperc",
+    "now": "most"
   },
   "car": {
     "title": "Autó adatlap",
@@ -614,6 +617,7 @@
     "empty_car_list": "Még egy autó se parkol a virtuális garázsában"
   },
   "statistics": {
+    "title": "Statisztika",
     "basic_car_title": "Autó statisztikák",
     "monthly_fuel_cost": "Havi üzemanyagköltség",
     "monthly_service_cost": "Havi szervizköltség",

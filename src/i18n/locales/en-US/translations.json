@@ -50,7 +50,8 @@
     "date_picker": {
       "title": "$t(date.text)",
       "year": "$t(date.year)",
-      "date_placeholder": "$t(date.text)"
+      "date_placeholder": "$t(date.text)",
+      "time_placeholder": "$t(date.time)"
     }
   },
   "toast": {
@@ -351,13 +352,15 @@
   },
   "date": {
     "text": "Date",
+    "time": "Time",
     "year": "Year",
     "today": "today",
     "days": "{{value}} days",
     "hours": "{{value}} hours",
     "minutes": "{{value}} minutes",
     "seconds": "{{value}} seconds",
-    "few_seconds": "a few seconds"
+    "few_seconds": "a few seconds",
+    "now": "now"
   },
   "car": {
     "title": "Car profile",
@@ -614,6 +617,7 @@
     "empty_car_list": "No cars are parked in your virtual garage yet"
   },
   "statistics": {
+    "title": "Statistics",
     "basic_car_title": "Car statistics",
     "monthly_fuel_cost": "Monthly fuel cost",
     "monthly_service_cost": "Monthly service cost",
