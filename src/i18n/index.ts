@@ -7,10 +7,32 @@ import translationHu from "./locales/hu-HU/translations.json";
 import { BaseConfig } from "../constants/index.ts";
 import dayjs from "dayjs";
 import weekday from "dayjs/plugin/weekday";
+import updateLocale from "dayjs/plugin/updateLocale";
+import quarterOfYear from "dayjs/plugin/quarterOfYear";
 import "dayjs/locale/en";
 import "dayjs/locale/hu";
 
 dayjs.extend(weekday);
+dayjs.extend(updateLocale);
+dayjs.extend(quarterOfYear);
+
+dayjs.updateLocale("hu", {
+    relativeTime: {
+        future: "%s múlva",
+        past: "%s",
+        s: (_, s, ___, isFuture) => `néhány másodperc${ isFuture || s ? "" : "e" }`,
+        m: (_, s, ___, isFuture) => `1 perc${ isFuture || s ? "" : "e" }`,
+        mm: (n, s, ___, isFuture) => `${ n } perc${ isFuture || s ? "" : "e" }`,
+        h: (_, s, ___, isFuture) => `1 ${ isFuture || s ? "óra" : "órával ezelőtt" }`,
+        hh: (n, s, ___, isFuture) => `${ n } ${ isFuture || s ? "óra" : "órával ezelőtt" }`,
+        d: (_, s, ___, isFuture) => `1 ${ isFuture || s ? "nap" : "nappal ezelőtt" }`,
+        dd: (n, s, ___, isFuture) => `${ n } ${ isFuture || s ? "nap" : "nappal ezelőtt" }`,
+        M: (_, s, ___, isFuture) => `1 ${ isFuture || s ? "hónap" : "hónappal ezelőtt" }`,
+        MM: (n, s, ___, isFuture) => `${ n } ${ isFuture || s ? "hónap" : "hónappal ezelőtt" }`,
+        y: (_, s, ___, isFuture) => `1 ${ isFuture || s ? "év" : "évvel ezelőtt" }`,
+        yy: (n, s, ___, isFuture) => `${ n } ${ isFuture || s ? "év" : "évvel ezelőtt" }`
+    }
+});
 
 const resources = {
     "en-US": { translation: translationEn },

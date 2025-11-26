@@ -26,6 +26,7 @@ type InputDatePicker = {
     maxDate?: DateType
     setValue?: (date: Date | Array<Date>) => void
     hiddenController?: boolean
+    showTimestamps?: boolean
 }
 
 function InputDatePicker({
@@ -36,7 +37,8 @@ function InputDatePicker({
     maxDate,
     minDate,
     setValue,
-    hiddenController = false
+    hiddenController = false,
+    showTimestamps = true
 }: InputDatePicker) {
     const { t } = useTranslation();
 
@@ -138,7 +140,10 @@ function InputDatePicker({
                     onSubmit={ submit }
                     onClose={ close }
                 >
-                    <DatePickerHeader title={ title ?? t("form.date_picker.title") }/>
+                    <DatePickerHeader
+                        title={ title ?? t("form.date_picker.title") }
+                        showTimestamps={ showTimestamps }
+                    />
                     <DatePicker/>
                     <DatePickerFooter/>
                 </DatePickerProvider>
