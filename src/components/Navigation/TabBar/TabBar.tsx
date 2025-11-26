@@ -85,7 +85,7 @@ const useStyles = (bottom: number) => StyleSheet.create({
         alignItems: "center",
         height: SIMPLE_TABBAR_HEIGHT + bottom,
         paddingBottom: bottom,
-        gap: SEPARATOR_SIZES.small,
+        gap: 2,
         width: "100%",
         backgroundColor: "transparent"
     }

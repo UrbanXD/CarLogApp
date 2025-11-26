@@ -1,9 +1,9 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import Icon from "../../Icon.tsx";
 import { SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
 import { Color, ImageSource } from "../../../types/index.ts";
-import Animated, { Easing, useAnimatedStyle, withTiming } from "react-native-reanimated";
+import { Easing, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { AnimatedPressable } from "../../AnimatedComponents/index.ts";
 
 type TabBarIconProps = {
@@ -32,7 +32,7 @@ function TabBarIcon({
     const styles = useStyles(isFocused ? activeColor : inactiveColor);
 
     const containerStyle = useAnimatedStyle(() => {
-        const scale = withTiming(isFocused ? 1.15 : 1, { duration: 150, easing: Easing.quad });
+        const scale = withTiming(isFocused ? 1.05 : 1, { duration: 150, easing: Easing.quad });
 
         return { transform: [{ scale }] };
     });
@@ -48,7 +48,7 @@ function TabBarIcon({
                 size={ iconSize }
                 color={ isFocused ? activeColor : inactiveColor }
             />
-            <Animated.Text style={ styles.title }>{ title }</Animated.Text>
+            <Text style={ styles.title } numberOfLines={ 1 } adjustsFontSizeToFit>{ title }</Text>
         </AnimatedPressable>
     );
 }
@@ -63,9 +63,12 @@ const useStyles = (color: Color) =>
             alignSelf: "center",
             justifyContent: "center",
             alignItems: "center"
+            // backgroundColor: "red"
         },
         title: {
             fontFamily: "Gilroy-Medium",
+            flexWrap: "nowrap",
+            // fontSize: 12,
             color
         }
     });
