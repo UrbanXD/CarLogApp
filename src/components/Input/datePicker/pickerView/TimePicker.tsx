@@ -1,4 +1,3 @@
-import { useDatePicker } from "../../../../contexts/datePicker/DatePickerContext.ts";
 import WheelPicker, {
     PickerItem,
     useOnPickerValueChangedEffect,
@@ -32,9 +31,12 @@ const amPmOptions = [
     { value: "PM", label: dayjs().hour(12).format("A") } // Lekérjük a '12' óra szerinti AM/PM címkét
 ];
 
-export function TimePicker() {
-    const { date, setDate } = useDatePicker();
+type TimePickerProps = {
+    date: Date,
+    setDate: (date: Date | null) => void
+}
 
+export function TimePicker({ date, setDate }: TimePickerProps) {
     const is12HourFormat = dayjs().localeData().longDateFormat("LT").includes("A");
 
     const hourOptions =

@@ -5,13 +5,15 @@ import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withTiming
 import Icon from "../../../Icon.tsx";
 import { DatePickerViews, useDatePicker } from "../../../../contexts/datePicker/DatePickerContext.ts";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 type DatePickerHeaderProps = {
     title?: string
 }
 
 export function DatePickerHeader({ title }: DatePickerHeaderProps) {
-    const { date, currentView, openView } = useDatePicker();
+    const { t } = useTranslation();
+    const { mode, startDate, endDate, currentView, openView } = useDatePicker();
 
     const view = useSharedValue<DatePickerViews>(currentView);
 
@@ -34,7 +36,12 @@ export function DatePickerHeader({ title }: DatePickerHeaderProps) {
         transform: [{ rotate: `${ timeArrowRotate.value }deg` }]
     }));
 
-    const onPressDateSelector = () => openView(currentView === "wheel_picker" ? "calendar" : "wheel_picker");
+    const onPressStartDateSelector = () => openView(
+        currentView === "start_date_picker"
+        ? "calendar"
+        : "start_date_picker"
+    );
+    const onPressEndDateSelector = () => openView(currentView === "end_date_picker" ? "calendar" : "end_date_picker");
     const onPressTimeSelector = () => openView(currentView === "time" ? "calendar" : "time");
 
     return (
@@ -43,41 +50,87 @@ export function DatePickerHeader({ title }: DatePickerHeaderProps) {
                 title &&
                <Text style={ styles.title }>{ title }</Text>
             }
-            <View style={ styles.buttonContainer }>
-                <Pressable onPress={ onPressDateSelector } style={ { flexDirection: "row", alignItems: "center" } }>
-                    <Icon
+            {
+                mode === "range" &&
+               <View style={ styles.buttonContainer }>
+                  <Pressable onPress={ onPressStartDateSelector }
+                             style={ { flexDirection: "row", alignItems: "center" } }>
+                     <Icon
                         icon={ ICON_NAMES.calendar }
                         size={ FONT_SIZES.p3 * ICON_FONT_SIZE_SCALE }
                         style={ { marginRight: SEPARATOR_SIZES.lightSmall / 2 } }
-                    />
-                    <Text style={ styles.label }>{ dayjs(date).format("LL") }</Text>
-                    <Animated.View style={ dateArrowStyle }>
+                     />
+                     <Text style={ styles.label }>
+                         { startDate ? dayjs(startDate).format("L") : t("form.date_picker.date_placeholder") }
+                     </Text>
+                     <Animated.View style={ dateArrowStyle }>
                         <Icon
-                            icon={ ICON_NAMES.downArrowHead }
-                            size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
+                           icon={ ICON_NAMES.downArrowHead }
+                           size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
                         />
-                    </Animated.View>
-                </Pressable>
-                <Pressable
-                    onPress={ onPressTimeSelector }
-                    style={ { flexDirection: "row", alignItems: "center", flexShrink: 1 } }
-                >
-                    <Icon
-                        icon={ ICON_NAMES.clock }
+                     </Animated.View>
+                  </Pressable>
+                  <Pressable
+                     onPress={ onPressEndDateSelector }
+                     style={ { flexDirection: "row-reverse", alignItems: "center", flexShrink: 1 } }
+                  >
+                     <Icon
+                        icon={ ICON_NAMES.calendar }
+                        size={ FONT_SIZES.p3 * ICON_FONT_SIZE_SCALE }
+                        style={ { marginLeft: SEPARATOR_SIZES.lightSmall / 2 } }
+                     />
+                     <Text numberOfLines={ 1 } adjustsFontSizeToFit style={ styles.label }>
+                         { endDate ? dayjs(endDate).format("L") : t("form.date_picker.date_placeholder") }
+                     </Text>
+                     <Animated.View style={ timeArrowStyle }>
+                        <Icon
+                           icon={ ICON_NAMES.downArrowHead }
+                           size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
+                        />
+                     </Animated.View>
+                  </Pressable>
+               </View>
+            }
+            {
+                mode === "single" &&
+               <View style={ styles.buttonContainer }>
+                  <Pressable onPress={ onPressStartDateSelector }
+                             style={ { flexDirection: "row", alignItems: "center" } }>
+                     <Icon
+                        icon={ ICON_NAMES.calendar }
                         size={ FONT_SIZES.p3 * ICON_FONT_SIZE_SCALE }
                         style={ { marginRight: SEPARATOR_SIZES.lightSmall / 2 } }
-                    />
-                    <Text numberOfLines={ 1 } adjustsFontSizeToFit style={ styles.label }>
-                        { dayjs(date).format("LT") }
-                    </Text>
-                    <Animated.View style={ timeArrowStyle }>
+                     />
+                     <Text style={ styles.label }>{ startDate ? dayjs(startDate).format("L") : t(
+                         "form.date_picker.date_placeholder") }</Text>
+                     <Animated.View style={ dateArrowStyle }>
                         <Icon
-                            icon={ ICON_NAMES.downArrowHead }
-                            size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
+                           icon={ ICON_NAMES.downArrowHead }
+                           size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
                         />
-                    </Animated.View>
-                </Pressable>
-            </View>
+                     </Animated.View>
+                  </Pressable>
+                  <Pressable
+                     onPress={ onPressTimeSelector }
+                     style={ { flexDirection: "row-reverse", alignItems: "center", flexShrink: 1 } }
+                  >
+                     <Icon
+                        icon={ ICON_NAMES.clock }
+                        size={ FONT_SIZES.p3 * ICON_FONT_SIZE_SCALE }
+                        style={ { marginLeft: SEPARATOR_SIZES.lightSmall / 2 } }
+                     />
+                     <Text numberOfLines={ 1 } adjustsFontSizeToFit style={ styles.label }>
+                         { startDate ? dayjs(startDate).format("LT") : t("form.date_picker.date_placeholder") }
+                     </Text>
+                     <Animated.View style={ timeArrowStyle }>
+                        <Icon
+                           icon={ ICON_NAMES.downArrowHead }
+                           size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
+                        />
+                     </Animated.View>
+                  </Pressable>
+               </View>
+            }
         </View>
     );
 }

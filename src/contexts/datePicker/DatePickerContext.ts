@@ -1,16 +1,18 @@
 import { Context, createContext, useContext } from "react";
 
-export type DatePickerViews = "calendar" | "wheel_picker" | "time";
+export type DatePickerViews = "calendar" | "start_date_picker" | "end_date_picker" | "time";
 
 type DatePickerContextValue = {
-    date: Date
-    setDate: (value: (((prevState: Date) => Date) | Date)) => void
+    mode: "single" | "range"
+    startDate: Date | null
+    endDate: Date | null
+    setStartDate: (value: (((prevState: Date | null) => Date | null) | Date | null)) => void
+    setEndDate: (value: (((prevState: Date | null) => Date | null) | Date | null)) => void
     calendarDate: Date
     nextMonthInCalendar: () => void
     previousMonthInCalendar: () => void
     currentView: DatePickerViews
     openView: (view: DatePickerViews) => void
-    locale: string
     minDate: Date
     maxDate: Date
     submit: () => void

@@ -8,8 +8,13 @@ import { OnlyDateFormat } from "@quidone/react-native-wheel-picker/dest/typescri
 import { DateNodeType } from "@quidone/react-native-wheel-picker/dest/typescript/date/DatePickerContainer";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 
-export function WheelDatePicker() {
-    const { date, setDate, maxDate, minDate } = useDatePicker();
+type WheelDatePickerProps = {
+    date: Date,
+    setDate: (date: Date | null) => void
+}
+
+export function WheelDatePicker({ date, setDate }: WheelDatePickerProps) {
+    const { maxDate, minDate } = useDatePicker();
 
     const renderDate = useCallback(() => (
         <DatePicker.Date

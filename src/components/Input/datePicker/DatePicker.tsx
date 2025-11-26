@@ -9,7 +9,7 @@ import { CalendarHeader } from "./header/CalendarHeader.tsx";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 
 export function DatePicker() {
-    const { currentView } = useDatePicker();
+    const { startDate, setStartDate, endDate, setEndDate, currentView } = useDatePicker();
 
     return (
         <View style={ styles.container }>
@@ -25,15 +25,21 @@ export function DatePicker() {
                    </Animated.View>
                 }
                 {
-                    currentView === "wheel_picker" &&
+                    currentView === "start_date_picker" &&
                    <Animated.View entering={ FadeIn } exiting={ FadeOut }>
-                      <WheelDatePicker/>
+                      <WheelDatePicker date={ startDate } setDate={ setStartDate }/>
+                   </Animated.View>
+                }
+                {
+                    currentView === "end_date_picker" &&
+                   <Animated.View entering={ FadeIn } exiting={ FadeOut }>
+                      <WheelDatePicker date={ endDate } setDate={ setEndDate }/>
                    </Animated.View>
                 }
                 {
                     currentView === "time" &&
                    <Animated.View entering={ FadeIn } exiting={ FadeOut }>
-                      <TimePicker/>
+                      <TimePicker date={ startDate } setDate={ setStartDate }/>
                    </Animated.View>
                 }
             </View>

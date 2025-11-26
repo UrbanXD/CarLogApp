@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDatePicker } from "../../../../contexts/datePicker/DatePickerContext.ts";
-import { SingleChange, Styles } from "react-native-ui-datepicker/lib/typescript/types";
-import { heightPercentageToDP } from "react-native-responsive-screen";
-import DateTimePicker, { useDefaultStyles } from "react-native-ui-datepicker";
+import { RangeChange, SingleChange } from "react-native-ui-datepicker/lib/typescript/types";
 import dayjs from "dayjs";
-import { StyleSheet } from "react-native";
-import { COLORS, FONT_SIZES } from "../../../../constants/index.ts";
+import { DateTimePickerUi } from "../common/DateTimePickerUi.tsx";
 
 export function CalendarPicker() {
-    const { date, setDate, calendarDate } = useDatePicker();
-    const defaultStyles = useDefaultStyles("dark");
+    const { mode, startDate, setStartDate, endDate, setEndDate, calendarDate } = useDatePicker();
 
     const [year, setYear] = useState(dayjs(calendarDate).year());
 
@@ -18,92 +14,62 @@ export function CalendarPicker() {
     }, [calendarDate]);
 
     const onDateChange: SingleChange = ({ date: newDateObj }) => {
-        const newDate = dayjs(newDateObj);
+        const newDate = newDateObj ? dayjs(newDateObj) : null;
 
-        setDate(prevState =>
-            dayjs(prevState)
-            .set("year", newDate.year())
-            .set("month", newDate.month())
-            .set("date", newDate.date())
-            .toDate()
-        );
+        setStartDate((prev) => {
+            if(!newDate) return null;
+
+            const normalized = dayjs(prev ?? newStartDate)
+            .set("year", newStartDate.year())
+            .set("month", newStartDate.month())
+            .set("date", newStartDate.date())
+            .toDate();
+
+            if(prev && dayjs(prev).isSame(normalized, "day")) return prev;
+            return normalized;
+        });
     };
 
-    const datePickerStyles: Styles = {
-        ...defaultStyles,
-        weekdays: styles.weekdays,
-        weekday_label: styles.weekdays.label,
-        days: styles.contentBackground,
-        day_cell: styles.days.cell,
-        day_label: styles.days.cell.label,
-        outside_label: [styles.days.cell.label, styles.days.cell.outsideLabel],
-        selected: styles.selected,
-        selected_label: styles.selected.label,
-        today: styles.days.cell.today,
-        today_label: styles.days.cell.today.label
+    const onRangeDateChange: RangeChange = ({ startDate: newStartDateObj, endDate: newEndDateObj }) => {
+        const newStartDate = newStartDateObj ? dayjs(newStartDateObj) : null;
+        const newEndDate = newEndDateObj ? dayjs(newEndDateObj) : null;
+
+        setStartDate(prev => {
+            if(!newStartDate) return null;
+
+            const normalized = dayjs(prev ?? newStartDate)
+            .set("year", newStartDate.year())
+            .set("month", newStartDate.month())
+            .set("date", newStartDate.date())
+            .toDate();
+
+            if(prev && dayjs(prev).isSame(normalized, "day")) return prev;
+            return normalized;
+        });
+
+        setEndDate(prev => {
+            if(!newEndDate) return null;
+
+            const normalized = dayjs(prev ?? newEndDate)
+            .set("year", newEndDate.year())
+            .set("month", newEndDate.month())
+            .set("date", newEndDate.date())
+            .toDate();
+
+            if(prev && dayjs(prev).isSame(normalized, "day")) return prev;
+            return normalized;
+        });
     };
 
     return (
-        <DateTimePicker
-            mode="single"
-            initialView="day"
-            hideHeader
-            disableMonthPicker
-            disableYearPicker
-            firstDayOfWeek={ dayjs().weekday(0).get("day") } // start with Monday (1) | Sunday is 0
-            weekdaysFormat="min"
-            showOutsideDays
-            date={ date }
+        <DateTimePickerUi
+            mode={ mode }
+            date={ startDate }
+            startDate={ startDate }
+            endDate={ endDate }
             year={ year }
             month={ dayjs(calendarDate).month() }
-            onChange={ onDateChange }
-            locale={ dayjs.locale() }
-            containerHeight={ heightPercentageToDP(25) }
-            styles={ datePickerStyles }
+            onChange={ mode === "single" ? onDateChange : onRangeDateChange }
         />
     );
 }
-
-const styles = StyleSheet.create({
-    weekdays: {
-        borderColor: COLORS.gray1,
-        borderBottomWidth: 0.50,
-
-        label: {
-            fontFamily: "Gilroy-Medium",
-            color: COLORS.gray2,
-            textTransform: "capitalize"
-        }
-    },
-    days: {
-        cell: {
-            borderColor: COLORS.gray5,
-            borderWidth: 0.25,
-
-            label: {
-                fontFamily: "Gilroy-Medium",
-                fontSize: FONT_SIZES.p4,
-                color: COLORS.white2
-            },
-
-            outsideLabel: {
-                color: COLORS.gray2
-            },
-
-            today: {
-                label: {
-                    color: COLORS.fuelYellow
-                }
-            }
-        }
-    },
-    selected: {
-        backgroundColor: COLORS.fuelYellow,
-        borderRadius: 10,
-
-        label: {
-            fontFamily: "Gilroy-Heavy",
-            color: COLORS.black5
-        }
-    }
-});

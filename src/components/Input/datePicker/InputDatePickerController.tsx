@@ -10,12 +10,12 @@ import Icon from "../../Icon.tsx";
 import { useTranslation } from "react-i18next";
 
 type InputDatePickerControllerProps = {
-    date: Date
+    date: Array<Date>
+    mode: "single" | "range"
     open: (view: DatePickerViews) => void
-    expanded: boolean
 }
 
-export function InputDatePickerController({ date, open }: InputDatePickerControllerProps) {
+export function InputDatePickerController({ date, mode, open }: InputDatePickerControllerProps) {
     const { t } = useTranslation();
 
     const is12HourFormat = dayjs().localeData().longDateFormat("LT").includes("A");
@@ -40,32 +40,39 @@ export function InputDatePickerController({ date, open }: InputDatePickerControl
                     style={ [styles.text, !date && styles.placeholder] }
                 >
                     {
-                        date
-                        ? dayjs(date).format("LL")
+                        date.length > 0
+                        ? mode === "single"
+                          ? dayjs(date[0]).format("L")
+                          : date.map(d => dayjs(d).format("L")).join(" - ")
                         : t("form.date_picker.date_placeholder")
                     }
                 </Text>
             </Pressable>
-            <Divider isVertical size={ formTheme.containerHeight } color={ formTheme.activeColor }/>
-            <Pressable
-                onPress={ onPressTime }
-                style={ [styles.container, styles.timeContainer] }
-            >
-                <Text
-                    numberOfLines={ 1 }
-                    adjustsFontSizeToFit
-                    style={ [styles.text, !date && styles.placeholder] }
-                >
-                    {
-                        date
-                        ? dayjs(date).format("LT")
-                        : dayjs().hour(0).minute(0).format("LT") //placeholder
-                    }
-                </Text>
-                <View style={ styles.iconContainer }>
-                    <Icon icon={ ICON_NAMES.clock } size={ formTheme.iconSize } color={ formTheme.valueTextColor }/>
-                </View>
-            </Pressable>
+            {
+                mode === "single" &&
+               <>
+                  <Divider isVertical size={ formTheme.containerHeight } color={ formTheme.activeColor }/>
+                  <Pressable
+                     onPress={ onPressTime }
+                     style={ [styles.container, styles.timeContainer] }
+                  >
+                     <Text
+                        numberOfLines={ 1 }
+                        adjustsFontSizeToFit
+                        style={ [styles.text, !date && styles.placeholder] }
+                     >
+                         {
+                             date
+                             ? dayjs(date).format("LT")
+                             : t("form.date_picker.time_placeholder")
+                         }
+                     </Text>
+                     <View style={ styles.iconContainer }>
+                        <Icon icon={ ICON_NAMES.clock } size={ formTheme.iconSize } color={ formTheme.valueTextColor }/>
+                     </View>
+                  </Pressable>
+               </>
+            }
         </InputRow>
     );
 }
