@@ -99,13 +99,13 @@ function ITimelineView({
             >
                 {
                     orderButtons &&
-                   <FilterRow>
+                   <FilterRow style={ { paddingHorizontal: DEFAULT_SEPARATOR } }>
                        { orderButtons.map((props, index) => <FilterButton key={ index.toString() } { ...props } />) }
                    </FilterRow>
                 }
                 {
                     filterButtons &&
-                   <FilterRow>
+                   <FilterRow style={ { paddingHorizontal: DEFAULT_SEPARATOR } }>
                        { filterButtons.map((props, index) => <FilterButton key={ index.toString() } { ...props } />) }
                    </FilterRow>
                 }
@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
     },
     filtersContainer: {
         position: "absolute",
+        backgroundColor: COLORS.black2,
         left: -DEFAULT_SEPARATOR,
         right: -DEFAULT_SEPARATOR,
         zIndex: 1

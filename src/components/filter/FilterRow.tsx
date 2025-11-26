@@ -1,15 +1,16 @@
 import { ScrollView } from "react-native-gesture-handler";
 import { ReactNode } from "react";
-import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../../constants/index.ts";
-import { StyleSheet } from "react-native";
+import { SEPARATOR_SIZES } from "../../constants/index.ts";
+import { StyleSheet, ViewStyle } from "react-native";
 
 type TimelineFilterRowProps = {
     children: ReactNode
+    style?: ViewStyle
 }
 
-export function FilterRow({ children }: TimelineFilterRowProps) {
+export function FilterRow({ children, style }: TimelineFilterRowProps) {
     return (
-        <ScrollView contentContainerStyle={ styles.container } horizontal>
+        <ScrollView contentContainerStyle={ [styles.container, style] } horizontal>
             { children }
         </ScrollView>
     );
@@ -20,9 +21,7 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         alignItems: "center",
         alignSelf: "flex-start",
-        backgroundColor: COLORS.black2,
         gap: SEPARATOR_SIZES.lightSmall,
-        paddingHorizontal: DEFAULT_SEPARATOR,
-        paddingBottom: SEPARATOR_SIZES.lightSmall
+        marginBottom: SEPARATOR_SIZES.lightSmall
     }
 });
