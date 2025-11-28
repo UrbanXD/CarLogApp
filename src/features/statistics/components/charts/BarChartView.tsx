@@ -1,154 +1,148 @@
-import { Text, View } from "react-native";
-import { BarChart } from "react-native-gifted-charts";
-import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
-import { widthPercentageToDP } from "react-native-responsive-screen";
+import { StyleSheet } from "react-native";
+import { BarChart, barDataItem } from "react-native-gifted-charts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { Legend } from "./common/Legend.tsx";
+import { hexToRgba } from "../../../../utils/colors/hexToRgba.ts";
+import { PointerLabel } from "./common/PointerLabel.tsx";
 
-const WIDTH = widthPercentageToDP(100) - 2 * DEFAULT_SEPARATOR;
-const BAR_WIDTH = SEPARATOR_SIZES.lightSmall;
-const SPACING = 3.5;
+const SPACING = 1.5;
 const X_AXIS_FONT_SIZE = FONT_SIZES.p4 * 0.85;
-
 
 export type BarChartItemType = {
     label: string
     color: string
 };
 
-
 export type BarChartItem = {
     label: string
     value: Array<number | string> | number | string
-    types?: Array<string>
+    type?: Array<string> | string
 }
 
 type BarChartViewProps = {
     chartData: Array<BarChartItem>
     itemTypes?: { [key: string]: BarChartItemType }
+    barWidth?: number
 }
 
-export function BarChartView() {
+export function BarChartView({
+    chartData,
+    itemTypes,
+    barWidth = SEPARATOR_SIZES.lightSmall
+}: BarChartViewProps) {
     const transformToBarData = (
-        groups: BarChartItem[],
-        itemTypes: { [key: string]: BarChartType },
-        defaultSpacing: number = 2
-    ): BarDataItem[] => {
-        const result: BarDataItem[] = [];
+        groups: Array<BarChartItem>,
+        itemTypes: { [key: string]: BarChartItemType }
+    ): Array<BarDataItem> => {
+        const result: Array<barDataItem> = [];
 
-        groups.forEach(group => {
-            const count = group.values.length;
+        groups.forEach((group) => {
+            const count = Array.isArray(group.value) ? group.value.length : 1;
+
+            const totalBarsWidth = barWidth * count + Math.max(0, SPACING * (count - 1));
+
             const labelWidth = Math.max(
-                X_AXIS_FONT_SIZE * 0.55 * (group.label.length ?? 0),
-                SPACING * (count - 1) + BAR_WIDTH * count
+                totalBarsWidth,
+                X_AXIS_FONT_SIZE * 0.55 * (group.label.length ?? 0)
             );
+            const spacingBetweenStackedBars = labelWidth - totalBarsWidth * 0.85 +
+                (labelWidth > totalBarsWidth ? SEPARATOR_SIZES.lightSmall : SEPARATOR_SIZES.normal);
 
-            const spacingBetweenStackedBars =
-                labelWidth - SPACING * (count - 1) - BAR_WIDTH * count + SEPARATOR_SIZES.lightSmall;
+            const startLeft = -labelWidth / count / 2;
 
-            group.values.forEach((value, index, array) => {
-                const isFirst = index === 0;
-                const isLast = index === array.length - 1;
+            if(Array.isArray(group.value)) {
+                group.value.forEach((value, index, array) => {
+                    const isFirst = index === 0;
+                    const isLast = index === array.length - 1;
 
-                const typeKey = group.typeKeys?.[index];
-                const typeInfo = typeKey ? itemTypes[typeKey] : undefined;
+                    const typeKey = Array.isArray(group.type) ? group.type?.[index] : group.type;
+                    const typeInfo = typeKey ? itemTypes?.[typeKey] : undefined;
+                    let frontColor = typeInfo?.color ?? "#000000";
+
+                    if(value === "" || value === 0) frontColor = hexToRgba(frontColor, 0.35);
+
+                    result.push({
+                        value,
+                        label: isFirst ? group.label : undefined,
+                        spacing: isLast
+                                 ? spacingBetweenStackedBars
+                                 : SPACING,
+                        labelWidth: isFirst ? labelWidth : undefined,
+                        frontColor,
+                        barStyle: { left: startLeft + index * SPACING },
+                        disablePress: false,
+                        leftShiftForTooltip: -startLeft - barWidth / 2 + (array.length - 1 - index) * SPACING
+                    });
+                });
+            } else {
+                const typeKey = Array.isArray(group.type) ? group.type?.[0] : group.type;
+                const typeInfo = typeKey ? itemTypes?.[typeKey] : undefined;
+
+                let frontColor = typeInfo?.color ?? "#000000";
+                if(group.value === "" || group.value === 0) frontColor = hexToRgba(frontColor, 0.35);
 
                 result.push({
-                    value,
-                    label: isFirst ? group.label : undefined,
-                    spacing: isLast ? spacingBetweenStackedBars : defaultSpacing,
-                    labelWidth: isFirst ? labelWidth : undefined,
-                    frontColor: typeInfo?.color ?? "#000"
+                    value: group.value,
+                    label: group.label,
+                    spacing: labelWidth + SPACING,
+                    labelWidth: labelWidth,
+                    frontColor,
+                    barStyle: { left: labelWidth / 2 - barWidth / 2 },
+                    disablePress: group.value === "" || group.value === 0,
+                    leftShiftForTooltip: startLeft + barWidth * 1.5  //megfixalni
                 });
-            });
+            }
         });
+
+        result.push({ label: "", barWidth: 0, labelWidth: 0, spacing: 0 }); //prevent overflow
 
         return result;
     };
 
-    const itemTypes = {
-        A: { label: "Type A", color: "#177AD5" },
-        B: { label: "Type B", color: "#ED6665" },
-        C: { label: "Type C", color: "green" },
-        D: { label: "Type D", color: "yellow" }
-    };
+    const barData = transformToBarData(chartData, itemTypes);
+    const maxValue = Math.max(...barData.map(data => data.value ?? 0));
+    const chartMaxValue = Math.round(maxValue + maxValue * 0.1);
 
-    const rawGroups: BarChartItem[] = [
-        { label: "SimaBar", values: [100, 80], typeKeys: ["A", "D"] },
-        { label: "Stack2", values: [40, 20], typeKeys: ["A", "B"] },
-        { label: "Stack4", values: [50, 40, 60, 25], typeKeys: ["A", "B", "C", "D"] },
-        { label: "NoTypes", values: [10, 20] }, // nincs typeKeys → fallback
-        { label: "PartialTypes", values: [5, 15, 25], typeKeys: ["A"] } // csak az első stack-hez van type
-    ];
-
-    const barData = transformToBarData(rawGroups, itemTypes);
+    const yAxisLabelWidth = X_AXIS_FONT_SIZE * 0.55 * (chartMaxValue.toString().length + 1.5 ?? 0);
 
     return (
         <>
-            <View
-                style={ {
-                    flex: 1,
-                    flexDirection: "row",
-                    justifyContent: "space-evenly",
-                    marginTop: 24
-                } }>
-                <View style={ { flexDirection: "row", alignItems: "center" } }>
-                    <View
-                        style={ {
-                            height: 12,
-                            width: 12,
-                            borderRadius: 6,
-                            backgroundColor: "#177AD5",
-                            marginRight: 8
-                        } }
-                    />
-                    <Text
-                        style={ {
-                            width: 60,
-                            height: 16,
-                            color: "lightgray"
-                        } }>
-                        Point 01
-                    </Text>
-                </View>
-                <View style={ { flexDirection: "row", alignItems: "center" } }>
-                    <View
-                        style={ {
-                            height: 12,
-                            width: 12,
-                            borderRadius: 6,
-                            backgroundColor: "#ED6665",
-                            marginRight: 8
-                        } }
-                    />
-                    <Text
-                        style={ {
-                            width: 60,
-                            height: 16,
-                            color: "lightgray"
-                        } }>
-                        Point 02
-                    </Text>
-                </View>
-            </View>
+            <Legend legend={ itemTypes }/>
             <BarChart
                 data={ barData }
-                width={ WIDTH }
-                barWidth={ SEPARATOR_SIZES.lightSmall }
-                // spacing={ SEPARATOR_SIZES.medium }
-                initialSpacing={ SEPARATOR_SIZES.small }
+                maxValue={ chartMaxValue }
+                barWidth={ barWidth }
+                minHeight={ SEPARATOR_SIZES.lightSmall }
+                disablePress
                 roundedTop
+                roundedBottom
                 lineBehindBars
+                noOfSections={ 7 }
                 rulesType="solid"
                 rulesColor={ COLORS.gray4 }
-                xAxisColor={ COLORS.gray1 }
-                xAxisLabelTextStyle={ { color: COLORS.gray1, textAlign: "left", fontSize: X_AXIS_FONT_SIZE } }
+                xAxisLabelTextStyle={ styles.axisLabel }
+                xAxisThickness={ 0 }
                 yAxisSide="right"
-                yAxisLabelWidth={ 50 } /*dinamikusra*/
-                yAxisTextStyle={ { color: COLORS.gray1 } }
+                yAxisLabelWidth={ yAxisLabelWidth }
+                yAxisTextStyle={ styles.axisLabel }
                 yAxisThickness={ 0 }
-                autoShiftLabels
-                noOfSections={ 6 }
-                maxValue={ 75 }
+                renderTooltip={ (item) => <PointerLabel value={ item.value }/> }
             />
         </>
     );
 }
+
+const styles = StyleSheet.create({
+    axisLabel: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: X_AXIS_FONT_SIZE,
+        color: COLORS.gray1,
+        textAlign: "center",
+        alignSelf: "center"
+    },
+    legendContainer: {
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "space-evenly"
+    }
+});

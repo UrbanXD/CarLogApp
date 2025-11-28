@@ -5,40 +5,44 @@ import { useEffect, useState } from "react";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 
 type PointerLabelProps = {
-    yAxisValue: string
-    xAxisValue: string
+    value: string
+    label?: string
 }
 
-export function PointerLabel({ yAxisValue, xAxisValue }: PointerLabelProps) {
-    const [xAxisTextWidth, setXAxisTextWidth] = useState<number>(0);
-    const [yAxisTextWidth, setYAxisTextWidth] = useState<number>(0);
+export function PointerLabel({ value, label }: PointerLabelProps) {
+    const [valueTextWidth, setValueTextWidth] = useState<number>(0);
+    const [labelTextWidth, setLabelTextWidth] = useState<number>(0);
     const [width, setWidth] = useState<number>(0);
-    const [height, setHeight] = useState<number>(0);
 
     useEffect(() => {
-        setWidth(Math.max(widthPercentageToDP(15), Math.max(xAxisTextWidth, yAxisTextWidth)));
-    }, [xAxisTextWidth, yAxisTextWidth]);
+        setWidth(Math.max(widthPercentageToDP(10), Math.max(valueTextWidth, labelTextWidth)));
+    }, [valueTextWidth, labelTextWidth]);
 
     return (
         <>
-            <MeasureElement onLayout={ (width) => setYAxisTextWidth(width + 2 * SEPARATOR_SIZES.small) }>
-                <Text style={ [styles.yAxisValueText] }>{ yAxisValue }</Text>
-            </MeasureElement>
-            <MeasureElement onLayout={ (width) => setXAxisTextWidth(width + 2 * SEPARATOR_SIZES.small) }>
-                <Text style={ styles.xAxisValueText }>{ xAxisValue }</Text>
+            {
+                label &&
+               <MeasureElement onLayout={ (width) => setLabelTextWidth(width + 2 * SEPARATOR_SIZES.small) }>
+                  <Text style={ [styles.value] }>{ label }</Text>
+               </MeasureElement>
+            }
+            <MeasureElement onLayout={ (width) => setValueTextWidth(width + 2 * SEPARATOR_SIZES.small) }>
+                <Text style={ styles.label }>{ value }</Text>
             </MeasureElement>
             <View
-                onLayout={ (e) => setHeight(e.nativeEvent.layout.height) }
                 style={ [
                     styles.container,
                     {
                         width,
-                        top: ((-height - SEPARATOR_SIZES.lightSmall) * 1.5) - SEPARATOR_SIZES.lightSmall / 2,
+                        marginBottom: SEPARATOR_SIZES.lightSmall / 2,
                         right: (width - 2 * SEPARATOR_SIZES.small) / 2
                     }
                 ] }>
-                <Text style={ styles.xAxisValueText }>{ xAxisValue }</Text>
-                <Text style={ styles.yAxisValueText }>{ yAxisValue }</Text>
+                {
+                    label &&
+                   <Text style={ styles.label }>{ label }</Text>
+                }
+                <Text style={ styles.value }>{ value }</Text>
             </View>
         </>
     );
@@ -51,12 +55,12 @@ const styles = StyleSheet.create({
         paddingVertical: SEPARATOR_SIZES.lightSmall / 2,
         borderRadius: 16
     },
-    xAxisValueText: {
+    label: {
         fontFamily: "Gilroy-Medium",
         color: COLORS.gray4,
         textAlign: "center"
     },
-    yAxisValueText: {
+    value: {
         fontFamily: "Gilroy-Heavy",
         color: COLORS.black4,
         textAlign: "center"
