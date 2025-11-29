@@ -42,13 +42,13 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     itemDot: {
-        height: heightPercentageToDP(1.25),
-        width: heightPercentageToDP(1.25),
+        height: heightPercentageToDP(1),
+        width: heightPercentageToDP(1),
         borderRadius: 100
     },
     itemText: {
         fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.p4,
+        fontSize: FONT_SIZES.p4 * 0.9,
         color: COLORS.gray1
     }
 });

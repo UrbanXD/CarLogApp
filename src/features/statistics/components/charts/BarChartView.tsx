@@ -1,17 +1,14 @@
 import { StyleSheet } from "react-native";
 import { BarChart, barDataItem } from "react-native-gifted-charts";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
-import { Legend } from "./common/Legend.tsx";
+import { Legend, LegendData } from "./common/Legend.tsx";
 import { hexToRgba } from "../../../../utils/colors/hexToRgba.ts";
 import { PointerLabel } from "./common/PointerLabel.tsx";
+import { ChartTitle, ChartTitleProps } from "./common/ChartTitle.tsx";
+import React from "react";
 
 const SPACING = 1.5;
 const X_AXIS_FONT_SIZE = FONT_SIZES.p4 * 0.85;
-
-export type BarChartItemType = {
-    label: string
-    color: string
-};
 
 export type BarChartItem = {
     label: string
@@ -21,18 +18,24 @@ export type BarChartItem = {
 
 type BarChartViewProps = {
     chartData: Array<BarChartItem>
-    itemTypes?: { [key: string]: BarChartItemType }
+    title?: ChartTitleProps
+    legend?: { [key: string]: LegendData }
     barWidth?: number
+    formatLabel?: (label: string) => string
+    formatValue?: (value: number | string) => string
 }
 
 export function BarChartView({
     chartData,
-    itemTypes,
-    barWidth = SEPARATOR_SIZES.lightSmall
+    title,
+    legend,
+    barWidth = 11.5,
+    formatLabel,
+    formatValue
 }: BarChartViewProps) {
     const transformToBarData = (
         groups: Array<BarChartItem>,
-        itemTypes: { [key: string]: BarChartItemType }
+        legend: { [key: string]: LegendData }
     ): Array<BarDataItem> => {
         const result: Array<barDataItem> = [];
 
@@ -56,40 +59,46 @@ export function BarChartView({
                     const isLast = index === array.length - 1;
 
                     const typeKey = Array.isArray(group.type) ? group.type?.[index] : group.type;
-                    const typeInfo = typeKey ? itemTypes?.[typeKey] : undefined;
-                    let frontColor = typeInfo?.color ?? "#000000";
+                    const typeInfo = typeKey ? legend?.[typeKey] : undefined;
 
-                    if(value === "" || value === 0) frontColor = hexToRgba(frontColor, 0.35);
+                    let frontColor = typeInfo?.color ?? "#000000";
+                    let disablePress = false;
+                    if(value === "" || value === 0) {
+                        frontColor = hexToRgba(frontColor, 0.35);
+                        disablePress = true;
+                    }
 
                     result.push({
-                        value,
-                        label: isFirst ? group.label : undefined,
-                        spacing: isLast
-                                 ? spacingBetweenStackedBars
-                                 : SPACING,
+                        value: formatValue ? formatValue(value) : value,
+                        label: isFirst ? (formatLabel ? formatLabel(group.label) : group.label) : undefined,
+                        spacing: isLast ? spacingBetweenStackedBars : SPACING,
                         labelWidth: isFirst ? labelWidth : undefined,
                         frontColor,
                         barStyle: { left: startLeft + index * SPACING },
-                        disablePress: false,
+                        disablePress,
                         leftShiftForTooltip: -startLeft - barWidth / 2 + (array.length - 1 - index) * SPACING
                     });
                 });
             } else {
                 const typeKey = Array.isArray(group.type) ? group.type?.[0] : group.type;
-                const typeInfo = typeKey ? itemTypes?.[typeKey] : undefined;
+                const typeInfo = typeKey ? legend?.[typeKey] : undefined;
 
                 let frontColor = typeInfo?.color ?? "#000000";
-                if(group.value === "" || group.value === 0) frontColor = hexToRgba(frontColor, 0.35);
+                let disablePress = false;
+                if(group.value === "" || group.value === 0) {
+                    frontColor = hexToRgba(frontColor, 0.35);
+                    disablePress = true;
+                }
 
                 result.push({
-                    value: group.value,
-                    label: group.label,
+                    value: formatValue ? formatValue(group.value) : group.value,
+                    label: formatLabel ? formatLabel(group.label) : group.label,
                     spacing: labelWidth + SPACING,
                     labelWidth: labelWidth,
                     frontColor,
                     barStyle: { left: labelWidth / 2 - barWidth / 2 },
-                    disablePress: group.value === "" || group.value === 0,
-                    leftShiftForTooltip: startLeft + barWidth * 1.5  //megfixalni
+                    disablePress,
+                    leftShiftForTooltip: -labelWidth / 3
                 });
             }
         });
@@ -99,20 +108,23 @@ export function BarChartView({
         return result;
     };
 
-    const barData = transformToBarData(chartData, itemTypes);
+    const barData = transformToBarData(chartData, legend);
     const maxValue = Math.max(...barData.map(data => data.value ?? 0));
-    const chartMaxValue = Math.round(maxValue + maxValue * 0.1);
+    const chartMaxValue = Math.round(maxValue + maxValue * 0.2);
 
     const yAxisLabelWidth = X_AXIS_FONT_SIZE * 0.55 * (chartMaxValue.toString().length + 1.5 ?? 0);
 
     return (
         <>
-            <Legend legend={ itemTypes }/>
+            {
+                title &&
+               <ChartTitle { ...title } />
+            }
             <BarChart
                 data={ barData }
                 maxValue={ chartMaxValue }
                 barWidth={ barWidth }
-                minHeight={ SEPARATOR_SIZES.lightSmall }
+                minHeight={ SEPARATOR_SIZES.lightSmall * 1.15 }
                 disablePress
                 roundedTop
                 roundedBottom
@@ -128,6 +140,10 @@ export function BarChartView({
                 yAxisThickness={ 0 }
                 renderTooltip={ (item) => <PointerLabel value={ item.value }/> }
             />
+            {
+                legend &&
+               <Legend legend={ legend }/>
+            }
         </>
     );
 }
