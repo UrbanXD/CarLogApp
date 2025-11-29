@@ -1,17 +1,25 @@
 import { numberToFractionDigit } from "../../../utils/numberToFractionDigit.ts";
 import i18n from "../../../i18n/index.ts";
 
-type Options = {
-    diffFormat?: "compact" | "standard" | "percent" | null,
-    trendSymbols?: {
-        positive?: string,
-        negative?: string,
-        equal?: string
-    }
+export type Trend = {
+    trend: string
+    trendDescription: string
+    isTrendPositive?: boolean
 }
 
-export function calculateTrend(current?: number = 0, previous?: number = 0, options?: Options = {}) {
-    const { diffFormat = "percent", trendSymbols } = options;
+export type TrendOptions = {
+    diffFormat?: "compact" | "standard" | "percent" | null
+    trendSymbols?: {
+        positive?: string
+        negative?: string
+        equal?: string
+    }
+    formatTrend?: (value: number) => string
+    formatTrendDescription?: (value: number, symbol?: string) => string
+}
+
+export function calculateTrend(current?: number = 0, previous?: number = 0, options?: TrendOptions = {}): Trend {
+    const { diffFormat = "percent", trendSymbols, formatTrend, formatTrendDescription } = options;
 
     const diff = numberToFractionDigit(current - previous);
     const absoluteDiff = Math.abs(diff);
@@ -41,7 +49,9 @@ export function calculateTrend(current?: number = 0, previous?: number = 0, opti
           ? trendSymbols?.negative ?? "↓"
           : trendSymbols?.equal ?? "≈";
 
-    const isTrendPositive = diff > 0 ? true : diff < 0 ? false : undefined;
-
-    return { trend, trendSymbol, isTrendPositive };
+    return {
+        trend: formatTrend ? formatTrend(trend) : trend,
+        trendDescription: formatTrendDescription ? formatTrendDescription(trend, trendSymbol) : trendSymbol,
+        isTrendPositive: diff > 0 ? true : diff < 0 ? false : undefined
+    };
 }
