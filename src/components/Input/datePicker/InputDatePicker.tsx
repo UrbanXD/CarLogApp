@@ -21,7 +21,8 @@ type InputDatePicker = {
     ref?: InputDatePickerRef
     title?: string
     mode?: "single" | "range"
-    defaultDate?: DateType
+    defaultStartDate?: DateType
+    defaultEndDate?: DateType
     minDate?: DateType
     maxDate?: DateType
     setValue?: (date: Date | Array<Date>) => void
@@ -33,7 +34,8 @@ function InputDatePicker({
     ref,
     title,
     mode = "single",
-    defaultDate,
+    defaultStartDate,
+    defaultEndDate,
     maxDate,
     minDate,
     setValue,
@@ -52,20 +54,20 @@ function InputDatePicker({
                 const [start, end] = rawValue;
 
                 return [
-                    dayjs(start).isValid() ? dayjs(start).toDate() : null,
-                    dayjs(end).isValid() ? dayjs(end).toDate() : null
+                    dayjs(start).isValid() ? dayjs(start).toDate() : dayjs(defaultStartDate).toDate(),
+                    dayjs(end).isValid() ? dayjs(end).toDate() : dayjs(defaultEndDate).toDate()
                 ];
             }
 
-            return [dayjs(defaultDate).toDate(), dayjs(defaultDate).toDate()];
+            return [dayjs(defaultStartDate).toDate(), dayjs(defaultEndDate).toDate()];
         }
 
         if(mode === "single" && rawValue && dayjs(rawValue).isValid()) {
             return [dayjs(rawValue).toDate()];
         }
 
-        return [dayjs(defaultDate).toDate()];
-    }, [inputFieldContext?.field.value, defaultDate]);
+        return [dayjs(defaultStartDate).toDate()];
+    }, [inputFieldContext?.field.value, defaultStartDate, defaultEndDate]);
 
     const isExpanded = useSharedValue(false);
 
