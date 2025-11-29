@@ -631,6 +631,13 @@
     "longest_ride_duration": "Havi leghosszabb menetidő",
     "top_visited_places": "Havi felkapott helyek",
     "compared_to_previous_month": "előző hónaphoz képest",
-    "compared_to_previous_30_days": "előző 30 naphoz képest"
+    "compared_to_previous_30_days": "előző 30 naphoz képest",
+    "compared_to_previous_cycle": "előző ciklushoz képest",
+    "expense": {
+      "total_amount": "Kiadások összege",
+      "max_amount": "Legdrágább kiadás",
+      "avg_amount": "Kiadások átlaga",
+      "distribution_by_type": "Költség eloszlás típus szerint"
+    }
   }
 }

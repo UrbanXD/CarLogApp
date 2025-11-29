@@ -9,9 +9,10 @@ export type LegendData = {
 
 type LegendProps = {
     legend: { [key: string]: LegendData }
+    formatLegend?: (label: string) => string
 }
 
-export function Legend({ legend }: LegendProps) {
+export function Legend({ legend, formatLegend }: LegendProps) {
     return (
         <View style={ styles.container }>
             {
@@ -19,7 +20,7 @@ export function Legend({ legend }: LegendProps) {
                     <View key={ key } style={ styles.itemContainer }>
                         <View style={ [styles.itemDot, { backgroundColor: legend[key].color }] }/>
                         <Text style={ styles.itemText }>
-                            { legend[key].label }
+                            { formatLegend?.(legend[key].label) ?? legend[key].label }
                         </Text>
                     </View>
                 ))

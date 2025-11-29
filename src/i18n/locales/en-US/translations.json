@@ -631,6 +631,13 @@
     "longest_ride_duration": "Longest ride duration this month",
     "top_visited_places": "Top visited places this month",
     "compared_to_previous_month": "compared to last month",
-    "compared_to_previous_30_days": "compared to the previous 30 days"
+    "compared_to_previous_30_days": "compared to the previous 30 days",
+    "compared_to_previous_cycle": "compared to the previous cycle",
+    "expense": {
+      "total_amount": "Total expenses",
+      "max_amount": "Most expensive expense",
+      "avg_amount": "Average expenses",
+      "distribution_by_type": "Expense distribution by type"
+    }
   }
 }

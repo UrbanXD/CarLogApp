@@ -7,49 +7,63 @@ import { Legend, LegendData } from "./common/Legend.tsx";
 
 export type DonutChartItem = {
     label: string
-    description: string
+    description?: string
     value: number | string
     color: string
+    focused?: boolean
 }
 
 type DonutChartViewProps = {
     chartData: Array<DonutChartItem>
     title?: ChartTitleProps
     legend?: { [key: string]: LegendData }
+    formatLabel?: (label: string) => string
+    formatDescription?: (description: string) => string
+    formatLegend?: (label: string) => string
 }
 
-export function DonutChartView({ chartData, title, legend }: DonutChartViewProps) {
+export function DonutChartView({
+    chartData,
+    title,
+    legend,
+    formatLabel,
+    formatDescription,
+    formatLegend
+}: DonutChartViewProps) {
     return (
         <View style={ styles.chartContainer }>
             {
                 title &&
                <ChartTitle { ...title } />
             }
-            <PieChart
-                data={ chartData }
-                donut
-                focusOnPress
-                sectionAutoFocus
-                radius={ 90 }
-                innerRadius={ 65 }
-                innerCircleColor={ COLORS.black2 }
-                centerLabelComponent={ (index: number) => {
-                    const focused = pieData?.[index];
+            {
+                chartData && chartData.length > 0 &&
+               <PieChart
+                  data={ chartData }
+                  donut
+                  focusOnPress
+                  sectionAutoFocus
+                  radius={ 90 }
+                  innerRadius={ 65 }
+                  innerCircleColor={ COLORS.black2 }
+                  centerLabelComponent={ (index: number) => {
+                      const focused = chartData?.[index];
 
-                    if(!focused) return <></>;
+                      if(!focused) return <></>;
 
-                    return (
-                        <CenterLabel
-                            label={ focused.label }
-                            de
-                            value={ focused.value }
-                        />
-                    );
-                } }
-            />
+                      return (
+                          <CenterLabel
+                              label={ focused.label && (formatLabel?.(focused.label) ?? focused.label) }
+                              description={ focused.description && (formatDescription?.(focused.description) ?? focused.description) }
+                              value={ focused.value }
+                          />
+                      );
+                  } }
+               />
+            }
             {
                 legend &&
-               <Legend legend={ legend }/>
+               <Legend legend={ legend } formatLegend={ formatLegend }/>
             }
         </View>
     );

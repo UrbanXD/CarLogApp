@@ -23,6 +23,7 @@ type BarChartViewProps = {
     barWidth?: number
     formatLabel?: (label: string) => string
     formatValue?: (value: number | string) => string
+    formatLegend?: (label: string) => string
 }
 
 export function BarChartView({
@@ -31,7 +32,8 @@ export function BarChartView({
     legend,
     barWidth = 11.5,
     formatLabel,
-    formatValue
+    formatValue,
+    formatLegend
 }: BarChartViewProps) {
     const transformToBarData = (
         groups: Array<BarChartItem>,
@@ -142,7 +144,7 @@ export function BarChartView({
             />
             {
                 legend &&
-               <Legend legend={ legend }/>
+               <Legend legend={ legend } formatLegend={ formatLegend }/>
             }
         </>
     );

@@ -12,10 +12,59 @@ import { RIDE_LOG_TABLE } from "../../../../database/connector/powersync/tables/
 import { RIDE_PLACE_TABLE } from "../../../../database/connector/powersync/tables/ridePlace.ts";
 import { PLACE_TABLE } from "../../../../database/connector/powersync/tables/place.ts";
 import { SERVICE_LOG_TABLE } from "../../../../database/connector/powersync/tables/serviceLog.ts";
+import { LineChartItem } from "../../components/charts/LineChartView.tsx";
+import { BarChartItem } from "../../components/charts/BarChartView.tsx";
+import { ExpenseTypeDao } from "../../../expense/model/dao/ExpenseTypeDao.ts";
+import { calculateTrend, Trend, TrendOptions } from "../../utils/calculateTrend.ts";
+import { getRangeUnit, RangeUnit } from "../../utils/getRangeUnit.ts";
+import { getPreviousRangeWindow } from "../../utils/getPreviousRangeWindow.ts";
+import { LegendData } from "../../components/charts/common/Legend.tsx";
+import { DonutChartItem } from "../../components/charts/DonutChartView.tsx";
+import { EXPENSE_TYPE_TABLE } from "../../../../database/connector/powersync/tables/expenseType.ts";
+import { ExpenseTypeEnum } from "../../../expense/model/enums/ExpenseTypeEnum.ts";
+
+type GroupingUnit = "year" | "month" | "day" | "hour"
+
+type StatisticsFunctionArgs = {
+    carId?: string
+    from: string
+    to: string
+    trendOptions?: TrendOptions
+}
+
+export type Stat = {
+    value: string | number
+    label: string
+    color?: string
+}
 
 export type TrendStat = {
-    current: number
-    previous: number
+    max: number
+    min: number
+    average: number
+    previousCycleAverage: number
+    lineChartData: Array<LineChartItem>
+}
+
+export type ComparisonStatByType = {
+    donutChartData: Array<DonutChartItem>
+    legend: { [key: string]: LegendData }
+}
+
+export type ComparisonStat = {
+    barChartData: Array<BarChartItem>
+    barChartTypes: { [key: string]: LegendData }
+    groupingUnit: GroupingUnit
+}
+
+export type TotalComparisonStat = {
+    max: Stat
+    min: Stat
+    total: number
+    average: number
+    previousWindowTotal?: number
+    previousWindowAverage?: number
+    trend?: Trend
 }
 
 export type TopListItemStat = {
@@ -111,9 +160,11 @@ function getTopDateLimit(dateField: string, dateType?: "year" | "month" | "day")
 
 export class StatisticsDao {
     private db: Kysely<DatabaseType>;
+    private readonly expenseTypeDao: ExpenseTypeDao;
 
-    constructor(db: Kysely<DatabaseType>) {
+    constructor(db: Kysely<DatabaseType>, expenseTypeDao: ExpenseTypeDao) {
         this.db = db;
+        this.expenseTypeDao = expenseTypeDao;
     }
 
     async getFuelCostTrend({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
@@ -435,5 +486,225 @@ export class StatisticsDao {
         if(dateLimit) query = query.where("t2.start_time", ">=", dateLimit);
 
         return await query.execute();
+    }
+
+    private getRangeGroupByExpression(fieldName: string, unit: RangeUnit) {
+        //@formatter:off
+        switch(unit) {
+            case "hour":
+                return sql`strftime('%Y-%m-%d %H:00:00', ${ sql.raw(fieldName) })`;
+            case "day":
+                return sql`strftime('%Y-%m-%d', ${ sql.raw(fieldName) })`;
+            case "month":
+                return sql`strftime('%Y-%m', ${ sql.raw(fieldName) })`;
+            case "year":
+                return sql`strftime('%Y', ${ sql.raw(fieldName) })`;
+        }
+        //@formatter:on
+    }
+
+    private getRangeSelectExpression(fieldName: string, unit: RangeUnit) {
+        //@formatter:off
+        switch(unit) {
+            case "hour":
+                return sql`strftime('%Y-%m-%d %H:00:00', ${ sql.raw(fieldName) })`.as("time");
+            case "day":
+                return sql`strftime('%Y-%m-%d', ${ sql.raw(fieldName) })`.as("time");
+            case "month":
+                return sql`strftime('%Y-%m', ${ sql.raw(fieldName) })`.as("time");
+            case "year":
+                return sql`strftime('%Y', ${ sql.raw(fieldName) })`.as("time");
+        }
+        //@formatter:on
+    }
+
+    async getExpenseTotalComparison({
+        carId,
+        from,
+        to,
+        trendOptions
+    }: StatisticsFunctionArgs): Promise<TotalComparisonStat> {
+        let maxItemQuery = this.db
+        .selectFrom(`${ EXPENSE_TABLE } as t1`)
+        .innerJoin(`${ EXPENSE_TYPE_TABLE } as t2`, "t1.type_id", "t2.id")
+        .select([
+            "t1.amount",
+            "t2.id as type_id",
+            "t2.owner_id as owner_id",
+            "t2.key as key"
+        ])
+        .where("date", ">=", from)
+        .where("date", "<=", to)
+        .orderBy("amount", "desc")
+        .limit(1);
+
+        if(carId) maxItemQuery = maxItemQuery.where("car_id", "=", carId);
+
+        const maxItemResult = await maxItemQuery.executeTakeFirst();
+        const expenseType = await this.expenseTypeDao.mapper.toDto({
+            id: maxItemResult.type_id,
+            owner_id: maxItemResult.owner_id,
+            key: maxItemResult.key
+        });
+
+        const { from: previousWindowFrom, to: previousWindowTo } = getPreviousRangeWindow(from, to);
+
+        let aggregateQuery = this.db
+        .selectFrom(EXPENSE_TABLE)
+        .select([
+            sql<number>`AVG(amount) as average`,
+            sql<number>`SUM(amount) as total`
+        ])
+        .where("date", ">=", from)
+        .where("date", "<=", to);
+
+        let previousWindowAggregateQuery = this.db
+        .selectFrom(EXPENSE_TABLE)
+        .select([
+            sql<number>`AVG(amount) as average`,
+            sql<number>`SUM(amount) as total`
+        ])
+        .where("date", ">=", previousWindowFrom)
+        .where("date", "<=", previousWindowTo);
+
+        if(carId) {
+            aggregateQuery = aggregateQuery.where("car_id", "=", carId);
+            previousWindowAggregateQuery = previousWindowAggregateQuery.where("car_id", "=", carId);
+        }
+
+        const averageResult = await aggregateQuery.executeTakeFirst();
+        const previousWindowAverageResult = await previousWindowAggregateQuery.executeTakeFirst();
+
+        const total = numberToFractionDigit(averageResult.total ?? 0);
+        const average = numberToFractionDigit(averageResult.average ?? 0);
+        const previousWindowTotal = numberToFractionDigit(previousWindowAverageResult.total ?? 0);
+        const previousWindowAverage = numberToFractionDigit(previousWindowAverageResult.average ?? 0);
+
+        return {
+            max: {
+                value: numberToFractionDigit(maxItemResult?.amount ?? 0),
+                label: maxItemResult?.key ?? ExpenseTypeEnum.OTHER,
+                color: expenseType.primaryColor
+            },
+            total,
+            average,
+            previousWindowTotal,
+            previousWindowAverage,
+            trend: calculateTrend(total, previousWindowTotal, trendOptions)
+        };
+    }
+
+    async getExpenseComparisonByType({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStatByType> {
+        let query = this.db
+        .selectFrom(EXPENSE_TABLE)
+        .select([
+            sql<number>`SUM(amount) as total`,
+            sql<number>`SUM(amount) * 100.0 / SUM(SUM(amount)) OVER () as percent`,
+            "type_id"
+        ])
+        .where("date", ">=", from)
+        .where("date", "<=", to)
+        .groupBy("type_id")
+        .orderBy("total", "desc");
+
+        if(carId) query = query.where("car_id", "=", carId);
+
+        const result = await query.execute();
+
+        const expenseTypes = await this.expenseTypeDao.getAll();
+        const legend: { [key: string]: LegendData } = {};
+        expenseTypes.forEach((t) => {
+            legend[t.id] = {
+                label: t.key,
+                color: t.primaryColor
+            };
+        });
+
+        const donutChartData: Array<DonutChartItem> = result.map((r, index) => ({
+            value: numberToFractionDigit(r.percent),
+            label: legend[r.type_id].label,
+            description: numberToFractionDigit(r.total),
+            color: legend[r.type_id].color,
+            focused: index === 0
+        }));
+
+        return {
+            donutChartData,
+            legend
+        };
+    }
+
+    async getExpenseComparison({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStat> {
+        const unit = getRangeUnit(from, to);
+        const groupExpr = this.getRangeGroupByExpression("date", unit);
+        const selectExpr = this.getRangeSelectExpression("date", unit);
+
+        let query = this.db
+        .selectFrom(EXPENSE_TABLE)
+        .select([
+            sql<number>`SUM(amount)`.as("total"),
+            selectExpr,
+            "type_id"
+        ])
+        .where("date", ">=", from)
+        .where("date", "<=", to);
+
+        if(carId) query = query.where("car_id", "=", carId);
+
+        query = query
+        .groupBy("type_id")
+        .groupBy(groupExpr)
+        .orderBy(groupExpr);
+
+        const result = await query.execute();
+        const expenseTypes = await this.expenseTypeDao.getAll();
+        const typeIds = expenseTypes.map((t) => t.id);
+
+        const barChartData: Array<BarChartItem> = [];
+
+        const groupedData: { [time: string]: { [typeId: string]: number } } = {};
+
+        result.forEach((item) => {
+            const time = item.time;
+            const typeId = item.type_id;
+            const total = item.total;
+
+            if(!groupedData[time]) groupedData[time] = {};
+
+            groupedData[time][typeId] = total;
+        });
+
+        for(const time in groupedData) {
+            if(Object.prototype.hasOwnProperty.call(groupedData, time)) {
+                const dailyData = groupedData[time];
+                const valueArray: number[] = [];
+
+                typeIds.forEach((typeId) => {
+                    const value = dailyData[typeId] !== undefined ? dailyData[typeId] : 0;
+                    valueArray.push(value);
+                });
+
+                barChartData.push({
+                    label: time,
+                    value: valueArray,
+                    type: typeIds
+                });
+            }
+        }
+
+        barChartData.sort((a, b) => new Date(a.label).getTime() - new Date(b.label).getTime());
+
+        const barChartTypes: { [key: string]: LegendData } = {};
+        expenseTypes.forEach((t) => {
+            barChartTypes[t.id] = {
+                label: t.key,
+                color: t.primaryColor
+            };
+        });
+
+        return {
+            barChartData,
+            barChartTypes
+        };
     }
 }
