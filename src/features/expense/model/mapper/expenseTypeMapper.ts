@@ -12,7 +12,7 @@ export class ExpenseTypeMapper extends AbstractMapper<ExpenseTypeTableRow, Expen
 
     async toDto(entity: ExpenseTypeTableRow): Promise<ExpenseType> {
         let icon = null;
-        let primaryColor = null;
+        let primaryColor = COLORS.gray2;
         let secondaryColor = null;
 
         switch(entity.key) {

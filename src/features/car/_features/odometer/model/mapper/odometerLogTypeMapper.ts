@@ -11,7 +11,7 @@ export class OdometerLogTypeMapper extends AbstractMapper<OdometerLogTypeTableRo
 
     async toDto(entity: OdometerLogTypeTableRow): Promise<OdometerLogType> {
         let icon = null;
-        let primaryColor = null;
+        let primaryColor = COLORS.gray2;
         let secondaryColor = null;
 
         switch(Number(entity.id)) {

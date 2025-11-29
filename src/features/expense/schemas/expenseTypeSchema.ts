@@ -5,7 +5,7 @@ export const expenseTypeSchema = z
     id: z.string().uuid(),
     key: z.string().max(64),
     icon: z.string().nullable(),
-    primaryColor: z.string().nullable(),
+    primaryColor: z.string(),
     secondaryColor: z.string().nullable(),
     ownerId: z.string().uuid().nullable() // when null it means its global
 });

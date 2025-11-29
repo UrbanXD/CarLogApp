@@ -5,7 +5,7 @@ export const odometerLogTypeSchema = z
     id: z.coerce.number(),
     key: z.string(),
     icon: z.string().nullable(),
-    primaryColor: z.string().nullable(),
+    primaryColor: z.string(),
     secondaryColor: z.string().nullable()
 });
 
