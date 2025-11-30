@@ -45,14 +45,16 @@ export function BarChartView({
         const result: Array<barDataItem> = [];
 
         groups.forEach((group) => {
+            const formatedLabel = formatLabel?.(group.label) ?? group.label;
             const count = Array.isArray(group.value) ? group.value.length : 1;
 
             const totalBarsWidth = barWidth * count + Math.max(0, SPACING * (count - 1));
 
             const labelWidth = Math.max(
                 totalBarsWidth,
-                AXIS_FONT_SIZE * 0.55 * (group.label.length ?? 0)
+                AXIS_FONT_SIZE * 0.55 * (formatedLabel.length ?? 0)
             );
+
             const spacingBetweenStackedBars = labelWidth - totalBarsWidth * 0.85 +
                 (labelWidth > totalBarsWidth ? SEPARATOR_SIZES.lightSmall : SEPARATOR_SIZES.normal);
 
@@ -74,8 +76,8 @@ export function BarChartView({
                     }
 
                     result.push({
-                        value: formatValue ? formatValue(value) : value,
-                        label: isFirst ? (formatLabel ? formatLabel(group.label) : group.label) : undefined,
+                        value: formatValue?.(value) ?? value,
+                        label: isFirst ? formatedLabel : undefined,
                         spacing: isLast ? spacingBetweenStackedBars : SPACING,
                         labelWidth: isFirst ? labelWidth : undefined,
                         frontColor,
@@ -96,14 +98,14 @@ export function BarChartView({
                 }
 
                 result.push({
-                    value: formatValue ? formatValue(group.value) : group.value,
-                    label: formatLabel ? formatLabel(group.label) : group.label,
-                    spacing: labelWidth * 1.35 + SPACING,
+                    value: formatValue?.(group.value) ?? group.value,
+                    label: formatedLabel,
+                    spacing: labelWidth + SPACING,
                     labelWidth: labelWidth,
                     frontColor,
                     barStyle: { left: labelWidth / 2 - barWidth / 2 },
                     disablePress,
-                    leftShiftForTooltip: -labelWidth / 3.5
+                    leftShiftForTooltip: -labelWidth / 3 - barWidth / 2
                 });
             }
         });
@@ -117,7 +119,8 @@ export function BarChartView({
     const maxValue = Math.max(...barData.map(data => data.value ?? 0));
     const chartMaxValue = Math.round(maxValue + maxValue * 0.2);
 
-    const yAxisLabelWidth = AXIS_FONT_SIZE * 0.55 * (chartMaxValue.toString().length + 1.5 ?? 0);
+    const formatedMaxValue = formatValue?.(chartMaxValue) ?? chartMaxValue.toString();
+    const yAxisLabelWidth = AXIS_FONT_SIZE * 0.55 * (formatedMaxValue.length + 1.5 ?? 0);
 
     return (
         <>
