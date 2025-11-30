@@ -31,10 +31,10 @@ export function Legend({ legend, formatLegend }: LegendProps) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         flexDirection: "row",
         justifyContent: "space-evenly",
-        gap: SEPARATOR_SIZES.small,
+        rowGap: SEPARATOR_SIZES.lightSmall,
+        columnGap: SEPARATOR_SIZES.small,
         flexWrap: "wrap"
     },
     itemContainer: {
