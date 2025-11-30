@@ -6,9 +6,10 @@ import { hexToRgba } from "../../../../utils/colors/hexToRgba.ts";
 import { PointerLabel } from "./common/PointerLabel.tsx";
 import { ChartTitle, ChartTitleProps } from "./common/ChartTitle.tsx";
 import React from "react";
+import { widthPercentageToDP } from "react-native-responsive-screen";
 
 const SPACING = 1.5;
-const X_AXIS_FONT_SIZE = FONT_SIZES.p4 * 0.85;
+const AXIS_FONT_SIZE = FONT_SIZES.p4 * 0.85;
 
 export type BarChartItem = {
     label: string
@@ -24,6 +25,7 @@ type BarChartViewProps = {
     formatLabel?: (label: string) => string
     formatValue?: (value: number | string) => string
     formatLegend?: (label: string) => string
+    showsLegend?: boolean
 }
 
 export function BarChartView({
@@ -33,7 +35,8 @@ export function BarChartView({
     barWidth = 11.5,
     formatLabel,
     formatValue,
-    formatLegend
+    formatLegend,
+    showsLegend = true
 }: BarChartViewProps) {
     const transformToBarData = (
         groups: Array<BarChartItem>,
@@ -48,7 +51,7 @@ export function BarChartView({
 
             const labelWidth = Math.max(
                 totalBarsWidth,
-                X_AXIS_FONT_SIZE * 0.55 * (group.label.length ?? 0)
+                AXIS_FONT_SIZE * 0.55 * (group.label.length ?? 0)
             );
             const spacingBetweenStackedBars = labelWidth - totalBarsWidth * 0.85 +
                 (labelWidth > totalBarsWidth ? SEPARATOR_SIZES.lightSmall : SEPARATOR_SIZES.normal);
@@ -95,12 +98,12 @@ export function BarChartView({
                 result.push({
                     value: formatValue ? formatValue(group.value) : group.value,
                     label: formatLabel ? formatLabel(group.label) : group.label,
-                    spacing: labelWidth + SPACING,
+                    spacing: labelWidth * 1.35 + SPACING,
                     labelWidth: labelWidth,
                     frontColor,
                     barStyle: { left: labelWidth / 2 - barWidth / 2 },
                     disablePress,
-                    leftShiftForTooltip: -labelWidth / 3
+                    leftShiftForTooltip: -labelWidth / 3.5
                 });
             }
         });
@@ -114,7 +117,7 @@ export function BarChartView({
     const maxValue = Math.max(...barData.map(data => data.value ?? 0));
     const chartMaxValue = Math.round(maxValue + maxValue * 0.2);
 
-    const yAxisLabelWidth = X_AXIS_FONT_SIZE * 0.55 * (chartMaxValue.toString().length + 1.5 ?? 0);
+    const yAxisLabelWidth = AXIS_FONT_SIZE * 0.55 * (chartMaxValue.toString().length + 1.5 ?? 0);
 
     return (
         <>
@@ -126,6 +129,7 @@ export function BarChartView({
                 data={ barData }
                 maxValue={ chartMaxValue }
                 barWidth={ barWidth }
+                width={ widthPercentageToDP(100) - yAxisLabelWidth }
                 minHeight={ SEPARATOR_SIZES.lightSmall * 1.15 }
                 disablePress
                 roundedTop
@@ -143,7 +147,7 @@ export function BarChartView({
                 renderTooltip={ (item) => <PointerLabel value={ item.value }/> }
             />
             {
-                legend &&
+                legend && showsLegend &&
                <Legend legend={ legend } formatLegend={ formatLegend }/>
             }
         </>
@@ -153,7 +157,7 @@ export function BarChartView({
 const styles = StyleSheet.create({
     axisLabel: {
         fontFamily: "Gilroy-Medium",
-        fontSize: X_AXIS_FONT_SIZE,
+        fontSize: AXIS_FONT_SIZE,
         color: COLORS.gray1,
         textAlign: "center",
         alignSelf: "center"

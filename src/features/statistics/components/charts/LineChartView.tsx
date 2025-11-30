@@ -1,8 +1,11 @@
 import { LineChart, lineDataItem } from "react-native-gifted-charts";
-import { COLORS, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import React from "react";
 import { PointerLabel } from "./common/PointerLabel.tsx";
 import { ChartTitle, ChartTitleProps } from "./common/ChartTitle.tsx";
+import { widthPercentageToDP } from "react-native-responsive-screen";
+
+const AXIS_FONT_SIZE = FONT_SIZES.p4 * 0.85;
 
 export type LineChartItem = lineDataItem
 
@@ -18,6 +21,8 @@ export function LineChartView({
     const maxValue = Math.max(...graphData.map(d => d.value ?? 0));
     const chartMaxValue = maxValue + maxValue * 0.2;
 
+    const yAxisLabelWidth = AXIS_FONT_SIZE * 0.55 * (chartMaxValue.toString().length + 1.5 ?? 0);
+
     return (
         <>
             {
@@ -29,6 +34,7 @@ export function LineChartView({
                 // isAnimated
                 areaChart
                 hideDataPoints
+                width={ widthPercentageToDP(100) - yAxisLabelWidth }
                 spacing={ SEPARATOR_SIZES.small }
                 initialSpacing={ 0 }
                 color={ COLORS.fuelYellow }
@@ -45,7 +51,7 @@ export function LineChartView({
                 rulesColor={ COLORS.gray4 }
                 yAxisTextStyle={ { color: COLORS.gray2 } }
                 yAxisSide="right"
-                yAxisLabelWidth={ 50 } /*dinamikusra kene*/
+                yAxisLabelWidth={ yAxisLabelWidth }
                 xAxisColor={ COLORS.gray1 }
                 xAxisLabelTextStyle={ { color: "red", width: 50 } }
                 xAxisThickness={ 1 }
