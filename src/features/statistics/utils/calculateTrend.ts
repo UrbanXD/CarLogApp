@@ -3,7 +3,7 @@ import i18n from "../../../i18n/index.ts";
 
 export type Trend = {
     trend: string
-    trendDescription: string
+    trendSymbol: string
     isTrendPositive?: boolean
 }
 
@@ -15,11 +15,10 @@ export type TrendOptions = {
         equal?: string
     }
     formatTrend?: (value: number) => string
-    formatTrendDescription?: (value: number, symbol?: string) => string
 }
 
 export function calculateTrend(current?: number = 0, previous?: number = 0, options?: TrendOptions = {}): Trend {
-    const { diffFormat = "percent", trendSymbols, formatTrend, formatTrendDescription } = options;
+    const { diffFormat = "percent", trendSymbols, formatTrend } = options;
 
     const diff = numberToFractionDigit(current - previous);
     const absoluteDiff = Math.abs(diff);
@@ -51,7 +50,7 @@ export function calculateTrend(current?: number = 0, previous?: number = 0, opti
 
     return {
         trend: formatTrend ? formatTrend(trend) : trend,
-        trendDescription: formatTrendDescription ? formatTrendDescription(trend, trendSymbol) : trendSymbol,
+        trendSymbol,
         isTrendPositive: diff > 0 ? true : diff < 0 ? false : undefined
     };
 }

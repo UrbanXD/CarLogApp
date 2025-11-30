@@ -22,6 +22,8 @@ import { LegendData } from "../../components/charts/common/Legend.tsx";
 import { DonutChartItem } from "../../components/charts/DonutChartView.tsx";
 import { EXPENSE_TYPE_TABLE } from "../../../../database/connector/powersync/tables/expenseType.ts";
 import { ExpenseTypeEnum } from "../../../expense/model/enums/ExpenseTypeEnum.ts";
+import { generateRangeBuckets } from "../../utils/generateRangeBuckets.ts";
+import { COLORS } from "../../../../constants/index.ts";
 
 type GroupingUnit = "year" | "month" | "day" | "hour"
 
@@ -51,10 +53,10 @@ export type ComparisonStatByType = {
     legend: { [key: string]: LegendData }
 }
 
-export type ComparisonStat = {
+export type ComparisonStatByDate = {
     barChartData: Array<BarChartItem>
     barChartTypes: { [key: string]: LegendData }
-    groupingUnit: GroupingUnit
+    rangeUnit: RangeUnit
 }
 
 export type TotalComparisonStat = {
@@ -64,7 +66,8 @@ export type TotalComparisonStat = {
     average: number
     previousWindowTotal?: number
     previousWindowAverage?: number
-    trend?: Trend
+    totalTrend: Trend
+    averageTrend: Trend
 }
 
 export type TopListItemStat = {
@@ -590,7 +593,8 @@ export class StatisticsDao {
             average,
             previousWindowTotal,
             previousWindowAverage,
-            trend: calculateTrend(total, previousWindowTotal, trendOptions)
+            totalTrend: calculateTrend(total, previousWindowTotal, trendOptions),
+            averageTrend: calculateTrend(average, previousWindowAverage, trendOptions)
         };
     }
 
@@ -634,7 +638,7 @@ export class StatisticsDao {
         };
     }
 
-    async getExpenseComparison({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStat> {
+    async getExpenseComparison({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStatByDate> {
         const unit = getRangeUnit(from, to);
         const groupExpr = this.getRangeGroupByExpression("date", unit);
         const selectExpr = this.getRangeSelectExpression("date", unit);
@@ -704,7 +708,8 @@ export class StatisticsDao {
 
         return {
             barChartData,
-            barChartTypes
+            barChartTypes,
+            rangeUnit: unit
         };
     }
 }

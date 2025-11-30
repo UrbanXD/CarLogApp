@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { BarChartView } from "../charts/BarChartView.tsx";
-import { ComparisonStat, ComparisonStatByType, TotalComparisonStat } from "../../model/dao/statisticsDao.ts";
+import { ComparisonStatByDate, ComparisonStatByType, TotalComparisonStat } from "../../model/dao/statisticsDao.ts";
 import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { StatCard } from "../StatCard.tsx";
 import { useTranslation } from "react-i18next";
 import { DonutChartView } from "../charts/DonutChartView.tsx";
 import { Currency } from "../../../_shared/currency/schemas/currencySchema.ts";
+import { getDateFormatTemplateByRangeUnit } from "../../utils/getDateFormatTemplateByRangeUnit.ts";
 
 type ExpenseStatisticsProps = {
     carId?: string
@@ -21,7 +22,7 @@ export function ExpenseStatistics({ carId, currency, from, to }: ExpenseStatisti
     const { t } = useTranslation();
     const { statisticsDao } = useDatabase();
 
-    const [expensesByDateWindow, setExpensesByDateWindow] = useState<ComparisonStat | null>(null);
+    const [expensesByDateWindow, setExpensesByDateWindow] = useState<ComparisonStatByDate | null>(null);
     const [expenseStat, setExpenseStat] = useState<TotalComparisonStat | null>(null);
     const [expensesByType, setExpensesByType] = useState<ComparisonStatByType | null>(null);
 
@@ -44,7 +45,8 @@ export function ExpenseStatistics({ carId, currency, from, to }: ExpenseStatisti
                <BarChartView
                   chartData={ expensesByDateWindow.barChartData }
                   legend={ expensesByDateWindow.barChartTypes }
-                  formatLabel={ (label) => dayjs(label).format("L") }
+                  formatLabel={ (label) => dayjs(label)
+                  .format(getDateFormatTemplateByRangeUnit(expensesByDateWindow?.rangeUnit)) }
                   formatLegend={ (label) => t(`expenses.types.${ label }`) }
                />
             }
@@ -56,15 +58,16 @@ export function ExpenseStatistics({ carId, currency, from, to }: ExpenseStatisti
                           <StatCard
                              label={ t("statistics.expense.total_amount") }
                              value={ `${ expenseStat.total } ${ currency?.symbol }` }
-                             isPositive={ expenseStat.trend?.isTrendPositive }
-                             trend={ expenseStat.trend?.trend }
-                             trendDescription={
-                                 `${ expenseStat.trend?.trendDescription } ${ t("statistics.compared_to_previous_cycle") }`
-                             }
+                             isPositive={ expenseStat.totalTrend.isTrendPositive }
+                             trend={ `${ expenseStat.totalTrend.trendSymbol } ${ expenseStat.totalTrend.trend }` }
+                             trendDescription={ t("statistics.compared_to_previous_cycle") }
                           />
                           <StatCard
                              label={ t("statistics.expense.avg_amount") }
                              value={ `${ expenseStat.average } ${ currency?.symbol }` }
+                             isPositive={ expenseStat.averageTrend.isTrendPositive }
+                             trend={ `${ expenseStat.averageTrend.trendSymbol } ${ expenseStat.averageTrend.trend }` }
+                             trendDescription={ t("statistics.compared_to_previous_cycle") }
                           />
                           <StatCard
                              label={ t("statistics.expense.max_amount") }

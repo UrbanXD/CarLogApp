@@ -76,8 +76,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "space-between",
-        paddingVertical: SEPARATOR_SIZES.lightSmall,
-        paddingHorizontal: SEPARATOR_SIZES.small,
+        padding: SEPARATOR_SIZES.small,
         borderRadius: 12,
         backgroundColor: COLORS.gray5,
         shadowColor: COLORS.black,
@@ -93,22 +92,27 @@ const styles = StyleSheet.create({
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p4 * 0.9,
         lineHeight: FONT_SIZES.p4 * 0.9 * 1.25,
+        letterSpacing: FONT_SIZES.p4 * 0.9 * 0.025,
         color: COLORS.gray1
     },
     value: {
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.p2,
         lineHeight: FONT_SIZES.p2 * 1.25,
+        letterSpacing: FONT_SIZES.p2 * 1.25 * 0.01,
         color: COLORS.white
     },
     trend: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p4 * 0.9,
         lineHeight: FONT_SIZES.p4 * 0.9 * 1.25,
+        // letterSpacing: FONT_SIZES.p4 * 0.9 * 0.05,
         marginTop: SEPARATOR_SIZES.small
     },
     trendDescription: {
         fontSize: FONT_SIZES.p4 * 0.825,
+        lineHeight: FONT_SIZES.p4 * 0.825 * 1.25,
+        // letterSpacing: FONT_SIZES.p4 * 0.825 * 0.05,
         marginTop: 0
     },
     description: {
