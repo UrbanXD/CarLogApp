@@ -58,6 +58,13 @@ export function ExpenseStatistics({ carId, currency, from, to }: ExpenseStatisti
                        <>
                           <StatCard
                              label={ t("statistics.expense.total_amount") }
+                             value={ `${ expenseStat.count } ${ t("common.count") }` }
+                             isPositive={ expenseStat.countTrend.isTrendPositive }
+                             trend={ `${ expenseStat.countTrend.trendSymbol } ${ expenseStat.countTrend.trend }` }
+                             trendDescription={ t("statistics.compared_to_previous_cycle") }
+                          />
+                          <StatCard
+                             label={ t("statistics.expense.total_amount") }
                              value={ `${ expenseStat.total } ${ currency?.symbol }` }
                              isPositive={ expenseStat.totalTrend.isTrendPositive }
                              trend={ `${ expenseStat.totalTrend.trendSymbol } ${ expenseStat.totalTrend.trend }` }
