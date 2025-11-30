@@ -95,7 +95,9 @@ export function CenterLabel({ label, description, value }: {
 
 const styles = StyleSheet.create({
     chartContainer: {
-        gap: SEPARATOR_SIZES.lightSmall
+        gap: SEPARATOR_SIZES.lightSmall,
+        alignItems: "center",
+        justifyContent: "center"
     },
     labelContainer: {
         flex: 1,
