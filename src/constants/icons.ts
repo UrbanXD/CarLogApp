@@ -62,6 +62,37 @@ export const ICON_NAMES = {
     mapMarkers: "map-marker-multiple-outline"
 };
 
+export const SERVICE_ICONS = {
+    SMALL_SERVICE: "wrench-outline",
+    MAJOR_SERVICE: "tools",
+    REPAIR: "car-wrench",
+    HOME_MAINTENANCE: "home",
+    INSPECTION: "clipboard-check-outline",
+    DIAGNOSTICS: "car-search-outline",
+    TIRE_CHANGE: "tire",
+    OTHER: "dots-horizontal-circle-outline"
+};
+
+export const SERVICE_ITEM_ICONS = {
+    TRANSMISSION_FLUID: "car-shift-pattern",
+    FUEL_FILTER: "filter-outline",
+    BRAKE_FLUID: "car-brake-fluid-level",
+    LIGHT_BULB: "lightbulb-outline",
+    WIPER_BLADES: "car-wash",
+    DIAGNOSTICS: "car-search-outline",
+    OIL: "oil",
+    COOLANT: "coolant-temperature",
+    CABIN_FILTER: "air-filter",
+    OIL_FILTER: "oil-filter",
+    BRAKE_DISCS: "car-brake-disc",
+    BATTERY: "car-battery",
+    SPARK_PLUGS: "car-spark-plug",
+    SOFTWARE_UPDATE: "update",
+    BRAKE_PADS: "shield-half-full",
+    TIRES: "tire",
+    AIR_FILTER: "air-filter"
+};
+
 export const ICON_COLORS = {
     default: COLORS.white,
     good: COLORS.greenLight,

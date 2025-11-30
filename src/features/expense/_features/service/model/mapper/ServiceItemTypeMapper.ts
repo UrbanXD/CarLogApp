@@ -2,13 +2,21 @@ import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts
 import { ServiceItemTypeTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { ServiceItemType, serviceItemTypeSchema } from "../../schemas/serviceItemTypeSchema.ts";
 import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
+import { SERVICE_COLORS, SERVICE_ITEM_COLORS, SERVICE_ITEM_ICONS } from "../../../../../../constants/index.ts";
 
 export class ServiceItemTypeMapper extends AbstractMapper<ServiceItemTypeTableRow, ServiceItemType> {
     async toDto(entity: ServiceItemTypeTableRow): Promise<ServiceItemType> {
+        let icon = SERVICE_ITEM_ICONS[entity.key] ?? null;
+        let primaryColor = SERVICE_ITEM_COLORS[entity.key] ?? SERVICE_COLORS.OTHER;
+        let secondaryColor = null;
+
         return serviceItemTypeSchema.parse({
             id: entity.id,
             key: entity.key,
-            ownerId: entity.owner_id
+            ownerId: entity.owner_id,
+            icon: icon,
+            primaryColor: primaryColor,
+            secondaryColor: secondaryColor
         });
     }
 

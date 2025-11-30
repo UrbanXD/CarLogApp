@@ -31,6 +31,37 @@ export const COLORS = {
     registration: "#4169E1"
 };
 
+export const SERVICE_COLORS = {
+    SMALL_SERVICE: "#4ECDC4",
+    MAJOR_SERVICE: "#1A535C",
+    REPAIR: "#FF6B6B",
+    HOME_MAINTENANCE: "#FFA600",
+    INSPECTION: "#4D96FF",
+    DIAGNOSTICS: "#6C5CE7",
+    TIRE_CHANGE: "#2ECC71",
+    OTHER: "#BFBFBF"
+};
+
+export const SERVICE_ITEM_COLORS = {
+    TRANSMISSION_FLUID: "#FF7F50",
+    FUEL_FILTER: "#D4A017",
+    BRAKE_FLUID: "#FF4500",
+    LIGHT_BULB: "#F5D142",
+    WIPER_BLADES: "#4FA3F7",
+    DIAGNOSTICS: "#6C5CE7",
+    OIL: "#8B4513",
+    COOLANT: "#00B7C2",
+    CABIN_FILTER: "#7A7A7A",
+    OIL_FILTER: "#A0522D",
+    BRAKE_DISCS: "#C0392B",
+    BATTERY: "#2ECC71",
+    SPARK_PLUGS: "#3498DB",
+    SOFTWARE_UPDATE: "#9B59B6",
+    BRAKE_PADS: "#E74C3C",
+    TIRES: "#2C3E50",
+    AIR_FILTER: "#BDC3C7"
+};
+
 export const PRIMARY_COLOR = COLORS.white;
 export const SECONDARY_COLOR = COLORS.black2;
 export const ACCENT_COLOR = COLORS.fuelYellow;

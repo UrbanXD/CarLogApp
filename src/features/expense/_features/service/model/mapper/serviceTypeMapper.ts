@@ -2,6 +2,7 @@ import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts
 import { ServiceTypeTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { ServiceType, serviceTypeSchema } from "../../schemas/serviceTypeSchema.ts";
 import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
+import { SERVICE_COLORS, SERVICE_ICONS } from "../../../../../../constants/index.ts";
 
 export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, ServiceType> {
     constructor() {
@@ -9,17 +10,9 @@ export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, Servi
     }
 
     async toDto(entity: ServiceTypeTableRow): Promise<ServiceType> {
-        let icon = null;
-        let primaryColor = null;
+        let icon = SERVICE_ICONS[entity.key] ?? null;
+        let primaryColor = SERVICE_COLORS[entity.key] ?? SERVICE_COLORS.OTHER;
         let secondaryColor = null;
-
-        // switch(entity.key) {
-        //     case ServiceTypeEnum.SMALL_SERVICE:
-        //         icon = ICON_NAMES.service;
-        //         primaryColor = COLORS.service;
-        //         secondaryColor = COLORS.service;
-        //         break;
-        // }
 
         return serviceTypeSchema.parse({
             id: entity.id,

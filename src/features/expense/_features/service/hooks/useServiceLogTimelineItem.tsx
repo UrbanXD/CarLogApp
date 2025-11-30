@@ -38,9 +38,9 @@ export function useServiceLogTimelineItem() {
             id: serviceLog.id,
             milestone: dayjs(serviceLog.expense.date).format("LLL"),
             title: t(`service.types.${ serviceLog.serviceType.key }`),
-            icon: serviceLog.expense.type.icon,
-            color: serviceLog.expense.type.primaryColor ?? undefined,
-            iconColor: serviceLog.expense.type.secondaryColor ?? undefined,
+            icon: serviceLog.serviceType.icon,
+            color: serviceLog.serviceType.primaryColor ?? undefined,
+            iconColor: serviceLog.serviceType.secondaryColor ?? undefined,
             note: serviceLog.expense.note,
             footerText: footer,
             onPress
