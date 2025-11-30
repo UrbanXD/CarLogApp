@@ -41,7 +41,7 @@ export function BarChartView({
     const transformToBarData = (
         groups: Array<BarChartItem>,
         legend: { [key: string]: LegendData }
-    ): Array<BarDataItem> => {
+    ): Array<barDataItem> => {
         const result: Array<barDataItem> = [];
 
         groups.forEach((group) => {
@@ -70,13 +70,13 @@ export function BarChartView({
 
                     let frontColor = typeInfo?.color ?? "#000000";
                     let disablePress = false;
-                    if(value === "" || value === 0) {
-                        frontColor = hexToRgba(frontColor, 0.35);
+                    if(value === "" || value <= 0) {
+                        frontColor = hexToRgba(frontColor, 0.3);
                         disablePress = true;
                     }
 
                     result.push({
-                        value: formatValue?.(value) ?? value,
+                        value: value,
                         label: isFirst ? formatedLabel : undefined,
                         spacing: isLast ? spacingBetweenStackedBars : SPACING,
                         labelWidth: isFirst ? labelWidth : undefined,
@@ -98,7 +98,7 @@ export function BarChartView({
                 }
 
                 result.push({
-                    value: formatValue?.(group.value) ?? group.value,
+                    value: group.value,
                     label: formatedLabel,
                     spacing: labelWidth + SPACING,
                     labelWidth: labelWidth,
@@ -132,13 +132,15 @@ export function BarChartView({
                 data={ barData }
                 maxValue={ chartMaxValue }
                 barWidth={ barWidth }
+                formatYLabel={ formatValue }
                 width={ widthPercentageToDP(100) - yAxisLabelWidth }
                 minHeight={ SEPARATOR_SIZES.lightSmall * 1.15 }
                 disablePress
                 roundedTop
                 roundedBottom
                 lineBehindBars
-                noOfSections={ 7 }
+                highlightEnabled
+                noOfSections={ 6 }
                 rulesType="solid"
                 rulesColor={ COLORS.gray4 }
                 xAxisLabelTextStyle={ styles.axisLabel }
@@ -147,7 +149,7 @@ export function BarChartView({
                 yAxisLabelWidth={ yAxisLabelWidth }
                 yAxisTextStyle={ styles.axisLabel }
                 yAxisThickness={ 0 }
-                renderTooltip={ (item) => <PointerLabel value={ item.value }/> }
+                renderTooltip={ (item) => <PointerLabel value={ formatValue?.(item.value) ?? item.value }/> }
             />
             {
                 legend && showsLegend &&

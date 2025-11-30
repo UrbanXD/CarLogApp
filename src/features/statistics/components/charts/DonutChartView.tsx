@@ -19,7 +19,8 @@ type DonutChartViewProps = {
     legend?: { [key: string]: LegendData }
     formatLabel?: (label: string) => string
     formatDescription?: (description: string) => string
-    formatLegend?: (label: string) => string
+    formatLegend?: (label: string) => string,
+    showsLegend?: boolean
 }
 
 export function DonutChartView({
@@ -28,7 +29,8 @@ export function DonutChartView({
     legend,
     formatLabel,
     formatDescription,
-    formatLegend
+    formatLegend,
+    showsLegend = true
 }: DonutChartViewProps) {
     return (
         <View style={ styles.chartContainer }>
@@ -62,7 +64,7 @@ export function DonutChartView({
                />
             }
             {
-                legend &&
+                showsLegend && legend &&
                <Legend legend={ legend } formatLegend={ formatLegend }/>
             }
         </View>

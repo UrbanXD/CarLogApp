@@ -45,6 +45,7 @@ export function ExpenseStatistics({ carId, currency, from, to }: ExpenseStatisti
                <BarChartView
                   chartData={ expensesByDateWindow.barChartData }
                   legend={ expensesByDateWindow.barChartTypes }
+                  formatValue={ (value) => `${ value } ${ currency?.symbol }` }
                   formatLabel={ (label) => dayjs(label)
                   .format(getDateFormatTemplateByRangeUnit(expensesByDateWindow?.rangeUnit)) }
                   formatLegend={ (label) => t(`expenses.types.${ label }`) }
@@ -98,7 +99,6 @@ export function ExpenseStatistics({ carId, currency, from, to }: ExpenseStatisti
 }
 
 const styles = StyleSheet.create(({
-    container: {},
     mainStatContainer: {
         flexDirection: "row",
         gap: SEPARATOR_SIZES.lightSmall
