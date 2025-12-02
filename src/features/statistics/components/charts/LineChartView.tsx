@@ -27,7 +27,7 @@ const THICKNESS = 3.5;
 export type LineChartItem = lineDataItem
 
 type LineChartViewProps = {
-    chartData: Array<LineChartItem>
+    chartData?: Array<LineChartItem>
     title?: ChartTitleProps
     formatLabel?: (label: string) => string
     formatValue?: (value: number | string) => string
@@ -35,7 +35,7 @@ type LineChartViewProps = {
 }
 
 export function LineChartView({
-    chartData,
+    chartData = [],
     title,
     formatLabel,
     formatValue,

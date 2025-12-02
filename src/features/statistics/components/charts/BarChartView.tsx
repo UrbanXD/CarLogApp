@@ -20,7 +20,7 @@ export type BarChartItem = {
 }
 
 type BarChartViewProps = {
-    chartData: Array<BarChartItem>
+    chartData?: Array<BarChartItem>
     title?: ChartTitleProps
     legend?: { [key: string]: LegendData }
     barWidth?: number
@@ -33,9 +33,9 @@ type BarChartViewProps = {
 }
 
 export function BarChartView({
-    chartData,
+    chartData = [],
     title,
-    legend,
+    legend = {},
     barWidth = 11.5,
     formatLabel,
     formatValue,
@@ -185,7 +185,7 @@ export function BarChartView({
                                     value={ formatValue?.(item.value) ?? item.value }/> }
                             />
                             {
-                                legend && showsLegend &&
+                                showsLegend && legend && Object.keys(legend).length > 0 &&
                                <View style={ { flex: 0.85, alignItems: "center", justifyContent: "center" } }>
                                   <Legend legend={ legend } formatLegend={ formatLegend }/>
                                </View> }

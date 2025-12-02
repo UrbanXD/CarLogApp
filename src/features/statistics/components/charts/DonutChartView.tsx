@@ -16,7 +16,7 @@ export type DonutChartItem = {
 }
 
 type DonutChartViewProps = {
-    chartData: Array<DonutChartItem>
+    chartData?: Array<DonutChartItem>
     title?: ChartTitleProps
     legend?: { [key: string]: LegendData }
     formatLabel?: (label: string) => string
@@ -28,9 +28,9 @@ type DonutChartViewProps = {
 }
 
 export function DonutChartView({
-    chartData,
+    chartData = [],
     title,
-    legend,
+    legend = {},
     formatLabel,
     formatDescription,
     formatLegend,
