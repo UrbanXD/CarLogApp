@@ -1,21 +1,26 @@
-import { StyleSheet, Text, View } from "react-native";
-import { COLORS, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
+import { StyleSheet, Text, View, ViewStyle } from "react-native";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import { MeasureElement } from "../../../../../components/marquee/helper/MeasureElement.tsx";
 import { useEffect, useState } from "react";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 
+export const POINTER_LABEL_FONT_SIZE = FONT_SIZES.p4 * 0.9;
+export const POINTER_LABEL_PADDING = SEPARATOR_SIZES.small;
+export const POINTER_LABEL_MIN_WIDTH = widthPercentageToDP(10);
+
 type PointerLabelProps = {
     value: string
     label?: string
+    style?: ViewStyle
 }
 
-export function PointerLabel({ value, label }: PointerLabelProps) {
+export function PointerLabel({ value, label, style }: PointerLabelProps) {
     const [valueTextWidth, setValueTextWidth] = useState<number>(0);
     const [labelTextWidth, setLabelTextWidth] = useState<number>(0);
     const [width, setWidth] = useState<number>(0);
 
     useEffect(() => {
-        setWidth(Math.max(widthPercentageToDP(10), Math.max(valueTextWidth, labelTextWidth)));
+        setWidth(Math.max(POINTER_LABEL_MIN_WIDTH, Math.max(valueTextWidth, labelTextWidth)));
     }, [valueTextWidth, labelTextWidth]);
 
     return (
@@ -34,9 +39,9 @@ export function PointerLabel({ value, label }: PointerLabelProps) {
                     styles.container,
                     {
                         width,
-                        marginBottom: SEPARATOR_SIZES.lightSmall / 2,
                         right: (width - 2 * SEPARATOR_SIZES.small) / 2
-                    }
+                    },
+                    style
                 ] }>
                 {
                     label &&
@@ -52,16 +57,20 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: COLORS.white,
         justifyContent: "center",
+        marginTop: SEPARATOR_SIZES.lightSmall / 2,
+        marginBottom: SEPARATOR_SIZES.lightSmall / 2,
         paddingVertical: SEPARATOR_SIZES.lightSmall / 2,
         borderRadius: 16
     },
     label: {
         fontFamily: "Gilroy-Medium",
+        fontSize: POINTER_LABEL_FONT_SIZE * 0.9,
         color: COLORS.gray4,
         textAlign: "center"
     },
     value: {
         fontFamily: "Gilroy-Heavy",
+        fontSize: POINTER_LABEL_FONT_SIZE,
         color: COLORS.black4,
         textAlign: "center"
     }
