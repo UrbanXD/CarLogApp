@@ -1,14 +1,16 @@
 import React, { ReactNode } from "react";
-import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 
 export type StatCardProps = {
     label: ReactNode
-    value: ReactNode
+    value: ReactNode | null
     trend?: string
     trendDescription?: string
     description?: string
+    emptyValueText?: string
     isPositive?: boolean
+    isLoading?: boolean
     containerStyle?: ViewStyle
     labelStyle?: TextStyle
     valueStyle?: TextStyle
@@ -22,7 +24,9 @@ export function StatCard({
     trend,
     trendDescription,
     description,
+    emptyValueText = "-",
     isPositive,
+    isLoading = false,
     containerStyle,
     labelStyle,
     valueStyle,
@@ -41,7 +45,11 @@ export function StatCard({
         <View style={ [styles.container, containerStyle] }>
             <View>
                 <Text style={ [styles.label, labelStyle] }>{ label }</Text>
-                <Text style={ [styles.value, valueStyle] }>{ value }</Text>
+                {
+                    !isLoading
+                    ? <Text style={ [styles.value, valueStyle] }>{ value ?? emptyValueText }</Text>
+                    : <ActivityIndicator size={ "small" } color={ COLORS.gray2 } style={ { alignSelf: "flex-start" } }/>
+                }
             </View>
             {
                 trend &&

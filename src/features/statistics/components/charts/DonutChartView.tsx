@@ -4,6 +4,8 @@ import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { ChartTitle, ChartTitleProps } from "./common/ChartTitle.tsx";
 import { Legend, LegendData } from "./common/Legend.tsx";
+import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
+import { ChartDataNotFound } from "./common/ChartDataNotFound.tsx";
 
 export type DonutChartItem = {
     label: string
@@ -21,6 +23,8 @@ type DonutChartViewProps = {
     formatDescription?: (description: string) => string
     formatLegend?: (label: string) => string,
     showsLegend?: boolean
+    legendPosition?: "top" | "bottom" | "left" | "right"
+    isLoading?: boolean
 }
 
 export function DonutChartView({
@@ -30,42 +34,75 @@ export function DonutChartView({
     formatLabel,
     formatDescription,
     formatLegend,
-    showsLegend = true
+    showsLegend = true,
+    legendPosition = "bottom",
+    isLoading = false
 }: DonutChartViewProps) {
+    let flexDirection;
+    switch(legendPosition) {
+        case "top":
+            flexDirection = "column-reverse";
+            break;
+        case "bottom":
+            flexDirection = "column";
+            break;
+        case "left":
+            flexDirection = "row-reverse";
+            break;
+        case "right":
+            flexDirection = "row";
+            break;
+        default:
+            flexDirection = "column";
+    }
+
     return (
-        <View style={ styles.chartContainer }>
+        <View style={ [styles.chartContainer] }>
             {
                 title &&
                <ChartTitle { ...title } />
             }
             {
-                chartData && chartData.length > 0 &&
-               <PieChart
-                  data={ chartData }
-                  donut
-                  focusOnPress
-                  sectionAutoFocus
-                  radius={ 90 }
-                  innerRadius={ 65 }
-                  innerCircleColor={ COLORS.black2 }
-                  centerLabelComponent={ (index: number) => {
-                      const focused = chartData?.[index];
+                isLoading
+                ? <MoreDataLoading/>
+                : (
+                    (!chartData || chartData.length === 0)
+                    ? <ChartDataNotFound/>
+                    : (
+                        <View style={ { flexDirection, gap: SEPARATOR_SIZES.lightSmall } }>
+                            <PieChart
+                                data={ chartData }
+                                donut
+                                isAnimated
+                                animationDuration={ 750 }
+                                focusOnPress
+                                sectionAutoFocus
+                                radius={ 90 }
+                                innerRadius={ 65 }
+                                innerCircleColor={ COLORS.black2 }
+                                centerLabelComponent={ (index: number) => {
+                                    const focused = chartData?.[index];
 
-                      if(!focused) return <></>;
+                                    if(!focused) return <></>;
 
-                      return (
-                          <CenterLabel
-                              label={ focused.label && (formatLabel?.(focused.label) ?? focused.label) }
-                              description={ focused.description && (formatDescription?.(focused.description) ?? focused.description) }
-                              value={ focused.value }
-                          />
-                      );
-                  } }
-               />
-            }
-            {
-                showsLegend && legend &&
-               <Legend legend={ legend } formatLegend={ formatLegend }/>
+                                    return (
+                                        <CenterLabel
+                                            label={ focused.label && (formatLabel?.(focused.label) ?? focused.label) }
+                                            description={ focused.description && (formatDescription?.(focused.description) ?? focused.description) }
+                                            value={ focused.value }
+                                        />
+                                    );
+                                } }
+                            />
+                            {
+                                showsLegend && legend &&
+                               <View style={ { flex: 0.85, alignItems: "center", justifyContent: "center" } }>
+                                  <Legend legend={ legend } formatLegend={ formatLegend }/>
+                               </View>
+                            }
+                        </View>
+                    )
+                )
             }
         </View>
     );

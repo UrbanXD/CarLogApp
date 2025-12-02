@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { BarChart, barDataItem } from "react-native-gifted-charts";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { Legend, LegendData } from "./common/Legend.tsx";
@@ -7,6 +7,8 @@ import { PointerLabel } from "./common/PointerLabel.tsx";
 import { ChartTitle, ChartTitleProps } from "./common/ChartTitle.tsx";
 import React from "react";
 import { widthPercentageToDP } from "react-native-responsive-screen";
+import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
+import { ChartDataNotFound } from "./common/ChartDataNotFound.tsx";
 
 const SPACING = 1.5;
 const AXIS_FONT_SIZE = FONT_SIZES.p4 * 0.85;
@@ -26,6 +28,8 @@ type BarChartViewProps = {
     formatValue?: (value: number | string) => string
     formatLegend?: (label: string) => string
     showsLegend?: boolean
+    legendPosition?: "top" | "bottom" | "left" | "right"
+    isLoading?: boolean
 }
 
 export function BarChartView({
@@ -36,7 +40,9 @@ export function BarChartView({
     formatLabel,
     formatValue,
     formatLegend,
-    showsLegend = true
+    showsLegend = true,
+    legendPosition = "bottom",
+    isLoading = false
 }: BarChartViewProps) {
     const transformToBarData = (
         groups: Array<BarChartItem>,
@@ -122,38 +128,70 @@ export function BarChartView({
     const formatedMaxValue = formatValue?.(chartMaxValue) ?? chartMaxValue.toString();
     const yAxisLabelWidth = AXIS_FONT_SIZE * 0.55 * (formatedMaxValue.length + 1.5 ?? 0);
 
+    let flexDirection;
+    switch(legendPosition) {
+        case "top":
+            flexDirection = "column-reverse";
+            break;
+        case "bottom":
+            flexDirection = "column";
+            break;
+        case "left":
+            flexDirection = "row-reverse";
+            break;
+        case "right":
+            flexDirection = "row";
+            break;
+        default:
+            flexDirection = "column";
+    }
+
     return (
         <>
             {
                 title &&
                <ChartTitle { ...title } />
             }
-            <BarChart
-                data={ barData }
-                maxValue={ chartMaxValue }
-                barWidth={ barWidth }
-                formatYLabel={ formatValue }
-                width={ widthPercentageToDP(100) - yAxisLabelWidth }
-                minHeight={ SEPARATOR_SIZES.lightSmall * 1.15 }
-                disablePress
-                roundedTop
-                roundedBottom
-                lineBehindBars
-                highlightEnabled
-                noOfSections={ 6 }
-                rulesType="solid"
-                rulesColor={ COLORS.gray4 }
-                xAxisLabelTextStyle={ styles.axisLabel }
-                xAxisThickness={ 0 }
-                yAxisSide="right"
-                yAxisLabelWidth={ yAxisLabelWidth }
-                yAxisTextStyle={ styles.axisLabel }
-                yAxisThickness={ 0 }
-                renderTooltip={ (item) => <PointerLabel value={ formatValue?.(item.value) ?? item.value }/> }
-            />
             {
-                legend && showsLegend &&
-               <Legend legend={ legend } formatLegend={ formatLegend }/>
+                isLoading
+                ? <MoreDataLoading/>
+                : (
+                    (!barData || barData.length <= 1) // 1 because of default one
+                    ? <ChartDataNotFound/>
+                    : (
+                        <View style={ { flexDirection, gap: SEPARATOR_SIZES.lightSmall } }>
+                            <BarChart
+                                data={ barData }
+                                maxValue={ chartMaxValue }
+                                barWidth={ barWidth }
+                                formatYLabel={ formatValue }
+                                width={ widthPercentageToDP(100) - yAxisLabelWidth }
+                                minHeight={ SEPARATOR_SIZES.lightSmall * 1.15 }
+                                disablePress
+                                roundedTop
+                                roundedBottom
+                                lineBehindBars
+                                highlightEnabled
+                                noOfSections={ 6 }
+                                rulesType="solid"
+                                rulesColor={ COLORS.gray4 }
+                                xAxisLabelTextStyle={ styles.axisLabel }
+                                xAxisThickness={ 0 }
+                                yAxisSide="right"
+                                yAxisLabelWidth={ yAxisLabelWidth }
+                                yAxisTextStyle={ styles.axisLabel }
+                                yAxisThickness={ 0 }
+                                renderTooltip={ (item) => <PointerLabel
+                                    value={ formatValue?.(item.value) ?? item.value }/> }
+                            />
+                            {
+                                legend && showsLegend &&
+                               <View style={ { flex: 0.85, alignItems: "center", justifyContent: "center" } }>
+                                  <Legend legend={ legend } formatLegend={ formatLegend }/>
+                               </View> }
+                        </View>
+                    )
+                )
             }
         </>
     );
