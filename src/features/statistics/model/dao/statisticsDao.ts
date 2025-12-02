@@ -26,6 +26,9 @@ import { COLORS } from "../../../../constants/index.ts";
 import { SERVICE_ITEM_TABLE } from "../../../../database/connector/powersync/tables/serviceItem.ts";
 import { ServiceItemTypeDao } from "../../../expense/_features/service/model/dao/ServiceItemTypeDao.ts";
 import { ServiceTypeDao } from "../../../expense/_features/service/model/dao/ServiceTypeDao.ts";
+import { FUEL_TANK_TABLE } from "../../../../database/connector/powersync/tables/fuelTank.ts";
+import dayjs from "dayjs";
+import { getExtendedRange } from "../../utils/getExtendedRange.ts";
 
 type StatisticsFunctionArgs = {
     carId?: string
@@ -41,11 +44,9 @@ export type Stat = {
 }
 
 export type TrendStat = {
-    max: number
-    min: number
     average: number
-    previousCycleAverage: number
     lineChartData: Array<LineChartItem>
+    rangeUnit: RangeUnit
 }
 
 export type ComparisonStatByType = {
@@ -59,15 +60,18 @@ export type ComparisonStatByDate = {
     rangeUnit: RangeUnit
 }
 
-export type TotalComparisonStat = {
-    max: Stat
-    min: Stat
+export type SummaryStat = {
+    max: Stat | null
+    min: Stat | null
     total: number
     average: number
-    previousWindowTotal?: number
-    previousWindowAverage?: number
+    count: number
+    previousWindowTotal: number
+    previousWindowAverage: number
+    previousWindowCount: number
     totalTrend: Trend
     averageTrend: Trend
+    countTrend: Trend
 }
 
 export type TopListItemStat = {
@@ -179,83 +183,6 @@ export class StatisticsDao {
         this.serviceItemTypeDao = serviceItemTypeDao;
     }
 
-    async getFuelCostTrend({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
-        const { currentTrendDateLimit, previousTrendDateLimit, dateLimitSql } = getTrendDateLimit("t2.date", type);
-
-        let query = this.db
-        .selectFrom(`${ FUEL_LOG_TABLE } as t1`)
-        .innerJoin(`${ EXPENSE_TABLE } as t2`, "t1.expense_id", "t2.id")
-        .select([
-            //@formatter:off
-            sql<number>`SUM(CASE WHEN ${ currentTrendDateLimit } THEN t2.amount ELSE 0 END)`
-            .as("current"),
-            sql<number>`SUM(CASE WHEN ${ previousTrendDateLimit } THEN t2.amount ELSE 0 END)`
-            .as("previous")
-            //@formatter:on
-        ]);
-
-        if(carId) query = query.where("t2.car_id", "=", carId);
-        if(dateLimitSql) query = query.where("t2.date", ">=", dateLimitSql);
-
-        const result = await query.executeTakeFirst();
-
-        return {
-            current: numberToFractionDigit(result?.current ?? 0),
-            previous: numberToFractionDigit(result?.previous ?? 0)
-        } as TrendStat;
-    }
-
-    async getServiceCostTrend({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
-        const { currentTrendDateLimit, previousTrendDateLimit, dateLimitSql } = getTrendDateLimit("t2.date", type);
-
-        let query = this.db
-        .selectFrom(`${ SERVICE_LOG_TABLE } as t1`)
-        .innerJoin(`${ EXPENSE_TABLE } as t2`, "t1.expense_id", "t2.id")
-        .select([
-            //@formatter:off
-            sql<number>`SUM(CASE WHEN ${ currentTrendDateLimit } THEN t2.amount ELSE 0 END)`
-            .as("current"),
-            sql<number>`SUM(CASE WHEN ${ previousTrendDateLimit } THEN t2.amount ELSE 0 END)`
-            .as("previous")
-            //@formatter:on
-        ]);
-
-        if(carId) query = query.where("t2.car_id", "=", carId);
-        if(dateLimitSql) query = query.where("t2.date", ">=", dateLimitSql);
-
-        const result = await query.executeTakeFirst();
-
-        return {
-            current: numberToFractionDigit(result?.current ?? 0),
-            previous: numberToFractionDigit(result?.previous ?? 0)
-        } as TrendStat;
-    }
-
-    async getTotalCostTrend({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
-        const { currentTrendDateLimit, previousTrendDateLimit, dateLimitSql } = getTrendDateLimit("date", type);
-
-        let query = this.db
-        .selectFrom(EXPENSE_TABLE)
-        .select([
-            //@formatter:off
-            sql<number>`SUM(CASE WHEN ${ currentTrendDateLimit } THEN amount ELSE 0 END)`
-            .as("current"),
-            sql<number>`SUM(CASE WHEN ${ previousTrendDateLimit } THEN amount ELSE 0 END)`
-            .as("previous")
-            //@formatter:on
-        ])
-
-        if(carId) query = query.where("car_id", "=", carId);
-        if(dateLimitSql) query = query.where("date", ">=", dateLimitSql);
-
-        const result = await query.executeTakeFirst();
-
-        return {
-            current: numberToFractionDigit(result?.current ?? 0),
-            previous: numberToFractionDigit(result?.previous ?? 0)
-        } as TrendStat;
-    }
-
     async getDistanceTrend({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
         const { currentTrendDateLimit, previousTrendDateLimit } = getTrendDateLimit("t2.date", type);
 
@@ -307,42 +234,6 @@ export class StatisticsDao {
             current: numberToFractionDigit(result?.current ?? 0),
             previous: numberToFractionDigit(result?.previous ?? 0)
         } as TrendStat;
-    }
-
-    async getFuelConsumption({ carId, type }: StatFunctionOptions): Promise<TrendStat> {
-        const distance = await this.getDistanceTrend({ carId: carId, type: type });
-
-        const { currentTrendDateLimit, previousTrendDateLimit, dateLimitSql } = getTrendDateLimit("t2.date", type);
-
-        let query = this.db
-        .selectFrom(`${ FUEL_LOG_TABLE } as t1`)
-        .innerJoin(`${ EXPENSE_TABLE } as t2`, "t1.expense_id", "t2.id")
-        .innerJoin(`${ FUEL_UNIT_TABLE } as t3`, "t3.id", "t1.fuel_unit_id")
-        .select([
-            //@formatter:off
-            sql<number>`SUM(CASE WHEN ${ currentTrendDateLimit } THEN t1.quantity * t3.conversion_factor ELSE 0 END)`
-            .as("current"),
-            sql<number>`SUM(CASE WHEN ${ previousTrendDateLimit } THEN t1.quantity * t3.conversion_factor ELSE 0 END)`
-            .as("previous")
-            //@formatter:on
-        ]);
-
-        if(carId) query = query.where("t2.car_id", "=", carId);
-        if(dateLimitSql) query = query.where("t2.date", ">=", dateLimitSql);
-
-        const fuelQuantity = await query.executeTakeFirst();
-
-        let current = 0;
-        if(fuelQuantity?.current && fuelQuantity.current !== 0 && distance.current !== 0) {
-            current = numberToFractionDigit((fuelQuantity.current / distance.current) * 100);
-        }
-
-        let previous = 0;
-        if(fuelQuantity?.previous && fuelQuantity.previous !== 0 && distance.previous !== 0) {
-            previous = numberToFractionDigit((fuelQuantity.previous / distance.previous) * 100);
-        }
-
-        return { current, previous } as TrendStat;
     }
 
     async getCostPerDistance(options: StatFunctionOptions): Promise<TrendStat> {
@@ -530,13 +421,13 @@ export class StatisticsDao {
         //@formatter:on
     }
 
-    async getExpenseTotalComparison({
+    async getExpenseSummary({
         carId,
         from,
         to,
         trendOptions,
         expenseType
-    }: StatisticsFunctionArgs & { expenseType?: ExpenseTypeEnum }): Promise<TotalComparisonStat> {
+    }: StatisticsFunctionArgs & { expenseType?: ExpenseTypeEnum }): Promise<SummaryStat> {
         let expenseTypeId = null;
         if(expenseType) expenseTypeId = await this.expenseTypeDao.getIdByKey(expenseType);
 
@@ -558,19 +449,25 @@ export class StatisticsDao {
         if(expenseTypeId) maxItemQuery = maxItemQuery.where("t1.type_id", "=", expenseTypeId);
 
         const maxItemResult = await maxItemQuery.executeTakeFirst();
-        const selectedExpenseType = await this.expenseTypeDao.mapper.toDto({
-            id: maxItemResult.type_id,
-            owner_id: maxItemResult.owner_id,
-            key: maxItemResult.key
-        });
+        const selectedExpenseType =
+            maxItemResult
+            ?
+            await this.expenseTypeDao.mapper.toDto({
+                id: maxItemResult.type_id,
+                owner_id: maxItemResult.owner_id,
+                key: maxItemResult.key
+            })
+            :
+            null;
 
         const { from: previousWindowFrom, to: previousWindowTo } = getPreviousRangeWindow(from, to);
 
         let aggregateQuery = this.db
         .selectFrom(EXPENSE_TABLE)
         .select([
-            sql<number>`AVG(amount) as average`,
-            sql<number>`SUM(amount) as total`
+            sql<number>`AVG(amount) as average_amount`,
+            sql<number>`SUM(amount) as total_amount`,
+            sql<number>`COUNT(id) as total_count`
         ])
         .where("date", ">=", from)
         .where("date", "<=", to);
@@ -578,8 +475,9 @@ export class StatisticsDao {
         let previousWindowAggregateQuery = this.db
         .selectFrom(EXPENSE_TABLE)
         .select([
-            sql<number>`AVG(amount) as average`,
-            sql<number>`SUM(amount) as total`
+            sql<number>`AVG(amount) as average_amount`,
+            sql<number>`SUM(amount) as total_amount`,
+            sql<number>`COUNT(id) as total_count`
         ])
         .where("date", ">=", previousWindowFrom)
         .where("date", "<=", previousWindowTo);
@@ -594,26 +492,34 @@ export class StatisticsDao {
             previousWindowAggregateQuery = previousWindowAggregateQuery.where("type_id", "=", expenseTypeId);
         }
 
-        const averageResult = await aggregateQuery.executeTakeFirst();
-        const previousWindowAverageResult = await previousWindowAggregateQuery.executeTakeFirst();
+        const aggregateResult = await aggregateQuery.executeTakeFirst();
+        const previousWindowAggregateResult = await previousWindowAggregateQuery.executeTakeFirst();
 
-        const total = numberToFractionDigit(averageResult.total ?? 0);
-        const average = numberToFractionDigit(averageResult.average ?? 0);
-        const previousWindowTotal = numberToFractionDigit(previousWindowAverageResult.total ?? 0);
-        const previousWindowAverage = numberToFractionDigit(previousWindowAverageResult.average ?? 0);
+        const total = numberToFractionDigit(aggregateResult.total_amount ?? 0);
+        const average = numberToFractionDigit(aggregateResult.average_amount ?? 0);
+        const count = numberToFractionDigit(aggregateResult.total_count);
+        const previousWindowTotal = numberToFractionDigit(previousWindowAggregateResult.total_amount ?? 0);
+        const previousWindowAverage = numberToFractionDigit(previousWindowAggregateResult.average_amount ?? 0);
+        const previousWindowCount = numberToFractionDigit(previousWindowAggregateResult.total_count ?? 0);
 
         return {
-            max: {
-                value: numberToFractionDigit(maxItemResult?.amount ?? 0),
-                label: maxItemResult?.key ?? ExpenseTypeEnum.OTHER,
-                color: selectedExpenseType.primaryColor
-            },
+            max: maxItemResult
+                 ?
+                {
+                    value: numberToFractionDigit(maxItemResult?.amount ?? 0),
+                    label: maxItemResult?.key ?? ExpenseTypeEnum.OTHER,
+                    color: selectedExpenseType.primaryColor
+                }
+                 : null,
             total,
             average,
+            count,
             previousWindowTotal,
             previousWindowAverage,
+            previousWindowCount,
             totalTrend: calculateTrend(total, previousWindowTotal, trendOptions),
-            averageTrend: calculateTrend(average, previousWindowAverage, trendOptions)
+            averageTrend: calculateTrend(average, previousWindowAverage, trendOptions),
+            countTrend: calculateTrend(count, previousWindowCount, trendOptions)
         };
     }
 
@@ -852,8 +758,8 @@ export class StatisticsDao {
         .innerJoin(`${ SERVICE_ITEM_TABLE } as t2`, "t1.id", "t2.service_log_id")
         .innerJoin(`${ EXPENSE_TABLE } as t3`, "t1.expense_id", "t3.id")
         .select([
-            sql<number>`SUM(amount) as total`,
-            sql<number>`SUM(amount) * 100.0 / SUM(SUM(amount)) OVER () as percent`,
+            sql<number>`SUM(t2.quantity * t2.price_per_unit * t2.exchange_rate) as total`,
+            sql<number>`SUM(t2.quantity * t2.price_per_unit * t2.exchange_rate) * 100.0 / SUM(SUM(t2.quantity * t2.price_per_unit * t2.exchange_rate)) OVER () as percent`,
             "t2.service_item_type_id as item_type_id"
         ])
         .where("t3.date", ">=", from)
@@ -897,6 +803,196 @@ export class StatisticsDao {
         return {
             donutChartData,
             legend: filteredLegend
+        };
+    }
+
+    async getTotalDistance({ carId, from, to }: StatisticsFunctionArgs): Promise<SummaryStat> {
+        let query = this.db
+        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
+        .innerJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t2`, "t1.id", "t2.odometer_log_id")
+        .innerJoin(`${ CAR_TABLE } as t3`, "t1.car_id", "t3.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t4`, "t3.odometer_unit_id", "t4.id")
+        .select([
+            sql<number>`MIN(ROUND(t1.value / t4.conversion_factor))`.as("min"),
+            sql<number>`MAX(ROUND(t1.value / t4.conversion_factor))`.as("max"),
+            sql<number>`MAX(ROUND(t1.value / t4.conversion_factor)) - MIN(ROUND(t1.value / t4.conversion_factor))`
+            .as("distance")
+        ])
+        .where("t2.date", ">=", from)
+        .where("t2.date", "<=", to);
+
+        if(carId) query = query.where("t3.id", "=", carId);
+
+        const result = await query.execute();
+        console.log(result);
+        return null;
+    }
+
+    async getFuelSummary({ carId, from, to, trendOptions }: StatisticsFunctionArgs): Promise<{
+        quantity: SummaryStat,
+        amount: SummaryStat
+    }> {
+        const fuelExpenseTypeId = await this.expenseTypeDao.getIdByKey(ExpenseTypeEnum.FUEL);
+
+        let maxItemQueryByAmount = this.db
+        .selectFrom(`${ EXPENSE_TABLE } as t1`)
+        .select("amount")
+        .where("date", ">=", from)
+        .where("date", "<=", to)
+        .where("type_id", "=", fuelExpenseTypeId)
+        .orderBy("amount", "desc")
+        .limit(1);
+
+        if(carId) maxItemQueryByAmount = maxItemQueryByAmount.where("car_id", "=", carId);
+
+        const maxItemResultByAmount = await maxItemQueryByAmount.executeTakeFirst();
+
+        const { from: previousWindowFrom, to: previousWindowTo } = getPreviousRangeWindow(from, to);
+
+        let aggregateQuery = () => {
+            let query = this.db
+            .selectFrom(`${ FUEL_LOG_TABLE } as t1`)
+            .innerJoin(`${ EXPENSE_TABLE } as t2`, "t1.expense_id", "t2.id")
+            .innerJoin(`${ CAR_TABLE } as t3`, "t2.car_id", "t3.id")
+            .innerJoin(`${ FUEL_TANK_TABLE } as t4`, "t3.id", "t4.car_id")
+            .innerJoin(`${ FUEL_UNIT_TABLE } as t5`, "t5.id", "t4.unit_id")
+            .select([
+                sql<number>`AVG((t1.quantity / t5.conversion_factor)) as average_quantity`,
+                sql<number>`SUM((t1.quantity / t5.conversion_factor)) as total_quantity`,
+                sql<number>`COUNT(t1.id) as total_count`,
+                sql<number>`AVG(t2.amount) as average_amount`,
+                sql<number>`SUM(t2.amount) as total_amount`
+            ]);
+
+            if(carId) query = query.where("t2.car_id", "=", carId);
+
+            return query;
+        };
+
+        let currentWindowAggregateQuery = aggregateQuery()
+        .where("t2.date", ">=", from)
+        .where("t2.date", "<=", to);
+
+        let previousWindowAggregateQuery = aggregateQuery()
+        .where("t2.date", ">=", previousWindowFrom)
+        .where("t2.date", "<=", previousWindowTo);
+
+        const aggregateResult = await currentWindowAggregateQuery.executeTakeFirst();
+        const previousWindowAggregateResult = await previousWindowAggregateQuery.executeTakeFirst();
+
+        const count = numberToFractionDigit(aggregateResult.total_count ?? 0);
+        const previousWindowCount = numberToFractionDigit(previousWindowAggregateResult.total_count ?? 0);
+
+        const totalQuantity = numberToFractionDigit(aggregateResult.total_quantity ?? 0);
+        const averageQuantity = numberToFractionDigit(aggregateResult.average_quantity ?? 0);
+        const previousWindowTotalQuantity = numberToFractionDigit(previousWindowAggregateResult.total_quantity ?? 0);
+        const previousWindowAverageQuantity = numberToFractionDigit(previousWindowAggregateResult.average_quantity ?? 0);
+
+        const totalAmount = numberToFractionDigit(aggregateResult.total_amount ?? 0);
+        const averageAmount = numberToFractionDigit(aggregateResult.average_amount ?? 0);
+        const previousWindowTotalAmount = numberToFractionDigit(previousWindowAggregateResult.total_amount ?? 0);
+        const previousWindowAverageAmount = numberToFractionDigit(previousWindowAggregateResult.average_amount ?? 0);
+
+        return {
+            quantity: {
+                total: totalQuantity,
+                average: averageQuantity,
+                count,
+                previousWindowTotal: previousWindowTotalQuantity,
+                previousWindowAverage: previousWindowAverageQuantity,
+                previousWindowCount,
+                totalTrend: calculateTrend(totalQuantity, previousWindowTotalQuantity, trendOptions),
+                averageTrend: calculateTrend(averageQuantity, previousWindowAverageQuantity, trendOptions),
+                countTrend: calculateTrend(count, previousWindowCount, trendOptions)
+            },
+            amount: {
+                max: { value: maxItemResultByAmount.amount },
+                total: totalAmount,
+                average: averageAmount,
+                count,
+                previousWindowTotal: previousWindowTotalAmount,
+                previousWindowAverage: previousWindowAverageAmount,
+                previousWindowCount,
+                totalTrend: calculateTrend(totalAmount, previousWindowTotalAmount, trendOptions),
+                averageTrend: calculateTrend(averageAmount, previousWindowAverageAmount, trendOptions),
+                countTrend: calculateTrend(count, previousWindowCount, trendOptions)
+            }
+        };
+    }
+
+    public async getFuelConsumption(
+        { carId, from, to }: StatisticsFunctionArgs
+    ): Promise<TrendStat> {
+        const { extendedFrom, extendedTo } = getExtendedRange(from, to);
+
+        let query = this.db
+        .selectFrom(`${ FUEL_LOG_TABLE } as t1`)
+        .innerJoin(`${ EXPENSE_TABLE } as t2`, "t1.expense_id", "t2.id")
+        .innerJoin(`${ FUEL_UNIT_TABLE } as t3`, "t1.fuel_unit_id", "t3.id")
+        .leftJoin(`${ ODOMETER_LOG_TABLE } as t4`, "t1.odometer_log_id", "t4.id")
+        .innerJoin(`${ CAR_TABLE } as t6`, "t2.car_id", "t6.id")
+        .leftJoin(`${ ODOMETER_UNIT_TABLE } as t7`, "t6.odometer_unit_id", "t7.id")
+        .innerJoin(`${ FUEL_TANK_TABLE } as t8`, "t6.id", "t8.car_id")
+        //@formatter:off
+        .select([
+            "t2.date as date",
+            sql<number>`t1.quantity / t3.conversion_factor`.as("quantity"),
+            sql<number | null>`t4.value / COALESCE(t7.conversion_factor, 1)`.as("odometer_value")
+        ])
+        //@formatter:on
+        .where("t2.date", ">=", extendedFrom)
+        .where("t2.date", "<=", extendedTo)
+        .orderBy("t2.date", "asc");
+
+        if(carId) {
+            query = query.where("t2.car_id", "=", carId) as any;
+        }
+
+        const logs = await query.execute();
+
+        const lineChartData: Array<LineChartItem> = [];
+
+        const logsWithOdometerValue = logs.filter(l => l.odometer_value !== null && l.quantity !== null && l.quantity !== undefined);
+
+        if(logsWithOdometerValue.length < 2) return { lineChartData: [], average: 0 };
+
+        let totalQuantity = 0;
+        let totalDistance = 0;
+        for(let i = 1; i < logsWithOdometerValue.length; i++) {
+            const prev = logsWithOdometerValue[i - 1];
+            const curr = logsWithOdometerValue[i];
+
+            const distance = curr.odometer_value! - prev.odometer_value!;
+            if(distance <= 0) continue;
+
+            totalDistance += distance;
+
+            let quantitySum = 0;
+            for(const log of logs) {
+                const logDate = dayjs(log.date);
+                if(logDate.isBetween(prev.date, curr.date, undefined, i === 1 ? "[]" : "(]")) {
+                    quantitySum += log.quantity ?? 0;
+                }
+
+                if(logDate.isAfter(dayjs(curr.date))) break;
+            }
+
+            if(quantitySum === 0) continue;
+
+            totalQuantity += quantitySum;
+            const consumption = (totalQuantity / totalDistance) * 100;
+
+            if(dayjs(curr.date).isBetween(from, to, undefined, i === 1 ? "[]" : "(]")) {
+                lineChartData.push({
+                    label: curr.date,
+                    value: numberToFractionDigit(consumption)
+                });
+            }
+        }
+
+        return {
+            lineChartData,
+            average: lineChartData?.[lineChartData.length - 1].value ?? 0
         };
     }
 }
