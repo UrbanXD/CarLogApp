@@ -43,7 +43,7 @@ export function LineChartView({
             label: g.label ? (formatLabel?.(g.label) ?? g.label) : undefined
         }));
 
-        data.unshift({ value: graphData[0].value, hidePointer: true });
+        data.unshift({ value: graphData?.[0]?.value, hidePointer: true });
 
         return data;
     }, [graphData]);
@@ -53,15 +53,15 @@ export function LineChartView({
         ...formattedGraphData.map(item => AXIS_FONT_SIZE * 0.55 * (item.label?.length ?? 0))
     );
 
-    const maxValue = Math.max(...graphData.map(d => d.value ?? 0));
+    const maxValue = Math.max(0, ...graphData.map(d => d.value ?? 0));
     const chartMaxValue = Math.max(0, numberToFractionDigit(maxValue + maxValue * 0.2));
 
     const formatedMaxValue = formatValue?.(chartMaxValue) ?? chartMaxValue.toString();
 
     const yAxisLabelWidth = AXIS_FONT_SIZE * 0.55 * (formatedMaxValue.length + 2.5 ?? 0);
 
-    const firstPointerLabelWidth = 2 * POINTER_LABEL_PADDING + POINTER_LABEL_FONT_SIZE * 0.55 * ((formattedGraphData?.[1].value.toString() ?? "").length + 1.5);
-    const lastPointerLabelWidth = 2 * POINTER_LABEL_PADDING + POINTER_LABEL_FONT_SIZE * 0.55 * ((formattedGraphData?.[formattedGraphData.length - 1].value.toString() ?? "").length + 1.5);
+    const firstPointerLabelWidth = 2 * POINTER_LABEL_PADDING + POINTER_LABEL_FONT_SIZE * 0.55 * ((formattedGraphData?.[1]?.value?.toString() ?? "").length + 1.5);
+    const lastPointerLabelWidth = 2 * POINTER_LABEL_PADDING + POINTER_LABEL_FONT_SIZE * 0.55 * ((formattedGraphData?.[formattedGraphData.length - 1]?.value?.toString() ?? "").length + 1.5);
 
     const spacing = maxLabelWidth + EXTRA_SPACING;
     const initialSpacing = -(Math.max(maxLabelWidth, Math.max(firstPointerLabelWidth, POINTER_LABEL_MIN_WIDTH))) / 2;
@@ -80,9 +80,6 @@ export function LineChartView({
                 curved
                 areaChart
                 interpolateMissingValues
-                isAnimated
-                animateOnDataChange
-                onDataChangeAnimationDuration={ 1000 }
                 noOfSections={ 6 }
                 maxValue={ chartMaxValue }
                 formatYLabel={ formatValue }
