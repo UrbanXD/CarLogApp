@@ -29,6 +29,7 @@ import { ServiceTypeDao } from "../../../expense/_features/service/model/dao/Ser
 import { FUEL_TANK_TABLE } from "../../../../database/connector/powersync/tables/fuelTank.ts";
 import dayjs from "dayjs";
 import { getExtendedRange } from "../../utils/getExtendedRange.ts";
+import { medianSubQuery } from "../../../../database/dao/utils/medianSubQuery.ts";
 
 type StatisticsFunctionArgs = {
     carId?: string
@@ -65,12 +66,15 @@ export type SummaryStat = {
     min: Stat | null
     total: number
     average: number
+    median: number
     count: number
     previousWindowTotal: number
     previousWindowAverage: number
+    previousWindowMedian: number
     previousWindowCount: number
     totalTrend: Trend
     averageTrend: Trend
+    medianTrend: Trend
     countTrend: Trend
 }
 
@@ -462,44 +466,36 @@ export class StatisticsDao {
 
         const { from: previousWindowFrom, to: previousWindowTo } = getPreviousRangeWindow(from, to);
 
-        let aggregateQuery = this.db
-        .selectFrom(EXPENSE_TABLE)
-        .select([
-            sql<number>`AVG(amount) as average_amount`,
-            sql<number>`SUM(amount) as total_amount`,
-            sql<number>`COUNT(id) as total_count`
-        ])
-        .where("date", ">=", from)
-        .where("date", "<=", to);
+        const aggregateQuery = (from: string, to: string) => {
+            let baseQuery = this.db
+            .selectFrom(EXPENSE_TABLE)
+            .where("date", ">=", from)
+            .where("date", "<=", to);
 
-        let previousWindowAggregateQuery = this.db
-        .selectFrom(EXPENSE_TABLE)
-        .select([
-            sql<number>`AVG(amount) as average_amount`,
-            sql<number>`SUM(amount) as total_amount`,
-            sql<number>`COUNT(id) as total_count`
-        ])
-        .where("date", ">=", previousWindowFrom)
-        .where("date", "<=", previousWindowTo);
+            if(carId) baseQuery = baseQuery.where("car_id", "=", carId);
+            if(expenseTypeId) baseQuery = baseQuery.where("type_id", "=", expenseTypeId);
 
-        if(carId) {
-            aggregateQuery = aggregateQuery.where("car_id", "=", carId);
-            previousWindowAggregateQuery = previousWindowAggregateQuery.where("car_id", "=", carId);
-        }
+            return baseQuery.select(
+                [
+                    sql<number>`COUNT(id) as total_count`,
+                    sql<number>`AVG(amount) as average_amount`,
+                    sql<number>`SUM(amount) as total_amount`,
+                    medianSubQuery(this.db, baseQuery, "amount").as("median_amount")
+                ]
+            );
+        };
 
-        if(expenseTypeId) {
-            aggregateQuery = aggregateQuery.where("type_id", "=", expenseTypeId);
-            previousWindowAggregateQuery = previousWindowAggregateQuery.where("type_id", "=", expenseTypeId);
-        }
-
-        const aggregateResult = await aggregateQuery.executeTakeFirst();
-        const previousWindowAggregateResult = await previousWindowAggregateQuery.executeTakeFirst();
+        const aggregateResult = await aggregateQuery(from, to).executeTakeFirst();
+        const previousWindowAggregateResult = await aggregateQuery(previousWindowFrom, previousWindowTo)
+        .executeTakeFirst();
 
         const total = numberToFractionDigit(aggregateResult.total_amount ?? 0);
         const average = numberToFractionDigit(aggregateResult.average_amount ?? 0);
-        const count = numberToFractionDigit(aggregateResult.total_count);
+        const median = numberToFractionDigit(aggregateResult.median_amount ?? 0);
+        const count = numberToFractionDigit(aggregateResult.total_count ?? 0);
         const previousWindowTotal = numberToFractionDigit(previousWindowAggregateResult.total_amount ?? 0);
         const previousWindowAverage = numberToFractionDigit(previousWindowAggregateResult.average_amount ?? 0);
+        const previousWindowMedian = numberToFractionDigit(previousWindowAggregateResult.median_amount ?? 0);
         const previousWindowCount = numberToFractionDigit(previousWindowAggregateResult.total_count ?? 0);
 
         return {
@@ -513,12 +509,15 @@ export class StatisticsDao {
                  : null,
             total,
             average,
+            median,
             count,
             previousWindowTotal,
             previousWindowAverage,
+            previousWindowMedian,
             previousWindowCount,
             totalTrend: calculateTrend(total, previousWindowTotal, trendOptions),
             averageTrend: calculateTrend(average, previousWindowAverage, trendOptions),
+            medianTrend: calculateTrend(median, previousWindowMedian, trendOptions),
             countTrend: calculateTrend(count, previousWindowCount, trendOptions)
         };
     }
@@ -849,72 +848,79 @@ export class StatisticsDao {
 
         const { from: previousWindowFrom, to: previousWindowTo } = getPreviousRangeWindow(from, to);
 
-        let aggregateQuery = () => {
-            let query = this.db
+        let aggregateQuery = (from: string, to: string) => {
+            let baseQuery = this.db
             .selectFrom(`${ FUEL_LOG_TABLE } as t1`)
             .innerJoin(`${ EXPENSE_TABLE } as t2`, "t1.expense_id", "t2.id")
             .innerJoin(`${ CAR_TABLE } as t3`, "t2.car_id", "t3.id")
             .innerJoin(`${ FUEL_TANK_TABLE } as t4`, "t3.id", "t4.car_id")
             .innerJoin(`${ FUEL_UNIT_TABLE } as t5`, "t5.id", "t4.unit_id")
+            .where("t2.date", ">=", from)
+            .where("t2.date", "<=", to);
+
+            if(carId) baseQuery = baseQuery.where("t2.car_id", "=", carId);
+
+            return baseQuery
             .select([
                 sql<number>`AVG((t1.quantity / t5.conversion_factor)) as average_quantity`,
                 sql<number>`SUM((t1.quantity / t5.conversion_factor)) as total_quantity`,
                 sql<number>`COUNT(t1.id) as total_count`,
                 sql<number>`AVG(t2.amount) as average_amount`,
-                sql<number>`SUM(t2.amount) as total_amount`
+                sql<number>`SUM(t2.amount) as total_amount`,
+                medianSubQuery(this.db, baseQuery, "t2.amount").as("median_amount"),
+                medianSubQuery(this.db, baseQuery, "(t1.quantity / t5.conversion_factor)").as("median_quantity")
             ]);
-
-            if(carId) query = query.where("t2.car_id", "=", carId);
-
-            return query;
         };
 
-        let currentWindowAggregateQuery = aggregateQuery()
-        .where("t2.date", ">=", from)
-        .where("t2.date", "<=", to);
-
-        let previousWindowAggregateQuery = aggregateQuery()
-        .where("t2.date", ">=", previousWindowFrom)
-        .where("t2.date", "<=", previousWindowTo);
-
-        const aggregateResult = await currentWindowAggregateQuery.executeTakeFirst();
-        const previousWindowAggregateResult = await previousWindowAggregateQuery.executeTakeFirst();
+        const aggregateResult = await aggregateQuery(from, to).executeTakeFirst();
+        const previousWindowAggregateResult = await aggregateQuery(previousWindowFrom, previousWindowTo)
+        .executeTakeFirst();
 
         const count = numberToFractionDigit(aggregateResult.total_count ?? 0);
         const previousWindowCount = numberToFractionDigit(previousWindowAggregateResult.total_count ?? 0);
 
         const totalQuantity = numberToFractionDigit(aggregateResult.total_quantity ?? 0);
         const averageQuantity = numberToFractionDigit(aggregateResult.average_quantity ?? 0);
+        const medianQuantity = numberToFractionDigit(aggregateResult.median_quantity ?? 0);
         const previousWindowTotalQuantity = numberToFractionDigit(previousWindowAggregateResult.total_quantity ?? 0);
         const previousWindowAverageQuantity = numberToFractionDigit(previousWindowAggregateResult.average_quantity ?? 0);
+        const previousWindowMedianQuantity = numberToFractionDigit(previousWindowAverageQuantity.median_quantity ?? 0);
 
         const totalAmount = numberToFractionDigit(aggregateResult.total_amount ?? 0);
         const averageAmount = numberToFractionDigit(aggregateResult.average_amount ?? 0);
+        const medianAmount = numberToFractionDigit(aggregateResult.median_amount ?? 0);
         const previousWindowTotalAmount = numberToFractionDigit(previousWindowAggregateResult.total_amount ?? 0);
         const previousWindowAverageAmount = numberToFractionDigit(previousWindowAggregateResult.average_amount ?? 0);
+        const previousWindowMedianAmount = numberToFractionDigit(previousWindowAggregateResult.median_amount ?? 0);
 
         return {
             quantity: {
                 total: totalQuantity,
                 average: averageQuantity,
+                median: medianQuantity,
                 count,
                 previousWindowTotal: previousWindowTotalQuantity,
                 previousWindowAverage: previousWindowAverageQuantity,
+                previousWindowMedian: previousWindowMedianQuantity,
                 previousWindowCount,
                 totalTrend: calculateTrend(totalQuantity, previousWindowTotalQuantity, trendOptions),
                 averageTrend: calculateTrend(averageQuantity, previousWindowAverageQuantity, trendOptions),
+                medianTrend: calculateTrend(medianQuantity, previousWindowMedianQuantity, trendOptions),
                 countTrend: calculateTrend(count, previousWindowCount, trendOptions)
             },
             amount: {
                 max: { value: maxItemResultByAmount.amount },
                 total: totalAmount,
                 average: averageAmount,
+                median: medianAmount,
                 count,
                 previousWindowTotal: previousWindowTotalAmount,
                 previousWindowAverage: previousWindowAverageAmount,
+                previousWindowMedian: previousWindowMedianAmount,
                 previousWindowCount,
                 totalTrend: calculateTrend(totalAmount, previousWindowTotalAmount, trendOptions),
                 averageTrend: calculateTrend(averageAmount, previousWindowAverageAmount, trendOptions),
+                medianTrend: calculateTrend(medianAmount, previousWindowMedianAmount, trendOptions),
                 countTrend: calculateTrend(count, previousWindowCount, trendOptions)
             }
         };

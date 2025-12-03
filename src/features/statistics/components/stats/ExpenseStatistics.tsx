@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { BarChartView } from "../charts/BarChartView.tsx";
-import { ComparisonStatByDate, ComparisonStatByType, TotalComparisonStat } from "../../model/dao/statisticsDao.ts";
-import { StyleSheet, View } from "react-native";
+import { ComparisonStatByDate, ComparisonStatByType, SummaryStat } from "../../model/dao/statisticsDao.ts";
+import { StyleSheet } from "react-native";
 import { SEPARATOR_SIZES } from "../../../../constants/index.ts";
-import { StatCard } from "../StatCard.tsx";
 import { useTranslation } from "react-i18next";
 import { DonutChartView } from "../charts/DonutChartView.tsx";
 import { Currency } from "../../../_shared/currency/schemas/currencySchema.ts";
 import { getDateFormatTemplateByRangeUnit } from "../../utils/getDateFormatTemplateByRangeUnit.ts";
+import { formatTrend } from "../../utils/formatTrend.ts";
+import { MasonryStatView } from "../MasonryStatView.tsx";
 
 type ExpenseStatisticsProps = {
     carId?: string
@@ -23,14 +24,26 @@ export function ExpenseStatistics({ carId, currency, from, to }: ExpenseStatisti
     const { statisticsDao } = useDatabase();
 
     const [expensesByDateWindow, setExpensesByDateWindow] = useState<ComparisonStatByDate | null>(null);
-    const [expenseStat, setExpenseStat] = useState<TotalComparisonStat | null>(null);
+    const [expenseStat, setExpenseStat] = useState<SummaryStat | null>(null);
     const [expensesByType, setExpensesByType] = useState<ComparisonStatByType | null>(null);
 
     useEffect(() => {
         (async () => {
-            const resultExpensesByDateWindow = await statisticsDao.getExpenseComparison({ carId: carId, from, to });
-            const resultExpenseStat = await statisticsDao.getExpenseTotalComparison({ carId: carId, from, to });
-            const resultExpensesByType = await statisticsDao.getExpenseComparisonByType({ carId: carId, from, to });
+            const statArgs = {
+                carId: carId,
+                from,
+                to
+            };
+
+            const [
+                resultExpensesByDateWindow,
+                resultExpenseStat,
+                resultExpensesByType
+            ] = await Promise.all([
+                statisticsDao.getExpenseComparison(statArgs),
+                statisticsDao.getExpenseSummary(statArgs),
+                statisticsDao.getExpenseComparisonByType(statArgs)
+            ]);
 
             setExpensesByDateWindow(resultExpensesByDateWindow);
             setExpenseStat(resultExpenseStat);
@@ -38,69 +51,115 @@ export function ExpenseStatistics({ carId, currency, from, to }: ExpenseStatisti
         })();
     }, [carId, from, to]);
 
+    const getCountOfExpenses = useCallback(() => {
+        const { trend, trendSymbol } = expenseStat?.totalTrend ?? {};
+
+        return {
+            label: t("statistics.expense.count"),
+            value: expenseStat?.count != null ? `${ expenseStat.count } ${ t("common.count") }` : null,
+            isPositive: expenseStat?.countTrend.isTrendPositive,
+            trend: formatTrend({ trend: trend, trendSymbol: trendSymbol }),
+            trendDescription: t("statistics.compared_to_previous_cycle"),
+            isLoading: !expenseStat
+        };
+    }, [expenseStat, t]);
+
+    const getTotalExpenseAmount = useCallback(() => {
+        return {
+            label: t("statistics.expense.total_amount"),
+            value: expenseStat ? `${ expenseStat.total } ${ currency?.symbol }` : null,
+            isPositive: expenseStat?.totalTrend.isTrendPositive,
+            trend: expenseStat
+                   ? `${ expenseStat.totalTrend.trendSymbol } ${ expenseStat.totalTrend.trend }`
+                   : null,
+            trendDescription: expenseStat ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: !expenseStat
+        };
+    }, [expenseStat, currency, t]);
+
+
+    const getAverageExpenseAmount = useCallback(() => {
+        return {
+            label: t("statistics.expense.avg_amount"),
+            value: expenseStat ? `${ expenseStat.average } ${ currency?.symbol }` : null,
+            isPositive: expenseStat?.averageTrend.isTrendPositive,
+            trend: expenseStat
+                   ? `${ expenseStat.averageTrend.trendSymbol } ${ expenseStat.averageTrend.trend }`
+                   : null,
+            trendDescription: expenseStat ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: !expenseStat
+        };
+    }, [expenseStat, currency, t]);
+
+
+    const getMedianExpenseAmount = useCallback(() => {
+        console.log(expenseStat?.median);
+        return {
+            label: t("statistics.expense.median_amount"),
+            value: expenseStat ? `${ expenseStat.median } ${ currency?.symbol }` : null,
+            isPositive: expenseStat?.medianTrend.isTrendPositive,
+            trend: expenseStat
+                   ? `${ expenseStat.medianTrend.trendSymbol } ${ expenseStat.medianTrend.trend }`
+                   : null,
+            trendDescription: expenseStat ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: !expenseStat
+        };
+    }, [expenseStat, currency, t]);
+
+    const getMaxExpense = useCallback(() => {
+        return {
+            label: t("statistics.expense.max_amount"),
+            value: expenseStat?.max != null ? `${ expenseStat.max.value } ${ currency?.symbol }` : null,
+            description: expenseStat ? t(`expenses.types.${ expenseStat.max.label }`) : null,
+            descriptionStyle: expenseStat ? { color: expenseStat.max.color } : undefined,
+            isLoading: !expenseStat
+        };
+    }, [expenseStat, currency, t]);
+
+
     return (
         <>
-            {
-                expensesByDateWindow &&
-               <BarChartView
-                  chartData={ expensesByDateWindow.barChartData }
-                  legend={ expensesByDateWindow.barChartTypes }
-                  formatValue={ (value) => `${ value } ${ currency?.symbol }` }
-                  formatLabel={ (label) => dayjs(label)
-                  .format(getDateFormatTemplateByRangeUnit(expensesByDateWindow?.rangeUnit)) }
-                  formatLegend={ (label) => t(`expenses.types.${ label }`) }
-               />
-            }
-            <View style={ styles.mainStatContainer }>
-                <View style={ styles.infoStatContainer }>
-                    {
-                        expenseStat &&
-                       <>
-                          <StatCard
-                             label={ t("statistics.expense.total_amount") }
-                             value={ `${ expenseStat.count } ${ t("common.count") }` }
-                             isPositive={ expenseStat.countTrend.isTrendPositive }
-                             trend={ `${ expenseStat.countTrend.trendSymbol } ${ expenseStat.countTrend.trend }` }
-                             trendDescription={ t("statistics.compared_to_previous_cycle") }
-                          />
-                          <StatCard
-                             label={ t("statistics.expense.total_amount") }
-                             value={ `${ expenseStat.total } ${ currency?.symbol }` }
-                             isPositive={ expenseStat.totalTrend.isTrendPositive }
-                             trend={ `${ expenseStat.totalTrend.trendSymbol } ${ expenseStat.totalTrend.trend }` }
-                             trendDescription={ t("statistics.compared_to_previous_cycle") }
-                          />
-                          <StatCard
-                             label={ t("statistics.expense.avg_amount") }
-                             value={ `${ expenseStat.average } ${ currency?.symbol }` }
-                             isPositive={ expenseStat.averageTrend.isTrendPositive }
-                             trend={ `${ expenseStat.averageTrend.trendSymbol } ${ expenseStat.averageTrend.trend }` }
-                             trendDescription={ t("statistics.compared_to_previous_cycle") }
-                          />
-                          <StatCard
-                             label={ t("statistics.expense.max_amount") }
-                             value={ `${ expenseStat.max.value } ${ currency?.symbol }` }
-                             description={ t(`expenses.types.${ expenseStat.max.label }`) }
-                             descriptionStyle={ { color: expenseStat.max.color } }
-                          />
-                       </>
-                    }
-                </View>
-                <View style={ { flex: 1, alignItems: "center", justifyContent: "center" } }>
-                    {
-                        expensesByType &&
-                       <DonutChartView
-                          title={ {
-                              title: t("statistics.expense.distribution_by_type"),
-                              titleStyle: { textAlign: "center" }
-                          } }
-                          chartData={ expensesByType.donutChartData }
-                          formatLabel={ (label) => t(`expenses.types.${ label }`) }
-                          formatDescription={ (description) => `${ description } ${ currency?.symbol }` }
-                       />
-                    }
-                </View>
-            </View>
+            <MasonryStatView
+                column1={ [
+                    getTotalExpenseAmount()
+                ] }
+                column2={ [
+                    getAverageExpenseAmount(),
+                    getMedianExpenseAmount()
+                ] }
+            />
+            <MasonryStatView
+                column1={ [
+                    getMaxExpense()
+                ] }
+                column2={ [
+                    getCountOfExpenses()
+                ] }
+            />
+            <BarChartView
+                title={ {
+                    title: t("statistics.expense.total_amount_by_date")
+                } }
+                chartData={ expensesByDateWindow?.barChartData }
+                legend={ expensesByDateWindow?.barChartTypes }
+                formatValue={ (value) => `${ value } ${ currency?.symbol }` }
+                formatLabel={ (label) => dayjs(label)
+                .format(getDateFormatTemplateByRangeUnit(expensesByDateWindow?.rangeUnit)) }
+                formatLegend={ (label) => t(`expenses.types.${ label }`) }
+                isLoading={ !expensesByDateWindow }
+            />
+            <DonutChartView
+                title={ {
+                    title: t("statistics.expense.distribution_by_type")
+                } }
+                chartData={ expensesByType?.donutChartData }
+                legend={ expensesByType?.legend }
+                formatLabel={ (label) => t(`expenses.types.${ label }`) }
+                formatDescription={ (description) => `${ description } ${ currency?.symbol }` }
+                formatLegend={ (label) => t(`expenses.types.${ label }`) }
+                legendPosition="right"
+                isLoading={ !expensesByType }
+            />
         </>
     );
 }

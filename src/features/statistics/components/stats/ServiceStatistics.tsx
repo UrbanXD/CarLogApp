@@ -54,7 +54,7 @@ export function ServiceStatistics({ carId, currency, from, to }: ServiceStatisti
         })();
     }, [carId, from, to]);
 
-    const getServiceCount = useCallback(() => {
+    const getCountOfServices = useCallback(() => {
         const { trend, trendSymbol } = serviceLogStat?.totalTrend ?? {};
 
         return {
@@ -67,7 +67,7 @@ export function ServiceStatistics({ carId, currency, from, to }: ServiceStatisti
         };
     }, [serviceLogStat, t]);
 
-    const getServiceTotal = useCallback(() => {
+    const getTotalServiceAmount = useCallback(() => {
         const { trend, trendSymbol } = serviceLogStat?.totalTrend ?? {};
 
         return {
@@ -81,7 +81,7 @@ export function ServiceStatistics({ carId, currency, from, to }: ServiceStatisti
     }, [serviceLogStat, currency, t]);
 
 
-    const getServiceAverage = useCallback(() => {
+    const getAverageServiceAmount = useCallback(() => {
         const { trend, trendSymbol } = serviceLogStat?.averageTrend ?? {};
 
         return {
@@ -94,8 +94,20 @@ export function ServiceStatistics({ carId, currency, from, to }: ServiceStatisti
         };
     }, [serviceLogStat, currency, t]);
 
+    const getMedianServiceAmount = useCallback(() => {
+        return {
+            label: t("statistics.service.median_amount"),
+            value: serviceLogStat ? `${ serviceLogStat.median } ${ currency?.symbol }` : null,
+            isPositive: serviceLogStat?.medianTrend.isTrendPositive,
+            trend: serviceLogStat
+                   ? `${ serviceLogStat.medianTrend.trendSymbol } ${ serviceLogStat.medianTrend.trend }`
+                   : null,
+            trendDescription: serviceLogStat ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: !serviceLogStat
+        };
+    }, [serviceLogStat, currency, t]);
 
-    const getServiceMax = useCallback(() => {
+    const getMaxServiceByAmount = useCallback(() => {
         return {
             label: t("statistics.service.max_amount"),
             value: serviceLogStat?.max != null ? `${ serviceLogStat.max.value } ${ currency?.symbol }` : null,
@@ -107,12 +119,19 @@ export function ServiceStatistics({ carId, currency, from, to }: ServiceStatisti
         <>
             <MasonryStatView
                 column1={ [
-                    getServiceTotal(),
-                    getServiceAverage()
+                    getTotalServiceAmount()
                 ] }
                 column2={ [
-                    getServiceMax(),
-                    getServiceCount()
+                    getAverageServiceAmount(),
+                    getMedianServiceAmount()
+                ] }
+            />
+            <MasonryStatView
+                column1={ [
+                    getMaxServiceByAmount()
+                ] }
+                column2={ [
+                    getCountOfServices()
                 ] }
             />
             <BarChartView
