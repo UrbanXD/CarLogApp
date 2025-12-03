@@ -633,11 +633,40 @@
     "compared_to_previous_month": "előző hónaphoz képest",
     "compared_to_previous_30_days": "előző 30 naphoz képest",
     "compared_to_previous_cycle": "előző ciklushoz képest",
+    "chart": {
+      "not_enough_data": "Nincs elegendő adat a grafikon megjelenítéséhez"
+    },
     "expense": {
+      "count": "Kiadások",
       "total_amount": "Kiadások összege",
       "max_amount": "Legdrágább kiadás",
       "avg_amount": "Kiadások átlaga",
+      "median_amount": "Kiadások mediánja",
+      "total_amount_by_date": "Költség eloszlás",
       "distribution_by_type": "Költség eloszlás típus szerint"
+    },
+    "fuel": {
+      "log_count": "Tankolások",
+      "total_amount": "Tankolások összege",
+      "max_amount": "Legdrágább tankolás",
+      "avg_amount": "Tankolások átlaga",
+      "median_amount": "Tankolasok medianja",
+      "total_quantity": "Tankolt mennyiség",
+      "max_quantity": "Legnagyobb tankolt mennyiség",
+      "avg_quantity": "Tankolt mennyiség átlaga",
+      "median_quantity": "Tankolt mennyiség mediánja",
+      "fuel_consumption": "Fogyasztás",
+      "fuel_consumption_accuracy": "A fogyasztás pontosságát befolyásolja, hogy megadja-e a kilométeróra állását tankolásai alkalmával"
+    },
+    "service": {
+      "log_count": "Szervízelések",
+      "total_amount": "Szervízelések összege",
+      "max_amount": "Legdrágább szervízelés",
+      "avg_amount": "Szervízek átlaga",
+      "median_amount": "Szervízek mediánja",
+      "total_amount_by_date": "Szervíz költségek",
+      "distribution_by_service_item": "Költség eloszlás szerviz tételek szerint",
+      "distribution_by_type": "Költség eloszlás szerviz típus szerint"
     }
   }
 }
