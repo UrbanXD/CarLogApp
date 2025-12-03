@@ -1,10 +1,10 @@
-import { Kysely, SelectQueryBuilder, sql } from "kysely";
+import { Kysely, RawBuilder, SelectQueryBuilder, sql } from "kysely";
 import { DatabaseType } from "../../connector/powersync/AppSchema.ts";
 
 export function medianSubQuery<DB = DatabaseType>(
     db: Kysely<DB>,
     baseQuery: SelectQueryBuilder<DB, any, any>,
-    field: string
+    field: string | RawBuilder<any>
 ) {
     const countQuery = baseQuery
     .clearSelect()
@@ -12,8 +12,8 @@ export function medianSubQuery<DB = DatabaseType>(
 
     const ordered = baseQuery
     .clearSelect()
-    .select(sql.raw(field).as("val"))
-    .orderBy(sql.raw(field));
+    .select((typeof field === "string" ? sql.raw(field) : field).as("val"))
+    .orderBy((typeof field === "string" ? sql.raw(field) : field));
 
     //@formatter:off
     const limit = sql`2 - ((${ countQuery }) % 2)`;
