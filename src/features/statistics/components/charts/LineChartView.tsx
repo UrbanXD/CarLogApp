@@ -14,6 +14,7 @@ import { Pointer } from "./common/Pointer.tsx";
 import { hexToRgba } from "../../../../utils/colors/hexToRgba.ts";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 import { ChartDataNotFound } from "./common/ChartDataNotFound.tsx";
+import { StyleSheet, View } from "react-native";
 
 const EXTRA_SPACING = SEPARATOR_SIZES.medium;
 const AXIS_FONT_SIZE = FONT_SIZES.p4 * 0.85;
@@ -31,6 +32,7 @@ type LineChartViewProps = {
     title?: ChartTitleProps
     formatLabel?: (label: string) => string
     formatValue?: (value: number | string) => string
+    formatYAxisLabel?: boolean
     isLoading?: boolean
 }
 
@@ -39,6 +41,7 @@ export function LineChartView({
     title,
     formatLabel,
     formatValue,
+    formatYAxisLabel = false,
     isLoading = false
 }: LineChartViewProps) {
     const formattedChartData = useMemo(() => {
@@ -60,7 +63,7 @@ export function LineChartView({
     const maxValue = Math.max(0, ...chartData.map(d => d.value ?? 0));
     const chartMaxValue = Math.max(0, numberToFractionDigit(maxValue + maxValue * 0.2));
 
-    const formatedMaxValue = formatValue?.(chartMaxValue) ?? chartMaxValue.toString();
+    const formatedMaxValue = (formatYAxisLabel && formatValue) ? formatValue(chartMaxValue) : chartMaxValue.toString();
 
     const yAxisLabelWidth = AXIS_FONT_SIZE * 0.55 * (formatedMaxValue.length + 2.5 ?? 0);
 
@@ -73,7 +76,7 @@ export function LineChartView({
         (EXTRA_SPACING / 2 + Math.max(maxLabelWidth, Math.max(lastPointerLabelWidth, POINTER_LABEL_MIN_WIDTH))) / 2;
 
     return (
-        <>
+        <View style={ styles.container }>
             {
                 title &&
                <ChartTitle { ...title } />
@@ -96,7 +99,7 @@ export function LineChartView({
                             interpolateMissingValues
                             noOfSections={ 6 }
                             maxValue={ chartMaxValue }
-                            formatYLabel={ formatValue }
+                            formatYLabel={ formatYAxisLabel && formatValue }
                             lineSegments={ formattedChartData.length > 0 && [
                                 { startIndex: 0, endIndex: 1, strokeDashArray: [6, 4] }
                             ] }
@@ -114,14 +117,16 @@ export function LineChartView({
                             yAxisSide="right"
                             yAxisLabelWidth={ yAxisLabelWidth }
                             yAxisThickness={ 0 }
-                            yAxisTextStyle={ { color: AXIS_COLOR } }
+                            yAxisTextStyle={ styles.axisLabel }
                             xAxisColor={ AXIS_COLOR }
                             xAxisThickness={ 1 }
-                            xAxisLabelTextStyle={ {
-                                color: AXIS_COLOR,
-                                width: maxLabelWidth,
-                                marginLeft: (-maxLabelWidth + EXTRA_SPACING / 2) / 2
-                            } }
+                            xAxisLabelTextStyle={ [
+                                styles.axisLabel,
+                                {
+                                    width: maxLabelWidth,
+                                    marginLeft: (-maxLabelWidth + EXTRA_SPACING / 2) / 2
+                                }
+                            ] }
                             customDataPoint={
                                 () => (
                                     <Pointer
@@ -165,6 +170,17 @@ export function LineChartView({
                     )
                 )
             }
-        </>
+        </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        gap: SEPARATOR_SIZES.lightSmall / 2
+    },
+    axisLabel: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: AXIS_FONT_SIZE,
+        color: AXIS_COLOR
+    }
+});

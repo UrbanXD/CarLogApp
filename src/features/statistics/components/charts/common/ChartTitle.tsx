@@ -1,21 +1,39 @@
 import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 import React from "react";
-import { COLORS, FONT_SIZES } from "../../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 
 export type ChartTitleProps = {
     title: string
+    unit?: string
     description?: string
     containerStyle?: ViewStyle
     titleStyle?: TextStyle
+    unitStyle?: TextStyle
     descriptionStyle?: TextStyle
 }
 
-export function ChartTitle({ title, description, containerStyle, titleStyle, descriptionStyle }: ChartTitleProps) {
+export function ChartTitle({
+    title,
+    unit,
+    description,
+    containerStyle,
+    titleStyle,
+    unitStyle,
+    descriptionStyle
+}: ChartTitleProps) {
     return (
         <View style={ containerStyle }>
-            <Text style={ [styles.title, titleStyle] }>
-                { title }
-            </Text>
+            <View style={ styles.titleContainer }>
+                <Text style={ [styles.title, titleStyle] }>
+                    { title }
+                </Text>
+                {
+                    unit &&
+                   <Text style={ [styles.unit, unitStyle] }>
+                      ({ unit })
+                   </Text>
+                }
+            </View>
             {
                 description &&
                <Text style={ [styles.description, descriptionStyle] }>
@@ -27,10 +45,21 @@ export function ChartTitle({ title, description, containerStyle, titleStyle, des
 }
 
 const styles = StyleSheet.create({
+    titleContainer: {
+        flexDirection: "row",
+        alignItems: "flex-end",
+        gap: SEPARATOR_SIZES.lightSmall / 2
+    },
     title: {
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.p1,
         color: COLORS.white
+    },
+    unit: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p4,
+        lineHeight: FONT_SIZES.p1,
+        color: COLORS.gray1
     },
     description: {
         fontFamily: "Gilroy-Medium",
