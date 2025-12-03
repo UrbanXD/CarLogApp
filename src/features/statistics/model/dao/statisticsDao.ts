@@ -30,6 +30,7 @@ import { FUEL_TANK_TABLE } from "../../../../database/connector/powersync/tables
 import dayjs from "dayjs";
 import { getExtendedRange } from "../../utils/getExtendedRange.ts";
 import { medianSubQuery } from "../../../../database/dao/utils/medianSubQuery.ts";
+import { CURRENCY_TABLE } from "../../../../database/connector/powersync/tables/currency.ts";
 
 type StatisticsFunctionArgs = {
     carId?: string
@@ -40,7 +41,8 @@ type StatisticsFunctionArgs = {
 
 export type Stat = {
     value: string | number
-    label: string
+    unitText?: string
+    label?: string
     color?: string
 }
 
@@ -48,6 +50,7 @@ export type TrendStat = {
     average: number
     lineChartData: Array<LineChartItem>
     rangeUnit: RangeUnit
+    unitText?: string
 }
 
 export type ComparisonStatByType = {
@@ -76,6 +79,7 @@ export type SummaryStat = {
     averageTrend: Trend
     medianTrend: Trend
     countTrend: Trend
+    unitText?: string
 }
 
 export type TopListItemStat = {
@@ -435,17 +439,33 @@ export class StatisticsDao {
         let expenseTypeId = null;
         if(expenseType) expenseTypeId = await this.expenseTypeDao.getIdByKey(expenseType);
 
-        let maxItemQuery = this.db
-        .selectFrom(`${ EXPENSE_TABLE } as t1`)
-        .innerJoin(`${ EXPENSE_TYPE_TABLE } as t2`, "t1.type_id", "t2.id")
+        const baseQuery = (from: string, to: string) => {
+            let query = this.db
+            .selectFrom(`${ EXPENSE_TABLE } as t1`)
+            .innerJoin(`${ EXPENSE_TYPE_TABLE } as t2`, "t1.type_id", "t2.id")
+            .leftJoin(`${ FUEL_LOG_TABLE } as t3`, "t1.id", "t3.expense_id")
+            .leftJoin(`${ FUEL_TANK_TABLE } as t4`, "t1.car_id", "t4.car_id")
+            .leftJoin(`${ FUEL_UNIT_TABLE } as t5`, "t4.unit_id", "t5.id")
+            .where("t1.date", ">=", from)
+            .where("t1.date", "<=", to);
+
+            if(carId) query = query.where("t1.car_id", "=", carId);
+            if(expenseTypeId) query = query.where("t1.type_id", "=", expenseTypeId);
+
+            return query;
+        };
+
+        const amountExpression =
+            sql<number>`CASE WHEN t3.is_price_per_unit THEN t1.amount * (t3.quantity / COALESCE(t5.conversion_factor, 1)) ELSE t1.amount
+            END`;
+
+        let maxItemQuery = baseQuery(from, to)
         .select([
-            "t1.amount",
+            amountExpression.as("amount"),
             "t2.id as type_id",
             "t2.owner_id as owner_id",
             "t2.key as key"
         ])
-        .where("date", ">=", from)
-        .where("date", "<=", to)
         .orderBy("amount", "desc")
         .limit(1);
 
@@ -467,22 +487,19 @@ export class StatisticsDao {
         const { from: previousWindowFrom, to: previousWindowTo } = getPreviousRangeWindow(from, to);
 
         const aggregateQuery = (from: string, to: string) => {
-            let baseQuery = this.db
-            .selectFrom(EXPENSE_TABLE)
-            .where("date", ">=", from)
-            .where("date", "<=", to);
+            const query = baseQuery(from, to);
 
-            if(carId) baseQuery = baseQuery.where("car_id", "=", carId);
-            if(expenseTypeId) baseQuery = baseQuery.where("type_id", "=", expenseTypeId);
-
-            return baseQuery.select(
+            //@formatter:off
+            return query.select(
                 [
-                    sql<number>`COUNT(id) as total_count`,
-                    sql<number>`AVG(amount) as average_amount`,
-                    sql<number>`SUM(amount) as total_amount`,
-                    medianSubQuery(this.db, baseQuery, "amount").as("median_amount")
+                    sql<number>`${ amountExpression }`.as("amount"),
+                    sql<number>`COUNT(t1.id)`.as("total_count"),
+                    sql<number>`AVG(${ amountExpression })`.as("average_amount"),
+                    sql<number>`SUM(${ amountExpression })`.as("total_amount"),
+                    medianSubQuery(this.db, query, amountExpression).as("median_amount")
                 ]
             );
+            //@formatter:on
         };
 
         const aggregateResult = await aggregateQuery(from, to).executeTakeFirst();
@@ -523,19 +540,28 @@ export class StatisticsDao {
     }
 
     async getExpenseComparisonByType({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStatByType> {
+        const amountExpression =
+            sql<number>`CASE WHEN t2.is_price_per_unit THEN t1.amount * (t2.quantity / COALESCE(t4.conversion_factor, 1)) ELSE t1.amount
+            END`;
+
         let query = this.db
-        .selectFrom(EXPENSE_TABLE)
+        .selectFrom(`${ EXPENSE_TABLE } as t1`)
+        .leftJoin(`${ FUEL_LOG_TABLE } as t2`, "t1.id", "t2.expense_id")
+        .leftJoin(`${ FUEL_TANK_TABLE } as t3`, "t1.car_id", "t3.car_id")
+        .leftJoin(`${ FUEL_UNIT_TABLE } as t4`, "t3.unit_id", "t4.id")
+        //@formatter:off
         .select([
-            sql<number>`SUM(amount) as total`,
-            sql<number>`SUM(amount) * 100.0 / SUM(SUM(amount)) OVER () as percent`,
-            "type_id"
+            sql<number>`SUM(${ amountExpression })`.as("total"),
+            sql<number>`SUM(${ amountExpression }) * 100.0 / SUM(SUM(${ amountExpression })) OVER ()`.as("percent"),
+            "t1.type_id as type_id"
         ])
-        .where("date", ">=", from)
-        .where("date", "<=", to)
-        .groupBy("type_id")
+        //@formatter:on
+        .where("t1.date", ">=", from)
+        .where("t1.date", "<=", to)
+        .groupBy("t1.type_id")
         .orderBy("total", "desc");
 
-        if(carId) query = query.where("car_id", "=", carId);
+        if(carId) query = query.where("t1.car_id", "=", carId);
 
         const result = await query.execute();
 
@@ -576,25 +602,34 @@ export class StatisticsDao {
 
     async getExpenseComparison({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStatByDate> {
         const unit = getRangeUnit(from, to);
-        const groupExpr = this.getRangeGroupByExpression("date", unit);
-        const selectExpr = this.getRangeSelectExpression("date", unit);
+        const groupExpression = this.getRangeGroupByExpression("t1.date", unit);
+        const selectExpression = this.getRangeSelectExpression("t1.date", unit);
+
+        const amountExpression =
+            sql<number>`CASE WHEN t2.is_price_per_unit THEN t1.amount * (t2.quantity / COALESCE(t4.conversion_factor, 1)) ELSE t1.amount
+            END`;
 
         let query = this.db
-        .selectFrom(EXPENSE_TABLE)
+        .selectFrom(`${ EXPENSE_TABLE } as t1`)
+        .leftJoin(`${ FUEL_LOG_TABLE } as t2`, "t1.id", "t2.expense_id")
+        .leftJoin(`${ FUEL_TANK_TABLE } as t3`, "t1.car_id", "t3.car_id")
+        .leftJoin(`${ FUEL_UNIT_TABLE } as t4`, "t3.unit_id", "t4.id")
+        //@formatter:off
         .select([
-            sql<number>`SUM(amount)`.as("total"),
-            selectExpr,
-            "type_id"
+            sql<number>`SUM(${ amountExpression })`.as("total"),
+            selectExpression,
+            "t1.type_id as type_id"
         ])
-        .where("date", ">=", from)
-        .where("date", "<=", to);
+        //@formatter:on
+        .where("t1.date", ">=", from)
+        .where("t1.date", "<=", to);
 
         if(carId) query = query.where("car_id", "=", carId);
 
         query = query
         .groupBy("type_id")
-        .groupBy(groupExpr)
-        .orderBy(groupExpr);
+        .groupBy(groupExpression)
+        .orderBy(groupExpression);
 
         const result = await query.execute();
         const expenseTypes = await this.expenseTypeDao.getAll();
@@ -651,15 +686,15 @@ export class StatisticsDao {
 
     async getServiceExpenseComparison({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStatByDate> {
         const unit = getRangeUnit(from, to);
-        const groupExpr = this.getRangeGroupByExpression("t1.date", unit);
-        const selectExpr = this.getRangeSelectExpression("t1.date", unit);
+        const groupExpression = this.getRangeGroupByExpression("t1.date", unit);
+        const selectExpression = this.getRangeSelectExpression("t1.date", unit);
 
         let query = this.db
         .selectFrom(`${ EXPENSE_TABLE } as t1`)
         .innerJoin(`${ SERVICE_LOG_TABLE } as t2`, "t1.id", "t2.expense_id")
         .select([
             sql<number>`SUM(t1.amount)`.as("total"),
-            selectExpr
+            selectExpression
         ])
         .where("t1.date", ">=", from)
         .where("t1.date", "<=", to);
@@ -667,8 +702,8 @@ export class StatisticsDao {
         if(carId) query = query.where("t1.car_id", "=", carId);
 
         query = query
-        .groupBy(groupExpr)
-        .orderBy(groupExpr);
+        .groupBy(groupExpression)
+        .orderBy(groupExpression);
 
         const result = await query.execute();
         const serviceTypeId = await this.expenseTypeDao.getIdByKey(ExpenseTypeEnum.SERVICE);
@@ -823,7 +858,7 @@ export class StatisticsDao {
         if(carId) query = query.where("t3.id", "=", carId);
 
         const result = await query.execute();
-        console.log(result);
+
         return null;
     }
 
@@ -831,45 +866,56 @@ export class StatisticsDao {
         quantity: SummaryStat,
         amount: SummaryStat
     }> {
-        const fuelExpenseTypeId = await this.expenseTypeDao.getIdByKey(ExpenseTypeEnum.FUEL);
-
-        let maxItemQueryByAmount = this.db
-        .selectFrom(`${ EXPENSE_TABLE } as t1`)
-        .select("amount")
-        .where("date", ">=", from)
-        .where("date", "<=", to)
-        .where("type_id", "=", fuelExpenseTypeId)
-        .orderBy("amount", "desc")
-        .limit(1);
-
-        if(carId) maxItemQueryByAmount = maxItemQueryByAmount.where("car_id", "=", carId);
-
-        const maxItemResultByAmount = await maxItemQueryByAmount.executeTakeFirst();
-
-        const { from: previousWindowFrom, to: previousWindowTo } = getPreviousRangeWindow(from, to);
-
-        let aggregateQuery = (from: string, to: string) => {
-            let baseQuery = this.db
+        const baseQuery = (from: string, to: string) => {
+            let query = this.db
             .selectFrom(`${ FUEL_LOG_TABLE } as t1`)
             .innerJoin(`${ EXPENSE_TABLE } as t2`, "t1.expense_id", "t2.id")
             .innerJoin(`${ CAR_TABLE } as t3`, "t2.car_id", "t3.id")
             .innerJoin(`${ FUEL_TANK_TABLE } as t4`, "t3.id", "t4.car_id")
-            .innerJoin(`${ FUEL_UNIT_TABLE } as t5`, "t5.id", "t4.unit_id")
+            .innerJoin(`${ FUEL_UNIT_TABLE } as t5`, "t4.unit_id", "t5.id")
+            .innerJoin(`${ CURRENCY_TABLE } as t6`, "t3.currency_id", "t6.id")
             .where("t2.date", ">=", from)
             .where("t2.date", "<=", to);
 
-            if(carId) baseQuery = baseQuery.where("t2.car_id", "=", carId);
+            if(carId) query = query.where("t3.id", "=", carId);
 
-            return baseQuery
+            return query;
+        };
+
+        const amountExpression =
+            sql<number>`CASE WHEN t1.is_price_per_unit THEN t2.amount * (t1.quantity / t5.conversion_factor) ELSE t2.amount
+            END`;
+        const quantityExpression = sql<number>`(t1.quantity / t5.conversion_factor)`;
+
+        const maxItemResultByAmount = await baseQuery(from, to)
+        .select(amountExpression.as("amount"))
+        .orderBy("amount", "desc")
+        .executeTakeFirst();
+
+        const maxItemResultByQuantity = await baseQuery(from, to)
+        .select(quantityExpression.as("quantity"))
+        .orderBy("quantity", "desc")
+        .executeTakeFirst();
+
+        const { from: previousWindowFrom, to: previousWindowTo } = getPreviousRangeWindow(from, to);
+
+        const aggregateQuery = (from: string, to: string) => {
+            const base = baseQuery(from, to);
+
+            //@formatter:off
+            return base
             .select([
-                sql<number>`AVG((t1.quantity / t5.conversion_factor)) as average_quantity`,
-                sql<number>`SUM((t1.quantity / t5.conversion_factor)) as total_quantity`,
-                sql<number>`COUNT(t1.id) as total_count`,
-                sql<number>`AVG(t2.amount) as average_amount`,
-                sql<number>`SUM(t2.amount) as total_amount`,
-                medianSubQuery(this.db, baseQuery, "t2.amount").as("median_amount"),
-                medianSubQuery(this.db, baseQuery, "(t1.quantity / t5.conversion_factor)").as("median_quantity")
+                "t5.short as quantity_unit",
+                "t6.symbol as amount_unit",
+                sql<number>`AVG(${ quantityExpression })`.as("average_quantity"),
+                sql<number>`SUM(${ quantityExpression })`.as("total_quantity"),
+                sql<number>`COUNT(t1.id)`.as("total_count"),
+                sql<number>`AVG(${ amountExpression })`.as("average_amount"),
+                sql<number>`SUM(${ amountExpression })`.as("total_amount"),
+                medianSubQuery(this.db, base, amountExpression).as("median_amount"),
+                medianSubQuery(this.db, base, quantityExpression).as("median_quantity")
             ]);
+            //@formatter:on
         };
 
         const aggregateResult = await aggregateQuery(from, to).executeTakeFirst();
@@ -895,6 +941,7 @@ export class StatisticsDao {
 
         return {
             quantity: {
+                max: { value: numberToFractionDigit(maxItemResultByQuantity?.quantity ?? 0) },
                 total: totalQuantity,
                 average: averageQuantity,
                 median: medianQuantity,
@@ -906,10 +953,11 @@ export class StatisticsDao {
                 totalTrend: calculateTrend(totalQuantity, previousWindowTotalQuantity, trendOptions),
                 averageTrend: calculateTrend(averageQuantity, previousWindowAverageQuantity, trendOptions),
                 medianTrend: calculateTrend(medianQuantity, previousWindowMedianQuantity, trendOptions),
-                countTrend: calculateTrend(count, previousWindowCount, trendOptions)
+                countTrend: calculateTrend(count, previousWindowCount, trendOptions),
+                unitText: aggregateResult?.quantity_unit
             },
             amount: {
-                max: { value: maxItemResultByAmount.amount },
+                max: { value: numberToFractionDigit(maxItemResultByAmount?.amount ?? 0) },
                 total: totalAmount,
                 average: averageAmount,
                 median: medianAmount,
@@ -921,7 +969,8 @@ export class StatisticsDao {
                 totalTrend: calculateTrend(totalAmount, previousWindowTotalAmount, trendOptions),
                 averageTrend: calculateTrend(averageAmount, previousWindowAverageAmount, trendOptions),
                 medianTrend: calculateTrend(medianAmount, previousWindowMedianAmount, trendOptions),
-                countTrend: calculateTrend(count, previousWindowCount, trendOptions)
+                countTrend: calculateTrend(count, previousWindowCount, trendOptions),
+                unitText: aggregateResult?.amount_unit
             }
         };
     }
@@ -931,19 +980,33 @@ export class StatisticsDao {
     ): Promise<TrendStat> {
         const { extendedFrom, extendedTo } = getExtendedRange(from, to);
 
+        let unitQuery = this.db
+        .selectFrom(`${ CAR_TABLE } as t1`)
+        .select([
+            "t4.short as fuel_unit",
+            "t2.short as odometer_unit"
+        ])
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t2`, "t1.odometer_unit_id", "t2.id")
+        .innerJoin(`${ FUEL_TANK_TABLE } as t3`, "t1.id", "t3.car_id")
+        .innerJoin(`${ FUEL_UNIT_TABLE } as t4`, "t3.unit_id", "t4.id")
+        .where("t1.id", "=", carId);
+
+        const unit = await unitQuery.executeTakeFirst();
+        const unitText = `${ unit.fuel_unit } / 100 ${ unit.odometer_unit }`;
+
         let query = this.db
         .selectFrom(`${ FUEL_LOG_TABLE } as t1`)
         .innerJoin(`${ EXPENSE_TABLE } as t2`, "t1.expense_id", "t2.id")
-        .innerJoin(`${ FUEL_UNIT_TABLE } as t3`, "t1.fuel_unit_id", "t3.id")
-        .leftJoin(`${ ODOMETER_LOG_TABLE } as t4`, "t1.odometer_log_id", "t4.id")
-        .innerJoin(`${ CAR_TABLE } as t6`, "t2.car_id", "t6.id")
-        .leftJoin(`${ ODOMETER_UNIT_TABLE } as t7`, "t6.odometer_unit_id", "t7.id")
-        .innerJoin(`${ FUEL_TANK_TABLE } as t8`, "t6.id", "t8.car_id")
+        .leftJoin(`${ ODOMETER_LOG_TABLE } as t3`, "t1.odometer_log_id", "t3.id")
+        .innerJoin(`${ CAR_TABLE } as t4`, "t2.car_id", "t4.id")
+        .innerJoin(`${ FUEL_TANK_TABLE } as t5`, "t4.id", "t5.car_id")
+        .innerJoin(`${ FUEL_UNIT_TABLE } as t6`, "t5.unit_id", "t6.id")
+        .leftJoin(`${ ODOMETER_UNIT_TABLE } as t7`, "t4.odometer_unit_id", "t7.id")
         //@formatter:off
         .select([
             "t2.date as date",
-            sql<number>`t1.quantity / t3.conversion_factor`.as("quantity"),
-            sql<number | null>`t4.value / COALESCE(t7.conversion_factor, 1)`.as("odometer_value")
+            sql<number>`t1.quantity / t6.conversion_factor`.as("quantity"),
+            sql<number | null>`t3.value / COALESCE(t7.conversion_factor, 1)`.as("odometer_value")
         ])
         //@formatter:on
         .where("t2.date", ">=", extendedFrom)
@@ -951,7 +1014,7 @@ export class StatisticsDao {
         .orderBy("t2.date", "asc");
 
         if(carId) {
-            query = query.where("t2.car_id", "=", carId) as any;
+            query = query.where("t2.car_id", "=", carId);
         }
 
         const logs = await query.execute();
@@ -960,7 +1023,13 @@ export class StatisticsDao {
 
         const logsWithOdometerValue = logs.filter(l => l.odometer_value !== null && l.quantity !== null && l.quantity !== undefined);
 
-        if(logsWithOdometerValue.length < 2) return { lineChartData: [], average: 0 };
+        if(logsWithOdometerValue.length < 2) {
+            return {
+                lineChartData: [],
+                average: 0,
+                unitText
+            };
+        }
 
         let totalQuantity = 0;
         let totalDistance = 0;
@@ -998,7 +1067,8 @@ export class StatisticsDao {
 
         return {
             lineChartData,
-            average: lineChartData?.[lineChartData.length - 1].value ?? 0
+            average: lineChartData?.[lineChartData.length - 1].value ?? 0,
+            unitText
         };
     }
 }
