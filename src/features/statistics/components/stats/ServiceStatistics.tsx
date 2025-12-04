@@ -1,4 +1,3 @@
-import { Currency } from "../../../_shared/currency/schemas/currencySchema.ts";
 import { useTranslation } from "react-i18next";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import React, { useCallback, useEffect, useState } from "react";
@@ -10,15 +9,15 @@ import { DonutChartView } from "../charts/DonutChartView.tsx";
 import { getDateFormatTemplateByRangeUnit } from "../../utils/getDateFormatTemplateByRangeUnit.ts";
 import { MasonryStatView } from "../MasonryStatView.tsx";
 import { formatTrend } from "../../utils/formatTrend.ts";
+import { formatWithUnit } from "../../../../utils/formatWithUnit.ts";
 
 type ServiceStatisticsProps = {
     carId?: string
-    currency?: Currency
     from: string
     to: string
 }
 
-export function ServiceStatistics({ carId, currency, from, to }: ServiceStatisticsProps) {
+export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
     const { t } = useTranslation();
     const { statisticsDao } = useDatabase();
 
@@ -72,13 +71,15 @@ export function ServiceStatistics({ carId, currency, from, to }: ServiceStatisti
 
         return {
             label: t("statistics.service.total_amount"),
-            value: serviceLogStat?.total != null ? `${ serviceLogStat?.total } ${ currency?.symbol }` : null,
+            value: serviceLogStat?.total != null
+                   ? formatWithUnit(serviceLogStat.total, serviceLogStat?.unitText)
+                   : null,
             isPositive: serviceLogStat?.totalTrend?.isTrendPositive,
             trend: formatTrend({ trend: trend, trendSymbol: trendSymbol }),
             trendDescription: t("statistics.compared_to_previous_cycle"),
             isLoading: !serviceLogStat
         };
-    }, [serviceLogStat, currency, t]);
+    }, [serviceLogStat, t]);
 
 
     const getAverageServiceAmount = useCallback(() => {
@@ -86,18 +87,20 @@ export function ServiceStatistics({ carId, currency, from, to }: ServiceStatisti
 
         return {
             label: t("statistics.service.avg_amount"),
-            value: serviceLogStat?.average != null ? `${ serviceLogStat.average } ${ currency?.symbol }` : null,
+            value: serviceLogStat?.average != null
+                   ? formatWithUnit(serviceLogStat.average, serviceLogStat?.unitText)
+                   : null,
             isPositive: serviceLogStat?.averageTrend.isTrendPositive,
             trend: formatTrend({ trend: trend, trendSymbol: trendSymbol }),
             trendDescription: t("statistics.compared_to_previous_cycle"),
             isLoading: !serviceLogStat
         };
-    }, [serviceLogStat, currency, t]);
+    }, [serviceLogStat, t]);
 
     const getMedianServiceAmount = useCallback(() => {
         return {
             label: t("statistics.service.median_amount"),
-            value: serviceLogStat ? `${ serviceLogStat.median } ${ currency?.symbol }` : null,
+            value: serviceLogStat ? formatWithUnit(serviceLogStat.median, serviceLogStat?.unitText) : null,
             isPositive: serviceLogStat?.medianTrend.isTrendPositive,
             trend: serviceLogStat
                    ? `${ serviceLogStat.medianTrend.trendSymbol } ${ serviceLogStat.medianTrend.trend }`
@@ -105,15 +108,17 @@ export function ServiceStatistics({ carId, currency, from, to }: ServiceStatisti
             trendDescription: serviceLogStat ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !serviceLogStat
         };
-    }, [serviceLogStat, currency, t]);
+    }, [serviceLogStat, t]);
 
     const getMaxServiceByAmount = useCallback(() => {
         return {
             label: t("statistics.service.max_amount"),
-            value: serviceLogStat?.max != null ? `${ serviceLogStat.max.value } ${ currency?.symbol }` : null,
+            value: serviceLogStat?.max != null
+                   ? formatWithUnit(serviceLogStat.max.value, serviceLogStat?.unitText)
+                   : null,
             isLoading: !serviceLogStat
         };
-    }, [serviceLogStat, currency, t]);
+    }, [serviceLogStat, t]);
 
     return (
         <>
@@ -140,7 +145,7 @@ export function ServiceStatistics({ carId, currency, from, to }: ServiceStatisti
                 title={ {
                     title: t("statistics.service.total_amount_by_date")
                 } }
-                formatValue={ (value) => `${ value } ${ currency?.symbol }` }
+                formatValue={ (value) => formatWithUnit(value, serviceLogsByDateWindow?.unitText) }
                 formatLabel={ (label) => dayjs(label)
                 .format(getDateFormatTemplateByRangeUnit(serviceLogsByDateWindow?.rangeUnit)) }
                 formatLegend={ (label) => t(`expenses.types.${ label }`) }
@@ -154,7 +159,7 @@ export function ServiceStatistics({ carId, currency, from, to }: ServiceStatisti
                 chartData={ serviceLogByType?.donutChartData }
                 legend={ serviceLogByType?.legend }
                 formatLabel={ (label) => t(`service.types.${ label }`) }
-                formatDescription={ (description) => `${ description } ${ currency?.symbol }` }
+                formatDescription={ (description) => formatWithUnit(description, serviceLogByType?.unitText) }
                 formatLegend={ (label) => t(`service.types.${ label }`) }
                 legendPosition="right"
                 isLoading={ !serviceLogByType }
@@ -166,7 +171,7 @@ export function ServiceStatistics({ carId, currency, from, to }: ServiceStatisti
                 chartData={ serviceItemByType?.donutChartData }
                 legend={ serviceItemByType?.legend }
                 formatLabel={ (label) => t(`service.items.types.${ label }`) }
-                formatDescription={ (description) => `${ description } ${ currency?.symbol }` }
+                formatDescription={ (description) => formatWithUnit(description, serviceItemByType?.unitText) }
                 formatLegend={ (label) => t(`service.items.types.${ label }`) }
                 legendPosition="right"
                 isLoading={ !serviceItemByType }

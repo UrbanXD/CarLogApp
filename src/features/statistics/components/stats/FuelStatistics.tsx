@@ -4,7 +4,6 @@ import { SummaryStat, TrendStat } from "../../model/dao/statisticsDao.ts";
 import { LineChartView } from "../charts/LineChartView.tsx";
 import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../../constants/index.ts";
-import { Currency } from "../../../_shared/currency/schemas/currencySchema.ts";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import { MasonryStatView } from "../MasonryStatView.tsx";
@@ -14,14 +13,12 @@ import { ChartTitle } from "../charts/common/ChartTitle.tsx";
 
 type FuelConsumptionStatisticsProps = {
     carId?: string
-    currency?: Currency
     from: string
     to: string
 }
 
 export function FuelStatistics({
     carId,
-    currency,
     from,
     to
 }: FuelConsumptionStatisticsProps) {
@@ -33,14 +30,22 @@ export function FuelStatistics({
 
     useEffect(() => {
         (async () => {
-            const resultFuelLogStat = await statisticsDao.getFuelSummary({
+            const statArgs = {
                 carId: carId,
                 from,
                 to
-            });
+            };
 
-            setFuelLogSummary(resultFuelLogStat);
-            setFuelConsumption(await statisticsDao.getFuelConsumption({ carId, from, to }));
+            const [
+                resultFuelLogSummary,
+                resultFuelConsumption
+            ] = await Promise.all([
+                statisticsDao.getFuelSummary(statArgs),
+                statisticsDao.getFuelConsumption(statArgs)
+            ]);
+
+            setFuelLogSummary(resultFuelLogSummary);
+            setFuelConsumption(resultFuelConsumption);
         })();
     }, [carId, from, to]);
 
@@ -135,7 +140,7 @@ export function FuelStatistics({
             trendDescription: fuelLogSummary ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !fuelLogSummary
         };
-    }, [fuelLogSummary, currency, t]);
+    }, [fuelLogSummary, t]);
 
     const getFuelAverageAmount = useCallback(() => {
         return {
@@ -153,7 +158,7 @@ export function FuelStatistics({
             trendDescription: fuelLogSummary ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !fuelLogSummary
         };
-    }, [fuelLogSummary, currency, t]);
+    }, [fuelLogSummary, t]);
 
     const getFuelMedianAmount = useCallback(() => {
         return {
@@ -171,7 +176,7 @@ export function FuelStatistics({
             trendDescription: fuelLogSummary ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !fuelLogSummary
         };
-    }, [fuelLogSummary, currency, t]);
+    }, [fuelLogSummary, t]);
 
     const getFuelMaxAmount = useCallback(() => {
         return {
@@ -182,7 +187,7 @@ export function FuelStatistics({
             ) : null,
             isLoading: !fuelLogSummary
         };
-    }, [fuelLogSummary, currency, t]);
+    }, [fuelLogSummary, t]);
 
     return (
         <View style={ styles.container }>

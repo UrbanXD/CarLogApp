@@ -56,12 +56,14 @@ export type TrendStat = {
 export type ComparisonStatByType = {
     donutChartData: Array<DonutChartItem>
     legend: { [key: string]: LegendData }
+    unitText?: string
 }
 
 export type ComparisonStatByDate = {
     barChartData: Array<BarChartItem>
     barChartTypes: { [key: string]: LegendData }
     rangeUnit: RangeUnit
+    unitText?: string
 }
 
 export type SummaryStat = {
@@ -399,36 +401,6 @@ export class StatisticsDao {
         return await query.execute();
     }
 
-    private getRangeGroupByExpression(fieldName: string, unit: RangeUnit) {
-        //@formatter:off
-        switch(unit) {
-            case "hour":
-                return sql`strftime('%Y-%m-%d %H:00:00', ${ sql.raw(fieldName) })`;
-            case "day":
-                return sql`strftime('%Y-%m-%d', ${ sql.raw(fieldName) })`;
-            case "month":
-                return sql`strftime('%Y-%m', ${ sql.raw(fieldName) })`;
-            case "year":
-                return sql`strftime('%Y', ${ sql.raw(fieldName) })`;
-        }
-        //@formatter:on
-    }
-
-    private getRangeSelectExpression(fieldName: string, unit: RangeUnit) {
-        //@formatter:off
-        switch(unit) {
-            case "hour":
-                return sql`strftime('%Y-%m-%d %H:00:00', ${ sql.raw(fieldName) })`.as("time");
-            case "day":
-                return sql`strftime('%Y-%m-%d', ${ sql.raw(fieldName) })`.as("time");
-            case "month":
-                return sql`strftime('%Y-%m', ${ sql.raw(fieldName) })`.as("time");
-            case "year":
-                return sql`strftime('%Y', ${ sql.raw(fieldName) })`.as("time");
-        }
-        //@formatter:on
-    }
-
     async getExpenseSummary({
         carId,
         from,
@@ -535,7 +507,8 @@ export class StatisticsDao {
             totalTrend: calculateTrend(total, previousWindowTotal, trendOptions),
             averageTrend: calculateTrend(average, previousWindowAverage, trendOptions),
             medianTrend: calculateTrend(median, previousWindowMedian, trendOptions),
-            countTrend: calculateTrend(count, previousWindowCount, trendOptions)
+            countTrend: calculateTrend(count, previousWindowCount, trendOptions),
+            unitText: carId && await this.getCarCurrencySymbol(carId)
         };
     }
 
@@ -596,7 +569,8 @@ export class StatisticsDao {
 
         return {
             donutChartData,
-            legend: filteredLegend
+            legend: filteredLegend,
+            unitText: carId && await this.getCarCurrencySymbol(carId)
         };
     }
 
@@ -624,10 +598,10 @@ export class StatisticsDao {
         .where("t1.date", ">=", from)
         .where("t1.date", "<=", to);
 
-        if(carId) query = query.where("car_id", "=", carId);
+        if(carId) query = query.where("t1.car_id", "=", carId);
 
         query = query
-        .groupBy("type_id")
+        .groupBy("t1.type_id")
         .groupBy(groupExpression)
         .orderBy(groupExpression);
 
@@ -656,7 +630,7 @@ export class StatisticsDao {
 
                 typeIds.forEach((typeId) => {
                     const value = dailyData[typeId] !== undefined ? dailyData[typeId] : 0;
-                    valueArray.push(value);
+                    valueArray.push(numberToFractionDigit(value));
                 });
 
                 barChartData.push({
@@ -680,7 +654,8 @@ export class StatisticsDao {
         return {
             barChartData,
             barChartTypes,
-            rangeUnit: unit
+            rangeUnit: unit,
+            unitText: carId && await this.getCarCurrencySymbol(carId)
         };
     }
 
@@ -713,9 +688,9 @@ export class StatisticsDao {
 
         result.forEach((r) => {
             barChartData.push({
-                value: r.total,
                 label: r.time,
-                type: serviceType?.id ?? "0"
+                type: serviceType?.id ?? "0",
+                value: numberToFractionDigit(r.total)
             });
         });
 
@@ -729,7 +704,8 @@ export class StatisticsDao {
         return {
             barChartData,
             barChartTypes,
-            rangeUnit: unit
+            rangeUnit: unit,
+            unitText: carId && await this.getCarCurrencySymbol(carId)
         };
     }
 
@@ -782,7 +758,8 @@ export class StatisticsDao {
 
         return {
             donutChartData,
-            legend: filteredLegend
+            legend: filteredLegend,
+            unitText: carId && await this.getCarCurrencySymbol(carId)
         };
     }
 
@@ -792,8 +769,9 @@ export class StatisticsDao {
         .innerJoin(`${ SERVICE_ITEM_TABLE } as t2`, "t1.id", "t2.service_log_id")
         .innerJoin(`${ EXPENSE_TABLE } as t3`, "t1.expense_id", "t3.id")
         .select([
-            sql<number>`SUM(t2.quantity * t2.price_per_unit * t2.exchange_rate) as total`,
-            sql<number>`SUM(t2.quantity * t2.price_per_unit * t2.exchange_rate) * 100.0 / SUM(SUM(t2.quantity * t2.price_per_unit * t2.exchange_rate)) OVER () as percent`,
+            sql<number>`SUM(t2.quantity * t2.price_per_unit * t2.exchange_rate)`.as("total"),
+            sql<number>`SUM(t2.quantity * t2.price_per_unit * t2.exchange_rate) * 100.0 / SUM(SUM(t2.quantity * t2.price_per_unit * t2.exchange_rate)) OVER ()`.as(
+                "percent"),
             "t2.service_item_type_id as item_type_id"
         ])
         .where("t3.date", ">=", from)
@@ -836,7 +814,8 @@ export class StatisticsDao {
 
         return {
             donutChartData,
-            legend: filteredLegend
+            legend: filteredLegend,
+            unitText: carId && await this.getCarCurrencySymbol(carId)
         };
     }
 
@@ -873,7 +852,6 @@ export class StatisticsDao {
             .innerJoin(`${ CAR_TABLE } as t3`, "t2.car_id", "t3.id")
             .innerJoin(`${ FUEL_TANK_TABLE } as t4`, "t3.id", "t4.car_id")
             .innerJoin(`${ FUEL_UNIT_TABLE } as t5`, "t4.unit_id", "t5.id")
-            .innerJoin(`${ CURRENCY_TABLE } as t6`, "t3.currency_id", "t6.id")
             .where("t2.date", ">=", from)
             .where("t2.date", "<=", to);
 
@@ -906,7 +884,6 @@ export class StatisticsDao {
             return base
             .select([
                 "t5.short as quantity_unit",
-                "t6.symbol as amount_unit",
                 sql<number>`AVG(${ quantityExpression })`.as("average_quantity"),
                 sql<number>`SUM(${ quantityExpression })`.as("total_quantity"),
                 sql<number>`COUNT(t1.id)`.as("total_count"),
@@ -970,7 +947,7 @@ export class StatisticsDao {
                 averageTrend: calculateTrend(averageAmount, previousWindowAverageAmount, trendOptions),
                 medianTrend: calculateTrend(medianAmount, previousWindowMedianAmount, trendOptions),
                 countTrend: calculateTrend(count, previousWindowCount, trendOptions),
-                unitText: aggregateResult?.amount_unit
+                unitText: carId && await this.getCarCurrencySymbol(carId)
             }
         };
     }
@@ -1068,7 +1045,49 @@ export class StatisticsDao {
         return {
             lineChartData,
             average: lineChartData?.[lineChartData.length - 1].value ?? 0,
-            unitText
+            unitText: carId && await this.getCarCurrencySymbol(carId)
         };
+    }
+
+    /* UTILS */
+
+    protected async getCarCurrencySymbol(carId: string): string | null {
+        const query = this.db
+        .selectFrom(`${ CAR_TABLE } as t1`)
+        .innerJoin(`${ CURRENCY_TABLE } as t2`, "t1.currency_id", "t2.id")
+        .select("t2.symbol as currency_symbol")
+        .where("t1.id", "=", carId);
+
+        return (await query.executeTakeFirst())?.currency_symbol;
+    }
+
+    protected getRangeGroupByExpression(fieldName: string, unit: RangeUnit) {
+        //@formatter:off
+        switch(unit) {
+            case "hour":
+                return sql`strftime('%Y-%m-%d %H:00:00', ${ sql.raw(fieldName) })`;
+            case "day":
+                return sql`strftime('%Y-%m-%d', ${ sql.raw(fieldName) })`;
+            case "month":
+                return sql`strftime('%Y-%m', ${ sql.raw(fieldName) })`;
+            case "year":
+                return sql`strftime('%Y', ${ sql.raw(fieldName) })`;
+        }
+        //@formatter:on
+    }
+
+    protected getRangeSelectExpression(fieldName: string, unit: RangeUnit) {
+        //@formatter:off
+        switch(unit) {
+            case "hour":
+                return sql`strftime('%Y-%m-%d %H:00:00', ${ sql.raw(fieldName) })`.as("time");
+            case "day":
+                return sql`strftime('%Y-%m-%d', ${ sql.raw(fieldName) })`.as("time");
+            case "month":
+                return sql`strftime('%Y-%m', ${ sql.raw(fieldName) })`.as("time");
+            case "year":
+                return sql`strftime('%Y', ${ sql.raw(fieldName) })`.as("time");
+        }
+        //@formatter:on
     }
 }

@@ -1,16 +1,17 @@
 import { StatCard, StatCardProps } from "./StatCard.tsx";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import React from "react";
 import { SEPARATOR_SIZES } from "../../../constants/index.ts";
 
 type MasonryStatViewProps = {
     column1: Array<StatCardProps>
     column2: Array<StatCardProps>
+    containerStyle?: ViewStyle
 }
 
-export function MasonryStatView({ column1, column2 }: MasonryStatViewProps) {
+export function MasonryStatView({ column1, column2, containerStyle }: MasonryStatViewProps) {
     return (
-        <View style={ styles.container }>
+        <View style={ [styles.container, containerStyle] }>
             <View style={ styles.column }>
                 {
                     column1.map((cardProps, index) => (
