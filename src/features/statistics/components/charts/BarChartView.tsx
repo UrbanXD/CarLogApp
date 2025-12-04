@@ -3,7 +3,12 @@ import { BarChart, barDataItem } from "react-native-gifted-charts";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { Legend, LegendData } from "./common/Legend.tsx";
 import { hexToRgba } from "../../../../utils/colors/hexToRgba.ts";
-import { PointerLabel } from "./common/PointerLabel.tsx";
+import {
+    POINTER_LABEL_FONT_SIZE,
+    POINTER_LABEL_MIN_WIDTH,
+    POINTER_LABEL_PADDING,
+    PointerLabel
+} from "./common/PointerLabel.tsx";
 import { ChartTitle, ChartTitleProps } from "./common/ChartTitle.tsx";
 import React from "react";
 import { widthPercentageToDP } from "react-native-responsive-screen";
@@ -125,6 +130,16 @@ export function BarChartView({
     const barData = transformToBarData(chartData, legend);
     const maxValue = Math.max(...barData.map(data => data.value ?? 0));
 
+    const maxLabelWidth = Math.max(
+        ...barData.map(item => AXIS_FONT_SIZE * 0.55 * (item.label?.length ?? 0))
+    );
+
+    const firstPointerLabelWidth = 2 * POINTER_LABEL_PADDING + POINTER_LABEL_FONT_SIZE * 0.55 * ((barData?.[0]?.value?.toString() ?? "").length + 1.5);
+    const lastPointerLabelWidth = 2 * POINTER_LABEL_PADDING + POINTER_LABEL_FONT_SIZE * 0.55 * ((barData?.[barData.length - 2]?.value?.toString() ?? "").length + 1.5);
+
+    const initialSpacing = Math.max(maxLabelWidth, firstPointerLabelWidth, POINTER_LABEL_MIN_WIDTH) / 2;
+    const endSpacing = Math.max(maxLabelWidth, lastPointerLabelWidth, POINTER_LABEL_MIN_WIDTH) / 2;
+
     const {
         chartMaxValue,
         yAxisLabelWidth,
@@ -176,6 +191,8 @@ export function BarChartView({
                                 maxValue={ chartMaxValue }
                                 barWidth={ barWidth }
                                 minHeight={ SEPARATOR_SIZES.lightSmall * 1.15 }
+                                initialSpacing={ initialSpacing }
+                                endSpacing={ endSpacing }
                                 disablePress
                                 roundedTop
                                 roundedBottom
