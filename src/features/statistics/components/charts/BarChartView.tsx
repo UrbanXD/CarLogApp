@@ -109,9 +109,9 @@ export function BarChartView({
                     spacing: labelWidth + SPACING,
                     labelWidth: labelWidth,
                     frontColor,
-                    barStyle: { left: labelWidth / 2 - barWidth / 2 },
+                    barStyle: { left: (labelWidth + SPACING) / 2 - barWidth / 2 },
                     disablePress,
-                    leftShiftForTooltip: -labelWidth / 3 - barWidth / 2
+                    leftShiftForTooltip: -(labelWidth + SPACING) / 2 + barWidth
                 });
             }
         });
