@@ -291,7 +291,12 @@ export class Database {
     }
 
     get statisticsDao(): StatisticsDao {
-        if(!this._statisticsDao) this._statisticsDao = new StatisticsDao(this.db, this.expenseTypeDao);
+        if(!this._statisticsDao) this._statisticsDao = new StatisticsDao(
+            this.db,
+            this.expenseTypeDao,
+            this.serviceTypeDao,
+            this.serviceItemTypeDao
+        );
 
         return this._statisticsDao;
     }
