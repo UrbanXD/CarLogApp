@@ -19,10 +19,10 @@ export function CalendarPicker() {
         setStartDate((prev) => {
             if(!newDate) return null;
 
-            const normalized = dayjs(prev ?? newStartDate)
-            .set("year", newStartDate.year())
-            .set("month", newStartDate.month())
-            .set("date", newStartDate.date())
+            const normalized = dayjs(prev ?? newDate)
+            .set("year", newDate.year())
+            .set("month", newDate.month())
+            .set("date", newDate.date())
             .toDate();
 
             if(prev && dayjs(prev).isSame(normalized, "day")) return prev;

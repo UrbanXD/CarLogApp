@@ -107,16 +107,16 @@ function InputDatePicker({
     };
 
     const submit = (startDate: Date | null, endDate: Date | null) => {
-        if(mode === "single") return setDate([startDate]);
-        if(mode === "range") {
+        if(mode === "single") {
+            setDate([startDate]);
+        } else if(mode === "range") {
             setDate(
                 startDate && endDate &&
-                dayjs(startDate).isBefore(endDate)
+                dayjs(startDate).isAfter(endDate)
                 ? [endDate, startDate]
                 : [startDate, endDate]
             );
         }
-        setDate(mode === "single" ? [startDate] : [startDate, endDate]);
         isExpanded.value = false;
     };
 
