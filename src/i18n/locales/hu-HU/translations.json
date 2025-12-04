@@ -665,8 +665,12 @@
       "avg_amount": "Szervízek átlaga",
       "median_amount": "Szervízek mediánja",
       "total_amount_by_date": "Szervíz költségek",
-      "distribution_by_service_item": "Költség eloszlás szerviz tételek szerint",
-      "distribution_by_type": "Költség eloszlás szerviz típus szerint"
+      "average_distance_between_services": "Átlagos megtett távolság szervízek között",
+      "average_time_between_services": "Átlagos eltelt idő szervízek között",
+      "expense_distribution_by_service_item": "Költség eloszlás szerviz tételek szerint",
+      "expense_distribution_by_type": "Költség eloszlás szerviz típus szerint",
+      "frequency_distribution_by_odometer": "Gyakorisági eloszlás kilométeróra-állás intervallum szerint",
+      "frequency_distribution_by_odometer_description": "Az intervallum terjedelme {{value}}"
     }
   }
 }
