@@ -9,12 +9,16 @@ import dayjs from "dayjs";
 import weekday from "dayjs/plugin/weekday";
 import updateLocale from "dayjs/plugin/updateLocale";
 import quarterOfYear from "dayjs/plugin/quarterOfYear";
+import isBetween from "dayjs/plugin/isBetween";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import "dayjs/locale/en";
 import "dayjs/locale/hu";
 
 dayjs.extend(weekday);
 dayjs.extend(updateLocale);
 dayjs.extend(quarterOfYear);
+dayjs.extend(isBetween);
+dayjs.extend(isSameOrBefore);
 
 dayjs.updateLocale("hu", {
     relativeTime: {
