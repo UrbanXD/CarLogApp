@@ -9,6 +9,7 @@ import React from "react";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 import { ChartDataNotFound } from "./common/ChartDataNotFound.tsx";
+import { getYAxisProps } from "../../utils/getYAxisProps.ts";
 
 const SPACING = 1.5;
 const AXIS_FONT_SIZE = FONT_SIZES.p4 * 0.85;
@@ -111,7 +112,7 @@ export function BarChartView({
                     frontColor,
                     barStyle: { left: (labelWidth + SPACING) / 2 - barWidth / 2 },
                     disablePress,
-                    leftShiftForTooltip: -(labelWidth + SPACING) / 2 + barWidth
+                    leftShiftForTooltip: barWidth - (labelWidth - SPACING * 2) / 2
                 });
             }
         });
@@ -123,10 +124,19 @@ export function BarChartView({
 
     const barData = transformToBarData(chartData, legend);
     const maxValue = Math.max(...barData.map(data => data.value ?? 0));
-    const chartMaxValue = Math.round(maxValue + maxValue * 0.2);
 
-    const formatedMaxValue = formatValue?.(chartMaxValue) ?? chartMaxValue.toString();
-    const yAxisLabelWidth = AXIS_FONT_SIZE * 0.55 * (formatedMaxValue.length + 1.5 ?? 0);
+    const {
+        chartMaxValue,
+        yAxisLabelWidth,
+        showFractionalValues,
+        precision,
+        steps,
+        formatYLabel
+    } = getYAxisProps({
+        maxValue,
+        formatLabel: formatValue,
+        fontSize: AXIS_FONT_SIZE
+    });
 
     let flexDirection;
     switch(legendPosition) {
@@ -162,17 +172,19 @@ export function BarChartView({
                         <View style={ { flexDirection, gap: SEPARATOR_SIZES.lightSmall } }>
                             <BarChart
                                 data={ barData }
+                                width={ widthPercentageToDP(100) - yAxisLabelWidth }
                                 maxValue={ chartMaxValue }
                                 barWidth={ barWidth }
-                                formatYLabel={ formatValue }
-                                width={ widthPercentageToDP(100) - yAxisLabelWidth }
                                 minHeight={ SEPARATOR_SIZES.lightSmall * 1.15 }
                                 disablePress
                                 roundedTop
                                 roundedBottom
                                 lineBehindBars
                                 highlightEnabled
-                                noOfSections={ 6 }
+                                formatYLabel={ formatYLabel }
+                                showFractionalValues={ showFractionalValues }
+                                roundToDigits={ precision }
+                                noOfSections={ steps }
                                 rulesType="solid"
                                 rulesColor={ COLORS.gray4 }
                                 xAxisLabelTextStyle={ styles.axisLabel }

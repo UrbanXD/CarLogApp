@@ -2,7 +2,6 @@ import { LineChart, lineDataItem } from "react-native-gifted-charts";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import React, { useMemo } from "react";
 import { ChartTitle, ChartTitleProps } from "./common/ChartTitle.tsx";
-import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
 import {
     POINTER_LABEL_FONT_SIZE,
     POINTER_LABEL_MIN_WIDTH,
@@ -15,6 +14,7 @@ import { hexToRgba } from "../../../../utils/colors/hexToRgba.ts";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 import { ChartDataNotFound } from "./common/ChartDataNotFound.tsx";
 import { StyleSheet, View } from "react-native";
+import { getYAxisProps } from "../../utils/getYAxisProps.ts";
 
 const EXTRA_SPACING = SEPARATOR_SIZES.medium;
 const AXIS_FONT_SIZE = FONT_SIZES.p4 * 0.85;
@@ -61,11 +61,18 @@ export function LineChartView({
     );
 
     const maxValue = Math.max(0, ...chartData.map(d => d.value ?? 0));
-    const chartMaxValue = Math.max(0, numberToFractionDigit(maxValue + maxValue * 0.2));
-
-    const formatedMaxValue = (formatYAxisLabel && formatValue) ? formatValue(chartMaxValue) : chartMaxValue.toString();
-
-    const yAxisLabelWidth = AXIS_FONT_SIZE * 0.55 * (formatedMaxValue.length + 2.5 ?? 0);
+    const {
+        chartMaxValue,
+        yAxisLabelWidth,
+        steps,
+        showFractionalValues,
+        precision,
+        formatYLabel
+    } = getYAxisProps({
+        maxValue,
+        fontSize: AXIS_FONT_SIZE,
+        formatLabel: formatYAxisLabel ? formatValue : undefined
+    });
 
     const firstPointerLabelWidth = 2 * POINTER_LABEL_PADDING + POINTER_LABEL_FONT_SIZE * 0.55 * ((formattedChartData?.[1]?.value?.toString() ?? "").length + 1.5);
     const lastPointerLabelWidth = 2 * POINTER_LABEL_PADDING + POINTER_LABEL_FONT_SIZE * 0.55 * ((formattedChartData?.[formattedChartData.length - 1]?.value?.toString() ?? "").length + 1.5);
@@ -74,6 +81,7 @@ export function LineChartView({
     const initialSpacing = -(Math.max(maxLabelWidth, Math.max(firstPointerLabelWidth, POINTER_LABEL_MIN_WIDTH))) / 2;
     const endSpacing =
         (EXTRA_SPACING / 2 + Math.max(maxLabelWidth, Math.max(lastPointerLabelWidth, POINTER_LABEL_MIN_WIDTH))) / 2;
+
 
     return (
         <View style={ styles.container }>
@@ -97,9 +105,11 @@ export function LineChartView({
                             animateOnDataChange
                             animationDuration={ 750 }
                             interpolateMissingValues
-                            noOfSections={ 6 }
+                            noOfSections={ steps }
                             maxValue={ chartMaxValue }
-                            formatYLabel={ formatYAxisLabel && formatValue }
+                            showFractionalValues={ showFractionalValues }
+                            roundToDigits={ precision }
+                            formatYLabel={ formatYLabel }
                             lineSegments={ formattedChartData.length > 0 && [
                                 { startIndex: 0, endIndex: 1, strokeDashArray: [6, 4] }
                             ] }
