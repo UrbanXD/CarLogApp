@@ -61,7 +61,7 @@ export type ComparisonStatByType = {
 
 export type ComparisonStatByDate = {
     barChartData: Array<BarChartItem>
-    barChartTypes: { [key: string]: LegendData }
+    legend: { [key: string]: LegendData }
     rangeUnit: RangeUnit
     unitText?: string
 }
@@ -632,7 +632,7 @@ export class StatisticsDao {
 
         return {
             barChartData,
-            barChartTypes,
+            legend: barChartTypes,
             rangeUnit: unit,
             unitText: carId && await this.getCarCurrencySymbol(carId)
         };
@@ -682,7 +682,7 @@ export class StatisticsDao {
 
         return {
             barChartData,
-            barChartTypes,
+            legend: barChartTypes,
             rangeUnit: unit,
             unitText: carId && await this.getCarCurrencySymbol(carId)
         };
@@ -797,6 +797,80 @@ export class StatisticsDao {
             unitText: carId && await this.getCarCurrencySymbol(carId)
         };
     }
+
+    async getStatBetweenServices({
+        carId,
+        from,
+        to
+    }: StatisticsFunctionArgs): Promise<{
+        averageDistance: Omit<Stat, "label" | "color">,
+        averageTime: Omit<Stat, "label" | "color">
+    }> {
+        let query = this.db
+        .selectFrom(`${ SERVICE_LOG_TABLE } as t1`)
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as t2`, "t1.odometer_log_id", "t2.id")
+        .innerJoin(`${ CAR_TABLE } as t3`, "t1.car_id", "t3.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t4`, "t3.odometer_unit_id", "t4.id")
+        .innerJoin(`${ EXPENSE_TABLE } as t5`, "t1.expense_id", "t5.id")
+        .select([
+            sql`ROUND
+            ((MAX (ROUND(t2.value / t4.conversion_factor)) - MIN (ROUND(t2.value / t4.conversion_factor)))
+                / (COUNT(t1.id) - 1))`.as("average_distance"),
+            sql`(JULIANDAY( MAX (t5.date)) - JULIANDAY(MIN (t5.date)))
+                / (COUNT(t1.id) - 1)`.as("average_time")
+        ])
+        .where("t5.date", ">=", from)
+        .where("t5.date", "<=", to);
+
+        if(carId) query = query.where("t1.car_id", "=", carId);
+
+        const result = await query.executeTakeFirst();
+
+        return {
+            averageDistance: {
+                value: numberToFractionDigit(result?.average_distance ?? 0),
+                unitText: carId ? await this.getCarOdometerUnit(carId) : null
+            },
+            averageTime: {
+                value: result?.average_time ?? 0
+            }
+        };
+    }
+
+    async getServiceFrequencyByOdometer({ carId, from, to, intervalSize = 50000 }: StatisticsFunctionArgs & {
+        intervalSize?: number
+    }): Promise<ComparisonStatByDate> {
+        let query = this.db
+        .selectFrom(`${ SERVICE_LOG_TABLE } as t1`)
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as t2`, "t1.odometer_log_id", "t2.id")
+        .innerJoin(`${ CAR_TABLE } as t3`, "t1.car_id", "t3.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t4`, "t3.odometer_unit_id", "t4.id")
+        .innerJoin(`${ EXPENSE_TABLE } as t5`, "t1.expense_id", "t5.id")
+        //@formatter:off
+        .select([
+            sql`COUNT(t1.id)`.as("service_count"),
+            sql`CAST(ROUND(t2.value / t4.conversion_factor) / ${intervalSize} AS INT) * ${intervalSize}`.as("interval_start")
+        ])
+        //@formatter:on
+        .where("t5.date", ">=", from)
+        .where("t5.date", "<=", to)
+        .groupBy("interval_start")
+        .orderBy("interval_start", "asc");
+
+        if(carId) query = query.where("t1.car_id", "=", carId);
+
+        const result = await query.execute();
+
+        return {
+            barChartData: result.map((r) => ({
+                value: r.service_count ?? 0,
+                label: r?.interval_start?.toString() ?? "0",
+                type: "simple"
+            })),
+            legend: { "simple": { color: COLORS.gray1 } },
+            unitText: carId ? await this.getCarOdometerUnit(carId) : null
+        };
+    };
 
     async getTotalDistance({ carId, from, to }: StatisticsFunctionArgs): Promise<SummaryStat> {
         let query = this.db
@@ -1073,7 +1147,7 @@ export class StatisticsDao {
 
         return {
             barChartData,
-            barChartTypes,
+            legend: barChartTypes,
             rangeUnit: unit,
             unitText: carId && await this.getCarCurrencySymbol(carId)
         };
@@ -1089,6 +1163,16 @@ export class StatisticsDao {
         .where("t1.id", "=", carId);
 
         return (await query.executeTakeFirst())?.currency_symbol;
+    }
+
+    protected async getCarOdometerUnit(carId: string): string | null {
+        const query = this.db
+        .selectFrom(`${ CAR_TABLE } as t1`)
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t2`, "t1.odometer_unit_id", "t2.id")
+        .select("t2.short as odometer_unit")
+        .where("t1.id", "=", carId);
+
+        return (await query.executeTakeFirst())?.odometer_unit;
     }
 
     protected getRangeGroupByExpression(fieldName: string, unit: RangeUnit) {

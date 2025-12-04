@@ -92,7 +92,6 @@ export function ExpenseStatistics({ carId, from, to }: ExpenseStatisticsProps) {
 
 
     const getMedianExpenseAmount = useCallback(() => {
-        console.log(expenseStat?.median);
         return {
             label: t("statistics.expense.median_amount"),
             value: expenseStat ? formatWithUnit(expenseStat.median, expenseStat?.unitText) : null,
@@ -139,7 +138,7 @@ export function ExpenseStatistics({ carId, from, to }: ExpenseStatisticsProps) {
                     title: t("statistics.expense.total_amount_by_date")
                 } }
                 chartData={ expensesByDateWindow?.barChartData }
-                legend={ expensesByDateWindow?.barChartTypes }
+                legend={ expensesByDateWindow?.legend }
                 formatValue={ (value) => formatWithUnit(value, expensesByDateWindow?.unitText) }
                 formatLabel={ (label) => dayjs(label)
                 .format(getDateFormatTemplateByRangeUnit(expensesByDateWindow?.rangeUnit)) }

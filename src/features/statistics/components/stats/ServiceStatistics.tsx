@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import React, { useCallback, useEffect, useState } from "react";
-import { ComparisonStatByDate, ComparisonStatByType, SummaryStat } from "../../model/dao/statisticsDao.ts";
+import { ComparisonStatByDate, ComparisonStatByType, Stat, SummaryStat } from "../../model/dao/statisticsDao.ts";
 import { BarChartView } from "../charts/BarChartView.tsx";
 import dayjs from "dayjs";
 import { ExpenseTypeEnum } from "../../../expense/model/enums/ExpenseTypeEnum.ts";
@@ -10,6 +10,9 @@ import { getDateFormatTemplateByRangeUnit } from "../../utils/getDateFormatTempl
 import { MasonryStatView } from "../MasonryStatView.tsx";
 import { formatTrend } from "../../utils/formatTrend.ts";
 import { formatWithUnit } from "../../../../utils/formatWithUnit.ts";
+import { StatCard } from "../StatCard.tsx";
+
+const SERVICE_FREQUENCY_INTERVAL = 25000;
 
 type ServiceStatisticsProps = {
     carId?: string
@@ -25,6 +28,11 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
     const [serviceLogStat, setServiceLogStat] = useState<SummaryStat | null>(null);
     const [serviceLogByType, setServiceLogByType] = useState<ComparisonStatByType | null>(null);
     const [serviceItemByType, setServiceItemByType] = useState<ComparisonStatByType | null>(null);
+    const [averageDistanceBetweenServices, setAverageDistanceBetweenServices] = useState<{
+        averageDistance: Omit<Stat, "label" | "color">,
+        averageTime: Omit<Stat, "label" | "color">
+    } | null>(null);
+    const [serviceFrequencyByOdometer, setServiceFrequencyByOdometer] = useState<ComparisonStatByDate | null>(null);
 
     useEffect(() => {
         (async () => {
@@ -38,18 +46,24 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
                 resultServiceLogsByDateWindow,
                 resultServiceLogStat,
                 resultServiceLogByType,
-                resultServiceItemByType
+                resultServiceItemByType,
+                resultAverageDistanceBetweenServices,
+                resultServiceFrequencyByOdometer
             ] = await Promise.all([
                 statisticsDao.getServiceExpenseComparison(statArgs),
                 statisticsDao.getExpenseSummary({ ...statArgs, expenseType: ExpenseTypeEnum.SERVICE }),
                 statisticsDao.getServiceComparisonByType(statArgs),
-                statisticsDao.getServiceItemComparisonByType(statArgs)
+                statisticsDao.getServiceItemComparisonByType(statArgs),
+                statisticsDao.getStatBetweenServices(statArgs),
+                statisticsDao.getServiceFrequencyByOdometer({ ...statArgs, intervalSize: SERVICE_FREQUENCY_INTERVAL })
             ]);
 
             setServiceLogsByDateWindow(resultServiceLogsByDateWindow);
             setServiceLogStat(resultServiceLogStat);
             setServiceLogByType(resultServiceLogByType);
             setServiceItemByType(resultServiceItemByType);
+            setAverageDistanceBetweenServices(resultAverageDistanceBetweenServices);
+            setServiceFrequencyByOdometer(resultServiceFrequencyByOdometer);
         })();
     }, [carId, from, to]);
 
@@ -120,6 +134,29 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
         };
     }, [serviceLogStat, t]);
 
+    const getAverageDistanceBetweenServices = useCallback(() => {
+        return {
+            label: t("statistics.service.average_distance_between_services"),
+            value: averageDistanceBetweenServices != null
+                   ? formatWithUnit(
+                    averageDistanceBetweenServices.averageDistance.value,
+                    averageDistanceBetweenServices.averageDistance?.unitText
+                )
+                   : null,
+            isLoading: !averageDistanceBetweenServices
+        };
+    }, [averageDistanceBetweenServices, t]);
+
+    const getAverageTimeBetweenServices = useCallback(() => {
+        return {
+            label: t("statistics.service.average_time_between_services"),
+            value: averageDistanceBetweenServices != null
+                   ? dayjs.duration(averageDistanceBetweenServices.averageTime.value, "days").humanize()
+                   : null,
+            isLoading: !averageDistanceBetweenServices
+        };
+    }, [averageDistanceBetweenServices, t]);
+
     return (
         <>
             <MasonryStatView
@@ -139,9 +176,25 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
                     getCountOfServices()
                 ] }
             />
+            <StatCard { ...getAverageDistanceBetweenServices() }/>
+            <StatCard { ...getAverageTimeBetweenServices() } />
+            <BarChartView
+                chartData={ serviceFrequencyByOdometer?.barChartData }
+                legend={ serviceFrequencyByOdometer?.legend }
+                title={ {
+                    title: t("statistics.service.frequency_distribution_by_odometer"),
+                    description: t(
+                        "statistics.service.frequency_distribution_by_odometer_description",
+                        { value: formatWithUnit(SERVICE_FREQUENCY_INTERVAL, serviceFrequencyByOdometer?.unitText) }
+                    )
+                } }
+                formatLabel={ (label) => formatWithUnit(label, serviceFrequencyByOdometer?.unitText) }
+                showsLegend={ false }
+                isLoading={ !serviceFrequencyByOdometer }
+            />
             <BarChartView
                 chartData={ serviceLogsByDateWindow?.barChartData }
-                legend={ serviceLogsByDateWindow?.barChartTypes }
+                legend={ serviceLogsByDateWindow?.legend }
                 title={ {
                     title: t("statistics.service.total_amount_by_date")
                 } }
@@ -154,7 +207,7 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
             />
             <DonutChartView
                 title={ {
-                    title: t("statistics.service.distribution_by_type")
+                    title: t("statistics.service.expense_distribution_by_type")
                 } }
                 chartData={ serviceLogByType?.donutChartData }
                 legend={ serviceLogByType?.legend }
@@ -166,7 +219,7 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
             />
             <DonutChartView
                 title={ {
-                    title: t("statistics.service.distribution_by_service_item")
+                    title: t("statistics.service.expense_distribution_by_service_item")
                 } }
                 chartData={ serviceItemByType?.donutChartData }
                 legend={ serviceItemByType?.legend }

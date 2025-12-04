@@ -64,7 +64,6 @@ export function FuelStatistics({
     }, [fuelLogSummary, t]);
 
     const getFuelTotalQuantity = useCallback(() => {
-        console.log(fuelLogSummary?.quantity.max);
         return {
             label: t("statistics.fuel.total_quantity"),
             value: fuelLogSummary
@@ -221,7 +220,7 @@ export function FuelStatistics({
             </View>
             <BarChartView
                 chartData={ fuelComparisonByDateWindow?.barChartData }
-                legend={ fuelComparisonByDateWindow?.barChartTypes }
+                legend={ fuelComparisonByDateWindow?.legend }
                 title={ {
                     title: t("statistics.service.total_amount_by_date")
                 } }
