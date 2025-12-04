@@ -10,7 +10,7 @@ export function getRangeUnit(from: string, to: string): RangeUnit {
     const diffMonths = end.diff(start, "month");
 
     if(diffHours < 24) return "hour";
-    if(diffDays < 32) return "day";
+    if(diffDays < 32 && diffMonths === 0) return "day";
     if(diffMonths < 12) return "month";
     return "year";
 }
