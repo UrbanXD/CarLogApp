@@ -1,6 +1,6 @@
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import React, { useCallback, useEffect, useState } from "react";
-import { SummaryStat, TrendStat } from "../../model/dao/statisticsDao.ts";
+import { ComparisonStatByDate, SummaryStat, TrendStat } from "../../model/dao/statisticsDao.ts";
 import { LineChartView } from "../charts/LineChartView.tsx";
 import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../../constants/index.ts";
@@ -10,6 +10,8 @@ import { MasonryStatView } from "../MasonryStatView.tsx";
 import { formatWithUnit } from "../../../../utils/formatWithUnit.ts";
 import { StatCard } from "../StatCard.tsx";
 import { ChartTitle } from "../charts/common/ChartTitle.tsx";
+import { getDateFormatTemplateByRangeUnit } from "../../utils/getDateFormatTemplateByRangeUnit.ts";
+import { BarChartView } from "../charts/BarChartView.tsx";
 
 type FuelConsumptionStatisticsProps = {
     carId?: string
@@ -27,6 +29,7 @@ export function FuelStatistics({
 
     const [fuelConsumption, setFuelConsumption] = useState<TrendStat | null>(null);
     const [fuelLogSummary, setFuelLogSummary] = useState<{ quantity: SummaryStat, amount: SummaryStat } | null>(null);
+    const [fuelComparisonByDateWindow, setFuelComparisonByDateWindow] = useState<ComparisonStatByDate | null>(null);
 
     useEffect(() => {
         (async () => {
@@ -38,14 +41,17 @@ export function FuelStatistics({
 
             const [
                 resultFuelLogSummary,
-                resultFuelConsumption
+                resultFuelConsumption,
+                resultFuelComparisonByDateWindow
             ] = await Promise.all([
                 statisticsDao.getFuelSummary(statArgs),
-                statisticsDao.getFuelConsumption(statArgs)
+                statisticsDao.getFuelConsumption(statArgs),
+                statisticsDao.getFuelExpenseComparisonByDateWindow(statArgs)
             ]);
 
             setFuelLogSummary(resultFuelLogSummary);
             setFuelConsumption(resultFuelConsumption);
+            setFuelComparisonByDateWindow(resultFuelComparisonByDateWindow);
         })();
     }, [carId, from, to]);
 
@@ -53,9 +59,6 @@ export function FuelStatistics({
         return {
             label: t("statistics.fuel.log_count"),
             value: fuelLogSummary ? `${ fuelLogSummary.quantity.count } ${ t("common.count") }` : null,
-            isPositive: undefined,
-            trend: null,
-            trendDescription: null,
             isLoading: !fuelLogSummary
         };
     }, [fuelLogSummary, t]);
@@ -216,6 +219,19 @@ export function FuelStatistics({
                     ] }
                 />
             </View>
+            <BarChartView
+                chartData={ fuelComparisonByDateWindow?.barChartData }
+                legend={ fuelComparisonByDateWindow?.barChartTypes }
+                title={ {
+                    title: t("statistics.service.total_amount_by_date")
+                } }
+                formatValue={ (value) => formatWithUnit(value, fuelComparisonByDateWindow?.unitText) }
+                formatLabel={ (label) => dayjs(label)
+                .format(getDateFormatTemplateByRangeUnit(fuelComparisonByDateWindow?.rangeUnit)) }
+                formatLegend={ (label) => t(`expenses.types.${ label }`) }
+                showsLegend={ false }
+                isLoading={ !fuelComparisonByDateWindow }
+            />
             <LineChartView
                 title={ {
                     title: t("statistics.fuel.fuel_consumption"),

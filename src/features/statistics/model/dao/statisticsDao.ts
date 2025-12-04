@@ -1045,6 +1045,60 @@ export class StatisticsDao {
         return {
             lineChartData,
             average: lineChartData?.[lineChartData.length - 1].value ?? 0,
+            unitText
+        };
+    }
+
+    async getFuelExpenseComparisonByDateWindow({
+        carId,
+        from,
+        to
+    }: StatisticsFunctionArgs): Promise<ComparisonStatByDate> {
+        const unit = getRangeUnit(from, to);
+        const groupExpression = this.getRangeGroupByExpression("t1.date", unit);
+        const selectExpression = this.getRangeSelectExpression("t1.date", unit);
+
+        let query = this.db
+        .selectFrom(`${ EXPENSE_TABLE } as t1`)
+        .innerJoin(`${ FUEL_LOG_TABLE } as t2`, "t1.id", "t2.expense_id")
+        .select([
+            sql<number>`SUM(t1.amount)`.as("total"),
+            selectExpression
+        ])
+        .where("t1.date", ">=", from)
+        .where("t1.date", "<=", to);
+
+        if(carId) query = query.where("t1.car_id", "=", carId);
+
+        query = query
+        .groupBy(groupExpression)
+        .orderBy(groupExpression);
+
+        const result = await query.execute();
+        const fuelTypeId = await this.expenseTypeDao.getIdByKey(ExpenseTypeEnum.FUEL);
+        const fuelType = await this.expenseTypeDao.getById(fuelTypeId);
+
+        const barChartData: Array<BarChartItem> = [];
+
+        result.forEach((r) => {
+            barChartData.push({
+                label: r.time,
+                type: fuelType?.id ?? "0",
+                value: numberToFractionDigit(r.total)
+            });
+        });
+
+        const barChartTypes: { [key: string]: LegendData } = {
+            [fuelType?.id ?? "0"]: {
+                label: fuelType?.key ?? ExpenseTypeEnum.FUEL,
+                color: fuelType?.primaryColor ?? COLORS.fuelYellow
+            }
+        };
+        console.log(unit);
+        return {
+            barChartData,
+            barChartTypes,
+            rangeUnit: unit,
             unitText: carId && await this.getCarCurrencySymbol(carId)
         };
     }
