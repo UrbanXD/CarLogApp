@@ -6,10 +6,7 @@ import {
 } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { FuelLog, fuelLogSchema } from "../../schemas/fuelLogSchema.ts";
 import { FuelUnitDao } from "../dao/FuelUnitDao.ts";
-import {
-    convertOdometerValueFromKilometer,
-    convertOdometerValueToKilometer
-} from "../../../odometer/utils/convertOdometerUnit.ts";
+import { convertOdometerValueToKilometer } from "../../../odometer/utils/convertOdometerUnit.ts";
 import { FuelLogFields } from "../../schemas/form/fuelLogForm.ts";
 import { ExpenseTypeEnum } from "../../../../../expense/model/enums/ExpenseTypeEnum.ts";
 import { ExpenseTypeDao } from "../../../../../expense/model/dao/ExpenseTypeDao.ts";
@@ -56,16 +53,19 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
 
         if(!expense) throw new Error("Expense not found!");
 
+        const isPricePerUnit = Boolean(entity.is_price_per_unit);
+        const quantity = numberToFractionDigit(entity.quantity / (fuelUnit?.conversionFactor ?? 1));
+
         return fuelLogSchema.parse({
             id: entity.id,
             ownerId: entity.owner_id,
             expense: expense,
             fuelUnit: fuelUnit,
             odometer: odometer,
-            quantity: entity.quantity,
-            originalPricePerUnit: numberToFractionDigit(expense.amount.amount / entity.quantity),
-            pricePerUnit: numberToFractionDigit(expense.amount.exchangedAmount / entity.quantity),
-            isPricePerUnit: Boolean(entity.is_price_per_unit)
+            quantity: quantity,
+            originalPricePerUnit: numberToFractionDigit(expense.amount.amount / (isPricePerUnit ? quantity : 1)),
+            pricePerUnit: numberToFractionDigit(expense.amount.exchangedAmount / (isPricePerUnit ? quantity : 1)),
+            isPricePerUnit
         });
     }
 
@@ -75,8 +75,8 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
             owner_id: dto.ownerId,
             expense_id: dto.expense.id,
             fuel_unit_id: dto.fuelUnit.id,
-            odometer_value: convertOdometerValueFromKilometer(dto.odometer.value, dto.odometer.unit.conversionFactor),
-            quantity: dto.quantity,
+            odometer_log_id: dto.odometer?.id ?? null,
+            quantity: dto.quantity * dto.fuelUnit.conversionFactor,
             is_price_per_unit: dto.isPricePerUnit
         };
     }
@@ -86,18 +86,23 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
         expense: ExpenseTableRow,
         odometerLog: OdometerLogTableRow | null
     }> {
+        const fuelUnit = await this.fuelUnitDao.getById(formResult.fuelUnitId);
         const odometerUnit = await this.odometerUnitDao.getUnitByCarId(formResult.carId);
         const expenseTypeId = await this.expenseTypeDao.getIdByKey(ExpenseTypeEnum.FUEL);
-        const originalAmount = formResult.amount * (formResult.isPricePerUnit ? formResult.quantity : 1);
+
+        const originalAmount = numberToFractionDigit(formResult.amount * (formResult.isPricePerUnit
+                                                                          ? formResult.quantity
+                                                                          : 1));
+        const amount = numberToFractionDigit(originalAmount * formResult.exchangeRate);
 
         const expense: ExpenseTableRow = {
             id: formResult.expenseId,
             car_id: formResult.carId,
             type_id: expenseTypeId,
             currency_id: formResult.currencyId,
-            original_amount: numberToFractionDigit(originalAmount),
+            original_amount: originalAmount,
             exchange_rate: formResult.exchangeRate,
-            amount: numberToFractionDigit(originalAmount * formResult.exchangeRate),
+            amount: amount,
             note: formResult.note,
             date: formResult.date
         };
@@ -108,8 +113,8 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
             expense_id: formResult.expenseId,
             odometer_log_id: !!formResult?.odometerValue ? formResult.odometerLogId : null,
             fuel_unit_id: formResult.fuelUnitId,
-            quantity: formResult.quantity,
-            is_price_per_unit: Number(formResult.isPricePerUnit)
+            quantity: formResult.quantity * (fuelUnit?.conversionFactor ?? 1),
+            is_price_per_unit: Number(formResult.isPricePerUnit) // because of sqllite
         };
 
         let odometerLog: OdometerLogTableRow | null = null;

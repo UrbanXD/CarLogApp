@@ -415,9 +415,6 @@ export class StatisticsDao {
             let query = this.db
             .selectFrom(`${ EXPENSE_TABLE } as t1`)
             .innerJoin(`${ EXPENSE_TYPE_TABLE } as t2`, "t1.type_id", "t2.id")
-            .leftJoin(`${ FUEL_LOG_TABLE } as t3`, "t1.id", "t3.expense_id")
-            .leftJoin(`${ FUEL_TANK_TABLE } as t4`, "t1.car_id", "t4.car_id")
-            .leftJoin(`${ FUEL_UNIT_TABLE } as t5`, "t4.unit_id", "t5.id")
             .where("t1.date", ">=", from)
             .where("t1.date", "<=", to);
 
@@ -427,18 +424,14 @@ export class StatisticsDao {
             return query;
         };
 
-        const amountExpression =
-            sql<number>`CASE WHEN t3.is_price_per_unit THEN t1.amount * (t3.quantity / COALESCE(t5.conversion_factor, 1)) ELSE t1.amount
-            END`;
-
         let maxItemQuery = baseQuery(from, to)
         .select([
-            amountExpression.as("amount"),
+            "t1.amount",
             "t2.id as type_id",
-            "t2.owner_id as owner_id",
-            "t2.key as key"
+            "t2.owner_id",
+            "t2.key"
         ])
-        .orderBy("amount", "desc")
+        .orderBy("t1.amount", "desc")
         .limit(1);
 
         if(carId) maxItemQuery = maxItemQuery.where("t1.car_id", "=", carId);
@@ -464,11 +457,11 @@ export class StatisticsDao {
             //@formatter:off
             return query.select(
                 [
-                    sql<number>`${ amountExpression }`.as("amount"),
+                    sql<number>`t1.amount`.as("amount"),
                     sql<number>`COUNT(t1.id)`.as("total_count"),
-                    sql<number>`AVG(${ amountExpression })`.as("average_amount"),
-                    sql<number>`SUM(${ amountExpression })`.as("total_amount"),
-                    medianSubQuery(this.db, query, amountExpression).as("median_amount")
+                    sql<number>`AVG(t1.amount)`.as("average_amount"),
+                    sql<number>`SUM(t1.amount)`.as("total_amount"),
+                    medianSubQuery(this.db, query, "t1.amount").as("median_amount")
                 ]
             );
             //@formatter:on
@@ -513,19 +506,12 @@ export class StatisticsDao {
     }
 
     async getExpenseComparisonByType({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStatByType> {
-        const amountExpression =
-            sql<number>`CASE WHEN t2.is_price_per_unit THEN t1.amount * (t2.quantity / COALESCE(t4.conversion_factor, 1)) ELSE t1.amount
-            END`;
-
         let query = this.db
         .selectFrom(`${ EXPENSE_TABLE } as t1`)
-        .leftJoin(`${ FUEL_LOG_TABLE } as t2`, "t1.id", "t2.expense_id")
-        .leftJoin(`${ FUEL_TANK_TABLE } as t3`, "t1.car_id", "t3.car_id")
-        .leftJoin(`${ FUEL_UNIT_TABLE } as t4`, "t3.unit_id", "t4.id")
         //@formatter:off
         .select([
-            sql<number>`SUM(${ amountExpression })`.as("total"),
-            sql<number>`SUM(${ amountExpression }) * 100.0 / SUM(SUM(${ amountExpression })) OVER ()`.as("percent"),
+            sql<number>`SUM(t1.amount)`.as("total"),
+            sql<number>`SUM(t1.amount) * 100.0 / SUM(SUM(t1.amount)) OVER ()`.as("percent"),
             "t1.type_id as type_id"
         ])
         //@formatter:on
@@ -579,18 +565,11 @@ export class StatisticsDao {
         const groupExpression = this.getRangeGroupByExpression("t1.date", unit);
         const selectExpression = this.getRangeSelectExpression("t1.date", unit);
 
-        const amountExpression =
-            sql<number>`CASE WHEN t2.is_price_per_unit THEN t1.amount * (t2.quantity / COALESCE(t4.conversion_factor, 1)) ELSE t1.amount
-            END`;
-
         let query = this.db
         .selectFrom(`${ EXPENSE_TABLE } as t1`)
-        .leftJoin(`${ FUEL_LOG_TABLE } as t2`, "t1.id", "t2.expense_id")
-        .leftJoin(`${ FUEL_TANK_TABLE } as t3`, "t1.car_id", "t3.car_id")
-        .leftJoin(`${ FUEL_UNIT_TABLE } as t4`, "t3.unit_id", "t4.id")
         //@formatter:off
         .select([
-            sql<number>`SUM(${ amountExpression })`.as("total"),
+            sql<number>`SUM(t1.amount)`.as("total"),
             selectExpression,
             "t1.type_id as type_id"
         ])
@@ -860,14 +839,11 @@ export class StatisticsDao {
             return query;
         };
 
-        const amountExpression =
-            sql<number>`CASE WHEN t1.is_price_per_unit THEN t2.amount * (t1.quantity / t5.conversion_factor) ELSE t2.amount
-            END`;
         const quantityExpression = sql<number>`(t1.quantity / t5.conversion_factor)`;
 
         const maxItemResultByAmount = await baseQuery(from, to)
-        .select(amountExpression.as("amount"))
-        .orderBy("amount", "desc")
+        .select("t2.amount")
+        .orderBy("t2.amount", "desc")
         .executeTakeFirst();
 
         const maxItemResultByQuantity = await baseQuery(from, to)
@@ -887,9 +863,9 @@ export class StatisticsDao {
                 sql<number>`AVG(${ quantityExpression })`.as("average_quantity"),
                 sql<number>`SUM(${ quantityExpression })`.as("total_quantity"),
                 sql<number>`COUNT(t1.id)`.as("total_count"),
-                sql<number>`AVG(${ amountExpression })`.as("average_amount"),
-                sql<number>`SUM(${ amountExpression })`.as("total_amount"),
-                medianSubQuery(this.db, base, amountExpression).as("median_amount"),
+                sql<number>`AVG(t2.amount)`.as("average_amount"),
+                sql<number>`SUM(t2.amount)`.as("total_amount"),
+                medianSubQuery(this.db, base, "t2.amount").as("median_amount"),
                 medianSubQuery(this.db, base, quantityExpression).as("median_quantity")
             ]);
             //@formatter:on
@@ -1094,7 +1070,7 @@ export class StatisticsDao {
                 color: fuelType?.primaryColor ?? COLORS.fuelYellow
             }
         };
-        console.log(unit);
+
         return {
             barChartData,
             barChartTypes,
