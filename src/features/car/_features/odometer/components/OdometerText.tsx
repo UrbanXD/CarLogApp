@@ -22,7 +22,7 @@ export function OdometerText({
 }: OdometerTextProps) {
     return (
         <View style={ [styles.container, containerStyle] }>
-            <View style={ [styles.digitContainer] }>
+            <View style={ [styles.digitContainer, textStyle && textStyle?.fontSize && { height: textStyle.fontSize }] }>
                 <Text style={ [styles.digitText, textStyle] }>
                     { text }
                 </Text>

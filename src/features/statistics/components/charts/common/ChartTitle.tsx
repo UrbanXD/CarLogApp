@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 import React from "react";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 
 export type ChartTitleProps = {
     title: string
@@ -50,15 +50,11 @@ const styles = StyleSheet.create({
         alignItems: "flex-end",
         gap: SEPARATOR_SIZES.lightSmall / 2
     },
-    title: {
-        fontFamily: "Gilroy-Heavy",
-        fontSize: FONT_SIZES.p1,
-        color: COLORS.white
-    },
+    title: GLOBAL_STYLE.containerTitleText,
     unit: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p4,
-        lineHeight: FONT_SIZES.p1,
+        lineHeight: GLOBAL_STYLE.containerTitleText.fontSize,
         color: COLORS.gray1
     },
     description: {

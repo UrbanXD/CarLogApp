@@ -27,10 +27,11 @@ import { SERVICE_ITEM_TABLE } from "../../../../database/connector/powersync/tab
 import { ServiceItemTypeDao } from "../../../expense/_features/service/model/dao/ServiceItemTypeDao.ts";
 import { ServiceTypeDao } from "../../../expense/_features/service/model/dao/ServiceTypeDao.ts";
 import { FUEL_TANK_TABLE } from "../../../../database/connector/powersync/tables/fuelTank.ts";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { getExtendedRange } from "../../utils/getExtendedRange.ts";
 import { medianSubQuery } from "../../../../database/dao/utils/medianSubQuery.ts";
 import { CURRENCY_TABLE } from "../../../../database/connector/powersync/tables/currency.ts";
+import { ServiceTypeEnum } from "../../../expense/_features/service/model/enums/ServiceTypeEnum.ts";
 
 type StatisticsFunctionArgs = {
     carId?: string
@@ -93,6 +94,23 @@ export type StatFunctionOptions = {
     carId?: string | null,
     type?: "year" | "month"
 }
+
+export type Forecast = {
+    oldValue: number | string
+    value: number | string
+    date: string | null
+    label?: string
+    color?: string
+}
+
+export type ServiceForecast = {
+    odometer: {
+        value: number
+        unitText?: string
+    }
+    major: Forecast | null
+    small: Forecast | null
+};
 
 export const formatDate = (options?: {
     base?: string
@@ -872,6 +890,110 @@ export class StatisticsDao {
         };
     };
 
+    async getForecastForService(carId: string): ServiceForecast {
+        const MAJOR_SERVICE_INTERVAL_ODOMETER = 60000; //KM
+        const MAJOR_SERVICE_INTERVAL_TIME = 2 * 365; // Day
+        const SMALL_SERVICE_INTERVAL_ODOMETER = 15000; //KM
+        const SMALL_SERVICE_INTERVAL_TIME = 365; // Day
+
+        const majorServiceId = await this.serviceTypeDao.getIdByKey(ServiceTypeEnum.MAJOR_SERVICE);
+        const smallServiceId = await this.serviceTypeDao.getIdByKey(ServiceTypeEnum.SMALL_SERVICE);
+
+        const oldServices = await this.db
+        .selectFrom(`${ SERVICE_LOG_TABLE } as t1`)
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as t2`, "t1.odometer_log_id", "t2.id")
+        .innerJoin(`${ CAR_TABLE } as t3`, "t1.car_id", "t3.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t4`, "t3.odometer_unit_id", "t4.id")
+        .innerJoin(`${ EXPENSE_TABLE } as t5`, "t1.expense_id", "t5.id")
+        //@formatter:off
+        .select([
+            "t1.service_type_id as type_id",
+            sql`MAX(ROUND(t2.value / t4.conversion_factor))`.as("odometer_value"),
+            sql`ROUND((MAX(ROUND(t2.value / t4.conversion_factor)) + ROUND(((CASE WHEN t1.service_type_id = ${ sql.val(majorServiceId) } THEN ${ sql.val(MAJOR_SERVICE_INTERVAL_ODOMETER) } ELSE ${ sql.val(SMALL_SERVICE_INTERVAL_ODOMETER) } END) / t4.conversion_factor))) / 1000) * 1000`.as("forecast_odometer"),
+            //ROUND(X / n) * n, n = 1000 for round up to first 1000 52899 -> 53000
+            "t5.date as date",
+            sql`DATE(
+                t5.date, 
+                '+' ||
+                (
+                    CASE WHEN t1.service_type_id = ${ sql.val(majorServiceId) }
+                    THEN ${ sql.val(MAJOR_SERVICE_INTERVAL_TIME) }
+                    ELSE ${ sql.val(SMALL_SERVICE_INTERVAL_TIME) } END
+                )
+                || ' days'
+            )`.as("max_forecast_date")
+        ])
+        //@formatter:on
+        .where("t1.car_id", "=", carId)
+        .where("t1.service_type_id", "in", [smallServiceId, majorServiceId])
+        .groupBy("t1.service_type_id")
+        .execute();
+
+        const averageDistanceDailyInLastMonths = await this.getAverageDistanceDaily({
+            carId: carId,
+            from: dayjs().subtract(3, "month").toISOString(),
+            to: dayjs().toISOString()
+        });
+
+        const currentOdometer = await this.db
+        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
+        .innerJoin(`${ CAR_TABLE } as t2`, "t1.car_id", "t2.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3`, "t2.odometer_unit_id", "t3.id")
+        //@formatter:off
+        .select([
+            sql`MAX(ROUND(t1.value / t3.conversion_factor))`.as("value"),
+            sql`t3.short`
+        ])
+        //@formatter:on
+        .where("t1.car_id", "=", carId)
+        .executeTakeFirst();
+
+        const odometer = Number(currentOdometer?.value ?? 0);
+        const serviceForecast: ServiceForecast = {
+            odometer: {
+                value: odometer,
+                unitText: currentOdometer?.short
+            }
+        };
+
+        const now = dayjs();
+        oldServices.forEach((service) => {
+            const serviceOdometer = Number(service?.odometer_value ?? 0);
+            const serviceForecastOdometer = Number(service?.forecast_odometer ?? 0);
+
+            let nextServiceDate: Dayjs = service.max_forecast_date
+                                         ? dayjs(service.max_forecast_date)
+                                         : now.add(1, "year");
+
+            if(averageDistanceDailyInLastMonths <= 0) {
+                nextServiceDate = null;
+            } else if(serviceForecastOdometer <= odometer) {
+                nextServiceDate = now;
+            } else {
+                const daysToNextServiceByDailyDistance = (serviceForecastOdometer - serviceOdometer) / averageDistanceDailyInLastMonths;
+                const nextServiceDateByDailyDistance = now.add(daysToNextServiceByDailyDistance, "day");
+                nextServiceDate = nextServiceDateByDailyDistance.isAfter(nextServiceDate)
+                                  ? nextServiceDate
+                                  : nextServiceDateByDailyDistance;
+            }
+
+            let forecast: Forecast = {
+                oldValue: serviceOdometer,
+                value: serviceForecastOdometer,
+                date: nextServiceDate ? nextServiceDate.toISOString() : null
+            };
+
+            if(service.type_id === majorServiceId) {
+                serviceForecast.major = forecast;
+            } else if(service.type_id === smallServiceId) {
+                serviceForecast.small = forecast;
+            }
+        });
+
+        return serviceForecast;
+        // console.log(oldServices, currentOdometer, averageDistanceDailyInLastMonths, "\n\n Forecast: ", serviceForecast);
+    }
+
     async getTotalDistance({ carId, from, to }: StatisticsFunctionArgs): Promise<SummaryStat> {
         let query = this.db
         .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
@@ -1173,6 +1295,28 @@ export class StatisticsDao {
         .where("t1.id", "=", carId);
 
         return (await query.executeTakeFirst())?.odometer_unit;
+    }
+
+    protected async getAverageDistanceDaily({ carId, from, to }: StatisticsFunctionArgs): Promise<number> {
+        if(dayjs(to).diff(from, "day") <= 0) return 0;
+
+        let query = this.db
+        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
+        .innerJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t2`, "t1.id", "t2.odometer_log_id")
+        .innerJoin(`${ CAR_TABLE } as t3`, "t1.car_id", "t3.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t4`, "t3.odometer_unit_id", "t4.id")
+        //@formatter:off
+        .select([
+            sql<number>`(MAX (ROUND(t1.value / t4.conversion_factor)) - MIN (ROUND(t1.value / t4.conversion_factor))) / (JULIANDAY(${ sql.val(to) }) - JULIANDAY(${ sql.val(from) }))`.as("daily_average")
+        ])
+        //@formatter:on
+        .where("t2.date", ">=", from)
+        .where("t2.date", "<=", to);
+
+        if(carId) query = query.where("t1.car_id", "=", carId);
+
+        const result = await query.executeTakeFirst();
+        return result?.daily_average ?? 0;
     }
 
     protected getRangeGroupByExpression(fieldName: string, unit: RangeUnit) {

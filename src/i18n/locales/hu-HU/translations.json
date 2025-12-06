@@ -670,7 +670,13 @@
       "expense_distribution_by_service_item": "Költség eloszlás szerviz tételek szerint",
       "expense_distribution_by_type": "Költség eloszlás szerviz típus szerint",
       "frequency_distribution_by_odometer": "Gyakorisági eloszlás kilométeróra-állás intervallum szerint",
-      "frequency_distribution_by_odometer_description": "Az intervallum terjedelme {{value}}"
+      "frequency_distribution_by_odometer_description": "Az intervallum terjedelme {{value}}",
+      "forecast": "Szervíz előrejelzés",
+      "last_odometer_value": "Legutóbbi",
+      "forecast_odometer_value": "Következő",
+      "forecast_not_possible": "Pontos becslés nem lehetséges",
+      "is_on_time": "Esedékes",
+      "forecast_date": "Becsült időpont"
     }
   }
 }

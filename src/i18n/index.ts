@@ -11,6 +11,8 @@ import updateLocale from "dayjs/plugin/updateLocale";
 import quarterOfYear from "dayjs/plugin/quarterOfYear";
 import isBetween from "dayjs/plugin/isBetween";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import duration from "dayjs/plugin/duration";
+
 import "dayjs/locale/en";
 import "dayjs/locale/hu";
 
@@ -19,6 +21,7 @@ dayjs.extend(updateLocale);
 dayjs.extend(quarterOfYear);
 dayjs.extend(isBetween);
 dayjs.extend(isSameOrBefore);
+dayjs.extend(duration);
 
 dayjs.updateLocale("hu", {
     relativeTime: {
