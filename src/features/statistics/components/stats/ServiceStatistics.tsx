@@ -11,6 +11,7 @@ import { MasonryStatView } from "../MasonryStatView.tsx";
 import { formatTrend } from "../../utils/formatTrend.ts";
 import { formatWithUnit } from "../../../../utils/formatWithUnit.ts";
 import { StatCard } from "../StatCard.tsx";
+import { ServiceForecastView } from "../forecasts/ServiceForecastView.tsx";
 
 const SERVICE_FREQUENCY_INTERVAL = 25000;
 
@@ -229,6 +230,7 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
                 legendPosition="right"
                 isLoading={ !serviceItemByType }
             />
+            <ServiceForecastView carId={ carId }/>
         </>
     );
 }
