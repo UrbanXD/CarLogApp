@@ -655,8 +655,12 @@
       "max_quantity": "Legnagyobb tankolt mennyiség",
       "avg_quantity": "Tankolt mennyiség átlaga",
       "median_quantity": "Tankolt mennyiség mediánja",
-      "fuel_consumption": "Fogyasztás",
-      "fuel_consumption_accuracy": "A fogyasztás pontosságát befolyásolja, hogy megadja-e a kilométeróra állását tankolásai alkalmával"
+      "amount": "Kiadások",
+      "quantity": "Mennyiség",
+      "total_amount_by_date": "Tankolási költségek",
+      "consumption": "Fogyasztás",
+      "cost_per_distance": "Fogyasztási költségelemzés",
+      "accuracy": "A mutató pontosságát befolyásolja, hogy megadja-e a kilométeróra állását tankolásai alkalmával"
     },
     "service": {
       "log_count": "Szervízelések",

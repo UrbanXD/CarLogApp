@@ -32,6 +32,7 @@ import { getExtendedRange } from "../../utils/getExtendedRange.ts";
 import { medianSubQuery } from "../../../../database/dao/utils/medianSubQuery.ts";
 import { CURRENCY_TABLE } from "../../../../database/connector/powersync/tables/currency.ts";
 import { ServiceTypeEnum } from "../../../expense/_features/service/model/enums/ServiceTypeEnum.ts";
+import { formatDateToDatabaseFormat } from "../../utils/formatDateToDatabaseFormat.ts";
 
 type StatisticsFunctionArgs = {
     carId?: string
@@ -433,8 +434,8 @@ export class StatisticsDao {
             let query = this.db
             .selectFrom(`${ EXPENSE_TABLE } as t1`)
             .innerJoin(`${ EXPENSE_TYPE_TABLE } as t2`, "t1.type_id", "t2.id")
-            .where("t1.date", ">=", from)
-            .where("t1.date", "<=", to);
+            .where("t1.date", ">=", formatDateToDatabaseFormat(from))
+            .where("t1.date", "<=", formatDateToDatabaseFormat(to));
 
             if(carId) query = query.where("t1.car_id", "=", carId);
             if(expenseTypeId) query = query.where("t1.type_id", "=", expenseTypeId);
@@ -533,8 +534,8 @@ export class StatisticsDao {
             "t1.type_id as type_id"
         ])
         //@formatter:on
-        .where("t1.date", ">=", from)
-        .where("t1.date", "<=", to)
+        .where("t1.date", ">=", formatDateToDatabaseFormat(from))
+        .where("t1.date", "<=", formatDateToDatabaseFormat(to))
         .groupBy("t1.type_id")
         .orderBy("total", "desc");
 
@@ -592,8 +593,8 @@ export class StatisticsDao {
             "t1.type_id as type_id"
         ])
         //@formatter:on
-        .where("t1.date", ">=", from)
-        .where("t1.date", "<=", to);
+        .where("t1.date", ">=", formatDateToDatabaseFormat(from))
+        .where("t1.date", "<=", formatDateToDatabaseFormat(to));
 
         if(carId) query = query.where("t1.car_id", "=", carId);
 
@@ -668,8 +669,8 @@ export class StatisticsDao {
             sql<number>`SUM(t1.amount)`.as("total"),
             selectExpression
         ])
-        .where("t1.date", ">=", from)
-        .where("t1.date", "<=", to);
+        .where("t1.date", ">=", formatDateToDatabaseFormat(from))
+        .where("t1.date", "<=", formatDateToDatabaseFormat(to));
 
         if(carId) query = query.where("t1.car_id", "=", carId);
 
@@ -715,8 +716,8 @@ export class StatisticsDao {
             sql<number>`SUM(t2.amount) * 100.0 / SUM(SUM(t2.amount)) OVER () as percent`,
             "t1.service_type_id as type_id"
         ])
-        .where("t2.date", ">=", from)
-        .where("t2.date", "<=", to)
+        .where("t2.date", ">=", formatDateToDatabaseFormat(from))
+        .where("t2.date", "<=", formatDateToDatabaseFormat(to))
         .groupBy("t1.service_type_id")
         .orderBy("total", "desc");
 
@@ -771,8 +772,8 @@ export class StatisticsDao {
                 "percent"),
             "t2.service_item_type_id as item_type_id"
         ])
-        .where("t3.date", ">=", from)
-        .where("t3.date", "<=", to)
+        .where("t3.date", ">=", formatDateToDatabaseFormat(from))
+        .where("t3.date", "<=", formatDateToDatabaseFormat(to))
         .groupBy("item_type_id")
         .orderBy("total", "desc");
 
@@ -837,8 +838,8 @@ export class StatisticsDao {
             sql`(JULIANDAY( MAX (t5.date)) - JULIANDAY(MIN (t5.date)))
                 / (COUNT(t1.id) - 1)`.as("average_time")
         ])
-        .where("t5.date", ">=", from)
-        .where("t5.date", "<=", to);
+        .where("t5.date", ">=", formatDateToDatabaseFormat(from))
+        .where("t5.date", "<=", formatDateToDatabaseFormat(to));
 
         if(carId) query = query.where("t1.car_id", "=", carId);
 
@@ -870,8 +871,8 @@ export class StatisticsDao {
             sql`CAST(ROUND(t2.value / t4.conversion_factor) / ${intervalSize} AS INT) * ${intervalSize}`.as("interval_start")
         ])
         //@formatter:on
-        .where("t5.date", ">=", from)
-        .where("t5.date", "<=", to)
+        .where("t5.date", ">=", formatDateToDatabaseFormat(from))
+        .where("t5.date", "<=", formatDateToDatabaseFormat(to))
         .groupBy("interval_start")
         .orderBy("interval_start", "asc");
 
@@ -1006,8 +1007,8 @@ export class StatisticsDao {
             sql<number>`MAX(ROUND(t1.value / t4.conversion_factor)) - MIN(ROUND(t1.value / t4.conversion_factor))`
             .as("distance")
         ])
-        .where("t2.date", ">=", from)
-        .where("t2.date", "<=", to);
+        .where("t2.date", ">=", formatDateToDatabaseFormat(from))
+        .where("t2.date", "<=", formatDateToDatabaseFormat(to));
 
         if(carId) query = query.where("t3.id", "=", carId);
 
@@ -1027,8 +1028,8 @@ export class StatisticsDao {
             .innerJoin(`${ CAR_TABLE } as t3`, "t2.car_id", "t3.id")
             .innerJoin(`${ FUEL_TANK_TABLE } as t4`, "t3.id", "t4.car_id")
             .innerJoin(`${ FUEL_UNIT_TABLE } as t5`, "t4.unit_id", "t5.id")
-            .where("t2.date", ">=", from)
-            .where("t2.date", "<=", to);
+            .where("t2.date", ">=", formatDateToDatabaseFormat(from))
+            .where("t2.date", "<=", formatDateToDatabaseFormat(to));
 
             if(carId) query = query.where("t3.id", "=", carId);
 
@@ -1158,8 +1159,8 @@ export class StatisticsDao {
             sql<number | null>`t3.value / COALESCE(t7.conversion_factor, 1)`.as("odometer_value")
         ])
         //@formatter:on
-        .where("t2.date", ">=", extendedFrom)
-        .where("t2.date", "<=", extendedTo)
+        .where("t2.date", ">=", formatDateToDatabaseFormat(extendedFrom))
+        .where("t2.date", "<=", formatDateToDatabaseFormat(extendedTo))
         .orderBy("t2.date", "asc");
 
         if(carId) {
@@ -1204,12 +1205,12 @@ export class StatisticsDao {
             if(quantitySum === 0) continue;
 
             totalQuantity += quantitySum;
-            const consumption = (totalQuantity / totalDistance) * 100;
+            const consumption = numberToFractionDigit((totalQuantity / totalDistance) * 100);
 
             if(dayjs(curr.date).isBetween(from, to, undefined, i === 1 ? "[]" : "(]")) {
                 lineChartData.push({
                     label: curr.date,
-                    value: numberToFractionDigit(consumption)
+                    value: consumption
                 });
             }
         }
@@ -1217,6 +1218,96 @@ export class StatisticsDao {
         return {
             lineChartData,
             average: lineChartData?.[lineChartData.length - 1].value ?? 0,
+            unitText
+        };
+    }
+
+    public async getFuelCostPerDistance(
+        { carId, from, to }: StatisticsFunctionArgs
+    ): Promise<TrendStat> {
+        const currency = await this.getCarCurrencySymbol(carId);
+        const odometerUnit = await this.getCarOdometerUnit(carId);
+
+        const unitText = `${ currency } / 100 ${ odometerUnit }`;
+
+        let odometerQuery = this.db
+        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
+        .innerJoin(`${ CAR_TABLE } as t2`, "t1.car_id", "t2.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3`, "t2.odometer_unit_id", "t3.id")
+        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t4`, "t1.id", "t4.odometer_log_id")
+        .leftJoin(`${ FUEL_LOG_TABLE } as t5`, "t1.id", "t5.odometer_log_id")
+        .leftJoin(`${ SERVICE_LOG_TABLE } as t6`, "t1.id", "t6.odometer_log_id")
+        .leftJoin(`${ EXPENSE_TABLE } as t7`, "t5.expense_id", "t7.id")
+        .leftJoin(`${ EXPENSE_TABLE } as t8`, "t6.expense_id", "t8.id")
+        //@formatter:off
+        .select([
+            sql`ROUND(t1.value / t3.conversion_factor)`.as("odometer_value"),
+            sql<string>`COALESCE(t8.date, t7.date, t4.date)`.as("date")
+        ])
+        //@formatter:on
+        .where(sql`COALESCE(t8.date, t7.date, t4.date) IS NOT NULL`)
+        .where(sql`COALESCE(t8.date, t7.date, t4.date)`, ">=", formatDateToDatabaseFormat(from))
+        .where(sql`COALESCE(t8.date, t7.date, t4.date)`, "<=", formatDateToDatabaseFormat(to))
+        .orderBy(sql`COALESCE(t8.date, t7.date, t4.date)`, "asc")
+        .orderBy("t1.value", "asc")
+        .orderBy("t1.id", "asc");
+
+        if(carId) odometerQuery = odometerQuery.where("t1.car_id", "=", carId);
+
+        const allOdometerLogs = await odometerQuery.execute();
+
+        const fuelExpenseBaseQuery = (from: string, to: string) => {
+            let query = this.db
+            .selectFrom(`${ FUEL_LOG_TABLE } as t1`)
+            .innerJoin(`${ EXPENSE_TABLE } as t2`, "t1.expense_id", "t2.id")
+            //@formatter:off
+            .select(sql`SUM(t2.amount)`.as("cost"))
+            //@formatter:on
+            .where("t2.date", ">=", formatDateToDatabaseFormat(from))
+            .where("t2.date", "<=", formatDateToDatabaseFormat(to))
+
+            if(carId) query = query.where("t2.car_id", "=", carId);
+
+            return query;
+        };
+
+        let totalCost = 0;
+        let totalDistance = 0;
+        let prevOdometer = allOdometerLogs[0];
+
+        const lineChartData: Array<LineChartItem> = [];
+        for(let i = 1; i < allOdometerLogs.length; i++) {
+            const currOdometer = allOdometerLogs[i];
+
+            const distance = currOdometer.odometer_value! - prevOdometer.odometer_value!;
+            if(distance <= 0) continue;
+            totalDistance += distance;
+
+            const costSum = (await fuelExpenseBaseQuery(
+                prevOdometer.date,
+                dayjs(currOdometer.date).subtract((i === allOdometerLogs.length - 1) ? 0 : 1, "second")
+            )
+            .executeTakeFirst())?.cost ?? 0;
+
+            prevOdometer = currOdometer;
+
+            if(costSum <= 0) continue;
+            totalCost += costSum;
+            totalDistance += distance;
+
+            const costPerDistance = numberToFractionDigit((totalCost / totalDistance) * 100);
+
+            if(costPerDistance > 0 && dayjs(currOdometer.date).isBetween(from, to, undefined, "[]")) {
+                lineChartData.push({
+                    label: currOdometer.date,
+                    value: costPerDistance
+                });
+            }
+        }
+
+        return {
+            lineChartData,
+            average: Number(lineChartData[lineChartData.length - 1]?.value ?? 0) ?? 0,
             unitText
         };
     }
@@ -1237,8 +1328,8 @@ export class StatisticsDao {
             sql<number>`SUM(t1.amount)`.as("total"),
             selectExpression
         ])
-        .where("t1.date", ">=", from)
-        .where("t1.date", "<=", to);
+        .where("t1.date", ">=", formatDateToDatabaseFormat(from))
+        .where("t1.date", "<=", formatDateToDatabaseFormat(to));
 
         if(carId) query = query.where("t1.car_id", "=", carId);
 
@@ -1302,16 +1393,20 @@ export class StatisticsDao {
 
         let query = this.db
         .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
-        .innerJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t2`, "t1.id", "t2.odometer_log_id")
+        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t2`, "t1.id", "t2.odometer_log_id")
         .innerJoin(`${ CAR_TABLE } as t3`, "t1.car_id", "t3.id")
         .innerJoin(`${ ODOMETER_UNIT_TABLE } as t4`, "t3.odometer_unit_id", "t4.id")
+        .leftJoin(`${ FUEL_LOG_TABLE } as t5`, "t1.id", "t5.odometer_log_id")
+        .leftJoin(`${ SERVICE_LOG_TABLE } as t6`, "t1.id", "t6.odometer_log_id")
+        .leftJoin(`${ EXPENSE_TABLE } as t7`, "t5.expense_id", "t7.id")
+        .leftJoin(`${ EXPENSE_TABLE } as t8`, "t6.expense_id", "t8.id")
         //@formatter:off
         .select([
             sql<number>`(MAX (ROUND(t1.value / t4.conversion_factor)) - MIN (ROUND(t1.value / t4.conversion_factor))) / (JULIANDAY(${ sql.val(to) }) - JULIANDAY(${ sql.val(from) }))`.as("daily_average")
         ])
         //@formatter:on
-        .where("t2.date", ">=", from)
-        .where("t2.date", "<=", to);
+        .where(sql`COALESCE(t2.date, t7.date, t8.date)`, ">=", formatDateToDatabaseFormat(from))
+        .where(sql`COALESCE(t2.date, t7.date, t8.date)`, "<=", formatDateToDatabaseFormat(to));
 
         if(carId) query = query.where("t1.car_id", "=", carId);
 

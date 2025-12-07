@@ -26,6 +26,7 @@ export const GLOBAL_STYLE = StyleSheet.create({
     },
     containerTitleText: {
         fontFamily: "Gilroy-Heavy",
+        flexWrap: "wrap",
         fontSize: FONT_SIZES.p1,
         letterSpacing: FONT_SIZES.p1 * 0.035,
         color: COLORS.white

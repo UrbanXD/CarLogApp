@@ -30,6 +30,7 @@ export function FuelStatistics({
     const [fuelConsumption, setFuelConsumption] = useState<TrendStat | null>(null);
     const [fuelLogSummary, setFuelLogSummary] = useState<{ quantity: SummaryStat, amount: SummaryStat } | null>(null);
     const [fuelComparisonByDateWindow, setFuelComparisonByDateWindow] = useState<ComparisonStatByDate | null>(null);
+    const [fuelCostPerDistance, setFuelCostPerDistance] = useState<TrendStat | null>(null);
 
     useEffect(() => {
         (async () => {
@@ -42,16 +43,19 @@ export function FuelStatistics({
             const [
                 resultFuelLogSummary,
                 resultFuelConsumption,
-                resultFuelComparisonByDateWindow
+                resultFuelComparisonByDateWindow,
+                resultFuelCostPerDistance
             ] = await Promise.all([
                 statisticsDao.getFuelSummary(statArgs),
                 statisticsDao.getFuelConsumption(statArgs),
-                statisticsDao.getFuelExpenseComparisonByDateWindow(statArgs)
+                statisticsDao.getFuelExpenseComparisonByDateWindow(statArgs),
+                statisticsDao.getFuelCostPerDistance(statArgs)
             ]);
 
             setFuelLogSummary(resultFuelLogSummary);
             setFuelConsumption(resultFuelConsumption);
             setFuelComparisonByDateWindow(resultFuelComparisonByDateWindow);
+            setFuelCostPerDistance(resultFuelCostPerDistance);
         })();
     }, [carId, from, to]);
 
@@ -195,7 +199,7 @@ export function FuelStatistics({
         <View style={ styles.container }>
             <View style={ styles.statCardContainer }>
                 <StatCard { ...getFuelCount() } />
-                <ChartTitle title={ "Kiadsok" }/>
+                <ChartTitle title={ t("statistics.fuel.amount") }/>
                 <MasonryStatView
                     column1={ [
                         getFuelTotalAmount(),
@@ -206,7 +210,7 @@ export function FuelStatistics({
                         getFuelMedianAmount()
                     ] }
                 />
-                <ChartTitle title={ "Kiadsok" }/>
+                <ChartTitle title={ t("statistics.fuel.quantity") }/>
                 <MasonryStatView
                     column1={ [
                         getFuelTotalQuantity(),
@@ -222,7 +226,7 @@ export function FuelStatistics({
                 chartData={ fuelComparisonByDateWindow?.barChartData }
                 legend={ fuelComparisonByDateWindow?.legend }
                 title={ {
-                    title: t("statistics.service.total_amount_by_date")
+                    title: t("statistics.fuel.total_amount_by_date")
                 } }
                 formatValue={ (value) => formatWithUnit(value, fuelComparisonByDateWindow?.unitText) }
                 formatLabel={ (label) => dayjs(label)
@@ -233,15 +237,27 @@ export function FuelStatistics({
             />
             <LineChartView
                 title={ {
-                    title: t("statistics.fuel.fuel_consumption"),
+                    title: t("statistics.fuel.consumption"),
                     unit: fuelConsumption?.unitText,
                     description: fuelConsumption && fuelConsumption.lineChartData.length > 0 && t(
-                        "statistics.fuel.fuel_consumption_accuracy")
+                        "statistics.fuel.accuracy")
                 } }
                 chartData={ fuelConsumption?.lineChartData }
                 formatValue={ (value) => formatWithUnit(value, fuelConsumption?.unitText) }
                 formatLabel={ (label) => dayjs(label).format("L") }
                 isLoading={ !fuelConsumption }
+            />
+            <LineChartView
+                title={ {
+                    title: t("statistics.fuel.cost_per_distance"),
+                    unit: fuelCostPerDistance?.unitText,
+                    description: fuelCostPerDistance && fuelCostPerDistance.lineChartData.length > 0 && t(
+                        "statistics.fuel.accuracy")
+                } }
+                chartData={ fuelCostPerDistance?.lineChartData }
+                formatValue={ (value) => formatWithUnit(value, fuelCostPerDistance?.unitText) }
+                formatLabel={ (label) => dayjs(label).format("L") }
+                isLoading={ !fuelCostPerDistance }
             />
         </View>
     );

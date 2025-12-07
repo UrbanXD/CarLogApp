@@ -48,7 +48,8 @@ const styles = StyleSheet.create({
     titleContainer: {
         flexDirection: "row",
         alignItems: "flex-end",
-        gap: SEPARATOR_SIZES.lightSmall / 2
+        columnGap: SEPARATOR_SIZES.lightSmall / 2,
+        flexWrap: "wrap"
     },
     title: GLOBAL_STYLE.containerTitleText,
     unit: {
