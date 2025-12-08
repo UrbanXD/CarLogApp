@@ -32,7 +32,7 @@ type LineChartViewProps = {
     title?: ChartTitleProps
     formatLabel?: (label: string) => string
     formatValue?: (value: number | string) => string
-    formatYAxisLabel?: boolean
+    formatYLabelAsValue?: boolean
     isLoading?: boolean
 }
 
@@ -41,7 +41,7 @@ export function LineChartView({
     title,
     formatLabel,
     formatValue,
-    formatYAxisLabel = false,
+    formatYLabelAsValue = false,
     isLoading = false
 }: LineChartViewProps) {
     const formattedChartData = useMemo(() => {
@@ -71,7 +71,7 @@ export function LineChartView({
     } = getYAxisProps({
         maxValue,
         fontSize: AXIS_FONT_SIZE,
-        formatLabel: formatYAxisLabel ? formatValue : undefined
+        formatLabel: formatYLabelAsValue ? formatValue : undefined
     });
 
     const firstPointerLabelWidth = 2 * POINTER_LABEL_PADDING + POINTER_LABEL_FONT_SIZE * 0.55 * ((formattedChartData?.[1]?.value?.toString() ?? "").length + 1.5);
@@ -101,7 +101,6 @@ export function LineChartView({
                             width={ widthPercentageToDP(100) - yAxisLabelWidth }
                             curved
                             areaChart
-                            isAnimated
                             animateOnDataChange
                             animationDuration={ 750 }
                             interpolateMissingValues
@@ -152,7 +151,6 @@ export function LineChartView({
                             focusedDataPointHeight={ FOCUSED_DATA_POINT_SIZE }
                             focusedDataPointWidth={ FOCUSED_DATA_POINT_SIZE }
                             pointerConfig={ {
-                                persistPointer: true,
                                 pointerStripColor: POINTER_STRIP_COLOR,
                                 pointerStripWidth: THICKNESS / 1.5,
                                 pointerVanishDelay: 3000,

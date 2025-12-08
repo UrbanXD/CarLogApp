@@ -35,6 +35,8 @@ type BarChartViewProps = {
     formatLegend?: (label: string) => string
     showsLegend?: boolean
     legendPosition?: "top" | "bottom" | "left" | "right"
+    formatYLabelAsValue?: boolean
+    defaultBarColor?: string
     isLoading?: boolean
 }
 
@@ -48,11 +50,13 @@ export function BarChartView({
     formatLegend,
     showsLegend = true,
     legendPosition = "bottom",
+    formatYLabelAsValue = true,
+    defaultBarColor = COLORS.gray1,
     isLoading = false
 }: BarChartViewProps) {
     const transformToBarData = (
         groups: Array<BarChartItem>,
-        legend: { [key: string]: LegendData }
+        legend?: { [key: string]: LegendData }
     ): Array<barDataItem> => {
         const result: Array<barDataItem> = [];
 
@@ -80,7 +84,7 @@ export function BarChartView({
                     const typeKey = Array.isArray(group.type) ? group.type?.[index] : group.type;
                     const typeInfo = typeKey ? legend?.[typeKey] : undefined;
 
-                    let frontColor = typeInfo?.color ?? "#000000";
+                    let frontColor = typeInfo?.color ?? defaultBarColor ?? "#000000";
                     let disablePress = false;
                     if(value === "" || value <= 0) {
                         frontColor = hexToRgba(frontColor, 0.3);
@@ -102,7 +106,7 @@ export function BarChartView({
                 const typeKey = Array.isArray(group.type) ? group.type?.[0] : group.type;
                 const typeInfo = typeKey ? legend?.[typeKey] : undefined;
 
-                let frontColor = typeInfo?.color ?? "#000000";
+                let frontColor = typeInfo?.color ?? defaultBarColor ?? "#000000";
                 let disablePress = false;
                 if(group.value === "" || group.value === 0) {
                     frontColor = hexToRgba(frontColor, 0.35);
@@ -149,7 +153,7 @@ export function BarChartView({
         formatYLabel
     } = getYAxisProps({
         maxValue,
-        formatLabel: formatValue,
+        formatLabel: (formatYLabelAsValue ? formatValue : undefined),
         fontSize: AXIS_FONT_SIZE
     });
 
