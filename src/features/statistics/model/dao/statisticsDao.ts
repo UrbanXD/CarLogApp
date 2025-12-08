@@ -1,4 +1,4 @@
-import { Kysely, QueryCreator, sql } from "kysely";
+import { Kysely, QueryCreator, SelectQueryBuilder, sql } from "kysely";
 import { DatabaseType } from "../../../../database/connector/powersync/AppSchema.ts";
 import { FUEL_LOG_TABLE } from "../../../../database/connector/powersync/tables/fuelLog.ts";
 import { EXPENSE_TABLE } from "../../../../database/connector/powersync/tables/expense.ts";
@@ -112,6 +112,11 @@ export type ServiceForecast = {
     major: Forecast | null
     small: Forecast | null
 };
+
+export type RideSummaryStat = {
+    distance: SummaryStat & { totalDistanceByOdometer: number, mostVisitedPlaces: Array<TopListItemStat> }
+    duration: Omit<SummaryStat, "count" | "previousWindowCount" | "unitText">
+}
 
 export const formatDate = (options?: {
     base?: string
@@ -992,29 +997,6 @@ export class StatisticsDao {
         });
 
         return serviceForecast;
-        // console.log(oldServices, currentOdometer, averageDistanceDailyInLastMonths, "\n\n Forecast: ", serviceForecast);
-    }
-
-    async getTotalDistance({ carId, from, to }: StatisticsFunctionArgs): Promise<SummaryStat> {
-        let query = this.db
-        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
-        .innerJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t2`, "t1.id", "t2.odometer_log_id")
-        .innerJoin(`${ CAR_TABLE } as t3`, "t1.car_id", "t3.id")
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t4`, "t3.odometer_unit_id", "t4.id")
-        .select([
-            sql<number>`MIN(ROUND(t1.value / t4.conversion_factor))`.as("min"),
-            sql<number>`MAX(ROUND(t1.value / t4.conversion_factor))`.as("max"),
-            sql<number>`MAX(ROUND(t1.value / t4.conversion_factor)) - MIN(ROUND(t1.value / t4.conversion_factor))`
-            .as("distance")
-        ])
-        .where("t2.date", ">=", formatDateToDatabaseFormat(from))
-        .where("t2.date", "<=", formatDateToDatabaseFormat(to));
-
-        if(carId) query = query.where("t3.id", "=", carId);
-
-        const result = await query.execute();
-
-        return null;
     }
 
     async getFuelSummary({ carId, from, to, trendOptions }: StatisticsFunctionArgs): Promise<{
@@ -1041,11 +1023,13 @@ export class StatisticsDao {
         const maxItemResultByAmount = await baseQuery(from, to)
         .select("t2.amount")
         .orderBy("t2.amount", "desc")
+        .limit(1)
         .executeTakeFirst();
 
         const maxItemResultByQuantity = await baseQuery(from, to)
         .select(quantityExpression.as("quantity"))
         .orderBy("quantity", "desc")
+        .limit(1)
         .executeTakeFirst();
 
         const { from: previousWindowFrom, to: previousWindowTo } = getPreviousRangeWindow(from, to);
@@ -1230,29 +1214,13 @@ export class StatisticsDao {
 
         const unitText = `${ currency } / 100 ${ odometerUnit }`;
 
-        let odometerQuery = this.db
-        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
-        .innerJoin(`${ CAR_TABLE } as t2`, "t1.car_id", "t2.id")
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3`, "t2.odometer_unit_id", "t3.id")
-        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t4`, "t1.id", "t4.odometer_log_id")
-        .leftJoin(`${ FUEL_LOG_TABLE } as t5`, "t1.id", "t5.odometer_log_id")
-        .leftJoin(`${ SERVICE_LOG_TABLE } as t6`, "t1.id", "t6.odometer_log_id")
-        .leftJoin(`${ EXPENSE_TABLE } as t7`, "t5.expense_id", "t7.id")
-        .leftJoin(`${ EXPENSE_TABLE } as t8`, "t6.expense_id", "t8.id")
+        const odometerQuery = this.odometerQuery(carId, from, to)
         //@formatter:off
         .select([
             sql`ROUND(t1.value / t3.conversion_factor)`.as("odometer_value"),
             sql<string>`COALESCE(t8.date, t7.date, t4.date)`.as("date")
         ])
         //@formatter:on
-        .where(sql`COALESCE(t8.date, t7.date, t4.date) IS NOT NULL`)
-        .where(sql`COALESCE(t8.date, t7.date, t4.date)`, ">=", formatDateToDatabaseFormat(from))
-        .where(sql`COALESCE(t8.date, t7.date, t4.date)`, "<=", formatDateToDatabaseFormat(to))
-        .orderBy(sql`COALESCE(t8.date, t7.date, t4.date)`, "asc")
-        .orderBy("t1.value", "asc")
-        .orderBy("t1.id", "asc");
-
-        if(carId) odometerQuery = odometerQuery.where("t1.car_id", "=", carId);
 
         const allOdometerLogs = await odometerQuery.execute();
 
@@ -1366,7 +1334,183 @@ export class StatisticsDao {
         };
     }
 
+    async getRideSummary({
+        carId,
+        from,
+        to,
+        trendOptions
+    }: StatisticsFunctionArgs): Promise<RideSummaryStat> {
+        const totalDistance = await this.getTotalDistance(carId, from, to);
+        const mostVisitedPlaces = await this.getMostVisitedPlaces(carId, from, to);
+
+        const baseQuery = (from: string, to: string, odometer?: boolean = true) => {
+            let query = this.db
+            .selectFrom(`${ RIDE_LOG_TABLE } as t1`)
+            .where("t1.start_time", ">=", formatDateToDatabaseFormat(from))
+            .where("t1.end_time", "<=", formatDateToDatabaseFormat(to));
+
+            if(odometer) {
+                query = query
+                .innerJoin(`${ ODOMETER_LOG_TABLE } as t2`, "t1.start_odometer_log_id", "t2.id")
+                .innerJoin(`${ ODOMETER_LOG_TABLE } as t3`, "t1.end_odometer_log_id", "t3.id")
+                .innerJoin(`${ CAR_TABLE } as t4`, "t1.car_id", "t4.id")
+                .innerJoin(`${ ODOMETER_UNIT_TABLE } as t5`, "t4.odometer_unit_id", "t5.id");
+            }
+
+            if(carId) query = query.where("t1.car_id", "=", carId);
+
+            return query;
+        };
+
+        //@formatter:off
+        const distanceExpression = sql<number>`ROUND(t3.value / t5.conversion_factor) - ROUND(t2.value / t5.conversion_factor)`;
+        const durationExpression = sql<number>`(julianday(t1.end_time) - julianday(t1.start_time))`;
+        //@formatter:on
+
+        const { from: previousWindowFrom, to: previousWindowTo } = getPreviousRangeWindow(from, to);
+
+        const aggregateDurationQuery = (from: string, to: string) => {
+            const base = baseQuery(from, to, false);
+
+            return base
+            //@formatter:off
+            .select([
+                sql<number>`MAX(${ durationExpression })`.as("max_ride_duration"),
+                sql<number>`AVG(${ durationExpression })`.as("average_ride_duration"),
+                sql<number>`SUM(${ durationExpression })`.as("total_ride_duration"),
+                medianSubQuery(this.db, base, durationExpression).as("median_ride_duration")
+            ])
+            //@formatter:on
+        }
+
+        const aggregateDistanceQuery = (from: string, to: string) => {
+            const base = baseQuery(from, to);
+
+            return base
+            //@formatter:off
+            .select([
+                "t5.short as unit",
+                sql<number>`MAX(${ distanceExpression })`.as("max_ride_distance"),
+                sql<number>`AVG(${ distanceExpression })`.as("average_ride_distance"),
+                sql<number>`SUM(${ distanceExpression })`.as("total_ride_distance"),
+                sql<number>`COUNT(t1.id)`.as("total_count"),
+                medianSubQuery(this.db, base, distanceExpression).as("median_ride_distance")
+            ]);
+            //@formatter:on
+        };
+
+        const aggregateDurationResult = await aggregateDurationQuery(from, to)
+        .executeTakeFirst();
+        const previousWindowDurationAggregateResult = await aggregateDurationQuery(previousWindowFrom, previousWindowTo)
+        .executeTakeFirst();
+        
+        const aggregateDistanceResult = await aggregateDistanceQuery(from, to)
+        .executeTakeFirst();
+        const previousWindowDistanceAggregateResult = await aggregateDistanceQuery(previousWindowFrom, previousWindowTo)
+        .executeTakeFirst();
+
+        const count = numberToFractionDigit(aggregateDistanceResult.total_count ?? 0);
+        const previousWindowCount = numberToFractionDigit(previousWindowDistanceAggregateResult.total_count ?? 0);
+
+        const totalRideDistance = numberToFractionDigit(aggregateDistanceResult.total_ride_distance ?? 0);
+        const averageRideDistance = numberToFractionDigit(aggregateDistanceResult.average_ride_distance ?? 0);
+        const medianRideDistance = numberToFractionDigit(aggregateDistanceResult.median_ride_distance ?? 0);
+        const previousWindowTotalRideDistance = numberToFractionDigit(previousWindowDistanceAggregateResult.total_ride_distance ?? 0);
+        const previousWindowAverageRideDistance = numberToFractionDigit(previousWindowDistanceAggregateResult.average_ride_distance ?? 0);
+        const previousWindowMedianRideDistance = numberToFractionDigit(previousWindowDistanceAggregateResult.median_ride_distance ?? 0);
+
+        const totalRideDuration = aggregateDurationResult.total_ride_duration ?? 0;
+        const averageRideDuration = aggregateDurationResult.average_ride_duration ?? 0;
+        const medianRideDuration = aggregateDurationResult.median_ride_duration ?? 0;
+        const previousWindowTotalRideDuration = previousWindowDurationAggregateResult.total_ride_duration ?? 0;
+        const previousWindowAverageRideDuration = previousWindowDurationAggregateResult.average_ride_duration ?? 0;
+        const previousWindowMedianRideDuration = previousWindowDurationAggregateResult.median_ride_duration ?? 0;
+
+        return {
+            distance: {
+                max: { value: numberToFractionDigit(aggregateDistanceResult?.max_ride_distance ?? 0) },
+                total: totalRideDistance,
+                average: averageRideDistance,
+                median: medianRideDistance,
+                count,
+                previousWindowTotal: previousWindowTotalRideDistance,
+                previousWindowAverage: previousWindowAverageRideDistance,
+                previousWindowMedian: previousWindowMedianRideDistance,
+                previousWindowCount,
+                totalTrend: calculateTrend(totalRideDistance, previousWindowTotalRideDistance, trendOptions),
+                averageTrend: calculateTrend(averageRideDistance, previousWindowAverageRideDistance, trendOptions),
+                medianTrend: calculateTrend(medianRideDistance, previousWindowMedianRideDistance, trendOptions),
+                countTrend: calculateTrend(count, previousWindowCount, trendOptions),
+                unitText: aggregateDistanceResult?.unit,
+                totalDistanceByOdometer: totalDistance,
+                mostVisitedPlaces
+            },
+            duration: {
+                max: { value: aggregateDurationResult?.max_ride_duration ?? 0 },
+                total: totalRideDuration,
+                average: averageRideDuration,
+                median: medianRideDuration,
+                previousWindowTotal: previousWindowTotalRideDuration,
+                previousWindowAverage: previousWindowAverageRideDuration,
+                previousWindowMedian: previousWindowMedianRideDuration,
+                totalTrend: calculateTrend(totalRideDuration, previousWindowTotalRideDuration, trendOptions),
+                averageTrend: calculateTrend(averageRideDuration, previousWindowAverageRideDuration, trendOptions),
+                medianTrend: calculateTrend(medianRideDuration, previousWindowMedianRideDuration, trendOptions)
+            }
+        };
+    }
+
     /* UTILS */
+
+    protected odometerQuery(carId: string, from: string, to: string): SelectQueryBuilder<any, any, any> {
+        return this.db
+        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
+        .innerJoin(`${ CAR_TABLE } as t2`, "t1.car_id", "t2.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3`, "t2.odometer_unit_id", "t3.id")
+        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t4`, "t1.id", "t4.odometer_log_id")
+        .leftJoin(`${ FUEL_LOG_TABLE } as t5`, "t1.id", "t5.odometer_log_id")
+        .leftJoin(`${ SERVICE_LOG_TABLE } as t6`, "t1.id", "t6.odometer_log_id")
+        .leftJoin(`${ EXPENSE_TABLE } as t7`, "t5.expense_id", "t7.id")
+        .leftJoin(`${ EXPENSE_TABLE } as t8`, "t6.expense_id", "t8.id")
+        .where("t1.car_id", "=", carId)
+        .where(sql`COALESCE(t8.date, t7.date, t4.date) IS NOT NULL`)
+        .where(sql`COALESCE(t8.date, t7.date, t4.date)`, ">=", formatDateToDatabaseFormat(from))
+        .where(sql`COALESCE(t8.date, t7.date, t4.date)`, "<=", formatDateToDatabaseFormat(to))
+        .orderBy(sql`COALESCE(t8.date, t7.date, t4.date)`, "asc")
+        .orderBy("t1.value", "asc")
+        .orderBy("t1.id", "asc");
+    }
+
+    protected async getTotalDistance(carId: string, from: string, to: string): Promise<number> {
+        const query = this.odometerQuery(carId, from, to)
+        .select([
+            sql<number>`MIN(ROUND(t1.value / t3.conversion_factor))`.as("min"),
+            sql<number>`MAX(ROUND(t1.value / t3.conversion_factor))`.as("max"),
+            sql<number>`MAX(ROUND(t1.value / t3.conversion_factor)) - MIN(ROUND(t1.value / t3.conversion_factor))`
+            .as("distance")
+        ]);
+
+        return (await query.executeTakeFirst())?.distance ?? 0;
+    }
+
+    protected async getMostVisitedPlaces(carId: string, from: string, to: string): Promise<Array<TopListItemStat>> {
+        const query = this.db
+        .selectFrom(`${ RIDE_PLACE_TABLE } as t1`)
+        .innerJoin(`${ RIDE_LOG_TABLE } as t2`, "t1.ride_log_id", "t2.id")
+        .innerJoin(`${ PLACE_TABLE } as t3`, "t1.place_id", "t3.id")
+        .select([
+            "t3.name",
+            sql`COUNT(t1.id)`.as("count")
+        ])
+        .where("t2.car_id", "=", carId)
+        .where("t2.start_time", ">=", formatDateToDatabaseFormat(from))
+        .where("t2.start_time", "<=", formatDateToDatabaseFormat(to))
+        .groupBy("t3.id")
+        .orderBy("count", "desc")
+        .limit(3);
+
+        return query.execute();
+    }
 
     protected async getCarCurrencySymbol(carId: string): string | null {
         const query = this.db
@@ -1391,24 +1535,12 @@ export class StatisticsDao {
     protected async getAverageDistanceDaily({ carId, from, to }: StatisticsFunctionArgs): Promise<number> {
         if(dayjs(to).diff(from, "day") <= 0) return 0;
 
-        let query = this.db
-        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
-        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t2`, "t1.id", "t2.odometer_log_id")
-        .innerJoin(`${ CAR_TABLE } as t3`, "t1.car_id", "t3.id")
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t4`, "t3.odometer_unit_id", "t4.id")
-        .leftJoin(`${ FUEL_LOG_TABLE } as t5`, "t1.id", "t5.odometer_log_id")
-        .leftJoin(`${ SERVICE_LOG_TABLE } as t6`, "t1.id", "t6.odometer_log_id")
-        .leftJoin(`${ EXPENSE_TABLE } as t7`, "t5.expense_id", "t7.id")
-        .leftJoin(`${ EXPENSE_TABLE } as t8`, "t6.expense_id", "t8.id")
+        const query = this.odometerQuery(carId, from, to)
         //@formatter:off
         .select([
-            sql<number>`(MAX (ROUND(t1.value / t4.conversion_factor)) - MIN (ROUND(t1.value / t4.conversion_factor))) / (JULIANDAY(${ sql.val(to) }) - JULIANDAY(${ sql.val(from) }))`.as("daily_average")
+            sql<number>`(MAX (ROUND(t1.value / t3.conversion_factor)) - MIN (ROUND(t1.value / t3.conversion_factor))) / (JULIANDAY(${ sql.val(to) }) - JULIANDAY(${ sql.val(from) }))`.as("daily_average")
         ])
         //@formatter:on
-        .where(sql`COALESCE(t2.date, t7.date, t8.date)`, ">=", formatDateToDatabaseFormat(from))
-        .where(sql`COALESCE(t2.date, t7.date, t8.date)`, "<=", formatDateToDatabaseFormat(to));
-
-        if(carId) query = query.where("t1.car_id", "=", carId);
 
         const result = await query.executeTakeFirst();
         return result?.daily_average ?? 0;

@@ -636,6 +636,17 @@
     "chart": {
       "not_enough_data": "Nincs elegendő adat a grafikon megjelenítéséhez"
     },
+    "distance": {
+      "ride_distance": "Futásteljesítmény",
+      "duration": "Idő",
+      "count": "Utak",
+      "total_distance_by_odometer": "Összes távolság",
+      "total_ride_distance": "Összes utazási távolság",
+      "max_ride_distance": "Legnagyobb utazási távolság",
+      "avg_ride_distance": "Átlagos utazási távolság",
+      "median_ride_distance": "Medián utazási távolság",
+      "most_visited_places": "Felkapott helyek"
+    },
     "expense": {
       "count": "Kiadások",
       "total_amount": "Kiadások összege",
