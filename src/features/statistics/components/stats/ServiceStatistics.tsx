@@ -189,6 +189,8 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
                         { value: formatWithUnit(SERVICE_FREQUENCY_INTERVAL, serviceFrequencyByOdometer?.unitText) }
                     )
                 } }
+                formatValue={ (value) => `${ value } ${ t("common.count") }` }
+                formatYLabelAsValue={ false }
                 formatLabel={ (label) => formatWithUnit(label, serviceFrequencyByOdometer?.unitText) }
                 showsLegend={ false }
                 isLoading={ !serviceFrequencyByOdometer }
@@ -200,8 +202,9 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
                     title: t("statistics.service.total_amount_by_date")
                 } }
                 formatValue={ (value) => formatWithUnit(value, serviceLogsByDateWindow?.unitText) }
-                formatLabel={ (label) => dayjs(label)
-                .format(getDateFormatTemplateByRangeUnit(serviceLogsByDateWindow?.rangeUnit)) }
+                formatLabel={
+                    (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit(serviceLogsByDateWindow?.rangeUnit))
+                }
                 formatLegend={ (label) => t(`expenses.types.${ label }`) }
                 showsLegend={ false }
                 isLoading={ !serviceLogsByDateWindow }

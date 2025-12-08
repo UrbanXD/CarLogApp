@@ -63,7 +63,7 @@ export type ComparisonStatByType = {
 
 export type ComparisonStatByDate = {
     barChartData: Array<BarChartItem>
-    legend: { [key: string]: LegendData }
+    legend?: { [key: string]: LegendData }
     rangeUnit: RangeUnit
     unitText?: string
 }
@@ -888,10 +888,8 @@ export class StatisticsDao {
         return {
             barChartData: result.map((r) => ({
                 value: r.service_count ?? 0,
-                label: r?.interval_start?.toString() ?? "0",
-                type: "simple"
+                label: r?.interval_start?.toString() ?? "0"
             })),
-            legend: { "simple": { color: COLORS.gray1 } },
             unitText: carId ? await this.getCarOdometerUnit(carId) : null
         };
     };
@@ -1403,7 +1401,7 @@ export class StatisticsDao {
         .executeTakeFirst();
         const previousWindowDurationAggregateResult = await aggregateDurationQuery(previousWindowFrom, previousWindowTo)
         .executeTakeFirst();
-        
+
         const aggregateDistanceResult = await aggregateDistanceQuery(from, to)
         .executeTakeFirst();
         const previousWindowDistanceAggregateResult = await aggregateDistanceQuery(previousWindowFrom, previousWindowTo)
@@ -1457,6 +1455,37 @@ export class StatisticsDao {
                 averageTrend: calculateTrend(averageRideDuration, previousWindowAverageRideDuration, trendOptions),
                 medianTrend: calculateTrend(medianRideDuration, previousWindowMedianRideDuration, trendOptions)
             }
+        };
+    }
+
+    async getRideFrequency({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStatByDate> {
+        const unit = getRangeUnit(from, to);
+        const groupExpression = this.getRangeGroupByExpression("t1.start_time", unit);
+        const selectExpression = this.getRangeSelectExpression("t1.start_time", unit);
+
+        let query = this.db
+        .selectFrom(`${ RIDE_LOG_TABLE } as t1`)
+        .select([
+            sql<number>`COUNT(t1.id)`.as("count"),
+            selectExpression
+        ])
+        .where("t1.start_time", ">=", formatDateToDatabaseFormat(from))
+        .where("t1.start_time", "<=", formatDateToDatabaseFormat(to));
+
+        if(carId) query = query.where("t1.car_id", "=", carId);
+
+        query = query
+        .groupBy(groupExpression)
+        .orderBy(groupExpression);
+
+        const result = await query.execute();
+
+        return {
+            barChartData: result.map((r) => ({
+                label: r.time,
+                value: r.count
+            })),
+            rangeUnit: unit
         };
     }
 

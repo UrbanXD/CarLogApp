@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import React, { useCallback, useEffect, useState } from "react";
-import { RideSummaryStat } from "../../model/dao/statisticsDao.ts";
+import { ComparisonStatByDate, RideSummaryStat } from "../../model/dao/statisticsDao.ts";
 import { formatTrend } from "../../utils/formatTrend.ts";
 import { formatWithUnit } from "../../../../utils/formatWithUnit.ts";
 import { MasonryStatView } from "../MasonryStatView.tsx";
@@ -10,6 +10,8 @@ import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index
 import { StatCard } from "../StatCard.tsx";
 import dayjs from "dayjs";
 import { ChartTitle } from "../charts/common/ChartTitle.tsx";
+import { BarChartView } from "../charts/BarChartView.tsx";
+import { getDateFormatTemplateByRangeUnit } from "../../utils/getDateFormatTemplateByRangeUnit.ts";
 
 type RideStatisticsProps = {
     carId?: string
@@ -22,6 +24,7 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
     const { statisticsDao } = useDatabase();
 
     const [rideSummaryStat, setRideSummaryStat] = useState<RideSummaryStat | null>(null);
+    const [rideFrequency, setRideFrequency] = useState<ComparisonStatByDate | null>(null);
 
     useEffect(() => {
         (async () => {
@@ -32,12 +35,15 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
             };
 
             const [
-                resultRideSummary
+                resultRideSummary,
+                resultRideFrequency
             ] = await Promise.all([
-                statisticsDao.getRideSummary(statArgs)
+                statisticsDao.getRideSummary(statArgs),
+                statisticsDao.getRideFrequency(statArgs)
             ]);
 
             setRideSummaryStat(resultRideSummary);
+            setRideFrequency(resultRideFrequency);
         })();
     }, [carId, from, to]);
 
@@ -243,6 +249,20 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
                     getAverageRideDuration(),
                     getMedianRideDuration()
                 ] }
+            />
+            <BarChartView
+                chartData={ rideFrequency?.barChartData }
+                legend={ rideFrequency?.legend }
+                title={ {
+                    title: t("statistics.distance.ride_frequency")
+                } }
+                formatValue={ (value) => `${ value } ${ t("common.count") }` }
+                formatYLabelAsValue={ false }
+                formatLabel={
+                    (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit(rideFrequency?.rangeUnit))
+                }
+                showsLegend={ false }
+                isLoading={ !rideFrequency }
             />
         </View>
     );
