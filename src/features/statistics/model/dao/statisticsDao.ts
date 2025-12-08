@@ -291,9 +291,9 @@ export class StatisticsDao {
     }
 
     async getExpenseComparison({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStatByDate> {
-        const unit = getRangeUnit(from, to);
-        const groupExpression = this.getRangeGroupByExpression("t1.date", unit);
-        const selectExpression = this.getRangeSelectExpression("t1.date", unit);
+        const rangeUnit = getRangeUnit(from, to);
+        const groupExpression = this.getRangeGroupByExpression("t1.date", rangeUnit);
+        const selectExpression = this.getRangeSelectExpression("t1.date", rangeUnit);
 
         let query = this.db
         .selectFrom(`${ EXPENSE_TABLE } as t1`)
@@ -363,15 +363,15 @@ export class StatisticsDao {
         return {
             barChartData,
             legend: barChartTypes,
-            rangeUnit: unit,
+            rangeUnit,
             unitText: carId && await this.getCarCurrencySymbol(carId)
         };
     }
 
     async getServiceExpenseComparison({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStatByDate> {
-        const unit = getRangeUnit(from, to);
-        const groupExpression = this.getRangeGroupByExpression("t1.date", unit);
-        const selectExpression = this.getRangeSelectExpression("t1.date", unit);
+        const rangeUnit = getRangeUnit(from, to);
+        const groupExpression = this.getRangeGroupByExpression("t1.date", rangeUnit);
+        const selectExpression = this.getRangeSelectExpression("t1.date", rangeUnit);
 
         let query = this.db
         .selectFrom(`${ EXPENSE_TABLE } as t1`)
@@ -413,7 +413,7 @@ export class StatisticsDao {
         return {
             barChartData,
             legend: barChartTypes,
-            rangeUnit: unit,
+            rangeUnit,
             unitText: carId && await this.getCarCurrencySymbol(carId)
         };
     }
@@ -913,6 +913,8 @@ export class StatisticsDao {
     public async getFuelCostPerDistance(
         { carId, from, to }: StatisticsFunctionArgs
     ): Promise<TrendStat> {
+        const rangeUnit = getRangeUnit(from, to);
+
         const currency = await this.getCarCurrencySymbol(carId);
         const odometerUnit = await this.getCarOdometerUnit(carId);
 
@@ -980,6 +982,7 @@ export class StatisticsDao {
         return {
             lineChartData,
             average: Number(lineChartData[lineChartData.length - 1]?.value ?? 0) ?? 0,
+            rangeUnit,
             unitText
         };
     }
@@ -989,9 +992,9 @@ export class StatisticsDao {
         from,
         to
     }: StatisticsFunctionArgs): Promise<ComparisonStatByDate> {
-        const unit = getRangeUnit(from, to);
-        const groupExpression = this.getRangeGroupByExpression("t1.date", unit);
-        const selectExpression = this.getRangeSelectExpression("t1.date", unit);
+        const rangeUnit = getRangeUnit(from, to);
+        const groupExpression = this.getRangeGroupByExpression("t1.date", rangeUnit);
+        const selectExpression = this.getRangeSelectExpression("t1.date", rangeUnit);
 
         let query = this.db
         .selectFrom(`${ EXPENSE_TABLE } as t1`)
@@ -1033,7 +1036,7 @@ export class StatisticsDao {
         return {
             barChartData,
             legend: barChartTypes,
-            rangeUnit: unit,
+            rangeUnit,
             unitText: carId && await this.getCarCurrencySymbol(carId)
         };
     }
@@ -1164,10 +1167,46 @@ export class StatisticsDao {
         };
     }
 
+    async getDrivingActivity({ carId, from, to }: StatisticsFunctionArgs): Promise<TrendStat> {
+        const rangeUnit = getRangeUnit(from, to);
+        const groupExpression = this.getRangeGroupByExpression("t1.start_time", rangeUnit);
+        const selectExpression = this.getRangeSelectExpression("t1.start_time", rangeUnit);
+
+        let query = this.db
+        .selectFrom(`${ RIDE_LOG_TABLE } as t1`)
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as t2`, "t1.start_odometer_log_id", "t2.id")
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as t3`, "t1.end_odometer_log_id", "t3.id")
+        .innerJoin(`${ CAR_TABLE } as t4`, "t1.car_id", "t4.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t5`, "t4.odometer_unit_id", "t5.id")
+        .select([
+            sql<number>`SUM(ROUND((t3.value - t2.value) / t5.conversion_factor))`.as("activity"),
+            selectExpression
+        ])
+        .where("t1.start_time", ">=", formatDateToDatabaseFormat(from))
+        .where("t1.start_time", "<=", formatDateToDatabaseFormat(to));
+
+        if(carId) query = query.where("t1.car_id", "=", carId);
+
+        query = query
+        .groupBy(groupExpression)
+        .orderBy(groupExpression);
+
+        const result = await query.execute();
+
+        return {
+            lineChartData: result.map(r => ({
+                label: r.time,
+                value: r.activity
+            })),
+            rangeUnit,
+            unitText: carId && await this.getCarOdometerUnit(carId)
+        };
+    }
+
     async getRideFrequency({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStatByDate> {
-        const unit = getRangeUnit(from, to);
-        const groupExpression = this.getRangeGroupByExpression("t1.start_time", unit);
-        const selectExpression = this.getRangeSelectExpression("t1.start_time", unit);
+        const rangeUnit = getRangeUnit(from, to);
+        const groupExpression = this.getRangeGroupByExpression("t1.start_time", rangeUnit);
+        const selectExpression = this.getRangeSelectExpression("t1.start_time", rangeUnit);
 
         let query = this.db
         .selectFrom(`${ RIDE_LOG_TABLE } as t1`)
@@ -1191,7 +1230,7 @@ export class StatisticsDao {
                 label: r.time,
                 value: r.count
             })),
-            rangeUnit: unit
+            rangeUnit
         };
     }
 

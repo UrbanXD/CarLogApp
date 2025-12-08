@@ -41,7 +41,7 @@ export function LineChartView({
     title,
     formatLabel,
     formatValue,
-    formatYLabelAsValue = false,
+    formatYLabelAsValue = true,
     isLoading = false
 }: LineChartViewProps) {
     const formattedChartData = useMemo(() => {

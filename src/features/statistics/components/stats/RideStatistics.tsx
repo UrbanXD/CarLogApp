@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import React, { useCallback, useEffect, useState } from "react";
-import { ComparisonStatByDate, RideSummaryStat } from "../../model/dao/statisticsDao.ts";
+import { ComparisonStatByDate, RideSummaryStat, TrendStat } from "../../model/dao/statisticsDao.ts";
 import { formatTrend } from "../../utils/formatTrend.ts";
 import { formatWithUnit } from "../../../../utils/formatWithUnit.ts";
 import { MasonryStatView } from "../MasonryStatView.tsx";
@@ -12,6 +12,7 @@ import dayjs from "dayjs";
 import { ChartTitle } from "../charts/common/ChartTitle.tsx";
 import { BarChartView } from "../charts/BarChartView.tsx";
 import { getDateFormatTemplateByRangeUnit } from "../../utils/getDateFormatTemplateByRangeUnit.ts";
+import { LineChartView } from "../charts/LineChartView.tsx";
 
 type RideStatisticsProps = {
     carId?: string
@@ -25,6 +26,7 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
 
     const [rideSummaryStat, setRideSummaryStat] = useState<RideSummaryStat | null>(null);
     const [rideFrequency, setRideFrequency] = useState<ComparisonStatByDate | null>(null);
+    const [drivingActivity, setDrivingActivity] = useState<TrendStat | null>(null);
 
     useEffect(() => {
         (async () => {
@@ -36,14 +38,17 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
 
             const [
                 resultRideSummary,
-                resultRideFrequency
+                resultRideFrequency,
+                resultDrivingActivity
             ] = await Promise.all([
                 statisticsDao.getRideSummary(statArgs),
-                statisticsDao.getRideFrequency(statArgs)
+                statisticsDao.getRideFrequency(statArgs),
+                statisticsDao.getDrivingActivity(statArgs)
             ]);
 
             setRideSummaryStat(resultRideSummary);
             setRideFrequency(resultRideFrequency);
+            setDrivingActivity(resultDrivingActivity);
         })();
     }, [carId, from, to]);
 
@@ -63,7 +68,6 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
     }, [rideSummaryStat, t]);
 
     const getTotalRideDuration = useCallback(() => {
-        console.log(rideSummaryStat?.duration);
         return {
             label: t("statistics.distance.total_ride_duration"),
             value: rideSummaryStat
@@ -263,6 +267,17 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
                 }
                 showsLegend={ false }
                 isLoading={ !rideFrequency }
+            />
+            <LineChartView
+                chartData={ drivingActivity?.lineChartData }
+                title={ {
+                    title: t("statistics.distance.driving_activity")
+                } }
+                formatValue={ (value) => formatWithUnit(value, drivingActivity?.unitText) }
+                formatLabel={
+                    (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit(drivingActivity?.rangeUnit))
+                }
+                isLoading={ !drivingActivity }
             />
         </View>
     );

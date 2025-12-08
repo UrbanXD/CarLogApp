@@ -256,7 +256,9 @@ export function FuelStatistics({
                 } }
                 chartData={ fuelCostPerDistance?.lineChartData }
                 formatValue={ (value) => formatWithUnit(value, fuelCostPerDistance?.unitText) }
-                formatLabel={ (label) => dayjs(label).format("L") }
+                formatLabel={
+                    (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit(fuelCostPerDistance?.rangeUnit))
+                }
                 isLoading={ !fuelCostPerDistance }
             />
         </View>
