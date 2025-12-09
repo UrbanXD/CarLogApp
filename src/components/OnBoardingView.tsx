@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef } from "react";
-import { ListRenderItemInfo, useWindowDimensions } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ListRenderItemInfo, useWindowDimensions, View } from "react-native";
 import { DEFAULT_SEPARATOR } from "../constants/index.ts";
 import { RenderComponent } from "../types/index.ts";
 import { useBottomSheetInternal, useBottomSheetScrollableCreator } from "@gorhom/bottom-sheet";
@@ -17,6 +17,10 @@ function OnBoardingView({ steps, currentStep = 0 }: OnBoardingViewProps) {
 
     const flatListRef = useRef<FlatList>(null);
 
+    const [stepHeights, setStepHeights] = useState<Record<number, number>>({});
+
+    const currentHeight = stepHeights[currentStep] ?? "auto";
+
     const width = useWindowDimensions().width - 2 * DEFAULT_SEPARATOR;
 
     useEffect(() => {
@@ -25,12 +29,26 @@ function OnBoardingView({ steps, currentStep = 0 }: OnBoardingViewProps) {
 
     const keyExtractor = useCallback((_, index: number) => index.toString(), []);
 
-    const renderStep = useCallback(({ item }: ListRenderItemInfo<RenderComponent>) => item(), []);
+    const renderStep = useCallback(({ item, index }: ListRenderItemInfo<RenderComponent>) => (
+        <View
+            onLayout={
+                (event) => {
+                    const { height } = event.nativeEvent.layout;
 
-    const renderItem = useCallback(({ item }: ListRenderItemInfo<RenderComponent>) => (
+                    if(stepHeights[index] !== height) {
+                        setStepHeights(prev => ({ ...prev, [index]: height }));
+                    }
+                }
+            }
+        >
+            { item() }
+        </View>
+    ), []);
+
+    const renderItem = useCallback(({ item, index }: ListRenderItemInfo<RenderComponent>) => (
         <FlashList
             data={ [item] }
-            renderItem={ renderStep }
+            renderItem={ () => renderStep({ item, index }) }
             keyExtractor={ keyExtractor }
             contentContainerStyle={ { width } }
             nestedScrollEnabled
@@ -49,6 +67,7 @@ function OnBoardingView({ steps, currentStep = 0 }: OnBoardingViewProps) {
             scrollEnabled={ false }
             nestedScrollEnabled
             showsHorizontalScrollIndicator={ false }
+            style={ { height: currentHeight } }
         />
     );
 };
