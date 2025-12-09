@@ -137,26 +137,34 @@ export function ServiceForecastCard({
                 :
                 <View style={ styles.contentContainer }>
                     <View style={ styles.content }>
-                        <Text style={ styles.forecastLabel }>
-                            {
-                                isLoading
-                                ?
-                                <ActivityIndicator
-                                    size={ "small" }
-                                    color={ COLORS.gray2 }
-                                    style={ { alignSelf: !isOdometerViewWrapped ? "flex-end" : "flex-start" } }
-                                />
-                                : (
-                                    forecast
-                                    ? (
-                                        isOverdue
-                                        ? t("statistics.service.is_on_time")
-                                        : dayjs(forecast.date).format("LL")
+                        <View>
+                            <Text style={ styles.forecastLabel }>
+                                {
+                                    isLoading
+                                    ?
+                                    <ActivityIndicator
+                                        size={ "small" }
+                                        color={ COLORS.gray2 }
+                                        style={ { alignSelf: !isOdometerViewWrapped ? "flex-end" : "flex-start" } }
+                                    />
+                                    : (
+                                        forecast
+                                        ? (
+                                            isOverdue
+                                            ? t("statistics.service.is_on_time")
+                                            : dayjs(forecast.date).format("LL")
+                                        )
+                                        : "-"
                                     )
-                                    : "-"
-                                )
+                                }
+                            </Text>
+                            {
+                                forecast && !isOverdue &&
+                               <Text style={ styles.forecastLabelSubtitle }>
+                                   { dayjs(forecast.date).fromNow() }
+                               </Text>
                             }
-                        </Text>
+                        </View>
                         <Text style={ styles.forecastText }>
                             { t("statistics.service.forecast_date") }
                         </Text>
@@ -247,17 +255,23 @@ const styles = StyleSheet.create({
     },
     content: {
         flexShrink: 1,
-        gap: 0
+        gap: SEPARATOR_SIZES.lightSmall / 2
     },
     forecastLabel: {
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.h3,
+        lineHeight: FONT_SIZES.h3,
         color: COLORS.white
     },
     forecastLabelNotPossible: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
         color: COLORS.gray1
+    },
+    forecastLabelSubtitle: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p3,
+        color: COLORS.white
     },
     forecastText: {
         fontFamily: "Gilroy-Medium",
