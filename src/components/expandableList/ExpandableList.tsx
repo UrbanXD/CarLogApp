@@ -102,6 +102,7 @@ export function ExpandableList({
                      currencyText={ totalAmount[0]?.exchangeCurrency?.symbol ?? "?" }
                      exchangedAmount={ totalAmount.length !== 1 && totalAmount.map(a => Number(a.amount ?? 0)) }
                      exchangeCurrencyText={ totalAmount.map(a => a.currency.symbol ?? "?") }
+                     freeText={ "-" }
                   />
                   <Text style={ [styles.label, styles.bottomContainer.label] }>{ t("currency.total_cost") }</Text>
                </View>

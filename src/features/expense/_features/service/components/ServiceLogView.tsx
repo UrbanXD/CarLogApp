@@ -135,7 +135,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         },
         {
             icon: ICON_NAMES.odometer,
-            title: t("car.odometer.value"),
+            title: t("odometer.value"),
             content: serviceLog?.odometer
                      ? `${ serviceLog.odometer.value } ${ serviceLog.odometer.unit.short }`
                      : t("common.not_assigned"),

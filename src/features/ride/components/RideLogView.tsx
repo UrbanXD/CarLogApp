@@ -209,7 +209,7 @@ export function RideLogView({ id }: RideLogViewProps) {
             },
             {
                 icon: ICON_NAMES.expenseItem,
-                title: t("ride.expenses"),
+                title: t("rides.expenses"),
                 content: isExpenseListExpanded
                          ? " "
                          : (textStyle) =>
@@ -219,6 +219,7 @@ export function RideLogView({ id }: RideLogViewProps) {
                                  exchangedAmount={ totalAmount.length !== 1 && totalAmount.map(a => Number(a.amount ?? 0)) }
                                  exchangeCurrencyText={ totalAmount.map(a => a.currency.symbol ?? "?") }
                                  amountTextStyle={ textStyle }
+                                 freeText={ "-" }
                              />,
                 actionIcon: isExpenseListExpanded ? ICON_NAMES.upArrowHead : ICON_NAMES.downArrowHead,
                 onPress: () => setExpenseListExpanded(prevState => !prevState),

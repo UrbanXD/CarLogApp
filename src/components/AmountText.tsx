@@ -7,6 +7,7 @@ export type AmountTextProps = {
     currencyText: string
     exchangedAmount?: (string | number) | Array<string | number>
     exchangeCurrencyText?: string | Array<string>
+    freeText?: string
     containerStyle?: ViewStyle
     amountTextStyle?: TextStyle
     exchangedAmountTextStyle?: TextStyle
@@ -17,6 +18,7 @@ export function AmountText({
     currencyText,
     exchangedAmount,
     exchangeCurrencyText,
+    freeText,
     containerStyle,
     amountTextStyle,
     exchangedAmountTextStyle
@@ -28,7 +30,7 @@ export function AmountText({
             <Text style={ [styles.text, amountTextStyle] }>
                 {
                     amount == 0
-                    ? t("currency.free")
+                    ? freeText ?? t("currency.free")
                     : `${ amount } ${ currencyText }`
                 }
             </Text>

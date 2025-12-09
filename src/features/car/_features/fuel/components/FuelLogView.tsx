@@ -156,7 +156,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         <>
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
                 <Title
-                    title={ t("expenses.types.fuel") }
+                    title={ t("expenses.types.FUEL") }
                     dividerStyle={ {
                         backgroundColor: fuelLog?.expense.type?.primaryColor ?? COLORS.gray2,
                         marginBottom: SEPARATOR_SIZES.normal
