@@ -622,6 +622,13 @@
     "chart": {
       "not_enough_data": "Not enough data to display the chart"
     },
+    "range_unit": {
+      "year": "Yearly breakdown",
+      "month": "Monthly breakdown",
+      "day": "Daily breakdown",
+      "hour": "Hourly breakdown",
+      "undefined": "Periodic breakdown"
+    },
     "distance": {
       "ride_distance": "Mileage",
       "duration": "Duration",
@@ -636,8 +643,14 @@
       "max_ride_duration": "Longest Trip Duration",
       "avg_ride_duration": "Average Trip Duration",
       "median_ride_duration": "Median Trip Duration",
-      "ride_frequency": "Trip Frequency",
-      "driving_activity": "Driving Activity"
+      "ride_frequency": {
+        "title": "Trip Frequency",
+        "y_axis": "Frequency"
+      },
+      "driving_activity": {
+        "title": "Driving",
+        "y_axis": "Distance traveled ({{unit}})"
+      }
     },
     "expense": {
       "count": "Expenses",
@@ -645,7 +658,10 @@
       "max_amount": "Most expensive expense",
       "avg_amount": "Average expenses",
       "median_amount": "Median of expenses",
-      "total_amount_by_date": "Expense Distribution",
+      "total_amount_by_date": {
+        "title": "Expense distribution",
+        "y_axis": "Cost ({{unit}})"
+      },
       "distribution_by_type": "Expense distribution by type"
     },
     "fuel": {
@@ -660,9 +676,18 @@
       "median_quantity": "Median quantity fueled",
       "amount": "Expenses",
       "quantity": "Quantity",
-      "total_amount_by_date": "Fueling Costs",
-      "consumption": "Consumption",
-      "cost_per_distance": "Consumption Cost Analysis",
+      "total_amount_by_date": {
+        "title": "Refueling costs",
+        "y_axis": "Cost ({{unit}})"
+      },
+      "consumption": {
+        "title": "Fuel consumption",
+        "y_axis": "Average consumption ({{unit}})"
+      },
+      "cost_per_distance": {
+        "title": "Consumption cost analysis",
+        "y_axis": "Average cost ({{unit}})"
+      },
       "accuracy": "The accuracy of this indicator is affected by whether you enter the odometer reading during your fuel-ups"
     },
     "service": {
@@ -671,13 +696,19 @@
       "max_amount": "Most expensive service",
       "avg_amount": "Average service cost",
       "median_amount": "Median service cost",
-      "total_amount_by_date": "Service Costs",
+      "total_amount_by_date": {
+        "title": "Service costs",
+        "y_axis": "Cost ({{unit}})"
+      },
       "average_distance_between_services": "Average distance between services",
       "average_time_between_services": "Average time between services",
       "expense_distribution_by_service_item": "Expense distribution by service item",
       "expense_distribution_by_type": "Expense distribution by service type",
-      "frequency_distribution_by_odometer": "Frequency distribution by odometer reading interval",
-      "frequency_distribution_by_odometer_description": "The interval range is {{value}}",
+      "frequency_distribution_by_odometer": {
+        "title": "Frequency distribution by odometer intervals",
+        "description": "Interval range: {{value}}",
+        "y_axis": "Frequency"
+      },
       "forecast": "Service Forecast",
       "last_odometer_value": "Latest",
       "forecast_odometer_value": "Next",

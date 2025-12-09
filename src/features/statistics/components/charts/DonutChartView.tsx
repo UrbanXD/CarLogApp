@@ -60,7 +60,7 @@ export function DonutChartView({
         <View style={ [styles.chartContainer] }>
             {
                 title &&
-               <ChartTitle { ...title } />
+               <ChartTitle { ...title } containerStyle={ { alignSelf: "flex-start" } }/>
             }
             {
                 isLoading

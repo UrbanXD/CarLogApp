@@ -183,14 +183,15 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
                 chartData={ serviceFrequencyByOdometer?.barChartData }
                 legend={ serviceFrequencyByOdometer?.legend }
                 title={ {
-                    title: t("statistics.service.frequency_distribution_by_odometer"),
+                    title: t("statistics.service.frequency_distribution_by_odometer.title"),
                     description: t(
-                        "statistics.service.frequency_distribution_by_odometer_description",
+                        "statistics.service.frequency_distribution_by_odometer.description",
                         { value: formatWithUnit(SERVICE_FREQUENCY_INTERVAL, serviceFrequencyByOdometer?.unitText) }
                     )
                 } }
+                yAxisTitle={ t("statistics.service.frequency_distribution_by_odometer.y_axis") }
                 formatValue={ (value) => `${ value } ${ t("common.count") }` }
-                formatYLabelAsValue={ false }
+                formatYAxisLabelAsValue={ false }
                 formatLabel={ (label) => formatWithUnit(label, serviceFrequencyByOdometer?.unitText) }
                 showsLegend={ false }
                 isLoading={ !serviceFrequencyByOdometer }
@@ -199,8 +200,12 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
                 chartData={ serviceLogsByDateWindow?.barChartData }
                 legend={ serviceLogsByDateWindow?.legend }
                 title={ {
-                    title: t("statistics.service.total_amount_by_date")
+                    title: t("statistics.service.total_amount_by_date.title")
                 } }
+                yAxisTitle={ t(
+                    "statistics.service.total_amount_by_date.y_axis",
+                    { unit: serviceLogsByDateWindow?.unitText }
+                ) }
                 formatValue={ (value) => formatWithUnit(value, serviceLogsByDateWindow?.unitText) }
                 formatLabel={
                     (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit(serviceLogsByDateWindow?.rangeUnit))

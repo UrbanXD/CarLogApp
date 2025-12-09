@@ -258,10 +258,10 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
                 chartData={ rideFrequency?.barChartData }
                 legend={ rideFrequency?.legend }
                 title={ {
-                    title: t("statistics.distance.ride_frequency")
+                    title: t("statistics.distance.ride_frequency.title")
                 } }
+                yAxisTitle={ t("statistics.distance.ride_frequency.y_axis") }
                 formatValue={ (value) => `${ value } ${ t("common.count") }` }
-                formatYLabelAsValue={ false }
                 formatLabel={
                     (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit(rideFrequency?.rangeUnit))
                 }
@@ -271,8 +271,9 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
             <LineChartView
                 chartData={ drivingActivity?.lineChartData }
                 title={ {
-                    title: t("statistics.distance.driving_activity")
+                    title: t("statistics.distance.driving_activity.title")
                 } }
+                yAxisTitle={ t("statistics.distance.driving_activity.y_axis", { unit: drivingActivity?.unitText }) }
                 formatValue={ (value) => formatWithUnit(value, drivingActivity?.unitText) }
                 formatLabel={
                     (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit(drivingActivity?.rangeUnit))

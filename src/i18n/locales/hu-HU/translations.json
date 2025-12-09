@@ -622,6 +622,13 @@
     "chart": {
       "not_enough_data": "Nincs elegendő adat a grafikon megjelenítéséhez"
     },
+    "range_unit": {
+      "year": "Éves bontás",
+      "month": "Havi bontás",
+      "day": "Napi bontás",
+      "hour": "Óránkénti bontás",
+      "undefined": "Időszakos bontás"
+    },
     "distance": {
       "ride_distance": "Futásteljesítmény",
       "duration": "Idő",
@@ -636,8 +643,14 @@
       "max_ride_duration": "Legnagyobb utazási idő",
       "avg_ride_duration": "Átlagos utazási idő",
       "median_ride_duration": "Medián utazási idő",
-      "ride_frequency": "Utak gyakorisága",
-      "driving_activity": "Vezetési aktivitás"
+      "ride_frequency": {
+        "title": "Utak gyakorisága",
+        "y_axis": "Gyakoriság"
+      },
+      "driving_activity": {
+        "title": "Vezetési aktivitás",
+        "y_axis": "Megtett táv ({{unit}})"
+      }
     },
     "expense": {
       "count": "Kiadások",
@@ -645,7 +658,10 @@
       "max_amount": "Legdrágább kiadás",
       "avg_amount": "Kiadások átlaga",
       "median_amount": "Kiadások mediánja",
-      "total_amount_by_date": "Költség eloszlás",
+      "total_amount_by_date": {
+        "title": "Költség eloszlás",
+        "y_axis": "Költség ({{unit}})"
+      },
       "distribution_by_type": "Költség eloszlás típus szerint"
     },
     "fuel": {
@@ -660,9 +676,18 @@
       "median_quantity": "Tankolt mennyiség mediánja",
       "amount": "Kiadások",
       "quantity": "Mennyiség",
-      "total_amount_by_date": "Tankolási költségek",
-      "consumption": "Fogyasztás",
-      "cost_per_distance": "Fogyasztási költségelemzés",
+      "total_amount_by_date": {
+        "title": "Tankolási költségek",
+        "y_axis": "Költség ({{unit}})"
+      },
+      "consumption": {
+        "title": "Fogyasztás",
+        "y_axis": "Átlagfogyasztás ({{unit}})"
+      },
+      "cost_per_distance": {
+        "title": "Fogyasztási költségelemzés",
+        "y_axis": "Átlag költség ({{unit}})"
+      },
       "accuracy": "A mutató pontosságát befolyásolja, hogy megadja-e a kilométeróra állását tankolásai alkalmával"
     },
     "service": {
@@ -671,13 +696,19 @@
       "max_amount": "Legdrágább szervízelés",
       "avg_amount": "Szervízek átlaga",
       "median_amount": "Szervízek mediánja",
-      "total_amount_by_date": "Szervíz költségek",
+      "total_amount_by_date": {
+        "title": "Szervíz költségek",
+        "y_axis": "Költség ({{unit}})"
+      },
       "average_distance_between_services": "Átlagos megtett távolság szervízek között",
       "average_time_between_services": "Átlagos eltelt idő szervízek között",
       "expense_distribution_by_service_item": "Költség eloszlás szerviz tételek szerint",
       "expense_distribution_by_type": "Költség eloszlás szerviz típus szerint",
-      "frequency_distribution_by_odometer": "Gyakorisági eloszlás kilométeróra-állás intervallum szerint",
-      "frequency_distribution_by_odometer_description": "Az intervallum terjedelme {{value}}",
+      "frequency_distribution_by_odometer": {
+        "title": "Gyakorisági eloszlás kilométeróra-állás intervallum szerint",
+        "description": "Az intervallum terjedelme {{value}}",
+        "y_axis": "Gyakoriság"
+      },
       "forecast": "Szervíz előrejelzés",
       "last_odometer_value": "Legutóbbi",
       "forecast_odometer_value": "Következő",

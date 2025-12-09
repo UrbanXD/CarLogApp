@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { BarChart, barDataItem } from "react-native-gifted-charts";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { Legend, LegendData } from "./common/Legend.tsx";
@@ -10,14 +10,16 @@ import {
     PointerLabel
 } from "./common/PointerLabel.tsx";
 import { ChartTitle, ChartTitleProps } from "./common/ChartTitle.tsx";
-import React from "react";
+import React, { useState } from "react";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 import { ChartDataNotFound } from "./common/ChartDataNotFound.tsx";
 import { getYAxisProps } from "../../utils/getYAxisProps.ts";
 
+const CHART_HEIGHT = 225;
 const SPACING = 1.5;
 const AXIS_FONT_SIZE = FONT_SIZES.p4 * 0.85;
+const AXIS_TITLE_FONT_SIZE = AXIS_FONT_SIZE * 1.2;
 
 export type BarChartItem = {
     label: string
@@ -29,13 +31,15 @@ type BarChartViewProps = {
     chartData?: Array<BarChartItem>
     title?: ChartTitleProps
     legend?: { [key: string]: LegendData }
+    yAxisTitle?: string
+    xAxisTitle?: string
     barWidth?: number
     formatLabel?: (label: string) => string
     formatValue?: (value: number | string) => string
     formatLegend?: (label: string) => string
     showsLegend?: boolean
     legendPosition?: "top" | "bottom" | "left" | "right"
-    formatYLabelAsValue?: boolean
+    formatYAxisLabelAsValue?: boolean
     defaultBarColor?: string
     isLoading?: boolean
 }
@@ -45,15 +49,19 @@ export function BarChartView({
     title,
     legend = {},
     barWidth = 11.5,
+    yAxisTitle,
+    xAxisTitle,
     formatLabel,
     formatValue,
     formatLegend,
     showsLegend = true,
     legendPosition = "bottom",
-    formatYLabelAsValue = true,
+    formatYAxisLabelAsValue = false,
     defaultBarColor = COLORS.gray1,
     isLoading = false
 }: BarChartViewProps) {
+    const [yAxisTitleLines, setYAxisTitleLines] = useState(1);
+
     const transformToBarData = (
         groups: Array<BarChartItem>,
         legend?: { [key: string]: LegendData }
@@ -153,7 +161,7 @@ export function BarChartView({
         formatYLabel
     } = getYAxisProps({
         maxValue,
-        formatLabel: (formatYLabelAsValue ? formatValue : undefined),
+        formatLabel: (formatYAxisLabelAsValue ? formatValue : undefined),
         fontSize: AXIS_FONT_SIZE
     });
 
@@ -189,34 +197,55 @@ export function BarChartView({
                     ? <ChartDataNotFound/>
                     : (
                         <View style={ { flexDirection, gap: SEPARATOR_SIZES.lightSmall } }>
-                            <BarChart
-                                data={ barData }
-                                width={ widthPercentageToDP(100) - yAxisLabelWidth }
-                                maxValue={ chartMaxValue }
-                                barWidth={ barWidth }
-                                minHeight={ SEPARATOR_SIZES.lightSmall * 1.15 }
-                                initialSpacing={ initialSpacing }
-                                endSpacing={ endSpacing }
-                                disablePress
-                                roundedTop
-                                roundedBottom
-                                lineBehindBars
-                                highlightEnabled
-                                formatYLabel={ formatYLabel }
-                                showFractionalValues={ showFractionalValues }
-                                roundToDigits={ precision }
-                                noOfSections={ steps }
-                                rulesType="solid"
-                                rulesColor={ COLORS.gray4 }
-                                xAxisLabelTextStyle={ styles.axisLabel }
-                                xAxisThickness={ 0 }
-                                yAxisSide="right"
-                                yAxisLabelWidth={ yAxisLabelWidth }
-                                yAxisTextStyle={ styles.axisLabel }
-                                yAxisThickness={ 0 }
-                                renderTooltip={ (item) => <PointerLabel
-                                    value={ formatValue?.(item.value) ?? item.value }/> }
-                            />
+                            <View style={ styles.container }>
+                                {
+                                    yAxisTitle &&
+                                   <View style={ [
+                                       styles.yAxisTitleWrapper, { width: AXIS_TITLE_FONT_SIZE * yAxisTitleLines }
+                                   ] }>
+                                      <Text style={ [styles.axisTitle, styles.yAxisTitle] }>{ yAxisTitle }</Text>
+                                   </View>
+                                }
+                                <View style={ styles.containerWithXAxisTitle }>
+                                    <BarChart
+                                        data={ barData }
+                                        width={
+                                            widthPercentageToDP(100)
+                                            - yAxisLabelWidth
+                                            - (yAxisTitle ? AXIS_TITLE_FONT_SIZE * yAxisTitleLines : 0)
+                                        }
+                                        height={ CHART_HEIGHT }
+                                        maxValue={ chartMaxValue }
+                                        barWidth={ barWidth }
+                                        minHeight={ SEPARATOR_SIZES.lightSmall * 1.15 }
+                                        initialSpacing={ initialSpacing }
+                                        endSpacing={ endSpacing }
+                                        disablePress
+                                        roundedTop
+                                        roundedBottom
+                                        lineBehindBars
+                                        highlightEnabled
+                                        formatYLabel={ formatYLabel }
+                                        showFractionalValues={ showFractionalValues }
+                                        roundToDigits={ precision }
+                                        noOfSections={ steps }
+                                        rulesType="solid"
+                                        rulesColor={ COLORS.gray4 }
+                                        xAxisLabelTextStyle={ styles.axisLabel }
+                                        xAxisThickness={ 0 }
+                                        yAxisSide="right"
+                                        yAxisLabelWidth={ yAxisLabelWidth }
+                                        yAxisTextStyle={ styles.axisLabel }
+                                        yAxisThickness={ 0 }
+                                        renderTooltip={ (item) => <PointerLabel
+                                            value={ formatValue?.(item.value) ?? item.value }/> }
+                                    />
+                                    {
+                                        xAxisTitle &&
+                                       <Text style={ styles.axisTitle }>{ xAxisTitle }</Text>
+                                    }
+                                </View>
+                            </View>
                             {
                                 showsLegend && legend && Object.keys(legend).length > 0 &&
                                <View style={ { flex: 0.85, alignItems: "center", justifyContent: "center" } }>
@@ -231,6 +260,31 @@ export function BarChartView({
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flexDirection: "row",
+        gap: SEPARATOR_SIZES.lightSmall,
+        alignItems: "center"
+    },
+    containerWithXAxisTitle: {
+        gap: SEPARATOR_SIZES.lightSmall
+    },
+    yAxisTitleWrapper: {
+        width: AXIS_TITLE_FONT_SIZE,
+        justifyContent: "center",
+        alignItems: "center",
+        transform: [{ translateY: "-50%" }]
+    },
+    axisTitle: {
+        fontFamily: "Gilroy-Medium",
+        fontWeight: "bold",
+        fontSize: AXIS_TITLE_FONT_SIZE,
+        color: COLORS.gray1,
+        textAlign: "center"
+    },
+    yAxisTitle: {
+        width: CHART_HEIGHT,
+        transform: [{ rotateZ: "-90deg" }]
+    },
     axisLabel: {
         fontFamily: "Gilroy-Medium",
         fontSize: AXIS_FONT_SIZE,

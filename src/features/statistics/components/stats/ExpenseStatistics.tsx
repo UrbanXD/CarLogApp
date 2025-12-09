@@ -135,10 +135,14 @@ export function ExpenseStatistics({ carId, from, to }: ExpenseStatisticsProps) {
             />
             <BarChartView
                 title={ {
-                    title: t("statistics.expense.total_amount_by_date")
+                    title: t("statistics.expense.total_amount_by_date.title")
                 } }
                 chartData={ expensesByDateWindow?.barChartData }
                 legend={ expensesByDateWindow?.legend }
+                yAxisTitle={ t(
+                    "statistics.expense.total_amount_by_date.y_axis",
+                    { unit: expensesByDateWindow?.unitText }
+                ) }
                 formatValue={ (value) => formatWithUnit(value, expensesByDateWindow?.unitText) }
                 formatLabel={ (label) => dayjs(label)
                 .format(getDateFormatTemplateByRangeUnit(expensesByDateWindow?.rangeUnit)) }

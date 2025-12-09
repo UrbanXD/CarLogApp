@@ -226,8 +226,12 @@ export function FuelStatistics({
                 chartData={ fuelComparisonByDateWindow?.barChartData }
                 legend={ fuelComparisonByDateWindow?.legend }
                 title={ {
-                    title: t("statistics.fuel.total_amount_by_date")
+                    title: t("statistics.fuel.total_amount_by_date.title")
                 } }
+                yAxisTitle={ t(
+                    "statistics.fuel.total_amount_by_date.y_axis",
+                    { unit: fuelComparisonByDateWindow?.unitText }
+                ) }
                 formatValue={ (value) => formatWithUnit(value, fuelComparisonByDateWindow?.unitText) }
                 formatLabel={ (label) => dayjs(label)
                 .format(getDateFormatTemplateByRangeUnit(fuelComparisonByDateWindow?.rangeUnit)) }
@@ -237,11 +241,11 @@ export function FuelStatistics({
             />
             <LineChartView
                 title={ {
-                    title: t("statistics.fuel.consumption"),
-                    unit: fuelConsumption?.unitText,
+                    title: t("statistics.fuel.consumption.title"),
                     description: fuelConsumption && fuelConsumption.lineChartData.length > 0 && t(
                         "statistics.fuel.accuracy")
                 } }
+                yAxisTitle={ t("statistics.fuel.consumption.y_axis", { unit: fuelConsumption?.unitText }) }
                 chartData={ fuelConsumption?.lineChartData }
                 formatValue={ (value) => formatWithUnit(value, fuelConsumption?.unitText) }
                 formatLabel={ (label) => dayjs(label).format("L") }
@@ -249,11 +253,11 @@ export function FuelStatistics({
             />
             <LineChartView
                 title={ {
-                    title: t("statistics.fuel.cost_per_distance"),
-                    unit: fuelCostPerDistance?.unitText,
+                    title: t("statistics.fuel.cost_per_distance.title"),
                     description: fuelCostPerDistance && fuelCostPerDistance.lineChartData.length > 0 && t(
                         "statistics.fuel.accuracy")
                 } }
+                yAxisTitle={ t("statistics.fuel.cost_per_distance.y_axis", { unit: fuelConsumption?.unitText }) }
                 chartData={ fuelCostPerDistance?.lineChartData }
                 formatValue={ (value) => formatWithUnit(value, fuelCostPerDistance?.unitText) }
                 formatLabel={
