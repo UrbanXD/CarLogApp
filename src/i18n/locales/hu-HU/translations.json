@@ -618,6 +618,12 @@
   },
   "statistics": {
     "title": "Statisztika",
+    "types": {
+      "fuel": "Tankolás",
+      "ride": "Út",
+      "expense": "Kiadás",
+      "service": "Szervíz"
+    },
     "compared_to_previous_cycle": "előző ciklushoz képest",
     "chart": {
       "not_enough_data": "Nincs elegendő adat a grafikon megjelenítéséhez"

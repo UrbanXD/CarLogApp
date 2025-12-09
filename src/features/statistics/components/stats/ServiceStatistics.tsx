@@ -12,6 +12,8 @@ import { formatTrend } from "../../utils/formatTrend.ts";
 import { formatWithUnit } from "../../../../utils/formatWithUnit.ts";
 import { StatCard } from "../StatCard.tsx";
 import { ServiceForecastView } from "../forecasts/ServiceForecastView.tsx";
+import { StyleSheet, View } from "react-native";
+import { SEPARATOR_SIZES } from "../../../../constants/index.ts";
 
 const SERVICE_FREQUENCY_INTERVAL = 25000;
 
@@ -159,7 +161,7 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
     }, [averageDistanceBetweenServices, t]);
 
     return (
-        <>
+        <View style={ styles.container }>
             <MasonryStatView
                 column1={ [
                     getTotalServiceAmount()
@@ -239,6 +241,12 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
                 isLoading={ !serviceItemByType }
             />
             <ServiceForecastView carId={ carId }/>
-        </>
+        </View>
     );
 }
+
+const styles = StyleSheet.create(({
+    container: {
+        gap: SEPARATOR_SIZES.small
+    }
+}));

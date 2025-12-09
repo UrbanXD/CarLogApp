@@ -60,6 +60,17 @@ const TabLayout: React.FC = () => {
                         })
                 } }
             />
+            <Tabs.Screen
+                name="statistics"
+                options={ {
+                    title: t("statistics.title"),
+                    tabBarIcon: () =>
+                        JSON.stringify({
+                            "inactive": ICON_NAMES.statistics,
+                            "active": ICON_NAMES.statistics
+                        })
+                } }
+            />
         </Tabs>
     );
 };

@@ -59,7 +59,8 @@ export const ICON_NAMES = {
     expenseItem: "invoice-text-multiple-outline",
     passenger: "account-outline",
     passengers: "account-multiple-outline",
-    mapMarkers: "map-marker-multiple-outline"
+    mapMarkers: "map-marker-multiple-outline",
+    statistics: "finance"
 };
 
 export const SERVICE_ICONS = {

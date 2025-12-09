@@ -618,6 +618,12 @@
   },
   "statistics": {
     "title": "Statistics",
+    "types": {
+      "fuel": "Fueling",
+      "ride": "Ride",
+      "expense": "Expense",
+      "service": "Service"
+    },
     "compared_to_previous_cycle": "compared to the previous cycle",
     "chart": {
       "not_enough_data": "Not enough data to display the chart"
