@@ -16,7 +16,7 @@ export function Odometer({ value, unit }: OdometerProps) {
     const [odometerContainerWidth, setOdometerContainerWidth] = React.useState(0);
 
     const onOdometerContainerLayout = useCallback((event: LayoutChangeEvent) => {
-        setOdometerContainerWidth(event.nativeEvent.layout.width);
+        setOdometerContainerWidth(Math.min(event.nativeEvent.layout.width, 475));
     }, []);
 
     const styles = useStyles(value.length, odometerContainerWidth);
@@ -48,12 +48,15 @@ const useStyles = (numberOfDigits: number, odometerContainerWidth: number) => St
     container: {
         flexGrow: 1,
         flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
         gap: SEPARATOR_SIZES.lightSmall
     },
     odometerContainer: {
-        flexGrow: 1,
+        flexGrow: 1, //elforgatva ki kellene venni
         flexDirection: "row",
         gap: SEPARATOR_SIZES.lightSmall,
+        alignSelf: "center",
         alignItems: "center",
         justifyContent: "center"
     },

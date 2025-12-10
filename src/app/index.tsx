@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
-// import * as ScreenOrientation from "expo-screen-orientation";
 import { useAuth } from "../contexts/auth/AuthContext.ts";
 import { useFonts } from "expo-font";
 import AnimatedSplashScreen from "../screens/AnimatedSplashScreen.tsx";
