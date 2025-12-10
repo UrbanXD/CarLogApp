@@ -32,7 +32,7 @@ function TabBarIcon({
     const styles = useStyles(isFocused ? activeColor : inactiveColor);
 
     const containerStyle = useAnimatedStyle(() => {
-        const scale = withTiming(isFocused ? 1.05 : 1, { duration: 150, easing: Easing.quad });
+        const scale = withTiming(isFocused ? 1.1 : 1, { duration: 150, easing: Easing.quad });
 
         return { transform: [{ scale }] };
     });
@@ -48,7 +48,7 @@ function TabBarIcon({
                 size={ iconSize }
                 color={ isFocused ? activeColor : inactiveColor }
             />
-            <Text style={ styles.title } numberOfLines={ 1 } adjustsFontSizeToFit>{ title }</Text>
+            <Text style={ styles.title } numberOfLines={ 2 } adjustsFontSizeToFit>{ title }</Text>
         </AnimatedPressable>
     );
 }
@@ -63,12 +63,12 @@ const useStyles = (color: Color) =>
             alignSelf: "center",
             justifyContent: "center",
             alignItems: "center"
-            // backgroundColor: "red"
         },
         title: {
             fontFamily: "Gilroy-Medium",
-            flexWrap: "nowrap",
-            // fontSize: 12,
+            flexWrap: "wrap",
+            textAlign: "center",
+            fontSize: 12,
             color
         }
     });

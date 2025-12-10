@@ -1,13 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import TabBarIcon from "./TabBarIcon.tsx";
-import {
-    COLORS,
-    FONT_SIZES,
-    SECONDARY_COLOR,
-    SEPARATOR_SIZES,
-    SIMPLE_TABBAR_HEIGHT
-} from "../../../constants/index.ts";
+import { COLORS, SECONDARY_COLOR, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
 import { LinearGradient } from "expo-linear-gradient";
@@ -59,7 +53,7 @@ function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
                                 title={ options.title }
                                 activeIcon={ icons?.["active"] }
                                 inactiveIcon={ icons?.["inactive"] }
-                                iconSize={ FONT_SIZES.h2 }
+                                iconSize={ 26 }
                                 activeColor={ COLORS.white }
                                 inactiveColor={ COLORS.white2 }
                                 onPress={ onPress }
@@ -85,7 +79,7 @@ const useStyles = (bottom: number) => StyleSheet.create({
         alignItems: "center",
         height: SIMPLE_TABBAR_HEIGHT + bottom,
         paddingBottom: bottom,
-        gap: 2,
+        gap: SEPARATOR_SIZES.lightSmall,
         width: "100%",
         backgroundColor: "transparent"
     }
