@@ -53,7 +53,7 @@ const useStyles = (numberOfDigits: number, odometerContainerWidth: number) => St
         gap: SEPARATOR_SIZES.lightSmall
     },
     odometerContainer: {
-        flexGrow: 1, //elforgatva ki kellene venni
+        flexGrow: 1,
         flexDirection: "row",
         gap: SEPARATOR_SIZES.lightSmall,
         alignSelf: "center",
