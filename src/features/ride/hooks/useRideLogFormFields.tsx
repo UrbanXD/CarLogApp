@@ -9,7 +9,6 @@ import { CarPickerInput } from "../../car/components/forms/inputFields/CarPicker
 import { RidePlaceInput } from "../_features/place/components/forms/inputFields/RidePlaceInput.tsx";
 import { OdometerValueInput } from "../../car/_features/odometer/components/forms/inputFields/OdometerValueInput.tsx";
 import Input from "../../../components/Input/Input.ts";
-import InputDatePicker from "../../../components/Input/datePicker/InputDatePicker.tsx";
 import { NoteInput } from "../../../components/Input/_presets/NoteInput.tsx";
 import { RidePassengerInput } from "../_features/passenger/components/forms/inputFields/RidePassengerInput.tsx";
 import { RideExpenseInput } from "../_features/rideExpense/components/forms/inputFields/RideExpenseInput.tsx";
@@ -73,92 +72,55 @@ export function useRideLogFormFields({
             render: () => <RidePassengerInput control={ control } fieldName="passengers"/>,
             editToastMessages: EditToast
         },
-        [RideLogFormFieldsEnum.StartOdometer]: {
+        [RideLogFormFieldsEnum.StartTimeAndOdometer]: {
             render: () => <OdometerValueInput
                 control={ control }
-                fieldName="startOdometerValue"
-                title={ t("rides.start_odometer") }
+                odometerValueFieldName="startOdometerValue"
+                odometerValueTitle={ t("rides.start_odometer") }
+                dateFieldName="startTime"
+                dateTitle={ t("rides.start") }
                 currentOdometerValue={ car?.odometer.value }
                 unitText={ car?.odometer.unit.short }
             />,
             editToastMessages: EditToast
         },
-        [RideLogFormFieldsEnum.EndOdometer]: {
+        [RideLogFormFieldsEnum.EndTimeAndOdometer]: {
             render: () => <OdometerValueInput
                 control={ control }
-                fieldName="endOdometerValue"
-                title={ t("rides.end_odometer") }
-                subtitle={ t(
+                odometerValueFieldName="endOdometerValue"
+                odometerValueTitle={ t("rides.end_odometer") }
+                odometerValueSubtitle={ t(
                     "rides.start_odometer_value",
                     { value: `${ formStartOdometerValue } ${ car?.odometer.unit.short }` }
+                ) }
+                dateFieldName="endTime"
+                dateTitle={ t("rides.end") }
+                dateSubtitle={ t(
+                    "rides.start_time_value",
+                    { value: `${ dayjs(formStartTime).format("LLL") }` }
                 ) }
                 unitText={ car?.odometer.unit.short }
             />,
             editToastMessages: EditToast
         },
-        [RideLogFormFieldsEnum.StartTime]: {
-            render: () => (
-                <Input.Field
-                    control={ control }
-                    fieldName="startTime"
-                    fieldNameText={ t("rides.start") }
-                >
-                    <InputDatePicker/>
-                </Input.Field>
-            ),
-            editToastMessages: EditToast
-        },
-        [RideLogFormFieldsEnum.EndTime]: {
-            render: () => (
-                <Input.Field
-                    control={ control }
-                    fieldName="endTime"
-                    fieldNameText={ t("rides.end") }
-                    fieldInfoText={ t(
-                        "rides.start_time_value",
-                        { value: `${ dayjs(formStartTime).format("LLL") }` }
-                    ) }
-                >
-                    <InputDatePicker/>
-                </Input.Field>
-            ),
-            editToastMessages: EditToast
-        },
-        [RideLogFormFieldsEnum.Time]: {
-            render: () => (
-                <Input.Group>
-                    <Input.Field
-                        control={ control }
-                        fieldName="startTime"
-                        fieldNameText={ t("rides.start") }
-                    >
-                        <InputDatePicker/>
-                    </Input.Field>
-                    <Input.Field
-                        control={ control }
-                        fieldName="endTime"
-                        fieldNameText={ t("rides.end") }
-                    >
-                        <InputDatePicker/>
-                    </Input.Field>
-                </Input.Group>
-            ),
-            editToastMessages: EditToast
-        },
-        [RideLogFormFieldsEnum.Odometer]: {
+        [RideLogFormFieldsEnum.DateAndOdometer]: {
             render: () => (
                 <Input.Group>
                     <OdometerValueInput
                         control={ control }
-                        fieldName="startOdometerValue"
-                        title={ t("rides.start_odometer") }
+                        odometerValueFieldName="startOdometerValue"
+                        odometerValueTitle={ t("rides.start_odometer") }
+                        dateFieldName="startTime"
+                        dateTitle={ t("rides.start") }
                         currentOdometerValue={ car?.odometer.value }
                         unitText={ car?.odometer.unit.short }
                     />
                     <OdometerValueInput
                         control={ control }
-                        fieldName="endOdometerValue"
-                        title={ t("rides.end_odometer") }
+                        odometerValueFieldName="endOdometerValue"
+                        odometerValueTitle={ t("rides.end_odometer") }
+                        dateFieldName="endTime"
+                        dateTitle={ t("rides.end") }
                         unitText={ car?.odometer.unit.short }
                     />
                 </Input.Group>
@@ -182,8 +144,7 @@ export function useRideLogFormFields({
             render: () => (
                 <Input.Group>
                     { fields[RideLogFormFieldsEnum.Car].render() }
-                    { fields[RideLogFormFieldsEnum.StartTime].render() }
-                    { fields[RideLogFormFieldsEnum.StartOdometer].render() }
+                    { fields[RideLogFormFieldsEnum.StartTimeAndOdometer].render() }
                 </Input.Group>
             )
         },
@@ -210,8 +171,7 @@ export function useRideLogFormFields({
             fields: ["endTime", "endOdometerValue"],
             render: () => (
                 <Input.Group>
-                    { fields[RideLogFormFieldsEnum.EndTime].render() }
-                    { fields[RideLogFormFieldsEnum.EndOdometer].render() }
+                    { fields[RideLogFormFieldsEnum.EndTimeAndOdometer].render() }
                 </Input.Group>
             )
         },

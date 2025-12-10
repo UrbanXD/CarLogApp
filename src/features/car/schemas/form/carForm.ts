@@ -18,10 +18,10 @@ export const carFormSchema = carSchema
         makeName: z.string().optional(), // hidden input only for result screen
         year: zPickerRequired("error.car_model_year_picker_required").pipe(modelSchema.shape.startYear)
     }),
-    odometer: odometerChangeLogForm(0)
+    odometer: odometerChangeLogForm()
     .pick({ id: true, value: true })
     .extend({
-        odometerChangeLogId: odometerChangeLogForm(0).shape.odometerChangeLogId.nullable(),
+        odometerChangeLogId: odometerChangeLogForm().shape.odometerChangeLogId.nullable(),
         unitId: zPickerRequired("error.unit_picker_required")
         .pipe(carSchema.shape.odometer.shape.unit.shape.id)
     }),

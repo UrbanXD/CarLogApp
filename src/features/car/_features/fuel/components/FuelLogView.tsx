@@ -133,7 +133,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
             icon: ICON_NAMES.calendar,
             title: t("date.text"),
             content: dayjs(fuelLog?.expense?.date).format("LLL"),
-            onPress: () => onEdit(FuelLogFormFieldsEnum.Date)
+            onPress: () => onEdit(FuelLogFormFieldsEnum.DateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.odometer,
@@ -142,7 +142,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
                      ? `${ fuelLog?.odometer?.value } ${ fuelLog.odometer.unit.short }`
                      : t("common.not_assigned"),
             contentTextStyle: !fuelLog?.odometer && { color: COLORS.gray2 },
-            onPress: () => onEdit(FuelLogFormFieldsEnum.OdometerValue)
+            onPress: () => onEdit(FuelLogFormFieldsEnum.DateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.note,

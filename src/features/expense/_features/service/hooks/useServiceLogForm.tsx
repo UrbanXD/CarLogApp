@@ -5,7 +5,6 @@ import { Car } from "../../../../car/schemas/carSchema.ts";
 import { FormFields, Steps } from "../../../../../types/index.ts";
 import { CarPickerInput } from "../../../../car/components/forms/inputFields/CarPickerInput.tsx";
 import Input from "../../../../../components/Input/Input.ts";
-import InputDatePicker from "../../../../../components/Input/datePicker/InputDatePicker.tsx";
 import {
     OdometerValueInput
 } from "../../../../car/_features/odometer/components/forms/inputFields/OdometerValueInput.tsx";
@@ -15,7 +14,7 @@ import { ServiceLogFormFieldsEnum } from "../enums/ServiceLogFormFieldsEnum.ts";
 import { ServiceTypeInput } from "../components/forms/inputFields/ServiceTypeInput.tsx";
 import { ServiceItemInput } from "../components/forms/inputFields/ServiceItemInput.tsx";
 import { useTranslation } from "react-i18next";
-import { EditToast } from "../../../../../ui/alert/presets/toast/EditToast.ts";
+import { EditToast } from "../../../../../ui/alert/presets/toast/index.ts";
 
 type UseServiceLogFormFieldsProps = UseFormReturn<ServiceLogFields>
 
@@ -47,25 +46,14 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
             render: () => <ServiceItemInput control={ control } fieldName="items" carIdFieldName="carId"/>,
             editToastMessages: EditToast
         },
-        [ServiceLogFormFieldsEnum.Date]: {
-            render: () => (
-                <Input.Field
-                    control={ control }
-                    fieldName="date"
-                    fieldNameText={ t("date.text") }
-                >
-                    <InputDatePicker/>
-                </Input.Field>
-            ),
-            editToastMessages: EditToast
-        },
-        [ServiceLogFormFieldsEnum.OdometerValue]: {
+        [ServiceLogFormFieldsEnum.DateAndOdometerValue]: {
             render: () => <OdometerValueInput
                 control={ control }
-                fieldName="odometerValue"
+                odometerValueFieldName="odometerValue"
+                odometerValueOptional
+                dateFieldName="date"
                 currentOdometerValue={ car?.odometer.value }
                 unitText={ car?.odometer.unit.short }
-                optional
             />,
             editToastMessages: EditToast
         },
@@ -86,8 +74,7 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
             render: () => (
                 <Input.Group>
                     { fields[ServiceLogFormFieldsEnum.Car].render() }
-                    { fields[ServiceLogFormFieldsEnum.Date].render() }
-                    { fields[ServiceLogFormFieldsEnum.OdometerValue].render() }
+                    { fields[ServiceLogFormFieldsEnum.DateAndOdometerValue].render() }
                     { fields[ServiceLogFormFieldsEnum.Note].render() }
                 </Input.Group>
             )

@@ -13,11 +13,14 @@ import { Odometer } from "../../schemas/odometerSchema.ts";
 import { FUEL_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/fuelLog.ts";
 import { ODOMETER_CHANGE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/odometerChangeLog.ts";
 import { EXPENSE_TABLE } from "../../../../../../database/connector/powersync/tables/expense.ts";
-import { SelectQueryBuilder } from "kysely";
+import { SelectQueryBuilder, sql } from "kysely";
 import { OdometerLogTypeEnum } from "../enums/odometerLogTypeEnum.ts";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { SERVICE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/serviceLog.ts";
 import { RIDE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/rideLog.ts";
+import { CAR_TABLE } from "../../../../../../database/connector/powersync/tables/car.ts";
+import { ODOMETER_UNIT_TABLE } from "../../../../../../database/connector/powersync/tables/odometerUnit.ts";
+import { formatDateToDatabaseFormat } from "../../../../../statistics/utils/formatDateToDatabaseFormat.ts";
 
 export type SelectOdometerLogTableRow = OdometerLogTableRow & {
     note: string | null,
@@ -105,6 +108,54 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         };
 
         return await this.mapper.toOdometerDto(entity ?? defaultOdometer);
+    }
+
+    async getOdometerLimitByDate(carId: string, date: string): Promise<{
+        min: { value: number, date: string },
+        max: { value: number, date: string } | null,
+        unitText: string
+    }> {
+        const baseQuery = this.db
+        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
+        .innerJoin(`${ CAR_TABLE } as t2`, "t1.car_id", "t2.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3`, "t2.odometer_unit_id", "t3.id")
+        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t4`, "t1.id", "t4.odometer_log_id")
+        .leftJoin(`${ FUEL_LOG_TABLE } as t5`, "t1.id", "t5.odometer_log_id")
+        .leftJoin(`${ SERVICE_LOG_TABLE } as t6`, "t1.id", "t6.odometer_log_id")
+        .leftJoin(`${ EXPENSE_TABLE } as t7`, "t5.expense_id", "t7.id")
+        .leftJoin(`${ EXPENSE_TABLE } as t8`, "t6.expense_id", "t8.id")
+        .where("t1.car_id", "=", carId)
+        .where(sql`COALESCE(t8.date, t7.date, t4.date) IS NOT NULL`);
+
+        const unitResult = await this.db
+        .selectFrom(`${ CAR_TABLE } as t1`)
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t2`, "t1.odometer_unit_id", "t2.id")
+        .select("t2.short as unit")
+        .where("t1.id", "=", carId)
+        .executeTakeFirst();
+
+        const minQuery = baseQuery
+        .select([
+            sql`MAX(ROUND(t1.value / t3.conversion_factor))`.as("odometer_value"),
+            sql`COALESCE(t8.date, t7.date, t4.date)`.as("date")
+        ])
+        .where(sql`COALESCE(t8.date, t7.date, t4.date)`, "<=", formatDateToDatabaseFormat(date));
+
+        const maxQuery = baseQuery
+        .select([
+            sql`MIN(ROUND(t1.value / t3.conversion_factor))`.as("odometer_value"),
+            sql`COALESCE(t8.date, t7.date, t4.date)`.as("date")
+        ])
+        .where(sql`COALESCE(t8.date, t7.date, t4.date)`, ">=", formatDateToDatabaseFormat(date));
+
+        const minResult = await minQuery.executeTakeFirst();
+        const maxResult = await maxQuery.executeTakeFirst();
+
+        return {
+            min: { value: minResult?.odometer_value ?? 0, date: minResult.date },
+            max: maxResult?.odometer_value ? { value: maxResult?.odometer_value, date: maxResult.date } : null,
+            unitText: unitResult?.unit ?? ""
+        };
     }
 
     async createOdometerChangeLog(formResult: OdometerChangeLogFormFields): Promise<OdometerLog> {

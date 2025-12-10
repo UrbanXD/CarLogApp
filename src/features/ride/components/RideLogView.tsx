@@ -190,7 +190,7 @@ export function RideLogView({ id }: RideLogViewProps) {
                 icon: ICON_NAMES.calendar,
                 title: t("rides.start_time"),
                 content: dayjs(rideLog?.startTime).format("LLL"),
-                onPress: () => onEdit(RideLogFormFieldsEnum.Time),
+                onPress: () => onEdit(RideLogFormFieldsEnum.DateAndOdometer),
                 secondaryInfo: {
                     title: t("rides.end_time"),
                     content: dayjs(rideLog?.endTime).format("LLL")
@@ -205,7 +205,7 @@ export function RideLogView({ id }: RideLogViewProps) {
                     title: t("rides.end_odometer"),
                     content: `${ rideLog?.endOdometer.value } ${ rideLog?.endOdometer.unit.short }`
                 },
-                onPress: () => onEdit(RideLogFormFieldsEnum.Odometer)
+                onPress: () => onEdit(RideLogFormFieldsEnum.DateAndOdometer)
             },
             {
                 icon: ICON_NAMES.expenseItem,

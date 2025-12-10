@@ -7,8 +7,11 @@ import { Car } from "../../../../../car/schemas/carSchema.ts";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formResultServiceItemSchema } from "../serviceItemSchema.ts";
+import { OdometerLogDao } from "../../../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
+import { zodOdometerValidation } from "../../../../../car/_features/odometer/utils/zodOdometerValidation.ts";
+import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 
-const serviceLogForm = expenseForm
+const serviceLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
 .pick({ date: true, note: true })
 .extend({ expenseId: expenseForm.shape.id })
 .merge(
@@ -22,19 +25,28 @@ const serviceLogForm = expenseForm
             bounds: { min: 0 },
             errorMessage: {
                 required: "error.odometer_value_required",
-                minBound: (min) =>
-                    min === 0
-                    ? "error.odometer_value_non_negative"
-                    : "error.odometer_value_min_limit"
+                minBound: () => "error.odometer_value_non_negative"
             }
         }),
         odometerLogId: odometerLogSchema.shape.id //hidden
     })
-);
+)
+.superRefine(async (data, ctx) => {
+    await zodOdometerValidation({
+        ctx,
+        odometerLogDao,
+        odometerValueFieldName: "odometerValue",
+        carId: data.carId,
+        date: data.date,
+        odometerValue: data.odometerValue
+    });
+});
 
 export type ServiceLogFields = z.infer<typeof serviceLogForm>;
 
 export function useCreateServiceLogFormProps(car: Car | null) {
+    const { odometerLogDao } = useDatabase();
+
     const defaultValues: ServiceLogFields = {
         id: getUUID(),
         expenseId: getUUID(),
@@ -47,10 +59,12 @@ export function useCreateServiceLogFormProps(car: Car | null) {
         date: new Date()
     };
 
-    return { defaultValues, resolver: zodResolver(serviceLogForm) };
+    return { defaultValues, resolver: zodResolver(serviceLogForm(odometerLogDao)) };
 }
 
 export function useEditServiceLogFormProps(serviceLog: ServiceLog) {
+    const { odometerLogDao } = useDatabase();
+
     const defaultValues: ServiceLogFields = {
         id: serviceLog.id,
         expenseId: serviceLog.expense.id,
@@ -63,5 +77,5 @@ export function useEditServiceLogFormProps(serviceLog: ServiceLog) {
         date: serviceLog.expense.date
     };
 
-    return { defaultValues, resolver: zodResolver(serviceLogForm) };
+    return { defaultValues, resolver: zodResolver(serviceLogForm(odometerLogDao)) };
 }

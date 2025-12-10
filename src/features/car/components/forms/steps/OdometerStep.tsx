@@ -15,7 +15,7 @@ function OdometerStep<FormFields = CarFormFields>({ control }: OdometerStepProps
         <Input.Group>
             <OdometerValueInput
                 control={ control }
-                fieldName="odometer.value"
+                odometerValueFieldName="odometer.value"
             />
             <OdometerUnitInput
                 control={ control }

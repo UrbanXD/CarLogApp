@@ -6,7 +6,6 @@ import { FormFields, Steps } from "../../../../../types/index.ts";
 import { CarPickerInput } from "../../../components/forms/inputFields/CarPickerInput.tsx";
 import { AmountInput } from "../../../../_shared/currency/components/AmountInput.tsx";
 import Input from "../../../../../components/Input/Input.ts";
-import InputDatePicker from "../../../../../components/Input/datePicker/InputDatePicker.tsx";
 import { NoteInput } from "../../../../../components/Input/_presets/NoteInput.tsx";
 import { FuelLogFormFieldsEnum } from "../enums/fuelLogFormFields.tsx";
 import { FuelLogFields } from "../schemas/form/fuelLogForm.ts";
@@ -64,26 +63,17 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             />,
             editToastMessages: EditToast
         },
-        [FuelLogFormFieldsEnum.Date]: {
-            render: () => (
-                <Input.Field
+        [FuelLogFormFieldsEnum.DateAndOdometerValue]: {
+            render: () => <>
+                <OdometerValueInput
                     control={ control }
-                    fieldName="date"
-                    fieldNameText={ t("date.text") }
-                >
-                    <InputDatePicker/>
-                </Input.Field>
-            ),
-            editToastMessages: EditToast
-        },
-        [FuelLogFormFieldsEnum.OdometerValue]: {
-            render: () => <OdometerValueInput
-                control={ control }
-                fieldName="odometerValue"
-                currentOdometerValue={ car?.odometer.value }
-                unitText={ car?.odometer.unit.short }
-                optional
-            />,
+                    odometerValueFieldName="odometerValue"
+                    dateFieldName="date"
+                    currentOdometerValue={ car?.odometer.value }
+                    unitText={ car?.odometer.unit.short }
+                    odometerValueOptional
+                />
+            </>,
             editToastMessages: EditToast
         },
         [FuelLogFormFieldsEnum.Note]: {
@@ -103,8 +93,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             render: () => (
                 <Input.Group>
                     { fields[FuelLogFormFieldsEnum.Car].render() }
-                    { fields[FuelLogFormFieldsEnum.Date].render() }
-                    { fields[FuelLogFormFieldsEnum.OdometerValue].render() }
+                    { fields[FuelLogFormFieldsEnum.DateAndOdometerValue].render() }
                     { fields[FuelLogFormFieldsEnum.Note].render() }
                 </Input.Group>
             )

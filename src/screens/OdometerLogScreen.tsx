@@ -82,7 +82,7 @@ export function OdometerLogScreen() {
             pathname: "/odometer/log/edit/[id]",
             params: { id: odometerLog.id, field: field }
         });
-    }, [t]);
+    }, [t, odometerLog]);
 
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
@@ -95,13 +95,13 @@ export function OdometerLogScreen() {
             icon: ICON_NAMES.odometer,
             title: t("odometer.value"),
             content: `${ odometerLog?.value } ${ odometerLog?.unit.short }`,
-            onPress: () => onEdit(OdometerLogFormFields.OdometerValue)
+            onPress: () => onEdit(OdometerLogFormFields.DateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.calendar,
             title: t("date.text"),
             content: dayjs(odometerLog?.date).format("LLL"),
-            onPress: () => onEdit(OdometerLogFormFields.Date)
+            onPress: () => onEdit(OdometerLogFormFields.DateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.note,

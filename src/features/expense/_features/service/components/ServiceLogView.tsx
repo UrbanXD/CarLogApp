@@ -131,7 +131,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
             icon: ICON_NAMES.calendar,
             title: t("date.text"),
             content: dayjs(serviceLog?.expense?.date).format("LLL"),
-            onPress: () => onEdit(ServiceLogFormFieldsEnum.Date)
+            onPress: () => onEdit(ServiceLogFormFieldsEnum.DateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.odometer,
@@ -140,7 +140,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
                      ? `${ serviceLog.odometer.value } ${ serviceLog.odometer.unit.short }`
                      : t("common.not_assigned"),
             contentTextStyle: !serviceLog?.odometer && { color: COLORS.gray2 },
-            onPress: () => onEdit(ServiceLogFormFieldsEnum.OdometerValue)
+            onPress: () => onEdit(ServiceLogFormFieldsEnum.DateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.note,
