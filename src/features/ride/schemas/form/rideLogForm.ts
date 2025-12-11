@@ -62,7 +62,8 @@ const rideLogForm = (odometerLogDao: OdometerLogDao) => rideLogSchema
         odometerValueFieldName: "startOdometerValue",
         carId: data.carId,
         date: data.startTime,
-        odometerValue: data.startOdometerValue
+        odometerValue: data.startOdometerValue,
+        skipOdometerLogs: [data.startOdometerLogId, data.endOdometerLogId]
     });
 
     await zodOdometerValidation({
@@ -71,7 +72,8 @@ const rideLogForm = (odometerLogDao: OdometerLogDao) => rideLogSchema
         odometerValueFieldName: "endOdometerValue",
         carId: data.carId,
         date: data.endTime,
-        odometerValue: data.endOdometerValue
+        odometerValue: data.endOdometerValue,
+        skipOdometerLogs: [data.startOdometerLogId, data.endOdometerLogId]
     });
 });
 

@@ -47,8 +47,6 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
 
             setOdometerLimit(await odometerLogDao.getOdometerLimitByDate(formCarId, formDate));
         })();
-
-        setOdometerLimit();
     }, [formCarId, formDate]);
 
     const fields: Record<FuelLogFormFieldsEnum, FormFields> = useMemo(() => ({

@@ -42,10 +42,13 @@ export const zNumber = ({
     return optional ? base.optional().nullable() : base;
 };
 
-export const zPickerRequired = (errorMessage?: string = "error.picker_required") => z.union([
-    z.string({ required_error: errorMessage }).min(1, errorMessage),
-    z.number({ required_error: errorMessage })
-]);
+export const zPickerRequired = (errorMessage?: string = "error.picker_required") => z.preprocess(
+    (value) => value ? value : "",
+    z.union([
+        z.string({ required_error: errorMessage }).min(1, errorMessage),
+        z.number({ required_error: errorMessage })
+    ])
+);
 
 export const zImage = z
 .custom<Image | null>(value => value === null || value instanceof Image);

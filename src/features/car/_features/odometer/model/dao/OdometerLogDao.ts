@@ -116,8 +116,12 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         return await this.mapper.toOdometerDto(entity ?? defaultOdometer);
     }
 
-    async getOdometerLimitByDate(carId: string, date: string): Promise<OdometerLimit> {
-        const baseQuery = this.db
+    async getOdometerLimitByDate(
+        carId: string,
+        date: string,
+        skipOdometerLogs?: Array<string> = []
+    ): Promise<OdometerLimit> {
+        let baseQuery = this.db
         .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
         .innerJoin(`${ CAR_TABLE } as t2`, "t1.car_id", "t2.id")
         .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3`, "t2.odometer_unit_id", "t3.id")
@@ -126,8 +130,11 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         .leftJoin(`${ SERVICE_LOG_TABLE } as t6`, "t1.id", "t6.odometer_log_id")
         .leftJoin(`${ EXPENSE_TABLE } as t7`, "t5.expense_id", "t7.id")
         .leftJoin(`${ EXPENSE_TABLE } as t8`, "t6.expense_id", "t8.id")
+        .leftJoin(`${ RIDE_LOG_TABLE } as t9`, "t1.id", "t9.start_odometer_log_id")
+        .leftJoin(`${ RIDE_LOG_TABLE } as t10`, "t1.id", "t10.end_odometer_log_id")
         .where("t1.car_id", "=", carId)
-        .where(sql`COALESCE(t8.date, t7.date, t4.date) IS NOT NULL`);
+        .where("t1.id", "not in", skipOdometerLogs)
+        .where(sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date) IS NOT NULL`);
 
         const unitResult = await this.db
         .selectFrom(`${ CAR_TABLE } as t1`)
@@ -139,16 +146,24 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         const minQuery = baseQuery
         .select([
             sql`MAX(ROUND(t1.value / t3.conversion_factor))`.as("odometer_value"),
-            sql`COALESCE(t8.date, t7.date, t4.date)`.as("date")
+            sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`.as("date")
         ])
-        .where(sql`COALESCE(t8.date, t7.date, t4.date)`, "<=", formatDateToDatabaseFormat(date));
+        .where(
+            sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`,
+            "<",
+            formatDateToDatabaseFormat(date)
+        );
 
         const maxQuery = baseQuery
         .select([
             sql`MIN(ROUND(t1.value / t3.conversion_factor))`.as("odometer_value"),
-            sql`COALESCE(t8.date, t7.date, t4.date)`.as("date")
+            sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`.as("date")
         ])
-        .where(sql`COALESCE(t8.date, t7.date, t4.date)`, ">=", formatDateToDatabaseFormat(date));
+        .where(
+            sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`,
+            ">",
+            formatDateToDatabaseFormat(date)
+        );
 
         const minResult = await minQuery.executeTakeFirst();
         const maxResult = await maxQuery.executeTakeFirst();

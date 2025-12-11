@@ -9,6 +9,7 @@ type ZodOdometerValidationArgs = {
     carId: string
     date: string
     odometerValue?: number | null
+    skipOdometerLogs?: Array<string>
 }
 
 
@@ -17,12 +18,13 @@ export async function zodOdometerValidation({
     odometerLogDao,
     odometerValueFieldName,
     carId,
+    date,
     odometerValue,
-    date
+    skipOdometerLogs
 }: ZodOdometerValidationArgs) {
     if(!odometerValue) return;
 
-    const odometerLimit = await odometerLogDao.getOdometerLimitByDate(carId, date);
+    const odometerLimit = await odometerLogDao.getOdometerLimitByDate(carId, date, skipOdometerLogs);
 
     if(odometerValue < odometerLimit.min.value) {
         ctx.addIssue({
