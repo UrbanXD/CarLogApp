@@ -459,7 +459,7 @@
     },
     "steps": {
       "basic_information": "Basic information",
-      "fueling_information": "$t(fueling)"
+      "fueling_information": "$t(fuel.fueling)"
     }
   },
   "odometer": {
@@ -469,7 +469,9 @@
     "value": "Odometer reading",
     "create": "Record odometer reading",
     "open_log": "Odometer log",
+    "current_value": "Current odometer reading: {{value}}",
     "original_value": "Original odometer reading {{value}}",
+    "limit": "Latest odometer reading:: {{value}} ({{date}})",
     "unit_types": {
       "title": "Odometer units",
       "undefined": "$t(common.unknown)",

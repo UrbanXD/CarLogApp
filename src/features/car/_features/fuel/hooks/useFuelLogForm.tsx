@@ -13,17 +13,25 @@ import { OdometerValueInput } from "../../odometer/components/forms/inputFields/
 import { FuelInput } from "../components/forms/inputFields/FuelInput.tsx";
 import { EditToast } from "../../../../../ui/alert/presets/toast/index.ts";
 import { useTranslation } from "react-i18next";
+import { formatWithUnit } from "../../../../../utils/formatWithUnit.ts";
+import { Odometer } from "../../odometer/schemas/odometerSchema.ts";
+import { OdometerLimit } from "../../odometer/model/dao/OdometerLogDao.ts";
+import dayjs from "dayjs";
+import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 
-type UseFuelLogFormFieldsProps = UseFormReturn<FuelLogFields>
+type UseFuelLogFormFieldsProps = UseFormReturn<FuelLogFields> & { odometer?: Odometer }
 
 export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
     const { t } = useTranslation();
-    const { control, setValue, clearErrors } = props;
+    const { control, setValue, clearErrors, odometer } = props;
+    const { odometerLogDao } = useDatabase();
     const { getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(null);
+    const [odometerLimit, setOdometerLimit] = useState<OdometerLimit | null>(null);
 
     const formCarId = useWatch({ control, name: "carId" });
+    const formDate = useWatch({ control, name: "date" });
 
     useEffect(() => {
         const car = getCar(formCarId);
@@ -32,6 +40,16 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
         setValue("fuelUnitId", car?.fuelTank.unit.id);
         clearErrors();
     }, [formCarId]);
+
+    useEffect(() => {
+        (async () => {
+            if(!formCarId || !formDate) return;
+
+            setOdometerLimit(await odometerLogDao.getOdometerLimitByDate(formCarId, formDate));
+        })();
+
+        setOdometerLimit();
+    }, [formCarId, formDate]);
 
     const fields: Record<FuelLogFormFieldsEnum, FormFields> = useMemo(() => ({
         [FuelLogFormFieldsEnum.Car]: {
@@ -69,6 +87,16 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
                     control={ control }
                     odometerValueFieldName="odometerValue"
                     dateFieldName="date"
+                    odometerValueSubtitle={ odometer ? t(
+                        "odometer.original_value",
+                        { value: formatWithUnit(odometer.value, odometer.unit.short) }
+                    ) : odometerLimit && t(
+                        "odometer.limit",
+                        {
+                            value: formatWithUnit(odometerLimit.min.value, odometerLimit.unitText),
+                            date: dayjs(odometerLimit.min.date).format("L")
+                        }
+                    ) }
                     currentOdometerValue={ car?.odometer.value }
                     unitText={ car?.odometer.unit.short }
                     odometerValueOptional
@@ -84,7 +112,7 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             />,
             editToastMessages: EditToast
         }
-    }), [control, setValue, car, t]);
+    }), [control, setValue, car, t, odometer, odometerLimit]);
 
     const multiStepFormSteps: Steps = [
         {

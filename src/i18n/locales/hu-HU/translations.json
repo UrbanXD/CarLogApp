@@ -460,7 +460,7 @@
     },
     "steps": {
       "basic_information": "Alap információk",
-      "fueling_information": "$t(fueling)"
+      "fueling_information": "$t(fuel.fueling)"
     }
   },
   "odometer": {
@@ -470,7 +470,9 @@
     "value": "Kilométeróra-állás",
     "create": "Kilométeróra-állás rögzítése",
     "open_log": "Kilométeróra-állás napló",
+    "current_value": "A jelenlegi kilométeróra-állás: {{value}}",
     "original_value": "A bejegyzés eredeti kilométeróra-állása {{value}}",
+    "limit": "A legutóbbi kilométeróra-állás: {{value}} ({{date}})",
     "unit_types": {
       "title": "Kilométeróra mértékegység",
       "undefined": "$t(common.unknown)",

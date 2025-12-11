@@ -28,6 +28,12 @@ export type SelectOdometerLogTableRow = OdometerLogTableRow & {
     related_id: string | null
 };
 
+export type OdometerLimit = {
+    min: { value: number, date: string },
+    max: { value: number, date: string } | null,
+    unitText: string
+}
+
 export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, OdometerLogMapper, SelectOdometerLogTableRow> {
     constructor(db: Kysely<DatabaseType>, odometerUnitDao: OdometerUnitDao, odometerLogTypeDao: OdometerLogTypeDao) {
         super(db, ODOMETER_LOG_TABLE, new OdometerLogMapper(odometerUnitDao, odometerLogTypeDao));
@@ -110,11 +116,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         return await this.mapper.toOdometerDto(entity ?? defaultOdometer);
     }
 
-    async getOdometerLimitByDate(carId: string, date: string): Promise<{
-        min: { value: number, date: string },
-        max: { value: number, date: string } | null,
-        unitText: string
-    }> {
+    async getOdometerLimitByDate(carId: string, date: string): Promise<OdometerLimit> {
         const baseQuery = this.db
         .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
         .innerJoin(`${ CAR_TABLE } as t2`, "t1.car_id", "t2.id")

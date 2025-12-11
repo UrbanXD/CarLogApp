@@ -1,5 +1,5 @@
 import { UseFormReturn, useWatch } from "react-hook-form";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Car } from "../../../schemas/carSchema.ts";
 import useCars from "../../../hooks/useCars.ts";
 import { FormFields } from "../../../../../types/index.ts";
@@ -12,6 +12,10 @@ import { OdometerChangeLogFormFields } from "../schemas/form/odometerChangeLogFo
 import { convertOdometerValueFromKilometer } from "../utils/convertOdometerUnit.ts";
 import { EditToast } from "../../../../../ui/alert/presets/toast/index.ts";
 import { useTranslation } from "react-i18next";
+import { OdometerLimit } from "../model/dao/OdometerLogDao.ts";
+import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
+import { formatWithUnit } from "../../../../../utils/formatWithUnit.ts";
+import dayjs from "dayjs";
 
 type UseOdometerLogFormFieldsProps = UseFormReturn<OdometerChangeLogFormFields> & {
     odometerLog?: OdometerLog
@@ -25,6 +29,7 @@ export function useOdometerLogFormFields({
 }: UseOdometerLogFormFieldsProps) {
     const { control, setValue, clearErrors, getFieldState } = restProps;
     const { t } = useTranslation();
+    const { odometerLogDao } = useDatabase();
     const { selectedCar, getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(
@@ -34,8 +39,10 @@ export function useOdometerLogFormFields({
           ? getCar(defaultCarId) ?? selectedCar
           : selectedCar
     );
+    const [odometerLimit, setOdometerLimit] = useState<OdometerLimit | null>(null);
 
     const formCarId = useWatch({ control, name: "carId" });
+    const formDate = useWatch({ control, name: "date" });
 
     useEffect(() => {
         const car = getCar(formCarId);
@@ -50,20 +57,15 @@ export function useOdometerLogFormFields({
         clearErrors();
     }, [formCarId, odometerLog]);
 
-    const getOdometerLogSubtitle = useCallback(() => {
-        if(!odometerLog) return undefined;
+    useEffect(() => {
+        (async () => {
+            if(!formCarId || !formDate) return;
 
-        let subtitle = t("odometer.original_value", { value: `${ odometerLog.value } ${ odometerLog.unit.short }` });
-        if(car && odometerLog.unit.id !== car.odometer.unit.id) {
-            const odometerValueConvertToCarOdometerUnit = convertOdometerValueFromKilometer(
-                odometerLog.valueInKm,
-                car.odometer.unit.conversionFactor
-            );
-            subtitle += ` (${ odometerValueConvertToCarOdometerUnit } ${ car.odometer.unit.short })`;
-        }
+            setOdometerLimit(await odometerLogDao.getOdometerLimitByDate(formCarId, formDate));
+        })();
 
-        return subtitle;
-    }, [odometerLog, car, t]);
+        setOdometerLimit();
+    }, [formCarId, formDate]);
 
     const fields: Record<OdometerLogFormFields, FormFields> = useMemo(() => ({
         [OdometerLogFormFields.Car]: {
@@ -74,7 +76,16 @@ export function useOdometerLogFormFields({
             render: () => <OdometerValueInput
                 control={ control }
                 odometerValueFieldName="value"
-                odometerValueSubtitle={ getOdometerLogSubtitle() }
+                odometerValueSubtitle={ odometerLog ? t(
+                    "odometer.original_value",
+                    { value: formatWithUnit(odometerLog.value, odometerLog.unit.short) }
+                ) : odometerLimit && t(
+                    "odometer.limit",
+                    {
+                        value: formatWithUnit(odometerLimit.min.value, odometerLimit.unitText),
+                        date: dayjs(odometerLimit.min.date).format("L")
+                    }
+                ) }
                 dateFieldName="date"
                 currentOdometerValue={ car?.odometer.value }
                 unitText={ car?.odometer.unit.short }
@@ -89,7 +100,7 @@ export function useOdometerLogFormFields({
             />,
             editToastMessages: EditToast
         }
-    }), [control, setValue, car, getOdometerLogSubtitle, t]);
+    }), [control, setValue, car, t, odometerLog, odometerLimit]);
 
     const fullForm: FormFields = {
         render: () => ([

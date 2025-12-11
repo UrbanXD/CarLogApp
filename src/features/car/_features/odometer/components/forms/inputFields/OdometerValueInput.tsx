@@ -7,6 +7,7 @@ import { UnitText } from "../../../../../../../components/UnitText.tsx";
 import { useTranslation } from "react-i18next";
 import { formTheme } from "../../../../../../../ui/form/constants/theme.ts";
 import InputDatePicker from "../../../../../../../components/Input/datePicker/InputDatePicker.tsx";
+import { formatWithUnit } from "../../../../../../../utils/formatWithUnit.ts";
 
 type OdometerValueInputProps = {
     control: Control<any>
@@ -54,7 +55,10 @@ export function OdometerValueInput({
                 control={ control }
                 fieldName={ odometerValueFieldName }
                 fieldNameText={ odometerValueTitle ?? t("odometer.value") }
-                fieldInfoText={ odometerValueSubtitle ?? (currentOdometerValue && `A jelenlegi kilométeróra-állás: ${ currentOdometerValue } ${ unitText }`) }
+                fieldInfoText={ odometerValueSubtitle ?? (currentOdometerValue && t(
+                    "odometer.current_value",
+                    { value: formatWithUnit(currentOdometerValue, unitText) }
+                )) }
                 optional={ odometerValueOptional }
             >
                 <Input.Row style={ { gap: 0 } }>
