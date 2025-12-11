@@ -16,6 +16,7 @@ import { useOdometerLogFormFields } from "../../hooks/useOdometerLogFormFields.t
 import { FormFields } from "../../../../../../types/index.ts";
 import Form from "../../../../../../components/Form/Form.tsx";
 import { Odometer } from "../../schemas/odometerSchema.ts";
+import { InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
 
 type EditOdometerLogFormProps = {
     odometerLog: OdometerLog
@@ -60,7 +61,7 @@ export function EditOdometerChangeLogForm({ odometerLog, field }: EditOdometerLo
         },
         (errors) => {
             console.log("Edit odometer log validation errors", errors);
-            openToast(editFields.editToastMessages.error());
+            openToast(InvalidFormToast.warning());
         }
     );
 

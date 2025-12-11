@@ -14,6 +14,7 @@ import { useFuelLogFormFields } from "../../hooks/useFuelLogForm.tsx";
 import { updateCarOdometer } from "../../../../model/slice/index.ts";
 import { Odometer } from "../../../odometer/schemas/odometerSchema.ts";
 import { useAppDispatch } from "../../../../../../hooks/index.ts";
+import { InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
 
 type EditFuelLogFormProps = {
     fuelLog: FuelLog
@@ -33,7 +34,7 @@ export function EditFuelLogForm({
     const form = useForm<FuelLogFields>(useEditFuelLogFormProps(fuelLog));
     const { handleSubmit, reset } = form;
 
-    const { fields } = useFuelLogFormFields(form);
+    const { fields } = useFuelLogFormFields({ ...form, odometer: fuelLog.odometer });
     const editFields: FormFields = fields[field];
 
     const submitHandler = useMemo(() => handleSubmit(
@@ -61,7 +62,7 @@ export function EditFuelLogForm({
             }
         },
         (errors) => {
-            openToast(editFields.editToastMessages.error());
+            openToast(InvalidFormToast.warning());
             console.log("Edit fuel log validation errors", errors);
         }
     ), [handleSubmit, editFields]);

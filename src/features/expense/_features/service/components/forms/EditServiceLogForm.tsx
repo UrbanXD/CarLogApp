@@ -13,6 +13,7 @@ import { ServiceLogFormFieldsEnum } from "../../enums/ServiceLogFormFieldsEnum.t
 import { ServiceLog } from "../../schemas/serviceLogSchema.ts";
 import { ServiceLogFields, useEditServiceLogFormProps } from "../../schemas/form/serviceLogForm.ts";
 import { useServiceLogFormFields } from "../../hooks/useServiceLogForm.tsx";
+import { InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
 
 type EditServiceLogFormProps = {
     serviceLog: ServiceLog
@@ -32,7 +33,7 @@ export function EditServiceLogForm({
     const form = useForm<ServiceLogFields>(useEditServiceLogFormProps(serviceLog));
     const { handleSubmit, reset } = form;
 
-    const { fields } = useServiceLogFormFields(form);
+    const { fields } = useServiceLogFormFields({ ...form, odometer: serviceLog.odometer });
     const editFields: FormFields = fields[field];
 
     const submitHandler = useMemo(() => handleSubmit(
@@ -60,7 +61,7 @@ export function EditServiceLogForm({
             }
         },
         (errors) => {
-            openToast(editFields.editToastMessages.error());
+            openToast(InvalidFormToast.warning());
             console.log("Edit fuel log validation errors", errors);
         }
     ), [handleSubmit, editFields]);

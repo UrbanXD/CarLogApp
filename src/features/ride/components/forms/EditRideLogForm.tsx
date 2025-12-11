@@ -14,6 +14,7 @@ import { RideLogFormFieldsEnum } from "../../enums/RideLogFormFields.ts";
 import { RideLogFormFields, useEditRideLogFormProps } from "../../schemas/form/rideLogForm.ts";
 import { getUser } from "../../../user/model/selectors/index.ts";
 import { useRideLogFormFields } from "../../hooks/useRideLogFormFields.tsx";
+import { InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
 
 type EditRideLogFormProps = {
     rideLog: RideLog
@@ -34,7 +35,12 @@ export function EditRideLogForm({
     const form = useForm<RideLogFormFields>(useEditRideLogFormProps(rideLog, user?.id));
     const { handleSubmit, reset } = form;
 
-    const { fields } = useRideLogFormFields({ form, setCarOdometerValueWhenInputNotTouched: false });
+    const { fields } = useRideLogFormFields({
+        form,
+        setCarOdometerValueWhenInputNotTouched: false,
+        startOdometer: rideLog.startOdometer,
+        endOdometer: rideLog.endOdometer
+    });
     const editFields: FormFields = fields[field];
 
     const submitHandler = useMemo(() => handleSubmit(
@@ -63,7 +69,7 @@ export function EditRideLogForm({
             }
         },
         (errors) => {
-            openToast(editFields.editToastMessages.error());
+            openToast(InvalidFormToast.warning());
             console.log("Edit ride log validation errors", errors);
         }
     ), [handleSubmit, editFields]);

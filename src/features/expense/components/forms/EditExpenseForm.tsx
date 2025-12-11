@@ -10,6 +10,7 @@ import { ExpenseFormFields } from "../../enums/expenseFormFields.ts";
 import { useExpenseFormFields } from "../../hooks/useExpenseFormFields.tsx";
 import Form from "../../../../components/Form/Form.tsx";
 import { FormFields } from "../../../../types/index.ts";
+import { InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
 
 type EditExpenseFormProps = {
     expense: Expense
@@ -44,7 +45,7 @@ export function EditExpenseForm({
             }
         },
         (errors) => {
-            openToast(editFields.editToastMessages.error());
+            openToast(InvalidFormToast.warning());
             console.log("Edit car validation errors", errors);
         }
     ), [handleSubmit, editFields]);

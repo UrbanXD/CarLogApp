@@ -41,7 +41,7 @@ const InputTitle: React.FC<InputTitleProps> = ({
 
 const styles = StyleSheet.create({
     container: {
-        gap: SEPARATOR_SIZES.lightSmall / 2
+        gap: SEPARATOR_SIZES.lightSmall / 4
     },
     inputNameText: {
         fontSize: FONT_SIZES.p1,
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZES.p3,
         fontFamily: "Gilroy-Medium",
         color: COLORS.gray1,
-        lineHeight: FONT_SIZES.p2 * 1.2,
+        lineHeight: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.05
     }
 });

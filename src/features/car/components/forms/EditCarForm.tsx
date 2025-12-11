@@ -11,6 +11,7 @@ import { EDIT_CAR_FORM_STEPS } from "../../constants/index.ts";
 import { useEditCarSteps } from "../../hooks/useEditCarSteps.tsx";
 import Form from "../../../../components/Form/Form.tsx";
 import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
+import { InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
 
 export type EditCarFormProps = {
     car: Car
@@ -40,11 +41,13 @@ const EditCarForm: React.FC<EditCarFormProps> = ({
 
                 if(dismissBottomSheet) dismissBottomSheet(true);
             } catch(e) {
+                openToast(editFields.editToastMessages.error());
                 console.error("Hiba a submitHandler-ben:", e);
             }
         },
         (errors) => {
             console.log("Edit car validation errors", errors);
+            openToast(InvalidFormToast.warning());
         }
     ), [handleSubmit, editFields]);
 
