@@ -36,6 +36,7 @@ export function ServiceForecastCard({
 
     useEffect(() => {
         if(!forecast) {
+            setIsOverdue(false);
             percentToNextService.value = withTiming(0, { duration: BAR_ANIMATiON_DURATION });
             return;
         }
@@ -64,6 +65,23 @@ export function ServiceForecastCard({
             width: `${ percentToNextService.value }%`
         };
     });
+
+    if(!forecast && !isLoading) {
+        return (
+            <View style={ styles.container }>
+                <View style={ styles.header }>
+                    <View style={ styles.titleContainer }>
+                        <Text style={ styles.title }>
+                            { t(`service.types.${ type }`) }
+                        </Text>
+                    </View>
+                </View>
+                <Text style={ styles.forecastLabelNotPossible }>
+                    { t("statistics.service.forecast_not_possible_try_to_add_new_service") }
+                </Text>
+            </View>
+        );
+    }
 
     return (
         <View style={ styles.container }>

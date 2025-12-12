@@ -722,6 +722,7 @@
       "last_odometer_value": "Legutóbbi",
       "forecast_odometer_value": "Következő",
       "forecast_not_possible": "Pontos becslés nem lehetséges",
+      "forecast_not_possible_try_to_add_new_service": "Pontos becslés nem lehetséges, először hozzonlétre ilyen típusú szervízt.",
       "is_on_time": "Esedékes",
       "forecast_date": "Becsült időpont"
     }
