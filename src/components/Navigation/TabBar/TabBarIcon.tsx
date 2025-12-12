@@ -48,7 +48,7 @@ function TabBarIcon({
                 size={ iconSize }
                 color={ isFocused ? activeColor : inactiveColor }
             />
-            <Text style={ styles.title } numberOfLines={ 2 } adjustsFontSizeToFit>{ title }</Text>
+            <Text style={ styles.title } numberOfLines={ 1 } adjustsFontSizeToFit>{ title }</Text>
         </AnimatedPressable>
     );
 }
