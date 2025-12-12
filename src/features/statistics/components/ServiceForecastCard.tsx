@@ -147,7 +147,7 @@ export function ServiceForecastCard({
                 <Animated.View style={ [styles.bar, isOverdue && styles.overdueBar, animatedBarStyle] }/>
             </View>
             {
-                forecast?.date === null
+                forecast?.date
                 ?
                 <Text style={ styles.forecastLabelNotPossible }>
                     { t("statistics.service.forecast_not_possible") }
@@ -166,20 +166,20 @@ export function ServiceForecastCard({
                                         style={ { alignSelf: !isOdometerViewWrapped ? "flex-end" : "flex-start" } }
                                     />
                                     : (
-                                        forecast
+                                        forecast && forecast?.date
                                         ? (
                                             isOverdue
                                             ? t("statistics.service.is_on_time")
-                                            : dayjs(forecast.date).format("LL")
+                                            : dayjs(forecast?.date).format("LL")
                                         )
                                         : "-"
                                     )
                                 }
                             </Text>
                             {
-                                forecast && !isOverdue &&
+                                forecast && forecast?.date && !isOverdue &&
                                <Text style={ styles.forecastLabelSubtitle }>
-                                   { dayjs(forecast.date).fromNow() }
+                                   { dayjs(forecast?.date).fromNow() }
                                </Text>
                             }
                         </View>

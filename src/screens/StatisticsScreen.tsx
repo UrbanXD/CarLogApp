@@ -22,7 +22,6 @@ export function StatisticsScreen() {
     const datePickerRef = useRef<InputDatePickerRef>();
 
     const [currentBoardIndex, setCurrentBoardIndex] = useState<number>(0);
-    const [selectedStatType, setSelectedStatType] = useState(STAT_TYPES[1]); // Fogyasztás
 
     const [from, setFrom] = useState(dayjs().subtract(1, "month").toISOString());
     const [to, setTo] = useState(dayjs().toISOString()); //now

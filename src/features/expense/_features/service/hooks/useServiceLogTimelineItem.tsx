@@ -1,13 +1,10 @@
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import React, { ReactNode, useCallback } from "react";
 import { TimelineItemType } from "../../../../../components/timelineView/item/TimelineItem.tsx";
 import { router } from "expo-router";
 import { AmountText } from "../../../../../components/AmountText.tsx";
 import { ServiceLog } from "../schemas/serviceLogSchema.ts";
 import { useTranslation } from "react-i18next";
-
-dayjs.extend(utc);
 
 export function useServiceLogTimelineItem() {
     const { t } = useTranslation();

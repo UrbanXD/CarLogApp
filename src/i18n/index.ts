@@ -6,22 +6,28 @@ import translationEn from "./locales/en-US/translations.json";
 import translationHu from "./locales/hu-HU/translations.json";
 import { BaseConfig } from "../constants/index.ts";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import localizedFormat from "dayjs/plugin/localizedFormat";
 import weekday from "dayjs/plugin/weekday";
 import updateLocale from "dayjs/plugin/updateLocale";
 import quarterOfYear from "dayjs/plugin/quarterOfYear";
 import isBetween from "dayjs/plugin/isBetween";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import duration from "dayjs/plugin/duration";
+import utc from "dayjs/plugin/utc";
 
 import "dayjs/locale/en";
 import "dayjs/locale/hu";
 
+dayjs.extend(customParseFormat);
+dayjs.extend(localizedFormat);
 dayjs.extend(weekday);
 dayjs.extend(updateLocale);
 dayjs.extend(quarterOfYear);
 dayjs.extend(isBetween);
 dayjs.extend(isSameOrBefore);
 dayjs.extend(duration);
+dayjs.extend(utc);
 
 dayjs.updateLocale("hu", {
     relativeTime: {

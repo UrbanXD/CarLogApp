@@ -2,13 +2,10 @@ import React, { ReactNode, useCallback } from "react";
 import { TimelineItemType } from "../../../components/timelineView/item/TimelineItem.tsx";
 import dayjs from "dayjs";
 import { Expense } from "../schemas/expenseSchema.ts";
-import utc from "dayjs/plugin/utc";
 import { router } from "expo-router";
 import { ExpenseTypeEnum } from "../model/enums/ExpenseTypeEnum.ts";
 import { AmountText } from "../../../components/AmountText.tsx";
 import { useTranslation } from "react-i18next";
-
-dayjs.extend(utc);
 
 export function useExpenseTimelineItem() {
     const { t } = useTranslation();

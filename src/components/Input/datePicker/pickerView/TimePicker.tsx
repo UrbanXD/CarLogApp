@@ -7,11 +7,6 @@ import WheelPicker, {
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-import localizedFormat from "dayjs/plugin/localizedFormat";
-
-dayjs.extend(customParseFormat);
-dayjs.extend(localizedFormat);
 
 const ControlPicker = withPickerControl(WheelPicker);
 
