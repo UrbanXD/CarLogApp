@@ -59,7 +59,6 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
 
             paginator.initial(scrollToItemId.current).then(result => {
                 scrollToItem.current = true;
-
                 setRawData(result);
             });
         }, [])
@@ -69,15 +68,9 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
         if(rawData.length === 0 && data.length === 0) return;
         if(rawData.length === 0) return setData([]);
 
-        setData(prev => {
-            const prevById = new Map(
-                prev.map(item => [item[resultItemIdField], item])
-            );
-
+        setData((_) => {
             const newItems = rawData.map(rawItem => {
                 const id = rawItem[mappedItemIdField];
-
-                if(prevById.has(id)) return prevById.get(id)!;
 
                 return mapper(rawItem, () => {
                     scrollToItemId.current = id;
