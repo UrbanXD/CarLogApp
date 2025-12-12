@@ -471,7 +471,7 @@
     "open_log": "Odometer log",
     "current_value": "Current odometer reading: {{value}}",
     "original_value": "Original odometer reading {{value}}",
-    "limit": "Latest odometer reading:: {{value}} ({{date}})",
+    "limit": "Latest odometer reading: {{value}} ({{date}})",
     "unit_types": {
       "title": "Odometer units",
       "undefined": "$t(common.unknown)",
@@ -598,6 +598,7 @@
     "start_time_value": "Start time: {{value}}",
     "end_time": "End time",
     "duration": "Duration",
+    "distance": "Distance",
     "start_odometer": "Start odometer",
     "start_odometer_value": "Start odometer: {{value}}",
     "end_odometer": "End odometer",

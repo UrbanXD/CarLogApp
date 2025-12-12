@@ -26,10 +26,11 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
         rideLogDao.paginator(
             {
                 cursor: [
-                    { table: null, field: "total_expense", order: "desc" },
                     { field: "start_time", order: "desc" },
                     { field: "end_time", order: "desc" },
+                    { table: null, field: "distance", order: "desc" },
                     { table: null, field: "duration", order: "desc" },
+                    { table: null, field: "total_expense", order: "desc" },
                     { field: "id" }
                 ]
             },
@@ -54,10 +55,11 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
         paginator,
         mapper,
         cursorOrderButtons: [
-            { table: null, field: "total_expense", title: t("currency.price") },
             { field: "start_time", title: t("rides.start_time") },
             { field: "end_time", title: t("rides.end_time") },
-            { table: null, field: "duration", title: t("rides.duration") }
+            { table: null, field: "distance", title: t("rides.distance") },
+            { table: null, field: "duration", title: t("rides.duration") },
+            { table: null, field: "total_expense", title: t("currency.price") }
         ]
     });
 

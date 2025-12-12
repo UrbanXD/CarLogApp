@@ -599,6 +599,7 @@
     "start_time_value": "Az indulás ideje: {{value}}",
     "end_time": "Érkezési idő",
     "duration": "Idő hossz",
+    "distance": "Megtett út",
     "start_odometer": "Indulási kilométeróra-állás",
     "start_odometer_value": "Az indulási kilométeróra-állás: {{value}}",
     "end_odometer": "Érkezési kilométeróra-állás",

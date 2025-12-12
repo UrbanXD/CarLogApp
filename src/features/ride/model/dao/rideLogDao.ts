@@ -351,10 +351,21 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
             .selectFrom(RIDE_LOG_TABLE)
             .leftJoin(RIDE_EXPENSE_TABLE, `${ RIDE_EXPENSE_TABLE }.ride_log_id`, `${ RIDE_LOG_TABLE }.id`)
             .leftJoin(EXPENSE_TABLE, `${ EXPENSE_TABLE }.id`, `${ RIDE_EXPENSE_TABLE }.expense_id`)
+            .innerJoin(
+                `${ ODOMETER_LOG_TABLE } as start_odometer`,
+                "start_odometer.id",
+                `${ RIDE_LOG_TABLE }.start_odometer_log_id`
+            )
+            .innerJoin(
+                `${ ODOMETER_LOG_TABLE } as end_odometer`,
+                "end_odometer.id",
+                `${ RIDE_LOG_TABLE }.end_odometer_log_id`
+            )
             .selectAll(RIDE_LOG_TABLE)
             .select((eb) => [
                 eb.fn.coalesce(eb.fn.sum(`${ EXPENSE_TABLE }.amount`), eb.val(0)).as("total_expense"),
                 // @formatter:off
+                sql<number>`COALESCE(end_odometer.value - start_odometer.value, 0)`.as("distance"),
                 sql<number>`(julianday(end_time) - julianday(start_time))* 86400`.as("duration")
                 // @formatter:on
             ])
