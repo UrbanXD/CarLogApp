@@ -71,7 +71,8 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
         return {
             label: t("statistics.distance.total_ride_duration"),
             value: rideSummaryStat
-                   ? dayjs.duration(rideSummaryStat.duration.total, "days").humanize()
+                   ? rideSummaryStat.duration.total > 0 ? dayjs.duration(rideSummaryStat.duration.total, "days")
+                .humanize() : "-"
                    : null,
             isPositive: rideSummaryStat?.duration?.totalTrend.isTrendPositive,
             trend: rideSummaryStat
@@ -87,8 +88,8 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
         return {
             label: t("statistics.distance.avg_ride_duration"),
             value: rideSummaryStat
-                   ? dayjs.duration(rideSummaryStat.duration.average, "days").humanize()
-                   : null,
+                   ? rideSummaryStat.duration.average > 0 ? dayjs.duration(rideSummaryStat.duration.average, "days")
+                .humanize() : "-" : null,
             isPositive: rideSummaryStat?.duration?.averageTrend.isTrendPositive,
             trend: rideSummaryStat
                    ? `${ rideSummaryStat.duration.averageTrend.trendSymbol } ${ rideSummaryStat.duration.averageTrend.trend }`
@@ -103,8 +104,8 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
         return {
             label: t("statistics.distance.median_ride_duration"),
             value: rideSummaryStat
-                   ? dayjs.duration(rideSummaryStat.duration.median, "days").humanize()
-                   : null,
+                   ? rideSummaryStat.duration.median > 0 ? dayjs.duration(rideSummaryStat.duration.median, "days")
+                .humanize() : "-" : null,
             isPositive: rideSummaryStat?.duration?.medianTrend.isTrendPositive,
             trend: rideSummaryStat
                    ? `${ rideSummaryStat.duration.medianTrend.trendSymbol } ${ rideSummaryStat.duration.medianTrend.trend }`
@@ -118,8 +119,8 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
         return {
             label: t("statistics.distance.max_ride_duration"),
             value: rideSummaryStat?.duration.max != null
-                   ? dayjs.duration(rideSummaryStat.duration.max.value, "days").humanize()
-                   : null,
+                   ? rideSummaryStat.duration.max.value > 0 ? dayjs.duration(rideSummaryStat.duration.max.value, "days")
+                .humanize() : "-" : null,
             isLoading: !rideSummaryStat
         };
     }, [rideSummaryStat, t]);

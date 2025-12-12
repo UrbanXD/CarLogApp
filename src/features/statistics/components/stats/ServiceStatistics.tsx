@@ -154,7 +154,10 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
         return {
             label: t("statistics.service.average_time_between_services"),
             value: averageDistanceBetweenServices != null
-                   ? dayjs.duration(averageDistanceBetweenServices.averageTime.value, "days").humanize()
+                   ? averageDistanceBetweenServices.averageTime.value > 0 ? dayjs.duration(
+                    averageDistanceBetweenServices.averageTime.value,
+                    "days"
+                ).humanize() : "-"
                    : null,
             isLoading: !averageDistanceBetweenServices
         };

@@ -119,14 +119,12 @@ export function CenterLabel({ label, description, value }: {
                 { value }%
             </Text>
             {
-                label &&
+                !!label &&
                <Text style={ styles.label }>{ label }</Text>
             }
             {
-                description &&
-               <Text style={ [styles.label, styles.description] }>
-                   { description }
-               </Text>
+                !!description &&
+               <Text style={ [styles.label, styles.description] }>{ description }</Text>
             }
         </View>
     );

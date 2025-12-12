@@ -269,9 +269,9 @@ export class StatisticsDao {
             typesInChart.add(r.type_id);
 
             return {
-                value: numberToFractionDigit(r.percent),
+                value: numberToFractionDigit(r.percent ?? 0),
                 label: legend[r.type_id].label,
-                description: numberToFractionDigit(r.total),
+                description: numberToFractionDigit(r.total ?? 0),
                 color: legend[r.type_id].color,
                 focused: index === 0
             };
@@ -339,7 +339,7 @@ export class StatisticsDao {
 
                 typeIds.forEach((typeId) => {
                     const value = dailyData[typeId] !== undefined ? dailyData[typeId] : 0;
-                    valueArray.push(numberToFractionDigit(value));
+                    valueArray.push(numberToFractionDigit(value ?? 0));
                 });
 
                 barChartData.push({
@@ -399,7 +399,7 @@ export class StatisticsDao {
             barChartData.push({
                 label: r.time,
                 type: serviceType?.id ?? "0",
-                value: numberToFractionDigit(r.total)
+                value: numberToFractionDigit(r.total ?? 0)
             });
         });
 
@@ -422,11 +422,18 @@ export class StatisticsDao {
         let query = this.db
         .selectFrom(`${ SERVICE_LOG_TABLE } as t1`)
         .innerJoin(`${ EXPENSE_TABLE } as t2`, "t1.expense_id", "t2.id")
+        //@formatter:off
         .select([
             sql<number>`SUM(t2.amount) as total`,
-            sql<number>`SUM(t2.amount) * 100.0 / SUM(SUM(t2.amount)) OVER () as percent`,
+            sql<number>`
+                CASE
+                WHEN SUM(SUM(t2.amount)) OVER () = 0
+                THEN 100.0
+                ELSE SUM(t2.amount) * 100.0 / SUM(SUM(t2.amount)) OVER ()
+                END AS percent`,
             "t1.service_type_id as type_id"
         ])
+        //@formatter:on
         .where("t2.date", ">=", formatDateToDatabaseFormat(from))
         .where("t2.date", "<=", formatDateToDatabaseFormat(to))
         .groupBy("t1.service_type_id")
@@ -451,9 +458,9 @@ export class StatisticsDao {
             typesInChart.add(r.type_id);
 
             return ({
-                value: numberToFractionDigit(r.percent),
+                value: numberToFractionDigit(r.percent ?? 0),
                 label: legend[r.type_id].label,
-                description: numberToFractionDigit(r.total),
+                description: numberToFractionDigit(r.total ?? 0),
                 color: legend[r.type_id].color,
                 focused: index === 0
             });
@@ -507,9 +514,9 @@ export class StatisticsDao {
             typesInChart.add(r.item_type_id);
 
             return ({
-                value: numberToFractionDigit(r.percent),
+                value: numberToFractionDigit(r.percent ?? 0),
                 label: legend[r.item_type_id].label,
-                description: numberToFractionDigit(r.total),
+                description: numberToFractionDigit(r.total ?? 0),
                 color: legend[r.item_type_id].color,
                 focused: index === 0
             });
@@ -652,7 +659,6 @@ export class StatisticsDao {
         //@formatter:off
         .select([
             sql`MAX(ROUND(t1.value / t3.conversion_factor))`.as("value"),
-            sql`t3.short`
         ])
         //@formatter:on
         .where("t1.car_id", "=", carId)
@@ -662,7 +668,7 @@ export class StatisticsDao {
         const serviceForecast: ServiceForecast = {
             odometer: {
                 value: odometer,
-                unitText: currentOdometer?.short
+                unitText: carId ? await this.getCarOdometerUnit(carId) : null
             }
         };
 
@@ -744,7 +750,6 @@ export class StatisticsDao {
             //@formatter:off
             return base
             .select([
-                "t5.short as quantity_unit",
                 sql<number>`AVG(${ quantityExpression })`.as("average_quantity"),
                 sql<number>`SUM(${ quantityExpression })`.as("total_quantity"),
                 sql<number>`COUNT(t1.id)`.as("total_count"),
@@ -792,7 +797,7 @@ export class StatisticsDao {
                 averageTrend: calculateTrend(averageQuantity, previousWindowAverageQuantity, trendOptions),
                 medianTrend: calculateTrend(medianQuantity, previousWindowMedianQuantity, trendOptions),
                 countTrend: calculateTrend(count, previousWindowCount, trendOptions),
-                unitText: aggregateResult?.quantity_unit
+                unitText: carId ? await this.getCarFuelUnit(carId) : null
             },
             amount: {
                 max: { value: numberToFractionDigit(maxItemResultByAmount?.amount ?? 0) },
@@ -1022,7 +1027,7 @@ export class StatisticsDao {
             barChartData.push({
                 label: r.time,
                 type: fuelType?.id ?? "0",
-                value: numberToFractionDigit(r.total)
+                value: numberToFractionDigit(r.total ?? 0)
             });
         });
 
@@ -1096,7 +1101,6 @@ export class StatisticsDao {
             return base
             //@formatter:off
             .select([
-                "t5.short as unit",
                 sql<number>`MAX(${ distanceExpression })`.as("max_ride_distance"),
                 sql<number>`AVG(${ distanceExpression })`.as("average_ride_distance"),
                 sql<number>`SUM(${ distanceExpression })`.as("total_ride_distance"),
@@ -1148,7 +1152,7 @@ export class StatisticsDao {
                 averageTrend: calculateTrend(averageRideDistance, previousWindowAverageRideDistance, trendOptions),
                 medianTrend: calculateTrend(medianRideDistance, previousWindowMedianRideDistance, trendOptions),
                 countTrend: calculateTrend(count, previousWindowCount, trendOptions),
-                unitText: aggregateDistanceResult?.unit,
+                unitText: carId ? await this.getCarOdometerUnit(carId) : null,
                 totalDistanceByOdometer: totalDistance,
                 mostVisitedPlaces
             },
@@ -1304,6 +1308,17 @@ export class StatisticsDao {
         .where("t1.id", "=", carId);
 
         return (await query.executeTakeFirst())?.odometer_unit;
+    }
+
+    protected async getCarFuelUnit(carId: string): string | null {
+        const query = this.db
+        .selectFrom(`${ CAR_TABLE } as t1`)
+        .innerJoin(`${ FUEL_TANK_TABLE } as t2`, "t1.id", "t2.car_id")
+        .innerJoin(`${ FUEL_UNIT_TABLE } as t3`, "t2.unit_id", "t3.id")
+        .select("t3.short as unit")
+        .where("t1.id", "=", carId);
+
+        return (await query.executeTakeFirst())?.unit;
     }
 
     protected async getAverageDistanceDaily({ carId, from, to }: StatisticsFunctionArgs): Promise<number> {
