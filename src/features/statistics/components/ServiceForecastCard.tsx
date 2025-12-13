@@ -147,7 +147,7 @@ export function ServiceForecastCard({
                 <Animated.View style={ [styles.bar, isOverdue && styles.overdueBar, animatedBarStyle] }/>
             </View>
             {
-                forecast?.date
+                !forecast?.date
                 ?
                 <Text style={ styles.forecastLabelNotPossible }>
                     { t("statistics.service.forecast_not_possible") }
