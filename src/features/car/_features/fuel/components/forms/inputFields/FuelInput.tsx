@@ -55,7 +55,6 @@ export function FuelInput({
     }, [t, title, fuelTypeText]);
 
     const stepperButtons = [-10, -1, +1, +10];
-
     return (
         <Input.Field
             control={ control }
@@ -127,15 +126,17 @@ export function FuelInput({
             />
         </Input.Field>
     );
-};
+}
 
 const styles = StyleSheet.create({
     actionContainer: {
+        flex: 1,
         flexDirection: "row",
         justifyContent: "space-between",
         gap: SEPARATOR_SIZES.lightSmall,
 
         stepperButtons: {
+            flex: 1,
             flexDirection: "row",
             flexWrap: "wrap",
             gap: SEPARATOR_SIZES.lightSmall,
@@ -159,6 +160,7 @@ const styles = StyleSheet.create({
             },
 
             fullTankButton: {
+                alignSelf: "center",
                 backgroundColor: COLORS.fuelYellow,
 
                 text: {
