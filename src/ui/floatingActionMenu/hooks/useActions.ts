@@ -2,6 +2,10 @@ import { useTranslation } from "react-i18next";
 import { ImageSource } from "../../../types/index.ts";
 import { ICON_NAMES } from "../../../constants/index.ts";
 import { router } from "expo-router";
+import { useAlert } from "../../alert/hooks/useAlert.ts";
+import useCars from "../../../features/car/hooks/useCars.ts";
+import { useCallback } from "react";
+import { UserDoesNotHaveCarToast } from "../../alert/presets/toast/index.ts";
 
 export type Action = {
     icon: ImageSource
@@ -11,6 +15,14 @@ export type Action = {
 
 export function useActions(): { actions: Array<Action> } {
     const { t } = useTranslation();
+    const { cars } = useCars();
+    const { openToast } = useAlert();
+
+    const actionOnlyWhenCarAvailable = useCallback((callback: () => void) => {
+        if(cars.length === 0) return openToast(UserDoesNotHaveCarToast.info());
+
+        callback();
+    }, [cars]);
 
     const actions: Array<Action> = [
         {
@@ -21,27 +33,27 @@ export function useActions(): { actions: Array<Action> } {
         {
             icon: ICON_NAMES.serviceOutline,
             label: t("action_menu.create_service"),
-            onPress: () => router.push("expense/create/service")
+            onPress: () => actionOnlyWhenCarAvailable(() => router.push("expense/create/service"))
         },
         {
             icon: ICON_NAMES.fuelPump,
             label: t("action_menu.create_fuel_log"),
-            onPress: () => router.push("expense/create/fuel")
+            onPress: () => actionOnlyWhenCarAvailable(() => router.push("expense/create/fuel"))
         },
         {
             icon: ICON_NAMES.receipt,
             label: t("action_menu.create_expense"),
-            onPress: () => router.push("expense/create")
+            onPress: () => actionOnlyWhenCarAvailable(() => router.push("expense/create"))
         },
         {
             icon: ICON_NAMES.road,
             label: t("action_menu.create_ride"),
-            onPress: () => router.push("ride/create")
+            onPress: () => actionOnlyWhenCarAvailable(() => router.push("ride/create"))
         },
         {
             icon: ICON_NAMES.odometer,
             label: t("action_menu.create_odometer_log"),
-            onPress: () => router.push("odometer/log/create")
+            onPress: () => actionOnlyWhenCarAvailable(() => router.push("odometer/log/create"))
         },
         {
             icon: ICON_NAMES.destinationPointMarker,

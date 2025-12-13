@@ -107,6 +107,9 @@
       "error": {
         "body": "Váratlan hiba lépett fel"
       }
+    },
+    "user_does_not_have_car": {
+      "body": "Először hozzalétre első autóját"
     }
   },
   "modal": {

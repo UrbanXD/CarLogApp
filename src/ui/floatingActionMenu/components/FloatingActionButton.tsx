@@ -1,4 +1,11 @@
-import Animated, { SharedValue, useAnimatedStyle, withDelay, withSpring, withTiming } from "react-native-reanimated";
+import Animated, {
+    SharedValue,
+    useAnimatedStyle,
+    useDerivedValue,
+    withDelay,
+    withSpring,
+    withTiming
+} from "react-native-reanimated";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { AnimatedPressable } from "../../../components/AnimatedComponents/index.ts";
@@ -29,6 +36,10 @@ export function FloatingActionButton({
     label,
     onPress
 }: FloatingActionButtonProps) {
+    const menuExpanded = useDerivedValue(() => {
+        return isMenuExpanded.value;
+    });
+
     const animatedStyles = useAnimatedStyle(() => {
         const translateY = withSpring(
             isMenuExpanded.value ? (-BUTTON_SIZE - SEPARATOR_SIZES.lightSmall / 2) * index : 0,
@@ -50,7 +61,8 @@ export function FloatingActionButton({
         <AnimatedPressable
             style={ [animatedStyles, styles.container] }
             onPress={ onPress }
-            pointerEvents="auto"
+            disabled={ !menuExpanded }
+            pointerEvents={ "auto" }
             hitSlop={ 10 }
         >
             <View style={ styles.labelContainer }>

@@ -5,3 +5,4 @@ export * from "./DeleteToast.ts";
 export * from "./NotFoundToast.ts";
 export * from "./InvalidFormToast.ts";
 export * from "./ArrayInputToast.ts";
+export * from "./UserDoesNotHaveCarToast.ts";

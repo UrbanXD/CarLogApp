@@ -107,6 +107,9 @@
       "error": {
         "body": "An unexpected error has occurred"
       }
+    },
+    "user_does_not_have_car": {
+      "body": "First create your first car"
     }
   },
   "modal": {

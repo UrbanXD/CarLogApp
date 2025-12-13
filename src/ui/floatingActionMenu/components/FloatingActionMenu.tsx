@@ -15,6 +15,7 @@ import { AnimatedPressable, AnimatedSafeAreaView } from "../../../components/Ani
 import { Overlay } from "../../../components/overlay/Overlay.tsx";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Action } from "../hooks/useActions.ts";
+import { debounce } from "es-toolkit";
 
 type FloatingActionMenu = {
     action: (() => void) | Array<Action>
@@ -62,7 +63,7 @@ function FloatingActionMenu({ action, containerStyle }: FloatingActionMenu) {
                 index={ index + 1 }
                 icon={ action.icon }
                 label={ action.label }
-                onPress={ handlePress }
+                onPress={ debounce(handlePress, 350) }
             />
         );
     }, []);
