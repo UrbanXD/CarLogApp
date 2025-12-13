@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Text, View } from "react-native";
 import { COLORS, GLOBAL_STYLE, ICON_NAMES } from "../../../constants/index.ts";
-import { Car } from "../../car/schemas/carSchema.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useRideLogTimelineItem } from "../hooks/useRideLogTimelineItem.tsx";
 import { RideLog } from "../schemas/rideLogSchema.ts";
@@ -15,11 +14,11 @@ import "dayjs/locale/en";
 import "dayjs/locale/hu";
 
 type UpcomingRidesProps = {
-    car: Car | null
+    carId: string
 }
 
-export function UpcomingRides({ car }: UpcomingRidesProps) {
-    const { t, i18n } = useTranslation();
+export function UpcomingRides({ carId }: UpcomingRidesProps) {
+    const { t } = useTranslation();
     const { rideLogDao } = useDatabase();
     const { mapper } = useRideLogTimelineItem();
 
@@ -29,14 +28,12 @@ export function UpcomingRides({ car }: UpcomingRidesProps) {
 
     useFocusEffect(
         useCallback(() => {
-            if(!car) return;
-
             setIsLoading(true);
-            rideLogDao.getUpcomingRides(car.id, today.toISOString()).then(result => {
+            rideLogDao.getUpcomingRides(carId, today.toISOString()).then(result => {
                 setIsLoading(false);
                 setRides(result);
             });
-        }, [car])
+        }, [carId])
     );
 
     const renderRideLog = (rideLog: RideLog, index: number) => {

@@ -8,14 +8,13 @@ import Link from "../../../components/Link.tsx";
 import { useExpenseTimelineItem } from "../hooks/useExepenseTimelineItem.tsx";
 import { TimelineItem } from "../../../components/timelineView/item/TimelineItem.tsx";
 import { MoreDataLoading } from "../../../components/loading/MoreDataLoading.tsx";
-import { Car } from "../../car/schemas/carSchema.ts";
 import { useTranslation } from "react-i18next";
 
 type LatestExpenseProps = {
-    car?: Car | null
+    carId: string
 }
 
-export function LatestExpenses({ car }: LatestExpenseProps) {
+export function LatestExpenses({ carId }: LatestExpenseProps) {
     const { t } = useTranslation();
     const { expenseDao } = useDatabase();
     const { mapper } = useExpenseTimelineItem();
@@ -25,14 +24,12 @@ export function LatestExpenses({ car }: LatestExpenseProps) {
 
     useFocusEffect(
         useCallback(() => {
-            if(!car) return;
-
             setIsLoading(true);
-            expenseDao.getLatestExpenses(car.id).then(result => {
+            expenseDao.getLatestExpenses(carId).then(result => {
                 setIsLoading(false);
                 setExpenses(result);
             });
-        }, [car])
+        }, [carId])
     );
 
     const renderExpense = (expense: Expense, index: number) => {

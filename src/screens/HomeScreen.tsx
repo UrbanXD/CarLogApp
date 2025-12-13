@@ -15,9 +15,14 @@ export function HomeScreen() {
         <ScreenScrollView style={ { paddingHorizontal: 0 } }>
             <Garage/>
             <View style={ styles.contentContainer }>
-                <UpcomingRides car={ selectedCar }/>
-                <LatestExpenses car={ selectedCar }/>
-                <ServiceForecastView carId={ selectedCar?.id }/>
+                {
+                    selectedCar &&
+                   <>
+                      <UpcomingRides carId={ selectedCar.id }/>
+                      <LatestExpenses carId={ selectedCar.id }/>
+                      <ServiceForecastView carId={ selectedCar.id }/>
+                   </>
+                }
             </View>
         </ScreenScrollView>
     );
