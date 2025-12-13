@@ -19,8 +19,6 @@ export function ServiceForecastView({ carId }: ServiceForecastProps) {
 
     useEffect(() => {
         (async () => {
-            if(!carId) return;
-
             setForecast(await statisticsDao.getForecastForService(carId));
         })();
     }, [carId]);
