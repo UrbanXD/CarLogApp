@@ -929,7 +929,7 @@ export class StatisticsDao {
         //@formatter:off
         .select([
             sql`ROUND(t1.value / t3.conversion_factor)`.as("odometer_value"),
-            sql<string>`COALESCE(t8.date, t7.date, t4.date)`.as("date")
+            sql<string>`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`.as("date")
         ])
         //@formatter:on
 
@@ -983,7 +983,7 @@ export class StatisticsDao {
                 });
             }
         }
-
+        
         return {
             lineChartData,
             average: Number(lineChartData[lineChartData.length - 1]?.value ?? 0) ?? 0,
@@ -1241,6 +1241,8 @@ export class StatisticsDao {
     /* UTILS */
 
     protected odometerQuery(carId: string, from: string, to: string): SelectQueryBuilder<any, any, any> {
+        const dateExpression = sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`;
+
         return this.db
         .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
         .innerJoin(`${ CAR_TABLE } as t2`, "t1.car_id", "t2.id")
@@ -1250,11 +1252,13 @@ export class StatisticsDao {
         .leftJoin(`${ SERVICE_LOG_TABLE } as t6`, "t1.id", "t6.odometer_log_id")
         .leftJoin(`${ EXPENSE_TABLE } as t7`, "t5.expense_id", "t7.id")
         .leftJoin(`${ EXPENSE_TABLE } as t8`, "t6.expense_id", "t8.id")
+        .leftJoin(`${ RIDE_LOG_TABLE } as t9`, "t1.id", "t9.start_odometer_log_id")
+        .leftJoin(`${ RIDE_LOG_TABLE } as t10`, "t1.id", "t10.end_odometer_log_id")
         .where("t1.car_id", "=", carId)
-        .where(sql`COALESCE(t8.date, t7.date, t4.date) IS NOT NULL`)
-        .where(sql`COALESCE(t8.date, t7.date, t4.date)`, ">=", formatDateToDatabaseFormat(from))
-        .where(sql`COALESCE(t8.date, t7.date, t4.date)`, "<=", formatDateToDatabaseFormat(to))
-        .orderBy(sql`COALESCE(t8.date, t7.date, t4.date)`, "asc")
+        .where(dateExpression, "is not", null)
+        .where(dateExpression, ">=", formatDateToDatabaseFormat(from))
+        .where(dateExpression, "<=", formatDateToDatabaseFormat(to))
+        .orderBy(dateExpression, "asc")
         .orderBy("t1.value", "asc")
         .orderBy("t1.id", "asc");
     }
@@ -1262,8 +1266,6 @@ export class StatisticsDao {
     protected async getTotalDistance(carId: string, from: string, to: string): Promise<number> {
         const query = this.odometerQuery(carId, from, to)
         .select([
-            sql<number>`MIN(ROUND(t1.value / t3.conversion_factor))`.as("min"),
-            sql<number>`MAX(ROUND(t1.value / t3.conversion_factor))`.as("max"),
             sql<number>`MAX(ROUND(t1.value / t3.conversion_factor)) - MIN(ROUND(t1.value / t3.conversion_factor))`
             .as("distance")
         ]);
