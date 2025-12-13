@@ -31,6 +31,7 @@ export const ICON_NAMES = {
     expensesOutline: "account-cash-outline",
     expenses: "account-cash",
     car: "car-outline",
+    carOff: "car-off",
     nametag: "tag-text-outline",
     odometer: "speedometer", //gauge
     odometerLow: "speedometer-slow",
@@ -60,7 +61,8 @@ export const ICON_NAMES = {
     passenger: "account-outline",
     passengers: "account-multiple-outline",
     mapMarkers: "map-marker-multiple-outline",
-    statistics: "finance"
+    statistics: "finance",
+    gestureTap: "gesture-tap"
 };
 
 export const SERVICE_ICONS = {

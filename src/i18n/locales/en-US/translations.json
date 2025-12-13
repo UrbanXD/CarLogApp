@@ -19,6 +19,10 @@
     "image": "Image",
     "element": "Item"
   },
+  "first_select_car": {
+    "title": "Select a vehicle first!",
+    "description": "To access the requested data, please select your primary vehicle. You can do this using the menu at the top of the screen. If you don't have a car parked in your virtual garage yet, please create one."
+  },
   "form_button": {
     "edit": "Edit",
     "save": "Save",

@@ -12,6 +12,7 @@ import { ServiceStatistics } from "../features/statistics/components/stats/Servi
 import { RideStatistics } from "../features/statistics/components/stats/RideStatistics.tsx";
 import { useTranslation } from "react-i18next";
 import OnBoardingView from "../components/OnBoardingView.tsx";
+import { FirstSelectCar } from "../components/firstSelectCar/FirstSelectCar.tsx";
 
 const STAT_TYPES = ["fuel", "ride", "expense", "service"];
 
@@ -58,6 +59,8 @@ export function StatisticsScreen() {
             />
         )
     ]), [selectedCar, from, to]);
+
+    if(!selectedCar) return <FirstSelectCar/>;
 
     return (
         <ScreenScrollView>
