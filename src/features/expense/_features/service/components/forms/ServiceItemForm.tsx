@@ -62,14 +62,12 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
                 <AmountInput
                     control={ control }
                     setValue={ setValue }
+                    fieldName="expense"
                     title={ t("currency.price_per_unit") }
                     amountPlaceholder={ t("currency.price_per_unit") }
-                    amountFieldName="pricePerUnit"
-                    currencyFieldName="currencyId"
-                    quantityFieldName="quantity"
-                    exchangeRateFieldName="exchangeRate"
                     defaultCurrency={ carCurrencyId }
                     isPricePerUnitFallback={ true }
+                    showsQuantityInput={ true }
                 />
             </Form>
             <SaveButton onPress={ submitHandler }/>

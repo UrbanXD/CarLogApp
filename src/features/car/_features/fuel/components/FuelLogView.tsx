@@ -117,7 +117,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
                   amountTextStyle={ textStyle ? [...textStyle, { textAlign: "left" }] : { textAlign: "left" } }
                />,
             onPress: () => onEdit(FuelLogFormFieldsEnum.Amount),
-            secondaryInfo: {
+            secondaryInfo: fuelLog?.originalPricePerUnit !== 0 && {
                 title: t("currency.price_per_unit"),
                 content: (textStyle) => fuelLog &&
                    <AmountText

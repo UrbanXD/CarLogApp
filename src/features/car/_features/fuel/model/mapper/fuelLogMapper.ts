@@ -63,8 +63,8 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
             fuelUnit: fuelUnit,
             odometer: odometer,
             quantity: quantity,
-            originalPricePerUnit: numberToFractionDigit(expense.amount.amount / quantity),
-            pricePerUnit: numberToFractionDigit(expense.amount.exchangedAmount / quantity),
+            originalPricePerUnit: quantity === 0 ? 0 : numberToFractionDigit(expense.amount.amount / quantity),
+            pricePerUnit: quantity === 0 ? 0 : numberToFractionDigit(expense.amount.exchangedAmount / quantity),
             isPricePerUnit
         });
     }
@@ -90,18 +90,18 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
         const odometerUnit = await this.odometerUnitDao.getUnitByCarId(formResult.carId);
         const expenseTypeId = await this.expenseTypeDao.getIdByKey(ExpenseTypeEnum.FUEL);
 
-        const originalAmount = numberToFractionDigit(formResult.amount * (formResult.isPricePerUnit
-                                                                          ? formResult.quantity
-                                                                          : 1));
-        const amount = numberToFractionDigit(originalAmount * formResult.exchangeRate);
+        const originalAmount = numberToFractionDigit(
+            formResult.expense.amount * (formResult.expense.isPricePerUnit ? formResult.quantity : 1)
+        );
+        const amount = numberToFractionDigit(originalAmount * formResult.expense.exchangeRate);
 
         const expense: ExpenseTableRow = {
-            id: formResult.expenseId,
+            id: formResult.expense.id,
             car_id: formResult.carId,
             type_id: expenseTypeId,
-            currency_id: formResult.currencyId,
+            currency_id: formResult.expense.currencyId,
             original_amount: originalAmount,
-            exchange_rate: formResult.exchangeRate,
+            exchange_rate: formResult.expense.exchangeRate,
             amount: amount,
             note: formResult.note,
             date: formResult.date
@@ -110,11 +110,11 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
         const fuelLog: FuelLogTableRow = {
             id: formResult.id,
             owner_id: formResult.ownerId,
-            expense_id: formResult.expenseId,
+            expense_id: formResult.expense.id,
             odometer_log_id: !!formResult?.odometerValue ? formResult.odometerLogId : null,
             fuel_unit_id: formResult.fuelUnitId,
             quantity: formResult.quantity * (fuelUnit?.conversionFactor ?? 1),
-            is_price_per_unit: Number(formResult.isPricePerUnit) // because of sqllite
+            is_price_per_unit: Number(formResult.expense.isPricePerUnit) // because of sqllite
         };
 
         let odometerLog: OdometerLogTableRow | null = null;

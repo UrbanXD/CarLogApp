@@ -44,9 +44,7 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
             render: () => <AmountInput
                 control={ control }
                 setValue={ setValue }
-                amountFieldName="amount"
-                currencyFieldName="currencyId"
-                exchangeRateFieldName="exchangeRate"
+                fieldName="expense"
                 defaultCurrency={ car?.currency.id }
             />,
             editToastMessages: EditToast

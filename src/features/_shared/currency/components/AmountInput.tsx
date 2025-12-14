@@ -16,16 +16,14 @@ import { PricePerUnitTotalCostInCarCurrency } from "./PricePerUnitTotalCostInCar
 type AmountInputProps = {
     control: Control<any>
     setValue: UseFormSetValue<any>
+    fieldName: string
     title?: string
     subtitle?: string
+    outsideQuantityFieldName?: string
     amountPlaceholder?: string
-    amountFieldName: string
-    currencyFieldName: string
-    quantityFieldName?: string
-    isPricePerUnitFieldName?: string
-    exchangeRateFieldName?: string
-    showsExchangeRate?: boolean
+    showsExchangeRateInput?: boolean
     showsQuantityInput?: boolean
+    showsIsPricePerUnitInput?: boolean
     defaultCurrency?: string | number
     isPricePerUnitFallback?: boolean
 }
@@ -33,16 +31,14 @@ type AmountInputProps = {
 export function AmountInput({
     control,
     setValue,
+    fieldName,
     title,
     subtitle,
+    outsideQuantityFieldName,
     amountPlaceholder,
-    amountFieldName,
-    currencyFieldName,
-    quantityFieldName,
-    isPricePerUnitFieldName,
-    exchangeRateFieldName,
-    showsExchangeRate = !!exchangeRateFieldName,
-    showsQuantityInput = !!quantityFieldName,
+    showsExchangeRateInput = true,
+    showsQuantityInput = false,
+    showsIsPricePerUnitInput = false,
     defaultCurrency,
     isPricePerUnitFallback = false
 }: AmountInputProps) {
@@ -54,13 +50,20 @@ export function AmountInput({
 
     const latestExchangeRate = useRef(1);
 
+    const amountFieldName = `${ fieldName }.amount`;
+    const currencyFieldName = `${ fieldName }.currencyId`;
+    const exchangeRateFieldName = `${ fieldName }.exchangeRate`;
+    const quantityFieldName = outsideQuantityFieldName ?? `${ fieldName }.quantity`;
+    const isPricePerUnitFieldName = `${ fieldName }.isPricePerUnit`;
+
     const formCurrency = useWatch({ control, name: currencyFieldName });
     const formAmount = useWatch({ control, name: amountFieldName });
+    const formExchangeRate = useWatch({ control, name: exchangeRateFieldName });
     const formQuantity = useWatch({ control, name: quantityFieldName });
-    const formExchangeRate = exchangeRateFieldName ? useWatch({ control, name: exchangeRateFieldName }) : null;
-    const formIsPricePerUnit = isPricePerUnitFieldName
-                               ? useWatch({ control, name: isPricePerUnitFieldName })
-                               : isPricePerUnitFallback;
+    const formIsPricePerUnit =
+        showsIsPricePerUnitInput
+        ? useWatch({ control, name: isPricePerUnitFieldName })
+        : isPricePerUnitFallback;
 
     useEffect(() => {
         (async () => {
@@ -82,8 +85,6 @@ export function AmountInput({
     }, [rawCurrencies, t]);
 
     useEffect(() => {
-        if(!exchangeRateFieldName) return;
-
         if(formCurrency?.toString() === defaultCurrency?.toString()) {
             latestExchangeRate.current = formExchangeRate;
             setValue(exchangeRateFieldName, 1);
@@ -134,11 +135,15 @@ export function AmountInput({
     }, [formAmount, formQuantity, formExchangeRate, formCurrency, defaultCurrency, getCurrencyText]);
 
     return (
-        <View style={ styles.container }>
-            <Input.Title title={ title ?? t("currency.cost") } subtitle={ subtitle }/>
+        <Input.Field
+            control={ control }
+            fieldName={ fieldName }
+            fieldNameText={ title ?? t("currency.cost") }
+            fieldInfoText={ subtitle }
+            containerStyle={ styles.container }
+        >
             {
                 (
-                    !isPricePerUnitFieldName &&
                     isPricePerUnitFallback &&
                     (!isNaN(Number(formQuantity)) && Number(formQuantity) > 1)
                 ) &&
@@ -147,8 +152,11 @@ export function AmountInput({
                </Text>
             }
             {
-                isPricePerUnitFieldName &&
-               <Input.Field control={ control } fieldName={ isPricePerUnitFieldName }>
+                showsIsPricePerUnitInput &&
+               <Input.Field
+                  control={ control }
+                  fieldName={ isPricePerUnitFieldName }
+               >
                   <View style={ styles.isPricePerUnitContainer }>
                      <Input.Switch label={ { on: t("currency.price_per_unit"), off: t("currency.total_cost") } }/>
                       {
@@ -164,13 +172,17 @@ export function AmountInput({
             }
             <View style={ styles.quantityAmountContainer }>
                 {
-                    (showsQuantityInput && quantityFieldName) &&
+                    showsQuantityInput &&
                    <View style={ styles.quantityContainer }>
-                      <Input.Row style={ { gap: 0 } }>
+                      <Input.Row
+                         errorFieldNames={ [quantityFieldName] }
+                         style={ { gap: 0 } }
+                      >
                          <View style={ { flex: 1 } }>
                             <Input.Field
                                control={ control }
                                fieldName={ quantityFieldName }
+                               hideError
                             >
                                <Input.Text
                                   placeholder={ "1" }
@@ -183,12 +195,16 @@ export function AmountInput({
                       </Input.Row>
                    </View>
                 }
-                <Input.Row style={ { gap: 0 } }>
+                <Input.Row
+                    errorFieldNames={ [amountFieldName, currencyFieldName] }
+                    style={ { gap: 0 } }
+                >
                     <View style={ styles.amountContainer }>
                         <View style={ styles.amountContainer.amount }>
                             <Input.Field
                                 control={ control }
                                 fieldName={ amountFieldName }
+                                hideError
                             >
                                 <Input.Text
                                     icon={ ICON_NAMES.money }
@@ -198,7 +214,11 @@ export function AmountInput({
                                 />
                             </Input.Field>
                         </View>
-                        <Input.Field control={ control } fieldName={ currencyFieldName }>
+                        <Input.Field
+                            control={ control }
+                            fieldName={ currencyFieldName }
+                            hideError
+                        >
                             {
                                 currencies
                                 ?
@@ -215,7 +235,7 @@ export function AmountInput({
                 </Input.Row>
             </View>
             {
-                showsExchangeRate && exchangeRateFieldName && (formCurrency?.toString() !== defaultCurrency?.toString()) &&
+                showsExchangeRateInput && (defaultCurrency && formCurrency?.toString() !== defaultCurrency?.toString()) &&
                <View style={ styles.exchangeContainer }>
                   <View style={ styles.exchangeContainer.textContainer }>
                      <Text style={ styles.label }>
@@ -223,7 +243,10 @@ export function AmountInput({
                      </Text>
                   </View>
                   <View style={ styles.exchangeContainer.inputContainer }>
-                     <Input.Row style={ styles.exchangeContainer.inputContainer.row }>
+                     <Input.Row
+                        errorFieldNames={ [exchangeRateFieldName] }
+                        style={ styles.exchangeContainer.inputContainer.row }
+                     >
                         <View style={ styles.exchangeContainer.inputContainer.label }>
                            <Text style={ styles.exchangeContainer.inputContainer.label.baseText }>1</Text>
                            <Text
@@ -235,6 +258,7 @@ export function AmountInput({
                         <Input.Field
                            control={ control }
                            fieldName={ exchangeRateFieldName }
+                           hideError
                            style={ { flex: 1 } }
                         >
                            <Input.Text
@@ -250,7 +274,7 @@ export function AmountInput({
                   </View>
                </View>
             }
-        </View>
+        </Input.Field>
     );
 }
 

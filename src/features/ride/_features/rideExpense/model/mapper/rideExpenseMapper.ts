@@ -40,12 +40,10 @@ export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideE
         const carCurrencyId = await this.carDao.getCarCurrencyIdById(formResult.carId);
 
         const expenseEntity = this.expenseDao.mapper.formResultToEntity({
-            id: formResult.expenseId,
+            id: formResult.expense.id,
             carId: formResult.carId,
             typeId: formResult.typeId,
-            currencyId: formResult.currencyId,
-            amount: formResult.amount,
-            exchangeRate: formResult.exchangeRate,
+            expense: formResult.expense,
             date: formResult.date,
             note: formResult.note
         });

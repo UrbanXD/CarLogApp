@@ -69,11 +69,8 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             render: () => <AmountInput
                 control={ control }
                 setValue={ setValue }
-                amountFieldName="amount"
-                quantityFieldName="quantity"
-                currencyFieldName="currencyId"
-                isPricePerUnitFieldName="isPricePerUnit"
-                exchangeRateFieldName="exchangeRate"
+                fieldName="expense"
+                outsideQuantityFieldName="quantity"
                 showsQuantityInput={ false }
                 defaultCurrency={ car?.currency.id }
             />,

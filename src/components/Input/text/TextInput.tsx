@@ -60,7 +60,8 @@ const TextInput: React.FC<TextInputProps> = ({
     const inputFieldContext = allowInputFieldContext ? useInputFieldContext() : null;
     const fieldValue = value || inputFieldContext?.field?.value || "";
     const onChange = inputFieldContext?.field?.onChange;
-    const error = inputFieldContext?.fieldState?.error;
+    let error = inputFieldContext?.fieldState?.error;
+    if(error && error.ref?.name !== inputFieldContext?.field.name) error = null;
 
     const height = useSharedValue(formTheme.containerHeight);
 

@@ -6,10 +6,10 @@ import { CurrencyEnum } from "../../../../../_shared/currency/enums/currencyEnum
 import { zodResolver } from "@hookform/resolvers/zod";
 
 export const rideExpenseForm = expenseForm
-.omit({ id: true, carId: true })
+.pick({ typeId: true, date: true, note: true })
 .extend({
     id: z.string().uuid(),
-    expenseId: expenseForm.shape.id
+    expense: expenseForm.shape.expense.extend({ id: expenseForm.shape.id })
 });
 
 export type RideExpenseFormFields = z.infer<typeof rideExpenseForm>;
@@ -21,11 +21,13 @@ export function useRideExpenseFormProps({
 }: { rideExpense?: RideExpense, defaultDate?: string, defaultCurrencyId?: number }) {
     const defaultValues: RideExpenseFormFields = {
         id: rideExpense?.id ?? getUUID(),
-        expenseId: rideExpense?.expense?.id ?? getUUID(),
+        expense: {
+            id: rideExpense?.expense?.id ?? getUUID(),
+            currencyId: rideExpense?.expense?.amount.currency?.id ?? defaultCurrencyId ?? CurrencyEnum.EUR,
+            amount: rideExpense?.expense?.amount.amount ?? NaN,
+            exchangeRate: rideExpense?.expense?.amount.exchangeRate ?? 1
+        },
         typeId: rideExpense?.expense?.type?.id ?? null,
-        currencyId: rideExpense?.expense?.amount.currency?.id ?? defaultCurrencyId ?? CurrencyEnum.EUR,
-        amount: rideExpense?.expense?.amount.amount ?? NaN,
-        exchangeRate: rideExpense?.expense?.amount.exchangeRate ?? 1,
         note: rideExpense?.expense?.note ?? null,
         date: rideExpense?.expense?.date ?? defaultDate ?? new Date()
     };

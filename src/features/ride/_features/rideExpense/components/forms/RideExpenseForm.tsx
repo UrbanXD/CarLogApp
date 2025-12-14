@@ -68,9 +68,7 @@ export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate
                 <AmountInput
                     control={ control }
                     setValue={ setValue }
-                    amountFieldName="amount"
-                    currencyFieldName="currencyId"
-                    exchangeRateFieldName="exchangeRate"
+                    fieldName="expense"
                     defaultCurrency={ car.currency.id }
                 />
                 <Input.Field

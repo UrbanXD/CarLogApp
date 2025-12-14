@@ -12,7 +12,24 @@ const InputError: React.FC = () => {
 
     if(!error) return <></>;
 
-    const [key, ...rest] = error?.message.split(";");
+    let rawMessage: string | undefined;
+
+    if(typeof error === "object" && "message" in error && typeof error.message === "string") {
+        rawMessage = error.message;
+    } else if(typeof error === "object") {
+        const childErrors = Object.values(error).filter(Boolean) as any[];
+
+        if(childErrors.length > 0) {
+            const firstChildError = childErrors[0];
+            if(typeof firstChildError === "object" && "message" in firstChildError && typeof firstChildError.message === "string") {
+                rawMessage = firstChildError.message;
+            }
+        }
+    }
+
+    if(!rawMessage) return <></>;
+
+    const [key, ...rest] = rawMessage.split(";");
     const values = rest.map(item => item.trim());
 
     const i18nParams = values.reduce((acc, val, idx) => {

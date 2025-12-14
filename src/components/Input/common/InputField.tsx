@@ -12,6 +12,7 @@ type InputFieldProps = {
     fieldNameText?: string
     fieldInfoText?: string
     optional?: boolean
+    hideError?: boolean
     containerStyle?: ViewStyle
     style?: ViewStyle
     children: ReactNode
@@ -23,6 +24,7 @@ function InputField({
     fieldNameText,
     fieldInfoText,
     optional,
+    hideError = false,
     containerStyle,
     style,
     children
@@ -33,7 +35,7 @@ function InputField({
                 <View style={ containerStyle }>
                     { children }
                 </View>
-                <InputError/>
+                { !hideError && <InputError/> }
             </InputFieldProvider>
         );
     };

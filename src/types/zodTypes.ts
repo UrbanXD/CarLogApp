@@ -3,10 +3,16 @@ import { ColorValue } from "react-native";
 import { Image } from "./index.ts";
 import dayjs from "dayjs";
 
+export type ZodNumberErrorMessage = {
+    required?: string
+    minBound?: (min?: number) => string
+    maxBound?: (max?: number) => string
+}
+
 type ZodNumberArgs = {
     optional?: boolean
     bounds?: { min?: number, max?: number },
-    errorMessage?: { required?: string, minBound?: (min?: number) => string, maxBound?: (max?: number) => string }
+    errorMessage?: ZodNumberErrorMessage
 }
 
 type ZodDateArgs = {

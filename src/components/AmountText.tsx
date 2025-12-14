@@ -35,7 +35,7 @@ export function AmountText({
                 }
             </Text>
             {
-                amount !== 0 && exchangedAmount && exchangeCurrencyText !== currencyText &&
+                amount !== 0 && !!exchangedAmount && exchangeCurrencyText !== currencyText &&
                <Text style={ [styles.text, amountTextStyle, styles.smallText, exchangedAmountTextStyle] }>
                    {
                        Array.isArray(exchangedAmount)

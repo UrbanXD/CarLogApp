@@ -68,10 +68,10 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, Sele
             id: formResult.id,
             car_id: formResult.carId,
             type_id: formResult.typeId,
-            currency_id: formResult.currencyId,
-            amount: numberToFractionDigit(formResult.amount * formResult.exchangeRate),
-            original_amount: formResult.amount,
-            exchange_rate: formResult.exchangeRate,
+            currency_id: formResult.expense.currencyId,
+            amount: numberToFractionDigit(formResult.expense.amount * formResult.expense.exchangeRate),
+            original_amount: formResult.expense.amount,
+            exchange_rate: formResult.expense.exchangeRate,
             note: formResult.note,
             date: formResult.date
         };

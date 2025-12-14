@@ -94,18 +94,18 @@ export class ServiceItemMapper extends AbstractMapper<ServiceItemTableRow, Servi
             [
                 this.serviceItemTypeDao.getById(formResult.typeId),
                 this.currencyDao.getById(formResult.carCurrencyId),
-                this.currencyDao.getById(formResult.currencyId)
+                this.currencyDao.getById(formResult.expense.currencyId)
             ]
         );
 
         return serviceItemSchema.omit({ serviceLogId: true, carId: true }).parse({
             id: formResult.id,
             type: type,
-            quantity: formResult.quantity,
+            quantity: formResult.expense.quantity,
             pricePerUnit: amountSchema.parse({
-                amount: numberToFractionDigit(formResult.pricePerUnit),
-                exchangedAmount: numberToFractionDigit(formResult.exchangeRate * formResult.pricePerUnit),
-                exchangeRate: numberToFractionDigit(formResult.exchangeRate),
+                amount: numberToFractionDigit(formResult.expense.amount),
+                exchangedAmount: numberToFractionDigit(formResult.expense.exchangeRate * formResult.expense.amount),
+                exchangeRate: numberToFractionDigit(formResult.expense.exchangeRate),
                 currency: currency,
                 exchangeCurrency: carCurrency
             })

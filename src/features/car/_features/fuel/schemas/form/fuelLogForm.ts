@@ -10,12 +10,22 @@ import { odometerLogSchema } from "../../../odometer/schemas/odometerLogSchema.t
 import { OdometerLogDao } from "../../../odometer/model/dao/OdometerLogDao.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import { zodOdometerValidation } from "../../../odometer/utils/zodOdometerValidation.ts";
+import { inputAmountSchema } from "../../../../../_shared/currency/schemas/inputAmountSchema.ts";
 
 const fuelLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
-.pick({ carId: true, currencyId: true, amount: true, exchangeRate: true, date: true, note: true })
-.extend({ expenseId: expenseForm.shape.id, isPricePerUnit: z.boolean().default(false) })
+.pick({ carId: true, date: true, note: true })
+.extend({
+    expense: inputAmountSchema({
+        withQuantity: false,
+        withIsPricePerUnit: true,
+        defaultIsPricePerUnit: false
+
+    }).extend({ id: expenseForm.shape.id })
+})
 .merge(
-    fuelLogSchema.pick({ id: true, ownerId: true }).extend({
+    fuelLogSchema
+    .pick({ id: true, ownerId: true })
+    .extend({
         quantity: zNumber({
             bounds: { min: fuelLogSchema.shape.quantity.minValue ?? 0 },
             errorMessage: {
@@ -43,23 +53,25 @@ const fuelLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
     });
 });
 
-export type FuelLogFields = z.infer<typeof fuelLogForm>;
+export type FuelLogFields = z.infer<ReturnType<typeof fuelLogForm>>;
 
 export function useCreateFuelLogFormProps(car: Car | null) {
     const { odometerLogDao } = useDatabase();
 
     const defaultValues: FuelLogFields = {
         id: getUUID(),
-        expenseId: getUUID(),
+        expense: {
+            id: getUUID(),
+            currencyId: car?.currency.id ?? CurrencyEnum.EUR,
+            amount: NaN,
+            isPricePerUnit: false,
+            exchangeRate: 1
+        },
+        quantity: 0,
         odometerLogId: getUUID(),
         ownerId: car?.ownerId,
         carId: car?.id,
         fuelUnitId: car?.fuelTank.unit.id,
-        currencyId: car?.currency.id ?? CurrencyEnum.EUR,
-        amount: NaN,
-        isPricePerUnit: false,
-        exchangeRate: 1,
-        quantity: 0,
         odometerValue: NaN,
         note: null,
         date: new Date()
@@ -73,16 +85,18 @@ export const useEditFuelLogFormProps = (fuelLog: FuelLog) => {
 
     const defaultValues: FuelLogFields = {
         id: fuelLog.id,
-        expenseId: fuelLog.expense.id,
+        expense: {
+            id: fuelLog.expense.id,
+            currencyId: fuelLog.expense.amount.currency.id,
+            amount: fuelLog.isPricePerUnit ? fuelLog.originalPricePerUnit : fuelLog.expense.amount.amount,
+            isPricePerUnit: fuelLog.isPricePerUnit,
+            exchangeRate: fuelLog.expense.amount.exchangeRate
+        },
+        quantity: fuelLog.quantity,
         odometerLogId: fuelLog.odometer?.id ?? getUUID(),
         ownerId: fuelLog.ownerId,
         carId: fuelLog.expense.carId,
         fuelUnitId: fuelLog.fuelUnit.id,
-        currencyId: fuelLog.expense.amount.currency.id,
-        amount: fuelLog.isPricePerUnit ? fuelLog.originalPricePerUnit : fuelLog.expense.amount.amount,
-        isPricePerUnit: fuelLog.isPricePerUnit,
-        exchangeRate: fuelLog.expense.amount.exchangeRate,
-        quantity: fuelLog.quantity,
         odometerValue: fuelLog.odometer?.value ?? NaN,
         note: fuelLog.expense.note,
         date: fuelLog.expense.date
