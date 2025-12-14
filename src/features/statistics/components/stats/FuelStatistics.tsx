@@ -257,7 +257,7 @@ export function FuelStatistics({
                     description: fuelCostPerDistance && fuelCostPerDistance.lineChartData.length > 0 && t(
                         "statistics.fuel.accuracy")
                 } }
-                yAxisTitle={ t("statistics.fuel.cost_per_distance.y_axis", { unit: fuelConsumption?.unitText }) }
+                yAxisTitle={ t("statistics.fuel.cost_per_distance.y_axis", { unit: fuelCostPerDistance?.unitText }) }
                 chartData={ fuelCostPerDistance?.lineChartData }
                 formatValue={ (value) => formatWithUnit(value, fuelCostPerDistance?.unitText) }
                 formatLabel={
