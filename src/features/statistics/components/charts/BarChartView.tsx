@@ -229,7 +229,7 @@ export function BarChartView({
                                         showFractionalValues={ showFractionalValues }
                                         roundToDigits={ precision }
                                         noOfSections={ steps }
-                                        rulesType="solid"
+                                        rulesType="dashed"
                                         rulesColor={ COLORS.gray4 }
                                         xAxisLabelTextStyle={ styles.axisLabel }
                                         xAxisThickness={ 0 }
