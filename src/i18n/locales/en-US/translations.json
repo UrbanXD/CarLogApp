@@ -152,6 +152,8 @@
     "exchange_rate_required": "Please enter the exchange rate",
     "exchange_rate_non_negative": "The exchange rate cannot be negative",
     "exchange_rate_min_limit": "The exchange rate must be at least {{0}}",
+    "quantity_required": "Please enter the quantity",
+    "quantity_non_negative": "Quantity cannot be a negative number",
     "car_name_required": "Please provide an identifier for your car",
     "car_name_max_limit": "The car identifier can be a maximum of {{0}} characters",
     "car_make_picker_required": "Please select a manufacturer",

@@ -152,6 +152,8 @@
     "exchange_rate_required": "Kérem adja meg az átváltási árfolyamot",
     "exchange_rate_non_negative": "Az átváltási árfolyam nem lehet negatív szám",
     "exchange_rate_min_limit": "Az átváltási árfolyam minimum {{0}} legyen",
+    "quantity_required": "Kérem adja meg a darabszámot",
+    "quantity_non_negative": "A darabszám nem lehet negatív szám",
     "car_name_required": "Kérem adjon meg egy azonosítót az autója számára",
     "car_name_max_limit": "Az autó azonosítója maximum {{0}} karakter lehet",
     "car_make_picker_required": "Kérem válasszon ki egy gyártót",
