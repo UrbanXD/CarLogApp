@@ -11,13 +11,16 @@ export const POINTER_LABEL_MIN_WIDTH = widthPercentageToDP(10);
 type PointerLabelProps = {
     value: string
     label?: string
+    abovePoint?: boolean
+    dataPointSize?: number
     style?: ViewStyle
 }
 
-export function PointerLabel({ value, label, style }: PointerLabelProps) {
+export function PointerLabel({ value, label, abovePoint, dataPointSize = 0, style }: PointerLabelProps) {
     const [valueTextWidth, setValueTextWidth] = useState<number>(0);
     const [labelTextWidth, setLabelTextWidth] = useState<number>(0);
     const [width, setWidth] = useState<number>(0);
+    const [height, setHeight] = useState<number>(0);
 
     useEffect(() => {
         setWidth(Math.max(POINTER_LABEL_MIN_WIDTH, Math.max(valueTextWidth, labelTextWidth)));
@@ -35,11 +38,16 @@ export function PointerLabel({ value, label, style }: PointerLabelProps) {
                 <Text style={ styles.label }>{ value }</Text>
             </MeasureElement>
             <View
+                onLayout={ (event) => setHeight(event.nativeEvent.layout.height) }
                 style={ [
                     styles.container,
                     {
                         width,
-                        right: (width - 2 * SEPARATOR_SIZES.small) / 2
+                        right: (width - 2 * SEPARATOR_SIZES.small) / 2,
+                        top: abovePoint
+                             ? -height - dataPointSize - SEPARATOR_SIZES.lightSmall
+                             : SEPARATOR_SIZES.lightSmall / 2,
+                        marginBottom: SEPARATOR_SIZES.lightSmall
                     },
                     style
                 ] }>
@@ -57,8 +65,6 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: COLORS.white,
         justifyContent: "center",
-        marginTop: SEPARATOR_SIZES.lightSmall / 2,
-        marginBottom: SEPARATOR_SIZES.lightSmall / 2,
         paddingVertical: SEPARATOR_SIZES.lightSmall / 2,
         borderRadius: 16
     },

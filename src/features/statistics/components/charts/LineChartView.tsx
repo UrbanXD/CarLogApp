@@ -53,10 +53,10 @@ export function LineChartView({
     const [yAxisTitleLines, setYAxisTitleLines] = useState(1);
 
     const formattedChartData = useMemo(() => {
-        const data = chartData.map((g) => ({
+        const data: Array<LineChartItem> = chartData.map((g) => ({
             ...g,
             label: g.label ? (formatLabel?.(g.label) ?? g.label) : undefined
-        }));
+        }) as LineChartItem);
 
         data.unshift({ value: chartData?.[0]?.value, hidePointer: true });
 
@@ -146,7 +146,7 @@ export function LineChartView({
                                     endFillColor={ PRIMARY_COLOR }
                                     startOpacity={ 0.3 }
                                     endOpacity={ 0.075 }
-                                    rulesType="solid"
+                                    rulesType="dashed"
                                     rulesColor={ COLORS.gray4 }
                                     yAxisSide="right"
                                     yAxisLabelWidth={ yAxisLabelWidth }
@@ -164,6 +164,7 @@ export function LineChartView({
                                     customDataPoint={
                                         () => (
                                             <Pointer
+                                                style={ { marginBottom: 50 } }
                                                 size={ DATA_POINT_SIZE }
                                                 color={ COLORS.black2 }
                                                 borderColor={ PRIMARY_COLOR }
@@ -178,6 +179,7 @@ export function LineChartView({
                                     pointerConfig={ {
                                         pointerStripColor: POINTER_STRIP_COLOR,
                                         pointerStripWidth: THICKNESS / 1.5,
+                                        persistPointer: true,
                                         pointerVanishDelay: 3000,
                                         pointerComponent: () => (
                                             <Pointer
@@ -189,11 +191,14 @@ export function LineChartView({
                                         ),
                                         radius: FOCUSED_DATA_POINT_SIZE / 2,
                                         stripBehindBars: true,
+                                        activatePointersInstantlyOnTouch: true,
                                         pointerStripUptoDataPoint: true,
                                         activatePointersOnLongPress: true,
                                         autoAdjustPointerLabelPosition: true,
                                         pointerLabelComponent: (items) => (
                                             <PointerLabel
+                                                dataPointSize={ FOCUSED_DATA_POINT_SIZE }
+                                                abovePoint={ Number(items[0].value) < chartMaxValue * 0.25 }
                                                 value={ formatValue?.(items[0].value) ?? items[0].value }
                                                 label={ items[0].label }
                                             />
