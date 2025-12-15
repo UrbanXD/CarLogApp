@@ -5,6 +5,7 @@ import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts
 import { useBottomSheet } from "../../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { getUUID } from "../../../../../database/utils/uuid.ts";
 import { CreateToast, InvalidFormToast } from "../../../../../ui/alert/presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
 
 type UseCreatePlaceProps = {
     userId: string,
@@ -12,6 +13,7 @@ type UseCreatePlaceProps = {
 }
 
 export function useCreatePlace({ userId, dismissSheet = true }: UseCreatePlaceProps) {
+    const { t } = useTranslation();
     const { openToast } = useAlert();
     const { placeDao } = useDatabase();
     const { dismissBottomSheet } = useBottomSheet();
