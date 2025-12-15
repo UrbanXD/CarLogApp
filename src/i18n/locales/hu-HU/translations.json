@@ -36,7 +36,8 @@
   "multistep_form": {
     "go_to_next_step": "Következő",
     "submit_multistep_form": "Befejezés",
-    "next_step": "Következik: {{step}}"
+    "next_step": "Következik: {{step}}",
+    "result_step": "Összegzés"
   },
   "form": {
     "optional": "opcionális",

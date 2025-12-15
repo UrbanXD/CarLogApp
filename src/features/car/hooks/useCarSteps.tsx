@@ -47,7 +47,7 @@ function useCarSteps({ control, formState, setValue, getValues }: StepProps<CarF
     ];
 
     const resultStep = {
-        type: "result",
+        title: t("multistep_form.result_step"),
         render: (goTo: (stepIndex?: number) => void) => {
             const values = getValues();
 

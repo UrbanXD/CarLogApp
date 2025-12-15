@@ -36,7 +36,8 @@
   "multistep_form": {
     "go_to_next_step": "Next",
     "submit_multistep_form": "Finish",
-    "next_step": "Next: {{step}}"
+    "next_step": "Next: {{step}}",
+    "result_step": "Summary"
   },
   "form": {
     "optional": "optional",

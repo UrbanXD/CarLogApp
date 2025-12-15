@@ -23,7 +23,7 @@ export type Step = {
 export type Steps = Array<Step>
 
 export type ResultStep = {
-    type: "result"
+    title: string
     render: (goTo?: (index: number) => void) => ReactNode | null
 }
 
