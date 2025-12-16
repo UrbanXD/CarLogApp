@@ -20,9 +20,9 @@ function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
             />
             <View style={ [styles.container] }>
                 <LinearGradient
-                    locations={ [0, 0.75] }
+                    locations={ [0, 0.65] }
                     colors={ [
-                        hexToRgba(SECONDARY_COLOR, 0.35),
+                        hexToRgba(SECONDARY_COLOR, 0.5),
                         hexToRgba(SECONDARY_COLOR, 1)
                     ] }
                     style={ StyleSheet.absoluteFillObject }
