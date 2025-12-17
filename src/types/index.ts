@@ -1,4 +1,5 @@
 import { OrderByDirectionExpression } from "kysely";
+import { SubmitErrorHandler, SubmitHandler } from "react-hook-form";
 
 export * from "./Color";
 export * from "./ImageSource";
@@ -8,6 +9,11 @@ export * from "./Step.ts";
 export type Image = {
     path: string
     image: string
+}
+
+export type SubmitHandlerArgs<FormResult> = {
+    onValid: SubmitHandler<FormResult>,
+    onInvalid?: SubmitErrorHandler<FormResult>
 }
 
 export type OffsetPagination = {
@@ -33,11 +39,3 @@ export type CommonPagination<F> = {
 }
 
 export type Pagination<F = string> = (OffsetPagination | CursorPagination<F>) & CommonPagination<F>
-
-export type Paginator<T> = {
-    search: {
-        term?: string,
-        fieldName: keyof T
-    }
-    pagination: Pagination<keyof T>
-}

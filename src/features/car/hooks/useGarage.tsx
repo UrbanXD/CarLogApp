@@ -14,7 +14,7 @@ const useGarage = () => {
         body: car.model.name
     });
 
-    const openNewCarForm = () => router.push("bottomSheet/createCar");
+    const openNewCarForm = () => router.push("car/create");
 
     const openCarProfile = (id: string) => router.push({ pathname: "(edit)/car", params: { id } });
 

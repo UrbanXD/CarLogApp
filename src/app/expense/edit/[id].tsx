@@ -1,13 +1,12 @@
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { heightPercentageToDP } from "react-native-responsive-screen";
-import BottomSheet from "../../../ui/bottomSheet/components/BottomSheet.tsx";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 import { Expense } from "../../../features/expense/schemas/expenseSchema.ts";
 import { EditExpenseForm } from "../../../features/expense/components/forms/EditExpenseForm.tsx";
 import { NotFoundToast } from "../../../ui/alert/presets/toast/index.ts";
 import { useTranslation } from "react-i18next";
+import { FormBottomSheet } from "../../../ui/bottomSheet/presets/FormBottomSheet.tsx";
 
 function Page() {
     const { t } = useTranslation();
@@ -38,16 +37,10 @@ function Page() {
 
     if(!expense) return <></>;
 
-    const CONTENT = <EditExpenseForm expense={ expense } field={ field }/>;
-    const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
-
     return (
-        <BottomSheet
-            content={ CONTENT }
-            maxDynamicContentSize={ MAX_DYNAMIC_CONTENT_SIZE }
+        <FormBottomSheet
+            content={ <EditExpenseForm expense={ expense } field={ field }/> }
             enableDynamicSizing
-            enableDismissOnClose={ false }
-            enableOverDrag={ false }
         />
     );
 }

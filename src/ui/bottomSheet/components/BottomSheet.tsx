@@ -123,7 +123,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         if(enableDismissOnClose) return dismissBottomSheet();
 
         openModal(BottomSheetLeavingModal(reopenBottomSheet, dismissBottomSheet));
-    }, [reopenBottomSheet, dismissBottomSheet]);
+    }, [reopenBottomSheet, dismissBottomSheet, enableDismissOnClose]);
 
     const renderBackdrop = useMemo(() => (props: BottomSheetBackdropProps) => <BottomSheetBackdrop { ...props }/>);
 
@@ -138,6 +138,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     return (
         <BottomSheetModal
             ref={ bottomSheetRef }
+            enableOverDrag={ false }
             { ...restProps }
             topInset={ top }
             keyboardBehavior="interactive"

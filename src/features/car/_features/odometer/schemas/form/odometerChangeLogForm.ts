@@ -8,6 +8,7 @@ import { odometerUnitSchema } from "../odometerUnitSchema.ts";
 import { zodOdometerValidation } from "../../utils/zodOdometerValidation.ts";
 import { OdometerLogDao } from "../../model/dao/OdometerLogDao.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
+import dayjs from "dayjs";
 
 export const odometerChangeLogForm = (odometerLogDao?: OdometerLogDao, omitOwnerId?: boolean) => {
     let schema = odometerLogSchema
@@ -75,7 +76,7 @@ export const useEditOdometerChangeLogFormProps = (odometerLog: OdometerLog) => {
         carId: odometerLog.carId,
         value: odometerLog.value,
         note: odometerLog.note,
-        date: odometerLog.date,
+        date: dayjs(odometerLog.date).isValid() ? dayjs(fuelLog.expense.date).toDate() : new Date(),
         conversionFactor: odometerLog.unit.conversionFactor
     };
 

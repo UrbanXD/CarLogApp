@@ -54,22 +54,28 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
     return (
         <View style={ styles.container }>
             <Text style={ styles.title }>{ t("service.items.title_singular") }</Text>
-            <Form style={ styles.formContainer }>
-                <ServiceItemTypeInput
-                    control={ control }
-                    fieldName="typeId"
-                />
-                <AmountInput
-                    control={ control }
-                    setValue={ setValue }
-                    fieldName="expense"
-                    title={ t("currency.price_per_unit") }
-                    amountPlaceholder={ t("currency.price_per_unit") }
-                    defaultCurrency={ carCurrencyId }
-                    isPricePerUnitFallback={ true }
-                    showsQuantityInput={ true }
-                />
-            </Form>
+            <Form
+                form={ form }
+                formFields={
+                    <>
+                        <ServiceItemTypeInput
+                            control={ control }
+                            fieldName="typeId"
+                        />
+                        <AmountInput
+                            control={ control }
+                            setValue={ setValue }
+                            fieldName="expense"
+                            title={ t("currency.price_per_unit") }
+                            amountPlaceholder={ t("currency.price_per_unit") }
+                            defaultCurrency={ carCurrencyId }
+                            isPricePerUnitFallback={ true }
+                            showsQuantityInput={ true }
+                        />
+                    </>
+                }
+                containerStyle={ styles.formContainer }
+            />
             <SaveButton onPress={ submitHandler }/>
         </View>
     );

@@ -1,5 +1,5 @@
 import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
-import { useForm } from "react-hook-form";
+import { FormState, useForm } from "react-hook-form";
 import React from "react";
 import { useAppDispatch } from "../../../../../../hooks/index.ts";
 import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
@@ -10,10 +10,9 @@ import {
     useEditOdometerChangeLogFormProps
 } from "../../schemas/form/odometerChangeLogForm.ts";
 import { updateCarOdometer } from "../../../../model/slice/index.ts";
-import { FormButtons } from "../../../../../../components/Button/presets/FormButtons.tsx";
 import { OdometerLogFormFields } from "../../enums/odometerLogFormFields.ts";
 import { useOdometerLogFormFields } from "../../hooks/useOdometerLogFormFields.tsx";
-import { FormFields } from "../../../../../../types/index.ts";
+import { FormFields, SubmitHandlerArgs } from "../../../../../../types/index.ts";
 import Form from "../../../../../../components/Form/Form.tsx";
 import { Odometer } from "../../schemas/odometerSchema.ts";
 import { InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
@@ -22,22 +21,21 @@ type EditOdometerLogFormProps = {
     odometerLog: OdometerLog
     /** Which field will be edited, if its undefined that means full form view will appear */
     field?: OdometerLogFormFields
+    onFormStateChange?: (formState: FormState<OdometerChangeLogFormFields>) => void
 }
 
-export function EditOdometerChangeLogForm({ odometerLog, field }: EditOdometerLogFormProps) {
+export function EditOdometerChangeLogForm({ odometerLog, field, onFormStateChange }: EditOdometerLogFormProps) {
     const dispatch = useAppDispatch();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
     const { odometerLogDao } = useDatabase();
 
     const form = useForm<OdometerChangeLogFormFields>(useEditOdometerChangeLogFormProps(odometerLog));
-    const { handleSubmit, reset } = form;
-
     const { fields, fullForm } = useOdometerLogFormFields({ odometerLog, ...form });
     const editFields: FormFields = fields?.[field] ?? fullForm;
 
-    const submitHandler = handleSubmit(
-        async (formResult: OdometerChangeLogFormFields) => {
+    const submitHandler: SubmitHandlerArgs<OdometerChangeLogFormFields> = {
+        onValid: async (formResult) => {
             try {
                 const result = await odometerLogDao.updateOdometerChangeLog(formResult);
 
@@ -59,16 +57,19 @@ export function EditOdometerChangeLogForm({ odometerLog, field }: EditOdometerLo
                 console.error("Hiba a submitHandler-ben log:", e);
             }
         },
-        (errors) => {
+        onInvalid: (errors) => {
             console.log("Edit odometer log validation errors", errors);
             openToast(InvalidFormToast.warning());
         }
-    );
+    };
 
     return (
-        <Form>
-            { editFields.render() }
-            <FormButtons reset={ reset } submit={ submitHandler }/>
-        </Form>
+        <Form
+            edit
+            form={ form }
+            formFields={ editFields.render() }
+            submitHandler={ submitHandler }
+            onFormStateChange={ onFormStateChange }
+        />
     );
 }

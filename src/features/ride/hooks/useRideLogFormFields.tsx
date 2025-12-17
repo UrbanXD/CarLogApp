@@ -49,7 +49,7 @@ export function useRideLogFormFields({
         const car = getCar(formCarId);
         setCar(car ?? null);
         if(car && !getFieldState("startOdometerValue").isDirty && setCarOdometerValueWhenInputNotTouched) {
-            setValue("startOdometerValue", car.odometer.value);
+            setValue("startOdometerValue", car.odometer.value, { shouldDirty: false });
         }
         clearErrors();
     }, [formCarId]);

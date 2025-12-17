@@ -8,20 +8,21 @@ import {
     useCreateOdometerChangeLogFormProps
 } from "../../schemas/form/odometerChangeLogForm.ts";
 import { updateCarOdometer } from "../../../../model/slice/index.ts";
-import { useForm, useWatch } from "react-hook-form";
+import { FormState, useForm, useWatch } from "react-hook-form";
 import useCars from "../../../../hooks/useCars.ts";
 import { Car } from "../../../../schemas/carSchema.ts";
 import { useOdometerLogFormFields } from "../../hooks/useOdometerLogFormFields.tsx";
 import Form from "../../../../../../components/Form/Form.tsx";
-import { FormButtons } from "../../../../../../components/Button/presets/FormButtons.tsx";
 import { CreateToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
 import { useTranslation } from "react-i18next";
+import { SubmitHandlerArgs } from "../../../../../../types/index.ts";
 
 type CreateOdometerLogFormProps = {
     defaultCarId?: string
+    onFormStateChange?: (formState: FormState<OdometerChangeLogFormFields>) => void
 }
 
-export function CreateOdometerChangeLogForm({ defaultCarId }: CreateOdometerLogFormProps) {
+export function CreateOdometerChangeLogForm({ defaultCarId, onFormStateChange }: CreateOdometerLogFormProps) {
     const dispatch = useAppDispatch();
     const { t } = useTranslation();
     const { openToast } = useAlert();
@@ -32,7 +33,7 @@ export function CreateOdometerChangeLogForm({ defaultCarId }: CreateOdometerLogF
     const [car, setCar] = useState<Car | null>(defaultCarId ? getCar(defaultCarId) ?? selectedCar : selectedCar);
 
     const form = useForm<OdometerChangeLogFormFields>(useCreateOdometerChangeLogFormProps(car));
-    const { control, setValue, handleSubmit, clearErrors, getFieldState } = form;
+    const { control, setValue, clearErrors, getFieldState } = form;
     const { fullForm } = useOdometerLogFormFields({ ...form, defaultCarId });
 
     const formCarId = useWatch({ control, name: "carId" });
@@ -51,8 +52,8 @@ export function CreateOdometerChangeLogForm({ defaultCarId }: CreateOdometerLogF
         }
     }, [car?.odometer.value]);
 
-    const submitHandler = handleSubmit(
-        async (formResult: OdometerChangeLogFormFields) => {
+    const submitHandler: SubmitHandlerArgs<OdometerChangeLogFormFields> = {
+        onValid: async (formResult: OdometerChangeLogFormFields) => {
             try {
                 const result = await odometerLogDao.createOdometerChangeLog(formResult);
                 const odometer = await odometerLogDao.getOdometerByCarId(result.carId);
@@ -67,16 +68,19 @@ export function CreateOdometerChangeLogForm({ defaultCarId }: CreateOdometerLogF
                 console.error("Hiba a submitHandler-ben log:", e);
             }
         },
-        (errors) => {
+        onInvalid: (errors) => {
             console.log("Create odometer log validation errors", errors);
             openToast(InvalidFormToast.warning());
         }
-    );
+    };
 
     return (
-        <Form>
-            { fullForm.render() }
-            <FormButtons submit={ submitHandler } submitText={ t("form_button.record") }/>
-        </Form>
+        <Form
+            form={ form }
+            formFields={ fullForm.render() }
+            submitHandler={ submitHandler }
+            submitText={ t("form_button.record") }
+            onFormStateChange={ onFormStateChange }
+        />
     );
 }

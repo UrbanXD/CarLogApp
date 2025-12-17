@@ -11,6 +11,7 @@ import { formResultRideExpenseSchema } from "../../_features/rideExpense/schemas
 import { zodOdometerValidation } from "../../../car/_features/odometer/utils/zodOdometerValidation.ts";
 import { OdometerLogDao } from "../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
+import dayjs from "dayjs";
 
 const rideLogForm = (odometerLogDao: OdometerLogDao) => rideLogSchema
 .pick({ id: true, carId: true, note: true })
@@ -87,9 +88,9 @@ export function useCreateRideLogFormProps(car: Car | null) {
         id: getUUID(),
         carId: car?.id,
         startOdometerLogId: getUUID(),
-        startOdometerValue: car?.odometer.value ?? 0,
+        startOdometerValue: car?.odometer.value ?? null,
         endOdometerLogId: getUUID(),
-        endOdometerValue: NaN,
+        endOdometerValue: car?.odometer.value ?? null,
         expenses: [],
         places: [],
         passengers: [],
@@ -115,8 +116,8 @@ export function useEditRideLogFormProps(rideLog: RideLog, ownerId: string) {
         expenses: rideLog.rideExpenses,
         places: rideLog.ridePlaces,
         passengers: rideLog.ridePassengers,
-        startTime: rideLog.startTime,
-        endTime: rideLog.endTime,
+        startTime: dayjs(rideLog.startTime).isValid() ? dayjs(rideLog.startTime).toDate() : new Date(),
+        endTime: dayjs(rideLog.endTime).isValid() ? dayjs(rideLog.endTime).toDate() : new Date(),
         note: rideLog.note
     };
 

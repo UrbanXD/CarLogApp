@@ -6,6 +6,7 @@ import { getUUID } from "../../../../database/utils/uuid.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CurrencyEnum } from "../../../_shared/currency/enums/currencyEnum.ts";
 import { inputAmountSchema } from "../../../_shared/currency/schemas/inputAmountSchema.ts";
+import dayjs from "dayjs";
 
 export const expenseForm = expenseSchema
 .pick({ id: true, note: true })
@@ -27,12 +28,12 @@ export function useCreateExpenseFormProps(car: Car | null) {
         carId: car?.id,
         typeId: null,
         expense: {
-            amount: NaN,
+            amount: null,
             currencyId: car?.currency.id ?? CurrencyEnum.EUR,
             exchangeRate: 1
         },
         note: null,
-        date: new Date().toISOString()
+        date: new Date()
     };
 
     return { defaultValues, resolver: zodResolver(expenseForm) };
@@ -49,7 +50,8 @@ export function useEditExpenseFormProps(expense: Expense) {
             exchangeRate: expense.amount.exchangeRate
         },
         note: expense.note,
-        date: expense.date
+        date: dayjs(expense.date).isValid() ? dayjs(expense.date).toDate() : new Date()
+
     };
 
     return { defaultValues, resolver: zodResolver(expenseForm) };

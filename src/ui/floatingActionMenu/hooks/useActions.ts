@@ -28,7 +28,7 @@ export function useActions(): { actions: Array<Action> } {
         {
             icon: ICON_NAMES.car,
             label: t("action_menu.create_car"),
-            onPress: () => router.push("bottomSheet/createCar")
+            onPress: () => router.push("car/create")
         },
         {
             icon: ICON_NAMES.serviceOutline,
@@ -53,7 +53,10 @@ export function useActions(): { actions: Array<Action> } {
         {
             icon: ICON_NAMES.odometer,
             label: t("action_menu.create_odometer_log"),
-            onPress: () => actionOnlyWhenCarAvailable(() => router.push("odometer/log/create"))
+            onPress: () => {
+                console.log("faszomat");
+                actionOnlyWhenCarAvailable(() => router.push("odometer/log/create"));
+            }
         },
         {
             icon: ICON_NAMES.destinationPointMarker,

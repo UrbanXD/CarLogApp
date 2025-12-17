@@ -3,15 +3,20 @@ import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import useCars from "../../../car/hooks/useCars.ts";
-import { useForm } from "react-hook-form";
+import { FormState, useForm } from "react-hook-form";
 import { RideLogFormFields, useCreateRideLogFormProps } from "../../schemas/form/rideLogForm.ts";
 import { useRideLogFormFields } from "../../hooks/useRideLogFormFields.tsx";
 import MultiStepForm from "../../../../components/Form/MultiStepForm.tsx";
 import { updateCarOdometer } from "../../../car/model/slice/index.ts";
 import { CreateToast, InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
 import { useTranslation } from "react-i18next";
+import { SubmitHandlerArgs } from "../../../../types/index.ts";
 
-export function CreateRideLogForm() {
+type CreateRideLogFormProps = {
+    onFormStateChange?: (formState: FormState<RideLogFormFields>) => void
+}
+
+export function CreateRideLogForm({ onFormStateChange }: CreateRideLogFormProps) {
     const dispatch = useAppDispatch();
     const { t } = useTranslation();
     const { openToast } = useAlert();
@@ -20,12 +25,10 @@ export function CreateRideLogForm() {
     const { selectedCar } = useCars();
 
     const form = useForm<RideLogFormFields>(useCreateRideLogFormProps(selectedCar));
-    const { handleSubmit } = form;
-
     const { multiStepFormSteps } = useRideLogFormFields({ form });
 
-    const submitHandler = handleSubmit(
-        async (formResult: RideLogFormFields) => {
+    const submitHandler: SubmitHandlerArgs<RideLogFormFields> = {
+        onValid: async (formResult) => {
             try {
                 const result = await rideLogDao.create(formResult);
                 if(result?.odometer) dispatch(updateCarOdometer({ odometer: result.odometer }));
@@ -38,17 +41,18 @@ export function CreateRideLogForm() {
                 console.error("Hiba a submitHandler-ben log:", e);
             }
         },
-        (errors) => {
-            console.log("Create service log validation errors", errors);
+        onInvalid: (errors) => {
+            console.log("Create ride log validation errors", errors);
             openToast(InvalidFormToast.warning());
         }
-    );
+    };
 
     return (
         <MultiStepForm
+            form={ form }
             steps={ multiStepFormSteps }
             submitHandler={ submitHandler }
-            { ...form }
+            onFormStateChange={ onFormStateChange }
         />
     );
 }

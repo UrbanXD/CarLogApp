@@ -1,4 +1,5 @@
 export const BottomSheetRoutes = [
+    "car/create",
     "car/edit/[id]",
     "odometer/log/create",
     "odometer/log/edit/[id]",

@@ -10,6 +10,7 @@ import { formResultServiceItemSchema } from "../serviceItemSchema.ts";
 import { OdometerLogDao } from "../../../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
 import { zodOdometerValidation } from "../../../../../car/_features/odometer/utils/zodOdometerValidation.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
+import dayjs from "dayjs";
 
 const serviceLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
 .pick({ date: true, note: true })
@@ -54,7 +55,7 @@ export function useCreateServiceLogFormProps(car: Car | null) {
         carId: car?.id,
         serviceTypeId: null,
         items: [],
-        odometerValue: NaN,
+        odometerValue: null,
         note: null,
         date: new Date()
     };
@@ -72,9 +73,9 @@ export function useEditServiceLogFormProps(serviceLog: ServiceLog) {
         carId: serviceLog.carId,
         serviceTypeId: serviceLog.serviceType.id,
         items: serviceLog.items,
-        odometerValue: serviceLog.odometer?.value ?? NaN,
+        odometerValue: serviceLog.odometer?.value ?? null,
         note: serviceLog.expense.note,
-        date: serviceLog.expense.date
+        date: dayjs(serviceLog.expense.date).isValid() ? dayjs(serviceLog.expense.date).toDate() : new Date()
     };
 
     return { defaultValues, resolver: zodResolver(serviceLogForm(odometerLogDao)) };

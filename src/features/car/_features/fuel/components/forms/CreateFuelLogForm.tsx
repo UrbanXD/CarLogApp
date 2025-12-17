@@ -4,15 +4,20 @@ import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import useCars from "../../../../hooks/useCars.ts";
-import { useForm } from "react-hook-form";
+import { FormState, useForm } from "react-hook-form";
 import { useFuelLogFormFields } from "../../hooks/useFuelLogForm.tsx";
 import { FuelLogFields, useCreateFuelLogFormProps } from "../../schemas/form/fuelLogForm.ts";
 import { updateCarOdometer } from "../../../../model/slice/index.ts";
 import { useAppDispatch } from "../../../../../../hooks/index.ts";
 import { CreateToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
 import { useTranslation } from "react-i18next";
+import { SubmitHandlerArgs } from "../../../../../../types/index.ts";
 
-export function CreateFuelLogForm() {
+type CreateFuelLogFormProps = {
+    onFormStateChange?: (formState: FormState<FuelLogFields>) => void
+}
+
+export function CreateFuelLogForm({ onFormStateChange }: CreateFuelLogFormProps) {
     const dispatch = useAppDispatch();
     const { t } = useTranslation();
     const { openToast } = useAlert();
@@ -21,12 +26,10 @@ export function CreateFuelLogForm() {
     const { selectedCar } = useCars();
 
     const form = useForm<FuelLogFields>(useCreateFuelLogFormProps(selectedCar));
-    const { handleSubmit } = form;
-
     const { multiStepFormSteps } = useFuelLogFormFields(form);
 
-    const submitHandler = handleSubmit(
-        async (formResult: FuelLogFields) => {
+    const submitHandler: SubmitHandlerArgs<FuelLogFields> = {
+        onValid: async (formResult) => {
             try {
                 const result = await fuelLogDao.create(formResult);
                 if(result?.odometer) dispatch(updateCarOdometer({ odometer: result.odometer }));
@@ -39,17 +42,18 @@ export function CreateFuelLogForm() {
                 console.error("Hiba a submitHandler-ben log:", e);
             }
         },
-        (errors) => {
-            console.log("Create expense validation errors", errors);
+        onInvalid: (errors) => {
+            console.log("Create fuel log validation errors", errors);
             openToast(InvalidFormToast.warning());
         }
-    );
+    };
 
     return (
         <MultiStepForm
+            form={ form }
             steps={ multiStepFormSteps }
             submitHandler={ submitHandler }
-            { ...form }
+            onFormStateChange={ onFormStateChange }
         />
     );
 }

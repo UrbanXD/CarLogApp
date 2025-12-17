@@ -2,13 +2,12 @@ import { useAppDispatch, useAppSelector } from "../../../../hooks/index.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
-import { useForm } from "react-hook-form";
-import { FormFields } from "../../../../types/index.ts";
-import React, { useMemo } from "react";
+import { FormState, useForm } from "react-hook-form";
+import { FormFields, SubmitHandlerArgs } from "../../../../types/index.ts";
+import React from "react";
 import { Odometer } from "../../../car/_features/odometer/schemas/odometerSchema.ts";
 import { updateCarOdometer } from "../../../car/model/slice/index.ts";
 import Form from "../../../../components/Form/Form.tsx";
-import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 import { RideLog } from "../../schemas/rideLogSchema.ts";
 import { RideLogFormFieldsEnum } from "../../enums/RideLogFormFields.ts";
 import { RideLogFormFields, useEditRideLogFormProps } from "../../schemas/form/rideLogForm.ts";
@@ -20,11 +19,13 @@ type EditRideLogFormProps = {
     rideLog: RideLog
     /** Which field will be edited */
     field: RideLogFormFieldsEnum
+    onFormStateChange?: (formState: FormState<RideLogFormFields>) => void
 }
 
 export function EditRideLogForm({
     rideLog,
-    field
+    field,
+    onFormStateChange
 }: EditRideLogFormProps) {
     const dispatch = useAppDispatch();
     const user = useAppSelector(getUser);
@@ -33,8 +34,6 @@ export function EditRideLogForm({
     const { dismissBottomSheet } = useBottomSheet();
 
     const form = useForm<RideLogFormFields>(useEditRideLogFormProps(rideLog, user?.id));
-    const { handleSubmit, reset } = form;
-
     const { fields } = useRideLogFormFields({
         form,
         setCarOdometerValueWhenInputNotTouched: false,
@@ -43,8 +42,8 @@ export function EditRideLogForm({
     });
     const editFields: FormFields = fields[field];
 
-    const submitHandler = useMemo(() => handleSubmit(
-        async (formResult: RideLogFormFields) => {
+    const submitHandler: SubmitHandlerArgs<RideLogFormFields> = {
+        onValid: async (formResult) => {
             try {
                 const result = await rideLogDao.update(formResult);
 
@@ -68,16 +67,19 @@ export function EditRideLogForm({
                 console.error("Hiba a submitHandler-ben (ride log):", e);
             }
         },
-        (errors) => {
+        onInvalid: (errors) => {
             openToast(InvalidFormToast.warning());
             console.log("Edit ride log validation errors", errors);
         }
-    ), [handleSubmit, editFields]);
+    };
 
     return (
-        <Form>
-            { editFields.render() }
-            <FormButtons reset={ reset } submit={ submitHandler }/>
-        </Form>
+        <Form
+            edit
+            form={ form }
+            formFields={ editFields.render() }
+            submitHandler={ submitHandler }
+            onFormStateChange={ onFormStateChange }
+        />
     );
 }

@@ -1,43 +1,42 @@
-import React from "react";
-import { Control, UseFormResetField, UseFormTrigger } from "react-hook-form";
+import React, { useEffect } from "react";
+import { FormState, UseFormReturn } from "react-hook-form";
 import { MultiStepFormProvider } from "../../contexts/multiStepForm/MultiStepFormProvider.tsx";
 import MultiStepFormProgressInfo from "./MultiStepFormProgressInfo.tsx";
 import MultiStepFormContent from "./MultiStepFormContent.tsx";
 import MultiStepFormButtons from "./MultiStepFormButtons.tsx";
 import { StyleSheet, View } from "react-native";
-import { ResultStep, Steps } from "../../types/index.ts";
+import { ResultStep, Steps, SubmitHandlerArgs } from "../../types/index.ts";
 import { formTheme } from "../../ui/form/constants/theme.ts";
 
 
-interface MultiStepFormProps {
-    steps: Steps;
-    resultStep?: ResultStep;
-    isFirstCount?: boolean;
-    control: Control<any>;
-    submitHandler: () => Promise<void>;
-    trigger: UseFormTrigger<any>;
-    resetField?: UseFormResetField<any>;
+type MultiStepFormProps = {
+    form: UseFormReturn
+    steps: Steps
+    submitHandler: SubmitHandlerArgs
+    resultStep?: ResultStep
+    isFirstCount?: boolean
+    onFormStateChange?: (formState: FormState<any>) => void
 }
 
-const MultiStepForm: React.FC<MultiStepFormProps> = ({
+function MultiStepForm({
+    form,
     steps,
+    submitHandler,
     resultStep,
     isFirstCount = true,
-    control,
-    submitHandler,
-    trigger,
-    resetField
-}) => {
+    onFormStateChange
+}: MultiStepFormProps) {
+    useEffect(() => {
+        if(onFormStateChange) onFormStateChange(form.formState);
+    }, [form.formState]);
 
     return (
         <MultiStepFormProvider
+            form={ form }
             steps={ steps }
             resultStep={ resultStep }
             isFirstCount={ isFirstCount }
-            control={ control }
             submitHandler={ submitHandler }
-            trigger={ trigger }
-            resetField={ resetField }
         >
             <View style={ styles.container }>
                 <MultiStepFormProgressInfo/>

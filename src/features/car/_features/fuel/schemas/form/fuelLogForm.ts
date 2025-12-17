@@ -11,6 +11,7 @@ import { OdometerLogDao } from "../../../odometer/model/dao/OdometerLogDao.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import { zodOdometerValidation } from "../../../odometer/utils/zodOdometerValidation.ts";
 import { inputAmountSchema } from "../../../../../_shared/currency/schemas/inputAmountSchema.ts";
+import dayjs from "dayjs";
 
 const fuelLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
 .pick({ carId: true, date: true, note: true })
@@ -63,7 +64,7 @@ export function useCreateFuelLogFormProps(car: Car | null) {
         expense: {
             id: getUUID(),
             currencyId: car?.currency.id ?? CurrencyEnum.EUR,
-            amount: NaN,
+            amount: 0,
             isPricePerUnit: false,
             exchangeRate: 1
         },
@@ -72,7 +73,7 @@ export function useCreateFuelLogFormProps(car: Car | null) {
         ownerId: car?.ownerId,
         carId: car?.id,
         fuelUnitId: car?.fuelTank.unit.id,
-        odometerValue: NaN,
+        odometerValue: null,
         note: null,
         date: new Date()
     };
@@ -97,9 +98,9 @@ export const useEditFuelLogFormProps = (fuelLog: FuelLog) => {
         ownerId: fuelLog.ownerId,
         carId: fuelLog.expense.carId,
         fuelUnitId: fuelLog.fuelUnit.id,
-        odometerValue: fuelLog.odometer?.value ?? NaN,
+        odometerValue: fuelLog.odometer?.value ?? null,
         note: fuelLog.expense.note,
-        date: fuelLog.expense.date
+        date: dayjs(fuelLog.expense.date).isValid() ? dayjs(fuelLog.expense.date).toDate() : new Date()
     };
 
     return { defaultValues, resolver: zodResolver(fuelLogForm(odometerLogDao)) };

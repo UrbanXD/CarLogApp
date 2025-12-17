@@ -35,7 +35,7 @@ export function useServiceItemFormProps({ carCurrencyId, serviceItem }: {
         expense: {
             currencyId: serviceItem?.pricePerUnit?.currency?.id ?? carCurrencyId ?? CurrencyEnum.EUR,
             quantity: serviceItem?.quantity ?? 1,
-            pricePerUnit: serviceItem?.pricePerUnit?.amount ?? 0,
+            pricePerUnit: serviceItem?.pricePerUnit?.amount ?? null,
             exchangeRate: serviceItem?.pricePerUnit?.exchangeRate ?? 1
         }
     };

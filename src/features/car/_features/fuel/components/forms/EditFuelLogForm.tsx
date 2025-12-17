@@ -1,12 +1,10 @@
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
-import { useForm } from "react-hook-form";
-import { ExpenseFields } from "../../../../../expense/schemas/form/expenseForm.ts";
-import { FormFields } from "../../../../../../types/index.ts";
-import React, { useMemo } from "react";
+import { FormState, useForm } from "react-hook-form";
+import { FormFields, SubmitHandlerArgs } from "../../../../../../types/index.ts";
+import React from "react";
 import Form from "../../../../../../components/Form/Form.tsx";
-import { FormButtons } from "../../../../../../components/Button/presets/FormButtons.tsx";
 import { FuelLog } from "../../schemas/fuelLogSchema.ts";
 import { FuelLogFormFieldsEnum } from "../../enums/fuelLogFormFields.tsx";
 import { FuelLogFields, useEditFuelLogFormProps } from "../../schemas/form/fuelLogForm.ts";
@@ -20,11 +18,13 @@ type EditFuelLogFormProps = {
     fuelLog: FuelLog
     /** Which field will be edited, if its undefined that means full form view will appear */
     field: FuelLogFormFieldsEnum
+    onFormStateChange?: (formState: FormState<FuelLogFields>) => void
 }
 
 export function EditFuelLogForm({
     fuelLog,
-    field
+    field,
+    onFormStateChange
 }: EditFuelLogFormProps) {
     const dispatch = useAppDispatch();
     const { fuelLogDao, odometerLogDao } = useDatabase();
@@ -32,13 +32,11 @@ export function EditFuelLogForm({
     const { dismissBottomSheet } = useBottomSheet();
 
     const form = useForm<FuelLogFields>(useEditFuelLogFormProps(fuelLog));
-    const { handleSubmit, reset } = form;
-
     const { fields } = useFuelLogFormFields({ ...form, odometer: fuelLog.odometer });
     const editFields: FormFields = fields[field];
 
-    const submitHandler = useMemo(() => handleSubmit(
-        async (formResult: ExpenseFields) => {
+    const submitHandler: SubmitHandlerArgs<FuelLogFields> = {
+        onValid: async (formResult) => {
             try {
                 const result = await fuelLogDao.update(formResult);
 
@@ -61,16 +59,19 @@ export function EditFuelLogForm({
                 console.error("Hiba a submitHandler-ben:", e);
             }
         },
-        (errors) => {
+        onInvalid: (errors) => {
             openToast(InvalidFormToast.warning());
             console.log("Edit fuel log validation errors", errors);
         }
-    ), [handleSubmit, editFields]);
+    };
 
     return (
-        <Form>
-            { editFields.render() }
-            <FormButtons reset={ reset } submit={ submitHandler }/>
-        </Form>
+        <Form
+            edit
+            form={ form }
+            formFields={ editFields.render() }
+            submitHandler={ submitHandler }
+            onFormStateChange={ onFormStateChange }
+        />
     );
 }

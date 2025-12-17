@@ -67,7 +67,7 @@ export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
     const select = useCallback((carId: string) => dispatch(selectCar({ database, carId })), []);
     const closeList = useCallback(() => isCarsListVisible.value = false, []);
     const openList = useCallback(() => isCarsListVisible.value = true, []);
-    const openCreateCarBottomSheet = useCallback(() => router.push("bottomSheet/createCar"), []);
+    const openCreateCarBottomSheet = useCallback(() => router.push("car/create"), []);
 
     const renderItem = ({ item }: ListRenderItemInfo<Car>) =>
         <CarPickerItem

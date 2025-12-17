@@ -5,7 +5,7 @@ import { AuthApiError, EmailOtpType } from "@supabase/supabase-js";
 import Divider from "../../../../components/Divider.tsx";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { useOtp } from "../../hooks/useOtp.ts";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 export type HandleVerificationOtpType = (errorCode?: string) => (Promise<void> | void)
 
@@ -26,6 +26,7 @@ const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
     subtitle,
     handleVerification
 }) => {
+    const { t } = useTranslation();
     const { verifyOTP, resendOTP } = useOtp();
 
     const defaultSubtitle = () =>
@@ -80,8 +81,12 @@ const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
             <Text style={ styles.didntReceivedCodeText }>
                 { t("auth.otp_verification.expired_or_didnt_received") }
                 { "\n" }
-                <Text style={ styles.didntReceivedCodeLinkText }
-                      onPress={ resend }>{ t("auth.otp_verification.resend") }</Text>
+                <Text
+                    style={ styles.didntReceivedCodeLinkText }
+                    onPress={ resend }
+                >
+                    { t("auth.otp_verification.resend") }
+                </Text>
             </Text>
         </View>
     );

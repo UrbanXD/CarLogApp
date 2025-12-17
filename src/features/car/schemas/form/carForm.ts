@@ -53,7 +53,7 @@ export const useCreatCarFormProps = (user: UserAccount) => {
         odometer: {
             id: getUUID(),
             odometerChangeLogId: getUUID(),
-            value: NaN,
+            value: null,
             unitId: ""
         },
         currencyId: user.currency.id,
@@ -61,7 +61,7 @@ export const useCreatCarFormProps = (user: UserAccount) => {
             id: getUUID(),
             typeId: "",
             unitId: "",
-            capacity: NaN
+            capacity: null
         }
     };
 

@@ -1,9 +1,7 @@
 import React, { useEffect } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import useCars from "../../../features/car/hooks/useCars.ts";
-import EditCarForm from "../../../features/car/components/forms/EditCarForm.tsx";
-import { heightPercentageToDP } from "react-native-responsive-screen";
-import BottomSheet from "../../../ui/bottomSheet/components/BottomSheet.tsx";
+import CarEditBottomSheet from "../../../features/car/presets/bottomSheet/CarEditBottomSheet.tsx";
 
 function Page() {
     const { id, stepIndex } = useLocalSearchParams();
@@ -20,16 +18,10 @@ function Page() {
 
     if(!car) return <></>;
 
-    const CONTENT = <EditCarForm car={ car } stepIndex={ stepIndex }/>;
-    const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
-
     return (
-        <BottomSheet
-            content={ CONTENT }
-            maxDynamicContentSize={ MAX_DYNAMIC_CONTENT_SIZE }
-            enableDynamicSizing
-            enableDismissOnClose={ false }
-            enableOverDrag={ false }
+        <CarEditBottomSheet
+            car={ car }
+            stepIndex={ stepIndex }
         />
     );
 }
