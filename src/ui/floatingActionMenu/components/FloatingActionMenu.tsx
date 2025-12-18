@@ -52,6 +52,8 @@ function FloatingActionMenu({ action, containerStyle }: FloatingActionMenu) {
 
     const renderAction = useCallback((action: Action, index: number) => {
         const handlePress = () => {
+            if(!isExpanded.value) return;
+
             isExpanded.value = false;
             action.onPress();
         };
@@ -66,14 +68,18 @@ function FloatingActionMenu({ action, containerStyle }: FloatingActionMenu) {
                 onPress={ debounce(handlePress, 350) }
             />
         );
-    }, []);
+    }, [isExpanded]);
 
     const styles = useStyles(bottom);
 
     return (
         <>
             <Overlay opened={ isExpanded } onPress={ close }/>
-            <AnimatedSafeAreaView entering={ FadeIn } exiting={ FadeOut } style={ [styles.container, containerStyle] }>
+            <AnimatedSafeAreaView
+                entering={ FadeIn }
+                exiting={ FadeOut }
+                style={ [styles.container, containerStyle] }
+            >
                 <View style={ styles.buttonsContainer }>
                     <AnimatedPressable
                         onPress={ Array.isArray(action) ? toggle : action }
@@ -88,12 +94,12 @@ function FloatingActionMenu({ action, containerStyle }: FloatingActionMenu) {
     );
 }
 
-export default FloatingActionMenu;
-
 const useStyles = (bottom: number) => StyleSheet.create({
     container: {
         position: "absolute",
+        top: 0,
         bottom: bottom + SEPARATOR_SIZES.small,
+        left: 0,
         right: DEFAULT_SEPARATOR,
         justifyContent: "flex-end",
         alignItems: "flex-end",
@@ -135,3 +141,5 @@ const useStyles = (bottom: number) => StyleSheet.create({
         }
     }
 });
+
+export default FloatingActionMenu;

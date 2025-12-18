@@ -53,10 +53,7 @@ export function useActions(): { actions: Array<Action> } {
         {
             icon: ICON_NAMES.odometer,
             label: t("action_menu.create_odometer_log"),
-            onPress: () => {
-                console.log("faszomat");
-                actionOnlyWhenCarAvailable(() => router.push("odometer/log/create"));
-            }
+            onPress: () => actionOnlyWhenCarAvailable(() => router.push("odometer/log/create"))
         },
         {
             icon: ICON_NAMES.destinationPointMarker,
