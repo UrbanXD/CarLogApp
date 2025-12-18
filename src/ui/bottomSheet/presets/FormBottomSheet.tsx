@@ -12,7 +12,7 @@ export function FormBottomSheet({
     content,
     enableDynamicSizing = false,
     snapPoints = !enableDynamicSizing ? ["90%"] : undefined,
-    maxDynamicContentSize = heightPercentageToDP(95),
+    maxDynamicContentSize = heightPercentageToDP(90),
     alwaysEnableDismiss = defaultEnableDismissOnClose ?? false,
     ...bottomSheetProps
 }: FormBottomSheetProps) {

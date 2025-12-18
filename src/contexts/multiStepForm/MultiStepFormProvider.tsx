@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { Keyboard } from "react-native";
 import { ResultStep, Steps, SubmitHandlerArgs } from "../../types/index.ts";
 import { MultiStepFormContext } from "./MultiStepFormContext.ts";
@@ -31,8 +31,15 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
         setFormSteps(tmpSteps);
     }, [steps, resultStep]);
 
-    const submit = useCallback(() => (
-        form.handleSubmit(submitHandler.onValid, submitHandler.onInvalid)
+    const submit = useMemo(() => (
+        form.handleSubmit(submitHandler.onValid, (errors, event) => {
+            submitHandler.onInvalid(errors, event);
+            if(Object.keys(errors).length > 0) {
+                const firstErrorStepIndex = steps.findIndex(step => step.fields.some(field => errors[field]));
+
+                if(firstErrorStepIndex !== -1) return goTo(firstErrorStepIndex);
+            }
+        })
     ), [form, submitHandler]);
 
     const isFirstStep = () => currentStep === 0;
