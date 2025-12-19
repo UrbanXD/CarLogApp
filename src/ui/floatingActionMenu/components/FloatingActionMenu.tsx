@@ -78,6 +78,7 @@ function FloatingActionMenu({ action, containerStyle }: FloatingActionMenu) {
             <AnimatedSafeAreaView
                 entering={ FadeIn }
                 exiting={ FadeOut }
+                pointerEvents="box-none"
                 style={ [styles.container, containerStyle] }
             >
                 <View style={ styles.buttonsContainer }>
