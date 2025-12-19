@@ -9,23 +9,23 @@ import { Trans, useTranslation } from "react-i18next";
 
 export type HandleVerificationOtpType = (errorCode?: string) => (Promise<void> | void)
 
-interface VerifyOTPProps {
-    type: EmailOtpType;
-    email: string;
-    otpLength?: number;
-    title?: string;
-    subtitle?: string;
-    handleVerification: HandleVerificationOtpType;
+type VerifyOTPProps = {
+    type: EmailOtpType
+    email: string
+    otpLength?: number
+    title?: string
+    subtitle?: string
+    handleVerification: HandleVerificationOtpType
 }
 
-const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
+function VerifyOtpForm({
     type,
     email,
     otpLength = 6,
     title,
     subtitle,
     handleVerification
-}) => {
+}: VerifyOTPProps) {
     const { t } = useTranslation();
     const { verifyOTP, resendOTP } = useOtp();
 

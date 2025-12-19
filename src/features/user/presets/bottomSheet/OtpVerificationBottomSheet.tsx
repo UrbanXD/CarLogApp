@@ -1,7 +1,7 @@
 import React from "react";
 import VerifyOtpForm, { HandleVerificationOtpType } from "../../components/forms/VerifyOtpForm.tsx";
 import { EmailOtpType } from "@supabase/supabase-js";
-import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
+import { FormBottomSheet } from "../../../../ui/bottomSheet/presets/FormBottomSheet.tsx";
 
 type OtpVerificationBottomSheetProps = {
     type: EmailOtpType
@@ -26,12 +26,10 @@ const OtpVerificationBottomSheet: React.FC<OtpVerificationBottomSheetProps> = ({
     const SNAP_POINTS = ["100%"];
 
     return (
-        <BottomSheet
+        <FormBottomSheet
             content={ CONTENT }
             snapPoints={ SNAP_POINTS }
-            enableDynamicSizing={ false }
-            enableOverDrag={ false }
-            enableDismissOnClose={ true }
+            alwaysEnableDismiss
         />
     );
 };

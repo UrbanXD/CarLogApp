@@ -1,13 +1,15 @@
 import { Context, createContext, useContext } from "react";
 import { User } from "@supabase/supabase-js";
+import { SignUpRequest } from "../../features/user/schemas/form/signUpRequest.ts";
+import { SignInRequest } from "../../features/user/schemas/form/signInRequest.ts";
 
 type AuthContextValue = {
     providers: Array<string>
     hasPassword: boolean // if the user use google oauth then dont have (without identity link)
     authenticated: boolean | null
     openAccountVerification: (email: string) => void
-    signUp: () => Promise<void>
-    signIn: () => Promise<void>
+    signUp: (request: SignUpRequest) => Promise<void>
+    signIn: (request: SignInRequest) => Promise<void>
     signOut: (disabledToast?: boolean) => Promise<void>
     deleteAccount: () => Promise<void>
     refreshSession: () => Promise<void>

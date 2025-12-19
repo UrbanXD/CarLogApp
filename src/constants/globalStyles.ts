@@ -16,7 +16,6 @@ export const GLOBAL_STYLE = StyleSheet.create({
     },
     formLinkText: {
         fontSize: FONT_SIZES.p3,
-        paddingLeft: SEPARATOR_SIZES.small,
         fontFamily: "Gilroy-Medium",
         color: COLORS.fuelYellow
     },

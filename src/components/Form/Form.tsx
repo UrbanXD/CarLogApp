@@ -53,7 +53,7 @@ export function Form({
                 showsVerticalScrollIndicator={ false }
             />
             {
-                submit &&
+                submitHandler && submit &&
                <FormButtons
                   submit={ submit }
                   reset={ edit ? form.reset : undefined }

@@ -1,12 +1,11 @@
 import React from "react";
-import { heightPercentageToDP } from "react-native-responsive-screen";
-import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
 import { EditUserInformationForm } from "../../components/forms/EditUserInformationForm.tsx";
 import { UserAccount } from "../../schemas/userSchema.ts";
 import { EditUserAvatarForm } from "../../components/forms/EditUserAvatarForm.tsx";
 import { ChangeEmailForm } from "../../components/forms/ChangeEmailForm.tsx";
 import { ResetPasswordForm } from "../../components/forms/ResetPasswordForm.tsx";
 import { LinkPasswordToOAuthForm } from "../../components/forms/LinkPasswordToOAuthForm.tsx";
+import { FormBottomSheet } from "../../../../ui/bottomSheet/presets/FormBottomSheet.tsx";
 
 export enum EDIT_USER_FORM_TYPE {
     ChangeEmail,
@@ -42,15 +41,11 @@ const EditUserBottomSheet: React.FC<EditUserBottomSheetProps> = ({ user, type })
             break;
     }
 
-    const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
 
     return (
-        <BottomSheet
+        <FormBottomSheet
             content={ CONTENT }
-            maxDynamicContentSize={ MAX_DYNAMIC_CONTENT_SIZE }
             enableDynamicSizing
-            enableOverDrag={ false }
-            enableDismissOnClose={ false }
         />
     );
 };

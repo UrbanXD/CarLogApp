@@ -1,20 +1,16 @@
 import React from "react";
 import SignInForm from "../../components/forms/SignInForm.tsx";
-import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
 import { useTranslation } from "react-i18next";
+import { FormBottomSheet } from "../../../../ui/bottomSheet/presets/FormBottomSheet.tsx";
 
 const SignInBottomSheet: React.FC = () => {
     const { t } = useTranslation();
-    const TITLE = t("auth.sign_in");
-    const CONTENT = <SignInForm/>;
 
     return (
-        <BottomSheet
-            title={ TITLE }
-            content={ CONTENT }
+        <FormBottomSheet
+            title={ t("auth.sign_in") }
+            content={ <SignInForm/> }
             enableDynamicSizing
-            enableOverDrag={ false }
-            enableDismissOnClose={ false }
         />
     );
 };
