@@ -1,4 +1,5 @@
 export const BottomSheetRoutes = [
+    "user/resetPassword",
     "car/create",
     "car/edit/[id]",
     "odometer/log/create",

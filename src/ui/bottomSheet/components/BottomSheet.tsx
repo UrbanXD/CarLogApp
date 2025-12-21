@@ -64,7 +64,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         return navigation.addListener("beforeRemove", (_event) => {
             forceClosed.current = true;
             KeyboardController.dismiss();
-            bottomSheetRef.current?.dismiss();
+            bottomSheetRef.current?.forceClose();
         });
     }, []);
 

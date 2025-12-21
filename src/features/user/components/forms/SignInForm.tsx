@@ -1,7 +1,7 @@
 import React from "react";
 import Input from "../../../../components/Input/Input.ts";
-import { COLORS, GLOBAL_STYLE, ICON_NAMES } from "../../../../constants/index.ts";
-import { Text, View } from "react-native";
+import { COLORS, FONT_SIZES, GLOBAL_STYLE, ICON_NAMES } from "../../../../constants/index.ts";
+import { View } from "react-native";
 import Button from "../../../../components/Button/Button.ts";
 import TextDivider from "../../../../components/TextDivider.tsx";
 import Form from "../../../../components/Form/Form.tsx";
@@ -10,6 +10,8 @@ import { useAuth } from "../../../../contexts/auth/AuthContext.ts";
 import { SignInRequest, useSignInFormProps } from "../../schemas/form/signInRequest.ts";
 import { useTranslation } from "react-i18next";
 import { formTheme } from "../../../../ui/form/constants/theme.ts";
+import Link from "../../../../components/Link.tsx";
+import { router } from "expo-router";
 
 type SignInFormProps = {
     onFormStateChange?: (formState: FormState<SignInRequest>) => void
@@ -22,6 +24,10 @@ function SignInForm({ onFormStateChange }: SignInFormProps) {
     const { t } = useTranslation();
     const { signIn } = useAuth();
     const submitHandler = handleSubmit(signIn);
+
+    const openResetPassword = () => {
+        router.push({ pathname: "user/resetPassword", params: { email: form.getValues("email") } });
+    };
 
     return (
         <Form
@@ -51,9 +57,12 @@ function SignInForm({ onFormStateChange }: SignInFormProps) {
                             secure
                         />
                     </Input.Field>
-                    <Text style={ GLOBAL_STYLE.formLinkText }>
-                        { t("auth.forgot_your_password") }
-                    </Text>
+                    <Link
+                        onPress={ openResetPassword }
+                        text={ t("auth.forgot_your_password") }
+                        textStyle={ { textAlign: "left", fontSize: FONT_SIZES.p3 } }
+                        style={ { alignSelf: "flex-start", alignItems: "flex-start" } }
+                    />
                     <Button.Text
                         text={ t("auth.sign_in") }
                         loadingIndicator
@@ -70,6 +79,6 @@ function SignInForm({ onFormStateChange }: SignInFormProps) {
             }
         />
     );
-};
+}
 
 export default SignInForm;

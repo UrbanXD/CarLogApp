@@ -41,7 +41,9 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         });
 
         const { data: authListener } = supabaseConnector.client.auth.onAuthStateChange(
-            (_event, supabaseSession) => {
+            (event, supabaseSession) => {
+                if(event === "PASSWORD_RECOVERY") return;
+
                 if(!supabaseSession) {
                     if(router.canDismiss()) router.dismissAll();
                     router.replace("/backToRootIndex");
@@ -62,6 +64,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             dispatch(resetUser());
             dispatch(resetCars());
             sessionDataFetched.current = false;
+            return;
         }
 
         if(session?.user.id === notVerifiedUser?.id) setNotVerifiedUser(null);
@@ -156,6 +159,8 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
 
     const signOut = async (disabledToast: boolean = false) => {
         try {
+            if(!session) return;
+
             const { error } = await supabaseConnector.client.auth.signOut();
 
             if(error) throw error;

@@ -106,6 +106,15 @@ const Layout: React.FC = () => {
                 } }
             />
             <Stack.Screen
+                name="user/resetPassword"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
                 name="car/create"
                 options={ {
                     header: () => <></>,

@@ -34,7 +34,7 @@ const EditUserBottomSheet: React.FC<EditUserBottomSheetProps> = ({ user, type })
             CONTENT = <ChangeEmailForm user={ user }/>;
             break;
         case EDIT_USER_FORM_TYPE.ResetPassword:
-            CONTENT = <ResetPasswordForm user={ user }/>;
+            CONTENT = <ResetPasswordForm defaultEmail={ user.email }/>;
             break;
         case EDIT_USER_FORM_TYPE.LinkPasswordToOAuth:
             CONTENT = <LinkPasswordToOAuthForm/>;

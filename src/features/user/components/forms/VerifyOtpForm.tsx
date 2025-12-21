@@ -6,6 +6,7 @@ import Divider from "../../../../components/Divider.tsx";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { useOtp } from "../../hooks/useOtp.ts";
 import { Trans, useTranslation } from "react-i18next";
+import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 
 export type HandleVerificationOtpType = (errorCode?: string) => (Promise<void> | void)
 
@@ -28,6 +29,7 @@ function VerifyOtpForm({
 }: VerifyOTPProps) {
     const { t } = useTranslation();
     const { verifyOTP, resendOTP } = useOtp();
+    const { dismissBottomSheet } = useBottomSheet();
 
     const defaultSubtitle = () =>
         <Text style={ styles.subtitleText }>
@@ -46,6 +48,7 @@ function VerifyOtpForm({
             await verifyOTP({ email, token, type });
 
             await handleVerification();
+            if(dismissBottomSheet) dismissBottomSheet(true);
         } catch(error: AuthApiError | any) {
             await handleVerification(error.code || "otp_error");
         }
@@ -90,7 +93,7 @@ function VerifyOtpForm({
             </Text>
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     pageContainer: {
