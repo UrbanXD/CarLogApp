@@ -14,31 +14,26 @@ type EditUserArgs = {
 export const editUserAvatar =
     createAsyncThunkWithTypes<EditUserReturn, EditUserArgs>(
         "user/edit/avatar",
-        async (args, { getState }) => {
+        async (args, { getState, rejectWithValue }) => {
             const { user: { user: oldUser } } = getState();
             const { database: { userDao, attachmentQueue }, request } = args;
 
-            //TODO fixalni hogy maga a request ImageType legyen hogy itt tudjam lementeni
+            if(!oldUser) return rejectWithValue();
 
-            // let avatar = request?.avatar ?? null;
+            let avatar = request?.avatar ?? null;
+            let path = null;
 
-            //     if(avatar && oldUser?.avatar?.path !== avatar.path) {
-            //         await attachmentQueue?.saveFile()
-            //     }
-            // }
-
-            // if(newUser?.avatarImage && user?.userAvatar?.path !== getPathFromImageType(newUser.avatarImage, user?.id)) {
-            //     const newAvatarImage = await attachmentQueue.saveFile(newUser.avatarImage, user.id);
-            //     newUserAvatar = getImageState(newAvatarImage.filename, newUser.avatarImage.buffer);
-            // }
+            if(attachmentQueue && avatar && oldUser?.avatar?.fileName !== avatar.fileName) {
+                const newAvatar = await attachmentQueue.saveFile(avatar, oldUser.id);
+                path = newAvatar.filename;
+            }
 
             const user: UserAccount = {
                 ...oldUser,
-                avatar: request.avatar,
+                avatar: (avatar && path) ? { ...avatar, fileName: path } : null,
                 avatarColor: request.avatarColor
             };
 
-            return oldUser;
-            // return await userDao.update(user); //TODO fixalni
+            return await userDao.update(user);
         }
     );

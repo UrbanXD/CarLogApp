@@ -12,23 +12,23 @@ export interface CarouselItemType {
     selected?: boolean
 }
 
-export interface CarouselProps {
-    data: Array<any>;
-    renderItem: (item: any, index: number, size: number, x: SharedValue<number>) => ReactElement;
-    renderDefaultItem?: (size: number, spacerWidth: number) => ReactElement;
-    contentWidth?: number;
-    itemSizePercentage?: number;
-    spacer?: number;
+export type CarouselProps = {
+    data: Array<any>
+    renderItem: (item: any, index: number, size: number, x: SharedValue<number>) => ReactElement
+    renderDefaultItem?: (size: number, spacerWidth: number) => ReactElement
+    contentWidth?: number
+    itemSizePercentage?: number
+    spacer?: number
 }
 
-const Carousel: React.FC<CarouselProps> = ({
+function Carousel({
     data,
     renderItem,
     renderDefaultItem,
     contentWidth,
     itemSizePercentage = 0.8,
     spacer
-}) => {
+}: CarouselProps) {
     const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
     const flatlistRef = useRef<FlatList>(null);
 
@@ -86,6 +86,6 @@ const Carousel: React.FC<CarouselProps> = ({
             } }
         />
     );
-};
+}
 
 export default Carousel;

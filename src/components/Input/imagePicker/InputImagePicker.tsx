@@ -1,7 +1,6 @@
 import Button from "../../Button/Button.ts";
 import { pickImage } from "../../../utils/pickImage.ts";
-import { ImageSourcePropType, StyleSheet, View } from "react-native";
-import { encode } from "base64-arraybuffer";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import { Control, Controller, UseControllerReturn } from "react-hook-form";
 import React, { useCallback, useEffect, useState } from "react";
 import Carousel, { CarouselItemType } from "../../Carousel/Carousel.tsx";
@@ -13,34 +12,36 @@ import InputTitle from "../common/InputTitle.tsx";
 import DefaultElement from "../../DefaultElement.tsx";
 import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
 import Image from "../../Image.tsx";
-import { ImageSource } from "../../../types/index.ts";
+import { Image as ImageType } from "../../../types/zodTypes.ts";
 import { useTranslation } from "react-i18next";
 
-interface InputImagePickerProps {
-    control: Control<any>;
-    fieldName: string;
-    fieldNameText?: string;
-    fieldInfoText?: string;
-    defaultImages?: Array<ImageSource>;
-    limitOfImages?: number;
-    multipleSelection?: boolean;
+type InputImagePickerProps = {
+    control: Control<any>
+    fieldName: string
+    fieldNameText?: string
+    fieldInfoText?: string
+    defaultImages?: Array<ImageType>
+    limitOfImages?: number
+    multipleSelection?: boolean
+    imageStyle?: ViewStyle
 }
 
-const InputImagePicker: React.FC<InputImagePickerProps> = ({
+function InputImagePicker({
     control,
     fieldName,
     fieldNameText,
     fieldInfoText,
     defaultImages = [],
     limitOfImages = 5,
-    multipleSelection = false
-}) => {
+    multipleSelection = false,
+    imageStyle
+}: InputImagePickerProps) {
     const { t } = useTranslation();
 
-    const [selectedImage, setSelectedImage] = useState<ImageSourcePropType | string | undefined>(defaultImages.length === 0 || multipleSelection
-                                                                                                 ? undefined
-                                                                                                 : defaultImages[0]);
-    const [history, setHistory] = useState(defaultImages);
+    const [selectedImage, setSelectedImage] = useState<ImageType | null>(
+        (defaultImages.length === 0 || multipleSelection) ? null : defaultImages[0]
+    );
+    const [history, setHistory] = useState<Array<ImageType>>(defaultImages ?? []);
     const [size, setSize] = useState({ width: 0, height: 0 });
 
     const handleLayout = (event: any) => {
@@ -56,26 +57,23 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
         setHistory(prevHistory => [...prevHistory.slice(0, index), ...prevHistory.slice(index + 1)]);
     };
 
-    const getImages = async (onChange: (...event: any[]) => void) => {
-        const images = await pickImage({
-            allowsMultipleSelection: multipleSelection,
-            selectionLimit: limitOfImages
-        });
+    const getImages = async (type: "CAMERA" | "GALLERY", onChange: (...event: any[]) => void) => {
+        const images = await pickImage(
+            type,
+            {
+                allowsMultipleSelection: multipleSelection,
+                selectionLimit: limitOfImages
+            }
+        );
 
-        if(!images) {
-            return;
-        }
+        if(!images || images.length === 0) return;
 
-        if(!multipleSelection) {
-            selectImage(encode(images[0].buffer));
-        } else {
-            addImagesToHistory(images.map(img => encode(img.buffer)));
-        }
-
+        selectImage(images[0]);
         onChange(images[0]);
+        if(images.length > 1) addImagesToHistory(images);
     };
 
-    const addImagesToHistory = (newImages: Array<ImageSourcePropType | string>) => {
+    const addImagesToHistory = (newImages: Array<ImageType>) => {
         setHistory(prevHistory => {
             const newHistoryLength = history.length + newImages.length;
             const limit = limitOfImages + defaultImages.length;
@@ -99,7 +97,7 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
         });
     };
 
-    const selectImage = (newImage: ImageSourcePropType | string) => {
+    const selectImage = (newImage: ImageType) => {
         if(multipleSelection) return;
 
         if(history.length + 1 > limitOfImages + defaultImages.length) {
@@ -140,14 +138,46 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
         });
     };
 
+    const renderHistoryItem = useCallback((
+        item: ImageType,
+        index: number,
+        size: number,
+        coordinate: SharedValue<number>
+    ) => {
+        const itemCarousel: CarouselItemType = { id: item.fileName, image: item.base64 };
+
+        return (
+            <CarouselItem
+                index={ index }
+                size={ size }
+                x={ coordinate }
+                fullScale
+                item={ itemCarousel }
+                cardAction={ () => selectImage(item) }
+                containerStyle={ { borderRadius: 100, height: hp(20), width: hp(20) } }
+                renderBottomActionButton={
+                    () =>
+                        <Button.Icon
+                            icon={ ICON_NAMES.close }
+                            iconSize={ FONT_SIZES.p1 }
+                            iconColor={ COLORS.redLight }
+                            width={ FONT_SIZES.p1 * 1.2 }
+                            height={ FONT_SIZES.p1 * 1.2 }
+                            backgroundColor={ hexToRgba(COLORS.black, 0.75) }
+                            onPress={ () => removeImageFromHistory(index) }
+                            style={ { borderColor: COLORS.redLight, borderWidth: 2 } }
+                        />
+                }
+            />
+        );
+    }, [removeImageFromHistory, selectImage]);
+
     const render = useCallback((args: UseControllerReturn) => {
-        const { field: { onChange, value }, fieldState: { error } } = args;
+        const { field: { onChange, value } } = args;
 
         useEffect(() => {
-            onChange(value);
-            if(value && value.buffer) {
-                selectImage(encode(value.buffer));
-            }
+            onChange(value ?? null);
+            if(value) selectImage(value);
         }, []);
 
         return (
@@ -164,8 +194,8 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                     !multipleSelection &&
                    <>
                       <Image
-                         source={ selectedImage }
-                         imageStyle={ [styles.chosenImage, { height: size.height * 1.25 }] }
+                         source={ selectedImage?.base64 }
+                         imageStyle={ [styles.chosenImage, { height: size.height * 1.25 }, imageStyle] }
                       />
                       <InputTitle title={ t("form.image_picker.selectable_images") }/>
                    </>
@@ -174,49 +204,22 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
                     <View style={ styles.uploadButtonContainer }>
                         <Button.Icon
                             icon={ ICON_NAMES.upload }
-                            onPress={ () => getImages(onChange) }
+                            onPress={ () => getImages("GALLERY", onChange) }
+                        />
+                        <Button.Icon
+                            icon={ ICON_NAMES.cameraPlus }
+                            onPress={ () => getImages("CAMERA", onChange) }
                         />
                     </View>
                     <View style={ styles.imagesContainer } onLayout={ handleLayout }>
                         <Carousel
                             data={ history }
-                            contentWidth={ size.width }
-                            renderItem={
-                                (
-                                    item: ImageSourcePropType,
-                                    index: number,
-                                    size: number,
-                                    coordinate: SharedValue<number>
-                                ) => {
-                                    const itemCarousel: CarouselItemType = {
-                                        id: index.toString(),
-                                        image: item
-                                    };
-                                    return (
-                                        <CarouselItem
-                                            index={ index }
-                                            size={ size }
-                                            x={ coordinate }
-                                            item={ itemCarousel }
-                                            cardAction={ () => selectImage(item) }
-                                            renderBottomActionButton={
-                                                () =>
-                                                    <Button.Icon
-                                                        icon={ ICON_NAMES.close }
-                                                        iconSize={ FONT_SIZES.p1 }
-                                                        iconColor={ COLORS.redLight }
-                                                        width={ FONT_SIZES.p1 * 1.2 }
-                                                        height={ FONT_SIZES.p1 * 1.2 }
-                                                        backgroundColor={ hexToRgba(COLORS.black, 0.75) }
-                                                        onPress={ () => removeImageFromHistory(index) }
-                                                        style={ { borderColor: COLORS.redLight, borderWidth: 2 } }
-                                                    />
-                                            }
-                                        />
-                                    );
-                                }
-                            }
-                            renderDefaultItem={ () => <DefaultElement/> }
+                            contentWidth={ hp(20) }
+                            renderItem={ renderHistoryItem }
+                            containerStyle={ { height: hp(20) } }
+                            renderDefaultItem={ (size) => (
+                                <DefaultElement style={ { height: size, width: size, borderRadius: 100 } }/>
+                            ) }
                         />
                     </View>
                 </View>
@@ -231,7 +234,7 @@ const InputImagePicker: React.FC<InputImagePickerProps> = ({
             render={ render }
         />
     );
-};
+}
 
 const styles = StyleSheet.create({
     inputContainer: {
@@ -240,7 +243,7 @@ const styles = StyleSheet.create({
     },
     chosenImage: {
         position: "relative",
-        resizeMode: "cover",
+        resizeMode: "stretch",
         borderRadius: 35
     },
     secondRowContainer: {
@@ -250,11 +253,11 @@ const styles = StyleSheet.create({
     uploadButtonContainer: {
         flex: 0.25,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        gap: SEPARATOR_SIZES.small
     },
     imagesContainer: {
-        flex: 1,
-        height: hp(17.5)
+        flex: 1
     }
 });
 

@@ -69,7 +69,7 @@ const useStyles = (
         image: {
             width: avatarSize,
             height: avatarSize,
-            resizeMode: "cover",
+            resizeMode: "stretch",
             borderRadius: avatarSize / 2,
             borderWidth,
             borderColor

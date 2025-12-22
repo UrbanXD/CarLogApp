@@ -19,7 +19,7 @@ type EditUserAvatarFormProps = {
     onFormStateChange?: (formState: FormState<EditUserAvatarRequest>) => void
 }
 
-export function EditUserAvatarForm({ user }: EditUserAvatarFormProps) {
+export function EditUserAvatarForm({ user, onFormStateChange }: EditUserAvatarFormProps) {
     const dispatch = useAppDispatch();
     const database = useDatabase();
     const { openToast } = useAlert();
@@ -30,9 +30,9 @@ export function EditUserAvatarForm({ user }: EditUserAvatarFormProps) {
     }));
 
     const submitHandler: SubmitHandlerArgs<EditUserAvatarRequest> = {
-        onValid: async (request: EditUserAvatarRequest) => {
+        onValid: async (request) => {
             try {
-                await dispatch(editUserAvatar({ database, request: { ...request } }));
+                await dispatch(editUserAvatar({ database, request: request }));
 
                 openToast(ChangePersonalInformationToast.success());
                 router.dismissTo("(profile)/user");

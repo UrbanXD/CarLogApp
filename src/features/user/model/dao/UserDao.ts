@@ -11,4 +11,9 @@ export class UserDao extends Dao<UserTableRow, UserAccount, UserMapper> {
     constructor(db: Kysely<DatabaseType>, currencyDao: CurrencyDao, attachmentQueue?: PhotoAttachmentQueue) {
         super(db, USER_TABLE, new UserMapper(currencyDao, attachmentQueue));
     }
+
+    async update(user: UserAccount, safe?: boolean): Promise<UserAccount | null> {
+        const entity = await this.mapper.toEntity(user);
+        return super.update(entity, safe);
+    }
 }

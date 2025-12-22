@@ -21,11 +21,11 @@ interface IconButtonProps {
 
 export const IconButton: React.FC<IconButtonProps> = ({
     icon,
-    iconSize = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE,
+    iconSize = FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE,
     iconColor = COLORS.black,
     backgroundColor = COLORS.fuelYellow,
-    width = FONT_SIZES.h3 * ICON_FONT_SIZE_SCALE + SEPARATOR_SIZES.lightSmall / 2,
-    height = FONT_SIZES.h3 * ICON_FONT_SIZE_SCALE + SEPARATOR_SIZES.lightSmall / 2,
+    width = FONT_SIZES.h3 * ICON_FONT_SIZE_SCALE + SEPARATOR_SIZES.lightSmall,
+    height = FONT_SIZES.h3 * ICON_FONT_SIZE_SCALE + SEPARATOR_SIZES.lightSmall,
     style,
     inverse = false,
     disabled = false,

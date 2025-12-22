@@ -2,10 +2,9 @@ import { AbstractAttachmentQueue, AttachmentRecord, AttachmentState } from "@pow
 import * as FileSystem from "expo-file-system/legacy";
 import { BaseConfig } from "../../../constants/index.ts";
 import { getUUID } from "../../utils/uuid.ts";
-import { ImageType } from "../../utils/pickImage.ts";
-import { encode } from "base64-arraybuffer";
 import { USER_TABLE } from "./tables/user.ts";
 import { CAR_TABLE } from "./tables/car.ts";
+import { Image } from "../../../types/zodTypes.ts";
 
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
 
@@ -27,13 +26,12 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
     // }
 
     onAttachmentIdsChange(onUpdate: (ids: string[]) => void): void {
-        console.log(this.table, "taxxx");
         const imgSQL = `
             SELECT image as image
             FROM ${ CAR_TABLE }
             WHERE image IS NOT NULL
             UNION ALL
-            SELECT avatarImage as image
+            SELECT avatar_url as image
             FROM ${ USER_TABLE }
             WHERE avatarImage IS NOT NULL
         `;
@@ -64,14 +62,14 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
         };
     }
 
-    async saveFile(image: ImageType, storagePath?: string): Promise<AttachmentRecord> {
+    async saveFile(image: Image, storagePath?: string): Promise<AttachmentRecord> {
         storagePath =
-            storagePath
+            storagePath && !image.fileName.startsWith(storagePath)
             ? storagePath[storagePath.length - 1] !== "/"
               ? `${ storagePath }/`
               : storagePath
             : "";
-        const filename = `${ storagePath }${ image.id }.${ image.fileExtension }`;
+        const filename = `${ storagePath }${ image.fileName }`;
 
         const attachmentRecord = await this.newAttachmentRecord({
             id: filename,
@@ -80,7 +78,7 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
         });
 
         const localURI = this.getLocalUri(attachmentRecord.local_uri || this.getLocalFilePathSuffix(filename));
-        await this.storage.writeFile(localURI, encode(image.buffer), { encoding: FileSystem.EncodingType.Base64 });
+        await this.storage.writeFile(localURI, image.base64, { encoding: FileSystem.EncodingType.Base64 });
 
         const fileInfo = await FileSystem.getInfoAsync(localURI);
         if(fileInfo.exists) {

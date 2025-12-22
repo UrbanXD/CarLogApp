@@ -3,10 +3,10 @@ import { UserTableRow } from "../../../../database/connector/powersync/AppSchema
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 import { getImageFromAttachmentQueue } from "../../../../database/utils/getImageFromAttachmentQueue.ts";
 import { Currency } from "../../../_shared/currency/schemas/currencySchema.ts";
-import { Image } from "../../../../types/index.ts";
 import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
 import { getUserLocalCurrency } from "../../../_shared/currency/utils/getUserLocalCurrency.ts";
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
+import { Image } from "../../../../types/zodTypes.ts";
 
 export class UserMapper extends AbstractMapper<UserTableRow, UserAccount> {
     private readonly currencyDao: CurrencyDao;
@@ -49,7 +49,7 @@ export class UserMapper extends AbstractMapper<UserTableRow, UserAccount> {
             lastname: dto.lastname,
             currency_id: dto.currency.id,
             avatar_color: dto.avatarColor,
-            avatar_url: dto.avatar?.path ?? null
+            avatar_url: dto.avatar?.fileName ?? null
         };
     }
 }

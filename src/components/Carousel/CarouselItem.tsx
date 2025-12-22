@@ -1,23 +1,24 @@
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { ReactElement } from "react";
+import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { CarouselItemType } from "./Carousel";
-import { hexToRgba } from "../../utils/colors/hexToRgba";
 import Image from "../Image";
 
-interface CarouselItemProps {
-    index: number;
-    size: number;
-    x: SharedValue<number>;
-    overlay?: boolean;
-    item: CarouselItemType;
-    cardAction?: () => void;
-    renderBottomActionButton?: () => React.ReactElement;
-    renderTopActionButton?: () => React.ReactElement;
+type CarouselItemProps = {
+    index: number
+    size: number
+    x: SharedValue<number>
+    overlay?: boolean
+    item: CarouselItemType
+    cardAction?: () => void
+    renderBottomActionButton?: () => ReactElement
+    renderTopActionButton?: () => ReactElement
+    fullScale?: boolean
+    containerStyle?: ViewStyle
 }
 
-const CarouselItem: React.FC<CarouselItemProps> = ({
+function CarouselItem({
     index,
     size,
     x,
@@ -25,17 +26,19 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
     item,
     cardAction,
     renderBottomActionButton,
-    renderTopActionButton
-}) => {
+    renderTopActionButton,
+    fullScale = false,
+    containerStyle
+}: CarouselItemProps) {
     const animatedStyle = useAnimatedStyle(() => {
-        const scaleY = interpolate(
+        const scale = interpolate(
             x.value,
             [size * (index - 1), size * index, size * (index + 1)],
-            [0.85, 1, 0.85]
+            [0.9, 1, 0.9]
         );
 
         return {
-            transform: [{ scaleY }]
+            transform: [fullScale ? { scale } : { scaleY: scale }]
         };
     });
 
@@ -43,15 +46,15 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
         <TouchableOpacity
             key={ item.id }
             activeOpacity={ 1 }
-            style={ { width: size, paddingHorizontal: 10 } }
+            style={ [{ width: size, paddingHorizontal: 10 }, containerStyle] }
             onPress={ cardAction }
             disabled={ !cardAction }
         >
-            <Animated.View style={ [styles.itemContainer, animatedStyle] }>
+            <Animated.View style={ [styles.itemContainer, animatedStyle, containerStyle] }>
                 <Image
                     source={ item.image || "" }
                     alt={ ICON_NAMES.car }
-                    // imageStyle={}
+                    imageStyle={ containerStyle }
                 >
                     <View style={ styles.topContainer }>
                         <Text style={ styles.topContainerTitleText }>
@@ -91,29 +94,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.black,
         borderRadius: 35
-    },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: hexToRgba(COLORS.white, 0.035),
-        borderRadius: 35,
-        zIndex: 1
-    },
-    itemContentContainer: {
-        flex: 1,
-        borderWidth: 1.5,
-        borderRadius: 35,
-        borderColor: COLORS.gray4
-    },
-    itemImage: {
-        position: "absolute",
-        width: "100%",
-        height: "100%",
-        resizeMode: "cover",
-        borderRadius: 35
-    },
-    imageOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        borderRadius: 33
     },
     topContainer: {
         flexDirection: "row",

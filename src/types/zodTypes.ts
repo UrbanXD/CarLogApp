@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { ColorValue } from "react-native";
-import { Image } from "./index.ts";
 import dayjs from "dayjs";
 
 export type ZodNumberErrorMessage = {
@@ -56,8 +55,13 @@ export const zPickerRequired = (errorMessage?: string = "error.picker_required")
     ])
 );
 
-export const zImage = z
-.custom<Image | null>(value => value === null || value instanceof Image);
+export const zImage = z.object({
+    fileName: z.string(),
+    base64: z.string().base64(),
+    mediaType: z.string().optional().nullable()
+});
+
+export type Image = z.infer<typeof zImage>;
 // .refine(
 //     files => [ 'image/jpg', 'image/jpeg', 'image/png' ].includes( files?.[ 0 ]?.type ),
 //     'Accepted Formats: JPG/JPEG/PNG'

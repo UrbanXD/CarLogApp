@@ -36,7 +36,7 @@ const PrimaryHeader: React.FC = () => {
                             />
                             : user.avatar
                               ? <Avatar.Image
-                                  source={ user.avatar.image }
+                                  source={ user.avatar.base64 }
                                   avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
                                   onPress={ openProfile }
                               />

@@ -6,21 +6,23 @@ import { hexToRgba } from "../utils/colors/hexToRgba";
 import { LinearGradient } from "expo-linear-gradient";
 import { ImageSource } from "../types/index.ts";
 
-interface ImageProps {
-    source?: ImageSource;
-    alt?: string;
-    imageStyle?: ImageStyle;
-    overlay?: boolean;
-    children?: ReactNode;
+type ImageProps = {
+    source?: ImageSource
+    alt?: string
+    mimeType?: string
+    imageStyle?: ImageStyle
+    overlay?: boolean
+    children?: ReactNode
 }
 
-const Image: React.FC<ImageProps> = ({
+function Image({
     source,
     alt = ICON_NAMES.image,
+    mimeType = "image/jpeg",
     imageStyle,
     overlay = true,
     children
-}) => {
+}: ImageProps) {
     const [imageError, setImageError] = useState<boolean>(!source);
 
     const handleImageLoadError = () => setImageError(true);
@@ -33,7 +35,7 @@ const Image: React.FC<ImageProps> = ({
     const formatImageSource =
         (source: ImageSourcePropType | string = "") =>
             typeof source === "string"
-            ? { uri: `data:image/jpeg;base64,${ source }` }
+            ? { uri: `data:${ mimeType };base64,${ source }` }
             : source;
 
     return (
@@ -53,13 +55,16 @@ const Image: React.FC<ImageProps> = ({
             }
             {
                 children &&
-               <View style={ styles.contentContainer }>
+               <View style={ [styles.contentContainer, imageStyle] }>
                    {
                        overlay && !imageError &&
                       <LinearGradient
                          locations={ [0, 0.85] }
-                         colors={ [hexToRgba(COLORS.black, 0.15), hexToRgba(COLORS.black, 0.90)] }
-                         style={ styles.imageOverlay }
+                         colors={ [hexToRgba(COLORS.black, 0.15), hexToRgba(COLORS.black, 0.60)] }
+                         style={ [
+                             styles.imageOverlay,
+                             imageStyle?.borderRadius && { borderRadius: imageStyle.borderRadius }
+                         ] }
                       />
                    }
                    { children }
@@ -70,24 +75,17 @@ const Image: React.FC<ImageProps> = ({
 };
 
 const styles = StyleSheet.create({
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        zIndex: 1,
-        backgroundColor: hexToRgba(COLORS.white, 0.035),
-        borderRadius: 35
-    },
     contentContainer: {
-        flex: 1,
-        borderWidth: 1.5,
-        borderRadius: 35,
-        borderColor: COLORS.gray4
+        flex: 1
     },
     image: {
         position: "absolute",
         width: "100%",
         height: "100%",
-        // resizeMode: "cover",
-        borderRadius: 35
+        resizeMode: "stretch",
+        borderRadius: 35,
+        borderWidth: 1.5,
+        borderColor: COLORS.gray4
     },
     imageOverlay: {
         ...StyleSheet.absoluteFillObject,

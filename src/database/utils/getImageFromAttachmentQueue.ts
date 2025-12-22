@@ -1,6 +1,7 @@
 import { PhotoAttachmentQueue } from "../connector/powersync/PhotoAttachmentQueue.ts";
 import { encode } from "base64-arraybuffer";
-import { Image } from "../../types/index.ts";
+import { Image } from "../../types/zodTypes.ts";
+import { getMediaType } from "./getFileExtension.ts";
 
 type GetImageFromAttachmentQueueFunction = (
     attachmentQueue?: PhotoAttachmentQueue,
@@ -13,7 +14,11 @@ export const getImageFromAttachmentQueue: GetImageFromAttachmentQueueFunction = 
             const file = await attachmentQueue.getFile(path);
             if(!file) return null;
 
-            return { path, image: encode(file) };
+            return {
+                fileName: path,
+                base64: encode(file),
+                mediaType: getMediaType(path)
+            };
         } catch(_) {
             return null;
         }

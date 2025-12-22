@@ -87,9 +87,9 @@ const ProfileScreen: React.FC = () => {
             <View style={ styles.container }>
                 <View style={ styles.informationContainer }>
                     {
-                        user?.userAvatar
+                        user?.avatar
                         ? <Avatar.Image
-                            source={ user.userAvatar.image }
+                            source={ user.avatar.base64 }
                             avatarSize={ hp(20) }
                             borderColor={ COLORS.black5 }
                             style={ styles.profileImage }

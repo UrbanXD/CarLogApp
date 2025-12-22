@@ -1,21 +1,26 @@
-import { askMediaLibraryPermission } from "./getPermissions.ts";
+import { askCameraPermission, askMediaLibraryPermission } from "./getPermissions.ts";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
-import { decode } from "base64-arraybuffer";
+import { File } from "expo-file-system";
 import { getFileExtension } from "../database/utils/getFileExtension.ts";
 import { getUUID } from "../database/utils/uuid.ts";
+import { Image } from "../types/zodTypes.ts";
 
-export interface ImageType {
-    id: string;
-    buffer: ArrayBuffer;
-    fileExtension: string;
-    mediaType: string;
-}
-
-export const pickImage = async (options?: ImagePicker.ImagePickerOptions): Promise<Array<ImageType> | null> => {
+export async function pickImage(
+    type: "CAMERA" | "GALLERY",
+    options?: ImagePicker.ImagePickerOptions
+): Promise<Array<Image> | null> {
     await askMediaLibraryPermission("Szukesges permisson");
+    await askCameraPermission("szuksees camera permisson");
 
     let pickerResult =
+        type === "CAMERA"
+        ?
+        await ImagePicker.launchCameraAsync({
+            mediaTypes: ["images"],
+            allowsEditing: !options?.allowsMultipleSelection,
+            ...options
+        })
+        :
         await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ["images"],
             allowsEditing: !options?.allowsMultipleSelection,
@@ -26,23 +31,20 @@ export const pickImage = async (options?: ImagePicker.ImagePickerOptions): Promi
     if(!pickerResult.canceled) {
         const assets = pickerResult.assets;
 
-        const images = await Promise.all(
+        const images: Array<Image> = await Promise.all(
             assets.map(async (img) => {
-                const base64 = await FileSystem.readAsStringAsync(img.uri, { encoding: "base64" });
+                const base64 = await new File(img.uri).base64();
                 const fileExtension = getFileExtension(img.uri);
 
                 return {
-                    id: getUUID(),
-                    buffer: decode(base64),
-                    fileExtension: fileExtension === "jpeg" ? "jpg" : fileExtension,
-                    mediaType: img.mimeType ?? "image/jpeg"
-                };
+                    fileName: `${ getUUID() }.${ fileExtension === "jpeg" ? "jpg" : fileExtension }`,
+                    base64,
+                    mediaType: img.mimeType ?? null
+                } as Image;
             })
         );
 
-        if(images.length > 0) {
-            return images;
-        }
+        if(images.length > 0) return images;
     }
 
     return null;
