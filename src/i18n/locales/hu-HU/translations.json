@@ -226,7 +226,13 @@
       "password": "Jelszó",
       "password_placeholder": "Jelszó",
       "repeat_password": "Jelszó újra",
-      "repeat_password_placeholder": "Jelszó újra"
+      "repeat_password_placeholder": "Jelszó újra",
+      "avatar": {
+        "title": "Avatár",
+        "type_of_avatar": "Avatár típusa",
+        "image": "Kép",
+        "monogram": "Monogram"
+      }
     },
     "toast": {
       "otp": {

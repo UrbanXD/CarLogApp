@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { loadUser } from "../actions/loadUser.ts";
 import { editUserInformation } from "../actions/editUserInformation.ts";
 import { UserAccount } from "../../schemas/userSchema.ts";
+import { editUserAvatar } from "../actions/editUserAvatar.ts";
 
 export type UserState = {
     user: UserAccount | null
@@ -35,7 +36,13 @@ const userSlice = createSlice({
         .addCase(editUserInformation.fulfilled, (state, action) => {
             state.user = action.payload;
         })
-        .addCase(editUserInformation.rejected, (state, action) => {
+        .addCase(editUserInformation.rejected, () => {
+            console.log("Edit User Information Error");
+        })
+        .addCase(editUserAvatar.fulfilled, (state, action) => {
+            state.user = action.payload;
+        })
+        .addCase(editUserAvatar.rejected, () => {
             console.log("Edit User Information Error");
         });
     }

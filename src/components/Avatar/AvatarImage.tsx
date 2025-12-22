@@ -76,6 +76,8 @@ const useStyles = (
         },
         badge: {
             position: "absolute",
+            width: avatarSize / 5,
+            height: avatarSize / 5,
             right: avatarSize / 12,
             bottom: avatarSize / 20,
             zIndex: 1

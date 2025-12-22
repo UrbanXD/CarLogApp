@@ -225,7 +225,13 @@
       "password": "Password",
       "password_placeholder": "Password",
       "repeat_password": "Repeat Password",
-      "repeat_password_placeholder": "Repeat Password"
+      "repeat_password_placeholder": "Repeat Password",
+      "avatar": {
+        "title": "Avatar",
+        "type_of_avatar": "Avatar type",
+        "image": "Image",
+        "monogram": "Monogram"
+      }
     },
     "toast": {
       "otp": {

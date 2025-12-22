@@ -1,8 +1,7 @@
 import Button from "../../Button/Button.ts";
 import { pickImage } from "../../../utils/pickImage.ts";
 import { StyleSheet, View, ViewStyle } from "react-native";
-import { Control, Controller, UseControllerReturn } from "react-hook-form";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Carousel, { CarouselItemType } from "../../Carousel/Carousel.tsx";
 import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../../Carousel/CarouselItem.tsx";
@@ -14,35 +13,38 @@ import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
 import Image from "../../Image.tsx";
 import { Image as ImageType } from "../../../types/zodTypes.ts";
 import { useTranslation } from "react-i18next";
+import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 
 type InputImagePickerProps = {
-    control: Control<any>
-    fieldName: string
-    fieldNameText?: string
-    fieldInfoText?: string
     defaultImages?: Array<ImageType>
     limitOfImages?: number
     multipleSelection?: boolean
+    setValue?: (image: Array<ImageType> | ImageType) => void
     imageStyle?: ViewStyle
 }
 
 function InputImagePicker({
-    control,
-    fieldName,
-    fieldNameText,
-    fieldInfoText,
     defaultImages = [],
     limitOfImages = 5,
     multipleSelection = false,
+    setValue,
     imageStyle
 }: InputImagePickerProps) {
     const { t } = useTranslation();
+    const inputFieldContext = useInputFieldContext();
+    const onChange = inputFieldContext?.field?.onChange;
+    const fieldValue = useMemo(() => inputFieldContext?.field?.value ?? (defaultImages.length === 0 || multipleSelection)
+                                     ? null
+                                     : defaultImages[0], [inputFieldContext?.field.value]);
 
-    const [selectedImage, setSelectedImage] = useState<ImageType | null>(
-        (defaultImages.length === 0 || multipleSelection) ? null : defaultImages[0]
-    );
+    const [selectedImage, setSelectedImage] = useState<ImageType | null>(fieldValue);
     const [history, setHistory] = useState<Array<ImageType>>(defaultImages ?? []);
     const [size, setSize] = useState({ width: 0, height: 0 });
+
+    useEffect(() => {
+        const newValue = inputFieldContext?.field.value;
+        if(newValue && !Array.isArray(newValue) && selectedImage !== newValue) selectImage(newValue);
+    }, [inputFieldContext?.field.value]);
 
     const handleLayout = (event: any) => {
         const { width, height } = event.nativeEvent.layout;
@@ -69,7 +71,9 @@ function InputImagePicker({
         if(!images || images.length === 0) return;
 
         selectImage(images[0]);
-        onChange(images[0]);
+        if(onChange) onChange(images[0]);
+        if(setValue) setValue(images[0]);
+
         if(images.length > 1) addImagesToHistory(images);
     };
 
@@ -172,67 +176,42 @@ function InputImagePicker({
         );
     }, [removeImageFromHistory, selectImage]);
 
-    const render = useCallback((args: UseControllerReturn) => {
-        const { field: { onChange, value } } = args;
-
-        useEffect(() => {
-            onChange(value ?? null);
-            if(value) selectImage(value);
-        }, []);
-
-        return (
-            <View style={ styles.inputContainer }>
-                {
-                    fieldNameText &&
-                   <InputTitle
-                      title={ fieldNameText }
-                      subtitle={ fieldInfoText }
-                      optional
-                   />
-                }
-                {
-                    !multipleSelection &&
-                   <>
-                      <Image
-                         source={ selectedImage?.base64 }
-                         imageStyle={ [styles.chosenImage, { height: size.height * 1.25 }, imageStyle] }
-                      />
-                      <InputTitle title={ t("form.image_picker.selectable_images") }/>
-                   </>
-                }
-                <View style={ styles.secondRowContainer }>
-                    <View style={ styles.uploadButtonContainer }>
-                        <Button.Icon
-                            icon={ ICON_NAMES.upload }
-                            onPress={ () => getImages("GALLERY", onChange) }
-                        />
-                        <Button.Icon
-                            icon={ ICON_NAMES.cameraPlus }
-                            onPress={ () => getImages("CAMERA", onChange) }
-                        />
-                    </View>
-                    <View style={ styles.imagesContainer } onLayout={ handleLayout }>
-                        <Carousel
-                            data={ history }
-                            contentWidth={ hp(20) }
-                            renderItem={ renderHistoryItem }
-                            containerStyle={ { height: hp(20) } }
-                            renderDefaultItem={ (size) => (
-                                <DefaultElement style={ { height: size, width: size, borderRadius: 100 } }/>
-                            ) }
-                        />
-                    </View>
+    return (
+        <View style={ styles.inputContainer }>
+            {
+                !multipleSelection &&
+               <>
+                  <Image
+                     source={ selectedImage?.base64 }
+                     imageStyle={ [styles.chosenImage, { height: size.height * 1.25 }, imageStyle] }
+                  />
+                  <InputTitle title={ t("form.image_picker.selectable_images") }/>
+               </>
+            }
+            <View style={ styles.secondRowContainer }>
+                <View style={ styles.uploadButtonContainer }>
+                    <Button.Icon
+                        icon={ ICON_NAMES.upload }
+                        onPress={ () => getImages("GALLERY", onChange) }
+                    />
+                    <Button.Icon
+                        icon={ ICON_NAMES.cameraPlus }
+                        onPress={ () => getImages("CAMERA", onChange) }
+                    />
+                </View>
+                <View style={ styles.imagesContainer } onLayout={ handleLayout }>
+                    <Carousel
+                        data={ history }
+                        contentWidth={ hp(20) }
+                        renderItem={ renderHistoryItem }
+                        containerStyle={ { height: hp(20) } }
+                        renderDefaultItem={ (size) => (
+                            <DefaultElement style={ { height: size, width: size, borderRadius: 100 } }/>
+                        ) }
+                    />
                 </View>
             </View>
-        );
-    }, [selectedImage, history, size, multipleSelection, t]);
-
-    return (
-        <Controller
-            control={ control }
-            name={ fieldName }
-            render={ render }
-        />
+        </View>
     );
 }
 
@@ -243,6 +222,7 @@ const styles = StyleSheet.create({
     },
     chosenImage: {
         position: "relative",
+        alignSelf: "flex-start",
         resizeMode: "stretch",
         borderRadius: 35
     },

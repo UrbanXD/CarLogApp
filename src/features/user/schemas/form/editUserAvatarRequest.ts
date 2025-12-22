@@ -2,7 +2,11 @@ import { z } from "zod";
 import { userSchema } from "../userSchema.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const editUserAvatarRequest = userSchema.pick({ avatar: true, avatarColor: true });
+const editUserAvatarRequest = userSchema
+.pick({ avatar: true, avatarColor: true })
+.extend({
+    isImageAvatar: z.boolean().default(false)
+});
 export type EditUserAvatarRequest = z.infer<typeof editUserAvatarRequest>;
 
 export const useEditUserAvatarFormProps = (defaultValues: EditUserAvatarRequest) => ({

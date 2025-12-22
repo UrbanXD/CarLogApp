@@ -23,15 +23,15 @@ export const editUserAvatar =
             let avatar = request?.avatar ?? null;
             let path = null;
 
-            if(attachmentQueue && avatar && oldUser?.avatar?.fileName !== avatar.fileName) {
+            if(request.isImageAvatar && attachmentQueue && avatar && oldUser?.avatar?.fileName !== avatar.fileName) {
                 const newAvatar = await attachmentQueue.saveFile(avatar, oldUser.id);
                 path = newAvatar.filename;
             }
 
             const user: UserAccount = {
                 ...oldUser,
-                avatar: (avatar && path) ? { ...avatar, fileName: path } : null,
-                avatarColor: request.avatarColor
+                avatar: (request.isImageAvatar && avatar && path) ? { ...avatar, fileName: path } : null,
+                avatarColor: !request.isImageAvatar ? request.avatarColor : oldUser.avatarColor
             };
 
             return await userDao.update(user);

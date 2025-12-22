@@ -67,14 +67,13 @@ export const SECONDARY_COLOR = COLORS.black2;
 export const ACCENT_COLOR = COLORS.fuelYellow;
 
 export const AVATAR_COLOR = [
-    "#FF5733", "#FF6F61", "#FF8C42", // Pirosas-narancs árnyalatok
-    "#33FF57", "#2ECC71", "#27AE60", // Zöld árnyalatok
-    "#3357FF", "#3498DB", "#2980B9", // Kék árnyalatok
-    "#FF33A1", "#E91E63", "#C2185B", // Pink árnyalatok
-    "#A133FF", "#9B59B6", "#8E44AD", // Lila árnyalatok
-    "#33FFF5", "#1ABC9C", "#16A085", // Türkiz árnyalatok
-    "#FFC300", "#F1C40F", "#D4AC0D", // Sárga árnyalatok
-    "#C70039", "#E74C3C", "#D63031", // Piros árnyalatok
-    "#900C3F", "#581845", "#5D4037", // Sötétebb, földes tónusok
-    "#34495E", "#2C3E50", "#1E272E"  // Semleges, sötétszürke-kékes árnyalatok
+    // Meleg tónusok (Piros, Narancs, Sárga)
+    "#E63946", "#F94144", "#F3722C", "#F8961E", "#F9C74F", "#E9C46A",
+    // Természetes tónusok (Zöldek, Türkiz)
+    "#43AA8B", "#4D908E", "#2A9D8F", "#27AE60", "#16A085", "#006D77",
+    // Hideg tónusok (Kékek, Lilák)
+    "#219EBC", "#3498DB", "#2980B9", "#457B9D", "#4895EF", "#4CC9F0",
+    "#7209B7", "#9B59B6", "#B5179E",
+    // Semleges / Sötét tónusok
+    "#577590", "#2C3E50", "#1D3557"
 ];
