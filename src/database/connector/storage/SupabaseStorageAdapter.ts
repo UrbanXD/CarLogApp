@@ -1,16 +1,15 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { decode } from "base64-arraybuffer";
-import * as FileSystem from "expo-file-system/legacy";
+import { Directory, File, Paths } from "expo-file-system";
 import { BaseConfig } from "../../../constants/index.ts";
-import { StorageAdapter } from "@powersync/attachments";
+import { EncodingType, StorageAdapter } from "@powersync/attachments";
+import { FileWriteOptions } from "expo-file-system/build/ExpoFileSystem.types";
 
-export interface SupabaseStorageAdapterOptions {
-    client: SupabaseClient;
+export type SupabaseStorageAdapterOptions = {
+    client: SupabaseClient
 }
 
 export class SupabaseStorageAdapter implements StorageAdapter {
-    constructor(private options: SupabaseStorageAdapterOptions) {
-    }
+    constructor(private options: SupabaseStorageAdapterOptions) {}
 
     async uploadFile(
         filename: string,
@@ -50,45 +49,25 @@ export class SupabaseStorageAdapter implements StorageAdapter {
 
     async writeFile(
         fileURI: string,
-        base64Data: string,
-        options?: {
-            encoding?: FileSystem.EncodingType;
-        }
+        data: string | Uint8Array,
+        options?: FileWriteOptions
     ): Promise<void> {
-        const { encoding = FileSystem.EncodingType.UTF8 } = options ?? {};
+        const { encoding = EncodingType.UTF8 } = options ?? {};
 
-        const directoryPath = fileURI.substring(0, fileURI.lastIndexOf("/") + 1);
-        if(!await this.fileExists(directoryPath)) {
-            await this.makeDir(directoryPath);
-        }
-
-        await FileSystem.writeAsStringAsync(fileURI, base64Data, { encoding });
+        const file = new File(fileURI);
+        await file.create({ intermediates: true, overwrite: true });
+        await file.write(data, { encoding });
     }
 
-    async readFile(
-        fileURI: string,
-        options?: { encoding?: FileSystem.EncodingType; mediaType?: string }
-    ): Promise<ArrayBuffer> {
-        const { encoding = FileSystem.EncodingType.UTF8 } = options ?? {};
-        const { exists } = await FileSystem.getInfoAsync(fileURI);
-
-        if(!exists) {
-            throw new Error(`File does not exist: ${ fileURI }`);
-        }
-
-        const fileContent = await FileSystem.readAsStringAsync(fileURI, options);
-
-        if(encoding === FileSystem.EncodingType.Base64) {
-            return this.base64ToArrayBuffer(fileContent);
-        }
-
-        return this.stringToArrayBuffer(fileContent);
+    async readFile(fileURI: string): Promise<ArrayBuffer> {
+        const file = new File(fileURI);
+        if(!file.exists) throw new Error(`File does not exist: ${ fileURI }`);
+        return file.arrayBuffer();
     }
 
-    async deleteFile(uri: string, options?: { filename?: string }): Promise<void> {
-        if(await this.fileExists(uri)) {
-            await FileSystem.deleteAsync(uri);
-        }
+    async deleteFile(fileURI: string, options?: { filename?: string }): Promise<void> {
+        const file = new File(fileURI);
+        if(file.exists) file.delete();
 
         const { filename } = options ?? {};
         if(!filename) return;
@@ -97,41 +76,26 @@ export class SupabaseStorageAdapter implements StorageAdapter {
             throw new Error("Supabase bucket not configured in AppConfig.ts");
         }
 
-        const { data, error } = await this.options.client.storage.from(BaseConfig.SUPABASE_BUCKET).remove([filename]);
+        const { error } = await this.options.client.storage.from(BaseConfig.SUPABASE_BUCKET).remove([filename]);
         if(error) throw error;
     }
 
     async fileExists(fileURI: string): Promise<boolean> {
-        const { exists } = await FileSystem.getInfoAsync(fileURI);
-
-        return exists;
+        return new File(fileURI).exists;
     }
 
     async makeDir(uri: string): Promise<void> {
-        const { exists } = await FileSystem.getInfoAsync(uri);
-
-        if(!exists) {
-            await FileSystem.makeDirectoryAsync(uri, { intermediates: true });
-        }
+        const directory = new Directory(uri);
+        if(!directory.exists) directory.create({ intermediates: true });
     }
 
     async copyFile(sourceUri: string, targetUri: string): Promise<void> {
-        await FileSystem.copyAsync({ from: sourceUri, to: targetUri });
+        const file = new File(sourceUri);
+        const copiedFile = new File(targetUri);
+        if(file.exists) file.copy(copiedFile);
     }
 
     getUserStorageDirectory(): string {
-        return FileSystem.documentDirectory!;
-    }
-
-    async stringToArrayBuffer(str: string): Promise<ArrayBuffer> {
-        const encoder = new TextEncoder();
-        return encoder.encode(str).buffer;
-    }
-
-    /**
-     * Converts a base64 string to an ArrayBuffer
-     */
-    async base64ToArrayBuffer(base64: string): Promise<ArrayBuffer> {
-        return decode(base64);
+        return Paths.document.uri;
     }
 }

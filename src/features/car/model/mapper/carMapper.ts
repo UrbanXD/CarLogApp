@@ -50,7 +50,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
             odometer,
             currency,
             fuelTank,
-            image,
+            image: image,
             createdAt: entity.created_at
         });
 
@@ -69,17 +69,33 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
             model_id: dto.model.id,
             model_year: dto.model.year,
             created_at: dto.createdAt,
-            image_url: dto.image?.path ?? null
+            image_url: dto.image?.fileName ?? null
         };
     }
 
-    async formResultToCarEntities(request: CarFormFields, createdAt?: string): Promise<{
+    async formResultToCarEntities(
+        request: CarFormFields,
+        previousCarImageUrl?: string | null,
+        createdAt?: string
+    ): Promise<{
         car: CarTableRow
         odometerLog: OdometerLogTableRow
         odometerChangeLog: OdometerChangeLogTableRow | null,
         fuelTank: FuelTankTableRow
     }> {
         const odometerUnit = await this.odometerUnitDao.getById(request.odometer.unitId);
+
+        let carImage = request?.image ?? null;
+        let path = request?.image?.fileName ?? null;
+
+        if(this.attachmentQueue && carImage && previousCarImageUrl !== path) {
+            const newAvatar = await this.attachmentQueue.saveFile(carImage, request.ownerId);
+            path = newAvatar.filename;
+        }
+
+        if(previousCarImageUrl && previousCarImageUrl !== path) {
+            await this.attachmentQueue?.deleteFile(previousCarImageUrl);
+        }
 
         const car: CarTableRow = {
             id: request.id,
@@ -89,7 +105,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
             currency_id: request.currencyId,
             model_id: request.model.id,
             model_year: request.model.year,
-            image_url: request.image?.path ?? null,
+            image_url: path ?? null,
             created_at: createdAt
         };
 

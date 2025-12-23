@@ -8,7 +8,7 @@ import FuelStep from "../components/forms/steps/FuelStep.tsx";
 import ImageStep from "../components/forms/steps/ImageStep.tsx";
 import { ResultStep } from "../components/forms/steps/ResultStep.tsx";
 import { useTranslation } from "react-i18next";
-import { EditToast } from "../../../ui/alert/presets/toast/EditToast.ts";
+import { EditToast } from "../../../ui/alert/presets/toast/index.ts";
 
 function useCarSteps({ control, formState, setValue, getValues }: StepProps<CarFormFields>): UseStepFormResult {
     const { t } = useTranslation();

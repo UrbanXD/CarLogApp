@@ -17,7 +17,7 @@ export const carSchema = z
     odometer: odometerSchema,
     currency: currencySchema,
     fuelTank: fuelTankSchema,
-    image: zImage,
+    image: zImage.optional().nullable(),
     createdAt: z.string()
 });
 

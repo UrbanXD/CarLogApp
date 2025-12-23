@@ -63,7 +63,7 @@ function CarProfileView({
         <View style={ styles.container }>
             <View style={ styles.imageContainer }>
                 <Image
-                    source={ car.image?.image }
+                    source={ car.image?.base64 }
                     alt={ ICON_NAMES.car }
                     overlay
                 >

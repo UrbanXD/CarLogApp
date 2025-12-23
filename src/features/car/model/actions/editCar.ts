@@ -13,9 +13,7 @@ export const editCar = createAsyncThunk(
         const { database: { carDao }, formResult } = args;
 
         try {
-            const { car, fuelTank } = await carDao.mapper.formResultToCarEntities(formResult);
-
-            return await carDao.update(car, fuelTank);
+            return await carDao.update(formResult);
         } catch(e) {
             console.log("edit car action error: ", e);
             return rejectWithValue("");
