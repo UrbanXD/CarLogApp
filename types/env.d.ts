@@ -8,4 +8,7 @@ declare module "@env" {
     export const LOCAL_STORAGE_KEY_SELECTED_CAR_INDEX: string;
     export const LOCAL_STORAGE_KEY_NOT_VERIFIED_USER: string;
     export const LOCAL_STORAGE_KEY_LANGUAGE: string;
+    export const LOCAL_STORAGE_KEY_LAST_LOCAL_IMAGE_CLEANUP: string;
+    export const LOCAL_IMAGE_CLEANUP_INTERVAL_MS: string;
+    export const LOCAL_IMAGE_CLEANUP_GRACE_PERIOD_MS: string;
 }

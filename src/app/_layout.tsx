@@ -9,7 +9,6 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import Compactor from "../components/Compactor";
 import { ScreenScrollViewProvider } from "../contexts/screenScrollView/ScreenScrollViewProvider.tsx";
 import { AuthProvider } from "../contexts/auth/AuthProvider.tsx";
-import { useDatabase } from "../contexts/database/DatabaseContext.ts";
 import { DatabaseProvider } from "../contexts/database/DatabaseProvider.tsx";
 import { store } from "../database/redux/store.ts";
 import Header from "../components/Navigation/Header/Header.tsx";
@@ -23,12 +22,10 @@ import { useTranslation } from "react-i18next";
 
 
 const Layout: React.FC = () => {
-    const database = useDatabase();
     const { t } = useTranslation();
 
     useEffect(() => {
         SystemUI.setBackgroundColorAsync(SECONDARY_COLOR);
-        database.init();
     }, []);
 
     return (

@@ -5,8 +5,20 @@ import { getUUID } from "../../utils/uuid.ts";
 import { USER_TABLE } from "./tables/user.ts";
 import { CAR_TABLE } from "./tables/car.ts";
 import { Image } from "../../../types/zodTypes.ts";
+import { Directory } from "expo-file-system";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
+    imageUrlSql = `
+        SELECT image_url as path
+        FROM ${ CAR_TABLE }
+        WHERE image_url IS NOT NULL
+        UNION ALL
+        SELECT avatar_url as path
+        FROM ${ USER_TABLE }
+        WHERE avatar_url IS NOT NULL
+    `;
+
     async init() {
         if(!BaseConfig.SUPABASE_BUCKET) {
             console.debug("No Supabase bucket configured, skip setting up PhotoAttachmentQueue watches");
@@ -18,24 +30,10 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
     }
 
     onAttachmentIdsChange(onUpdate: (ids: string[]) => void): void {
-        const imgSQL = `
-            SELECT image as image
-            FROM ${ CAR_TABLE }
-            WHERE image IS NOT NULL
-            UNION ALL
-            SELECT avatar_url as image
-            FROM ${ USER_TABLE }
-            WHERE avatarImage IS NOT NULL
-        `;
-
-        this.powersync.watch(imgSQL, [], {
+        this.powersync.watch(this.imageUrlSql, [], {
             onResult:
                 async (result) => {
-                    return onUpdate(
-                        result.rows?._array.map(
-                            (r) => r.image
-                        ) ?? []
-                    );
+                    return onUpdate(result.rows?._array.map((r) => r.path) ?? []);
                 }
         });
     }
@@ -59,6 +57,11 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
                  ? `${ storagePath }/${ filePath }`
                  : `${ storagePath }${ filePath }`
                : filePath;
+    }
+
+    getLocalFilePathSuffix(filename?: string): string {
+        const suffix = super.getLocalFilePathSuffix(filename ?? "");
+        return filename ? suffix : suffix.slice(0, suffix.length - 1);
     }
 
     async saveFile(image: Image, storagePath?: string): Promise<AttachmentRecord> {
@@ -98,5 +101,23 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
     async deleteFile(path: string): Promise<void> {
         const localURI = this.getLocalUri(this.getLocalFilePathSuffix(path));
         await this.storage.deleteFile(localURI, { filename: path });
+    }
+
+    async cleanUpLocalFiles(storagePath?: string): Promise<void> {
+        const now = Date.now();
+        const lastLocalImageCleanupTime = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_LAST_LOCAL_IMAGE_CLEANUP);
+
+        const maxLocalImageCleanupTime = now - BaseConfig.LOCAL_IMAGE_CLEANUP_INTERVAL_MS;
+        if(lastLocalImageCleanupTime && maxLocalImageCleanupTime <= lastLocalImageCleanupTime) return;
+        await AsyncStorage.setItem(BaseConfig.LOCAL_STORAGE_KEY_LAST_LOCAL_IMAGE_CLEANUP, now.toString());
+
+        const localURI = this.getLocalUri(this.getLocalFilePathSuffix(storagePath));
+        const images = (await this.powersync.getAll(this.imageUrlSql))
+        .map(file => this.getLocalUri(this.getLocalFilePathSuffix(file.path)));
+
+        const maxModificationTime = now - BaseConfig.LOCAL_IMAGE_CLEANUP_GRACE_PERIOD_MS;
+        new Directory(localURI).list().map(file => {
+            if(!images.includes(file.uri) && maxModificationTime > file.info().modificationTime) file.delete();
+        });
     }
 }

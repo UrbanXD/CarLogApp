@@ -67,6 +67,10 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             return;
         }
 
+        try {
+            if(database.attachmentQueue) database.attachmentQueue.cleanUpLocalFiles(session.user.id);
+        } catch(_) {}
+
         if(session?.user.id === notVerifiedUser?.id) setNotVerifiedUser(null);
 
         if(powersync.currentStatus.connected && powersync.currentStatus.hasSynced && session) {
