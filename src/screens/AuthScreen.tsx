@@ -18,14 +18,14 @@ const ENTERING_ANIMATION_DURATION = 300;
 const AuthScreen: React.FC = () => {
     const { t } = useTranslation();
     const { top, bottom } = useSafeAreaInsets();
-    const { authenticated, notVerifiedUser, openAccountVerification } = useAuth();
+    const { notVerifiedEmail, openAccountVerification } = useAuth();
 
     const openSignUp = () => router.push("bottomSheet/signUp");
     const openSignIn = () => router.push("bottomSheet/signIn");
 
     const openVerification = useCallback(() => {
-        if(notVerifiedUser && notVerifiedUser.email) openAccountVerification(notVerifiedUser.email);
-    }, [notVerifiedUser]);
+        if(notVerifiedEmail) openAccountVerification(notVerifiedEmail);
+    }, [notVerifiedEmail]);
 
     const styles = useStyles(top, bottom);
 
@@ -80,7 +80,7 @@ const AuthScreen: React.FC = () => {
                 </Animated.View>
             </View>
             {
-                !authenticated && notVerifiedUser &&
+                notVerifiedEmail &&
                <Animated.View
                   entering={ SlideInRight.duration(ENTERING_ANIMATION_DURATION * 1.5) }
                   style={ styles.verificationContainer }
@@ -171,15 +171,16 @@ const useStyles = (top: number, bottom: number) =>
         },
         verificationIcon: {
             borderColor: COLORS.gray4,
-            borderWidth: 0.75
+            borderWidth: 1.5
         },
         verificationText: {
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p3,
             color: COLORS.white,
             textShadowColor: COLORS.black,
-            textShadowRadius: 15,
-            flexWrap: "wrap"
+            textShadowRadius: 30,
+            flexWrap: "wrap",
+            textAlign: "center"
         }
     });
 

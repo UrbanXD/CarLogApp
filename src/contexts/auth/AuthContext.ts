@@ -1,5 +1,4 @@
 import { Context, createContext, useContext } from "react";
-import { User } from "@supabase/supabase-js";
 import { SignUpRequest } from "../../features/user/schemas/form/signUpRequest.ts";
 import { SignInRequest } from "../../features/user/schemas/form/signInRequest.ts";
 
@@ -13,10 +12,8 @@ type AuthContextValue = {
     signOut: (disabledToast?: boolean) => Promise<void>
     deleteAccount: () => Promise<void>
     refreshSession: () => Promise<void>
-
-    // TODO: not verified user rework
-    notVerifiedUser: User | null
-    updateNotVerifiedUser: (newNotVerifiedUser: User | null) => Promise<void>
+    notVerifiedEmail: string | null
+    updateNotVerifiedEmail: (newNotVerifiedEmail: string | null) => Promise<void>
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);

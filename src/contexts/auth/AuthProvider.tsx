@@ -2,7 +2,7 @@ import React, { ProviderProps, useEffect, useMemo, useRef, useState } from "reac
 import { AuthContext } from "./AuthContext.ts";
 import { useAppDispatch } from "../../hooks/index.ts";
 import { useDatabase } from "../database/DatabaseContext.ts";
-import { AuthError, GenerateLinkParams, Session, User } from "@supabase/supabase-js";
+import { AuthError, GenerateLinkParams, Session } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AVATAR_COLOR, BaseConfig } from "../../constants/index.ts";
 import { loadUser } from "../../features/user/model/actions/loadUser.ts";
@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
 
     const [session, setSession] = useState<Session | null>(null);
     const [authenticated, setAuthenticated] = useState<boolean | null>(null);
-    const [notVerifiedUser, setNotVerifiedUser] = useState<User | null>(null);
+    const [notVerifiedEmail, setNotVerifiedEmail] = useState<string | null>(null);
 
     const sessionDataFetched = useRef<boolean>(false);
 
@@ -61,6 +61,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         database.init();
 
         if(!session) {
+            fetchNotVerifiedEmail();
             dispatch(resetUser());
             dispatch(resetCars());
             sessionDataFetched.current = false;
@@ -71,7 +72,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             if(database.attachmentQueue) database.attachmentQueue.cleanUpLocalFiles(session.user.id);
         } catch(_) {}
 
-        if(session?.user.id === notVerifiedUser?.id) setNotVerifiedUser(null);
+        if(session?.user.id === notVerifiedEmail?.id) setNotVerifiedEmail(null);
 
         if(powersync.currentStatus.connected && powersync.currentStatus.hasSynced && session) {
             dispatch(loadUser({ database, userId: session.user.id }));
@@ -123,7 +124,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             if(error) throw error;
             if(!supabaseUser) throw { code: "user_not_found" } as AuthError;
 
-            updateNotVerifiedUser(supabaseUser).catch(console.error);
+            updateNotVerifiedEmail(supabaseUser.email).catch(console.error);
 
             openAccountVerification(supabaseUser.email);
             await userDao.create({
@@ -155,6 +156,8 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         }
 
         if(error.code === "email_not_confirmed") return openAccountVerification(request.email);
+
+        if(notVerifiedEmail === request.email) updateNotVerifiedEmail(null).catch(console.error);
 
         console.log("signIn error:", error);
         const toastMessage = getToastMessage({ messages: SignInToast, error });
@@ -209,23 +212,20 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         }
     };
 
-    const fetchNotVerifiedUser = async () => {
-        const newNotVerifiedUser = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_USER);
-        if(!newNotVerifiedUser) return;
+    const fetchNotVerifiedEmail = async () => {
+        const newNotVerifiedEmail = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_EMAIL);
+        if(!newNotVerifiedEmail) return;
 
-        setNotVerifiedUser(JSON.parse(newNotVerifiedUser));
+        setNotVerifiedEmail(newNotVerifiedEmail);
     };
 
-    const updateNotVerifiedUser = async (newNotVerifiedUser: User | null) => {
-        setNotVerifiedUser(newNotVerifiedUser);
+    const updateNotVerifiedEmail = async (newNotVerifiedEmail: string | null) => {
+        setNotVerifiedEmail(newNotVerifiedEmail);
 
-        if(newNotVerifiedUser) {
-            await AsyncStorage.setItem(
-                BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_USER,
-                JSON.stringify(newNotVerifiedUser)
-            );
+        if(newNotVerifiedEmail) {
+            await AsyncStorage.setItem(BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_EMAIL, newNotVerifiedEmail);
         } else {
-            await AsyncStorage.removeItem(BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_USER);
+            await AsyncStorage.removeItem(BaseConfig.LOCAL_STORAGE_KEY_NOT_VERIFIED_EMAIL);
         }
     };
 
@@ -243,7 +243,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 (session?.user.user_metadata?.provider ? [session.user.user_metadata.provider] : []);
 
             return {
-                authenticated,
+                authenticated: authenticated,
                 hasPassword,
                 providers,
                 openAccountVerification,
@@ -252,8 +252,8 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 signOut,
                 deleteAccount,
                 refreshSession,
-                notVerifiedUser,
-                updateNotVerifiedUser
+                notVerifiedEmail: notVerifiedEmail,
+                updateNotVerifiedEmail
             };
         },
         [
@@ -265,8 +265,8 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             signOut,
             deleteAccount,
             refreshSession,
-            notVerifiedUser,
-            updateNotVerifiedUser
+            notVerifiedEmail,
+            updateNotVerifiedEmail
         ]
     );
 
