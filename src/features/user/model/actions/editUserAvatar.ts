@@ -28,6 +28,11 @@ export const editUserAvatar =
                 path = newAvatar.filename;
             }
 
+            const previousAvatarImageUrl = await userDao.getPreviousAvatarImageUrl(oldUser.id);
+            if(attachmentQueue && !!previousAvatarImageUrl && previousAvatarImageUrl !== path) {
+                await attachmentQueue.deleteFile(previousAvatarImageUrl);
+            }
+
             const user: UserAccount = {
                 ...oldUser,
                 avatar: (request.isImageAvatar && avatar && path) ? { ...avatar, fileName: path } : null,

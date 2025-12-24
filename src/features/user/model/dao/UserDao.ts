@@ -12,8 +12,32 @@ export class UserDao extends Dao<UserTableRow, UserAccount, UserMapper> {
         super(db, USER_TABLE, new UserMapper(currencyDao, attachmentQueue));
     }
 
+    async getPreviousAvatarImageUrl(id: string): Promise<string | null> {
+        const result = await this.db
+        .selectFrom(USER_TABLE)
+        .select("avatar_url")
+        .where("id", "=", id)
+        .executeTakeFirst();
+
+        return result?.avatar_url ?? null;
+    }
+
     async update(user: UserAccount, safe?: boolean): Promise<UserAccount | null> {
         const entity = await this.mapper.toEntity(user);
         return super.update(entity, safe);
+    }
+
+    async delete(id: string, safe?: boolean = true): Promise<string> {
+        try {
+            const user = await this.getById(id);
+
+            if(user?.avatar && this.attachmentQueue) {
+                await this.attachmentQueue.deleteFile(user.avatar.fileName);
+            }
+        } catch(e) {
+            console.log("User image cannot be deleted: ", e);
+        }
+
+        return super.delete(id, safe);
     }
 }
