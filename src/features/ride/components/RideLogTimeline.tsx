@@ -13,6 +13,7 @@ import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../..
 import { YearPicker } from "../../../components/Input/_presets/YearPicker.tsx";
 import { sql } from "@powersync/kysely-driver";
 import { useTranslation } from "react-i18next";
+import { CAR_TABLE } from "../../../database/connector/powersync/tables/car.ts";
 
 type RideLogTimelineProps = {
     car: Car
@@ -35,7 +36,7 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
                 ]
             },
             {
-                group: "car",
+                group: CAR_TABLE,
                 filters: [{ field: "car_id", operator: "=", value: car.id }]
             }
         ), []);

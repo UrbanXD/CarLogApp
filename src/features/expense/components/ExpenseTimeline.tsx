@@ -12,6 +12,7 @@ import { useExpenseTimelineFilter } from "../hooks/useExpenseTimelineFilter.ts";
 import { SelectExpenseTableRow } from "../model/mapper/expenseMapper.ts";
 import { TimelineItemType } from "../../../components/timelineView/item/TimelineItem.tsx";
 import { useTranslation } from "react-i18next";
+import { CAR_TABLE } from "../../../database/connector/powersync/tables/car.ts";
 
 type ExpenseTimelineProps = {
     car: Car
@@ -32,7 +33,7 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
                     ]
                 },
                 {
-                    group: "car",
+                    group: CAR_TABLE,
                     filters: [{ field: "car_id", operator: "=", value: car.id }]
                 }
             ),

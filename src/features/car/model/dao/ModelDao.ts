@@ -8,6 +8,7 @@ import { getToday } from "../../../../utils/getDate.ts";
 import { CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
+import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";
 
 export class ModelDao extends Dao<ModelTableRow, Model, ModelMapper> {
     constructor(db: Kysely<DatabaseType>, makeDao: MakeDao) {
@@ -50,7 +51,7 @@ export class ModelDao extends Dao<ModelTableRow, Model, ModelMapper> {
             {
                 perPage,
                 filterBy: makeId ? {
-                    group: "make",
+                    group: MAKE_TABLE,
                     filters: [{ field: "make_id", value: makeId, operator: "=" }]
                 } : undefined,
                 mapper: this.mapper.toPickerItem

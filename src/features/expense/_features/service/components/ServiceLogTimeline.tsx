@@ -15,6 +15,7 @@ import { sql } from "@powersync/kysely-driver";
 import { Title } from "../../../../../components/Title.tsx";
 import { TimelineItemType } from "../../../../../components/timelineView/item/TimelineItem.tsx";
 import { useTranslation } from "react-i18next";
+import { CAR_TABLE } from "../../../../../database/connector/powersync/tables/car.ts";
 
 type ServiceLogTimelineProps = {
     car: Car
@@ -35,7 +36,7 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
                     ]
                 },
                 {
-                    group: "car",
+                    group: CAR_TABLE,
                     filters: [{ field: "car_id", operator: "=", value: car.id }]
                 }
             ),

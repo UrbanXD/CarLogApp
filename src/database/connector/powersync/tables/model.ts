@@ -8,4 +8,4 @@ export const modelTable = new Table({
     name: column.text,
     start_year: column.text,
     end_year: column.text
-});
+}, { localOnly: true });

@@ -15,6 +15,7 @@ import { OdometerLog } from "../../../schemas/odometerLogSchema.ts";
 import { useOdometerLogTimelineFilter } from "../hooks/useOdometerLogTimelineFilter.ts";
 import { TimelineItemType } from "../../../../../components/timelineView/item/TimelineItem.tsx";
 import { useTranslation } from "react-i18next";
+import { CAR_TABLE } from "../../../../../database/connector/powersync/tables/car.ts";
 
 type OdometerLogTimelineProps = {
     carId: string
@@ -37,7 +38,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
                     ]
                 },
                 {
-                    group: "car",
+                    group: CAR_TABLE,
                     filters: [{ field: "car_id", operator: "=", value: carId }]
                 }
             ),
