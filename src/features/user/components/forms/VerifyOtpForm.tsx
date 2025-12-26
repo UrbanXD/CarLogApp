@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Input from "../../../../components/Input/Input.ts";
 import { AuthApiError, EmailOtpType } from "@supabase/supabase-js";
@@ -17,6 +17,7 @@ type VerifyOTPProps = {
     title?: string
     subtitle?: string
     handleVerification: HandleVerificationOtpType
+    automaticResend?: boolean
 }
 
 function VerifyOtpForm({
@@ -25,11 +26,16 @@ function VerifyOtpForm({
     otpLength = 6,
     title,
     subtitle,
-    handleVerification
+    handleVerification,
+    automaticResend = false
 }: VerifyOTPProps) {
     const { t } = useTranslation();
     const { verifyOTP, resendOTP } = useOtp();
     const { dismissBottomSheet } = useBottomSheet();
+
+    useEffect(() => {
+        if(automaticResend) resend();
+    }, [automaticResend]);
 
     const defaultSubtitle = () =>
         <Text style={ styles.subtitleText }>

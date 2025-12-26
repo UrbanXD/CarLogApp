@@ -20,6 +20,7 @@ type OtpVerificationLocalSearchParams = {
     userId?: string
     newPassword?: string
     newEmail?: string
+    automaticResend?: boolean
 }
 
 const Page: React.FC = () => {
@@ -30,7 +31,8 @@ const Page: React.FC = () => {
         email,
         newEmail,
         newPassword,
-        userId
+        userId,
+        automaticResend
     } = useLocalSearchParams<OtpVerificationLocalSearchParams>();
     const {
         handleSignUpVerification,
@@ -65,6 +67,7 @@ const Page: React.FC = () => {
             title={ title }
             email={ email }
             handleVerification={ handleVerification }
+            automaticResend={ automaticResend }
         />
     );
 };

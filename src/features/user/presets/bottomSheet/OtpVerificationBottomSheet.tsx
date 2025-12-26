@@ -8,13 +8,15 @@ type OtpVerificationBottomSheetProps = {
     title: string
     email: string
     handleVerification: HandleVerificationOtpType
+    automaticResend?: boolean
 }
 
 const OtpVerificationBottomSheet: React.FC<OtpVerificationBottomSheetProps> = ({
     type,
     title,
     email,
-    handleVerification
+    handleVerification,
+    automaticResend
 }) => {
     const CONTENT =
         <VerifyOtpForm
@@ -22,6 +24,7 @@ const OtpVerificationBottomSheet: React.FC<OtpVerificationBottomSheetProps> = ({
             title={ title }
             email={ email }
             handleVerification={ handleVerification }
+            automaticResend={ automaticResend }
         />;
     const SNAP_POINTS = ["100%"];
 
