@@ -20,7 +20,7 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
     `;
 
     async init() {
-        if(!BaseConfig.SUPABASE_BUCKET) {
+        if(!BaseConfig.SUPABASE_ATTACHMENT_BUCKET) {
             console.debug("No Supabase bucket configured, skip setting up PhotoAttachmentQueue watches");
             // Disable sync interval to prevent errors from trying to sync to a non-existent bucket
             this.options.syncInterval = 0;

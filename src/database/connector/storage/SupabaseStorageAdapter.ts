@@ -18,7 +18,7 @@ export class SupabaseStorageAdapter implements StorageAdapter {
             mediaType?: string;
         }
     ): Promise<void> {
-        if(!BaseConfig.SUPABASE_BUCKET) {
+        if(!BaseConfig.SUPABASE_ATTACHMENT_BUCKET) {
             throw new Error("Supabase bucket not configured in AppConfig.ts");
         }
 
@@ -26,20 +26,20 @@ export class SupabaseStorageAdapter implements StorageAdapter {
 
         const res =
             await this.options.client.storage
-            .from(BaseConfig.SUPABASE_BUCKET)
+            .from(BaseConfig.SUPABASE_ATTACHMENT_BUCKET)
             .upload(filename, data, { contentType: mediaType });
 
         if(res.error) throw res.error;
     }
 
     async downloadFile(filePath: string) {
-        if(!BaseConfig.SUPABASE_BUCKET) {
+        if(!BaseConfig.SUPABASE_ATTACHMENT_BUCKET) {
             throw new Error("Supabase bucket not configured in AppConfig.ts");
         }
 
         const { data, error } =
             await this.options.client.storage
-            .from(BaseConfig.SUPABASE_BUCKET)
+            .from(BaseConfig.SUPABASE_ATTACHMENT_BUCKET)
             .download(filePath);
 
         if(error) throw error;
@@ -72,11 +72,12 @@ export class SupabaseStorageAdapter implements StorageAdapter {
         const { filename } = options ?? {};
         if(!filename) return;
 
-        if(!BaseConfig.SUPABASE_BUCKET) {
+        if(!BaseConfig.SUPABASE_ATTACHMENT_BUCKET) {
             throw new Error("Supabase bucket not configured in AppConfig.ts");
         }
 
-        const { error } = await this.options.client.storage.from(BaseConfig.SUPABASE_BUCKET).remove([filename]);
+        const { error } = await this.options.client.storage.from(BaseConfig.SUPABASE_ATTACHMENT_BUCKET)
+        .remove([filename]);
         if(error) throw error;
     }
 
