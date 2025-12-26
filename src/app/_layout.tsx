@@ -14,18 +14,20 @@ import { store } from "../database/redux/store.ts";
 import Header from "../components/Navigation/Header/Header.tsx";
 import ToastManager from "../ui/alert/components/toast/ToastManager.tsx";
 import ModalManager from "../ui/alert/components/modal/ModalManager.tsx";
-import * as SystemUI from "expo-system-ui";
 import { SystemBars } from "react-native-edge-to-edge";
 import { SECONDARY_COLOR } from "../constants/index.ts";
 import { PortalHost, PortalProvider } from "@gorhom/portal";
 import { useTranslation } from "react-i18next";
+import { setBackgroundColorAsync } from "expo-system-ui";
 
 
 const Layout: React.FC = () => {
     const { t } = useTranslation();
 
     useEffect(() => {
-        SystemUI.setBackgroundColorAsync(SECONDARY_COLOR);
+        (async () => {
+            await setBackgroundColorAsync(SECONDARY_COLOR);
+        })();
     }, []);
 
     return (
