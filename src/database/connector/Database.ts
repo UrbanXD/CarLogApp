@@ -32,7 +32,7 @@ import { RideExpenseDao } from "../../features/ride/_features/rideExpense/model/
 import { RideLogDao } from "../../features/ride/model/dao/rideLogDao.ts";
 import { StatisticsDao } from "../../features/statistics/model/dao/statisticsDao.ts";
 import { File, Paths } from "expo-file-system";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import LargeSecureStore from "./storage/LargeSecureStorage.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import dayjs from "dayjs";
@@ -45,7 +45,7 @@ export class Database {
     supabaseConnector: SupabaseConnector;
     storage: SupabaseStorageAdapter;
     attachmentQueue?: PhotoAttachmentQueue;
-    private syncSeedDatabase = false;
+    private readonly syncSeedDatabase = false;
     private _userDao?: UserDao;
     private _carDao?: CarDao;
     private _makeDao?: MakeDao;
@@ -101,41 +101,7 @@ export class Database {
                 }
             );
 
-            const globalSeedDbLastModificationAtLocal = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_GLOBAL_SEED_DB_LAST_MODIFICATION);
-            const { data, error } = await supabaseClient
-            .storage
-            .from(BaseConfig.SUPABASE_SEED_BUCKET)
-            .info(BaseConfig.SEED_DATABASE_NAME);
-            const globalSeedDbLastModifiedAt = data?.lastModified;
-
-            let syncSeedDatabase = false;
-            if(
-                !error &&
-                (
-                    !globalSeedDbLastModifiedAt ||
-                    !globalSeedDbLastModificationAtLocal ||
-                    !dayjs(globalSeedDbLastModifiedAt).isValid() ||
-                    !dayjs(globalSeedDbLastModificationAtLocal).isValid() ||
-                    !dayjs(globalSeedDbLastModificationAtLocal).isAfter(globalSeedDbLastModifiedAt)
-                )
-            ) {
-                const seedDatabaseUrl = supabaseClient
-                .storage
-                .from(BaseConfig.SUPABASE_SEED_BUCKET)
-                .getPublicUrl(BaseConfig.SEED_DATABASE_NAME)
-                    .data
-                    .publicUrl;
-
-                const newFile = new File(Paths.document.uri, SEED_DATABASE_NAME);
-                const file = await File.downloadFileAsync(seedDatabaseUrl, newFile, { idempotent: true });
-                if(file.exists && file.info().size > 0) {
-                    syncSeedDatabase = true;
-                    await AsyncStorage.setItem(
-                        BaseConfig.LOCAL_STORAGE_KEY_GLOBAL_SEED_DB_LAST_MODIFICATION,
-                        dayjs(file.info().modificationTime).toISOString()
-                    );
-                }
-            }
+            const { syncNeed } = await this.getSeedDatabase(supabaseClient);
 
             const powersync = new PowerSyncDatabase({
                 schema: AppSchema,
@@ -159,15 +125,15 @@ export class Database {
                         return { retry: true };
                     },
                     onUploadError: async (attachment: AttachmentRecord, exception: any) => {
-                        console.log("attachment upload hiba", exception);
+                        console.log("attachment upload error: ", exception);
                         return { retry: false };
                     }
                 });
             }
 
-            return new Database(powersync, db, supabaseConnector, storage, syncSeedDatabase, attachmentQueue);
+            return new Database(powersync, db, supabaseConnector, storage, syncNeed, attachmentQueue);
         } catch(error) {
-            console.error("Hiba a Database.create() során:", error);
+            console.error("Error at Database.create():", error);
             throw error;
         }
     }
@@ -183,6 +149,46 @@ export class Database {
 
     async disconnect() {
         await this.powersync.disconnectAndClear({ clearLocal: false });
+    }
+
+    static async getSeedDatabase(supabaseClient: SupabaseClient): Promise<{ syncNeed: boolean }> {
+        const globalSeedDbLastModificationAtLocal = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_GLOBAL_SEED_DB_LAST_MODIFICATION);
+        const { data, error } = await supabaseClient
+        .storage
+        .from(BaseConfig.SUPABASE_SEED_BUCKET)
+        .info(BaseConfig.SEED_DATABASE_NAME);
+        const globalSeedDbLastModifiedAt = data?.lastModified;
+
+        let syncSeedDatabase = false;
+        if(
+            !error &&
+            (
+                !globalSeedDbLastModifiedAt ||
+                !globalSeedDbLastModificationAtLocal ||
+                !dayjs(globalSeedDbLastModifiedAt).isValid() ||
+                !dayjs(globalSeedDbLastModificationAtLocal).isValid() ||
+                !dayjs(globalSeedDbLastModificationAtLocal).isAfter(globalSeedDbLastModifiedAt)
+            )
+        ) {
+            const seedDatabaseUrl = supabaseClient
+            .storage
+            .from(BaseConfig.SUPABASE_SEED_BUCKET)
+            .getPublicUrl(BaseConfig.SEED_DATABASE_NAME)
+                .data
+                .publicUrl;
+
+            const newFile = new File(Paths.document.uri, SEED_DATABASE_NAME);
+            const file = await File.downloadFileAsync(seedDatabaseUrl, newFile, { idempotent: true });
+            if(file.exists && file.info().size > 0) {
+                syncSeedDatabase = true;
+                await AsyncStorage.setItem(
+                    BaseConfig.LOCAL_STORAGE_KEY_GLOBAL_SEED_DB_LAST_MODIFICATION,
+                    dayjs(file.info().modificationTime).toISOString()
+                );
+            }
+        }
+
+        return { syncNeed: syncSeedDatabase };
     }
 
     async autoSyncSeedDatabase() {
