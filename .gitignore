@@ -12,6 +12,7 @@ android/
 # Supabase
 supabase/.branches
 supabase/.temp
+supabase/signing_key.json
 
 # IDEA
 .idea
