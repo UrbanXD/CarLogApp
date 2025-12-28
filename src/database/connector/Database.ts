@@ -148,8 +148,8 @@ export class Database {
             let attachmentQueue;
             if(BaseConfig.SUPABASE_ATTACHMENT_BUCKET) {
                 attachmentQueue = new PhotoAttachmentQueue({
-                    powersync: this.powersync,
-                    storage: this.storage,
+                    powersync,
+                    storage,
                     onDownloadError: async (attachment: AttachmentRecord, exception: any) => {
                         console.log("attachment download error: ", exception);
                         if(exception.toString() === "StorageApiError: Object not found") {
