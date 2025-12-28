@@ -1,9 +1,8 @@
 import { AbstractPowerSyncDatabase, CrudEntry, PowerSyncBackendConnector, UpdateType } from "@powersync/react-native";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { SupabaseClient } from "@supabase/supabase-js";
 import "react-native-url-polyfill/auto";
 import { BaseConfig } from "../../constants/index.ts";
 import { SupabaseStorageAdapter } from "./storage/SupabaseStorageAdapter.ts";
-import LargeSecureStore from "./storage/LargeSecureStorage.ts";
 
 /// Postgres Response codes that we cannot recover from by retrying.
 const FATAL_RESPONSE_CODES = [
@@ -21,19 +20,10 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
     client: SupabaseClient;
     powersync: AbstractPowerSyncDatabase;
     storage: SupabaseStorageAdapter;
+    powersyncGuest: { token: string, userId?: string, expiresAt?: Date | null };
 
-    constructor(powersync: AbstractPowerSyncDatabase) {
-        this.client = createClient(
-            BaseConfig.SUPABASE_URL,
-            BaseConfig.SUPABASE_ANON_KEY,
-            {
-                auth: {
-                    persistSession: true,
-                    storage: new LargeSecureStore()
-                }
-            }
-        );
-
+    constructor(client: SupabaseClient, powersync: AbstractPowerSyncDatabase) {
+        this.client = client;
         this.powersync = powersync;
         this.storage = new SupabaseStorageAdapter({ client: this.client });
     }
@@ -44,14 +34,30 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
             error
         } = await this.client.auth.getSession();
 
-        if(!session || error) throw new Error(`Could not fetch Supabase credentials: ${ error }`);
+        if((!this.powersyncGuest) && (!session || error)) {
+            const { data: powersyncGuestData, error: powersyncGuestError } = await this.client
+            .functions
+            .invoke("generate-powersync-guest-token");
+
+            if(!powersyncGuestData || powersyncGuestError) throw new Error(`Could not fetch Supabase credentials or Powersync Quest credentials: ${ error } ${ powersyncGuestError }`);
+
+            this.powersyncGuest = {
+                token: powersyncGuestData?.token ?? "",
+                expiresAt: powersyncGuestData?.expires_at ? new Date(powersyncGuestData.expires_at * 1000) : undefined,
+                userId: powersyncGuestData?.user_id
+            };
+        }
 
         return {
             client: this.client,
             endpoint: BaseConfig.POWERSYNC_URL,
-            token: session.access_token ?? "",
-            expiresAt: session.expires_at ? new Date(session.expires_at * 1000) : undefined,
-            userID: session.user.id
+            token: session?.access_token ?? this.powersyncGuest.token,
+            expiresAt: session?.expires_at
+                       ? new Date(session.expires_at * 1000)
+                       : this.powersyncGuest?.expiresAt
+                         ? new Date(this.powersyncGuest.expiresAt * 1000)
+                         : undefined,
+            userID: session?.user.id ?? this.powersyncGuest?.userId ?? undefined
         };
     }
 

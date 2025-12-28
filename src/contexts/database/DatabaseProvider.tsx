@@ -1,20 +1,43 @@
-import React, { ReactNode, useMemo } from "react";
-import { PowerSyncContext } from "@powersync/react-native";
-import { useDatabase } from "./DatabaseContext.ts";
+import React, { ReactNode, useEffect, useState } from "react";
+import { DatabaseContext } from "./DatabaseContext.ts";
+import { Database } from "../../database/connector/Database.ts";
+import * as SplashScreen from "expo-splash-screen";
 
-interface PowerSyncProviderProps {
-    children: ReactNode | null;
+type DatabaseProviderProps = {
+    children: ReactNode | null
 }
 
-export const DatabaseProvider: React.FC<PowerSyncProviderProps> = ({ children }) => {
-    const { powersync } = useDatabase();
-    const db = useMemo(() => powersync, []);
+SplashScreen.preventAutoHideAsync();
+
+export function DatabaseProvider({ children }: DatabaseProviderProps) {
+    const [database, setDatabase] = useState<Database | null>(null);
+    const [error, setError] = useState<Error | null>(null);
+
+    useEffect(() => {
+        let mounted = true;
+
+        const init = async () => {
+            try {
+                const databaseInstance = await Database.create();
+                if(mounted) {
+                    setDatabase(databaseInstance);
+                }
+            } catch(e) {
+                if(mounted) {
+                    setError(e as Error);
+                }
+            }
+        };
+
+        init();
+        return () => { mounted = false; };
+    }, []);
+
+    if(error || !database) return null;
 
     return (
-        <PowerSyncContext.Provider
-            value={ db }
-        >
+        <DatabaseContext.Provider value={ database }>
             { children }
-        </PowerSyncContext.Provider>
+        </DatabaseContext.Provider>
     );
-};
+}

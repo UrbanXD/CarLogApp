@@ -5,8 +5,6 @@ import { useFonts } from "expo-font";
 import AnimatedSplashScreen from "../screens/AnimatedSplashScreen.tsx";
 import "../i18n/index.ts";
 
-SplashScreen.preventAutoHideAsync();
-
 const App: React.FC = () => {
     const [fontsLoaded, fontsLoadError] = useFonts({
         "Gilroy-Heavy": require("../assets/fonts/Gilroy-Heavy.otf"),

@@ -26,7 +26,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     const dispatch = useAppDispatch();
     const { openToast } = useAlert();
     const database = useDatabase();
-    const { supabaseConnector, powersync, userDao, carDAO } = database;
+    const { supabaseConnector, powersync, userDao } = database;
 
     const [session, setSession] = useState<Session | null>(null);
     const [authenticated, setAuthenticated] = useState<boolean | null>(null);
@@ -35,11 +35,6 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     const sessionDataFetched = useRef<boolean>(false);
 
     useEffect(() => {
-        supabaseConnector.client.auth.getSession().then(({ data }) => {
-            setAuthenticated(!!data.session);
-            setSession(data.session);
-        });
-
         const { data: authListener } = supabaseConnector.client.auth.onAuthStateChange(
             (event, supabaseSession) => {
                 if(event === "PASSWORD_RECOVERY") return;
@@ -74,14 +69,15 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
 
         if(session?.user.id === notVerifiedEmail?.id) setNotVerifiedEmail(null);
 
-        if(powersync.currentStatus.connected && powersync.currentStatus.hasSynced && session) {
+        if(powersync.currentStatus.connected && powersync.currentStatus.hasSynced && !sessionDataFetched.current && session) {
             dispatch(loadUser({ database, userId: session.user.id }));
             dispatch(loadCars(database));
+            sessionDataFetched.current = true;
         }
 
         return powersync.registerListener({
             statusChanged: (status) => {
-                if(status.connected && status.hasSynced && !status.dataFlowStatus.downloading && session && !sessionDataFetched.current) {
+                if(status.connected && status.hasSynced && session) {
                     dispatch(loadUser({ database, userId: session.user.id }));
                     dispatch(loadCars(database));
                     sessionDataFetched.current = true;
@@ -90,14 +86,15 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         });
     }, [session]);
 
-    const openAccountVerification = (email: string) => {
+    const openAccountVerification = (email: string, automaticResend?: boolean = false) => {
         router.push({
             pathname: "bottomSheet/otpVerification",
             params: {
                 type: "signup",
                 title: t("auth.otp_verification.email"),
                 email,
-                handlerType: OtpVerificationHandlerType.SignUp
+                handlerType: OtpVerificationHandlerType.SignUp,
+                automaticResend: automaticResend
             }
         });
     };
@@ -155,7 +152,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             return;
         }
 
-        if(error.code === "email_not_confirmed") return openAccountVerification(request.email);
+        if(error.code === "email_not_confirmed") return openAccountVerification(request.email, true);
 
         if(notVerifiedEmail === request.email) updateNotVerifiedEmail(null).catch(console.error);
 

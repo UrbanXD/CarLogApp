@@ -31,6 +31,13 @@ import { RidePassengerDao } from "../../features/ride/_features/passenger/model/
 import { RideExpenseDao } from "../../features/ride/_features/rideExpense/model/dao/rideExpenseDao.ts";
 import { RideLogDao } from "../../features/ride/model/dao/rideLogDao.ts";
 import { StatisticsDao } from "../../features/statistics/model/dao/statisticsDao.ts";
+import { File, Paths } from "expo-file-system";
+import { createClient } from "@supabase/supabase-js";
+import LargeSecureStore from "./storage/LargeSecureStorage.ts";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import dayjs from "dayjs";
+import { open } from "@journeyapps/react-native-quick-sqlite";
+import { SEED_DATABASE_NAME } from "@env";
 
 export class Database {
     powersync: AbstractPowerSyncDatabase;
@@ -38,6 +45,7 @@ export class Database {
     supabaseConnector: SupabaseConnector;
     storage: SupabaseStorageAdapter;
     attachmentQueue?: PhotoAttachmentQueue;
+    private syncSeedDatabase = false;
     private _userDao?: UserDao;
     private _carDao?: CarDao;
     private _makeDao?: MakeDao;
@@ -64,33 +72,178 @@ export class Database {
     private _rideExpenseDao?: RideExpenseDao;
     private _statisticsDao?: StatisticsDao;
 
-    constructor() {
-        this.powersync = new PowerSyncDatabase({
-            schema: AppSchema,
-            database: {
-                dbFilename: "powersync-carlog.sqlite"
-            }
-        });
-        this.db = wrapPowerSyncWithKysely(this.powersync);
-        this.supabaseConnector = new SupabaseConnector(this.powersync);
-        this.storage = this.supabaseConnector.storage;
+    protected constructor(
+        powersync: AbstractPowerSyncDatabase,
+        db: Kysely<DatabaseType>,
+        supabaseConnector: SupabaseConnector,
+        storage: SupabaseStorageAdapter,
+        syncSeedDatabase: boolean,
+        attachmentQueue?: PhotoAttachmentQueue
+    ) {
+        this.powersync = powersync;
+        this.db = db;
+        this.supabaseConnector = supabaseConnector;
+        this.storage = storage;
+        this.syncSeedDatabase = syncSeedDatabase;
+        this.attachmentQueue = attachmentQueue;
+    }
 
-        if(BaseConfig.SUPABASE_BUCKET) {
-            this.attachmentQueue = new PhotoAttachmentQueue({
-                powersync: this.powersync,
-                storage: this.storage,
-                onDownloadError: async (attachment: AttachmentRecord, exception: any) => {
-                    if(exception.toString() === "StorageApiError: Object not found") {
+    static async create() {
+        try {
+            const supabaseClient = createClient(
+                BaseConfig.SUPABASE_URL,
+                BaseConfig.SUPABASE_ANON_KEY,
+                {
+                    auth: {
+                        persistSession: true,
+                        storage: new LargeSecureStore()
+                    }
+                }
+            );
+
+            const globalSeedDbLastModificationAtLocal = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_GLOBAL_SEED_DB_LAST_MODIFICATION);
+            const { data, error } = await supabaseClient
+            .storage
+            .from(BaseConfig.SUPABASE_SEED_BUCKET)
+            .info(BaseConfig.SEED_DATABASE_NAME);
+            const globalSeedDbLastModifiedAt = data?.lastModified;
+
+            let syncSeedDatabase = false;
+            if(
+                !error &&
+                (
+                    !globalSeedDbLastModifiedAt ||
+                    !globalSeedDbLastModificationAtLocal ||
+                    !dayjs(globalSeedDbLastModifiedAt).isValid() ||
+                    !dayjs(globalSeedDbLastModificationAtLocal).isValid() ||
+                    !dayjs(globalSeedDbLastModificationAtLocal).isAfter(globalSeedDbLastModifiedAt)
+                )
+            ) {
+                const seedDatabaseUrl = supabaseClient
+                .storage
+                .from(BaseConfig.SUPABASE_SEED_BUCKET)
+                .getPublicUrl(BaseConfig.SEED_DATABASE_NAME)
+                    .data
+                    .publicUrl;
+
+                const newFile = new File(Paths.document.uri, SEED_DATABASE_NAME);
+                const file = await File.downloadFileAsync(seedDatabaseUrl, newFile, { idempotent: true });
+                if(file.exists && file.info().size > 0) {
+                    syncSeedDatabase = true;
+                    await AsyncStorage.setItem(
+                        BaseConfig.LOCAL_STORAGE_KEY_GLOBAL_SEED_DB_LAST_MODIFICATION,
+                        dayjs(file.info().modificationTime).toISOString()
+                    );
+                }
+            }
+
+            const powersync = new PowerSyncDatabase({
+                schema: AppSchema,
+                database: { dbFilename: BaseConfig.MAIN_DATABASE_NAME }
+            });
+            const db = wrapPowerSyncWithKysely(powersync);
+            const supabaseConnector = new SupabaseConnector(supabaseClient, powersync);
+            const storage = supabaseConnector.storage;
+
+            let attachmentQueue;
+            if(BaseConfig.SUPABASE_ATTACHMENT_BUCKET) {
+                attachmentQueue = new PhotoAttachmentQueue({
+                    powersync: this.powersync,
+                    storage: this.storage,
+                    onDownloadError: async (attachment: AttachmentRecord, exception: any) => {
+                        console.log("attachment download error: ", exception);
+                        if(exception.toString() === "StorageApiError: Object not found") {
+                            return { retry: false };
+                        }
+
+                        return { retry: true };
+                    },
+                    onUploadError: async (attachment: AttachmentRecord, exception: any) => {
+                        console.log("attachment upload hiba", exception);
                         return { retry: false };
                     }
+                });
+            }
 
-                    return { retry: true };
-                },
-                onUploadError: async (attachment: AttachmentRecord, exception: any) => {
-                    console.log("attachment upload hiba", exception);
-                    return { retry: false };
+            return new Database(powersync, db, supabaseConnector, storage, syncSeedDatabase, attachmentQueue);
+        } catch(error) {
+            console.error("Hiba a Database.create() során:", error);
+            throw error;
+        }
+    }
+
+    async init() {
+        if(this.powersync.connecting || this.powersync.connected) return;
+
+        await this.powersync.init();
+        if(this.syncSeedDatabase) await this.autoSyncSeedDatabase();
+        await this.powersync.connect(this.supabaseConnector);
+        if(this.attachmentQueue) await this.attachmentQueue.init();
+    }
+
+    async disconnect() {
+        await this.powersync.disconnectAndClear({ clearLocal: false });
+    }
+
+    async autoSyncSeedDatabase() {
+        const seedDb = open(BaseConfig.SEED_DATABASE_NAME);
+
+        try {
+            const seedTablesResult = (await seedDb.execute(`
+                SELECT name
+                FROM sqlite_master
+                WHERE type = 'table'
+                  AND name NOT LIKE 'sqlite_%'
+            `)).rows?._array ?? [];
+            const seedTables = seedTablesResult.map(row => row.name);
+
+            for(const tableName of seedTables) {
+                const tableExists = await this.powersync.get(`
+                    SELECT name
+                    FROM sqlite_master
+                    WHERE type = 'table'
+                      AND name = 'ps_data_local__${ tableName }'
+                `);
+
+                if(!tableExists) {
+                    console.warn(`[Sync Seed Database] Table schema missing: '${ tableName }', skipped`);
+                    continue;
                 }
-            });
+
+                const dataResult = await seedDb.execute(
+                    `SELECT *
+                     FROM ${ tableName }`
+                );
+                const rows = dataResult.rows?._array ?? [];
+
+                if(rows.length === 0) continue;
+
+                await this.powersync.writeTransaction(async (tx) => {
+                    await tx.execute(`
+                        DELETE
+                        FROM ${ tableName }
+                    `);
+
+                    const batchSize = 500;
+                    for(let i = 0; i < rows.length; i += batchSize) {
+                        const batch = rows.slice(i, i + batchSize);
+
+                        const columns = Object.keys(batch[0]).join(", ");
+                        const placeholders = `(${ Object.keys(batch[0]).map(() => "?").join(",") })`;
+                        const batchSql = `
+                            INSERT INTO ${ tableName } (${ columns })
+                            VALUES ${ placeholders }
+                        `;
+
+                        const flatValues = batch.flatMap(row => Object.values(row));
+                        await tx.execute(batchSql, flatValues);
+                    }
+                });
+            }
+        } catch(e) {
+            console.error("Sync seed database error:", e);
+        } finally {
+            seedDb.close();
         }
     }
 
@@ -299,20 +452,5 @@ export class Database {
         );
 
         return this._statisticsDao;
-    }
-
-    async init() {
-        if(this.powersync.connecting || this.powersync.connected) return;
-
-        await this.powersync.init();
-        await this.powersync.connect(this.supabaseConnector);
-
-        if(this.attachmentQueue) {
-            await this.attachmentQueue.init();
-        }
-    }
-
-    async disconnect() {
-        await this.powersync.disconnect();
     }
 }
