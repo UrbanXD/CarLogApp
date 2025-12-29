@@ -235,10 +235,12 @@ export class Database {
                         const batch = rows.slice(i, i + batchSize);
 
                         const columns = Object.keys(batch[0]).join(", ");
-                        const placeholders = `(${ Object.keys(batch[0]).map(() => "?").join(",") })`;
+                        const singleRowPlaceholders = `(${ Object.keys(batch[0]).map(() => "?").join(",") })`;
+                        const allPlaceholders = batch.map(() => singleRowPlaceholders).join(", ");
+
                         const batchSql = `
                             INSERT INTO ${ tableName } (${ columns })
-                            VALUES ${ placeholders }
+                            VALUES ${ allPlaceholders }
                         `;
 
                         const flatValues = batch.flatMap(row => Object.values(row));
