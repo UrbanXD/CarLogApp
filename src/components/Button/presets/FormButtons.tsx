@@ -1,8 +1,10 @@
-import Button from "../Button.ts";
 import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import ButtonsRow from "../ButtonsRow.tsx";
+import IconButton from "../IconButton.tsx";
+import TextButton from "../TextButton.tsx";
 
 type FormButtonsProps = {
     submit: () => Promise<void>
@@ -18,21 +20,21 @@ export function FormButtons({
     const { t } = useTranslation();
 
     return (
-        <Button.Row
+        <ButtonsRow
             style={ { paddingTop: SEPARATOR_SIZES.lightSmall, justifyContent: !reset ? "flex-end" : "space-between" } }>
             {
                 reset &&
-               <Button.Icon
+               <IconButton
                   icon={ ICON_NAMES.reset }
                   onPress={ () => reset() }
                />
             }
-            <Button.Text
+            <TextButton
                 text={ submitText ?? t("form_button.save") }
                 onPress={ submit }
                 style={ { flex: reset ? 1 : 0.8 } }
                 loadingIndicator
             />
-        </Button.Row>
+        </ButtonsRow>
     );
 }

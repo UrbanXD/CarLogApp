@@ -1,9 +1,10 @@
 import { StyleSheet, ViewStyle } from "react-native";
 import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import Button from "../Button.ts";
 import React from "react";
 import { DeleteButton } from "./DeleteButton.tsx";
 import { useTranslation } from "react-i18next";
+import ButtonsRow from "../ButtonsRow.tsx";
+import TextButton from "../TextButton.tsx";
 
 type EditDeleteButton = {
     deleteIcon?: string
@@ -27,7 +28,7 @@ export function EditDeleteButton({
     const { t } = useTranslation();
 
     return (
-        <Button.Row style={ [styles.buttonContainer, buttonContainerStyle] }>
+        <ButtonsRow style={ [styles.buttonContainer, buttonContainerStyle] }>
             {
                 onDeletePress &&
                <DeleteButton
@@ -38,14 +39,14 @@ export function EditDeleteButton({
             }
             {
                 onEditPress &&
-               <Button.Text
+               <TextButton
                   text={ editText ?? t("form_button.edit") }
                   fontSize={ FONT_SIZES.p1 }
                   onPress={ onEditPress }
                   style={ [styles.editButton, editButtonStyle] }
                />
             }
-        </Button.Row>
+        </ButtonsRow>
     );
 }
 

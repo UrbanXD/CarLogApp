@@ -2,15 +2,10 @@ import React from "react";
 import OtpVerificationBottomSheet from "../../features/user/presets/bottomSheet/OtpVerificationBottomSheet.tsx";
 import { useLocalSearchParams } from "expo-router";
 import { EmailOtpType } from "@supabase/supabase-js";
-import { useOtpVerificationHandler } from "../../features/user/hooks/useOtpVerificationHandler.ts";
-
-export enum OtpVerificationHandlerType {
-    SignUp,
-    CurrentEmailChange,
-    NewEmailChange,
-    PasswordReset,
-    UserDelete
-}
+import {
+    OtpVerificationHandlerType,
+    useOtpVerificationHandler
+} from "../../features/user/hooks/useOtpVerificationHandler.ts";
 
 type OtpVerificationLocalSearchParams = {
     type: EmailOtpType

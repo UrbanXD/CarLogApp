@@ -1,7 +1,7 @@
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import Button from "../Button.ts";
 import React from "react";
 import { ViewStyle } from "react-native";
+import IconButton from "../IconButton.tsx";
 
 export type DeleteButtonProps = {
     icon?: string
@@ -11,7 +11,7 @@ export type DeleteButtonProps = {
 
 export function DeleteButton({ icon = ICON_NAMES.trashCan, onPress, style }: DeleteButtonProps) {
     return (
-        <Button.Icon
+        <IconButton
             icon={ icon }
             iconSize={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
             backgroundColor={ COLORS.googleRed }

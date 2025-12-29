@@ -5,13 +5,13 @@ import { EmailStep } from "./steps/index.ts";
 import { router } from "expo-router";
 import { getToastMessage } from "../../../../ui/alert/utils/getToastMessage.ts";
 import { ChangeEmailToast } from "../../presets/toast/index.ts";
-import { OtpVerificationHandlerType } from "../../../../app/bottomSheet/otpVerification.tsx";
 import { ChangeEmailRequest, useChangeEmailFormProps } from "../../schemas/form/changeEmailRequest.ts";
 import Form from "../../../../components/Form/Form.tsx";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { useTranslation } from "react-i18next";
 import { SubmitHandlerArgs } from "../../../../types/index.ts";
 import { InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
+import { OtpVerificationHandlerType } from "../../hooks/useOtpVerificationHandler.ts";
 
 export type ChangeEmailFormProps = {
     user: UserAccount

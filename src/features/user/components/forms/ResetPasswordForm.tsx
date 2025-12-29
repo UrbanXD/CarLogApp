@@ -4,7 +4,6 @@ import { EmailStep, PasswordStep } from "./steps/index.ts";
 import { router } from "expo-router";
 import { getToastMessage } from "../../../../ui/alert/utils/getToastMessage.ts";
 import { ResetPasswordToast } from "../../presets/toast/index.ts";
-import { OtpVerificationHandlerType } from "../../../../app/bottomSheet/otpVerification.tsx";
 import { NewPasswordRequest, useNewPasswordFormProps } from "../../schemas/form/newPasswordRequest.ts";
 import Form from "../../../../components/Form/Form.tsx";
 import React from "react";
@@ -14,6 +13,7 @@ import { SubmitHandlerArgs } from "../../../../types/index.ts";
 import { InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
 import { View } from "react-native";
 import { formTheme } from "../../../../ui/form/constants/theme.ts";
+import { OtpVerificationHandlerType } from "../../hooks/useOtpVerificationHandler.ts";
 
 type ResetPasswordFormProps = {
     defaultEmail?: string

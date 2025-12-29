@@ -3,11 +3,17 @@ import { getToastMessage } from "../../../ui/alert/utils/getToastMessage.ts";
 import { ChangeEmailToast, DeleteUserToast, ResetPasswordToast, SignUpToast } from "../presets/toast/index.ts";
 import { router } from "expo-router";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
-import { OtpVerificationHandlerType } from "../../../app/bottomSheet/otpVerification.tsx";
 import { useAuth } from "../../../contexts/auth/AuthContext.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useTranslation } from "react-i18next";
 
+export enum OtpVerificationHandlerType {
+    SignUp,
+    CurrentEmailChange,
+    NewEmailChange,
+    PasswordReset,
+    UserDelete
+}
 
 export const useOtpVerificationHandler = () => {
     const { t } = useTranslation();

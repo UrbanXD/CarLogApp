@@ -12,12 +12,12 @@ import { getToastMessage } from "../../ui/alert/utils/getToastMessage.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { SignInRequest } from "../../features/user/schemas/form/signInRequest.ts";
 import { SignUpRequest } from "../../features/user/schemas/form/signUpRequest.ts";
-import { OtpVerificationHandlerType } from "../../app/bottomSheet/otpVerification.tsx";
 import { loadCars } from "../../features/car/model/actions/loadCars.ts";
 import { resetCars } from "../../features/car/model/slice/index.ts";
 import { resetUser } from "../../features/user/model/slice/index.ts";
 import { getUserLocalCurrency } from "../../features/_shared/currency/utils/getUserLocalCurrency.ts";
 import { useTranslation } from "react-i18next";
+import { OtpVerificationHandlerType } from "../../features/user/hooks/useOtpVerificationHandler.ts";
 
 export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     children
