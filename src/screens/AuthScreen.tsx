@@ -34,7 +34,7 @@ const AuthScreen: React.FC = () => {
             <View style={ styles.imageContainer }>
                 <Animated.Image
                     entering={ FadeIn.duration(ENTERING_ANIMATION_DURATION) }
-                    source={ require("../assets/images/home2.jpg") }
+                    source={ require("../assets/images/home.jpg") }
                     style={ { width: "100%", height: "100%" } }
                     resizeMode="cover"
                 />

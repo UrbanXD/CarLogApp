@@ -9,7 +9,6 @@ const App: React.FC = () => {
     const [fontsLoaded, fontsLoadError] = useFonts({
         "Gilroy-Heavy": require("../assets/fonts/Gilroy-Heavy.otf"),
         "Gilroy-Medium": require("../assets/fonts/Gilroy-Medium.ttf"),
-        "Gilroy-Regular": require("../assets/fonts/Gilroy-Regular.ttf"),
         "DSEG7": require("../assets/fonts/DSEG7ClassicMini-Bold.ttf")
     });
 
