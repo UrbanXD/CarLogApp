@@ -52,7 +52,7 @@ function CarouselItem({
         >
             <Animated.View style={ [styles.itemContainer, animatedStyle, containerStyle] }>
                 <Image
-                    source={ item.image || "" }
+                    path={ item.image }
                     alt={ ICON_NAMES.car }
                     imageStyle={ containerStyle }
                 >
@@ -87,7 +87,7 @@ function CarouselItem({
             </Animated.View>
         </TouchableOpacity>
     );
-};
+}
 
 const styles = StyleSheet.create({
     itemContainer: {

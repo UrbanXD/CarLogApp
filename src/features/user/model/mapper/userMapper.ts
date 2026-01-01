@@ -1,12 +1,9 @@
 import { UserAccount, userSchema } from "../../schemas/userSchema.ts";
 import { UserTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
-import { getImageFromAttachmentQueue } from "../../../../database/utils/getImageFromAttachmentQueue.ts";
-import { Currency } from "../../../_shared/currency/schemas/currencySchema.ts";
 import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
 import { getUserLocalCurrency } from "../../../_shared/currency/utils/getUserLocalCurrency.ts";
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
-import { Image } from "../../../../types/zodTypes.ts";
 
 export class UserMapper extends AbstractMapper<UserTableRow, UserAccount> {
     private readonly currencyDao: CurrencyDao;
@@ -19,11 +16,7 @@ export class UserMapper extends AbstractMapper<UserTableRow, UserAccount> {
     }
 
     async toDto(entity: UserTableRow): Promise<UserAccount> {
-        const [currency, avatar]: [Currency | null, Image | null] = await Promise.all([
-            this.currencyDao.getById(entity.currency_id, false),
-            getImageFromAttachmentQueue(this.attachmentQueue, entity.avatar_url)
-        ]);
-
+        const currency = await this.currencyDao.getById(entity.currency_id, false);
 
         let localCurrency;
         if(!currency) {
@@ -37,7 +30,7 @@ export class UserMapper extends AbstractMapper<UserTableRow, UserAccount> {
             lastname: entity.lastname,
             currency: currency ?? localCurrency,
             avatarColor: entity.avatar_color,
-            avatar: avatar
+            avatarPath: entity.avatar_url
         });
     }
 

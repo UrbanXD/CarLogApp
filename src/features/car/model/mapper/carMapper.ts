@@ -5,7 +5,6 @@ import {
     OdometerLogTableRow
 } from "../../../../database/connector/powersync/AppSchema.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
-import { getImageFromAttachmentQueue } from "../../../../database/utils/getImageFromAttachmentQueue.ts";
 import { Car, carSchema } from "../../schemas/carSchema.ts";
 import { MakeDao } from "../dao/MakeDao.ts";
 import { ModelDao } from "../dao/ModelDao.ts";
@@ -33,7 +32,6 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
     }
 
     async toDto(entity: CarTableRow): Promise<Car | null> {
-        const image = await getImageFromAttachmentQueue(this.attachmentQueue, entity.image_url);
         const model = await this.modelDao.getById(entity.model_id);
         const carModel = await this.modelDao.mapper.toCarModelDto(model, entity.model_year);
 
@@ -50,7 +48,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
             odometer,
             currency,
             fuelTank,
-            image: image,
+            imagePath: entity.image_url,
             createdAt: entity.created_at
         });
 

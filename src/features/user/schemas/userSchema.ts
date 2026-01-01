@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { zImage } from "../../../types/zodTypes.ts";
 import { currencySchema } from "../../_shared/currency/schemas/currencySchema.ts";
 
 export const userSchema = z
@@ -9,7 +8,7 @@ export const userSchema = z
     firstname: z.string().optional(),
     lastname: z.string().optional(),
     currency: currencySchema,
-    avatar: zImage.optional().nullable(),
+    avatarPath: z.string().optional().nullable(),
     avatarColor: z.string().optional().nullable()
 });
 

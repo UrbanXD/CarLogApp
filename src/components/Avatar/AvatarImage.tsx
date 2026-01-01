@@ -7,7 +7,7 @@ import Image from "../Image.tsx";
 import { Color, ImageSource } from "../../types/index.ts";
 
 interface AvatarImageProps {
-    source: ImageSource;
+    path: string;
     avatarSize?: number;
     borderColor?: Color;
     style?: ViewStyle;
@@ -17,7 +17,7 @@ interface AvatarImageProps {
 }
 
 const AvatarImage: React.FC<AvatarImageProps> = ({
-    source,
+    path,
     avatarSize = hp(5),
     borderColor,
     style,
@@ -48,7 +48,7 @@ const AvatarImage: React.FC<AvatarImageProps> = ({
                />
             }
             <Image
-                source={ source }
+                path={ path }
                 alt={ ICON_NAMES.user }
                 imageStyle={ styles.image }
             />

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { zImage } from "../../../types/zodTypes.ts";
 import { odometerSchema } from "../_features/odometer/schemas/odometerSchema.ts";
 import { fuelTankSchema } from "../_features/fuel/schemas/fuelTankSchema.ts";
 import { carModelSchema } from "./carModelSchema.ts";
@@ -17,7 +16,7 @@ export const carSchema = z
     odometer: odometerSchema,
     currency: currencySchema,
     fuelTank: fuelTankSchema,
-    image: zImage.optional().nullable(),
+    imagePath: z.string().optional().nullable(),
     createdAt: z.string()
 });
 

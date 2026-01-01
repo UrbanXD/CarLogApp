@@ -1,66 +1,97 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import { Image as ImageRN, ImageSourcePropType, ImageStyle, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Image as ImageRN, ImageStyle, StyleSheet, View } from "react-native";
 import DefaultElement from "./DefaultElement";
 import { COLORS, ICON_NAMES } from "../constants/index.ts";
 import { hexToRgba } from "../utils/colors/hexToRgba";
 import { LinearGradient } from "expo-linear-gradient";
-import { ImageSource } from "../types/index.ts";
+import { useDatabase } from "../contexts/database/DatabaseContext.ts";
 
 type ImageProps = {
-    source?: ImageSource
+    path?: string
     alt?: string
-    mimeType?: string
     imageStyle?: ImageStyle
     overlay?: boolean
     children?: ReactNode
 }
 
 function Image({
-    source,
+    path,
     alt = ICON_NAMES.image,
-    mimeType = "image/jpeg",
     imageStyle,
     overlay = true,
     children
 }: ImageProps) {
-    const [imageError, setImageError] = useState<boolean>(!source);
+    const { attachmentQueue } = useDatabase();
 
-    const handleImageLoadError = () => setImageError(true);
-    const handleImageLoaded = () => setImageError(false);
+    const [source, setSource] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(!!path);
+    const [imageError, setImageError] = useState<boolean>(false);
 
     useEffect(() => {
-        setImageError(!source);
-    }, [source]);
+        if(!path || !attachmentQueue) {
+            setLoading(false);
+            setImageError(true);
+            return;
+        }
 
-    const formatImageSource =
-        (source: ImageSourcePropType | string = "") =>
-            typeof source === "string"
-            ? { uri: `data:${ mimeType };base64,${ source }` }
-            : source;
+        let isMounted = true;
+
+        const loadImage = async () => {
+            try {
+                setLoading(true);
+                const result = await attachmentQueue.getFile(path);
+                if(isMounted) {
+                    if(result) {
+                        setSource(result);
+                        setImageError(false);
+                    } else {
+                        setImageError(true);
+                    }
+                }
+            } catch(e) {
+                if(isMounted) setImageError(true);
+            } finally {
+                if(isMounted) setLoading(false);
+            }
+        };
+
+        loadImage();
+
+        return () => { isMounted = false; };
+    }, [path, attachmentQueue]);
 
     return (
         <>
             {
-                !imageError
-                ? <ImageRN
-                    source={ formatImageSource(source) }
-                    onError={ handleImageLoadError }
-                    onLoad={ handleImageLoaded }
-                    style={ [styles.image, imageStyle] }
-                />
-                : <DefaultElement
-                    icon={ alt }
-                    style={ [styles.image, imageStyle] }
-                />
+                loading
+                ?
+                <View
+                    style={ [styles.image, imageStyle, { backgroundColor: COLORS.black5, justifyContent: "center" }] }>
+                    <ActivityIndicator size={ "large" } color={ COLORS.gray2 }/>
+                </View>
+                : !imageError && source
+                  ?
+                  <ImageRN
+                      source={ { uri: source } }
+                      style={ [styles.image, imageStyle] }
+                  />
+                  :
+                  <DefaultElement
+                      icon={ alt }
+                      style={ [styles.image, imageStyle] }
+                  />
             }
             {
                 children &&
                <View style={ [styles.contentContainer, imageStyle] }>
                    {
-                       overlay && !imageError &&
+                       overlay && !imageError && source &&
                       <LinearGradient
                          locations={ [0, 0.85] }
-                         colors={ [hexToRgba(COLORS.black, 0.15), hexToRgba(COLORS.black, 0.60)] }
+                         colors={ [
+                             hexToRgba(COLORS.black, 0.15),
+                             hexToRgba(COLORS.black, 0.60)
+                         ] }
                          style={ [
                              styles.imageOverlay,
                              imageStyle?.borderRadius && { borderRadius: imageStyle.borderRadius }
@@ -72,7 +103,7 @@ function Image({
             }
         </>
     );
-};
+}
 
 const styles = StyleSheet.create({
     contentContainer: {
@@ -93,4 +124,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Image;
+export default React.memo(Image);
