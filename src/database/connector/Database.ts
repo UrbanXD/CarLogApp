@@ -45,6 +45,7 @@ export class Database {
     supabaseConnector: SupabaseConnector;
     storage: SupabaseStorageAdapter;
     attachmentQueue?: PhotoAttachmentQueue;
+    private initPromise = null;
     private readonly syncSeedDatabase = false;
     private _userDao?: UserDao;
     private _carDao?: CarDao;
@@ -92,7 +93,7 @@ export class Database {
         try {
             const supabaseClient = createClient(
                 BaseConfig.SUPABASE_URL,
-                BaseConfig.SUPABASE_ANON_KEY,
+                BaseConfig.SUPABASE_PUBLISHABLE_KEY,
                 {
                     auth: {
                         persistSession: true,
@@ -108,7 +109,7 @@ export class Database {
                 database: { dbFilename: BaseConfig.MAIN_DATABASE_NAME }
             });
             const db = wrapPowerSyncWithKysely(powersync);
-            const supabaseConnector = new SupabaseConnector(supabaseClient, powersync);
+            const supabaseConnector = new SupabaseConnector(supabaseClient);
             const storage = supabaseConnector.storage;
 
             let attachmentQueue;
@@ -139,15 +140,32 @@ export class Database {
     }
 
     async init() {
-        if(this.powersync.connecting || this.powersync.connected) return;
+        if(this.initPromise) return this.initPromise;
 
-        await this.powersync.init();
-        if(this.syncSeedDatabase) await this.autoSyncSeedDatabase();
-        await this.powersync.connect(this.supabaseConnector);
-        if(this.attachmentQueue) await this.attachmentQueue.init();
+        this.initPromise = (async () => {
+            try {
+                await this.powersync.init();
+                if(this.syncSeedDatabase) await this.autoSyncSeedDatabase();
+                await this.powersync.connect(this.supabaseConnector);
+                if(this.attachmentQueue) await this.attachmentQueue.init();
+            } catch(e) {
+                this.initPromise = null;
+                console.log(e);
+                throw e;
+            }
+        })();
+
+        return this.initPromise;
+    }
+
+    async waitForInit() {
+        if(this.initPromise) return this.initPromise;
+        return this.init();
     }
 
     async disconnect() {
+        this.initPromise = null;
+
         await this.powersync.disconnectAndClear({ clearLocal: false });
     }
 

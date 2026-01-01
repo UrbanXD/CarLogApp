@@ -1,23 +1,25 @@
-import React, { ProviderProps, useEffect, useMemo, useRef, useState } from "react";
+import React, { ProviderProps, useEffect, useMemo, useState } from "react";
 import { AuthContext } from "./AuthContext.ts";
 import { useAppDispatch } from "../../hooks/index.ts";
 import { useDatabase } from "../database/DatabaseContext.ts";
 import { AuthError, GenerateLinkParams, Session } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AVATAR_COLOR, BaseConfig } from "../../constants/index.ts";
-import { loadUser } from "../../features/user/model/actions/loadUser.ts";
 import { router } from "expo-router";
 import { DeleteUserToast, SignInToast, SignOutToast, SignUpToast } from "../../features/user/presets/toast/index.ts";
 import { getToastMessage } from "../../ui/alert/utils/getToastMessage.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { SignInRequest } from "../../features/user/schemas/form/signInRequest.ts";
 import { SignUpRequest } from "../../features/user/schemas/form/signUpRequest.ts";
-import { loadCars } from "../../features/car/model/actions/loadCars.ts";
-import { resetCars } from "../../features/car/model/slice/index.ts";
-import { resetUser } from "../../features/user/model/slice/index.ts";
+import { updateCars } from "../../features/car/model/slice/index.ts";
+import { updateUser } from "../../features/user/model/slice/index.ts";
 import { getUserLocalCurrency } from "../../features/_shared/currency/utils/getUserLocalCurrency.ts";
 import { useTranslation } from "react-i18next";
 import { OtpVerificationHandlerType } from "../../features/user/hooks/useOtpVerificationHandler.ts";
+import { CAR_TABLE } from "../../database/connector/powersync/tables/car.ts";
+import { DiffTriggerOperation, sanitizeSQL } from "@powersync/react-native";
+import { USER_TABLE } from "../../database/connector/powersync/tables/user.ts";
+import { selectCar } from "../../features/car/model/actions/selectCar.ts";
 
 export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     children
@@ -26,15 +28,15 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     const dispatch = useAppDispatch();
     const { openToast } = useAlert();
     const database = useDatabase();
-    const { supabaseConnector, powersync, userDao } = database;
+    const { supabaseConnector, powersync, attachmentQueue, userDao, carDao } = database;
 
     const [session, setSession] = useState<Session | null>(null);
     const [authenticated, setAuthenticated] = useState<boolean | null>(null);
     const [notVerifiedEmail, setNotVerifiedEmail] = useState<string | null>(null);
 
-    const sessionDataFetched = useRef<boolean>(false);
-
     useEffect(() => {
+        database.init();
+
         const { data: authListener } = supabaseConnector.client.auth.onAuthStateChange(
             (event, supabaseSession) => {
                 if(event === "PASSWORD_RECOVERY") return;
@@ -53,38 +55,98 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     }, []);
 
     useEffect(() => {
-        database.init();
+        if(!session) fetchNotVerifiedEmail();
+        if(session?.user?.email === notVerifiedEmail) setNotVerifiedEmail(null);
 
-        if(!session) {
-            fetchNotVerifiedEmail();
-            dispatch(resetUser());
-            dispatch(resetCars());
-            sessionDataFetched.current = false;
-            return;
-        }
+        if(!session?.user.id) return;
+        const userId = session.user.id;
 
-        try {
-            if(database.attachmentQueue) database.attachmentQueue.cleanUpLocalFiles(session.user.id);
-        } catch(_) {}
+        let unsubscribeUserTrigger;
+        let unsubscribeCarsTrigger;
 
-        if(session?.user.id === notVerifiedEmail?.id) setNotVerifiedEmail(null);
+        const initTriggers = async () => {
+            await database.waitForInit();
+            await powersync.waitForReady();
+            await powersync.waitForFirstSync();
 
-        if(powersync.currentStatus.connected && powersync.currentStatus.hasSynced && !sessionDataFetched.current && session) {
-            dispatch(loadUser({ database, userId: session.user.id }));
-            dispatch(loadCars(database));
-            sessionDataFetched.current = true;
-        }
+            unsubscribeUserTrigger = await powersync.triggers.trackTableDiff({
+                source: USER_TABLE,
+                when: {
+                    [DiffTriggerOperation.INSERT]: `id = '${ userId }'`,
+                    [DiffTriggerOperation.UPDATE]: `id = '${ userId }'`,
+                    [DiffTriggerOperation.DELETE]: `id = '${ userId }'`
+                },
+                onChange: async (context) => {
+                    const newUser = (await context.withDiff(`
+                        SELECT *
+                        FROM DIFF
+                                 JOIN ${ USER_TABLE } ON DIFF.id = ${ USER_TABLE }.id
+                        WHERE id = '${ userId }'
+                    `))[0];
 
-        return powersync.registerListener({
-            statusChanged: (status) => {
-                if(status.connected && status.hasSynced && session) {
-                    dispatch(loadUser({ database, userId: session.user.id }));
-                    dispatch(loadCars(database));
-                    sessionDataFetched.current = true;
+                    if(newUser) {
+                        const dto = await userDao.mapper.toDto(newUser);
+                        dispatch(updateUser({ user: dto }));
+                    }
+                },
+                hooks: {
+                    beforeCreate: async (lockContext) => {
+                        const res = await lockContext.getOptional(`
+                            SELECT *
+                            FROM ${ USER_TABLE }
+                            WHERE id = '${ userId }'
+                        `);
+
+                        if(res) dispatch(updateUser({ user: await database.userDao.mapper.toDto(res) }));
+                    }
                 }
-            }
-        });
-    }, [session]);
+            });
+
+            unsubscribeCarsTrigger = await powersync.triggers.trackTableDiff({
+                source: CAR_TABLE,
+                when: {
+                    [DiffTriggerOperation.INSERT]: sanitizeSQL`json_extract(NEW.data, '$.owner_id') = ${ userId }`,
+                    [DiffTriggerOperation.UPDATE]: sanitizeSQL`json_extract(NEW.data, '$.owner_id') = ${ userId }`,
+                    [DiffTriggerOperation.DELETE]: sanitizeSQL`json_extract(OLD.data, '$.owner_id') = ${ userId }`
+                },
+                onChange: async (context) => {
+                    const newCars = await context.withDiff(`
+                        SELECT ${ CAR_TABLE }.*
+                        FROM DIFF
+                                 JOIN ${ CAR_TABLE } ON DIFF.id = ${ CAR_TABLE }.id
+                    `);
+
+                    if(newCars.length > 0) {
+                        const cars = await carDao.mapper.toDtoArray(newCars);
+                        dispatch(updateCars({ cars }));
+                    }
+                },
+                hooks: {
+                    beforeCreate: async (lockContext) => {
+                        const result = await lockContext.getAll(`
+                            SELECT *
+                            FROM ${ CAR_TABLE } AS t1
+                            WHERE t1.owner_id = '${ userId }'
+                            ORDER BY t1.created_at
+                        `);
+
+                        const cars = await database.carDao.mapper.toDtoArray(result);
+                        dispatch(updateCars({ cars }));
+                        const selectedCarId = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_SELECTED_CAR_INDEX);
+                        if(selectedCarId) dispatch(selectCar({ database, carId: selectedCarId }));
+                    }
+                }
+            });
+        };
+
+        initTriggers();
+        if(attachmentQueue) attachmentQueue.cleanUpLocalFiles(userId);
+
+        return () => {
+            if(unsubscribeUserTrigger) unsubscribeUserTrigger();
+            if(unsubscribeCarsTrigger) unsubscribeCarsTrigger();
+        };
+    }, [session?.user.id]);
 
     const openAccountVerification = (email: string, automaticResend?: boolean = false) => {
         router.push({
@@ -114,7 +176,12 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 email: request.email,
                 password: request.password,
                 options: {
-                    data: { firstname: request.firstname, lastname: request.lastname, avatar_color: avatarColor }
+                    data: {
+                        firstname: request.firstname,
+                        lastname: request.lastname,
+                        avatar_color: avatarColor,
+                        currency_id: getUserLocalCurrency()
+                    }
                 }
             });
 

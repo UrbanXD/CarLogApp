@@ -1,6 +1,6 @@
 declare module "@env" {
     export const SUPABASE_URL: string;
-    export const SUPABASE_ANON_KEY: string;
+    export const SUPABASE_PUBLISHABLE_KEY: string;
     export const SUPABASE_ATTACHMENT_BUCKET: string;
     export const SUPABASE_SEED_BUCKET: string;
     export const RESEND_API_KEY: string;
