@@ -83,7 +83,7 @@ export function ResultStep({
             unit: fuelUnit,
             capacity: Number(formValues.fuelTank.capacity)
         },
-        image: formValues.image
+        imagePath: formValues.image?.uri
     });
 
     if(!data) return <></>;

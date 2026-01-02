@@ -26,7 +26,7 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
 
     useEffect(() => {
         const tmpSteps = steps;
-        if(resultStep) tmpSteps.push(resultStep);
+        if(resultStep) tmpSteps.push({ ...resultStep, render: () => resultStep.render(goTo) });
 
         setFormSteps(tmpSteps);
     }, [steps, resultStep]);
