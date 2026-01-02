@@ -3,7 +3,6 @@ import { EditUserAvatarRequest, useEditUserAvatarFormProps } from "../../schemas
 import { FormState, useForm } from "react-hook-form";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
-import { useAppDispatch } from "../../../../hooks/index.ts";
 import { UserAccount } from "../../schemas/userSchema.ts";
 import { ChangePersonalInformationToast } from "../../presets/toast/index.ts";
 import { getToastMessage } from "../../../../ui/alert/utils/getToastMessage.ts";
@@ -13,7 +12,7 @@ import { SubmitHandlerArgs } from "../../../../types/index.ts";
 import { InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
 import { getLabelByName } from "../../../../utils/getLabelByName.ts";
 import { router } from "expo-router";
-import { editUserAvatar } from "../../model/actions/editUserAvatar.ts";
+import { getMediaType } from "../../../../database/utils/getFileExtension.ts";
 
 type EditUserAvatarFormProps = {
     user: UserAccount
@@ -21,24 +20,30 @@ type EditUserAvatarFormProps = {
 }
 
 export function EditUserAvatarForm({ user, onFormStateChange }: EditUserAvatarFormProps) {
-    const dispatch = useAppDispatch();
-    const database = useDatabase();
+    const { userDao, attachmentQueue } = useDatabase();
     const { openToast } = useAlert();
 
     const form = useForm<EditUserAvatarRequest>(useEditUserAvatarFormProps({
-        avatar: user.avatar,
+        avatar: {
+            uri: attachmentQueue
+                 ? attachmentQueue.getLocalUri(attachmentQueue.getLocalFilePathSuffix(user.avatarPath))
+                 : user.avatarPath,
+            fileName: user.avatarPath,
+            mediaType: getMediaType(user.avatarPath)
+        },
         avatarColor: user.avatarColor,
-        isImageAvatar: !!user.avatar
+        isImageAvatar: !!user.avatarPath
     }));
 
     const submitHandler: SubmitHandlerArgs<EditUserAvatarRequest> = {
         onValid: async (request) => {
             try {
-                await dispatch(editUserAvatar({ database, request: request }));
+                await userDao.updateAvatar(user.id, request);
 
                 openToast(ChangePersonalInformationToast.success());
                 router.dismissTo("(profile)/user");
             } catch(error) {
+                console.log(error);
                 openToast(getToastMessage({ messages: ChangePersonalInformationToast, error }));
             }
         },

@@ -52,7 +52,8 @@ function CarouselItem({
         >
             <Animated.View style={ [styles.itemContainer, animatedStyle, containerStyle] }>
                 <Image
-                    path={ item.image }
+                    path={ item?.image?.uri }
+                    attachment={ item?.image?.attachment ?? false }
                     alt={ ICON_NAMES.car }
                     imageStyle={ containerStyle }
                 >

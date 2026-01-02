@@ -1,11 +1,14 @@
 import React, { ReactElement, useEffect, useRef } from "react";
-import { ImageSourcePropType, useWindowDimensions, View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import Animated, { SharedValue, useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
 
 export interface CarouselItemType {
     id: string,
-    image?: ImageSourcePropType | string
+    image?: {
+        uri: string
+        attachment?: boolean
+    },
     title?: string,
     subtitle?: string,
     body?: string,

@@ -5,12 +5,14 @@ import { COLORS, ICON_NAMES } from "../constants/index.ts";
 import { hexToRgba } from "../utils/colors/hexToRgba";
 import { LinearGradient } from "expo-linear-gradient";
 import { useDatabase } from "../contexts/database/DatabaseContext.ts";
+import { File } from "expo-file-system";
 
 type ImageProps = {
     path?: string
     alt?: string
     imageStyle?: ImageStyle
     overlay?: boolean
+    attachment?: boolean
     children?: ReactNode
 }
 
@@ -19,6 +21,7 @@ function Image({
     alt = ICON_NAMES.image,
     imageStyle,
     overlay = true,
+    attachment = true,
     children
 }: ImageProps) {
     const { attachmentQueue } = useDatabase();
@@ -28,7 +31,7 @@ function Image({
     const [imageError, setImageError] = useState<boolean>(false);
 
     useEffect(() => {
-        if(!path || !attachmentQueue) {
+        if(!path || (attachment && !attachmentQueue)) {
             setLoading(false);
             setImageError(true);
             return;
@@ -39,7 +42,13 @@ function Image({
         const loadImage = async () => {
             try {
                 setLoading(true);
-                const result = await attachmentQueue.getFile(path);
+                let result = null;
+                if(attachment && attachmentQueue) {
+                    result = await attachmentQueue.getFile(path);
+                } else {
+                    const file = new File(path);
+                    if(file.exists && file.size > 0) result = file.uri;
+                }
                 if(isMounted) {
                     if(result) {
                         setSource(result);

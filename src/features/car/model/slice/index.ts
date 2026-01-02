@@ -1,8 +1,5 @@
 import { CarsState } from "../types/index.ts";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createCar } from "../actions/createCar.ts";
-import { editCar } from "../actions/editCar.ts";
-import { deleteCar } from "../actions/deleteCar.ts";
 import { selectCar } from "../actions/selectCar.ts";
 import { Car } from "../../schemas/carSchema.ts";
 import { Odometer } from "../../_features/odometer/schemas/odometerSchema.ts";
@@ -51,31 +48,6 @@ const carsSlice = createSlice({
     },
     extraReducers: builder => {
         builder
-        .addCase(createCar.fulfilled, (state, action) => {
-            if(!action.payload) return;
-            state.cars.push(action.payload);
-        })
-        .addCase(createCar.rejected, () => {
-            console.log("Car slice create car rejected");
-        })
-        .addCase(editCar.fulfilled, (state, action) => {
-            if(!action.payload) return;
-
-            const editedCar = action.payload;
-
-            const index = state.cars.findIndex(car => car.id === editedCar.id);
-            if(index === -1) return;
-
-            state.cars[index] = editedCar;
-            if(state.selectedCar.id === editedCar?.id) state.selectedCar = editedCar;
-        })
-        .addCase(deleteCar.fulfilled, (state, action) => {
-            state.cars = state.cars.filter((car) => car.id !== action.payload);
-            if(action.payload && state.selectedCar?.id === action.payload) state.selectedCar = null;
-        })
-        .addCase(deleteCar.rejected, () => {
-            console.log("Car slice delete car rejected");
-        })
         .addCase(selectCar.fulfilled, (state, action) => {
             state.selectedCar = action.payload;
         })

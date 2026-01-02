@@ -34,6 +34,7 @@ function CarProfileByObj({ car, goTo }: CarProfileByObjProps) {
     return (
         <CarProfileView
             car={ car }
+            imageIsAttachment={ false }
             openEditCarStep={ openEditCarStep }
             openEditOdometerValue={ () => goTo(CAR_FORM_STEPS.OdometerStep) }
         />

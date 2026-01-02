@@ -1,8 +1,6 @@
 import React, { useMemo } from "react";
-import { useAppDispatch } from "../../../../hooks/index.ts";
 import { FormState, useForm } from "react-hook-form";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
-import { editCar } from "../../model/actions/editCar.ts";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { CarFormFields, useEditCarFormProps } from "../../schemas/form/carForm.ts";
@@ -24,22 +22,20 @@ export function EditCarForm({
     stepIndex,
     onFormStateChange
 }: EditCarFormProps) {
-    const dispatch = useAppDispatch();
-    const database = useDatabase();
+    const { carDao, attachmentQueue } = useDatabase();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
 
-    const form = useForm<CarFormFields>(useEditCarFormProps(car));
+    const form = useForm<CarFormFields>(useEditCarFormProps(car, attachmentQueue));
     const editFields = useEditCarSteps({ ...form, index: stepIndex, car });
 
     const submitHandler: SubmitHandlerArgs<CarFormFields> = useMemo(() => ({
         onValid: async (formResult) => {
             try {
-                await dispatch(editCar({ database, formResult }));
-
-                openToast(editFields.editToastMessages.success());
+                await carDao.update(formResult);
 
                 if(dismissBottomSheet) dismissBottomSheet(true);
+                openToast(editFields.editToastMessages.success());
             } catch(e) {
                 openToast(editFields.editToastMessages.error());
                 console.error("Hiba a submitHandler-ben:", e);

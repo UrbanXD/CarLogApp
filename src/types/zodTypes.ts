@@ -56,8 +56,8 @@ export const zPickerRequired = (errorMessage?: string = "error.picker_required")
 );
 
 export const zImage = z.object({
+    uri: z.string(),
     fileName: z.string(),
-    base64: z.string().base64(),
     mediaType: z.string().optional().nullable()
 });
 

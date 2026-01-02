@@ -1,7 +1,7 @@
 import { askCameraPermission, askMediaLibraryPermission } from "./getPermissions.ts";
 import * as ImagePicker from "expo-image-picker";
-import { File } from "expo-file-system";
-import { getFileExtension } from "../database/utils/getFileExtension.ts";
+import { Directory, File, Paths } from "expo-file-system";
+import { getFileExtension, getMediaType } from "../database/utils/getFileExtension.ts";
 import { getUUID } from "../database/utils/uuid.ts";
 import { Image } from "../types/zodTypes.ts";
 
@@ -30,16 +30,22 @@ export async function pickImage(
 
     if(!pickerResult.canceled) {
         const assets = pickerResult.assets;
+        const directory = new Directory(Paths.document, "temp");
+        if(!directory.exists) directory.create();
 
         const images: Array<Image> = await Promise.all(
             assets.map(async (img) => {
-                const base64 = await new File(img.uri).base64();
                 const fileExtension = getFileExtension(img.uri);
+                const newFileName = `${ getUUID() }.${ fileExtension }`;
+
+                const file = new File(img.uri);
+                const copiedFile = new File(directory.uri, newFileName);
+                file.copy(copiedFile);
 
                 return {
-                    fileName: `${ getUUID() }.${ fileExtension === "jpeg" ? "jpg" : fileExtension }`,
-                    base64,
-                    mediaType: img.mimeType ?? null
+                    uri: copiedFile.uri,
+                    fileName: newFileName,
+                    mediaType: img.mimeType ?? getMediaType(copiedFile)
                 } as Image;
             })
         );
@@ -48,4 +54,4 @@ export async function pickImage(
     }
 
     return null;
-};
+}

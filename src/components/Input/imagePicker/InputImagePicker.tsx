@@ -30,6 +30,8 @@ function InputImagePicker({
     setValue,
     imageStyle
 }: InputImagePickerProps) {
+    if(!defaultImages) throw new Error("DefaultImages is invalid");
+
     const { t } = useTranslation();
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field?.onChange;
@@ -70,11 +72,10 @@ function InputImagePicker({
 
         if(!images || images.length === 0) return;
 
-        selectImage(images[0]);
         if(onChange) onChange(images[0]);
         if(setValue) setValue(images[0]);
 
-        if(images.length > 1) addImagesToHistory(images);
+        if(images.length > 1) addImagesToHistory(images.slice(1));
     };
 
     const addImagesToHistory = (newImages: Array<ImageType>) => {
@@ -107,7 +108,6 @@ function InputImagePicker({
         if(history.length + 1 > limitOfImages + defaultImages.length) {
             setHistory(prevHistory => {
                 let removeIndex = defaultImages.length;
-
                 return [...prevHistory.slice(0, removeIndex), ...prevHistory.slice(removeIndex + 1)];
             });
         }
@@ -148,7 +148,7 @@ function InputImagePicker({
         size: number,
         coordinate: SharedValue<number>
     ) => {
-        const itemCarousel: CarouselItemType = { id: item.fileName, image: item.base64 };
+        const itemCarousel: CarouselItemType = { id: item.uri, image: { uri: item.uri, attachment: false } };
 
         return (
             <CarouselItem
@@ -182,7 +182,8 @@ function InputImagePicker({
                 !multipleSelection &&
                <>
                   <Image
-                     source={ selectedImage?.base64 }
+                     path={ selectedImage?.uri }
+                     attachment={ false }
                      imageStyle={ [styles.chosenImage, { height: size.height * 1.25 }, imageStyle] }
                   />
                   <InputTitle title={ t("form.image_picker.selectable_images") }/>

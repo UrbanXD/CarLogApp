@@ -8,7 +8,7 @@ const useGarage = () => {
 
     const toCarouselItem = (car: Car): CarouselItemType => ({
         id: car.id,
-        image: car.imagePath,
+        image: { uri: car.imagePath, attachment: true },
         title: car.name,
         subtitle: car.model.make.name,
         body: car.model.name

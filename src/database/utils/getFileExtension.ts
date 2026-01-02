@@ -2,14 +2,8 @@ export function getFileExtension(path?: string) {
     if(!path) return "";
 
     const fileName = path.split("/").pop() || path;
-    return fileName.substring(fileName.lastIndexOf(".") + 1) || "jpg";
-}
-
-export function getFileName(path?: string) {
-    if(!path) return "";
-
-    const fileName = path.split("/").pop() || path;
-    return fileName.substring(0, fileName.lastIndexOf(".")) || fileName;
+    const fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1) ?? "jpg";
+    return fileExtension === "jpeg" ? "jpg" : fileExtension;
 }
 
 const mimeTypes: Record<string, string> = {

@@ -9,7 +9,7 @@ const editUserInformation = userSchema
     lastname: true
 })
 .extend({
-    currency_id: currencySchema.shape.id
+    currencyId: currencySchema.shape.id
 });
 export type EditUserInformationRequest = z.infer<typeof editUserInformation>;
 

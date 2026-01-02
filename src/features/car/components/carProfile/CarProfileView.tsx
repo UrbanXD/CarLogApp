@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 type CarProfileViewProps = {
     car: Car
     openEditCarStep: (stepIndex: EDIT_CAR_FORM_STEPS) => void
+    imageIsAttachment?: boolean
     handleDeleteCar?: () => void
     openOdometerLog?: () => void
     openEditOdometerValue?: () => void
@@ -29,6 +30,7 @@ const MARQUEE_BOUNCE_DELAY = 500;
 function CarProfileView({
     car,
     openEditCarStep,
+    imageIsAttachment = true,
     handleDeleteCar,
     openOdometerLog,
     openEditOdometerValue
@@ -64,6 +66,7 @@ function CarProfileView({
             <View style={ styles.imageContainer }>
                 <Image
                     path={ car.imagePath }
+                    attachment={ imageIsAttachment }
                     alt={ ICON_NAMES.car }
                     overlay
                 >

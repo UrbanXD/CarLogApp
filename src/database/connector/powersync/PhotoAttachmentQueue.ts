@@ -1,11 +1,10 @@
 import { AbstractAttachmentQueue, AttachmentRecord, AttachmentState } from "@powersync/attachments";
-import * as FileSystem from "expo-file-system/legacy";
 import { BaseConfig } from "../../../constants/index.ts";
 import { getUUID } from "../../utils/uuid.ts";
 import { USER_TABLE } from "./tables/user.ts";
 import { CAR_TABLE } from "./tables/car.ts";
 import { Image } from "../../../types/zodTypes.ts";
-import { Directory } from "expo-file-system";
+import { Directory, File } from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
@@ -74,15 +73,16 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
         });
 
         const localURI = this.getLocalUri(attachmentRecord.local_uri || this.getLocalFilePathSuffix(path));
-        await this.storage.writeFile(localURI, image.base64, { encoding: FileSystem.EncodingType.Base64 });
+        const file = new File(image.uri);
+        const copiedFile = new File(localURI);
+        file.copy(copiedFile);
 
-        const fileInfo = await FileSystem.getInfoAsync(localURI);
-        if(fileInfo.exists) attachmentRecord.size = fileInfo.size;
+        if(copiedFile.exists && copiedFile.size > 0) attachmentRecord.size = copiedFile.size;
 
         return this.saveToQueue(attachmentRecord);
     }
 
-    async getFile(filename: string): Promise<ArrayBuffer | null> {
+    async getFile(filename: string): Promise<string | null> {
         const localURI = `${ this.storageDirectory }/${ filename }`;
 
         let attachmentRecord = await this.record(filename);
@@ -92,10 +92,23 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
                 state: AttachmentState.QUEUED_DOWNLOAD
             });
 
-            await this.saveToQueue(attachmentRecord);
+            await this.saveToQueue(attachmentRecord)
+            .catch((e) => console.log("error download missing file at getFile: ", e));
         }
 
-        return await this.storage.readFile(localURI, { encoding: FileSystem.EncodingType.Base64 });
+        const file = new File(localURI);
+
+        if(!file.exists) {
+            console.log(`File not downloaded: ${ filename }`);
+            return null;
+        }
+
+        try {
+            return file.uri;
+        } catch(e) {
+            console.error("Error at getFile", e);
+            return null;
+        }
     }
 
     async deleteFile(path: string): Promise<void> {
