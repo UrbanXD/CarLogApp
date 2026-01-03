@@ -161,8 +161,8 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
         try {
             const car = await this.getById(carId);
 
-            if(car?.image && this.attachmentQueue) {
-                await this.attachmentQueue.deleteFile(car.image.fileName);
+            if(car?.imagePath && this.attachmentQueue) {
+                await this.attachmentQueue.deleteFile(car.imagePath);
             }
         } catch(e) {
             console.log("Car image cannot be deleted: ", e);

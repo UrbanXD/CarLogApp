@@ -11,7 +11,7 @@ import { getToastMessage } from "../../ui/alert/utils/getToastMessage.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { SignInRequest } from "../../features/user/schemas/form/signInRequest.ts";
 import { SignUpRequest } from "../../features/user/schemas/form/signUpRequest.ts";
-import { updateCars } from "../../features/car/model/slice/index.ts";
+import { deleteCars, updateCars } from "../../features/car/model/slice/index.ts";
 import { updateUser } from "../../features/user/model/slice/index.ts";
 import { getUserLocalCurrency } from "../../features/_shared/currency/utils/getUserLocalCurrency.ts";
 import { useTranslation } from "react-i18next";
@@ -80,16 +80,13 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 },
                 onChange: async (context) => {
                     const newUser = (await context.withDiff(`
-                        SELECT *
+                        SELECT ${ USER_TABLE }.*
                         FROM DIFF
                                  JOIN ${ USER_TABLE } ON DIFF.id = ${ USER_TABLE }.id
                         WHERE DIFF.id = '${ userId }'
-                    `))[0];
+                    `))?.[0] ?? null;
 
-                    if(newUser) {
-                        const dto = await userDao.mapper.toDto(newUser);
-                        dispatch(updateUser({ user: dto }));
-                    }
+                    dispatch(updateUser({ user: newUser ? await userDao.mapper.toDto(newUser) : null }));
                 },
                 hooks: {
                     beforeCreate: async (lockContext) => {
@@ -115,16 +112,30 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                         userId) }`
                 },
                 onChange: async (context) => {
-                    const newCars = await context.withDiff(`
+                    const updatedDiffResult = await context.withDiff(`
                         SELECT ${ CAR_TABLE }.*
                         FROM DIFF
                                  JOIN ${ CAR_TABLE } ON DIFF.id = ${ CAR_TABLE }.id
                         WHERE ${ CAR_TABLE }.owner_id = '${ userId }'
+                          AND operation != '${ DiffTriggerOperation.DELETE }'
                     `);
 
-                    if(newCars.length > 0) {
-                        const cars = await carDao.mapper.toDtoArray(newCars);
-                        dispatch(updateCars({ cars }));
+                    const deletedDiffResult = await context.withDiff(`
+                        SELECT DIFF.id
+                        FROM DIFF
+                        WHERE operation = '${ DiffTriggerOperation.DELETE }'
+                    `);
+
+                    console.log(updatedDiffResult, "\n\n", deletedDiffResult);
+
+                    if(deletedDiffResult.length > 0) {
+                        dispatch(deleteCars({
+                            carIds: deletedDiffResult.map(res => res.id)
+                        }));
+                    }
+
+                    if(updatedDiffResult.length > 0) {
+                        dispatch(updateCars({ cars: await carDao.mapper.toDtoArray(updatedDiffResult) }));
                     }
                 },
                 hooks: {
@@ -137,7 +148,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                         `);
 
                         const cars = await database.carDao.mapper.toDtoArray(result);
-                        dispatch(updateCars({ cars }));
+                        dispatch(updateCars({ cars, shouldReplace: true }));
                         const selectedCarId = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_SELECTED_CAR_INDEX);
                         if(selectedCarId) dispatch(selectCar({ database, carId: selectedCarId }));
                     }
