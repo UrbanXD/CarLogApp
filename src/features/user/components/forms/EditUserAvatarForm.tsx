@@ -24,13 +24,17 @@ export function EditUserAvatarForm({ user, onFormStateChange }: EditUserAvatarFo
     const { openToast } = useAlert();
 
     const form = useForm<EditUserAvatarRequest>(useEditUserAvatarFormProps({
-        avatar: {
-            uri: attachmentQueue
-                 ? attachmentQueue.getLocalUri(attachmentQueue.getLocalFilePathSuffix(user.avatarPath))
-                 : user.avatarPath,
-            fileName: user.avatarPath,
-            mediaType: getMediaType(user.avatarPath)
-        },
+        avatar:
+            user.avatarPath
+            ?
+                {
+                    uri: attachmentQueue
+                         ? attachmentQueue.getLocalUri(attachmentQueue.getLocalFilePathSuffix(user.avatarPath))
+                         : user.avatarPath,
+                    fileName: user.avatarPath,
+                    mediaType: getMediaType(user.avatarPath)
+                }
+            : null,
         avatarColor: user.avatarColor,
         isImageAvatar: !!user.avatarPath
     }));

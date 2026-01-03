@@ -15,6 +15,8 @@ import { Image as ImageType } from "../../../types/zodTypes.ts";
 import { useTranslation } from "react-i18next";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 
+export const INPUT_IMAGE_TEMP_DIR = "temp";
+
 type InputImagePickerProps = {
     defaultImages?: Array<ImageType>
     limitOfImages?: number

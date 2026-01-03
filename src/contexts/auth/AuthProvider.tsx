@@ -17,9 +17,11 @@ import { getUserLocalCurrency } from "../../features/_shared/currency/utils/getU
 import { useTranslation } from "react-i18next";
 import { OtpVerificationHandlerType } from "../../features/user/hooks/useOtpVerificationHandler.ts";
 import { CAR_TABLE } from "../../database/connector/powersync/tables/car.ts";
-import { DiffTriggerOperation, sanitizeSQL } from "@powersync/react-native";
+import { DiffTriggerOperation, sanitizeSQL, sanitizeUUID } from "@powersync/react-native";
 import { USER_TABLE } from "../../database/connector/powersync/tables/user.ts";
 import { selectCar } from "../../features/car/model/actions/selectCar.ts";
+import { Directory, Paths } from "expo-file-system";
+import { INPUT_IMAGE_TEMP_DIR } from "../../components/Input/imagePicker/InputImagePicker.tsx";
 
 export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     children
@@ -72,16 +74,16 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             unsubscribeUserTrigger = await powersync.triggers.trackTableDiff({
                 source: USER_TABLE,
                 when: {
-                    [DiffTriggerOperation.INSERT]: `id = '${ userId }'`,
-                    [DiffTriggerOperation.UPDATE]: `id = '${ userId }'`,
-                    [DiffTriggerOperation.DELETE]: `id = '${ userId }'`
+                    [DiffTriggerOperation.INSERT]: sanitizeSQL`NEW.id = ${ sanitizeUUID(userId) }`,
+                    [DiffTriggerOperation.UPDATE]: sanitizeSQL`NEW.id = ${ sanitizeUUID(userId) }`,
+                    [DiffTriggerOperation.DELETE]: sanitizeSQL`OLD.id = ${ sanitizeUUID(userId) }`
                 },
                 onChange: async (context) => {
                     const newUser = (await context.withDiff(`
                         SELECT *
                         FROM DIFF
                                  JOIN ${ USER_TABLE } ON DIFF.id = ${ USER_TABLE }.id
-                        WHERE id = '${ userId }'
+                        WHERE DIFF.id = '${ userId }'
                     `))[0];
 
                     if(newUser) {
@@ -105,15 +107,19 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             unsubscribeCarsTrigger = await powersync.triggers.trackTableDiff({
                 source: CAR_TABLE,
                 when: {
-                    [DiffTriggerOperation.INSERT]: sanitizeSQL`json_extract(NEW.data, '$.owner_id') = ${ userId }`,
-                    [DiffTriggerOperation.UPDATE]: sanitizeSQL`json_extract(NEW.data, '$.owner_id') = ${ userId }`,
-                    [DiffTriggerOperation.DELETE]: sanitizeSQL`json_extract(OLD.data, '$.owner_id') = ${ userId }`
+                    [DiffTriggerOperation.INSERT]: sanitizeSQL`json_extract(NEW.data, '$.owner_id') = ${ sanitizeUUID(
+                        userId) }`,
+                    [DiffTriggerOperation.UPDATE]: sanitizeSQL`json_extract(NEW.data, '$.owner_id') = ${ sanitizeUUID(
+                        userId) }`,
+                    [DiffTriggerOperation.DELETE]: sanitizeSQL`json_extract(OLD.data, '$.owner_id') = ${ sanitizeUUID(
+                        userId) }`
                 },
                 onChange: async (context) => {
                     const newCars = await context.withDiff(`
                         SELECT ${ CAR_TABLE }.*
                         FROM DIFF
                                  JOIN ${ CAR_TABLE } ON DIFF.id = ${ CAR_TABLE }.id
+                        WHERE ${ CAR_TABLE }.owner_id = '${ userId }'
                     `);
 
                     if(newCars.length > 0) {
@@ -141,6 +147,8 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
 
         initTriggers();
         if(attachmentQueue) attachmentQueue.cleanUpLocalFiles(userId);
+        const inputImageTempDirectory = new Directory(Paths.document, INPUT_IMAGE_TEMP_DIR);
+        if(inputImageTempDirectory.exists) inputImageTempDirectory.delete();
 
         return () => {
             if(unsubscribeUserTrigger) unsubscribeUserTrigger();

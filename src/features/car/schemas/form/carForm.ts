@@ -76,13 +76,17 @@ export const useEditCarFormProps = (car: Car, attachmentQueue?: PhotoAttachmentQ
         id: car.id,
         ownerId: car.ownerId,
         name: car.name,
-        image: {
-            uri: attachmentQueue
-                 ? attachmentQueue.getLocalUri(attachmentQueue.getLocalFilePathSuffix(car.imagePath))
-                 : car.imagePath,
-            fileName: car.imagePath,
-            mediaType: getMediaType(car.imagePath)
-        },
+        image:
+            car.imagePath
+            ?
+                {
+                    uri: attachmentQueue
+                         ? attachmentQueue.getLocalUri(attachmentQueue.getLocalFilePathSuffix(car.imagePath))
+                         : car.imagePath,
+                    fileName: car.imagePath,
+                    mediaType: getMediaType(car.imagePath)
+                }
+            : null,
         model: {
             id: car.model.id,
             name: car.model.name,
