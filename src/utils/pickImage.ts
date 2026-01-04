@@ -4,11 +4,10 @@ import { Directory, File, Paths } from "expo-file-system";
 import { getFileExtension, getMediaType } from "../database/utils/getFileExtension.ts";
 import { getUUID } from "../database/utils/uuid.ts";
 import { Image } from "../types/zodTypes.ts";
-import { INPUT_IMAGE_TEMP_DIR } from "../components/Input/imagePicker/InputImagePicker.tsx";
 
 export async function pickImage(
     type: "CAMERA" | "GALLERY",
-    options?: ImagePicker.ImagePickerOptions
+    options?: ImagePicker.ImagePickerOptions & { directory?: string }
 ): Promise<Array<Image> | null> {
     await askMediaLibraryPermission("Szukesges permisson");
     await askCameraPermission("szuksees camera permisson");
@@ -31,7 +30,7 @@ export async function pickImage(
 
     if(!pickerResult.canceled) {
         const assets = pickerResult.assets;
-        const directory = new Directory(Paths.document, INPUT_IMAGE_TEMP_DIR);
+        const directory = new Directory(options?.directory ?? Paths.cache);
         if(!directory.exists) directory.create();
 
         const images: Array<Image> = await Promise.all(

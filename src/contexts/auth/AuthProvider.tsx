@@ -20,7 +20,7 @@ import { CAR_TABLE } from "../../database/connector/powersync/tables/car.ts";
 import { DiffTriggerOperation, sanitizeSQL, sanitizeUUID } from "@powersync/react-native";
 import { USER_TABLE } from "../../database/connector/powersync/tables/user.ts";
 import { selectCar } from "../../features/car/model/actions/selectCar.ts";
-import { Directory, Paths } from "expo-file-system";
+import { Directory } from "expo-file-system";
 import { INPUT_IMAGE_TEMP_DIR } from "../../components/Input/imagePicker/InputImagePicker.tsx";
 
 export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
@@ -158,7 +158,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
 
         initTriggers();
         if(attachmentQueue) attachmentQueue.cleanUpLocalFiles(userId);
-        const inputImageTempDirectory = new Directory(Paths.document, INPUT_IMAGE_TEMP_DIR);
+        const inputImageTempDirectory = new Directory(INPUT_IMAGE_TEMP_DIR);
         if(inputImageTempDirectory.exists) inputImageTempDirectory.delete();
 
         return () => {

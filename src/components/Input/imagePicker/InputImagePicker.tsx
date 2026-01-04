@@ -14,8 +14,9 @@ import Image from "../../Image.tsx";
 import { Image as ImageType } from "../../../types/zodTypes.ts";
 import { useTranslation } from "react-i18next";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
+import { Paths } from "expo-file-system";
 
-export const INPUT_IMAGE_TEMP_DIR = "temp";
+export const INPUT_IMAGE_TEMP_DIR = `${ Paths.document.uri }/temp`;
 
 type InputImagePickerProps = {
     defaultImages?: Array<ImageType>
@@ -71,6 +72,7 @@ function InputImagePicker({
         const images = await pickImage(
             type,
             {
+                directory: INPUT_IMAGE_TEMP_DIR,
                 allowsMultipleSelection: multipleSelection,
                 selectionLimit: limitOfImages
             }
