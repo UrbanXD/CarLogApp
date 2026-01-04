@@ -1,9 +1,10 @@
 import React, { ReactElement } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
+import { StyleSheet, Text, View, ViewStyle } from "react-native";
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { CarouselItemType } from "./Carousel";
 import Image from "../Image";
+import { AnimatedPressable } from "../AnimatedComponents/index.ts";
 
 type CarouselItemProps = {
     index: number
@@ -14,7 +15,6 @@ type CarouselItemProps = {
     cardAction?: () => void
     renderBottomActionButton?: () => ReactElement
     renderTopActionButton?: () => ReactElement
-    fullScale?: boolean
     containerStyle?: ViewStyle
 }
 
@@ -27,7 +27,6 @@ function CarouselItem({
     cardAction,
     renderBottomActionButton,
     renderTopActionButton,
-    fullScale = false,
     containerStyle
 }: CarouselItemProps) {
     const animatedStyle = useAnimatedStyle(() => {
@@ -38,15 +37,15 @@ function CarouselItem({
         );
 
         return {
-            transform: [fullScale ? { scale } : { scaleY: scale }]
+            transform: [{ scale }]
         };
     });
 
     return (
-        <TouchableOpacity
+        <AnimatedPressable
             key={ item.id }
             activeOpacity={ 1 }
-            style={ [{ width: size, paddingHorizontal: 10 }, containerStyle] }
+            style={ [{ width: size }, containerStyle] }
             onPress={ cardAction }
             disabled={ !cardAction }
         >
@@ -86,7 +85,7 @@ function CarouselItem({
                     </View>
                 </Image>
             </Animated.View>
-        </TouchableOpacity>
+        </AnimatedPressable>
     );
 }
 
@@ -98,7 +97,7 @@ const styles = StyleSheet.create({
     },
     topContainer: {
         flexDirection: "row",
-        padding: SEPARATOR_SIZES.lightSmall,
+        padding: SEPARATOR_SIZES.mediumSmall,
         paddingLeft: SEPARATOR_SIZES.normal
     },
     bottomContainer: {
@@ -106,7 +105,7 @@ const styles = StyleSheet.create({
         bottom: 0,
         width: "100%",
         flexDirection: "row",
-        padding: SEPARATOR_SIZES.lightSmall,
+        padding: SEPARATOR_SIZES.mediumSmall,
         paddingLeft: SEPARATOR_SIZES.normal
     },
     topContainerTitleText: {

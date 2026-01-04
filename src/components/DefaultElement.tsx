@@ -1,24 +1,29 @@
 import React from "react";
-import { StyleSheet, Text, View, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import Icon from "./Icon";
 import { hexToRgba } from "../utils/colors/hexToRgba";
 import { ImageSource } from "../types/index.ts";
 
-interface DefaultElementProps {
-    icon?: ImageSource;
-    text?: string;
-    loadingText?: string;
-    style?: ViewStyle;
+type DefaultElementProps = {
+    icon?: ImageSource
+    text?: string
+    onPress?: () => void
+    style?: ViewStyle
 }
 
-const DefaultElement: React.FC<DefaultElementProps> = ({
+function DefaultElement({
     icon = ICON_NAMES.image,
     text,
+    onPress,
     style
-}) => {
+}: DefaultElementProps) {
     return (
-        <View style={ [styles.container, style] }>
+        <Pressable
+            onPress={ onPress }
+            disabled={ !onPress }
+            style={ [styles.container, style] }
+        >
             <View style={ { alignItems: "center" } }>
                 <Icon
                     icon={ icon }
@@ -30,9 +35,9 @@ const DefaultElement: React.FC<DefaultElementProps> = ({
                    <Text style={ styles.text }>{ text }</Text>
                 }
             </View>
-        </View>
+        </Pressable>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {

@@ -116,7 +116,8 @@ function Image({
 
 const styles = StyleSheet.create({
     contentContainer: {
-        flex: 1
+        flex: 1,
+        width: "100%"
     },
     image: {
         position: "absolute",

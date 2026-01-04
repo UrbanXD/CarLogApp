@@ -20,17 +20,21 @@ export const INPUT_IMAGE_TEMP_DIR = "temp";
 type InputImagePickerProps = {
     defaultImages?: Array<ImageType>
     limitOfImages?: number
+    alt?: string
     multipleSelection?: boolean
     setValue?: (image: Array<ImageType> | ImageType) => void
     imageStyle?: ViewStyle
+    historyImageStyle?: ViewStyle
 }
 
 function InputImagePicker({
     defaultImages = [],
     limitOfImages = 5,
+    alt,
     multipleSelection = false,
     setValue,
-    imageStyle
+    imageStyle,
+    historyImageStyle
 }: InputImagePickerProps) {
     if(!defaultImages) throw new Error("DefaultImages is invalid");
 
@@ -43,7 +47,7 @@ function InputImagePicker({
 
     const [selectedImage, setSelectedImage] = useState<ImageType | null>(fieldValue);
     const [history, setHistory] = useState<Array<ImageType>>(defaultImages ?? []);
-    const [size, setSize] = useState({ width: 0, height: 0 });
+    const [carouselLayout, setCarouselLayout] = useState({ width: 0, height: 0 });
 
     useEffect(() => {
         const newValue = inputFieldContext?.field.value;
@@ -52,7 +56,7 @@ function InputImagePicker({
 
     const handleLayout = (event: any) => {
         const { width, height } = event.nativeEvent.layout;
-        setSize({ width, height });
+        setCarouselLayout({ width, height });
     };
 
     const removeImageFromHistory = (index: number) => {
@@ -104,7 +108,7 @@ function InputImagePicker({
         });
     };
 
-    const selectImage = (newImage: ImageType) => {
+    const selectImage = (newImage: ImageType | null) => {
         if(multipleSelection) return;
 
         if(history.length + 1 > limitOfImages + defaultImages.length) {
@@ -157,10 +161,14 @@ function InputImagePicker({
                 index={ index }
                 size={ size }
                 x={ coordinate }
-                fullScale
                 item={ itemCarousel }
                 cardAction={ () => selectImage(item) }
-                containerStyle={ { borderRadius: 100, height: hp(20), width: hp(20) } }
+                containerStyle={ {
+                    height: carouselLayout.height,
+                    width: size,
+                    ...imageStyle,
+                    ...historyImageStyle
+                } }
                 renderBottomActionButton={
                     () =>
                         <Button.Icon
@@ -186,8 +194,29 @@ function InputImagePicker({
                   <Image
                      path={ selectedImage?.uri }
                      attachment={ false }
-                     imageStyle={ [styles.chosenImage, { height: size.height * 1.25 }, imageStyle] }
-                  />
+                     alt={ alt }
+                     imageStyle={ {
+                         ...styles.chosenImage,
+                         ...(selectedImage ? {} : { position: "relative" }),
+                         ...(imageStyle ?? {})
+                     } }
+                  >
+                      {
+                          !!selectedImage &&
+                         <View style={ styles.chosenImageActionContainer }>
+                            <Button.Icon
+                               icon={ ICON_NAMES.close }
+                               iconSize={ FONT_SIZES.p1 }
+                               iconColor={ COLORS.redLight }
+                               width={ FONT_SIZES.p1 * 1.2 }
+                               height={ FONT_SIZES.p1 * 1.2 }
+                               backgroundColor={ hexToRgba(COLORS.black, 0.75) }
+                               onPress={ () => selectImage(null) }
+                               style={ { alignSelf: "flex-end", borderColor: COLORS.redLight, borderWidth: 2 } }
+                            />
+                         </View>
+                      }
+                  </Image>
                   <InputTitle title={ t("form.image_picker.selectable_images") }/>
                </>
             }
@@ -205,11 +234,21 @@ function InputImagePicker({
                 <View style={ styles.imagesContainer } onLayout={ handleLayout }>
                     <Carousel
                         data={ history }
-                        contentWidth={ hp(20) }
                         renderItem={ renderHistoryItem }
+                        spacer={ 0 }
+                        contentWidth={ historyImageStyle?.width ?? imageStyle?.width ?? carouselLayout.width }
                         containerStyle={ { height: hp(20) } }
                         renderDefaultItem={ (size) => (
-                            <DefaultElement style={ { height: size, width: size, borderRadius: 100 } }/>
+                            <DefaultElement
+                                style={ {
+                                    height: carouselLayout.height,
+                                    width: size,
+                                    ...imageStyle,
+                                    ...historyImageStyle
+                                } }
+                                icon={ alt }
+                                onPress={ () => selectImage(null) }
+                            />
                         ) }
                     />
                 </View>
@@ -224,10 +263,15 @@ const styles = StyleSheet.create({
         gap: SEPARATOR_SIZES.lightSmall
     },
     chosenImage: {
-        position: "relative",
         alignSelf: "flex-start",
         resizeMode: "stretch",
         borderRadius: 35
+    },
+    chosenImageActionContainer: {
+        flex: 1,
+        alignItems: "flex-end",
+        justifyContent: "flex-end",
+        padding: SEPARATOR_SIZES.small
     },
     secondRowContainer: {
         flexDirection: "row",

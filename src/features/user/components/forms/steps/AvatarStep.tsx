@@ -44,10 +44,9 @@ export function AvatarStep({
                 >
                     <Input.ImagePicker
                         imageStyle={ {
+                            aspectRatio: 1,
                             width: hp(20),
                             height: hp(20),
-                            borderWidth: hp(1),
-                            borderColor: "transparent",
                             borderRadius: 100
                         } }
                     />

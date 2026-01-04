@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     editImageIconContainer: {
         flex: 1,
         justifyContent: "flex-end",
-        padding: SEPARATOR_SIZES.lightSmall
+        padding: SEPARATOR_SIZES.small
     },
     editImageIcon: {
         alignSelf: "flex-end"
