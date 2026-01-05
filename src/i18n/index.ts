@@ -8,6 +8,7 @@ import { BaseConfig } from "../constants/index.ts";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import localizedFormat from "dayjs/plugin/localizedFormat";
+import relativeTime from "dayjs/plugin/relativeTime";
 import weekday from "dayjs/plugin/weekday";
 import updateLocale from "dayjs/plugin/updateLocale";
 import quarterOfYear from "dayjs/plugin/quarterOfYear";
@@ -21,6 +22,7 @@ import "dayjs/locale/hu";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(localizedFormat);
+dayjs.extend(relativeTime);
 dayjs.extend(weekday);
 dayjs.extend(updateLocale);
 dayjs.extend(quarterOfYear);
