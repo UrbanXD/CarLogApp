@@ -8,10 +8,11 @@ import { ServiceItemTypeInput } from "./inputFields/ServiceItemTypeInput.tsx";
 import { AmountInput } from "../../../../../_shared/currency/components/AmountInput.tsx";
 import React from "react";
 import { SaveButton } from "../../../../../../components/Button/presets/SaveButton.tsx";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
+import { COLORS, FONT_SIZES } from "../../../../../../constants/index.ts";
 import Form from "../../../../../../components/Form/Form.tsx";
 import { useTranslation } from "react-i18next";
 import { ArrayInputToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
+import { formTheme } from "../../../../../../ui/form/constants/theme.ts";
 
 type ServiceItemFormProps = {
     carCurrencyId: number
@@ -57,11 +58,11 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
             <Form
                 form={ form }
                 formFields={
-                    <>
+                    [
                         <ServiceItemTypeInput
                             control={ control }
                             fieldName="typeId"
-                        />
+                        />,
                         <AmountInput
                             control={ control }
                             setValue={ setValue }
@@ -72,7 +73,7 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
                             isPricePerUnitFallback={ true }
                             showsQuantityInput={ true }
                         />
-                    </>
+                    ]
                 }
                 containerStyle={ styles.formContainer }
             />
@@ -85,10 +86,13 @@ const styles = StyleSheet.create({
     container: {
         width: "100%",
         alignSelf: "center",
-        gap: SEPARATOR_SIZES.lightSmall
+        gap: formTheme.gap
     },
     formContainer: {
         flex: 1,
+        width: "100%",
+        alignSelf: "center",
+        gap: formTheme.gap,
         overflow: "hidden"
     },
     title: {

@@ -10,7 +10,11 @@ type TimelineFilterRowProps = {
 
 export function FilterRow({ children, style }: TimelineFilterRowProps) {
     return (
-        <ScrollView contentContainerStyle={ [styles.container, style] } horizontal>
+        <ScrollView
+            contentContainerStyle={ [styles.container, style] }
+            horizontal
+            showsHorizontalScrollIndicator={ false }
+        >
             { children }
         </ScrollView>
     );

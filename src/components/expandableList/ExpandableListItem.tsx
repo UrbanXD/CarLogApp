@@ -1,8 +1,8 @@
 import { AmountText, AmountTextProps } from "../AmountText.tsx";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import Button from "../Button/Button.ts";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/index.ts";
+import Icon from "../Icon.tsx";
 
 export type ExpandableListItemType = {
     id: string | number // for keyExtractor
@@ -30,13 +30,10 @@ export function ExpandableListItem({
             <View style={ styles.labelContainer }>
                 {
                     onRemove &&
-                   <Button.Icon
+                   <Icon
                       icon={ ICON_NAMES.close }
-                      iconSize={ FONT_SIZES.p3 }
-                      iconColor={ COLORS.gray2 }
-                      width={ FONT_SIZES.p3 }
-                      height={ FONT_SIZES.p3 }
-                      backgroundColor="transparent"
+                      size={ FONT_SIZES.p3 * 0.9 }
+                      color={ COLORS.gray2 }
                       onPress={ onRemove }
                    />
                 }
@@ -63,21 +60,18 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
         alignItems: "center",
-        gap: SEPARATOR_SIZES.lightSmall / 2,
-        paddingVertical: SEPARATOR_SIZES.lightSmall / 2
+        gap: SEPARATOR_SIZES.lightSmall / 2
     },
     labelContainer: {
         flex: 1,
         flexDirection: "row",
         alignItems: "center",
-        // backgroundColor: "red",
         gap: SEPARATOR_SIZES.lightSmall / 2
     },
     itemText: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p3,
         letterSpacing: FONT_SIZES.p3 * 0.025,
-        lineHeight: FONT_SIZES.p3,
         color: COLORS.gray1
     },
     countText: {

@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactElement, ReactNode } from "react";
 import { Control, Controller, UseControllerReturn } from "react-hook-form";
 import { SEPARATOR_SIZES } from "../../../constants/index.ts";
 import InputTitle from "./InputTitle.tsx";
@@ -10,7 +10,7 @@ type InputFieldProps = {
     control: Control<any>
     fieldName: string
     fieldNameText?: string
-    fieldInfoText?: string
+    fieldInfoText?: string | ReactElement
     optional?: boolean
     hideError?: boolean
     containerStyle?: ViewStyle

@@ -52,7 +52,6 @@ export function RidePassengerForm({ onSubmit, defaultRidePassenger }: RidePassen
     );
 
     return (
-        // <Form form={} formFields={} />
         <View style={ styles.container }>
             <PassengerInput control={ control } fieldName="passengerId" title={ t("passengers.title_singular") }/>
             <SaveButton onPress={ submitHandler }/>

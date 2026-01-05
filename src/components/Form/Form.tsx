@@ -1,4 +1,4 @@
-import React, { ReactElement, ReactNode, useEffect, useMemo } from "react";
+import React, { ReactElement, useEffect, useMemo } from "react";
 import { FlatList } from "react-native-gesture-handler";
 import { View, ViewStyle } from "react-native";
 import { FormState, UseFormReturn } from "react-hook-form";
@@ -9,7 +9,7 @@ import { SEPARATOR_SIZES } from "../../constants/index.ts";
 
 type FormProps = {
     form: UseFormReturn
-    formFields: ReactNode
+    formFields: ReactElement | Array<ReactElement>
     submitHandler?: SubmitHandlerArgs
     edit?: boolean
     onFormStateChange?: (formState: FormState<any>) => void

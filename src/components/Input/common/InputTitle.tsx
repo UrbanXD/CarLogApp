@@ -1,19 +1,19 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { useTranslation } from "react-i18next";
 
-interface InputTitleProps {
-    title: string,
-    subtitle?: string
+type InputTitleProps = {
+    title: string
+    subtitle?: string | ReactElement
     optional?: boolean
 }
 
-const InputTitle: React.FC<InputTitleProps> = ({
+function InputTitle({
     title,
     subtitle,
     optional = false
-}) => {
+}: InputTitleProps) {
     const { t } = useTranslation();
 
     return (

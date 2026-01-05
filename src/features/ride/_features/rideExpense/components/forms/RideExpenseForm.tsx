@@ -7,8 +7,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { ExpenseTypeInput } from "../../../../../expense/components/forms/inputFields/ExpenseTypeInput.tsx";
 import React from "react";
 import { SaveButton } from "../../../../../../components/Button/presets/SaveButton.tsx";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
-import Form from "../../../../../../components/Form/Form.tsx";
+import { COLORS, FONT_SIZES } from "../../../../../../constants/index.ts";
 import { AmountInput } from "../../../../../_shared/currency/components/AmountInput.tsx";
 import { Car } from "../../../../../car/schemas/carSchema.ts";
 import Input from "../../../../../../components/Input/Input.ts";
@@ -16,6 +15,8 @@ import InputDatePicker from "../../../../../../components/Input/datePicker/Input
 import { NoteInput } from "../../../../../../components/Input/_presets/NoteInput.tsx";
 import { useTranslation } from "react-i18next";
 import { ArrayInputToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
+import { formTheme } from "../../../../../../ui/form/constants/theme.ts";
+import Form from "../../../../../../components/Form/Form.tsx";
 
 type RideExpenseFormProps = {
     car: Car
@@ -60,29 +61,36 @@ export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate
     return (
         <View style={ styles.container }>
             <Text style={ styles.title }>{ t("rides.other_expense") }</Text>
-            <Form style={ styles.formContainer }>
-                <ExpenseTypeInput
-                    control={ control }
-                    fieldName="typeId"
-                />
-                <AmountInput
-                    control={ control }
-                    setValue={ setValue }
-                    fieldName="expense"
-                    defaultCurrency={ car.currency.id }
-                />
-                <Input.Field
-                    control={ control }
-                    fieldName="date"
-                    fieldNameText={ t("date.text") }
-                >
-                    <InputDatePicker/>
-                </Input.Field>
-                <NoteInput
-                    control={ control }
-                    setValue={ setValue }
-                    fieldName="note"
-                />
+            <Form
+                form={ form }
+                formFields={
+                    [
+                        <ExpenseTypeInput
+                            control={ control }
+                            fieldName="typeId"
+                        />,
+                        <AmountInput
+                            control={ control }
+                            setValue={ setValue }
+                            fieldName="expense"
+                            defaultCurrency={ car.currency.id }
+                        />,
+                        <Input.Field
+                            control={ control }
+                            fieldName="date"
+                            fieldNameText={ t("date.text") }
+                        >
+                            <InputDatePicker/>
+                        </Input.Field>,
+                        <NoteInput
+                            control={ control }
+                            setValue={ setValue }
+                            fieldName="note"
+                        />
+                    ]
+                }
+                containerStyle={ styles.formContainer }
+            >
             </Form>
             <SaveButton onPress={ submitHandler }/>
         </View>
@@ -93,10 +101,13 @@ const styles = StyleSheet.create({
     container: {
         width: "100%",
         alignSelf: "center",
-        gap: SEPARATOR_SIZES.lightSmall
+        gap: formTheme.gap
     },
     formContainer: {
         flex: 1,
+        width: "100%",
+        alignSelf: "center",
+        gap: formTheme.gap,
         overflow: "hidden"
     },
     title: {

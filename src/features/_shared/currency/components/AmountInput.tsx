@@ -139,18 +139,19 @@ export function AmountInput({
             control={ control }
             fieldName={ fieldName }
             fieldNameText={ title ?? t("currency.cost") }
-            fieldInfoText={ subtitle }
+            fieldInfoText={
+                subtitle
+                ??
+                (
+                    (
+                        isPricePerUnitFallback &&
+                        (!isNaN(Number(formQuantity)) && Number(formQuantity) > 1)
+                    ) &&
+                    getTotalAmountTextByPricePerUnit()
+                )
+            }
             containerStyle={ styles.container }
         >
-            {
-                (
-                    isPricePerUnitFallback &&
-                    (!isNaN(Number(formQuantity)) && Number(formQuantity) > 1)
-                ) &&
-               <Text style={ styles.label }>
-                   { getTotalAmountTextByPricePerUnit() }
-               </Text>
-            }
             {
                 showsIsPricePerUnitInput &&
                <Input.Field
@@ -320,7 +321,9 @@ const styles = StyleSheet.create({
     label: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p3,
-        color: COLORS.gray1
+        color: COLORS.gray1,
+        lineHeight: FONT_SIZES.p2,
+        letterSpacing: FONT_SIZES.p2 * 0.05
     },
     exchangeContainer: {
         width: "100%",

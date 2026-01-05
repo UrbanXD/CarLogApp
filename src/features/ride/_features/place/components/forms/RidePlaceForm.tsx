@@ -6,10 +6,11 @@ import { PlaceInput } from "./inputFields/PlaceInput.tsx";
 import { StyleSheet, View } from "react-native";
 import { SaveButton } from "../../../../../../components/Button/presets/SaveButton.tsx";
 import React, { useEffect } from "react";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
+import { COLORS, FONT_SIZES } from "../../../../../../constants/index.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import { useTranslation } from "react-i18next";
 import { ArrayInputToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
+import { formTheme } from "../../../../../../ui/form/constants/theme.ts";
 
 type RidePlaceFormProps = {
     onSubmit: (result: RidePlaceFormFields) => void
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
     container: {
         width: "100%",
         alignSelf: "center",
-        gap: SEPARATOR_SIZES.lightSmall
+        gap: formTheme.gap
     },
     title: {
         fontFamily: "Gilroy-Heavy",
