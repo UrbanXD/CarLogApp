@@ -37,6 +37,7 @@ export function EditRideLogForm({
     const { fields } = useRideLogFormFields({
         form,
         setCarOdometerValueWhenInputNotTouched: false,
+        setEndTimeWhenInputNotTouched: false,
         startOdometer: rideLog.startOdometer,
         endOdometer: rideLog.endOdometer
     });

@@ -13,10 +13,8 @@ import { OdometerValueInput } from "../../odometer/components/forms/inputFields/
 import { FuelInput } from "../components/forms/inputFields/FuelInput.tsx";
 import { EditToast } from "../../../../../ui/alert/presets/toast/index.ts";
 import { useTranslation } from "react-i18next";
-import { formatWithUnit } from "../../../../../utils/formatWithUnit.ts";
 import { Odometer } from "../../odometer/schemas/odometerSchema.ts";
 import { OdometerLimit } from "../../odometer/model/dao/OdometerLogDao.ts";
-import dayjs from "dayjs";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 
 type UseFuelLogFormFieldsProps = UseFormReturn<FuelLogFields> & { odometer?: Odometer }
@@ -82,17 +80,13 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
                     control={ control }
                     odometerValueFieldName="odometerValue"
                     dateFieldName="date"
-                    odometerValueSubtitle={ odometer ? t(
-                        "odometer.original_value",
-                        { value: formatWithUnit(odometer.value, odometer.unit.short) }
-                    ) : odometerLimit && t(
-                        "odometer.limit",
-                        {
-                            value: formatWithUnit(odometerLimit.min.value, odometerLimit.unitText),
-                            date: dayjs(odometerLimit.min.date).format("L")
-                        }
-                    ) }
-                    currentOdometerValue={ car?.odometer.value }
+                    currentOdometerValueTranslationKey={
+                        odometer
+                        ? "odometer.original_value"
+                        : "odometer.current_value"
+                    }
+                    currentOdometerValue={ odometer?.value ?? car?.odometer.value }
+                    odometerLimit={ odometerLimit }
                     unitText={ car?.odometer.unit.short }
                     odometerValueOptional
                 />

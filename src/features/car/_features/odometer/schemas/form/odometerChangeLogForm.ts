@@ -76,7 +76,7 @@ export const useEditOdometerChangeLogFormProps = (odometerLog: OdometerLog) => {
         carId: odometerLog.carId,
         value: odometerLog.value,
         note: odometerLog.note,
-        date: dayjs(odometerLog.date).isValid() ? dayjs(fuelLog.expense.date).toDate() : new Date(),
+        date: dayjs(odometerLog.date).isValid() ? dayjs(odometerLog.date).toDate() : new Date(),
         conversionFactor: odometerLog.unit.conversionFactor
     };
 

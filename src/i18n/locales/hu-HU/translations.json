@@ -490,6 +490,7 @@
     "current_value": "A jelenlegi kilométeróra-állás: {{value}}",
     "original_value": "A bejegyzés eredeti kilométeróra-állása {{value}}",
     "limit": "A legutóbbi kilométeróra-állás: {{value}} ({{date}})",
+    "limit_without_date": "A legutóbbi kilométeróra-állás: {{value}}",
     "unit_types": {
       "title": "Kilométeróra mértékegység",
       "undefined": "$t(common.unknown)",

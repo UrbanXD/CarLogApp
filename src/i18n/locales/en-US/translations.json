@@ -167,6 +167,7 @@
     "odometer_value_required": "Please enter the current odometer reading",
     "odometer_value_non_negative": "The odometer reading cannot be negative",
     "odometer_value_min_limit": "The odometer reading cannot go backwards",
+    "odometer_value_max_limit": "The entered value contradicts the odometer history. Based on the date, the previous reading was: {{0}} {{1}} (recorded: {{2}}).",
     "service_type_required": "Please select a service type",
     "service_item_quantity_required": "Please enter the item quantity",
     "service_item_quantity_non_negative": "The item quantity cannot be negative",
@@ -489,6 +490,7 @@
     "current_value": "Current odometer reading: {{value}}",
     "original_value": "Original odometer reading {{value}}",
     "limit": "Latest odometer reading: {{value}} ({{date}})",
+    "limit_without_date": "Latest odometer reading: {{value}}",
     "unit_types": {
       "title": "Odometer units",
       "undefined": "$t(common.unknown)",

@@ -8,6 +8,8 @@ import { useTranslation } from "react-i18next";
 import { formTheme } from "../../../../../../../ui/form/constants/theme.ts";
 import InputDatePicker from "../../../../../../../components/Input/datePicker/InputDatePicker.tsx";
 import { formatWithUnit } from "../../../../../../../utils/formatWithUnit.ts";
+import { OdometerLimit } from "../../../model/dao/OdometerLogDao.ts";
+import dayjs from "dayjs";
 
 type OdometerValueInputProps = {
     control: Control<any>
@@ -19,7 +21,9 @@ type OdometerValueInputProps = {
     dateFieldName?: string
     dateTitle?: string
     dateSubtitle?: string
+    currentOdometerValueTranslationKey?: string
     currentOdometerValue?: number
+    odometerLimit?: OdometerLimit | null
     unitText?: string
 }
 
@@ -33,7 +37,9 @@ export function OdometerValueInput({
     dateFieldName,
     dateTitle,
     dateSubtitle,
+    currentOdometerValueTranslationKey,
     currentOdometerValue,
+    odometerLimit,
     unitText
 }: OdometerValueInputProps) {
     const { t } = useTranslation();
@@ -55,10 +61,37 @@ export function OdometerValueInput({
                 control={ control }
                 fieldName={ odometerValueFieldName }
                 fieldNameText={ odometerValueTitle ?? t("odometer.value") }
-                fieldInfoText={ odometerValueSubtitle ?? (currentOdometerValue && t(
-                    "odometer.current_value",
-                    { value: formatWithUnit(currentOdometerValue, unitText) }
-                )) }
+                fieldInfoText={
+                    odometerValueSubtitle
+                    ??
+                    (
+                        odometerLimit && (
+                            odometerLimit.min?.date &&
+                            dayjs(odometerLimit.min.date).isValid()
+                            ?
+                            t(
+                                "odometer.limit",
+                                {
+                                    value: formatWithUnit(odometerLimit.min.value ?? 0, odometerLimit.unitText),
+                                    date: dayjs(odometerLimit.min.date).format("L")
+                                }
+                            )
+                            :
+                            t(
+                                "odometer.limit_without_date",
+                                { value: formatWithUnit(odometerLimit.min?.value ?? 0, odometerLimit.unitText) }
+                            )
+                        )
+                    )
+                    ??
+                    (
+                        currentOdometerValue &&
+                        t(
+                            currentOdometerValueTranslationKey ?? "odometer.current_value",
+                            { value: formatWithUnit(currentOdometerValue, unitText) }
+                        )
+                    )
+                }
                 optional={ odometerValueOptional }
             >
                 <Input.Row style={ { gap: 0 } }>

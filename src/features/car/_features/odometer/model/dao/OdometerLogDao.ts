@@ -29,7 +29,7 @@ export type SelectOdometerLogTableRow = OdometerLogTableRow & {
 };
 
 export type OdometerLimit = {
-    min: { value: number, date: string },
+    min: { value: number, date: string } | null,
     max: { value: number, date: string } | null,
     unitText: string
 }
@@ -169,8 +169,12 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         const maxResult = await maxQuery.executeTakeFirst();
 
         return {
-            min: { value: minResult?.odometer_value ?? 0, date: minResult.date },
-            max: maxResult?.odometer_value ? { value: maxResult?.odometer_value, date: maxResult.date } : null,
+            min: typeof minResult.odometer_value === "number" && minResult.date
+                 ? { value: minResult.odometer_value, date: minResult.date }
+                 : null,
+            max: typeof maxResult.odometer_value === "number" && maxResult.date
+                 ? { value: maxResult.odometer_value, date: maxResult.date }
+                 : null,
             unitText: unitResult?.unit ?? ""
         };
     }

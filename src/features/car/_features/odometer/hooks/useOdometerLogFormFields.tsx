@@ -14,8 +14,6 @@ import { EditToast } from "../../../../../ui/alert/presets/toast/index.ts";
 import { useTranslation } from "react-i18next";
 import { OdometerLimit } from "../model/dao/OdometerLogDao.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
-import { formatWithUnit } from "../../../../../utils/formatWithUnit.ts";
-import dayjs from "dayjs";
 
 type UseOdometerLogFormFieldsProps = UseFormReturn<OdometerChangeLogFormFields> & {
     odometerLog?: OdometerLog
@@ -76,18 +74,14 @@ export function useOdometerLogFormFields({
             render: () => <OdometerValueInput
                 control={ control }
                 odometerValueFieldName="value"
-                odometerValueSubtitle={ odometerLog ? t(
-                    "odometer.original_value",
-                    { value: formatWithUnit(odometerLog.value, odometerLog.unit.short) }
-                ) : odometerLimit && t(
-                    "odometer.limit",
-                    {
-                        value: formatWithUnit(odometerLimit.min.value, odometerLimit.unitText),
-                        date: dayjs(odometerLimit.min.date).format("L")
-                    }
-                ) }
                 dateFieldName="date"
-                currentOdometerValue={ car?.odometer.value }
+                currentOdometerValueTranslationKey={
+                    odometerLog
+                    ? "odometer.original_value"
+                    : "odometer.current_value"
+                }
+                currentOdometerValue={ odometerLog?.value ?? car?.odometer.value }
+                odometerLimit={ odometerLimit }
                 unitText={ car?.odometer.unit.short }
             />,
             editToastMessages: EditToast
