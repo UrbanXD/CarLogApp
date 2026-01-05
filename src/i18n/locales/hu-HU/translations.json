@@ -105,6 +105,9 @@
       "limit": {
         "body": "Felső határ elérve, nem adható több elem hozzá"
       },
+      "already_added": {
+        "body": "Már hozzáadásra került, nem lehet többször"
+      },
       "error": {
         "body": "Váratlan hiba lépett fel"
       }

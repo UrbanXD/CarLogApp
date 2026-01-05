@@ -105,6 +105,9 @@
       "limit": {
         "body": "Upper limit reached, no more items can be added"
       },
+      "already_added": {
+        "body": "This item has already been added and cannot be duplicated"
+      },
       "error": {
         "body": "An unexpected error has occurred"
       }

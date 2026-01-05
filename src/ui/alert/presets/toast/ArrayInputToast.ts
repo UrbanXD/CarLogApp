@@ -8,6 +8,13 @@ const limit: ToastMessage = () => {
     };
 };
 
+const alreadyAdded: ToastMessage = () => {
+    return {
+        type: "warning",
+        body: i18n.t("toast.array_input.already_added.body")
+    };
+};
+
 const error: ToastMessage = (action) => {
     return {
         type: "error",
@@ -17,5 +24,6 @@ const error: ToastMessage = (action) => {
 
 export const ArrayInputToast: ToastMessages = {
     limit,
+    alreadyAdded,
     error
 };

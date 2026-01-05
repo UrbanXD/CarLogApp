@@ -1,16 +1,17 @@
 import { Control, useFieldArray } from "react-hook-form";
 import Input from "../../../../../../../components/Input/Input.ts";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSharedValue } from "react-native-reanimated";
 import { PopupView } from "../../../../../../../components/popupView/PopupView.tsx";
 import { ICON_NAMES } from "../../../../../../../constants/index.ts";
 import { ExpandableList } from "../../../../../../../components/expandableList/ExpandableList.tsx";
-import { PlaceFormFields } from "../../../schemas/form/placeForm.ts";
 import { RidePlaceForm } from "../RidePlaceForm.tsx";
 import { useRidePlaceToExpandableList } from "../../../hooks/useRidePlaceToExpandableList.ts";
 import { useTranslation } from "react-i18next";
 import { ArrayInputToast } from "../../../../../../../ui/alert/presets/toast/index.ts";
 import { useAlert } from "../../../../../../../ui/alert/hooks/useAlert.ts";
+import { debounce } from "es-toolkit";
+import { RidePlaceFormFields } from "../../../schemas/form/ridePlaceForm.ts";
 
 type RidePlaceInputProps = {
     control: Control<any>
@@ -38,7 +39,7 @@ export function RidePlaceInput({
     const isExpandedAddForm = useSharedValue(false);
     const isExpandedUpdateForm = useSharedValue(false);
 
-    const { fields: items, append, update, remove } = useFieldArray<PlaceFormFields>({
+    const { fields: items, append, update, remove } = useFieldArray<RidePlaceFormFields>({
         control,
         name: fieldName,
         keyName: "fieldId"
@@ -60,14 +61,15 @@ export function RidePlaceInput({
         setTimeout(() => setSelectedItemIndex(index), 0);
     });
 
-    const addItem = useCallback((item: PlaceFormFields) => {
+    const addItem = useCallback((item: RidePlaceFormFields) => {
         if(items.length >= maxItemCount) return openToast(ArrayInputToast.limit());
+        if(items.some(_item => _item.id === item.id)) return;
 
         append(item);
         isExpandedAddForm.value = false;
-    }, [items.length, maxItemCount, append]);
+    }, [items, maxItemCount, append]);
 
-    const updateItem = useCallback((item: PlaceFormFields, index: number) => {
+    const updateItem = useCallback((item: RidePlaceFormFields, index: number) => {
         update(index, item);
         isExpandedUpdateForm.value = false;
         setSelectedItemIndex(null);
@@ -77,6 +79,10 @@ export function RidePlaceInput({
         remove(index);
     }, [items.length, minItemCount, remove]);
 
+    const debouncedAddItem = useMemo(() => debounce(addItem, 250), [addItem]);
+    const debouncedUpdateItem = useMemo(() => debounce(updateItem, 250), [updateItem]);
+    const debouncedRemoveItem = useMemo(() => debounce(removeItem, 250), [removeItem]);
+
     return (
         <Input.Field control={ control } fieldName={ fieldName }>
             <ExpandableList
@@ -85,16 +91,16 @@ export function RidePlaceInput({
                 title={ title ?? t("places.title") }
                 actionIcon={ ICON_NAMES.add }
                 onAction={ openAddItemForm }
-                onRemoveItem={ removeItem }
+                onRemoveItem={ debouncedRemoveItem }
                 onItemPress={ openUpdateItemForm }
             />
             <PopupView opened={ isExpandedAddForm }>
-                <RidePlaceForm onSubmit={ (result) => addItem(result) }/>
+                <RidePlaceForm onSubmit={ debouncedAddItem }/>
             </PopupView>
             <PopupView opened={ isExpandedUpdateForm }>
                 <RidePlaceForm
                     defaultRidePlace={ items?.[selectedItemIndex] }
-                    onSubmit={ (result) => updateItem(result, selectedItemIndex) }
+                    onSubmit={ (result) => debouncedUpdateItem(result, selectedItemIndex) }
                 />
             </PopupView>
         </Input.Field>

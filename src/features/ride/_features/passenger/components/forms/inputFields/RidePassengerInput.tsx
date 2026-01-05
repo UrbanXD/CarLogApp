@@ -1,8 +1,7 @@
 import { Control, useFieldArray } from "react-hook-form";
 import { useRidePassengerToExpandableList } from "../../../hooks/useRidePassengerToExpandableList.ts";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSharedValue } from "react-native-reanimated";
-import { PassengerFormFields } from "../../../schemas/form/passengerForm.ts";
 import { ExpandableList } from "../../../../../../../components/expandableList/ExpandableList.tsx";
 import { ICON_NAMES } from "../../../../../../../constants/index.ts";
 import { PopupView } from "../../../../../../../components/popupView/PopupView.tsx";
@@ -11,6 +10,8 @@ import { RidePassengerForm } from "../RidePassengerForm.tsx";
 import { useTranslation } from "react-i18next";
 import { ArrayInputToast } from "../../../../../../../ui/alert/presets/toast/index.ts";
 import { useAlert } from "../../../../../../../ui/alert/hooks/useAlert.ts";
+import { debounce } from "es-toolkit";
+import { RidePassengerFormFields } from "../../../schemas/form/ridePassengerForm.ts";
 
 type RidePassengerInputProps = {
     control: Control<any>
@@ -38,7 +39,7 @@ export function RidePassengerInput({
     const isExpandedAddForm = useSharedValue(false);
     const isExpandedUpdateForm = useSharedValue(false);
 
-    const { fields: items, append, update, remove } = useFieldArray<PassengerFormFields>({
+    const { fields: items, append, update, remove } = useFieldArray<RidePassengerFormFields>({
         control,
         name: fieldName,
         keyName: "fieldId"
@@ -60,22 +61,32 @@ export function RidePassengerInput({
         setTimeout(() => setSelectedItemIndex(index), 0);
     });
 
-    const addItem = useCallback((item: PassengerFormFields) => {
+    const addItem = useCallback((item: RidePassengerFormFields) => {
         if(items.length >= maxItemCount) return openToast(ArrayInputToast.limit());
+        if(items.some(_item => _item.id === item.id)) return;
+        if(items.some(_item => _item?.passengerId === item.passengerId)) return openToast(ArrayInputToast.alreadyAdded());
 
         append(item);
         isExpandedAddForm.value = false;
-    }, [items.length, maxItemCount, append]);
+    }, [items, maxItemCount, append]);
 
-    const updateItem = useCallback((item: PassengerFormFields, index: number) => {
+    const updateItem = useCallback((item: RidePassengerFormFields, index: number) => {
+        if(items.some(_item => _item.id !== item.id && _item?.passengerId === item.passengerId)) {
+            return openToast(ArrayInputToast.alreadyAdded());
+        }
+
         update(index, item);
         isExpandedUpdateForm.value = false;
         setSelectedItemIndex(null);
-    }, [update]);
+    }, [update, items]);
 
     const removeItem = useCallback((index: number) => {
         remove(index);
     }, [items.length, minItemCount, remove]);
+
+    const debouncedAddItem = useMemo(() => debounce(addItem, 250), [addItem]);
+    const debouncedUpdateItem = useMemo(() => debounce(updateItem, 250), [updateItem]);
+    const debouncedRemoveItem = useMemo(() => debounce(removeItem, 250), [removeItem]);
 
     return (
         <Input.Field control={ control } fieldName={ fieldName }>
@@ -85,16 +96,16 @@ export function RidePassengerInput({
                 title={ title ?? t("passengers.title") }
                 actionIcon={ ICON_NAMES.add }
                 onAction={ openAddItemForm }
-                onRemoveItem={ removeItem }
+                onRemoveItem={ debouncedRemoveItem }
                 onItemPress={ openUpdateItemForm }
             />
             <PopupView opened={ isExpandedAddForm }>
-                <RidePassengerForm onSubmit={ (result) => addItem(result) }/>
+                <RidePassengerForm onSubmit={ debouncedAddItem }/>
             </PopupView>
             <PopupView opened={ isExpandedUpdateForm }>
                 <RidePassengerForm
                     defaultRidePassenger={ items?.[selectedItemIndex] }
-                    onSubmit={ (result) => updateItem(result, selectedItemIndex) }
+                    onSubmit={ (result) => debouncedUpdateItem(result, selectedItemIndex) }
                 />
             </PopupView>
         </Input.Field>

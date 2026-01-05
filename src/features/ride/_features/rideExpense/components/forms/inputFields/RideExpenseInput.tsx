@@ -1,7 +1,6 @@
 import { Control, useFieldArray, useWatch } from "react-hook-form";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSharedValue } from "react-native-reanimated";
-import { PlaceFormFields } from "../../../../place/schemas/form/placeForm.ts";
 import Input from "../../../../../../../components/Input/Input.ts";
 import { ExpandableList } from "../../../../../../../components/expandableList/ExpandableList.tsx";
 import { ICON_NAMES } from "../../../../../../../constants/index.ts";
@@ -15,6 +14,7 @@ import { FormResultRideExpense } from "../../../schemas/rideExpenseSchema.ts";
 import { useTranslation } from "react-i18next";
 import { useAlert } from "../../../../../../../ui/alert/hooks/useAlert.ts";
 import { ArrayInputToast } from "../../../../../../../ui/alert/presets/toast/index.ts";
+import { debounce } from "es-toolkit";
 
 type RideExpenseInputProps = {
     control: Control<any>
@@ -101,14 +101,15 @@ export function RideExpenseInput({
         setTimeout(() => setSelectedItemIndex(index), 0);
     });
 
-    const addItem = useCallback((item: PlaceFormFields) => {
+    const addItem = useCallback((item: FormResultRideExpense) => {
         if(items.length >= maxItemCount) return openToast(ArrayInputToast.limit());
+        if(items.some(_item => _item.id === item.id)) return;
 
         append(item);
         isExpandedAddForm.value = false;
-    }, [items.length, maxItemCount, append]);
+    }, [items, maxItemCount, append]);
 
-    const updateItem = useCallback((item: PlaceFormFields, index: number) => {
+    const updateItem = useCallback((item: FormResultRideExpense, index: number) => {
         update(index, item);
         isExpandedUpdateForm.value = false;
         setSelectedItemIndex(null);
@@ -117,6 +118,10 @@ export function RideExpenseInput({
     const removeItem = useCallback((index: number) => {
         remove(index);
     }, [items.length, remove]);
+
+    const debouncedAddItem = useMemo(() => debounce(addItem, 250), [addItem]);
+    const debouncedUpdateItem = useMemo(() => debounce(updateItem, 250), [updateItem]);
+    const debouncedRemoveItem = useMemo(() => debounce(removeItem, 250), [removeItem]);
 
     return (
         <Input.Field control={ control } fieldName={ fieldName }>
@@ -127,14 +132,14 @@ export function RideExpenseInput({
                 title={ title ?? t("rides.other_expenses") }
                 actionIcon={ ICON_NAMES.add }
                 onAction={ openAddItemForm }
-                onRemoveItem={ removeItem }
+                onRemoveItem={ debouncedRemoveItem }
                 onItemPress={ openUpdateItemForm }
             />
             <PopupView opened={ isExpandedAddForm }>
                 <RideExpenseForm
                     car={ car }
                     defaultDate={ formStartTime }
-                    onSubmit={ (result) => addItem(result) }
+                    onSubmit={ debouncedAddItem }
                 />
             </PopupView>
             <PopupView opened={ isExpandedUpdateForm }>
@@ -142,7 +147,7 @@ export function RideExpenseInput({
                     car={ car }
                     defaultRideExpense={ items?.[selectedItemIndex] }
                     defaultDate={ formStartTime }
-                    onSubmit={ (result) => updateItem(result, selectedItemIndex) }
+                    onSubmit={ (result) => debouncedUpdateItem(result, selectedItemIndex) }
                 />
             </PopupView>
         </Input.Field>
