@@ -128,8 +128,8 @@ export function AmountInput({
 
         return (
             <PricePerUnitTotalCostInCarCurrency
-                amountText={ `${ quantity * amount } ${ currencyText }` }
-                carAmountText={ defaultCurrency !== formCurrency && `${ quantity * exchangedAmount } ${ defaultCurrencyText }` }
+                amountText={ `${ numberToFractionDigit(quantity * amount) } ${ currencyText }` }
+                carAmountText={ defaultCurrency !== formCurrency && `${ numberToFractionDigit(quantity * exchangedAmount) } ${ defaultCurrencyText }` }
             />
         );
     }, [formAmount, formQuantity, formExchangeRate, formCurrency, defaultCurrency, getCurrencyText]);

@@ -358,7 +358,7 @@
     "free": "Free",
     "cost_in_car_currency": "Amount in car's base currency",
     "price_per_unit_in_car_currency": "Unit price in car's base currency",
-    "price_per_unit_based_on_total_cost": "Unit price based on total cost",
+    "price_per_unit_based_on_total_cost": "Unit price based on total cost is <amount>{{amount}}</amount>, calculated in the car's base currency as <amount>{{carAmount}}</amount>",
     "price_per_unit_based_on_total_cost_in_car_currency": "Total cost per unit based on the unit price <amount>{{amount}}</amount>",
     "names": {
       "HUF": "Hungarian Forint",
