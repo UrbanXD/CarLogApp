@@ -27,7 +27,6 @@ export function PlaceInput({
     const paginator = useMemo(() => placeDao.pickerPaginator(), []);
 
     const { form, submitHandler } = useCreatePlace({ userId: user.id, dismissSheet: false });
-
     return (
         <Input.Field
             control={ control }
@@ -37,12 +36,17 @@ export function PlaceInput({
                 title={ title ?? t("places.title_singular") }
                 paginator={ paginator }
                 renderCreateItemForm={
-                    (callback) => <AddItemToDropdownInput
-                        control={ form.control }
-                        fieldName={ "name" }
-                        submitHandler={ () => submitHandler(callback)() }
-                        placeholder={ t("places.new") }
-                    />
+                    (callback) => {
+                        const handler = submitHandler(callback);
+                        return (
+                            <AddItemToDropdownInput
+                                control={ form.control }
+                                fieldName="name"
+                                submitHandler={ form.handleSubmit(handler.onValid, handler.onInvalid) }
+                                placeholder={ t("places.new") }
+                            />
+                        );
+                    }
                 }
                 searchBy="name"
                 hideController

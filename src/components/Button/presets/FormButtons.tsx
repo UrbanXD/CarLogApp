@@ -21,7 +21,11 @@ export function FormButtons({
 
     return (
         <ButtonsRow
-            style={ { paddingTop: SEPARATOR_SIZES.lightSmall, justifyContent: !reset ? "flex-end" : "space-between" } }>
+            style={ {
+                paddingTop: SEPARATOR_SIZES.lightSmall / 2,
+                justifyContent: !reset ? "flex-end" : "space-between"
+            } }
+        >
             {
                 reset &&
                <IconButton

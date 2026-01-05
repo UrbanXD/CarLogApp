@@ -37,12 +37,17 @@ export function PassengerInput({
                 title={ title ?? t("passengers.title_singular") }
                 paginator={ paginator }
                 renderCreateItemForm={
-                    (callback) => <AddItemToDropdownInput
-                        control={ form.control }
-                        fieldName={ "name" }
-                        submitHandler={ () => submitHandler(callback)() }
-                        placeholder={ t("passengers.new") }
-                    />
+                    (callback) => {
+                        const handler = submitHandler(callback);
+                        return (
+                            <AddItemToDropdownInput
+                                control={ form.control }
+                                fieldName={ "name" }
+                                submitHandler={ form.handleSubmit(handler.onValid, handler.onInvalid) }
+                                placeholder={ t("passengers.new") }
+                            />
+                        );
+                    }
                 }
                 searchBy="name"
                 hideController

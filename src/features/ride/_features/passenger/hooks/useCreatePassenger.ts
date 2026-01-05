@@ -6,6 +6,7 @@ import { useBottomSheet } from "../../../../../ui/bottomSheet/contexts/BottomShe
 import { getUUID } from "../../../../../database/utils/uuid.ts";
 import { CreateToast, InvalidFormToast } from "../../../../../ui/alert/presets/toast/index.ts";
 import { useTranslation } from "react-i18next";
+import { SubmitHandlerArgs } from "../../../../../types/index.ts";
 
 type UseCreatePassengerProps = {
     userId: string
@@ -19,29 +20,27 @@ export function useCreatePassenger({ userId, dismissSheet = true }: UseCreatePas
     const { dismissBottomSheet } = useBottomSheet();
 
     const form = useForm<PassengerFormFields>(useCreatePassengerFormProps(passengerDao, userId));
-    const { handleSubmit, reset } = form;
 
-    const submitHandler = (onDone?: () => void) =>
-        handleSubmit(
-            async (formResult: PassengerFormFields) => {
-                try {
-                    await passengerDao.create(formResult);
-                    openToast(CreateToast.success(t("passengers.title_singular")));
+    const submitHandler = (onDone?: () => void): SubmitHandlerArgs<PassengerFormFields> => ({
+        onValid: async (formResult) => {
+            try {
+                await passengerDao.create(formResult);
+                openToast(CreateToast.success(t("passengers.title_singular")));
 
-                    onDone?.();
-                    reset({ id: getUUID(), name: "", ownerId: userId });
+                onDone?.();
+                form.reset({ id: getUUID(), name: "", ownerId: userId });
 
-                    if(dismissBottomSheet && dismissSheet) dismissBottomSheet(true);
-                } catch(e) {
-                    openToast(CreateToast.error(t("passengers.title_singular")));
-                    console.error("Hiba a submitHandler-ben passenger form:", e);
-                }
-            },
-            (errors) => {
-                console.log("Passenger form validation errors", errors);
-                openToast(InvalidFormToast.warning());
+                if(dismissBottomSheet && dismissSheet) dismissBottomSheet(true);
+            } catch(e) {
+                openToast(CreateToast.error(t("passengers.title_singular")));
+                console.error("Hiba a submitHandler-ben passenger form:", e);
             }
-        );
+        },
+        onInvalid: (errors) => {
+            console.log("Passenger form validation errors", errors);
+            openToast(InvalidFormToast.warning());
+        }
+    });
 
     return { form, submitHandler };
 }
