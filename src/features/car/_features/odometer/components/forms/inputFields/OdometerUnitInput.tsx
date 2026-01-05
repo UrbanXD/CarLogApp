@@ -47,7 +47,7 @@ export function OdometerUnitInput({
         <Input.Field
             control={ control }
             fieldName={ fieldName }
-            fieldNameText={ title ?? t("odometer.unit") }
+            fieldNameText={ title ?? t("odometer.unit_types.title") }
             fieldInfoText={ subtitle }
         >
             {
