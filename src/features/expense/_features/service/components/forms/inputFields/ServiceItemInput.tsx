@@ -110,10 +110,11 @@ export function ServiceItemInput({
 
     const addItem = useCallback((item: FormResultServiceItem) => {
         if(items.length >= maxItemCount) return;
+        if(items.some(_item => _item.id === item.id)) return;
 
         append(item);
         isExpandedAddForm.value = false;
-    }, [items.length, maxItemCount, append]);
+    }, [items, maxItemCount, append]);
 
     const updateItem = useCallback((item: FormResultServiceItem, index: number) => {
         update(index, item);
