@@ -24,6 +24,7 @@ export function ScreenView({
                 {
                     flex: 1,
                     paddingTop: (screenHasHeader && SIMPLE_HEADER_HEIGHT) + SEPARATOR_SIZES.lightSmall,
+                    paddingBottom: SEPARATOR_SIZES.lightSmall,
                     paddingHorizontal: DEFAULT_SEPARATOR,
                     backgroundColor: COLORS.black2
                 },

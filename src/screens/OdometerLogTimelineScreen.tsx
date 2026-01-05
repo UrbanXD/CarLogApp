@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../constants/index.ts";
 import { OdometerLogTimeline } from "../features/car/_features/odometer/components/OdometerLogTimeline.tsx";
+import { ScreenView } from "../components/screenView/ScreenView.tsx";
 
 export function OdometerLogTimelineScreen() {
     const { id } = useLocalSearchParams();
@@ -17,16 +16,8 @@ export function OdometerLogTimelineScreen() {
     if(!id) return <></>;
 
     return (
-        <SafeAreaView
-            style={ {
-                flex: 1,
-                paddingTop: SIMPLE_HEADER_HEIGHT + SEPARATOR_SIZES.lightSmall,
-                paddingHorizontal: DEFAULT_SEPARATOR,
-                paddingBottom: SEPARATOR_SIZES.lightSmall,
-                backgroundColor: COLORS.black2
-            } }
-        >
+        <ScreenView>
             <OdometerLogTimeline carId={ id }/>
-        </SafeAreaView>
+        </ScreenView>
     );
 }
