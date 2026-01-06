@@ -82,31 +82,23 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
         return this.saveToQueue(attachmentRecord);
     }
 
-    async getFile(filename: string): Promise<string | null> {
-        const localURI = `${ this.storageDirectory }/${ filename }`;
-
-        let attachmentRecord = await this.record(filename);
-        if(!attachmentRecord) {
-            attachmentRecord = await this.newAttachmentRecord({
-                id: filename,
+    async getFile(path: string): Promise<string | null> {
+        let record = await this.record(path);
+        if(!record) {
+            record = await this.newAttachmentRecord({
+                id: path,
                 state: AttachmentState.QUEUED_DOWNLOAD
             });
 
-            await this.saveToQueue(attachmentRecord)
-            .catch((e) => console.log("error download missing file at getFile: ", e));
+            this.saveToQueue(record).catch(e => console.error("Queue error", e));
         }
 
+        const localURI = `${ this.storageDirectory }/${ path }`;
         const file = new File(localURI);
 
-        if(!file.exists) {
-            console.log(`File not downloaded: ${ filename }`);
-            return null;
-        }
-
-        try {
+        if(file.exists && file.size > 0) {
             return file.uri;
-        } catch(e) {
-            console.error("Error at getFile", e);
+        } else {
             return null;
         }
     }

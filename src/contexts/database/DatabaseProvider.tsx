@@ -3,6 +3,7 @@ import { DatabaseContext } from "./DatabaseContext.ts";
 import { Database } from "../../database/connector/Database.ts";
 import * as SplashScreen from "expo-splash-screen";
 import * as Network from "expo-network";
+import { PowerSyncContext } from "@powersync/react-native";
 
 type DatabaseProviderProps = {
     children: ReactNode | null
@@ -62,8 +63,10 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
     if(error || !database) return null;
 
     return (
-        <DatabaseContext.Provider value={ database }>
-            { children }
-        </DatabaseContext.Provider>
+        <PowerSyncContext.Provider value={ database.powersync }>
+            <DatabaseContext.Provider value={ database }>
+                { children }
+            </DatabaseContext.Provider>
+        </PowerSyncContext.Provider>
     );
 }

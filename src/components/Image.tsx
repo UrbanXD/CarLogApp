@@ -1,11 +1,10 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode } from "react";
 import { ActivityIndicator, Image as ImageRN, ImageStyle, StyleSheet, View } from "react-native";
 import DefaultElement from "./DefaultElement";
 import { COLORS, ICON_NAMES } from "../constants/index.ts";
 import { hexToRgba } from "../utils/colors/hexToRgba";
 import { LinearGradient } from "expo-linear-gradient";
-import { useDatabase } from "../contexts/database/DatabaseContext.ts";
-import { File } from "expo-file-system";
+import { useFile } from "../database/hooks/useFile.ts";
 
 type ImageProps = {
     path?: string
@@ -24,50 +23,7 @@ function Image({
     attachment = true,
     children
 }: ImageProps) {
-    const { attachmentQueue } = useDatabase();
-
-    const [source, setSource] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(!!path);
-    const [imageError, setImageError] = useState<boolean>(false);
-
-    useEffect(() => {
-        if(!path || (attachment && !attachmentQueue)) {
-            setLoading(false);
-            setImageError(true);
-            return;
-        }
-
-        let isMounted = true;
-
-        const loadImage = async () => {
-            try {
-                setLoading(true);
-                let result = null;
-                if(attachment && attachmentQueue) {
-                    result = await attachmentQueue.getFile(path);
-                } else {
-                    const file = new File(path);
-                    if(file.exists && file.size > 0) result = file.uri;
-                }
-                if(isMounted) {
-                    if(result) {
-                        setSource(result);
-                        setImageError(false);
-                    } else {
-                        setImageError(true);
-                    }
-                }
-            } catch(e) {
-                if(isMounted) setImageError(true);
-            } finally {
-                if(isMounted) setLoading(false);
-            }
-        };
-
-        loadImage();
-
-        return () => { isMounted = false; };
-    }, [path, attachmentQueue]);
+    const { source, loading, error } = useFile({ uri: path, attachment: attachment });
 
     return (
         <>
@@ -76,31 +32,20 @@ function Image({
                 ?
                 <View
                     style={ [styles.image, imageStyle, { backgroundColor: COLORS.black5, justifyContent: "center" }] }>
-                    <ActivityIndicator size={ "large" } color={ COLORS.gray2 }/>
+                    <ActivityIndicator size="large" color={ COLORS.gray2 }/>
                 </View>
-                : !imageError && source
-                  ?
-                  <ImageRN
-                      source={ { uri: source } }
-                      style={ [styles.image, imageStyle] }
-                  />
-                  :
-                  <DefaultElement
-                      icon={ alt }
-                      style={ [styles.image, imageStyle] }
-                  />
+                : error || !source
+                  ? <DefaultElement icon={ alt } style={ [styles.image, imageStyle] }/>
+                  : <ImageRN source={ { uri: source } } style={ [styles.image, imageStyle] }/>
             }
             {
                 children &&
                <View style={ [styles.contentContainer, imageStyle] }>
                    {
-                       overlay && !imageError && source &&
+                       overlay &&
                       <LinearGradient
                          locations={ [0, 0.85] }
-                         colors={ [
-                             hexToRgba(COLORS.black, 0.15),
-                             hexToRgba(COLORS.black, 0.60)
-                         ] }
+                         colors={ [hexToRgba(COLORS.black, 0.15), hexToRgba(COLORS.black, 0.60)] }
                          style={ [
                              styles.imageOverlay,
                              imageStyle?.borderRadius && { borderRadius: imageStyle.borderRadius }
