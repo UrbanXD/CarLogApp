@@ -639,7 +639,8 @@
     "garage": "Garage",
     "use_garage": "Manage cars parked in your virtual garage!",
     "add_new_car": "Add car",
-    "empty_car_list": "No cars are parked in your virtual garage yet"
+    "empty_car_list": "No cars are parked in your virtual garage yet",
+    "loading": "Virtual garage loading"
   },
   "statistics": {
     "title": "Statistics",

@@ -639,7 +639,8 @@
     "garage": "Garázs",
     "use_garage": "Rendelkezzen a virutális garázsában parkoló autókról!",
     "add_new_car": "Autó hozzáadás",
-    "empty_car_list": "Még egy autó se parkol a virtuális garázsában"
+    "empty_car_list": "Még egy autó se parkol a virtuális garázsában",
+    "loading": "Virtuális garázs betöltése"
   },
   "statistics": {
     "title": "Statisztika",

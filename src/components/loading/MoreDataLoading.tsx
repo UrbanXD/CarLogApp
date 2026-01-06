@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 
 type MoreDataLoadingProps = {
     text?: string
-    activityIndicatorSize?: "small" | "large"
+    activityIndicatorSize?: "small" | "large" | number
     activityIndicatorColor?: Color
     containerStyle?: ViewStyle
     textStyle?: TextStyle

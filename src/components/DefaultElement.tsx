@@ -1,14 +1,19 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import Icon from "./Icon";
 import { hexToRgba } from "../utils/colors/hexToRgba";
 import { ImageSource } from "../types/index.ts";
+import { debounce } from "es-toolkit";
+import { MoreDataLoading } from "./loading/MoreDataLoading.tsx";
 
 type DefaultElementProps = {
     icon?: ImageSource
     text?: string
     onPress?: () => void
+    loading?: boolean
+    loadingText?: string
+    activityIndicatorSize?: "large" | "small" | number
     style?: ViewStyle
 }
 
@@ -16,23 +21,43 @@ function DefaultElement({
     icon = ICON_NAMES.image,
     text,
     onPress,
+    loading,
+    loadingText,
+    activityIndicatorSize = "large",
     style
 }: DefaultElementProps) {
+    const debouncedOnPress = useMemo(() => debounce(() => {
+        if(loading) return;
+
+        onPress?.();
+    }), [onPress, loading]);
+
     return (
         <Pressable
-            onPress={ onPress }
-            disabled={ !onPress }
+            onPress={ debouncedOnPress }
+            disabled={ !onPress || loading }
             style={ [styles.container, style] }
         >
             <View style={ { alignItems: "center" } }>
-                <Icon
-                    icon={ icon }
-                    size={ FONT_SIZES.title }
-                    color={ COLORS.gray3 }
-                />
                 {
-                    text &&
-                   <Text style={ styles.text }>{ text }</Text>
+                    loading
+                    ?
+                    <MoreDataLoading
+                        text={ loadingText }
+                        activityIndicatorSize={ activityIndicatorSize }
+                    />
+                    :
+                    <>
+                        <Icon
+                            icon={ icon }
+                            size={ FONT_SIZES.title }
+                            color={ COLORS.gray3 }
+                        />
+                        {
+                            text &&
+                           <Text style={ styles.text }>{ text }</Text>
+                        }
+                    </>
                 }
             </View>
         </Pressable>

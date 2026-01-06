@@ -23,6 +23,7 @@ const carsSlice = createSlice({
 
             if(shouldReplace) {
                 state.cars = cars;
+                state.loading = false;
                 return;
             }
 

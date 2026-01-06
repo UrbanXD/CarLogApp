@@ -17,8 +17,9 @@ export interface CarouselItemType {
 
 export type CarouselProps = {
     data: Array<any>
+    loading?: boolean
     renderItem: (item: any, index: number, size: number, x: SharedValue<number>) => ReactElement
-    renderDefaultItem?: (size: number, spacerWidth: number) => ReactElement
+    renderDefaultItem?: (size: number, spacerWidth: number, loading: boolean) => ReactElement
     contentWidth?: number
     itemSizePercentage?: number
     spacer?: number
@@ -26,6 +27,7 @@ export type CarouselProps = {
 
 function Carousel({
     data,
+    loading,
     renderItem,
     renderDefaultItem,
     contentWidth,
@@ -56,7 +58,7 @@ function Carousel({
     return (
         <AnimatedFlatList
             ref={ flatlistRef }
-            data={ data }
+            data={ !loading ? data : [] }
             renderItem={
                 ({ item, index }) =>
                     <React.Fragment key={ index }>
@@ -71,7 +73,7 @@ function Carousel({
                         }
                     </React.Fragment>
             }
-            ListEmptyComponent={ renderDefaultItem ? renderDefaultItem(ITEM_SIZE, SPACER) : <></> }
+            ListEmptyComponent={ renderDefaultItem ? renderDefaultItem(ITEM_SIZE, SPACER, loading) : <></> }
             keyExtractor={ (_, index) => index.toString() }
             horizontal
             snapToInterval={ ITEM_SIZE }

@@ -12,17 +12,21 @@ import { useTranslation } from "react-i18next";
 
 const Garage: React.FC = () => {
     const { t } = useTranslation();
-    const { cars, openNewCarForm, openCarProfile } = useGarage();
+    const { cars, loading, openNewCarForm, openCarProfile } = useGarage();
 
     const renderDefaultElement =
-        (size: number, spacerSize: number) =>
-            <View style={ styles.defaultElementContainer }>
-                <DefaultElement
-                    icon={ ICON_NAMES.car }
-                    text={ t("garage.empty_car_list") }
-                    style={ { width: size - spacerSize / 2 } }
-                />
-            </View>;
+        (size: number, spacerSize: number, loading: boolean) => {
+            return (
+                <View style={ styles.defaultElementContainer }>
+                    <DefaultElement
+                        icon={ ICON_NAMES.car }
+                        text={ t("garage.empty_car_list") }
+                        style={ { width: size - spacerSize / 2 } }
+                        loading={ loading }
+                        loadingText={ t("garage.loading") }
+                    />
+                </View>);
+        };
 
     const renderCarouselItem =
         (item: CarouselItemType, index: number, size: number, coordinate: SharedValue<number>) =>
@@ -48,6 +52,7 @@ const Garage: React.FC = () => {
             <View style={ styles.carouselContainer }>
                 <Carousel
                     data={ cars }
+                    loading={ loading }
                     renderItem={ renderCarouselItem }
                     renderDefaultItem={ renderDefaultElement }
                 />
