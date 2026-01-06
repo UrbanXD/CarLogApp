@@ -62,7 +62,7 @@ export function FuelStatistics({
     const getFuelCount = useCallback(() => {
         return {
             label: t("statistics.fuel.log_count"),
-            value: fuelLogSummary ? `${ fuelLogSummary.quantity.count } ${ t("common.count") }` : null,
+            value: fuelLogSummary != null ? `${ fuelLogSummary.quantity.count } ${ t("common.count") }` : null,
             isLoading: !fuelLogSummary
         };
     }, [fuelLogSummary, t]);
@@ -70,17 +70,17 @@ export function FuelStatistics({
     const getFuelTotalQuantity = useCallback(() => {
         return {
             label: t("statistics.fuel.total_quantity"),
-            value: fuelLogSummary
+            value: fuelLogSummary != null
                    ? formatWithUnit(fuelLogSummary.quantity.total, fuelLogSummary.quantity?.unitText)
                    : null,
-            isPositive: fuelLogSummary?.quantity.totalTrend.isTrendPositive,
-            trend: fuelLogSummary && fuelLogSummary?.quantity
+            isPositive: fuelLogSummary?.quantity?.totalTrend?.isTrendPositive,
+            trend: fuelLogSummary != null && fuelLogSummary?.quantity
                    ? `${ fuelLogSummary.quantity.totalTrend.trendSymbol } ${ formatWithUnit(
                     fuelLogSummary.quantity.totalTrend.trend,
                     fuelLogSummary.quantity?.unitText
                 ) }`
                    : null,
-            trendDescription: fuelLogSummary ? t("statistics.compared_to_previous_cycle") : null,
+            trendDescription: fuelLogSummary != null ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !fuelLogSummary
         };
     }, [fuelLogSummary, t]);
@@ -88,17 +88,17 @@ export function FuelStatistics({
     const getFuelAverageQuantity = useCallback(() => {
         return {
             label: t("statistics.fuel.avg_quantity"),
-            value: fuelLogSummary
+            value: fuelLogSummary != null
                    ? formatWithUnit(fuelLogSummary.quantity.average, fuelLogSummary.quantity?.unitText)
                    : null,
-            isPositive: fuelLogSummary?.quantity.averageTrend.isTrendPositive,
-            trend: fuelLogSummary
+            isPositive: fuelLogSummary?.quantity?.averageTrend?.isTrendPositive,
+            trend: fuelLogSummary != null
                    ? `${ fuelLogSummary.quantity.averageTrend.trendSymbol } ${ formatWithUnit(
                     fuelLogSummary.quantity.averageTrend.trend,
                     fuelLogSummary.quantity?.unitText
                 ) }`
                    : null,
-            trendDescription: fuelLogSummary ? t("statistics.compared_to_previous_cycle") : null,
+            trendDescription: fuelLogSummary != null ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !fuelLogSummary
         };
     }, [fuelLogSummary, t]);
@@ -106,17 +106,17 @@ export function FuelStatistics({
     const getFuelMedianQuantity = useCallback(() => {
         return {
             label: t("statistics.fuel.median_quantity"),
-            value: fuelLogSummary
+            value: fuelLogSummary != null
                    ? formatWithUnit(fuelLogSummary.quantity.median, fuelLogSummary.quantity?.unitText)
                    : null,
-            isPositive: fuelLogSummary?.quantity.medianTrend.isTrendPositive,
-            trend: fuelLogSummary
+            isPositive: fuelLogSummary?.quantity?.medianTrend?.isTrendPositive,
+            trend: fuelLogSummary != null
                    ? `${ fuelLogSummary.quantity.medianTrend.trendSymbol } ${ formatWithUnit(
                     fuelLogSummary.quantity.medianTrend.trend,
                     fuelLogSummary.quantity?.unitText
                 ) }`
                    : null,
-            trendDescription: fuelLogSummary ? t("statistics.compared_to_previous_cycle") : null,
+            trendDescription: fuelLogSummary != null ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !fuelLogSummary
         };
     }, [fuelLogSummary, t]);
@@ -135,15 +135,17 @@ export function FuelStatistics({
     const getFuelTotalAmount = useCallback(() => {
         return {
             label: t("statistics.fuel.total_amount"),
-            value: fuelLogSummary ? formatWithUnit(fuelLogSummary.amount.total, fuelLogSummary.amount?.unitText) : null,
-            isPositive: fuelLogSummary?.amount.totalTrend.isTrendPositive,
-            trend: fuelLogSummary
+            value: fuelLogSummary != null
+                   ? formatWithUnit(fuelLogSummary.amount.total, fuelLogSummary.amount?.unitText)
+                   : null,
+            isPositive: fuelLogSummary?.amount?.totalTrend?.isTrendPositive,
+            trend: fuelLogSummary != null
                    ? `${ fuelLogSummary.amount.totalTrend.trendSymbol } ${ formatWithUnit(
                     fuelLogSummary.amount.totalTrend.trend,
                     fuelLogSummary.amount?.unitText
                 ) }`
                    : null,
-            trendDescription: fuelLogSummary ? t("statistics.compared_to_previous_cycle") : null,
+            trendDescription: fuelLogSummary != null ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !fuelLogSummary
         };
     }, [fuelLogSummary, t]);
@@ -151,17 +153,17 @@ export function FuelStatistics({
     const getFuelAverageAmount = useCallback(() => {
         return {
             label: t("statistics.fuel.avg_amount"),
-            value: fuelLogSummary
+            value: fuelLogSummary != null
                    ? formatWithUnit(fuelLogSummary.amount.average, fuelLogSummary.amount?.unitText)
                    : null,
-            isPositive: fuelLogSummary?.amount.averageTrend.isTrendPositive,
-            trend: fuelLogSummary
+            isPositive: fuelLogSummary?.amount?.averageTrend?.isTrendPositive,
+            trend: fuelLogSummary != null
                    ? `${ fuelLogSummary.amount.averageTrend.trendSymbol } ${ formatWithUnit(
                     fuelLogSummary.amount.averageTrend.trend,
                     fuelLogSummary.amount?.unitText
                 ) }`
                    : null,
-            trendDescription: fuelLogSummary ? t("statistics.compared_to_previous_cycle") : null,
+            trendDescription: fuelLogSummary != null ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !fuelLogSummary
         };
     }, [fuelLogSummary, t]);
@@ -169,17 +171,17 @@ export function FuelStatistics({
     const getFuelMedianAmount = useCallback(() => {
         return {
             label: t("statistics.fuel.median_amount"),
-            value: fuelLogSummary
+            value: fuelLogSummary != null
                    ? formatWithUnit(fuelLogSummary.amount.median, fuelLogSummary.amount?.unitText)
                    : null,
-            isPositive: fuelLogSummary?.amount.medianTrend.isTrendPositive,
-            trend: fuelLogSummary
+            isPositive: fuelLogSummary?.amount?.medianTrend?.isTrendPositive,
+            trend: fuelLogSummary != null
                    ? `${ fuelLogSummary.amount.medianTrend.trendSymbol } ${ formatWithUnit(
                     fuelLogSummary.amount.medianTrend.trend,
                     fuelLogSummary.amount?.unitText
                 ) }`
                    : null,
-            trendDescription: fuelLogSummary ? t("statistics.compared_to_previous_cycle") : null,
+            trendDescription: fuelLogSummary != null ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !fuelLogSummary
         };
     }, [fuelLogSummary, t]);

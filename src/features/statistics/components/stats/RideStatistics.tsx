@@ -60,7 +60,7 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
             value: rideSummaryStat?.distance.count != null
                    ? `${ rideSummaryStat.distance.count } ${ t("common.count") }`
                    : null,
-            isPositive: rideSummaryStat?.distance.countTrend.isTrendPositive,
+            isPositive: rideSummaryStat?.distance?.countTrend?.isTrendPositive,
             trend: formatTrend({ trend: trend, trendSymbol: trendSymbol }),
             trendDescription: t("statistics.compared_to_previous_cycle"),
             isLoading: !rideSummaryStat
@@ -70,15 +70,15 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
     const getTotalRideDuration = useCallback(() => {
         return {
             label: t("statistics.distance.total_ride_duration"),
-            value: rideSummaryStat
+            value: rideSummaryStat != null
                    ? rideSummaryStat.duration.total > 0 ? dayjs.duration(rideSummaryStat.duration.total, "days")
                 .humanize() : "-"
                    : null,
-            isPositive: rideSummaryStat?.duration?.totalTrend.isTrendPositive,
-            trend: rideSummaryStat
+            isPositive: rideSummaryStat?.duration?.totalTrend?.isTrendPositive,
+            trend: rideSummaryStat != null
                    ? `${ rideSummaryStat.duration.totalTrend.trendSymbol } ${ rideSummaryStat.duration.totalTrend.trend }`
                    : null,
-            trendDescription: rideSummaryStat ? t("statistics.compared_to_previous_cycle") : null,
+            trendDescription: rideSummaryStat != null ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !rideSummaryStat
         };
     }, [rideSummaryStat, t]);
@@ -87,14 +87,14 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
     const getAverageRideDuration = useCallback(() => {
         return {
             label: t("statistics.distance.avg_ride_duration"),
-            value: rideSummaryStat
+            value: rideSummaryStat != null
                    ? rideSummaryStat.duration.average > 0 ? dayjs.duration(rideSummaryStat.duration.average, "days")
                 .humanize() : "-" : null,
-            isPositive: rideSummaryStat?.duration?.averageTrend.isTrendPositive,
-            trend: rideSummaryStat
+            isPositive: rideSummaryStat?.duration?.averageTrend?.isTrendPositive,
+            trend: rideSummaryStat != null
                    ? `${ rideSummaryStat.duration.averageTrend.trendSymbol } ${ rideSummaryStat.duration.averageTrend.trend }`
                    : null,
-            trendDescription: rideSummaryStat ? t("statistics.compared_to_previous_cycle") : null,
+            trendDescription: rideSummaryStat != null ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !rideSummaryStat
         };
     }, [rideSummaryStat, t]);
@@ -103,14 +103,14 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
     const getMedianRideDuration = useCallback(() => {
         return {
             label: t("statistics.distance.median_ride_duration"),
-            value: rideSummaryStat
+            value: rideSummaryStat != null
                    ? rideSummaryStat.duration.median > 0 ? dayjs.duration(rideSummaryStat.duration.median, "days")
                 .humanize() : "-" : null,
-            isPositive: rideSummaryStat?.duration?.medianTrend.isTrendPositive,
-            trend: rideSummaryStat
+            isPositive: rideSummaryStat?.duration?.medianTrend?.isTrendPositive,
+            trend: rideSummaryStat != null
                    ? `${ rideSummaryStat.duration.medianTrend.trendSymbol } ${ rideSummaryStat.duration.medianTrend.trend }`
                    : null,
-            trendDescription: rideSummaryStat ? t("statistics.compared_to_previous_cycle") : null,
+            trendDescription: rideSummaryStat != null ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !rideSummaryStat
         };
     }, [rideSummaryStat, t]);
@@ -118,7 +118,7 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
     const getMaxRideDuration = useCallback(() => {
         return {
             label: t("statistics.distance.max_ride_duration"),
-            value: rideSummaryStat?.duration.max != null
+            value: rideSummaryStat?.duration?.max != null
                    ? rideSummaryStat.duration.max.value > 0 ? dayjs.duration(rideSummaryStat.duration.max.value, "days")
                 .humanize() : "-" : null,
             isLoading: !rideSummaryStat
@@ -128,13 +128,13 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
     const getTotalDistanceByOdometer = useCallback(() => {
         return {
             label: t("statistics.distance.total_distance_by_odometer"),
-            value: rideSummaryStat
+            value: rideSummaryStat != null
                    ? formatWithUnit(
                     rideSummaryStat.distance.totalDistanceByOdometer,
                     rideSummaryStat.distance?.unitText
                 )
                    : null,
-            // isPositive: rideSummaryStat?.countTrend.isTrendPositive,
+            isPositive: null,
             isLoading: !rideSummaryStat
         };
     });
@@ -142,14 +142,14 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
     const getTotalRideDistance = useCallback(() => {
         return {
             label: t("statistics.distance.total_ride_distance"),
-            value: rideSummaryStat
+            value: rideSummaryStat != null
                    ? formatWithUnit(rideSummaryStat.distance.total, rideSummaryStat.distance?.unitText)
                    : null,
-            isPositive: rideSummaryStat?.distance?.totalTrend.isTrendPositive,
-            trend: rideSummaryStat
+            isPositive: rideSummaryStat?.distance?.totalTrend?.isTrendPositive,
+            trend: rideSummaryStat != null
                    ? `${ rideSummaryStat.distance.totalTrend.trendSymbol } ${ rideSummaryStat.distance.totalTrend.trend }`
                    : null,
-            trendDescription: rideSummaryStat ? t("statistics.compared_to_previous_cycle") : null,
+            trendDescription: rideSummaryStat != null ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !rideSummaryStat
         };
     }, [rideSummaryStat, t]);
@@ -158,15 +158,15 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
     const getAverageRideDistance = useCallback(() => {
         return {
             label: t("statistics.distance.avg_ride_distance"),
-            value: rideSummaryStat ? formatWithUnit(
+            value: rideSummaryStat != null ? formatWithUnit(
                 rideSummaryStat.distance.average,
                 rideSummaryStat.distance?.unitText
             ) : null,
-            isPositive: rideSummaryStat?.distance.averageTrend.isTrendPositive,
-            trend: rideSummaryStat
+            isPositive: rideSummaryStat?.distance?.averageTrend?.isTrendPositive,
+            trend: rideSummaryStat != null
                    ? `${ rideSummaryStat.distance.averageTrend.trendSymbol } ${ rideSummaryStat.distance.averageTrend.trend }`
                    : null,
-            trendDescription: rideSummaryStat ? t("statistics.compared_to_previous_cycle") : null,
+            trendDescription: rideSummaryStat != null ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !rideSummaryStat
         };
     }, [rideSummaryStat, t]);
@@ -175,14 +175,14 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
     const getMedianRideDistance = useCallback(() => {
         return {
             label: t("statistics.distance.median_ride_distance"),
-            value: rideSummaryStat
+            value: rideSummaryStat != null
                    ? formatWithUnit(rideSummaryStat.distance.median, rideSummaryStat.distance?.unitText)
                    : null,
-            isPositive: rideSummaryStat?.distance.medianTrend.isTrendPositive,
-            trend: rideSummaryStat
+            isPositive: rideSummaryStat?.distance?.medianTrend?.isTrendPositive,
+            trend: rideSummaryStat != null
                    ? `${ rideSummaryStat.distance.medianTrend.trendSymbol } ${ rideSummaryStat.distance.medianTrend.trend }`
                    : null,
-            trendDescription: rideSummaryStat ? t("statistics.compared_to_previous_cycle") : null,
+            trendDescription: rideSummaryStat != null ? t("statistics.compared_to_previous_cycle") : null,
             isLoading: !rideSummaryStat
         };
     }, [rideSummaryStat, t]);
@@ -190,7 +190,7 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
     const getMaxRideDistance = useCallback(() => {
         return {
             label: t("statistics.distance.max_ride_distance"),
-            value: rideSummaryStat?.distance.max != null
+            value: rideSummaryStat?.distance?.max != null
                    ? formatWithUnit(rideSummaryStat.distance.max.value, rideSummaryStat.distance?.unitText)
                    : null,
             isLoading: !rideSummaryStat
@@ -203,21 +203,23 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
         if(rideSummaryStat && rideSummaryStat.distance.mostVisitedPlaces.length > 0) {
             value = (
                 <>
-                    { rideSummaryStat.distance.mostVisitedPlaces.map((place, index) => (
-                        <React.Fragment key={ place.name + index }>
-                            { place.name }{ " " }
-                            <Text
-                                style={ {
-                                    fontFamily: "Gilroy-Medium",
-                                    fontSize: FONT_SIZES.p3,
-                                    color: COLORS.gray1
-                                } }
-                            >
-                                (x{ place.count })
-                            </Text>
-                            { rideSummaryStat.distance.mostVisitedPlaces.length - 1 !== index && "\n" }
-                        </React.Fragment>
-                    )) }
+                    {
+                        rideSummaryStat.distance.mostVisitedPlaces.map((place, index) => (
+                            <React.Fragment key={ place.name + index }>
+                                { place.name }{ " " }
+                                <Text
+                                    style={ {
+                                        fontFamily: "Gilroy-Medium",
+                                        fontSize: FONT_SIZES.p3,
+                                        color: COLORS.gray1
+                                    } }
+                                >
+                                    (x{ place.count })
+                                </Text>
+                                { rideSummaryStat.distance.mostVisitedPlaces.length - 1 !== index && "\n" }
+                            </React.Fragment>
+                        ))
+                    }
                 </>
             );
         }

@@ -108,8 +108,8 @@ export function ExpenseStatistics({ carId, from, to }: ExpenseStatisticsProps) {
         return {
             label: t("statistics.expense.max_amount"),
             value: expenseStat?.max != null ? formatWithUnit(expenseStat.max.value, expenseStat?.unitText) : null,
-            description: expenseStat ? t(`expenses.types.${ expenseStat.max.label }`) : null,
-            descriptionStyle: expenseStat ? { color: expenseStat.max.color } : undefined,
+            description: expenseStat?.max != null ? t(`expenses.types.${ expenseStat.max.label }`) : null,
+            descriptionStyle: expenseStat?.max != null ? { color: expenseStat.max.color } : undefined,
             isLoading: !expenseStat
         };
     }, [expenseStat, t]);

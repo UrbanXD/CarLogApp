@@ -76,7 +76,7 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
         return {
             label: t("statistics.service.log_count"),
             value: serviceLogStat?.count != null ? `${ serviceLogStat.count } ${ t("common.count") }` : null,
-            isPositive: serviceLogStat?.countTrend.isTrendPositive,
+            isPositive: serviceLogStat?.countTrend?.isTrendPositive,
             trend: formatTrend({ trend: trend, trendSymbol: trendSymbol }),
             trendDescription: t("statistics.compared_to_previous_cycle"),
             isLoading: !serviceLogStat
@@ -107,7 +107,7 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
             value: serviceLogStat?.average != null
                    ? formatWithUnit(serviceLogStat.average, serviceLogStat?.unitText)
                    : null,
-            isPositive: serviceLogStat?.averageTrend.isTrendPositive,
+            isPositive: serviceLogStat?.averageTrend?.isTrendPositive,
             trend: formatTrend({ trend: trend, trendSymbol: trendSymbol }),
             trendDescription: t("statistics.compared_to_previous_cycle"),
             isLoading: !serviceLogStat
@@ -117,9 +117,9 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
     const getMedianServiceAmount = useCallback(() => {
         return {
             label: t("statistics.service.median_amount"),
-            value: serviceLogStat ? formatWithUnit(serviceLogStat.median, serviceLogStat?.unitText) : null,
-            isPositive: serviceLogStat?.medianTrend.isTrendPositive,
-            trend: serviceLogStat
+            value: serviceLogStat != null ? formatWithUnit(serviceLogStat.median, serviceLogStat?.unitText) : null,
+            isPositive: serviceLogStat?.medianTrend?.isTrendPositive,
+            trend: serviceLogStat != null
                    ? `${ serviceLogStat.medianTrend.trendSymbol } ${ serviceLogStat.medianTrend.trend }`
                    : null,
             trendDescription: serviceLogStat ? t("statistics.compared_to_previous_cycle") : null,
