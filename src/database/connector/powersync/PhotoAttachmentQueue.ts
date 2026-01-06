@@ -75,6 +75,8 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
         const localURI = this.getLocalUri(attachmentRecord.local_uri || this.getLocalFilePathSuffix(path));
         const file = new File(image.uri);
         const copiedFile = new File(localURI);
+        if(!copiedFile.parentDirectory.exists) copiedFile.parentDirectory.create({ intermediates: true });
+
         file.copy(copiedFile);
 
         if(copiedFile.exists && copiedFile.size > 0) attachmentRecord.size = copiedFile.size;
