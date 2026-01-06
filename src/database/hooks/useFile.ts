@@ -35,6 +35,7 @@ export function useFile({ uri, attachment = true }: UseFileOptions) {
                 const file = new File(uri);
                 if(file.exists && file.size > 0) {
                     setSource(file.uri);
+                    setError(false);
                 } else {
                     setError(true);
                 }
@@ -49,6 +50,7 @@ export function useFile({ uri, attachment = true }: UseFileOptions) {
                 const fileURI = await attachmentQueue.getFile(uri);
                 if(fileURI) {
                     setSource(fileURI);
+                    setError(false);
                     setLoading(false);
                 }
             }
