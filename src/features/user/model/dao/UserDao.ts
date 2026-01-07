@@ -18,7 +18,7 @@ export class UserDao extends Dao<UserTableRow, UserAccount, UserMapper> {
         this.attachmentQueue = attachmentQueue;
     }
 
-    async getPreviousAvatarImageUrl(id: string): Promise<string | null> {
+    async getPreviousAvatarImagePath(id: string): Promise<string | null> {
         const result = await this.db
         .selectFrom(USER_TABLE)
         .select("avatar_url")
@@ -48,18 +48,28 @@ export class UserDao extends Dao<UserTableRow, UserAccount, UserMapper> {
     }
 
     async updateAvatar(userId: string, request: EditUserAvatarRequest): Promise<void> {
-        const previousAvatarPath = await this.getPreviousAvatarImageUrl(userId);
-        let avatarPath = previousAvatarPath;
+        const previousAvatarPath = await this.getPreviousAvatarImagePath(userId);
+        const user: Partial<UserTableRow> = {};
 
-        if(request.isImageAvatar && this.attachmentQueue && !!request.avatar && previousAvatarPath !== request.avatar.fileName) {
-            const newAvatar = await this.attachmentQueue.saveFile(request.avatar, userId);
-            avatarPath = newAvatar.filename;
-
-            if(previousAvatarPath) await this.attachmentQueue.deleteFile(previousAvatarPath);
+        let path = previousAvatarPath;
+        if(this.attachmentQueue && request.isImageAvatar) {
+            path = await this.attachmentQueue.changeEntityAttachment(
+                request.avatar ?? null,
+                previousAvatarPath,
+                userId
+            );
         }
 
-        const user: Partial<UserTableRow> = { avatar_url: avatarPath };
-        if(!request.isImageAvatar) user.avatar_color = request.avatarColor ?? AVATAR_COLOR[0];
+        if(!request.isImageAvatar) {
+            user.avatar_url = null;
+            user.avatar_color = request.avatarColor ?? AVATAR_COLOR[0];
+
+            if(this.attachmentQueue && previousAvatarPath) await this.attachmentQueue.deleteFile(previousAvatarPath);
+        } else {
+            user.avatar_url = path;
+        }
+
+        if(Object.keys(user).length === 0) throw "Nothing changed";
 
         await this.db
         .updateTable(USER_TABLE)

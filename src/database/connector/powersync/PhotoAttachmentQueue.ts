@@ -110,6 +110,24 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
         await this.storage.deleteFile(localURI, { filename: path });
     }
 
+    async changeEntityAttachment(
+        image: Image | null,
+        previousFilePath: string | null,
+        storagePath?: string
+    ): Promise<string> {
+        if(!image) {
+            if(previousFilePath) await this.deleteFile(previousFilePath);
+            return null;
+        }
+        const path = this.getPathWithStoragePath(image.fileName, storagePath);
+        if(previousFilePath === path) return previousFilePath;
+
+        const newAttachment = await this.saveFile(image, storagePath);
+        if(previousFilePath) await this.deleteFile(previousFilePath);
+
+        return newAttachment.filename;
+    }
+
     async cleanUpLocalFiles(storagePath?: string): Promise<void> {
         const now = Date.now();
         const lastLocalImageCleanupTime = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_LAST_LOCAL_IMAGE_CLEANUP);

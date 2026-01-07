@@ -52,7 +52,7 @@ function InputImagePicker({
 
     useEffect(() => {
         const newValue = inputFieldContext?.field.value;
-        if(newValue && !Array.isArray(newValue) && selectedImage !== newValue) selectImage(newValue);
+        if(!Array.isArray(newValue) && selectedImage !== newValue) selectImage(newValue, false);
     }, [inputFieldContext?.field.value]);
 
     const handleLayout = (event: any) => {
@@ -80,8 +80,7 @@ function InputImagePicker({
 
         if(!images || images.length === 0) return;
 
-        if(onChange) onChange(images[0]);
-        if(setValue) setValue(images[0]);
+        selectImage(images[0]);
 
         if(images.length > 1) addImagesToHistory(images.slice(1));
     };
@@ -110,8 +109,15 @@ function InputImagePicker({
         });
     };
 
-    const selectImage = (newImage: ImageType | null) => {
+    const selectImage = (newImage: ImageType | null, userSelection?: boolean = true) => {
         if(multipleSelection) return;
+
+        if(userSelection) {
+            if(onChange) onChange(newImage);
+            if(setValue) setValue(newImage);
+        }
+
+        if(newImage === selectedImage) return;
 
         if(history.length + 1 > limitOfImages + defaultImages.length) {
             setHistory(prevHistory => {
@@ -121,29 +127,15 @@ function InputImagePicker({
         }
 
         setSelectedImage(prevSelectedImage => {
-            let removeIndex =
-                defaultImages.includes(newImage)
-                ? -1
-                : history.indexOf(newImage);
-
             setHistory(prevHistory => {
-                return (
-                    prevSelectedImage
-                    ? defaultImages.includes(prevSelectedImage)
-                      ? removeIndex !== -1
-                        ? [...prevHistory.slice(0, removeIndex), ...prevHistory.slice(removeIndex + 1)]
-                        : [...prevHistory]
-                      : removeIndex !== -1
-                        ? [
-                                ...prevHistory.slice(0, removeIndex),
-                                ...prevHistory.slice(removeIndex + 1),
-                                prevSelectedImage
-                            ]
-                        : [...prevHistory, prevSelectedImage]
-                    : removeIndex !== -1
-                      ? [...prevHistory.slice(0, removeIndex), ...prevHistory.slice(removeIndex + 1)]
-                      : [...prevHistory]
-                );
+                if(prevSelectedImage?.uri === newImage?.uri) return prevHistory;
+
+                const filteredHistory = prevHistory.filter(img => img.uri !== newImage?.uri);
+                const shouldStoreOld = prevSelectedImage && !defaultImages.includes(prevSelectedImage);
+
+                if(shouldStoreOld) return [...filteredHistory, prevSelectedImage];
+
+                return filteredHistory;
             });
 
             return newImage;

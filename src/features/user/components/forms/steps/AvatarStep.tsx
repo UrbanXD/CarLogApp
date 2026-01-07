@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Input from "../../../../../components/Input/Input.ts";
-import { AVATAR_COLOR } from "../../../../../constants/index.ts";
+import { AVATAR_COLOR, ICON_NAMES } from "../../../../../constants/index.ts";
 import Avatar from "../../../../../components/Avatar/Avatar.ts";
 import { UseFormReturn, useWatch } from "react-hook-form";
 
@@ -49,6 +49,7 @@ export function AvatarStep({
                             height: hp(20),
                             borderRadius: 100
                         } }
+                        alt={ ICON_NAMES.user }
                     />
                 </Input.Field>
                 :

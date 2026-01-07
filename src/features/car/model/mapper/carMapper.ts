@@ -73,7 +73,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
 
     async formResultToCarEntities(
         request: CarFormFields,
-        previousCarImageUrl?: string | null,
+        previousCarImagePath?: string | null,
         createdAt?: string
     ): Promise<{
         car: CarTableRow
@@ -83,16 +83,14 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
     }> {
         const odometerUnit = await this.odometerUnitDao.getById(request.odometer.unitId);
 
-        let carImage = request?.image ?? null;
         let path = request?.image?.fileName ?? null;
 
-        if(this.attachmentQueue && carImage && previousCarImageUrl !== path) {
-            const newAvatar = await this.attachmentQueue.saveFile(carImage, request.ownerId);
-            path = newAvatar.filename;
-        }
-
-        if(previousCarImageUrl && previousCarImageUrl !== path) {
-            await this.attachmentQueue?.deleteFile(previousCarImageUrl);
+        if(this.attachmentQueue) {
+            path = await this.attachmentQueue.changeEntityAttachment(
+                request.image ?? null,
+                previousCarImagePath ?? null,
+                request.ownerId
+            );
         }
 
         const car: CarTableRow = {

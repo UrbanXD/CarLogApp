@@ -80,7 +80,7 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
         return result.owner_id;
     }
 
-    async getCarImageUrl(id: string): Promise<string | null> {
+    async getCarImagePath(id: string): Promise<string | null> {
         const result = await this.db
         .selectFrom(CAR_TABLE)
         .select("image_url")
@@ -91,11 +91,11 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
     }
 
     async create(formResult: CarFormFields): Promise<Car> {
-        const previousCarImageUrl = await this.getCarImageUrl(formResult.id);
+        const previousCarImagePath = await this.getCarImagePath(formResult.id);
 
         const { car, odometerLog, odometerChangeLog, fuelTank } = await this.mapper.formResultToCarEntities(
             formResult,
-            previousCarImageUrl,
+            previousCarImagePath,
             new Date().toISOString()
         );
 
@@ -133,8 +133,8 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
     }
 
     async update(formResult: CarFormFields) {
-        const previousCarImageUrl = await this.getCarImageUrl(formResult.id);
-        const { car, fuelTank } = await this.mapper.formResultToCarEntities(formResult, previousCarImageUrl);
+        const previousCarImagePath = await this.getCarImagePath(formResult.id);
+        const { car, fuelTank } = await this.mapper.formResultToCarEntities(formResult, previousCarImagePath);
 
         const updatedCar = await this.db.transaction().execute(async trx => {
             const carRow = await trx
