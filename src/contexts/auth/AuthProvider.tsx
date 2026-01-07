@@ -129,10 +129,11 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                         WHERE operation = '${ DiffTriggerOperation.DELETE }'
                     `);
 
-                    if(deletedDiffResult.length > 0) {
-                        dispatch(deleteCars({
-                            carIds: deletedDiffResult.map(res => res.id)
-                        }));
+                    const updatedIds = new Set(updatedDiffResult.map(result => result.id));
+                    const realDeletes = deletedDiffResult.filter(result => !updatedIds.has(result.id));
+
+                    if(realDeletes.length > 0) {
+                        dispatch(deleteCars({ carIds: realDeletes.map(result => result.id) }));
                     }
 
                     if(updatedDiffResult.length > 0) {

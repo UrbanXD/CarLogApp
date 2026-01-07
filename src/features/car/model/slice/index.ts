@@ -29,7 +29,7 @@ const carsSlice = createSlice({
 
             if(shouldReplace) {
                 state.cars = cars;
-                state.loading = false;
+                if(state.loading) state.loading = false;
                 return;
             }
 
@@ -44,7 +44,7 @@ const carsSlice = createSlice({
                 }
             });
 
-            state.loading = false;
+            if(state.loading) state.loading = false;
         },
         deleteCars: (state: CarsState, action: PayloadAction<{ carIds: Array<string> }>) => {
             const { carIds } = action.payload;
