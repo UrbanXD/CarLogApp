@@ -24,7 +24,7 @@ const AuthScreen: React.FC = () => {
     const openSignIn = () => router.push("bottomSheet/signIn");
 
     const openVerification = useCallback(() => {
-        if(notVerifiedEmail) openAccountVerification(notVerifiedEmail);
+        if(notVerifiedEmail) openAccountVerification(notVerifiedEmail, true);
     }, [notVerifiedEmail]);
 
     const styles = useStyles(top, bottom);

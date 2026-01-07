@@ -34,7 +34,7 @@ function VerifyOtpForm({
     const { dismissBottomSheet } = useBottomSheet();
 
     useEffect(() => {
-        if(automaticResend) resend();
+        if(automaticResend) resend(true);
     }, [automaticResend]);
 
     const defaultSubtitle = () =>
@@ -60,7 +60,13 @@ function VerifyOtpForm({
         }
     };
 
-    const resend = async () => await resendOTP({ type, email });
+    const resend = async (automatic?: boolean = false) => {
+        try {
+            await resendOTP({ type, email }, automatic);
+        } catch(e) {
+            console.log("Resend OTP error: ", e);
+        }
+    };
 
     return (
         <View style={ styles.pageContainer }>

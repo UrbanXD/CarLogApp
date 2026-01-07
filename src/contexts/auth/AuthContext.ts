@@ -6,7 +6,7 @@ type AuthContextValue = {
     providers: Array<string>
     hasPassword: boolean // if the user use google oauth then dont have (without identity link)
     authenticated: boolean | null
-    openAccountVerification: (email: string) => void
+    openAccountVerification: (email: string, automaticResend?: boolean) => void
     signUp: (request: SignUpRequest) => Promise<void>
     signIn: (request: SignInRequest) => Promise<void>
     signOut: (disabledToast?: boolean) => Promise<void>

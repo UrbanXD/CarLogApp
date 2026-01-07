@@ -36,11 +36,6 @@ const ProfileScreen: React.FC = () => {
 
     const selectedLanguage = useSharedValue(i18n.language);
 
-    if(!user) return <Redirect href={ "backToRootIndex" }/>;
-
-    const name = `${ user.lastname } ${ user.firstname }`;
-    const avatarColor = user.avatarColor;
-
     const openEditUser = (type: EDIT_USER_FORM_TYPE) => router.push({
         pathname: "bottomSheet/editUser",
         params: { type }
@@ -76,7 +71,14 @@ const ProfileScreen: React.FC = () => {
         });
     });
 
+    const enFlagStyle = useFlagStyle(["en", "en-US"]);
+    const huFlagStyle = useFlagStyle(["hu", "hu-HU"]);
     const styles = useStyles(bottom);
+
+    if(!user) return <Redirect href={ "backToRootIndex" }/>;
+
+    const name = `${ user.lastname } ${ user.firstname }`;
+    const avatarColor = user.avatarColor;
 
     return (
         <ScreenScrollView
@@ -113,13 +115,13 @@ const ProfileScreen: React.FC = () => {
                         </Text>
                         <View style={ styles.flagContainer }>
                             <AnimatedPressable
-                                style={ useFlagStyle(["en", "en-US"]) }
+                                style={ enFlagStyle }
                                 onPress={ () => changeLanguage("en-US") }
                             >
                                 <FlagUs width={ 36 } height={ 36 }/>
                             </AnimatedPressable>
                             <AnimatedPressable
-                                style={ useFlagStyle(["hu", "hu-HU"]) }
+                                style={ huFlagStyle }
                                 onPress={ () => changeLanguage("hu-HU") }
                             >
                                 <FlagHu width={ 36 } height={ 36 }/>
