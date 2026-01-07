@@ -59,7 +59,7 @@ export function ExpenseScreen() {
     const onDelete = useCallback(() => {
         if(!expense) return openToast(NotFoundToast.warning(t("expenses.title_singular")));
 
-        openModal(DeleteModal({ name: t("expenses.title_singular"), acceptAction: handleDelete(expense.id) }));
+        openModal(DeleteModal({ name: t("expenses.title_singular"), acceptAction: () => handleDelete(expense.id) }));
     }, [expense, openToast, openModal, t]);
 
     const getAmountSubtitle = useCallback(() => {
