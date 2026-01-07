@@ -15,8 +15,14 @@ const carsSlice = createSlice({
     name: "cars",
     initialState,
     reducers: {
+        resetCars: (state: CarsState) => {
+            state.loading = true;
+            state.loadError = false;
+            state.cars = [];
+            state.selectedCar = null;
+        },
         updateCars: (
-            state,
+            state: CarsState,
             action: PayloadAction<{ cars: Array<Car>, shouldReplace?: boolean }>
         ) => {
             const { cars, shouldReplace = false } = action.payload;
@@ -31,6 +37,7 @@ const carsSlice = createSlice({
                 const index = state.cars.findIndex(car => car.id === updatedCar.id);
                 if(index !== -1) {
                     state.cars[index] = updatedCar;
+                    if(state.selectedCar?.id === updatedCar.id) state.selectedCar = updatedCar;
                 } else {
                     state.cars.push(updatedCar);
                     state.cars.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
@@ -39,11 +46,11 @@ const carsSlice = createSlice({
 
             state.loading = false;
         },
-        deleteCars: (state, action: PayloadAction<{ carIds: Array<string> }>) => {
+        deleteCars: (state: CarsState, action: PayloadAction<{ carIds: Array<string> }>) => {
             const { carIds } = action.payload;
             state.cars = state.cars.filter(car => !carIds.includes(car.id));
         },
-        updateCarOdometer: (state, action: PayloadAction<{ odometer: Odometer }>) => {
+        updateCarOdometer: (state: CarsState, action: PayloadAction<{ odometer: Odometer }>) => {
             const carIndex = state.cars.findIndex(car => car.id === action.payload.odometer.carId);
             if(carIndex === -1) return;
 
@@ -51,6 +58,7 @@ const carsSlice = createSlice({
             updatedCar.odometer = action.payload?.odometer;
 
             state.cars[carIndex] = updatedCar;
+            if(state.cars[carIndex].id === state.selectedCar?.id) state.selectedCar = updatedCar;
         }
     },
     extraReducers: builder => {
@@ -64,5 +72,5 @@ const carsSlice = createSlice({
     }
 });
 
-export const { updateCars, deleteCars, updateCarOdometer } = carsSlice.actions;
+export const { resetCars, updateCars, deleteCars, updateCarOdometer } = carsSlice.actions;
 export const carsReducer = carsSlice.reducer;

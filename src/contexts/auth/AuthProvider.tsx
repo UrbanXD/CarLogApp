@@ -11,7 +11,7 @@ import { getToastMessage } from "../../ui/alert/utils/getToastMessage.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { SignInRequest } from "../../features/user/schemas/form/signInRequest.ts";
 import { SignUpRequest } from "../../features/user/schemas/form/signUpRequest.ts";
-import { deleteCars, updateCars } from "../../features/car/model/slice/index.ts";
+import { deleteCars, resetCars, updateCars } from "../../features/car/model/slice/index.ts";
 import { updateUser } from "../../features/user/model/slice/index.ts";
 import { getUserLocalCurrency } from "../../features/_shared/currency/utils/getUserLocalCurrency.ts";
 import { useTranslation } from "react-i18next";
@@ -57,8 +57,11 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     }, []);
 
     useEffect(() => {
-        if(!session) fetchNotVerifiedEmail();
-        if(session?.user?.email === notVerifiedEmail) setNotVerifiedEmail(null);
+        if(session && notVerifiedEmail && session.user.email === notVerifiedEmail) updateNotVerifiedEmail(null);
+        if(!session) {
+            fetchNotVerifiedEmail();
+            dispatch(resetCars());
+        }
 
         if(!session?.user.id) return;
         const userId = session.user.id;
@@ -126,8 +129,6 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                         WHERE operation = '${ DiffTriggerOperation.DELETE }'
                     `);
 
-                    console.log(updatedDiffResult, "\n\n", deletedDiffResult);
-
                     if(deletedDiffResult.length > 0) {
                         dispatch(deleteCars({
                             carIds: deletedDiffResult.map(res => res.id)
@@ -137,6 +138,8 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                     if(updatedDiffResult.length > 0) {
                         dispatch(updateCars({ cars: await carDao.mapper.toDtoArray(updatedDiffResult) }));
                     }
+
+                    dispatch(selectCar());
                 },
                 hooks: {
                     beforeCreate: async (lockContext) => {
@@ -149,8 +152,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
 
                         const cars = await database.carDao.mapper.toDtoArray(result);
                         dispatch(updateCars({ cars, shouldReplace: true }));
-                        const selectedCarId = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_SELECTED_CAR_INDEX);
-                        if(selectedCarId) dispatch(selectCar({ database, carId: selectedCarId }));
+                        dispatch(selectCar());
                     }
                 }
             });
@@ -208,17 +210,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             if(!supabaseUser) throw { code: "user_not_found" } as AuthError;
 
             updateNotVerifiedEmail(supabaseUser.email).catch(console.error);
-
             openAccountVerification(supabaseUser.email);
-            await userDao.create({
-                id: supabaseUser.id,
-                email: supabaseUser.email,
-                firstname: supabaseUser.user_metadata.firstname,
-                lastname: supabaseUser.user_metadata.lastname,
-                currency_id: getUserLocalCurrency(),
-                avatar_url: null,
-                avatar_color: supabaseUser.user_metadata.avatar_color
-            });
         } catch(error) {
             console.error("Signup error: ", error);
             const toastMessage = getToastMessage({ messages: SignUpToast, error });
