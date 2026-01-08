@@ -102,9 +102,24 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
             if(!route) continue;
             if(!route.name.startsWith("bottomSheet/") && !BottomSheetRoutes.includes(route.name)) {
                 let pathname = route.name;
-                if(route.name.endsWith("index")) pathname = pathname.slice(0, pathname.length - 5);
+                let params = { ...route.params };
 
-                router.dismissTo({ pathname, params: route.params });
+                if(route.state) {
+                    const activeRouteIndex = route.state.index;
+                    const activeSubRoute = route.state.routes[activeRouteIndex];
+
+                    if(activeSubRoute) {
+                        pathname = `/(main)/${ activeSubRoute.name }`;
+                        params = { ...params, ...activeSubRoute.params };
+                    }
+                } else if(pathname.endsWith("index")) {
+                    pathname = pathname.slice(0, pathname.length - 5);
+                }
+
+                router.dismissTo({
+                    pathname: pathname.startsWith("/") ? pathname : `/${ pathname }`,
+                    params
+                });
                 return;
             }
         }
