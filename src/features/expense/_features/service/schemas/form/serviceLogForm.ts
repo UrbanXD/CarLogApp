@@ -8,7 +8,10 @@ import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formResultServiceItemSchema } from "../serviceItemSchema.ts";
 import { OdometerLogDao } from "../../../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
-import { zodOdometerValidation } from "../../../../../car/_features/odometer/utils/zodOdometerValidation.ts";
+import {
+    MIN_ODOMETER_VALUE,
+    zodOdometerValidation
+} from "../../../../../car/_features/odometer/utils/zodOdometerValidation.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import dayjs from "dayjs";
 
@@ -23,7 +26,7 @@ const serviceLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
         serviceTypeId: zPickerRequired("error.service_type_required")
         .pipe(serviceLogSchema.shape.serviceType.shape.id),
         odometerValue: zNumber({
-            bounds: { min: 0 },
+            bounds: { min: MIN_ODOMETER_VALUE },
             errorMessage: {
                 required: "error.odometer_value_required",
                 minBound: () => "error.odometer_value_non_negative"
@@ -39,7 +42,8 @@ const serviceLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
         odometerValueFieldName: "odometerValue",
         carId: data.carId,
         date: data.date,
-        odometerValue: data.odometerValue
+        odometerValue: data.odometerValue,
+        skipOdometerLogs: [data.odometerLogId]
     });
 });
 

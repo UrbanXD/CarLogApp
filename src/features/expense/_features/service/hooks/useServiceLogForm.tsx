@@ -30,6 +30,7 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
     const [car, setCar] = useState<Car | null>(null);
     const [odometerLimit, setOdometerLimit] = useState<OdometerLimit | null>(null);
 
+    const formOdometerLogId = useWatch({ control, name: "odometerLogId" });
     const formCarId = useWatch({ control, name: "carId" });
     const formDate = useWatch({ control, name: "date" });
 
@@ -43,9 +44,9 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
         (async () => {
             if(!formCarId || !formDate) return;
 
-            setOdometerLimit(await odometerLogDao.getOdometerLimitByDate(formCarId, formDate));
+            setOdometerLimit(await odometerLogDao.getOdometerLimitByDate(formCarId, formDate, [formOdometerLogId]));
         })();
-    }, [formCarId, formDate]);
+    }, [formCarId, formDate, formOdometerLogId]);
 
     const fields: Record<ServiceLogFormFieldsEnum, FormFields> = useMemo(() => ({
         [ServiceLogFormFieldsEnum.Car]: {

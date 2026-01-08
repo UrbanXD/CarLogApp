@@ -43,6 +43,8 @@ export function useRideLogFormFields({
     const [car, setCar] = useState<Car | null>(null);
     const [startOdometerLimit, setStartOdometerLimit] = useState<OdometerLimit | null>(null);
 
+    const formStartOdometerLogId = useWatch({ control, name: "startOdometerLogId" });
+    const formEndOdometerLogId = useWatch({ control, name: "endOdometerLogId" });
     const formCarId = useWatch({ control, name: "carId" });
     const formStartOdometerValue = useWatch({ control, name: "startOdometerValue" });
     const formStartTime = useWatch({ control, name: "startTime" });
@@ -69,9 +71,13 @@ export function useRideLogFormFields({
             }
             if(!formCarId || !formStartTime) return;
 
-            setStartOdometerLimit(await odometerLogDao.getOdometerLimitByDate(formCarId, formStartTime));
+            setStartOdometerLimit(await odometerLogDao.getOdometerLimitByDate(
+                formCarId,
+                formStartTime,
+                [formStartOdometerLogId, formEndOdometerLogId]
+            ));
         })();
-    }, [formCarId, formStartTime]);
+    }, [formCarId, formStartTime, formStartOdometerLogId, formEndOdometerLogId]);
 
     const fields: Record<RideLogFormFieldsEnum, FormFields> = useMemo(
         () => ({

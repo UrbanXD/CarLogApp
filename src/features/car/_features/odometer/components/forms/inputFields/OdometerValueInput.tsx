@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Control } from "react-hook-form";
 import Input from "../../../../../../../components/Input/Input.ts";
 import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../../../../constants/index.ts";
@@ -25,6 +25,7 @@ type OdometerValueInputProps = {
     currentOdometerValue?: number
     odometerLimit?: OdometerLimit | null
     unitText?: string
+    showCurrentOdometerValueAsSubtitle?: boolean
 }
 
 export function OdometerValueInput({
@@ -40,9 +41,82 @@ export function OdometerValueInput({
     currentOdometerValueTranslationKey,
     currentOdometerValue,
     odometerLimit,
-    unitText
+    unitText,
+    showCurrentOdometerValueAsSubtitle = false
 }: OdometerValueInputProps) {
     const { t } = useTranslation();
+
+    const getSubtitle = useCallback(
+        () => {
+            if(odometerValueSubtitle) return odometerValueSubtitle;
+
+            if(odometerLimit) {
+                let subtitle;
+
+                if(odometerLimit.min) {
+                    subtitle =
+                        dayjs(odometerLimit.min.date).isValid()
+                        ?
+                        t(
+                            "odometer.limit",
+                            {
+                                value: formatWithUnit(odometerLimit.min.value, odometerLimit.unitText),
+                                date: dayjs(odometerLimit.min.date).format("L")
+                            }
+                        )
+                        :
+                        t(
+                            "odometer.limit_without_date",
+                            { value: formatWithUnit(odometerLimit.min.value, odometerLimit.unitText) }
+                        );
+                }
+
+                if(odometerLimit.max) {
+                    const maxLimitText =
+                        dayjs(odometerLimit.max.date).isValid()
+                        ?
+                        t(
+                            "odometer.limit",
+                            {
+                                value: formatWithUnit(odometerLimit.max.value, odometerLimit.unitText),
+                                date: dayjs(odometerLimit.max.date).format("L")
+                            }
+                        )
+                        :
+                        t(
+                            "odometer.limit_without_date",
+                            { value: formatWithUnit(odometerLimit.max.value, odometerLimit.unitText) }
+                        );
+
+                    if(subtitle) {
+                        subtitle += `\n${ maxLimitText }`;
+                    } else {
+                        subtitle = maxLimitText;
+                    }
+                }
+
+                return subtitle;
+            }
+
+            if(showCurrentOdometerValueAsSubtitle && currentOdometerValue) {
+                return t(
+                    currentOdometerValueTranslationKey ?? "odometer.current_value",
+                    { value: formatWithUnit(currentOdometerValue, unitText) }
+                );
+            }
+
+            return undefined;
+        },
+        [
+            t,
+            odometerValueSubtitle,
+            odometerLimit,
+            showCurrentOdometerValueAsSubtitle,
+            currentOdometerValue,
+            unitText,
+            currentOdometerValueTranslationKey
+        ]
+    );
 
     return (
         <View style={ { gap: formTheme.gap } }>
@@ -61,37 +135,7 @@ export function OdometerValueInput({
                 control={ control }
                 fieldName={ odometerValueFieldName }
                 fieldNameText={ odometerValueTitle ?? t("odometer.value") }
-                fieldInfoText={
-                    odometerValueSubtitle
-                    ??
-                    (
-                        odometerLimit && (
-                            odometerLimit.min?.date &&
-                            dayjs(odometerLimit.min.date).isValid()
-                            ?
-                            t(
-                                "odometer.limit",
-                                {
-                                    value: formatWithUnit(odometerLimit.min.value ?? 0, odometerLimit.unitText),
-                                    date: dayjs(odometerLimit.min.date).format("L")
-                                }
-                            )
-                            :
-                            t(
-                                "odometer.limit_without_date",
-                                { value: formatWithUnit(odometerLimit.min?.value ?? 0, odometerLimit.unitText) }
-                            )
-                        )
-                    )
-                    ??
-                    (
-                        currentOdometerValue &&
-                        t(
-                            currentOdometerValueTranslationKey ?? "odometer.current_value",
-                            { value: formatWithUnit(currentOdometerValue, unitText) }
-                        )
-                    )
-                }
+                fieldInfoText={ getSubtitle() }
                 optional={ odometerValueOptional }
             >
                 <Input.Row style={ { gap: 0 } }>

@@ -5,7 +5,7 @@ import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { Car, carSchema } from "../../../../schemas/carSchema.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { odometerUnitSchema } from "../odometerUnitSchema.ts";
-import { zodOdometerValidation } from "../../utils/zodOdometerValidation.ts";
+import { MIN_ODOMETER_VALUE, zodOdometerValidation } from "../../utils/zodOdometerValidation.ts";
 import { OdometerLogDao } from "../../model/dao/OdometerLogDao.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import dayjs from "dayjs";
@@ -18,7 +18,7 @@ export const odometerChangeLogForm = (odometerLogDao?: OdometerLogDao, omitOwner
         ownerId: carSchema.shape.ownerId, //hidden
         odometerChangeLogId: z.string().uuid(), //hidden
         value: zNumber({
-                bounds: { min: 0 },
+                bounds: { min: MIN_ODOMETER_VALUE },
                 errorMessage: {
                     required: "error.odometer_value_required",
                     minBound: () => "error.odometer_value_non_negative"
@@ -40,7 +40,8 @@ export const odometerChangeLogForm = (odometerLogDao?: OdometerLogDao, omitOwner
                 odometerValueFieldName: "value",
                 carId: data.carId,
                 date: data.date,
-                odometerValue: data.value
+                odometerValue: data.value,
+                skipOdometerLogs: [data.id]
             });
         });
     }

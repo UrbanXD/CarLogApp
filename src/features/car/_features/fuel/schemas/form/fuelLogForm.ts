@@ -9,7 +9,7 @@ import { expenseForm } from "../../../../../expense/schemas/form/expenseForm.ts"
 import { odometerLogSchema } from "../../../odometer/schemas/odometerLogSchema.ts";
 import { OdometerLogDao } from "../../../odometer/model/dao/OdometerLogDao.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
-import { zodOdometerValidation } from "../../../odometer/utils/zodOdometerValidation.ts";
+import { MIN_ODOMETER_VALUE, zodOdometerValidation } from "../../../odometer/utils/zodOdometerValidation.ts";
 import { inputAmountSchema } from "../../../../../_shared/currency/schemas/inputAmountSchema.ts";
 import dayjs from "dayjs";
 
@@ -36,7 +36,7 @@ const fuelLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
         }).pipe(fuelLogSchema.shape.quantity),
         odometerValue: zNumber({
             optional: true,
-            bounds: { min: 0 },
+            bounds: { min: MIN_ODOMETER_VALUE },
             errorMessage: { minBound: () => "error.odometer_value_non_negative" }
         }),
         fuelUnitId: fuelLogSchema.shape.fuelUnit.shape.id, // hidden
@@ -50,7 +50,8 @@ const fuelLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
         odometerValueFieldName: "odometerValue",
         carId: data.carId,
         date: data.date,
-        odometerValue: data.odometerValue
+        odometerValue: data.odometerValue,
+        skipOdometerLogs: [data.odometerLogId]
     });
 });
 
