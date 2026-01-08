@@ -76,7 +76,7 @@ const InputOTP: React.FC<InputOTPProps> = ({
     }, []);
 
     useEffect(() => {
-        setTimeout(() => hiddenInputRef.current?.focus(), 0); // auto focus
+        setTimeout(() => hiddenInputRef.current?.focus(), 100); // auto focus
     }, [hiddenInputRef]);
 
     const styles = useStyles(numberOfDigits);

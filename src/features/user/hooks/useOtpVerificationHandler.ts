@@ -53,9 +53,9 @@ export const useOtpVerificationHandler = () => {
             await signOut(true);
         };
 
-    const handleCurrentEmailVerification = (email?: string): HandleVerificationOtpType =>
+    const handleCurrentEmailVerification = (newEmail?: string): HandleVerificationOtpType =>
         async (errorCode) => {
-            if(errorCode || !email) {
+            if(errorCode || !newEmail) {
                 return openToast(
                     getToastMessage({
                         messages: ChangeEmailToast,
@@ -69,7 +69,7 @@ export const useOtpVerificationHandler = () => {
                 params: {
                     type: "email_change",
                     title: t("auth.otp_verification.new_email"),
-                    email,
+                    email: newEmail,
                     handlerType: OtpVerificationHandlerType.NewEmailChange
                 }
             });

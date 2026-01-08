@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import OtpVerificationBottomSheet from "../../features/user/presets/bottomSheet/OtpVerificationBottomSheet.tsx";
 import { useLocalSearchParams } from "expo-router";
 import {
@@ -27,15 +27,18 @@ const Page: React.FC = () => {
         handlePasswordResetVerification,
         handleUserDeleteVerification
     } = useOtpVerificationHandler();
+
     const { setOTPTimeLimitStorage } = useOtp();
 
     let handleVerification = () => {};
+    let dismissOnSuccess;
     switch(Number(handlerType)) {
         case OtpVerificationHandlerType.SignUp:
             handleVerification = handleSignUpVerification;
             break;
         case OtpVerificationHandlerType.CurrentEmailChange:
             handleVerification = handleCurrentEmailVerification(newEmail);
+            dismissOnSuccess = false;
             break;
         case OtpVerificationHandlerType.NewEmailChange:
             handleVerification = handleNewEmailVerification;
@@ -48,9 +51,11 @@ const Page: React.FC = () => {
             break;
     }
 
-    if(setOtpLastSend === undefined || setOtpLastSend === "true") {
-        setOTPTimeLimitStorage(type, email);
-    }
+    useEffect(() => {
+        if(setOtpLastSend === undefined || setOtpLastSend === "true") {
+            setOTPTimeLimitStorage(type, email);
+        }
+    }, [type, email, setOtpLastSend]);
 
     return (
         <OtpVerificationBottomSheet
@@ -59,6 +64,7 @@ const Page: React.FC = () => {
             email={ email }
             handleVerification={ handleVerification }
             automaticResend={ automaticResend === "true" }
+            dismissOnSuccess={ dismissOnSuccess }
         />
     );
 };

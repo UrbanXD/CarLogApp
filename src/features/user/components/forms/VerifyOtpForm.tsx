@@ -18,6 +18,7 @@ type VerifyOTPProps = {
     subtitle?: string
     handleVerification: HandleVerificationOtpType
     automaticResend?: boolean
+    dismissOnSuccess?: boolean
 }
 
 function VerifyOtpForm({
@@ -27,7 +28,8 @@ function VerifyOtpForm({
     title,
     subtitle,
     handleVerification,
-    automaticResend = false
+    automaticResend = false,
+    dismissOnSuccess = true
 }: VerifyOTPProps) {
     const { t } = useTranslation();
     const { verifyOTP, resendOTP } = useOtp();
@@ -54,7 +56,8 @@ function VerifyOtpForm({
             await verifyOTP({ email, token, type });
 
             await handleVerification();
-            if(dismissBottomSheet) dismissBottomSheet(true);
+
+            if(dismissOnSuccess && !!dismissBottomSheet) dismissBottomSheet(true);
         } catch(error: AuthApiError | any) {
             await handleVerification(error.code || "otp_error");
         }
