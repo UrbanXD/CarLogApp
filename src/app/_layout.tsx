@@ -26,7 +26,9 @@ const Layout: React.FC = () => {
 
     useEffect(() => {
         (async () => {
-            await setBackgroundColorAsync(SECONDARY_COLOR);
+            try {
+                await setBackgroundColorAsync(SECONDARY_COLOR);
+            } catch(_) {}
         })();
     }, []);
 

@@ -4,7 +4,6 @@ import { ModelMapper } from "../mapper/modelMapper.ts";
 import { MODEL_TABLE } from "../../../../database/connector/powersync/tables/model.ts";
 import { Model } from "../../schemas/modelSchema.ts";
 import { MakeDao } from "./MakeDao.ts";
-import { getToday } from "../../../../utils/getDate.ts";
 import { CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
@@ -21,7 +20,7 @@ export class ModelDao extends Dao<ModelTableRow, Model, ModelMapper> {
         const years = {
             start: Number(model?.startYear),
             end: !model?.endYear
-                 ? getToday().getFullYear()
+                 ? new Date().getFullYear()
                  : Number(model.endYear)
         };
 
@@ -43,7 +42,6 @@ export class ModelDao extends Dao<ModelTableRow, Model, ModelMapper> {
         makeId: string | undefined,
         perPage?: number = 50
     ): CursorPaginator<ModelTableRow, PickerItemType> {
-        console.log(makeId, "paginator ");
         return new CursorPaginator<ModelTableRow, PickerItemType>(
             this.db,
             MODEL_TABLE,

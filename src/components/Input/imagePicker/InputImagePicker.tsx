@@ -15,6 +15,7 @@ import { Image as ImageType } from "../../../types/zodTypes.ts";
 import { useTranslation } from "react-i18next";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { Paths } from "expo-file-system";
+import { usePermission } from "../../../hooks/usePermission.ts";
 
 export const INPUT_IMAGE_TEMP_DIR = `${ Paths.document.uri }/temp`;
 
@@ -40,6 +41,8 @@ function InputImagePicker({
     if(!defaultImages) throw new Error("DefaultImages is invalid");
 
     const { t } = useTranslation();
+    const { askMediaLibraryPermission, askCameraPermission } = usePermission();
+
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field?.onChange;
     const fieldValue = useMemo(() => inputFieldContext?.field?.value ?? (defaultImages.length === 0 || multipleSelection)
@@ -68,7 +71,13 @@ function InputImagePicker({
         setHistory(prevHistory => [...prevHistory.slice(0, index), ...prevHistory.slice(index + 1)]);
     };
 
-    const getImages = async (type: "CAMERA" | "GALLERY", onChange: (...event: any[]) => void) => {
+    const getImages = async (type: "CAMERA" | "GALLERY") => {
+        if(type === "CAMERA") {
+            await askCameraPermission();
+        } else {
+            await askMediaLibraryPermission();
+        }
+
         const images = await pickImage(
             type,
             {
@@ -218,11 +227,11 @@ function InputImagePicker({
                 <View style={ styles.uploadButtonContainer }>
                     <Button.Icon
                         icon={ ICON_NAMES.upload }
-                        onPress={ () => getImages("GALLERY", onChange) }
+                        onPress={ () => getImages("GALLERY") }
                     />
                     <Button.Icon
                         icon={ ICON_NAMES.cameraPlus }
-                        onPress={ () => getImages("CAMERA", onChange) }
+                        onPress={ () => getImages("CAMERA") }
                     />
                 </View>
                 <View style={ styles.imagesContainer } onLayout={ handleLayout }>

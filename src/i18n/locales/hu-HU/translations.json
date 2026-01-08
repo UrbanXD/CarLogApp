@@ -19,6 +19,11 @@
     "image": "Kép",
     "element": "Elem"
   },
+  "permission": {
+    "title": "erőforrás",
+    "camera": "kamera",
+    "media_library": "galéria"
+  },
   "first_select_car": {
     "title": "Először válasszon autót!",
     "description": "Ahhoz, hogy hozzáférjen a kért adatokhoz, kérjük, válassza ki elsődleges autóját. Ezt a képernyő tetején található menüben teheti\n                    meg. Amennyiben Önnek még nem parkol autója a virtuális garázsában akkor hozzonlétre egyet."
@@ -69,6 +74,9 @@
     "default_error": "Váratlan hiba lépett fel!",
     "picker_disabled": {
       "default_body": "Nem lehetséges művelet! Valami kimaradt."
+    },
+    "denied_permission": {
+      "body": "A(z) {{permission}} elérése megtagadva. Kérjük, engedélyezze a beállításokban."
     },
     "not_found": {
       "body": "{{name}} nem található"

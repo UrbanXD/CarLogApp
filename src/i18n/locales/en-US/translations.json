@@ -19,6 +19,11 @@
     "image": "Image",
     "element": "Item"
   },
+  "permission": {
+    "title": "requested feature",
+    "camera": "camera",
+    "media_library": "media library"
+  },
   "first_select_car": {
     "title": "Select a vehicle first!",
     "description": "To access the requested data, please select your primary vehicle. You can do this using the menu at the top of the screen. If you don't have a car parked in your virtual garage yet, please create one."
@@ -69,6 +74,9 @@
     "default_error": "An unexpected error has occurred!",
     "picker_disabled": {
       "default_body": "Action not possible! Something is missing."
+    },
+    "denied_permission": {
+      "body": "Access to {{permission}} was denied. Please enable it in settings."
     },
     "not_found": {
       "body": "{{name}} not found"
