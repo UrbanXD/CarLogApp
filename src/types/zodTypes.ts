@@ -82,9 +82,9 @@ export const zDate = (args: ZodDateArgs = {}) => {
         z.string({ required_error })
         .transform(v => {
             if(v === "" || v == null) return null;
-            return dayjs(v).isValid() ? dayjs(v).toISOString() : null;
+            return dayjs(v).isValid() ? dayjs(v).toISOString().replace("T", " ") : null;
         }),
-        z.date({ required_error }).transform(v => v.toISOString())
+        z.date({ required_error }).transform(v => v.toISOString().replace("T", " "))
     ]);
 
     if(optional) {
