@@ -1,29 +1,29 @@
 import React, { useMemo } from "react";
-import { StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import Icon from "../Icon";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
-import { Color, ImageSource } from "../../types/index.ts";
+import { Color, ImageSource, ViewStyle } from "../../types/index.ts";
 import { debounce } from "es-toolkit";
 
-interface IconButtonProps {
-    icon: ImageSource;
-    iconSize?: number;
-    iconColor?: Color;
-    backgroundColor?: Color;
-    width?: number;
-    height?: number;
-    style?: ViewStyle;
-    inverse?: boolean;
-    disabled?: boolean;
-    debounceMs?: number;
-    onPress: () => void;
+type IconButtonProps = {
+    icon: ImageSource
+    iconSize?: number
+    iconColor?: Color | null
+    backgroundColor?: Color | null
+    width?: number
+    height?: number
+    style?: ViewStyle
+    inverse?: boolean
+    disabled?: boolean
+    debounceMs?: number
+    onPress: () => void
 }
 
-export const IconButton: React.FC<IconButtonProps> = ({
+export function IconButton({
     icon,
     iconSize = FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE,
-    iconColor = COLORS.black,
-    backgroundColor = COLORS.fuelYellow,
+    iconColor,
+    backgroundColor,
     width = FONT_SIZES.h3 * ICON_FONT_SIZE_SCALE + SEPARATOR_SIZES.lightSmall,
     height = FONT_SIZES.h3 * ICON_FONT_SIZE_SCALE + SEPARATOR_SIZES.lightSmall,
     style,
@@ -31,10 +31,13 @@ export const IconButton: React.FC<IconButtonProps> = ({
     disabled = false,
     debounceMs = 350,
     onPress
-}) => {
+}: IconButtonProps) {
+    const primaryColor = backgroundColor ?? COLORS.fuelYellow;
+    const secondaryColor = iconColor ?? COLORS.black;
+
     const styles = useButtonStyles(
-        !inverse ? backgroundColor : iconColor,
-        !inverse ? iconColor : backgroundColor,
+        !inverse ? primaryColor : secondaryColor,
+        !inverse ? secondaryColor : primaryColor,
         width,
         height
     );
@@ -54,7 +57,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
             />
         </TouchableOpacity>
     );
-};
+}
 
 export const useButtonStyles = (
     primaryColor: Color,

@@ -14,7 +14,7 @@ export class FuelTankDao extends Dao<FuelTankTableRow, FuelTank, FuelTankMapper>
 
     async getByCarId(carId: string): Promise<FuelTank> {
         const fuelTankRow = await this.db
-        .selectFrom(this.table)
+        .selectFrom(FUEL_TANK_TABLE)
         .selectAll()
         .where("car_id", "=", carId)
         .executeTakeFirstOrThrow();

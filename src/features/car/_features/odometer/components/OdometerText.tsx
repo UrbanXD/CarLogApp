@@ -1,11 +1,12 @@
 import React from "react";
-import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
+import { StyleSheet, Text, View } from "react-native";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants";
 import { UnitText } from "../../../../../components/UnitText.tsx";
+import { TextStyle, ViewStyle } from "../../../../../types";
 
 type OdometerTextProps = {
     text: string
-    unit?: string
+    unit?: string | null
     containerStyle?: ViewStyle
     textStyle?: TextStyle
     backgroundTextStyle?: TextStyle
@@ -22,7 +23,10 @@ export function OdometerText({
 }: OdometerTextProps) {
     return (
         <View style={ [styles.container, containerStyle] }>
-            <View style={ [styles.digitContainer, textStyle && textStyle?.fontSize && { height: textStyle.fontSize }] }>
+            <View style={ [
+                styles.digitContainer,
+                !!(textStyle && StyleSheet.flatten(textStyle)?.fontSize) && { height: StyleSheet.flatten(textStyle).fontSize }
+            ] }>
                 <Text style={ [styles.digitText, textStyle] }>
                     { text }
                 </Text>

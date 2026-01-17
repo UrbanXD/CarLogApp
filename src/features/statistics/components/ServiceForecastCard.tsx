@@ -12,11 +12,11 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-na
 const BAR_ANIMATiON_DURATION = 300;
 
 type ForecastCardProps = {
-    forecast: Forecast | null
+    forecast?: Forecast | null
     type: ServiceTypeEnum
-    odometer: {
+    odometer?: {
         value: number
-        unitText?: string
+        unitText?: string | null
     }
     isLoading?: boolean
 }
@@ -41,7 +41,7 @@ export function ServiceForecastCard({
             return;
         }
 
-        let percent = !isLoading && forecast
+        let percent = !isLoading && forecast && odometer
                       ? ((odometer.value - forecast.oldValue) / (forecast.value - forecast.oldValue)) * 100
                       : 0;
 
@@ -103,8 +103,8 @@ export function ServiceForecastCard({
                             />
                             :
                             <OdometerText
-                                text={ forecast?.oldValue ?? 0 }
-                                unit={ odometer.unitText }
+                                text={ forecast?.oldValue.toString() ?? "0" }
+                                unit={ odometer?.unitText }
                                 textStyle={ styles.label }
                                 unitTextStyle={ { color: styles.label.color } }
                             />
@@ -127,11 +127,11 @@ export function ServiceForecastCard({
                             />
                             :
                             <OdometerText
-                                text={ forecast?.value ?? 0 }
-                                unit={ odometer.unitText }
+                                text={ forecast?.value.toString() ?? "0" }
+                                unit={ odometer?.unitText }
                                 textStyle={ styles.label }
                                 unitTextStyle={ { color: styles.label.color } }
-                                containerStyle={ !isOdometerViewWrapped && { alignSelf: "flex-end" } }
+                                containerStyle={ !isOdometerViewWrapped ? { alignSelf: "flex-end" } : undefined }
                             />
                         }
                         <Text style={ [

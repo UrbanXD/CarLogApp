@@ -4,12 +4,13 @@ import { COLORS, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { formTheme } from "../../../ui/form/constants/theme.ts";
+import { Color } from "../../../types/index.ts";
 
 type InputColorPickerProps = {
     colors: Array<string>
-    defaultColor?: string
+    defaultColor?: string | null
     setValue?: (color: string | null) => void
-    renderSelectedColor?: (color: string | null) => ReactElement
+    renderSelectedColor?: (color: Color | null) => ReactElement
 }
 
 export function InputColorPicker({

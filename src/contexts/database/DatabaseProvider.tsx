@@ -3,6 +3,7 @@ import { DatabaseContext } from "./DatabaseContext.ts";
 import { Database } from "../../database/connector/Database.ts";
 import * as SplashScreen from "expo-splash-screen";
 import * as Network from "expo-network";
+import { NetworkState } from "expo-network";
 import { PowerSyncContext } from "@powersync/react-native";
 
 type DatabaseProviderProps = {
@@ -38,7 +39,7 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
     }, []);
 
     useEffect(() => {
-        const checkAndSync = async (state) => {
+        const checkAndSync = async (state: NetworkState) => {
             if(state.isConnected && state.isInternetReachable && !isSyncing.current && database) {
                 try {
                     isSyncing.current = true;

@@ -1,9 +1,10 @@
 import React, { ReactNode, useCallback, useState } from "react";
-import { LayoutChangeEvent, StyleSheet, type ViewStyle } from "react-native";
+import { LayoutChangeEvent, StyleSheet } from "react-native";
 import Animated, { useAnimatedReaction, useFrameCallback, useSharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { MeasureElement } from "./helper/MeasureElement.tsx";
 import { Cloner } from "./helper/Cloner.tsx";
+import { ViewStyle } from "../../types/index.ts";
 
 export type MarqueeProps = {
     children: ReactNode

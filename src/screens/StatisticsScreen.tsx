@@ -20,14 +20,14 @@ export function StatisticsScreen() {
     const { selectedCar } = useCars();
     const { t } = useTranslation();
 
-    const datePickerRef = useRef<InputDatePickerRef>();
+    const datePickerRef = useRef<InputDatePickerRef>(null);
 
     const [currentBoardIndex, setCurrentBoardIndex] = useState<number>(0);
 
     const [from, setFrom] = useState(dayjs().subtract(1, "month").toISOString());
     const [to, setTo] = useState(dayjs().toISOString()); //now
 
-    const openDateRangePicker = () => datePickerRef?.current?.open();
+    const openDateRangePicker = () => datePickerRef?.current?.open("calendar");
 
     const boards = useMemo(() => ([
         () => (
@@ -71,9 +71,11 @@ export function StatisticsScreen() {
                 defaultEndDate={ to }
                 hiddenController
                 setValue={
-                    (date: Array<Date>) => {
-                        setFrom(date[0].toISOString());
-                        setTo(date[1].toISOString());
+                    (date: string | Array<string>) => {
+                        if(Array.isArray(date)) {
+                            setFrom(date[0]);
+                            setTo(date[1]);
+                        }
                     }
                 }
             />

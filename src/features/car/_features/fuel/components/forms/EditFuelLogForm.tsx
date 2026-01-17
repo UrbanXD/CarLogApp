@@ -7,7 +7,7 @@ import React from "react";
 import Form from "../../../../../../components/Form/Form.tsx";
 import { FuelLog } from "../../schemas/fuelLogSchema.ts";
 import { FuelLogFormFieldsEnum } from "../../enums/fuelLogFormFields.tsx";
-import { FuelLogFields, useEditFuelLogFormProps } from "../../schemas/form/fuelLogForm.ts";
+import { FuelLogFormFields, useEditFuelLogFormProps } from "../../schemas/form/fuelLogForm.ts";
 import { useFuelLogFormFields } from "../../hooks/useFuelLogForm.tsx";
 import { updateCarOdometer } from "../../../../model/slice/index.ts";
 import { Odometer } from "../../../odometer/schemas/odometerSchema.ts";
@@ -18,7 +18,7 @@ type EditFuelLogFormProps = {
     fuelLog: FuelLog
     /** Which field will be edited, if its undefined that means full form view will appear */
     field: FuelLogFormFieldsEnum
-    onFormStateChange?: (formState: FormState<FuelLogFields>) => void
+    onFormStateChange?: (formState: FormState<FuelLogFormFields>) => void
 }
 
 export function EditFuelLogForm({
@@ -31,11 +31,11 @@ export function EditFuelLogForm({
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
 
-    const form = useForm<FuelLogFields>(useEditFuelLogFormProps(fuelLog));
+    const form = useForm<FuelLogFormFields, any, FuelLogFormFields>(useEditFuelLogFormProps(fuelLog));
     const { fields } = useFuelLogFormFields({ ...form, odometer: fuelLog.odometer });
     const editFields: FormFields = fields[field];
 
-    const submitHandler: SubmitHandlerArgs<FuelLogFields> = {
+    const submitHandler: SubmitHandlerArgs<FuelLogFormFields> = {
         onValid: async (formResult) => {
             try {
                 const result = await fuelLogDao.update(formResult);

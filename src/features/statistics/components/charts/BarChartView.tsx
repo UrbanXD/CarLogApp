@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
-import { BarChart, barDataItem } from "react-native-gifted-charts";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { BarChart, barDataItem, yAxisSides } from "react-native-gifted-charts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants";
 import { Legend, LegendData } from "./common/Legend.tsx";
 import { hexToRgba } from "../../../../utils/colors/hexToRgba.ts";
 import {
@@ -23,7 +23,7 @@ const AXIS_TITLE_FONT_SIZE = AXIS_FONT_SIZE * 1.2;
 
 export type BarChartItem = {
     label: string
-    value: Array<number | string> | number | string
+    value: Array<number> | number
     type?: Array<string> | string
 }
 
@@ -94,7 +94,7 @@ export function BarChartView({
 
                     let frontColor = typeInfo?.color ?? defaultBarColor ?? "#000000";
                     let disablePress = false;
-                    if(value === "" || value <= 0) {
+                    if(value <= 0) {
                         frontColor = hexToRgba(frontColor, 0.3);
                         disablePress = true;
                     }
@@ -116,7 +116,7 @@ export function BarChartView({
 
                 let frontColor = typeInfo?.color ?? defaultBarColor ?? "#000000";
                 let disablePress = false;
-                if(group.value === "" || group.value === 0) {
+                if(group.value === 0) {
                     frontColor = hexToRgba(frontColor, 0.35);
                     disablePress = true;
                 }
@@ -168,19 +168,19 @@ export function BarChartView({
     let flexDirection;
     switch(legendPosition) {
         case "top":
-            flexDirection = "column-reverse";
+            flexDirection = "column-reverse" as const;
             break;
         case "bottom":
-            flexDirection = "column";
+            flexDirection = "column" as const;
             break;
         case "left":
-            flexDirection = "row-reverse";
+            flexDirection = "row-reverse" as const;
             break;
         case "right":
-            flexDirection = "row";
+            flexDirection = "row" as const;
             break;
         default:
-            flexDirection = "column";
+            flexDirection = "column" as const;
     }
 
     return (
@@ -233,12 +233,20 @@ export function BarChartView({
                                         rulesColor={ COLORS.gray4 }
                                         xAxisLabelTextStyle={ styles.axisLabel }
                                         xAxisThickness={ 0 }
-                                        yAxisSide="right"
+                                        yAxisSide={ yAxisSides.LEFT }
                                         yAxisLabelWidth={ yAxisLabelWidth }
                                         yAxisTextStyle={ styles.axisLabel }
                                         yAxisThickness={ 0 }
-                                        renderTooltip={ (item) => <PointerLabel
-                                            value={ formatValue?.(item.value) ?? item.value }/> }
+                                        renderTooltip={
+                                            (item: barDataItem) => {
+                                                if(!item.value) return null;
+                                                return (
+                                                    <PointerLabel
+                                                        value={ formatValue?.(item.value) ?? item.value.toString() }
+                                                    />
+                                                );
+                                            }
+                                        }
                                     />
                                     {
                                         xAxisTitle &&

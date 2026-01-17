@@ -7,6 +7,7 @@ import WheelPicker, {
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import dayjs from "dayjs";
+import { Dispatch, SetStateAction } from "react";
 
 const ControlPicker = withPickerControl(WheelPicker);
 
@@ -27,8 +28,8 @@ const amPmOptions = [
 ];
 
 type TimePickerProps = {
-    date: Date,
-    setDate: (date: Date | null) => void
+    date: Date | null,
+    setDate: Dispatch<SetStateAction<Date | null>>;
 }
 
 export function TimePicker({ date, setDate }: TimePickerProps) {
@@ -56,7 +57,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
 
         let newHour24;
 
-        if(is12HourFormat) {
+        if(is12HourFormat && event.pickers.amPm) {
             const selectedAmPm = event.pickers.amPm.item.value;
 
             if(selectedHourIndex === 0 && selectedAmPm === "AM") newHour24 = 0;      // 12 AM
@@ -87,13 +88,13 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
                 value={ is12HourFormat ? dayjs(date).hour() % 12 : dayjs(date).hour() }
                 width="15%"
                 itemHeight={ styles.item.height }
-                itemTextStyle={ styles.item.text }
+                itemTextStyle={ styles.text }
                 overlayItemStyle={ { backgroundColor: "transparent" } }
                 // enableScrollByTapOnItem
                 visibleItemCount={ 7 }
                 scrollEventThrottle={ 16 }
             />
-            <Text style={ styles.item.separator }>:</Text>
+            <Text style={ styles.separator }>:</Text>
             <ControlPicker
                 control={ pickerControl }
                 pickerName="minute"
@@ -101,7 +102,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
                 value={ dayjs(date).minute() }
                 width="15%"
                 itemHeight={ styles.item.height }
-                itemTextStyle={ styles.item.text }
+                itemTextStyle={ styles.text }
                 overlayItemStyle={ { backgroundColor: "transparent" } }
                 // enableScrollByTapOnItem
                 visibleItemCount={ 7 }
@@ -116,7 +117,7 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
                   value={ dayjs(date).hour() >= 12 ? "PM" : "AM" }
                   width="15%"
                   itemHeight={ styles.item.height }
-                  itemTextStyle={ styles.item.text }
+                  itemTextStyle={ styles.text }
                   overlayItemStyle={ { backgroundColor: "transparent" } }
                    // enableScrollByTapOnItem
                   visibleItemCount={ 7 }
@@ -143,20 +144,18 @@ const useStyles = (is12HourFormat: boolean) => StyleSheet.create({
         borderRadius: 10
     },
     item: {
-        height: 2.5 * FONT_SIZES.p2,
-
-        text: {
-            fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.p2,
-            color: COLORS.white2
-        },
-
-        separator: { // : between hour : minute
-            fontFamily: "Gilroy-Medium",
-            color: COLORS.white2,
-            fontSize: FONT_SIZES.p1,
-            alignSelf: "center",
-            lineHeight: FONT_SIZES.p2 * 1.25
-        }
+        height: 2.5 * FONT_SIZES.p2
+    },
+    text: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p2,
+        color: COLORS.white2
+    },
+    separator: { // : between hour : minute
+        fontFamily: "Gilroy-Medium",
+        color: COLORS.white2,
+        fontSize: FONT_SIZES.p1,
+        alignSelf: "center",
+        lineHeight: FONT_SIZES.p2 * 1.25
     }
 });

@@ -2,7 +2,10 @@ import { ALERT_ICONS } from "../../../../constants/index.ts";
 import { Modal } from "../../../alert/model/types/index.ts";
 import i18n from "../../../../i18n/index.ts";
 
-export const BottomSheetLeavingModal = (reopenBottomSheet: () => void, dismissBottomSheet: () => void): Modal => {
+export const BottomSheetLeavingModal = (
+    reopenBottomSheet: () => void,
+    dismissBottomSheet: () => void
+): Partial<Modal> => {
     return {
         icon: ALERT_ICONS.warning,
         title: i18n.t("modal.bottom_sheet_leaving.title"),

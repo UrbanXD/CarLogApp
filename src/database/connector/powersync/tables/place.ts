@@ -1,6 +1,6 @@
 import { column, Table } from "@powersync/react-native";
 
-export const PLACE_TABLE = "place";
+export const PLACE_TABLE = "place" as const;
 
 export const placeTable = new Table({
     id: column.text,

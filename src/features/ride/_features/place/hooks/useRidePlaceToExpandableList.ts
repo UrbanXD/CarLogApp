@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { ExpandableListItemProps } from "../../../components/expandableList/ExpandableListItem.tsx";
-import { RidePlaceFormFields } from "../_features/place/schemas/form/ridePlaceForm.ts";
 import { useTranslation } from "react-i18next";
+import { RidePlaceFormFields } from "../schemas/form/ridePlaceForm.ts";
+import { ExpandableListItemProps } from "../../../../../components/expandableList/ExpandableListItem.tsx";
 
 export function useRidePlaceToExpandableList() {
     const { t } = useTranslation();

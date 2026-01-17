@@ -1,4 +1,3 @@
-import { Color } from "../../types/index.ts";
 import Animated, {
     interpolateColor,
     useAnimatedStyle,
@@ -11,6 +10,7 @@ import getContrastingColor from "../../utils/colors/getContrastingColor.ts";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { AnimatedMaterialIcon, AnimatedPressable } from "../AnimatedComponents/index.ts";
 import { StyleSheet } from "react-native";
+import { Color } from "../../types/index.ts";
 
 export type FilterButtonProps = {
     title: string
@@ -39,7 +39,7 @@ export function FilterButton({
     ));
 
     useEffect(() => {
-        isActive.value = withTiming(Number(active), 350);
+        isActive.value = withTiming(Number(active), { duration: 350 });
     }, [active]);
 
     const containerStyle = useAnimatedStyle(() => {

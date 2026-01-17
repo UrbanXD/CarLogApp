@@ -12,12 +12,14 @@ export class OdometerUnitDao extends Dao<OdometerUnitTableRow, OdometerUnit, Odo
     }
 
     async getUnitByCarId(carId: string): Promise<OdometerUnit> {
-        const result = await this.db
+        const tmpResult = await this.db
         .selectFrom(CAR_TABLE)
         .select("odometer_unit_id")
         .where("id", "=", carId)
         .executeTakeFirstOrThrow();
 
-        return super.getById(result.odometer_unit_id);
+        const result = await super.getById(tmpResult.odometer_unit_id);
+        if(!result) throw new Error(`Could not get ${ tmpResult.odometer_unit_id } [odometer unit getUnitByCarId]`);
+        return result;
     }
 }

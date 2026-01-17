@@ -17,7 +17,8 @@ export const selectCar = createAsyncThunk<
             const selectedCarId = carId ?? await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_SELECTED_CAR_INDEX);
             let selectedCar =
                 state.cars.cars.find(car => car.id === selectedCarId) ??
-                state.cars.cars.find(car => car.id === state.cars.selectedCar?.id);
+                state.cars.cars.find(car => car.id === state.cars.selectedCar?.id) ??
+                null;
 
             if(selectedCar) await AsyncStorage.setItem(BaseConfig.LOCAL_STORAGE_KEY_SELECTED_CAR_INDEX, selectedCar.id);
             return selectedCar;

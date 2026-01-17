@@ -1,8 +1,7 @@
 import * as React from "react";
-import { SVGProps } from "react";
-import Svg, { Defs, G, Marker, Path } from "react-native-svg";
+import Svg, { Defs, G, Marker, Path, SvgProps } from "react-native-svg";
 
-export function FlagUs(props: SVGProps<any>) {
+export function FlagUs(props: SvgProps) {
     return (
         <Svg
             viewBox="0 0 640 480"
@@ -14,7 +13,6 @@ export function FlagUs(props: SVGProps<any>) {
                     id="us-a"
                     markerHeight="30"
                     markerWidth="30"
-                    overflow="visible"
                     refX="30"
                     refY="30"
                 >

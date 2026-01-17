@@ -1,7 +1,11 @@
-import { getRangeUnit } from "./getRangeUnit.ts";
+import { getRangeUnit, RangeUnit } from "./getRangeUnit.ts";
 import dayjs from "dayjs";
 
-export function getExtendedRange(from: string, to: string): { extendedFrom: string, extendedTo: string } {
+export function getExtendedRange(from: string, to: string): {
+    extendedFrom: string,
+    extendedTo: string,
+    rangeUnit: RangeUnit
+} {
     const rangeUnit = getRangeUnit(from, to);
 
     let extendedFrom = from;
@@ -19,5 +23,5 @@ export function getExtendedRange(from: string, to: string): { extendedFrom: stri
             extendedTo = dayjs(to).add(1, "month").toISOString();
     }
 
-    return { extendedFrom, extendedTo };
+    return { extendedFrom, extendedTo, rangeUnit };
 }

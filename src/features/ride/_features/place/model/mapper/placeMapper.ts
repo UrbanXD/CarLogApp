@@ -21,7 +21,7 @@ export class PlaceMapper extends AbstractMapper<PlaceTableRow, Place> {
         };
     }
 
-    entityToPickerItem(entity: PlaceTableRow): PickerItemType {
+    async entityToPickerItem(entity: PlaceTableRow): Promise<PickerItemType> {
         return {
             value: entity.id,
             title: entity.name

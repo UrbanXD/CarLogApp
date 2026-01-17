@@ -111,8 +111,8 @@ function CarProfileView({
                     margin={ SEPARATOR_SIZES.lightSmall / 2.5 }
                 />
                 <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoRow.title }>{ t("car.make") }</Text>
-                    <View style={ styles.carInfoRow.infoContainer }>
+                    <Text style={ styles.carInfoRowTitle }>{ t("car.make") }</Text>
+                    <View style={ styles.carInfoRowContentContainer }>
                         <IntelligentMarquee
                             speed={ MARQUEE_SPEED }
                             bounceDelay={ MARQUEE_BOUNCE_DELAY }
@@ -120,13 +120,13 @@ function CarProfileView({
                             spacing={ SEPARATOR_SIZES.medium }
                             style={ { alignSelf: "flex-end" } }
                         >
-                            <Text style={ styles.carInfoRow.infoContainer.text }>{ car.model.make.name }</Text>
+                            <Text style={ styles.carInfoRowText }>{ car.model.make.name }</Text>
                         </IntelligentMarquee>
                     </View>
                 </View>
                 <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoRow.title }>{ t("car.model") }</Text>
-                    <View style={ styles.carInfoRow.infoContainer }>
+                    <Text style={ styles.carInfoRowTitle }>{ t("car.model") }</Text>
+                    <View style={ styles.carInfoRowContentContainer }>
                         <IntelligentMarquee
                             speed={ 0.75 }
                             bounceDelay={ 500 }
@@ -134,13 +134,13 @@ function CarProfileView({
                             spacing={ SEPARATOR_SIZES.medium }
                             style={ { alignSelf: "flex-end" } }
                         >
-                            <Text style={ styles.carInfoRow.infoContainer.text }>{ car.model.name }</Text>
+                            <Text style={ styles.carInfoRowText }>{ car.model.name }</Text>
                         </IntelligentMarquee>
                     </View>
                 </View>
                 <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoRow.title }>{ t("car.model_year") }</Text>
-                    <View style={ styles.carInfoRow.infoContainer }>
+                    <Text style={ styles.carInfoRowTitle }>{ t("car.model_year") }</Text>
+                    <View style={ styles.carInfoRowContentContainer }>
                         <IntelligentMarquee
                             speed={ MARQUEE_SPEED }
                             bounceDelay={ MARQUEE_BOUNCE_DELAY }
@@ -148,7 +148,7 @@ function CarProfileView({
                             spacing={ SEPARATOR_SIZES.medium }
                             style={ { alignSelf: "flex-end" } }
                         >
-                            <Text style={ styles.carInfoRow.infoContainer.text }>{ car.model.year }</Text>
+                            <Text style={ styles.carInfoRowText }>{ car.model.year }</Text>
                         </IntelligentMarquee>
                     </View>
                 </View>
@@ -181,7 +181,7 @@ function CarProfileView({
                 </Button.Row>
             </View>
             <View style={ styles.block }>
-                <Text style={ styles.block.title }>{ t("car.basic_information") }</Text>
+                <Text style={ styles.blockTitle }>{ t("car.basic_information") }</Text>
                 <InfoContainer data={ infos } flexDirection={ "column" } maxItemInRow={ 3 }/>
             </View>
             <View style={ styles.block }>
@@ -195,7 +195,7 @@ function CarProfileView({
                         openEditOdometerValue &&
                        <View style={ { width: FONT_SIZES.h3, height: FONT_SIZES.h3, backgroundColor: "transparent" } }/>
                     }
-                    <Text style={ styles.block.title }>{ t("odometer.text") }</Text>
+                    <Text style={ styles.blockTitle }>{ t("odometer.text") }</Text>
                     {
                         openEditOdometerValue &&
                        <Button.Icon
@@ -259,39 +259,35 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "row",
         justifyContent: "space-between",
-        gap: SEPARATOR_SIZES.lightSmall,
-
-        title: {
-            fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.p2,
-            letterSpacing: FONT_SIZES.p2 * 0.05,
-            color: COLORS.gray1
-        },
-
-        infoContainer: {
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "flex-end",
-
-            text: {
-                fontFamily: "Gilroy-Heavy",
-                fontSize: FONT_SIZES.p2,
-                letterSpacing: FONT_SIZES.p2 * 0.05,
-                color: COLORS.gray1
-            }
-        }
+        gap: SEPARATOR_SIZES.lightSmall
+    },
+    carInfoRowTitle: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p2,
+        letterSpacing: FONT_SIZES.p2 * 0.05,
+        color: COLORS.gray1
+    },
+    carInfoRowText: {
+        fontFamily: "Gilroy-Heavy",
+        fontSize: FONT_SIZES.p2,
+        letterSpacing: FONT_SIZES.p2 * 0.05,
+        color: COLORS.gray1
+    },
+    carInfoRowContentContainer: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "flex-end"
     },
     block: {
-        gap: SEPARATOR_SIZES.lightSmall,
-
-        title: {
-            flexShrink: 1,
-            fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.p2,
-            letterSpacing: FONT_SIZES.p2 * 0.05,
-            textAlign: "center",
-            color: COLORS.gray1
-        }
+        gap: SEPARATOR_SIZES.lightSmall
+    },
+    blockTitle: {
+        flexShrink: 1,
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p2,
+        letterSpacing: FONT_SIZES.p2 * 0.05,
+        textAlign: "center",
+        color: COLORS.gray1
     }
 });
 

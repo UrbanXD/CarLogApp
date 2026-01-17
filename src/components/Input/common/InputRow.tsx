@@ -1,8 +1,9 @@
-import React, { ReactElement } from "react";
-import { StyleSheet, View, ViewStyle } from "react-native";
+import React, { ReactNode } from "react";
+import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { formTheme } from "../../../ui/form/constants/theme.ts";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
+import { ViewStyle } from "../../../types/index.ts";
 
 const hasErrorForFields = (error: any, fieldNames: string[]): boolean => {
     if(typeof error !== "object" || error === null) {
@@ -26,7 +27,7 @@ const hasErrorForFields = (error: any, fieldNames: string[]): boolean => {
 };
 
 type InputRowProps = {
-    children?: ReactElement
+    children?: ReactNode | Array<ReactNode>
     errorFieldNames?: Array<string>
     focused?: boolean
     style?: ViewStyle

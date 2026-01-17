@@ -39,7 +39,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         super(db, ODOMETER_LOG_TABLE, new OdometerLogMapper(odometerUnitDao, odometerLogTypeDao));
     }
 
-    selectQuery(): SelectQueryBuilder<OdometerLogTableRow> {
+    selectQuery(): SelectQueryBuilder<DatabaseType, any, SelectOdometerLogTableRow> {
         return this.db
         .selectFrom(ODOMETER_LOG_TABLE)
         .leftJoin(
@@ -49,11 +49,11 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         )
         .leftJoin(FUEL_LOG_TABLE, `${ FUEL_LOG_TABLE }.odometer_log_id`, `${ ODOMETER_LOG_TABLE }.id`)
         .leftJoin(SERVICE_LOG_TABLE, `${ SERVICE_LOG_TABLE }.odometer_log_id`, `${ ODOMETER_LOG_TABLE }.id`)
-        .leftJoin(`${ RIDE_LOG_TABLE } as rl1`, "rl1.start_odometer_log_id", `${ ODOMETER_LOG_TABLE }.id`)
-        .leftJoin(`${ RIDE_LOG_TABLE } as rl2`, "rl2.end_odometer_log_id", `${ ODOMETER_LOG_TABLE }.id`)
-        .leftJoin(`${ EXPENSE_TABLE } as e1`, "e1.id", `${ FUEL_LOG_TABLE }.expense_id`)
-        .leftJoin(`${ EXPENSE_TABLE } as e2`, "e2.id", `${ SERVICE_LOG_TABLE }.expense_id`)
-        .select([
+        .leftJoin(`${ RIDE_LOG_TABLE } as rl1` as const, "rl1.start_odometer_log_id", `${ ODOMETER_LOG_TABLE }.id`)
+        .leftJoin(`${ RIDE_LOG_TABLE } as rl2` as const, "rl2.end_odometer_log_id", `${ ODOMETER_LOG_TABLE }.id`)
+        .leftJoin(`${ EXPENSE_TABLE } as e1` as const, "e1.id", `${ FUEL_LOG_TABLE }.expense_id`)
+        .leftJoin(`${ EXPENSE_TABLE } as e2` as const, "e2.id", `${ SERVICE_LOG_TABLE }.expense_id`)
+        .select((eb) => [
             `${ ODOMETER_LOG_TABLE }.id`,
             `${ ODOMETER_LOG_TABLE }.car_id`,
             `${ ODOMETER_LOG_TABLE }.value`,
@@ -63,8 +63,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
                 "e2.date",
                 `${ ODOMETER_CHANGE_LOG_TABLE }.date`,
                 "rl1.start_time",
-                "rl2.end_time",
-                eb.val("1970-01-01")
+                eb.fn.coalesce("rl2.end_time", eb.val("1970-01-01")) // kysely coalasce only accept 5 arg max
             ).as("date"),
             eb => eb.fn.coalesce(
                 "e1.note",
@@ -93,6 +92,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         const defaultOdometer: OdometerLogTableRow = { // when no odometer found fallback to 0
             id: getUUID(),
             car_id: carId,
+            type_id: OdometerLogTypeEnum.SIMPLE,
             value: 0
         };
 
@@ -110,6 +110,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         const defaultOdometer: OdometerLogTableRow = { // when no odometer found fallback to 0
             id: getUUID(),
             car_id: fallbackCarId,
+            type_id: OdometerLogTypeEnum.SIMPLE,
             value: 0
         };
 
@@ -119,22 +120,26 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
     async getOdometerLimitByDate(
         carId: string,
         date: string,
-        skipOdometerLogs?: Array<string> = []
+        skipOdometerLogs: Array<string> = []
     ): Promise<OdometerLimit> {
         let baseQuery = this.db
-        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
-        .innerJoin(`${ CAR_TABLE } as t2`, "t1.car_id", "t2.id")
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3`, "t2.odometer_unit_id", "t3.id")
-        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t4`, "t1.id", "t4.odometer_log_id")
-        .leftJoin(`${ FUEL_LOG_TABLE } as t5`, "t1.id", "t5.odometer_log_id")
-        .leftJoin(`${ SERVICE_LOG_TABLE } as t6`, "t1.id", "t6.odometer_log_id")
-        .leftJoin(`${ EXPENSE_TABLE } as t7`, "t5.expense_id", "t7.id")
-        .leftJoin(`${ EXPENSE_TABLE } as t8`, "t6.expense_id", "t8.id")
-        .leftJoin(`${ RIDE_LOG_TABLE } as t9`, "t1.id", "t9.start_odometer_log_id")
-        .leftJoin(`${ RIDE_LOG_TABLE } as t10`, "t1.id", "t10.end_odometer_log_id")
+        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1` as const)
+        .innerJoin(`${ CAR_TABLE } as t2` as const, "t1.car_id", "t2.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3` as const, "t2.odometer_unit_id", "t3.id")
+        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t4` as const, "t1.id", "t4.odometer_log_id")
+        .leftJoin(`${ FUEL_LOG_TABLE } as t5` as const, "t1.id", "t5.odometer_log_id")
+        .leftJoin(`${ SERVICE_LOG_TABLE } as t6` as const, "t1.id", "t6.odometer_log_id")
+        .leftJoin(`${ EXPENSE_TABLE } as t7` as const, "t5.expense_id", "t7.id")
+        .leftJoin(`${ EXPENSE_TABLE } as t8` as const, "t6.expense_id", "t8.id")
+        .leftJoin(`${ RIDE_LOG_TABLE } as t9` as const, "t1.id", "t9.start_odometer_log_id")
+        .leftJoin(`${ RIDE_LOG_TABLE } as t10` as const, "t1.id", "t10.end_odometer_log_id")
         .where("t1.car_id", "=", carId)
         .where("t1.id", "not in", skipOdometerLogs)
-        .where(sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date) IS NOT NULL`);
+        .where(
+            sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`,
+            "is not",
+            null
+        );
 
         const unitResult = await this.db
         .selectFrom(`${ CAR_TABLE } as t1`)
@@ -168,13 +173,19 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         const minResult = await minQuery.executeTakeFirst();
         const maxResult = await maxQuery.executeTakeFirst();
 
+        const formatResult = (result: any) => {
+            if(result && typeof result.odometer_value === "number" && result.date) {
+                return {
+                    value: result.odometer_value,
+                    date: String(result.date)
+                };
+            }
+            return null;
+        };
+
         return {
-            min: typeof minResult.odometer_value === "number" && minResult.date
-                 ? { value: minResult.odometer_value, date: minResult.date }
-                 : null,
-            max: typeof maxResult.odometer_value === "number" && maxResult.date
-                 ? { value: maxResult.odometer_value, date: maxResult.date }
-                 : null,
+            min: formatResult(minResult),
+            max: formatResult(maxResult),
             unitText: unitResult?.unit ?? ""
         };
     }
@@ -197,7 +208,9 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
             return result.id;
         });
 
-        return await this.getById(insertedOdometerLogId);
+        const result = await this.getById(insertedOdometerLogId);
+        if(!result) throw new Error("Cannot get odometer log at insertOdometerChangeLOG");
+        return result;
     }
 
     async updateOdometerChangeLog(formResult: OdometerChangeLogFormFields): Promise<OdometerLog> {
@@ -221,7 +234,9 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
             return result.id;
         });
 
-        return await this.getById(updatedOdometerLogId);
+        const result = await this.getById(updatedOdometerLogId);
+        if(!result) throw new Error("Cannot get odometer log at updateOdometerChangeLOG");
+        return result;
     }
 
 
@@ -246,16 +261,16 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
     paginator(
         cursorOptions: CursorOptions<keyof SelectOdometerLogTableRow>,
         filterBy?: PaginatorOptions<SelectOdometerLogTableRow>["filterBy"],
-        perPage?: number = 25
+        perPage: number = 25
     ): CursorPaginator<SelectOdometerLogTableRow, OdometerLog> {
-        return new CursorPaginator<OdometerLogTableRow, OdometerLog>(
+        return new CursorPaginator<SelectOdometerLogTableRow, OdometerLog>(
             this.db,
             this.table,
             cursorOptions,
             {
                 baseQuery: this.selectQuery(),
                 perPage,
-                filterBy,
+                filterBy: filterBy,
                 mapper: async (entity) => await this.mapper.toDto(entity)
             }
         );

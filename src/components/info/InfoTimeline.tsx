@@ -1,15 +1,15 @@
-import { FlashListRef } from "@shopify/flash-list";
+import { FlashList, FlashListRef, ListRenderItemInfo } from "@shopify/flash-list";
 import { RNNativeScrollEvent } from "react-native-reanimated/lib/typescript/hook/commonTypes";
-import { ListRenderItemInfo, StyleSheet, Text, View, ViewStyle } from "react-native";
-import React, { useCallback } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import React, { Ref, useCallback } from "react";
 import { MoreDataLoading } from "../loading/MoreDataLoading.tsx";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { heightPercentageToDP } from "react-native-responsive-screen";
-import { AnimatedFlashList } from "../AnimatedComponents/index.ts";
 import Divider from "../Divider.tsx";
 import Icon from "../Icon.tsx";
 import FloatingActionMenu from "../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
 import { useTranslation } from "react-i18next";
+import { ViewStyle } from "../../types/index.ts";
 
 export type InfoTimelineItem = {
     id: string | number
@@ -18,7 +18,7 @@ export type InfoTimelineItem = {
 }
 
 type InfoTimelineProps = {
-    ref: FlashListRef<InfoTimelineItem>
+    ref: Ref<FlashListRef<any>>
     data: Array<InfoTimelineItem>
     openCreateForm: () => void
     onEdit: (id: string | number, callback?: () => void) => void
@@ -98,11 +98,11 @@ function IInfoTimeline({
         );
     }, []);
 
-    const keyExtractor = useCallback((item: InfoTimelineItem) => item.id, []);
+    const keyExtractor = useCallback((item: InfoTimelineItem) => item.id.toString(), []);
 
     return (
         <>
-            <AnimatedFlashList
+            <FlashList<InfoTimelineItem>
                 ref={ ref }
                 data={ data }
                 renderItem={ renderItem }

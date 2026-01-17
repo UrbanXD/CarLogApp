@@ -68,7 +68,7 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
 
         const attachmentRecord = await this.newAttachmentRecord({
             id: path,
-            media_type: image.mediaType,
+            media_type: image.mediaType ?? undefined,
             state: AttachmentState.QUEUED_UPLOAD
         });
 
@@ -114,7 +114,7 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
         image: Image | null,
         previousFilePath: string | null,
         storagePath?: string
-    ): Promise<string> {
+    ): Promise<string | null> {
         if(!image) {
             if(previousFilePath) await this.deleteFile(previousFilePath);
             return null;
@@ -130,19 +130,19 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
 
     async cleanUpLocalFiles(storagePath?: string): Promise<void> {
         const now = Date.now();
-        const lastLocalImageCleanupTime = await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_LAST_LOCAL_IMAGE_CLEANUP);
+        const lastLocalImageCleanupTime = Number(await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_LAST_LOCAL_IMAGE_CLEANUP));
 
         const maxLocalImageCleanupTime = now - BaseConfig.LOCAL_IMAGE_CLEANUP_INTERVAL_MS;
-        if(lastLocalImageCleanupTime && maxLocalImageCleanupTime <= lastLocalImageCleanupTime) return;
+        if(isNaN(lastLocalImageCleanupTime) || maxLocalImageCleanupTime <= lastLocalImageCleanupTime) return;
         await AsyncStorage.setItem(BaseConfig.LOCAL_STORAGE_KEY_LAST_LOCAL_IMAGE_CLEANUP, now.toString());
 
         const localURI = this.getLocalUri(this.getLocalFilePathSuffix(storagePath));
-        const images = (await this.powersync.getAll(this.imageUrlSql))
+        const images = (await this.powersync.getAll<{ path: string }>(this.imageUrlSql))
         .map(file => this.getLocalUri(this.getLocalFilePathSuffix(file.path)));
 
         const maxModificationTime = now - BaseConfig.LOCAL_IMAGE_CLEANUP_GRACE_PERIOD_MS;
         new Directory(localURI).list().map(file => {
-            if(!images.includes(file.uri) && maxModificationTime > file.info().modificationTime) file.delete();
+            if(!images.includes(file.uri) && maxModificationTime > (file.info()?.modificationTime ?? 0)) file.delete();
         });
     }
 }

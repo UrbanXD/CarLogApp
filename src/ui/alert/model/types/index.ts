@@ -47,5 +47,5 @@ export type ModalAction = ({ name, acceptAction, dismissAction }: {
 
 export type AlertState = {
     toasts: Array<Toast>
-    modal: Modal
+    modal: Modal | null
 }

@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useDatePicker } from "../../../../contexts/datePicker/DatePickerContext.ts";
-import { RangeChange, SingleChange } from "react-native-ui-datepicker/lib/typescript/types";
 import dayjs from "dayjs";
-import { DateTimePickerUi } from "../common/DateTimePickerUi.tsx";
+import DateTimePicker, { DateType, useDefaultStyles } from "react-native-ui-datepicker";
+import { StyleSheet } from "react-native";
+import { COLORS, FONT_SIZES } from "../../../../constants/index.ts";
+import { hexToRgba } from "../../../../utils/colors/hexToRgba.ts";
+import { heightPercentageToDP } from "react-native-responsive-screen";
+
+export type SingleChange = (params: { date: DateType }) => void;
+
+export type RangeChange = (params: {
+    startDate: DateType;
+    endDate: DateType;
+}) => void;
 
 export function CalendarPicker() {
+    const defaultStyles = useDefaultStyles("dark");
     const { mode, startDate, setStartDate, endDate, setEndDate, calendarDate } = useDatePicker();
 
     const [year, setYear] = useState(dayjs(calendarDate).year());
@@ -13,8 +24,8 @@ export function CalendarPicker() {
         setYear(dayjs(calendarDate).year());
     }, [calendarDate]);
 
-    const onDateChange: SingleChange = ({ date: newDateObj }) => {
-        const newDate = newDateObj ? dayjs(newDateObj) : null;
+    const onDateChange: SingleChange = ({ date }) => {
+        const newDate = date ? dayjs(date) : null;
 
         setStartDate((prev) => {
             if(!newDate) return null;
@@ -30,9 +41,9 @@ export function CalendarPicker() {
         });
     };
 
-    const onRangeDateChange: RangeChange = ({ startDate: newStartDateObj, endDate: newEndDateObj }) => {
-        const newStartDate = newStartDateObj ? dayjs(newStartDateObj) : null;
-        const newEndDate = newEndDateObj ? dayjs(newEndDateObj) : null;
+    const onRangeDateChange: RangeChange = ({ startDate, endDate }) => {
+        const newStartDate = startDate ? dayjs(startDate) : null;
+        const newEndDate = endDate ? dayjs(endDate) : null;
 
         setStartDate(prev => {
             if(!newStartDate) return null;
@@ -61,15 +72,106 @@ export function CalendarPicker() {
         });
     };
 
-    return (
-        <DateTimePickerUi
-            mode={ mode }
-            date={ startDate }
-            startDate={ startDate }
-            endDate={ endDate }
-            year={ year }
-            month={ dayjs(calendarDate).month() }
-            onChange={ mode === "single" ? onDateChange : onRangeDateChange }
-        />
-    );
+    const datePickerStyles = {
+        ...defaultStyles,
+        weekdays: styles.weekdays,
+        weekday_label: styles.weekDaysLabel,
+        day_cell: styles.daysCell,
+        day_label: styles.daysLabel,
+        outside_label: [styles.daysLabel, styles.daysOutsideLabel],
+        selected: styles.selected,
+        selected_label: styles.selectedLabel,
+        today_label: styles.todayLabel,
+        range_start: styles.selectedRange,
+        range_start_label: styles.selectedRangeLabel,
+        range_end: styles.selectedRange,
+        range_end_label: styles.selectedRangeLabel,
+        range_fill: styles.selectedRangeFill
+    };
+
+    const commonProps = {
+        year: year,
+        month: dayjs(calendarDate).month(),
+        initialView: "day" as const,
+        hideHeader: true,
+        disableMonthPicker: true,
+        disableYearPicker: true,
+        firstDayOfWeek: dayjs().weekday(0).get("day"),
+        weekdaysFormat: "min" as const,
+        showOutsideDays: true,
+        locale: dayjs.locale(),
+        containerHeight: heightPercentageToDP(25),
+        styles: datePickerStyles as any
+    };
+
+    if(mode === "single") {
+        return (
+            <DateTimePicker
+                { ...commonProps }
+                mode="single"
+                date={ startDate }
+                onChange={ onDateChange }
+            />
+        );
+    }
+
+    if(mode === "range") {
+        return (
+            <DateTimePicker
+                { ...commonProps }
+                mode="range"
+                startDate={ startDate }
+                endDate={ endDate }
+                onChange={ onRangeDateChange }
+            />
+        );
+    }
+
+    return <></>;
 }
+
+const styles = StyleSheet.create({
+    weekdays: {
+        borderColor: COLORS.gray1,
+        borderBottomWidth: 0.50
+    },
+    weekDaysLabel: {
+        fontFamily: "Gilroy-Medium",
+        color: COLORS.gray2,
+        textTransform: "capitalize"
+    },
+    daysCell: {
+        borderColor: COLORS.gray5,
+        borderWidth: 0.25
+    },
+    daysLabel: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p4,
+        color: COLORS.white2
+    },
+    daysOutsideLabel: {
+        color: COLORS.gray2
+    },
+    todayLabel: {
+        color: COLORS.fuelYellow
+    },
+    selected: {
+        backgroundColor: COLORS.fuelYellow,
+        borderRadius: 10
+    },
+    selectedLabel: {
+        fontFamily: "Gilroy-Heavy",
+        color: COLORS.black5
+    },
+    selectedRange: {
+        backgroundColor: COLORS.fuelYellow,
+        borderRadius: 10
+    },
+    selectedRangeLabel: {
+        fontFamily: "Gilroy-Heavy",
+        color: COLORS.black5
+    },
+    selectedRangeFill: {
+        backgroundColor: hexToRgba(COLORS.fuelYellow, 0.1)
+    }
+});

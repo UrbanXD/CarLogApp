@@ -1,10 +1,10 @@
-import { ColorValue, Image, StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
+import { ColorValue, Image, StyleSheet, TouchableOpacity } from "react-native";
 import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import React from "react";
 import getContrastingColor from "../utils/colors/getContrastingColor";
 import { COLORS } from "../constants/index.ts";
-import { Color, ImageSource } from "../types/index.ts";
+import { Color, ImageSource, ViewStyle } from "../types/index.ts";
 
 interface IconProps {
     icon: ImageSource;

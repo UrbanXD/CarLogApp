@@ -13,21 +13,29 @@ import {
     ReplaceFilterArgs
 } from "../database/paginator/AbstractPaginator.ts";
 
-type UseTimelinePaginatorProps<TableItem, MappedItem, ResultItem = MappedItem, DB> = {
-    paginator: CursorPaginator<TableItem, MappedItem, DB>
+type UseTimelinePaginatorProps<
+    TableItem extends { id: any },
+    MappedItem,
+    ResultItem = MappedItem
+> = {
+    paginator: CursorPaginator<TableItem, MappedItem>
     mapper: (item: MappedItem, callback?: () => void) => ResultItem
-    mappedItemIdField?: string
-    resultItemIdField?: string
-    cursorOrderButtons?: Array<{ field: keyof TableItem, table?: keyof DB | null, title: string }>
+    mappedItemIdField?: keyof MappedItem | null
+    resultItemIdField?: keyof ResultItem | null
+    cursorOrderButtons?: Array<{ field: keyof TableItem, table?: keyof DatabaseType | null, title: string }>
 }
 
-export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultItem = MappedItem, DB = DatabaseType>({
+export function useTimelinePaginator<
+    TableItem extends { id: string | number },
+    MappedItem = TableItem,
+    ResultItem = MappedItem
+>({
     paginator,
     mapper,
-    mappedItemIdField = "id",
-    resultItemIdField = "id",
+    mappedItemIdField = "id" as keyof MappedItem,
+    resultItemIdField = "id" as keyof ResultItem,
     cursorOrderButtons
-}: UseTimelinePaginatorProps<TableItem, MappedItem, ResultItem, DB>) {
+}: UseTimelinePaginatorProps<TableItem, MappedItem, ResultItem>) {
     const flashListRef = useRef<FlashListRef<ResultItem>>(null);
     const firstFocus = useRef(true);
 
@@ -41,13 +49,13 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
 
     const [rawData, setRawData] = useState<Array<MappedItem>>([]);
     const [data, setData] = useState<Array<ResultItem>>([]);
-    const [filters, setFilters] = useState<Map<string, FilterGroup<TableItem, DB>>>(paginator.filterBy);
+    const [filters, setFilters] = useState<Map<string, FilterGroup<TableItem>>>(paginator.filterBy);
     const [initialFetchHappened, setInitialFetchHappened] = useState(false);
     const [isInitialFetching, setIsInitialFetching] = useState(true);
     const [isNextFetching, setIsNextFetching] = useState(false);
     const [isPreviousFetching, setIsPreviousFetching] = useState(false);
 
-    const scrollToItemId = useRef<number | string | null>(null);
+    const scrollToItemId = useRef<string | number | any | null>(null);
     const scrollToItem = useRef<boolean>(false);
 
     useFocusEffect(
@@ -70,7 +78,7 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
 
         setData((_) => {
             const newItems = rawData.map(rawItem => {
-                const id = rawItem[mappedItemIdField];
+                const id = mappedItemIdField ? rawItem[mappedItemIdField] : null;
 
                 return mapper(rawItem, () => {
                     scrollToItemId.current = id;
@@ -84,7 +92,11 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
     useEffect(() => {
         if(rawData.length === 0) return;
 
-        const newData = rawData.map((item) => mapper(item, () => scrollToItemId.current = item?.[mappedItemIdField]));
+        const newData = rawData.map((item) => mapper(item, () => {
+            if(!mappedItemIdField) return;
+
+            scrollToItemId.current = item?.[mappedItemIdField] ?? null;
+        }));
         setData(newData);
     }, [mapper]);
 
@@ -97,7 +109,10 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
 
         setTimeout(
             () => {
-                const itemToScrollTo = data.find(item => item?.[resultItemIdField] === scrollToItemId.current);
+                const itemToScrollTo =
+                    resultItemIdField
+                    ? data.find(item => (item?.[resultItemIdField]) === scrollToItemId.current) ?? null
+                    : null;
 
                 if(itemToScrollTo) {
                     scrollToItemId.current = null;
@@ -134,12 +149,14 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
     }, [cursorOptions]);
 
     useEffect(() => {
-        const handler = (newFilters: Map<string, FilterGroup<TableItem, DB>>) => {
+        const handler = (newFilters: Map<string, FilterGroup<TableItem>>) => {
             setFilters(newFilters);
         };
 
         paginator.on(FILTER_CHANGED_EVENT, handler);
-        return () => paginator.off(FILTER_CHANGED_EVENT, handler);
+        return () => {
+            paginator.off(FILTER_CHANGED_EVENT, handler);
+        };
     }, [paginator]);
 
     const refresh = useCallback(async () => {
@@ -175,32 +192,32 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
         });
     }, [paginator]);
 
-    const addFilter = useCallback(async (args: AddFilterArgs<TableItem, DB>) => {
+    const addFilter = useCallback(async (args: AddFilterArgs<TableItem>) => {
         const result = await paginator.addFilter(args);
         setRawData(result);
     }, [paginator, mapper]);
 
-    const replaceFilter = useCallback(async (args: ReplaceFilterArgs<TableItem, DB>) => {
+    const replaceFilter = useCallback(async (args: ReplaceFilterArgs<TableItem>) => {
         const result = await paginator.replaceFilter(args);
         setRawData(result);
     }, [paginator, mapper]);
 
-    const removeFilter = useCallback(async (args: RemoveFilterArgs<TableItem, DB>) => {
+    const removeFilter = useCallback(async (args: RemoveFilterArgs<TableItem>) => {
         const result = await paginator.removeFilter(args);
-        setRawData(result);
+        if(result) setRawData(result);
     }, [paginator]);
 
     const clearFilters = useCallback(async (groupKey?: string) => {
         const result = await paginator.clearFilters(groupKey);
-        setRawData(result);
+        if(result) setRawData(result);
     }, [paginator]);
 
     const orderButtons: Array<FilterButtonProps> | undefined = cursorOrderButtons?.map(cursor => ({
         title: cursor.title,
-        active: isMainCursor(cursor.field, cursor.table),
-        onPress: () => makeFieldMainCursor(cursor.field, cursor.table),
-        icon: getOrderIconForField(cursor.field, cursor.table),
-        iconOnPress: () => toggleFieldOrder(cursor.field, cursor.table)
+        active: isMainCursor(cursor.field as any, cursor.table as any),
+        onPress: () => makeFieldMainCursor(cursor.field as any, cursor.table as any),
+        icon: getOrderIconForField(cursor.field as any, cursor.table as any),
+        iconOnPress: () => toggleFieldOrder(cursor.field as any, cursor.table as any)
     }));
 
     return {
@@ -224,15 +241,15 @@ export function useTimelinePaginator<TableItem, MappedItem = TableItem, ResultIt
     };
 }
 
-export type TimelineFilterManagement<TableItem, DB = DatabaseType> = {
-    filters: Map<string, FilterGroup<TableItem, DB>>
-    addFilter: AddFilter<TableItem, DB>
-    replaceFilter: ReplaceFilter<TableItem, DB>
-    removeFilter: RemoveFilter<TableItem, DB>
-    clearFilters: ClearFilters<TableItem, DB>
+export type TimelineFilterManagement<TableItem> = {
+    filters: Map<string, FilterGroup<TableItem>>
+    addFilter: AddFilter<TableItem>
+    replaceFilter: ReplaceFilter<TableItem>
+    removeFilter: RemoveFilter<TableItem>
+    clearFilters: ClearFilters<TableItem>
 }
 
-export type AddFilter<TableItem, DB = DatabaseType> = (args: AddFilterArgs<TableItem, DB>) => void;
-export type ReplaceFilter<TableItem, DB = DatabaseType> = (args: ReplaceFilterArgs<TableItem, DB>) => void;
-export type RemoveFilter<TableItem, DB = DatabaseType> = (args: RemoveFilterArgs<TableItem, DB>) => void;
-export type ClearFilters<TableItem, DB = DatabaseType> = (groupKey?: string) => void;
+export type AddFilter<TableItem> = (args: AddFilterArgs<TableItem>) => Promise<void>;
+export type ReplaceFilter<TableItem> = (args: ReplaceFilterArgs<TableItem>) => Promise<void>;
+export type RemoveFilter<TableItem> = (args: RemoveFilterArgs<TableItem>) => Promise<void>;
+export type ClearFilters<TableItem> = (groupKey?: string) => Promise<void>;

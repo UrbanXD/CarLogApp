@@ -1,11 +1,12 @@
-import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
 import { useTranslation } from "react-i18next";
+import { TextStyle, ViewStyle } from "../types/index.ts";
 
 export type AmountTextProps = {
     amount: string | number
     currencyText: string
-    exchangedAmount?: (string | number) | Array<string | number>
+    exchangedAmount?: (string | number) | Array<string | number> | null
     exchangeCurrencyText?: string | Array<string>
     freeText?: string
     containerStyle?: ViewStyle

@@ -12,7 +12,7 @@ export class RidePlaceDao extends Dao<RidePlaceTableRow, RidePlace, RidePlaceMap
         super(db, RIDE_PLACE_TABLE, new RidePlaceMapper());
     }
 
-    selectQuery(): SelectQueryBuilder<DatabaseType, SelectRidePlaceTableRow> {
+    selectQuery(): SelectQueryBuilder<DatabaseType, any, SelectRidePlaceTableRow> {
         return this.db
         .selectFrom(RIDE_PLACE_TABLE)
         .innerJoin(PLACE_TABLE, `${ PLACE_TABLE }.id`, `${ RIDE_PLACE_TABLE }.place_id`)

@@ -1,16 +1,16 @@
 import React from "react";
 import MultiStepForm from "../../../../components/Form/MultiStepForm.tsx";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
-import { useAppSelector } from "../../../../hooks/index.ts";
-import { getUser } from "../../../user/model/selectors/index.ts";
+import { useAppSelector } from "../../../../hooks";
+import { getUser } from "../../../user/model/selectors";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { FormState, useForm } from "react-hook-form";
 import { CarFormFields, useCreatCarFormProps } from "../../schemas/form/carForm.ts";
 import useCarSteps from "../../hooks/useCarSteps.tsx";
-import { CarCreateToast } from "../../presets/toast/index.ts";
-import { InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
-import { SubmitHandlerArgs } from "../../../../types/index.ts";
+import { CarCreateToast } from "../../presets/toast";
+import { InvalidFormToast } from "../../../../ui/alert/presets/toast";
+import { SubmitHandlerArgs } from "../../../../types";
 
 type CreateCarFormProps = {
     onFormStateChange?: (formState: FormState<CarFormFields>) => void

@@ -1,11 +1,11 @@
-import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import React, { useCallback } from "react";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import Button from "../Button/Button.ts";
 import { Amount } from "../../features/_shared/currency/schemas/amountSchema.ts";
 import { useBottomSheetInternal, useBottomSheetScrollableCreator } from "@gorhom/bottom-sheet";
-import { FlashList } from "@shopify/flash-list";
+import { FlashList, ListRenderItemInfo } from "@shopify/flash-list";
 import { AmountText } from "../AmountText.tsx";
 import { ExpandableListItem, ExpandableListItemType } from "./ExpandableListItem.tsx";
 import { DropdownView } from "../dropdownView/DropdownView.tsx";
@@ -17,7 +17,7 @@ type ExpandableListProps = {
     data: Array<ExpandableListItemType>
     title?: string
     subtitle?: string
-    totalAmount?: Array<Amount>
+    totalAmount?: Array<Omit<Amount, "exchangeRate">>
     actionIcon?: string
     onAction?: () => void
     onItemPress?: (index: number) => void
@@ -36,7 +36,7 @@ export function ExpandableList({
     onRemoveItem
 }: ExpandableListProps) {
     const { t } = useTranslation();
-    const keyExtractor = useCallback((item: ExpandableListItemType) => item.id, []);
+    const keyExtractor = useCallback((item: ExpandableListItemType) => item.id.toString(), []);
 
     const renderItem = useCallback(
         ({ item, index }: ListRenderItemInfo<ExpandableListItemType>) => (
@@ -51,7 +51,7 @@ export function ExpandableList({
 
     const renderSeparatorComponent = useCallback(() => <View style={ { height: SEPARATOR_SIZES.lightSmall } }/>, []);
 
-    const renderEmptyComponent = useCallback(() => <Text style={ styles.label }>-</Text>);
+    const renderEmptyComponent = useCallback(() => <Text style={ styles.label }>-</Text>, []);
 
     const bottomSheetInternal = useBottomSheetInternal(true);
     const BottomSheetFlashListScrollable = bottomSheetInternal ? useBottomSheetScrollableCreator() : undefined;
@@ -79,12 +79,12 @@ export function ExpandableList({
                 </View>
                 {
                     subtitle &&
-                   <View style={ styles.topContainer.labelContainer }>
+                   <View style={ styles.topLabelContainer }>
                       <Text style={ styles.label }>{ subtitle }</Text>
                    </View>
                 }
             </View>
-            <FlashList
+            <FlashList<ExpandableListItemType>
                 data={ data }
                 keyExtractor={ keyExtractor }
                 renderItem={ renderItem }
@@ -100,11 +100,11 @@ export function ExpandableList({
                   <AmountText
                      amount={ totalAmount.reduce((sum, a) => sum + a.exchangedAmount, 0) }
                      currencyText={ totalAmount[0]?.exchangeCurrency?.symbol ?? "?" }
-                     exchangedAmount={ totalAmount.length !== 1 && totalAmount.map(a => Number(a.amount ?? 0)) }
+                     exchangedAmount={ totalAmount.length !== 1 ? totalAmount.map(a => Number(a.amount ?? 0)) : null }
                      exchangeCurrencyText={ totalAmount.map(a => a.currency.symbol ?? "?") }
                      freeText={ "-" }
                   />
-                  <Text style={ [styles.label, styles.bottomContainer.label] }>{ t("currency.total_cost") }</Text>
+                  <Text style={ [styles.label, styles.bottomContainerLabel] }>{ t("currency.total_cost") }</Text>
                </View>
             }
         </DropdownView>
@@ -128,15 +128,13 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZES.p3,
         letterSpacing: FONT_SIZES.p3 * 0.025,
         color: COLORS.gray1,
-        textAlign: "right",
-
-        countText: {
-            color: COLORS.gray2
-        },
-
-        totalAmountText: {
-            fontSize: FONT_SIZES.p4 * 0.85
-        }
+        textAlign: "right"
+    },
+    countText: {
+        color: COLORS.gray2
+    },
+    totalAmountText: {
+        fontSize: FONT_SIZES.p4 * 0.85
     },
     itemsContainer: {
         maxHeight: heightPercentageToDP(30),
@@ -150,12 +148,11 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: COLORS.gray3,
         paddingBottom: SEPARATOR_SIZES.lightSmall,
-        marginBottom: SEPARATOR_SIZES.lightSmall / 2,
-
-        labelContainer: {
-            flex: 1,
-            alignSelf: "flex-end"
-        }
+        marginBottom: SEPARATOR_SIZES.lightSmall / 2
+    },
+    topLabelContainer: {
+        flex: 1,
+        alignSelf: "flex-end"
     },
     bottomContainer: {
         flex: 1,
@@ -163,10 +160,9 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderColor: COLORS.gray3,
         paddingTop: SEPARATOR_SIZES.lightSmall,
-        marginTop: SEPARATOR_SIZES.lightSmall / 2,
-
-        label: {
-            paddingTop: SEPARATOR_SIZES.lightSmall / 4
-        }
+        marginTop: SEPARATOR_SIZES.lightSmall / 2
+    },
+    bottomContainerLabel: {
+        paddingTop: SEPARATOR_SIZES.lightSmall / 4
     }
 });

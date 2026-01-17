@@ -17,12 +17,12 @@ export class FuelTypeMapper extends AbstractMapper<FuelTypeTableRow, FuelType> {
 
     async toEntity(dto: FuelType): Promise<FuelTypeTableRow> {
         return {
-            id: dto.id,
+            id: dto.id as never,
             key: dto.key
         };
     }
 
-    dtoToPicker(dtos: Array<FuelType>, getTitle?: (dto: FuelType) => string): Promise<Array<PickerItemType>> {
+    dtoToPicker(dtos: Array<FuelType>, getTitle?: (dto: FuelType) => string): Array<PickerItemType> {
         return dtos.map(dto => ({
             value: dto.id.toString(),
             title: getTitle?.(dto) ?? dto.key

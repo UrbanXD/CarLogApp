@@ -1,9 +1,10 @@
 import React, { ReactElement, useMemo } from "react";
-import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { InfoText, InfoTextProps } from "./InfoText.tsx";
 import Icon from "../Icon.tsx";
 import { debounce } from "es-toolkit";
+import { ViewStyle } from "../../types/index.ts";
 
 export type InfoRowProps = InfoTextProps & {
     onPress?: () => void
@@ -23,7 +24,7 @@ export function InfoRow({
     containerStyle,
     ...infoTextProps
 }: InfoRowProps) {
-    const debouncedPress = useMemo(() => debounce(onPress, 250), [onPress]);
+    const debouncedPress = useMemo(() => debounce(() => onPress?.(), 250), [onPress]);
 
     return (
         <View style={ { flex: 1 } }>
@@ -45,8 +46,8 @@ export function InfoRow({
                     {
                         secondaryInfo &&
                        <InfoText
-                          contentTextStyle={ row && styles.rowContentText }
-                          titleStyle={ row && styles.rowContentText }
+                          contentTextStyle={ row ? styles.rowContentText : undefined }
+                          titleStyle={ row ? styles.rowContentText : undefined }
                           { ...secondaryInfo }
                        />
                     }

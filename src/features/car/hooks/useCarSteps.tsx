@@ -1,5 +1,5 @@
 import React from "react";
-import { StepProps, Steps, UseStepFormResult } from "../../../types/index.ts";
+import { ResultStep as ResultStepType, StepProps, Steps, UseStepFormResult } from "../../../types/index.ts";
 import { CarFormFields } from "../schemas/form/carForm.ts";
 import CarModelStep from "../components/forms/steps/CarModelStep.tsx";
 import NameStep from "../components/forms/steps/NameStep.tsx";
@@ -46,16 +46,16 @@ function useCarSteps({ control, formState, setValue, getValues }: StepProps<CarF
         }
     ];
 
-    const resultStep = {
+    const resultStep: ResultStepType = {
         title: t("multistep_form.result_step"),
-        render: (goTo: (stepIndex?: number) => void) => {
+        render: (goTo: (stepIndex: number) => void) => {
             const values = getValues();
 
             return <ResultStep formValues={ values } goTo={ goTo }/>;
         }
     };
 
-    return { steps, resultStep: getValues && resultStep };
+    return { steps, resultStep: resultStep };
 }
 
 export default useCarSteps;

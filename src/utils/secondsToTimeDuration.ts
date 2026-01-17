@@ -1,6 +1,6 @@
 import i18n from "../i18n/index.ts";
 
-export function secondsToTimeText(seconds: number, showsSeconds?: boolean = false): string {
+export function secondsToTimeText(seconds: number, showsSeconds: boolean = false): string {
     if(!showsSeconds && seconds < 59) return i18n.t("date.few_seconds");
 
     let remaining = seconds;

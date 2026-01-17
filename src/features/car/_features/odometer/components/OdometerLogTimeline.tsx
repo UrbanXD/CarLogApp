@@ -3,31 +3,29 @@ import { TimelineView } from "../../../../../components/timelineView/TimelineVie
 import React, { useCallback, useMemo } from "react";
 import { SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import { StyleSheet, View } from "react-native";
-import useCars from "../../../hooks/useCars.ts";
 import { Odometer } from "./Odometer.tsx";
 import FloatingActionMenu from "../../../../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
 import { router } from "expo-router";
 import { useOdometerTimelineItem } from "../hooks/useOdometerTimelineItem.tsx";
 import { Title } from "../../../../../components/Title.tsx";
 import { useTimelinePaginator } from "../../../../../hooks/useTimelinePaginator.ts";
-import { OdometerLogTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
-import { OdometerLog } from "../../../schemas/odometerLogSchema.ts";
 import { useOdometerLogTimelineFilter } from "../hooks/useOdometerLogTimelineFilter.ts";
 import { TimelineItemType } from "../../../../../components/timelineView/item/TimelineItem.tsx";
 import { useTranslation } from "react-i18next";
 import { CAR_TABLE } from "../../../../../database/connector/powersync/tables/car.ts";
+import { SelectOdometerLogTableRow } from "../model/dao/OdometerLogDao.ts";
+import { OdometerLog } from "../schemas/odometerLogSchema.ts";
+import { Car } from "../../../schemas/carSchema.ts";
 
 type OdometerLogTimelineProps = {
-    carId: string
+    car: Car
 };
 
-export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
+export function OdometerLogTimeline({ car }: OdometerLogTimelineProps) {
     const { t } = useTranslation();
     const { odometerLogDao } = useDatabase();
-    const { getCar } = useCars();
     const { mapper } = useOdometerTimelineItem();
 
-    const car = useMemo(() => getCar(carId), [carId, getCar]);
     const paginator = useMemo(
         () =>
             odometerLogDao.paginator(
@@ -39,10 +37,10 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
                 },
                 {
                     group: CAR_TABLE,
-                    filters: [{ field: "car_id", operator: "=", value: carId }]
+                    filters: [{ field: "car_id", operator: "=", value: car.id }]
                 }
             ),
-        [carId]
+        [car.id]
     );
 
     const {
@@ -55,14 +53,12 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
         isPreviousFetching,
         timelineFilterManagement,
         orderButtons
-    } = useTimelinePaginator<OdometerLogTableRow, OdometerLog, TimelineItemType>({
+    } = useTimelinePaginator<SelectOdometerLogTableRow, OdometerLog, TimelineItemType>({
         paginator,
         mapper,
         cursorOrderButtons: [{ field: "value", title: t("odometer.value") }]
     });
     const { filterButtons } = useOdometerLogTimelineFilter({ timelineFilterManagement, car });
-
-    if(!car) return <></>;
 
     const openCreateOdometerLog = useCallback(() => router.push({
         pathname: "/odometer/log/create",
@@ -84,8 +80,8 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
                 orderButtons={ orderButtons }
                 filterButtons={ filterButtons }
                 isInitialFetching={ isInitialFetching }
-                fetchNext={ paginator.hasNext() && fetchNext }
-                fetchPrevious={ paginator.hasPrevious() && fetchPrevious }
+                fetchNext={ paginator.hasNext() ? fetchNext : undefined }
+                fetchPrevious={ paginator.hasPrevious() ? fetchPrevious : undefined }
                 isNextFetching={ isNextFetching }
                 isPreviousFetching={ isPreviousFetching }
             />

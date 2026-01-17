@@ -1,36 +1,29 @@
-import { OrderByDirectionExpression } from "kysely";
-import { SubmitErrorHandler, SubmitHandler } from "react-hook-form";
+import { FieldValues, SubmitErrorHandler, SubmitHandler } from "react-hook-form";
+import {
+    Falsy,
+    RecursiveArray,
+    RegisteredStyle,
+    TextStyle as RNTextStyle,
+    ViewStyle as RNViewStyle
+} from "react-native";
 
 export * from "./Color";
 export * from "./ImageSource";
 export * from "./RenderComponent.ts";
 export * from "./Step.ts";
 
-export type SubmitHandlerArgs<FormResult> = {
+export type ViewStyle =
+    (number & { __registeredStyleBrand: RNViewStyle }) |
+    RecursiveArray<RegisteredStyle<RNViewStyle> | Falsy | RNViewStyle>
+    | false | null | undefined | RNViewStyle;
+
+export type TextStyle =
+    (number & { __registeredStyleBrand: RNTextStyle })
+    | RecursiveArray<RegisteredStyle<RNTextStyle> | Falsy | RNTextStyle>
+    | false | null | undefined |
+    RNTextStyle;
+
+export type SubmitHandlerArgs<FormResult extends FieldValues> = {
     onValid: SubmitHandler<FormResult>,
     onInvalid?: SubmitErrorHandler<FormResult>
 }
-
-export type OffsetPagination = {
-    page: number,
-    cursor?: never
-}
-
-export type CursorPagination<F> = {
-    page?: never
-    cursor: {
-        value?: string | number
-        fieldName: F,
-        direction?: "prev" | "next"
-    }
-}
-
-export type CommonPagination<F> = {
-    perPage?: number,
-    order?: {
-        by: F,
-        direction?: OrderByDirectionExpression
-    }
-}
-
-export type Pagination<F = string> = (OffsetPagination | CursorPagination<F>) & CommonPagination<F>

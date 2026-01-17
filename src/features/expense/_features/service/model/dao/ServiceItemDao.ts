@@ -19,7 +19,7 @@ export class ServiceItemDao extends Dao<ServiceItemTableRow, ServiceItem, Servic
         super(db, SERVICE_ITEM_TABLE, new ServiceItemMapper(serviceItemTypeDao, currencyDao));
     }
 
-    selectQuery(): SelectQueryBuilder<DatabaseType, ServiceItemTableRow> {
+    selectQuery(): SelectQueryBuilder<DatabaseType, any, SelectServiceItemTableRow> {
         return this.db
         .selectFrom(SERVICE_ITEM_TABLE)
         .innerJoin(CAR_TABLE, `${ CAR_TABLE }.id`, `${ SERVICE_ITEM_TABLE }.car_id`)
@@ -27,7 +27,7 @@ export class ServiceItemDao extends Dao<ServiceItemTableRow, ServiceItem, Servic
         .select(`${ CAR_TABLE }.currency_id as car_currency_id`);
     }
 
-    async getAllByServiceLogId(serviceLogId: string): Array<SelectServiceItemTableRow> {
+    async getAllByServiceLogId(serviceLogId: string): Promise<Array<ServiceItem>> {
         const result = await this.selectQuery()
         .where(`${ SERVICE_ITEM_TABLE }.service_log_id`, "=", serviceLogId)
         .execute();
@@ -40,7 +40,7 @@ export class ServiceItemDao extends Dao<ServiceItemTableRow, ServiceItem, Servic
         .selectFrom(`${ SERVICE_ITEM_TABLE } as si`)
         .innerJoin(`${ CAR_TABLE } as c`, "c.id", "si.car_id")
         .select("c.currency_id as car_currency_id")
-        .whereRef("si.service_log_id", "=", serviceLogId)
+        .where("si.service_log_id", "=", serviceLogId)
         .executeTakeFirst();
 
         if(!result1?.car_currency_id) return [];
@@ -50,13 +50,19 @@ export class ServiceItemDao extends Dao<ServiceItemTableRow, ServiceItem, Servic
         .select((eb) => [
             "si.service_log_id",
             // @formatter:off
-            eb.fn.coalesce(eb.fn.sum(sql<number>`si.price_per_unit * si.quantity`), eb.val(0)).as("total_amount"),
-            eb.fn.coalesce(eb.fn.sum(sql<number>`si.price_per_unit * si.quantity * si.exchange_rate`), eb.val(0)).as("exchanged_total_amount"),
+            eb.fn.coalesce(
+                sql<number>`CAST(SUM(si.price_per_unit * si.quantity) AS FLOAT)`,
+                eb.val(0)
+            ).as("total_amount"),
+            eb.fn.coalesce(
+                sql<number>`CAST(SUM(si.price_per_unit * si.quantity * si.exchange_rate) AS FLOAT)`,
+                eb.val(0)
+            ).as("exchanged_total_amount"),
             // @fomatter:on
             "si.currency_id",
             "si.exchange_rate"
         ])
-        .whereRef("si.service_log_id", "=", serviceLogId)
+        .where("si.service_log_id", "=", serviceLogId)
         .groupBy(["si.service_log_id", "si.currency_id"])
         .orderBy("total_amount", "desc")
         .execute();

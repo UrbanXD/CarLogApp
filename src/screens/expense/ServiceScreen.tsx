@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { ServiceLogView } from "../../features/expense/_features/service/components/ServiceLogView.tsx";
 
 export function ServiceScreen() {
-    const { id } = useLocalSearchParams();
+    const { id } = useLocalSearchParams<{ id?: string }>();
 
     useEffect(() => {
         if(!id) {
@@ -12,7 +12,7 @@ export function ServiceScreen() {
         }
     }, [id]);
 
-    if(!id) return <></>;
+    if(!id) return null;
 
     return <ServiceLogView id={ id }/>;
 }

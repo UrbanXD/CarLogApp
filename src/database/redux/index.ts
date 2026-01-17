@@ -1,5 +1,5 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import { carsReducer, CarsState } from "../../features/car/model/slice/index.ts";
+import { carsReducer } from "../../features/car/model/slice/index.ts";
 import { userReducer } from "../../features/user/model/slice/index.ts";
 import { alertReducer } from "../../ui/alert/model/slice/index.ts";
 

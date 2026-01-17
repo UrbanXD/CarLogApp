@@ -2,9 +2,10 @@ import React, { ReactElement, ReactNode } from "react";
 import { Control, Controller, UseControllerReturn } from "react-hook-form";
 import { SEPARATOR_SIZES } from "../../../constants/index.ts";
 import InputTitle from "./InputTitle.tsx";
-import { StyleSheet, View, ViewStyle } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { InputFieldProvider } from "../../../contexts/inputField/InputFieldProvider.tsx";
 import InputError from "./InputError.tsx";
+import { ViewStyle } from "../../../types/index.ts";
 
 type InputFieldProps = {
     control: Control<any>

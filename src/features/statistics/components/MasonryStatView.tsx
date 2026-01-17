@@ -1,7 +1,8 @@
 import { StatCard, StatCardProps } from "./StatCard.tsx";
-import { StyleSheet, View, ViewStyle } from "react-native";
+import { StyleSheet, View } from "react-native";
 import React from "react";
 import { SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { ViewStyle } from "../../../types/index.ts";
 
 type MasonryStatViewProps = {
     column1: Array<StatCardProps>

@@ -1,27 +1,28 @@
 import React, { ProviderProps, useEffect, useMemo, useState } from "react";
 import { AuthContext } from "./AuthContext.ts";
-import { useAppDispatch } from "../../hooks/index.ts";
+import { useAppDispatch } from "../../hooks";
 import { useDatabase } from "../database/DatabaseContext.ts";
 import { AuthError, GenerateLinkParams, Session } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AVATAR_COLOR, BaseConfig } from "../../constants/index.ts";
+import { AVATAR_COLOR, BaseConfig } from "../../constants";
 import { router } from "expo-router";
-import { DeleteUserToast, SignInToast, SignOutToast, SignUpToast } from "../../features/user/presets/toast/index.ts";
+import { DeleteUserToast, SignInToast, SignOutToast, SignUpToast } from "../../features/user/presets/toast";
 import { getToastMessage } from "../../ui/alert/utils/getToastMessage.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { SignInRequest } from "../../features/user/schemas/form/signInRequest.ts";
 import { SignUpRequest } from "../../features/user/schemas/form/signUpRequest.ts";
-import { deleteCars, resetCars, updateCars } from "../../features/car/model/slice/index.ts";
-import { updateUser } from "../../features/user/model/slice/index.ts";
+import { deleteCars, resetCars, updateCars } from "../../features/car/model/slice";
+import { updateUser } from "../../features/user/model/slice";
 import { getUserLocalCurrency } from "../../features/_shared/currency/utils/getUserLocalCurrency.ts";
 import { useTranslation } from "react-i18next";
 import { OtpVerificationHandlerType } from "../../features/user/hooks/useOtpVerificationHandler.ts";
 import { CAR_TABLE } from "../../database/connector/powersync/tables/car.ts";
-import { DiffTriggerOperation, sanitizeSQL, sanitizeUUID } from "@powersync/react-native";
+import { DiffTriggerOperation, sanitizeSQL, sanitizeUUID, TriggerRemoveCallback } from "@powersync/react-native";
 import { USER_TABLE } from "../../database/connector/powersync/tables/user.ts";
 import { selectCar } from "../../features/car/model/actions/selectCar.ts";
 import { Directory } from "expo-file-system";
 import { INPUT_IMAGE_TEMP_DIR } from "../../components/Input/imagePicker/InputImagePicker.tsx";
+import { CarTableRow, UserTableRow } from "../../database/connector/powersync/AppSchema.ts";
 
 export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     children
@@ -66,8 +67,8 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         if(!session?.user.id) return;
         const userId = session.user.id;
 
-        let unsubscribeUserTrigger;
-        let unsubscribeCarsTrigger;
+        let unsubscribeUserTrigger: TriggerRemoveCallback | null = null;
+        let unsubscribeCarsTrigger: TriggerRemoveCallback | null = null;
 
         const initTriggers = async () => {
             await database.waitForInit();
@@ -93,7 +94,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 },
                 hooks: {
                     beforeCreate: async (lockContext) => {
-                        const res = await lockContext.getOptional(`
+                        const res = await lockContext.getOptional<UserTableRow>(`
                             SELECT *
                             FROM ${ USER_TABLE }
                             WHERE id = '${ userId }'
@@ -144,7 +145,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 },
                 hooks: {
                     beforeCreate: async (lockContext) => {
-                        const result = await lockContext.getAll(`
+                        const result = await lockContext.getAll<CarTableRow>(`
                             SELECT *
                             FROM ${ CAR_TABLE } AS t1
                             WHERE t1.owner_id = '${ userId }'
@@ -170,7 +171,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         };
     }, [session?.user.id]);
 
-    const openAccountVerification = (email: string, automaticResend?: boolean = false) => {
+    const openAccountVerification = (email: string, automaticResend: boolean = false) => {
         router.push({
             pathname: "bottomSheet/otpVerification",
             params: {
@@ -178,12 +179,12 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 title: t("auth.otp_verification.email"),
                 email,
                 handlerType: OtpVerificationHandlerType.SignUp,
-                automaticResend: automaticResend
+                automaticResend: automaticResend.toString()
             }
         });
     };
 
-    const signUp = async (request: SignUpRequest): Promise<ApiResult> => {
+    const signUp = async (request: SignUpRequest) => {
         try {
             const {
                 data: emailExists,
@@ -208,7 +209,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             });
 
             if(error) throw error;
-            if(!supabaseUser) throw { code: "user_not_found" } as AuthError;
+            if(!supabaseUser?.email) throw { code: "user_not_found" } as AuthError;
 
             updateNotVerifiedEmail(supabaseUser.email).catch(console.error);
             openAccountVerification(supabaseUser.email);
@@ -258,7 +259,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
 
     const deleteAccount = async () => {
         try {
-            if(!session?.user) throw { code: "session_not_found" };
+            if(!session?.user.email) throw { code: "session_not_found" };
 
             const emailParams: GenerateLinkParams = { type: "magiclink", email: session.user.email };
 

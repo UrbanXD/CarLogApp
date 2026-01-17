@@ -3,7 +3,6 @@ import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useRideLogTimelineItem } from "../hooks/useRideLogTimelineItem.tsx";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useTimelinePaginator } from "../../../hooks/useTimelinePaginator.ts";
-import { RideLogTableRow } from "../../../database/connector/powersync/AppSchema.ts";
 import { TimelineItemType } from "../../../components/timelineView/item/TimelineItem.tsx";
 import { RideLog } from "../schemas/rideLogSchema.ts";
 import { StyleSheet, View } from "react-native";
@@ -14,6 +13,8 @@ import { YearPicker } from "../../../components/Input/_presets/YearPicker.tsx";
 import { sql } from "@powersync/kysely-driver";
 import { useTranslation } from "react-i18next";
 import { CAR_TABLE } from "../../../database/connector/powersync/tables/car.ts";
+import { PaginatorSelectRideLogTableRow } from "../model/dao/rideLogDao.ts";
+import { RawBuilder } from "kysely";
 
 type RideLogTimelineProps = {
     car: Car
@@ -52,7 +53,7 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
         isPreviousFetching,
         timelineFilterManagement,
         orderButtons
-    } = useTimelinePaginator<RideLogTableRow & { total_expense: number }, RideLog, TimelineItemType>({
+    } = useTimelinePaginator<PaginatorSelectRideLogTableRow, RideLog, TimelineItemType>({
         paginator,
         mapper,
         cursorOrderButtons: [
@@ -75,7 +76,7 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
 
     const setYearFilter = useCallback((year: string) => {
         // @formatter:off
-        const customSql = (fieldRef: string) => sql<number>`strftime('%Y', ${ fieldRef })`;
+        const customSql = (fieldRef: string | RawBuilder<any>) => sql<number>`strftime('%Y', ${ fieldRef })`;
         // @formatter:on
         timelineFilterManagement.replaceFilter({
             groupKey: "year",
@@ -88,11 +89,11 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
             <View style={ styles.headerContainer }>
                 <Title
                     title={ t("rides.title") }
-                    containerStyle={ styles.headerContainer.titleContainer }
+                    containerStyle={ styles.headerTitleContainer }
                 />
                 <YearPicker
-                    containerStyle={ styles.headerContainer.yearPicker }
-                    textInputStyle={ styles.headerContainer.yearPicker.label }
+                    containerStyle={ styles.yearPicker }
+                    textInputStyle={ styles.yearPickerLabel }
                     inputPlaceholder={ t("date.year") }
                     hiddenBackground={ true }
                     setValue={ setYearFilter }
@@ -103,8 +104,8 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
                 data={ data }
                 orderButtons={ orderButtons }
                 isInitialFetching={ isInitialFetching }
-                fetchNext={ initialFetchHappened && paginator.hasNext() && fetchNext }
-                fetchPrevious={ initialFetchHappened && paginator.hasPrevious() && fetchPrevious }
+                fetchNext={ (initialFetchHappened && paginator.hasNext()) ? fetchNext : undefined }
+                fetchPrevious={ (initialFetchHappened && paginator.hasPrevious()) ? fetchPrevious : undefined }
                 isNextFetching={ isNextFetching }
                 isPreviousFetching={ isPreviousFetching }
                 style={ { paddingBottom: SIMPLE_TABBAR_HEIGHT } }
@@ -121,20 +122,17 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "space-between",
         flexDirection: "row",
-        alignItems: "flex-start",
-
-        titleContainer: {
-            flexShrink: 1
-        },
-
-        yearPicker: {
-            minHeight: 0,
-            height: FONT_SIZES.p1,
-
-            label: {
-                fontFamily: "Gilroy-Heavy",
-                color: COLORS.white
-            }
-        }
+        alignItems: "flex-start"
+    },
+    headerTitleContainer: {
+        flexShrink: 1
+    },
+    yearPicker: {
+        minHeight: 0,
+        height: FONT_SIZES.p1
+    },
+    yearPickerLabel: {
+        fontFamily: "Gilroy-Heavy",
+        color: COLORS.white
     }
 });

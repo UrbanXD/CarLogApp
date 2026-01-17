@@ -1,8 +1,6 @@
 import React, { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import DropdownPickerController, { DropdownPickerControllerProps } from "./dropdown/DropdownPickerController.tsx";
 import DropdownPickerItems from "./dropdown/DropdownPickerItems.tsx";
-import { Paginator } from "../../../database/paginator/AbstractPaginator.ts";
-import { DatabaseType } from "../../../database/connector/powersync/AppSchema.ts";
 import { PopupView } from "../../popupView/PopupView.tsx";
 import { useAnimatedReaction, useSharedValue } from "react-native-reanimated";
 import { PickerItemType } from "./PickerItem.tsx";
@@ -11,10 +9,11 @@ import { useInputFieldContext } from "../../../contexts/inputField/InputFieldCon
 import { DropdownPickerFooter } from "./dropdown/DropdownPickerFooter.tsx";
 import { debounce } from "es-toolkit";
 import { scheduleOnRN } from "react-native-worklets";
+import { CursorPaginator } from "../../../database/paginator/CursorPaginator.ts";
 
-type ConditionalDropdownPickerProps<Item, DB> = | {
+type ConditionalDropdownPickerProps<Item extends { id: any }> = | {
     /** Used when the dropdown fetches data with pagination */
-    paginator: Paginator<Item, PickerItemType, DB>
+    paginator: CursorPaginator<Item, PickerItemType>
     /** The key of the item property used for search filtering in the paginator. */
     searchBy?: keyof Item
     /** Replace search bar and user can add an item to dropdown list */
@@ -28,7 +27,7 @@ type ConditionalDropdownPickerProps<Item, DB> = | {
     data: Array<PickerItemType>
 }
 
-type CommonDropdownPickerProps = {
+export type CommonDropdownPickerProps = {
     /** The item that will be selected by default on first render */
     defaultSelectedItemValue?: string
     /** Callback function for set the selected value outside the dropdown picker **/
@@ -51,10 +50,10 @@ type CommonDropdownPickerProps = {
     hideController?: boolean
 } & Omit<DropdownPickerControllerProps, "selectedItem" | "toggleDropdown">;
 
-export type DropdownPickerProps<Item, DB> =
-    ConditionalDropdownPickerProps<Item, DB> & CommonDropdownPickerProps;
+export type DropdownPickerProps<Item extends { id: any } = { id: any }> =
+    ConditionalDropdownPickerProps<Item> & CommonDropdownPickerProps;
 
-const DropdownPicker = <Item, DB = DatabaseType, >({
+const DropdownPicker = <Item extends { id: any } = { id: any }, >({
     title,
     data,
     paginator,
@@ -76,7 +75,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     hiddenBackground,
     containerStyle,
     textInputStyle
-}: DropdownPickerProps<Item, DB>) => {
+}: DropdownPickerProps<Item>) => {
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field.onChange;
     const inputFieldValue = inputFieldContext?.field?.value?.toString() ?? defaultSelectedItemValue;
@@ -201,6 +200,8 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     }, []);
 
     const renderForm = useCallback(() => {
+        if(!renderCreateItemForm) return <></>;
+
         return renderCreateItemForm(() => paginator?.refresh().then((result) => setItems(result)));
     }, [renderCreateItemForm, paginator]);
 

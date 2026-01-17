@@ -502,8 +502,10 @@
     "open_log": "Odometer log",
     "current_value": "Current odometer reading: {{value}}",
     "original_value": "Original odometer reading {{value}}",
-    "limit": "Latest odometer reading: {{value}} ({{date}})",
-    "limit_without_date": "Latest odometer reading: {{value}}",
+    "min_limit": "Previous: {{value}} ({{date}})",
+    "min_limit_without_date": "Previous: {{value}}",
+    "max_limit": "Subsequent: {{value}} ({{date}})",
+    "max_limit_without_date": "Subsequent: {{value}}",
     "unit_types": {
       "title": "Odometer units",
       "undefined": "$t(common.unknown)",

@@ -9,28 +9,32 @@ import { CarFormFields } from "../../../schemas/form/carForm.ts";
 import { YearPicker } from "../../../../../components/Input/_presets/YearPicker.tsx";
 import { useTranslation } from "react-i18next";
 
-type CarModelStepProps<FormFields> = Pick<StepProps<FormFields>, "control" | "formState" | "setValue">;
+type CarModelStepProps = Pick<StepProps<CarFormFields>, "control" | "formState" | "setValue">;
 
-function CarModelStep<FormFields = CarFormFields>({ control, formState, setValue }: CarModelStepProps<FormFields>) {
+function CarModelStep({
+    control,
+    formState,
+    setValue
+}: CarModelStepProps) {
     const { t } = useTranslation();
     const { makeDao, modelDao } = useDatabase();
 
     const selectedMakeId = useWatch({ control, name: "model.makeId" });
     const selectedModelId = useWatch({ control, name: "model.id" });
     const selectedYear = useWatch({ control, name: "model.year" });
-    const [modelYears, setModelYears] = useState<Array<string>>([]);
+    const [modelYears, setModelYears] = useState<{ start?: number, end?: number }>({});
 
     const [defaultLoadMakeId, setDefaultLoadMakeId] = useState(true);
     const [defaultLoadModelId, setDefaultLoadModelId] = useState(true);
 
     const makePaginator = useMemo(() => makeDao.paginator(50), []);
-    const modelPaginator = useMemo(() => modelDao.paginatorByMakeId(selectedMakeId, 25), [selectedMakeId]);
+    const modelPaginator = useMemo(() => modelDao.paginatorByMakeId(selectedMakeId ?? null, 25), [selectedMakeId]);
 
     useEffect(() => {
         if(defaultLoadModelId) setDefaultLoadModelId(false);
         if(!selectedModelId) return;
 
-        const fetchYears = async () => setModelYears(await modelDao.getModelYearsById(selectedModelId, true));
+        const fetchYears = async () => setModelYears((await modelDao.getModelYearsById(selectedModelId)));
         fetchYears();
     }, [selectedModelId]);
 
@@ -38,23 +42,27 @@ function CarModelStep<FormFields = CarFormFields>({ control, formState, setValue
         if(defaultLoadMakeId) return setDefaultLoadMakeId(false);
         if(formState.defaultValues?.["model"]?.["makeId"] === selectedMakeId && formState.defaultValues?.["model"]?.["id"] === selectedModelId) return;
 
-        setValue("model.id", "", { keepError: true, keepDirty: true });
+        setValue("model.id", "");
     }, [selectedMakeId]);
 
     useEffect(() => {
         const setHiddenInputsValue = async () => {
             const model = await modelDao.getById(selectedModelId);
-            const make = await makeDao.getById(model.makeId);
+            const make = model ? await makeDao.getById(model.makeId) : null;
 
-            setValue("model.name", model.name);
-            setValue("model.makeName", make.name);
+            setValue("model.name", model?.name ?? "");
+            setValue("model.makeName", make?.name ?? "");
         };
 
         if(selectedModelId) setHiddenInputsValue();
         if(defaultLoadModelId) return setDefaultLoadModelId(false);
         if(formState.defaultValues?.["model"]?.["id"] === selectedModelId && formState.defaultValues?.["model"]?.["year"] === selectedYear) return;
-        setValue("model.year", "", { keepError: true, keepDirty: true });
+        setValue("model.year", "");
     }, [selectedModelId]);
+
+    useEffect(() => {
+        console.log(modelYears);
+    }, [modelYears]);
 
     return (
         <Input.Group>
@@ -92,7 +100,8 @@ function CarModelStep<FormFields = CarFormFields>({ control, formState, setValue
                 <YearPicker
                     title={ t("car.steps.model.model_year_field.title") }
                     icon={ ICON_NAMES.calendar }
-                    data={ modelYears }
+                    maxYear={ modelYears.end ?? new Date().getFullYear() }
+                    minYear={ modelYears.start }
                     disabled={ !selectedModelId }
                     disabledText={ t("car.steps.model.model_year_field.disabled_text") }
                 />

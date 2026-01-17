@@ -1,6 +1,6 @@
 import Input from "../../../../components/Input/Input.ts";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Control, UseFormSetValue, useWatch } from "react-hook-form";
@@ -77,8 +77,8 @@ export function AmountInput({
         setCurrencies(
             currencyDao.mapper.dtoToPicker({
                 dtos: rawCurrencies,
-                getControllerTitle: (dto) => dto.symbol,
-                getTitle: (dto) => `${ t(`currency.names.${ dto.key }`) } - ${ dto.symbol }`
+                getControllerTitle: (dto: Currency) => dto.symbol,
+                getTitle: (dto: Currency) => `${ t(`currency.names.${ dto.key }`) } - ${ dto.symbol }`
             })
         );
 
@@ -93,8 +93,9 @@ export function AmountInput({
         }
     }, [formCurrency]);
 
-    const getCurrencyText = useCallback((currencyId: string) => {
-        const currency = currencies?.find((currency: PickerItemType) => currency.value === currencyId);
+    const getCurrencyText = useCallback((currencyId?: string) => {
+        if(!currencyId) return "";
+        const currency = currencies.find((currency: PickerItemType) => currency.value === currencyId);
 
         return currency?.controllerTitle ?? currency?.title ?? "";
     }, [currencies]);
@@ -108,7 +109,7 @@ export function AmountInput({
             exchangedAmount = numberToFractionDigit(Number(formAmount) * Number(formExchangeRate ?? 1));
         }
 
-        return `${ exchangedAmount }${ "\u00A0" }${ defaultCurrencyText }`; // "\u00A0" - for prevent only currency wrap to the next line
+        return `${ exchangedAmount }\u00A0${ defaultCurrencyText }`; // "\u00A0" - for prevent only currency wrap to the next line
     }, [formAmount, formExchangeRate, defaultCurrency, getCurrencyText]);
 
     const getTotalAmountTextByPricePerUnit = useCallback(() => {
@@ -129,7 +130,11 @@ export function AmountInput({
         return (
             <PricePerUnitTotalCostInCarCurrency
                 amountText={ `${ numberToFractionDigit(quantity * amount) } ${ currencyText }` }
-                carAmountText={ defaultCurrency !== formCurrency && `${ numberToFractionDigit(quantity * exchangedAmount) } ${ defaultCurrencyText }` }
+                carAmountText={
+                    defaultCurrency !== formCurrency
+                    ? `${ numberToFractionDigit(quantity * exchangedAmount) } ${ defaultCurrencyText }`
+                    : undefined
+                }
             />
         );
     }, [formAmount, formQuantity, formExchangeRate, formCurrency, defaultCurrency, getCurrencyText]);
@@ -146,8 +151,9 @@ export function AmountInput({
                     (
                         isPricePerUnitFallback &&
                         (!isNaN(Number(formQuantity)) && Number(formQuantity) > 1)
-                    ) &&
-                    getTotalAmountTextByPricePerUnit()
+                    )
+                    ? getTotalAmountTextByPricePerUnit()
+                    : undefined
                 )
             }
             containerStyle={ styles.container }
@@ -162,7 +168,7 @@ export function AmountInput({
                      <Input.Switch label={ { on: t("currency.price_per_unit"), off: t("currency.total_cost") } }/>
                       {
                           formIsPricePerUnit &&
-                         <View style={ styles.isPricePerUnitContainer.textContainer }>
+                         <View style={ styles.isPricePerUnitTextContainer }>
                             <Text style={ styles.label }>
                                 { getTotalAmountTextByPricePerUnit() }
                             </Text>
@@ -192,7 +198,7 @@ export function AmountInput({
                                />
                             </Input.Field>
                          </View>
-                         <Text style={ styles.quantityContainer.countText }>{ t("common.count") }</Text>
+                         <Text style={ styles.quantityCountText }>{ t("common.count") }</Text>
                       </Input.Row>
                    </View>
                 }
@@ -201,7 +207,7 @@ export function AmountInput({
                     style={ { gap: 0 } }
                 >
                     <View style={ styles.amountContainer }>
-                        <View style={ styles.amountContainer.amount }>
+                        <View style={ styles.amountContent }>
                             <Input.Field
                                 control={ control }
                                 fieldName={ amountFieldName }
@@ -238,23 +244,22 @@ export function AmountInput({
             {
                 showsExchangeRateInput && (defaultCurrency && formCurrency?.toString() !== defaultCurrency?.toString()) &&
                <View style={ styles.exchangeContainer }>
-                  <View style={ styles.exchangeContainer.textContainer }>
+                  <View style={ styles.exchangeTextContainer }>
                      <Text style={ styles.label }>
                         <AmountInCarCurrency amountText={ getExchangedAmount() } isPricePerUnit={ formIsPricePerUnit }/>
                      </Text>
                   </View>
-                  <View style={ styles.exchangeContainer.inputContainer }>
+                  <View style={ styles.exchangeInputContainer }>
                      <Input.Row
                         errorFieldNames={ [exchangeRateFieldName] }
-                        style={ styles.exchangeContainer.inputContainer.row }
+                        style={ styles.exchangeInputRow }
                      >
-                        <View style={ styles.exchangeContainer.inputContainer.label }>
-                           <Text style={ styles.exchangeContainer.inputContainer.label.baseText }>1</Text>
-                           <Text
-                              style={ styles.exchangeContainer.inputContainer.label.currencyText }>
+                        <View style={ styles.exchangeLabel }>
+                           <Text style={ styles.exchangeLabelBaseText }>1</Text>
+                           <Text style={ styles.labelCurrencyText }>
                                { getCurrencyText(formCurrency?.toString()) }
                            </Text>
-                           <Text style={ styles.exchangeContainer.inputContainer.label.arrow }>⇄</Text>
+                           <Text style={ styles.labelArrow }>⇄</Text>
                         </View>
                         <Input.Field
                            control={ control }
@@ -268,7 +273,7 @@ export function AmountInput({
                               type="secondary"
                            />
                         </Input.Field>
-                        <Text style={ styles.exchangeContainer.inputContainer.label.currencyText }>
+                        <Text style={ styles.labelCurrencyText }>
                             { getCurrencyText(defaultCurrency?.toString()) }
                         </Text>
                      </Input.Row>
@@ -287,36 +292,33 @@ const styles = StyleSheet.create({
     isPricePerUnitContainer: {
         flexDirection: "row",
         alignItems: "center",
-        gap: SEPARATOR_SIZES.lightSmall,
-
-        textContainer: {
-            flexShrink: 1,
-            height: "100%"
-        }
+        gap: SEPARATOR_SIZES.lightSmall
+    },
+    isPricePerUnitTextContainer: {
+        flexShrink: 1,
+        height: "100%"
     },
     quantityAmountContainer: {
         flexDirection: "row",
         gap: SEPARATOR_SIZES.lightSmall
     },
     quantityContainer: {
-        flex: 0.4,
-
-        countText: {
-            alignSelf: "flex-end",
-            marginBottom: SEPARATOR_SIZES.small,
-            fontSize: formTheme.valueTextFontSize / 1.35,
-            color: COLORS.gray1
-        }
+        flex: 0.4
+    },
+    quantityCountText: {
+        alignSelf: "flex-end",
+        marginBottom: SEPARATOR_SIZES.small,
+        fontSize: formTheme.valueTextFontSize / 1.35,
+        color: COLORS.gray1
     },
     amountContainer: {
         flex: 1,
         flexDirection: "row",
         justifyContent: "space-between",
-        gap: SEPARATOR_SIZES.lightSmall / 2,
-
-        amount: {
-            flex: 1
-        }
+        gap: SEPARATOR_SIZES.lightSmall / 2
+    },
+    amountContent: {
+        flex: 1
     },
     label: {
         fontFamily: "Gilroy-Medium",
@@ -330,44 +332,37 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "flex-start",
         justifyContent: "space-between",
-        gap: SEPARATOR_SIZES.lightSmall,
-
-        textContainer: {
-            flex: 1
-        },
-
-        inputContainer: {
-            flex: 0.55,
-
-            row: {
-                flex: 0,
-                alignItems: "center",
-                gap: 0
-            },
-
-            label: {
-                flexDirection: "row",
-                alignItems: "center",
-
-                baseText: {
-                    fontSize: formTheme.valueTextFontSize,
-                    color: formTheme.valueTextColor,
-                    marginRight: 2
-                },
-
-                arrow: {
-                    fontSize: formTheme.valueTextFontSize,
-                    color: COLORS.gray1,
-                    fontWeight: 600,
-                    marginLeft: 2,
-                    marginBottom: formTheme.valueTextFontSize / 4
-                },
-
-                currencyText: {
-                    fontSize: formTheme.valueTextFontSize / 1.35,
-                    color: COLORS.gray1
-                }
-            }
-        }
+        gap: SEPARATOR_SIZES.lightSmall
+    },
+    exchangeTextContainer: {
+        flex: 1
+    },
+    exchangeInputContainer: {
+        flex: 0.55
+    },
+    exchangeInputRow: {
+        flex: 0,
+        alignItems: "center",
+        gap: 0
+    },
+    exchangeLabel: {
+        flexDirection: "row",
+        alignItems: "center"
+    },
+    exchangeLabelBaseText: {
+        fontSize: formTheme.valueTextFontSize,
+        color: formTheme.valueTextColor,
+        marginRight: 2
+    },
+    labelArrow: {
+        fontSize: formTheme.valueTextFontSize,
+        color: COLORS.gray1,
+        fontWeight: 600,
+        marginLeft: 2,
+        marginBottom: formTheme.valueTextFontSize / 4
+    },
+    labelCurrencyText: {
+        fontSize: formTheme.valueTextFontSize / 1.35,
+        color: COLORS.gray1
     }
 });

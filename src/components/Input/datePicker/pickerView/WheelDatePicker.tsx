@@ -1,16 +1,16 @@
 import { StyleSheet, Text } from "react-native";
 import { COLORS, FONT_SIZES } from "../../../../constants/index.ts";
 import { useDatePicker } from "../../../../contexts/datePicker/DatePickerContext.ts";
-import { DatePicker, RenderItemProps } from "@quidone/react-native-wheel-picker";
-import React, { ReactNode, useCallback } from "react";
+import { DatePicker, PickerItem, RenderItemProps } from "@quidone/react-native-wheel-picker";
+import React, { Dispatch, ReactNode, SetStateAction, useCallback } from "react";
 import dayjs from "dayjs";
 import { OnlyDateFormat } from "@quidone/react-native-wheel-picker/dest/typescript/date/date";
 import { DateNodeType } from "@quidone/react-native-wheel-picker/dest/typescript/date/DatePickerContainer";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 
 type WheelDatePickerProps = {
-    date: Date,
-    setDate: (date: Date | null) => void
+    date: Date | null,
+    setDate: Dispatch<SetStateAction<Date | null>>;
 }
 
 export function WheelDatePicker({ date, setDate }: WheelDatePickerProps) {
@@ -23,7 +23,7 @@ export function WheelDatePicker({ date, setDate }: WheelDatePickerProps) {
         />
     ), []);
 
-    const renderDateText = useCallback((props: RenderItemProps<number>) => (
+    const renderDateText = useCallback((props: RenderItemProps<PickerItem<number>>) => (
         <Text key={ props.index } style={ props.itemTextStyle }>
             { props.item.value.toString().padStart(2, "0") }
         </Text>

@@ -1,10 +1,10 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { ICON_NAMES } from "../../constants/index.ts";
 import Button from "../Button/Button.ts";
 import Image from "../Image.tsx";
-import { Color, ImageSource } from "../../types/index.ts";
+import { Color, ImageSource, ViewStyle } from "../../types/index.ts";
 
 interface AvatarImageProps {
     path: string;

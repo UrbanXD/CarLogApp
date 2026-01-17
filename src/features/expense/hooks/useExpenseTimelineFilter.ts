@@ -7,9 +7,10 @@ import { Car } from "../../car/schemas/carSchema.ts";
 import { SelectExpenseTableRow } from "../model/mapper/expenseMapper.ts";
 import { TimelineFilterManagement } from "../../../hooks/useTimelinePaginator.ts";
 import { useTranslation } from "react-i18next";
+import { FilterCondition } from "../../../database/paginator/AbstractPaginator.ts";
 
 const TYPES_FILTER_KEY = "type_filter";
-const TYPES_FILTER_FIELD_NAME = "type_id";
+const TYPES_FILTER_FIELD_NAME = "type_id" as keyof SelectExpenseTableRow;
 
 type UseExpenseTimelineFilterProps = {
     timelineFilterManagement: TimelineFilterManagement<SelectExpenseTableRow>,
@@ -73,7 +74,11 @@ export function useExpenseTimelineFilter({
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {
         const active = selectedTypesId.includes(type.id);
-        const filter = { field: TYPES_FILTER_FIELD_NAME, operator: "=", value: type.id };
+        const filter: FilterCondition<SelectExpenseTableRow> = {
+            field: TYPES_FILTER_FIELD_NAME,
+            operator: "=",
+            value: type.id
+        };
         const onPress = () => {
             if(!active) {
                 addFilter({ groupKey: TYPES_FILTER_KEY, filter, logic: "OR" });

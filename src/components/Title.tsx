@@ -1,8 +1,9 @@
-import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Divider from "./Divider.tsx";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
 import React from "react";
+import { TextStyle, ViewStyle } from "../types/index.ts";
 
 type TitleProps = {
     title: string

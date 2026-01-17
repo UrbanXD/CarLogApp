@@ -30,7 +30,7 @@ export class ModelMapper extends AbstractMapper<ModelTableRow, Model> {
         };
     }
 
-    async toCarModelDto(model: Model, modelYear: string): CarModel {
+    async toCarModelDto(model: Model, modelYear: string): Promise<CarModel> {
         const make = await this.makeDao.getById(model.makeId);
 
         return carModelSchema.parse({

@@ -7,32 +7,50 @@ import { render } from "@testing-library/react-native";
 import { ReactNode } from "react";
 import { Provider } from "react-redux";
 import { MockContextConfig, renderRouter } from "expo-router/testing-library";
-import { carLogReducer } from "../../features/carLog/model/slice/index.ts";
 
-const setupStore = (preloadedState?: Partial<RootState>) =>
-    configureStore({
+const setupStore = (preloadedState?: Partial<RootState>) => {
+    const initialState: RootState = {
+        alert: {
+            toasts: [],
+            modal: null
+        },
+        user: {
+            user: null,
+            loading: false
+        },
+        cars: {
+            cars: [],
+            selectedCar: null,
+            loading: false,
+            loadError: false
+        },
+        ...preloadedState
+    };
+
+    return configureStore({
         reducer: {
             user: userReducer,
             cars: carsReducer,
-            alert: alertReducer,
-            carLog: carLogReducer
+            alert: alertReducer
         },
-        preloadedState,
-        middleware: getDefaultMiddleware =>
-            getDefaultMiddleware({
-                serializableCheck: {
-                    ignoredPaths: [
-                        "alert.modal.acceptAction",
-                        "alert.modal.dismissAction"
-                    ],
-                    ignoredActionPaths: [
-                        "meta.arg",
-                        "payload.acceptAction",
-                        "payload.dismissAction"
-                    ]
-                }
-            })
+        preloadedState: initialState,
+        middleware:
+            getDefaultMiddleware =>
+                getDefaultMiddleware({
+                    serializableCheck: {
+                        ignoredPaths: [
+                            "alert.modal.acceptAction",
+                            "alert.modal.dismissAction"
+                        ],
+                        ignoredActionPaths: [
+                            "meta.arg",
+                            "payload.acceptAction",
+                            "payload.dismissAction"
+                        ]
+                    }
+                })
     });
+};
 
 export type MockInitialReduxState = Partial<RootState>;
 

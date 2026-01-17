@@ -18,7 +18,7 @@ export function ScreenScrollView({
     const { y, distanceFromBottom, scrollDirection, isScrolling } = useScreenScrollView();
 
     const prevOffset = useSharedValue(0);
-    const scrollTimeout = useSharedValue(null);
+    const scrollTimeout = useSharedValue<NodeJS.Timeout | null>(null);
 
     const [layoutHeight, setLayoutHeight] = useState(0);
 

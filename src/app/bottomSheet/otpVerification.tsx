@@ -6,6 +6,7 @@ import {
     useOtpVerificationHandler
 } from "../../features/user/hooks/useOtpVerificationHandler.ts";
 import { useOtp } from "../../features/user/hooks/useOtp.ts";
+import { EmailOtpType } from "@supabase/supabase-js";
 
 const Page: React.FC = () => {
     const {
@@ -18,7 +19,17 @@ const Page: React.FC = () => {
         userId,
         automaticResend,
         setOtpLastSend = "true"
-    } = useLocalSearchParams();
+    } = useLocalSearchParams<{
+        type: string
+        handlerType: string
+        title: string
+        email: string
+        newEmail: string
+        newPassword: string
+        userId: string
+        automaticResend: string
+        setOtpLastSend: string
+    }>();
 
     const {
         handleSignUpVerification,
@@ -59,7 +70,7 @@ const Page: React.FC = () => {
 
     return (
         <OtpVerificationBottomSheet
-            type={ type }
+            type={ type as EmailOtpType }
             title={ title }
             email={ email }
             handleVerification={ handleVerification }

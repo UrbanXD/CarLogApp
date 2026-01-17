@@ -28,7 +28,7 @@ export function FuelTankCapacityInput({
             control={ control }
             fieldName={ fieldName }
             fieldNameText={ title ?? t("fuel.tank_capacity") }
-            fullWidth={ subtitle }
+            fieldInfoText={ subtitle }
         >
             <Input.Row style={ { gap: 0 } }>
                 <View style={ { flex: 1 } }>
@@ -40,7 +40,7 @@ export function FuelTankCapacityInput({
                     />
                 </View>
                 {
-                    unitText &&
+                    !!unitText &&
                    <UnitText
                       text={ unitText }
                       style={ { padding: SEPARATOR_SIZES.lightSmall } }

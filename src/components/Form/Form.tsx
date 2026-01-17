@@ -1,16 +1,16 @@
-import React, { ReactElement, useEffect, useMemo } from "react";
+import React, { ReactElement, ReactNode, useEffect, useMemo } from "react";
 import { FlatList } from "react-native-gesture-handler";
-import { View, ViewStyle } from "react-native";
+import { View } from "react-native";
 import { FormState, UseFormReturn } from "react-hook-form";
 import { formTheme } from "../../ui/form/constants/theme.ts";
 import { FormButtons } from "../Button/presets/FormButtons.tsx";
-import { SubmitHandlerArgs } from "../../types/index.ts";
+import { SubmitHandlerArgs, ViewStyle } from "../../types/index.ts";
 import { SEPARATOR_SIZES } from "../../constants/index.ts";
 
 type FormProps = {
-    form: UseFormReturn
-    formFields: ReactElement | Array<ReactElement>
-    submitHandler?: SubmitHandlerArgs
+    form: UseFormReturn<any>
+    formFields: ReactNode | Array<ReactNode>
+    submitHandler?: SubmitHandlerArgs<any>
     edit?: boolean
     onFormStateChange?: (formState: FormState<any>) => void
     submitText?: string

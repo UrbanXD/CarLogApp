@@ -1,7 +1,6 @@
 import { UseFormReturn, useWatch } from "react-hook-form";
 import { Car } from "../../car/schemas/carSchema.ts";
-import { ExpenseFormFields } from "../enums/expenseFormFields.ts";
-import { ExpenseFields } from "../schemas/form/expenseForm.ts";
+import { ExpenseFormFieldsEnum } from "../enums/expenseFormFieldsEnum.ts";
 import { FormFields } from "../../../types/index.ts";
 import { CarPickerInput } from "../../car/components/forms/inputFields/CarPickerInput.tsx";
 import { ExpenseTypeInput } from "../components/forms/inputFields/ExpenseTypeInput.tsx";
@@ -13,8 +12,9 @@ import { NoteInput } from "../../../components/Input/_presets/NoteInput.tsx";
 import useCars from "../../car/hooks/useCars.ts";
 import { EditToast } from "../../../ui/alert/presets/toast/index.ts";
 import { useTranslation } from "react-i18next";
+import { ExpenseFormFields } from "../schemas/form/expenseForm.ts";
 
-type UseExpenseFormFieldsProps = UseFormReturn<ExpenseFields>
+type UseExpenseFormFieldsProps = UseFormReturn<ExpenseFormFields, any, ExpenseFormFields>
 
 export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
     const { control, setValue, clearErrors } = props;
@@ -31,16 +31,16 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
         clearErrors();
     }, [formCarId]);
 
-    const fields: Record<ExpenseFormFields, FormFields> = useMemo(() => ({
-        [ExpenseFormFields.Car]: {
+    const fields: Record<ExpenseFormFieldsEnum, FormFields> = useMemo(() => ({
+        [ExpenseFormFieldsEnum.Car]: {
             render: () => <CarPickerInput control={ control } fieldName="carId"/>,
             editToastMessages: EditToast
         },
-        [ExpenseFormFields.Type]: {
+        [ExpenseFormFieldsEnum.Type]: {
             render: () => <ExpenseTypeInput control={ control } fieldName="typeId"/>,
             editToastMessages: EditToast
         },
-        [ExpenseFormFields.Amount]: {
+        [ExpenseFormFieldsEnum.Amount]: {
             render: () => <AmountInput
                 control={ control }
                 setValue={ setValue }
@@ -49,7 +49,7 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
             />,
             editToastMessages: EditToast
         },
-        [ExpenseFormFields.Date]: {
+        [ExpenseFormFieldsEnum.Date]: {
             render: () => (
                 <Input.Field
                     control={ control }
@@ -61,7 +61,7 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
             ),
             editToastMessages: EditToast
         },
-        [ExpenseFormFields.Note]: {
+        [ExpenseFormFieldsEnum.Note]: {
             render: () => <NoteInput
                 control={ control }
                 setValue={ setValue }
@@ -73,11 +73,11 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
 
     const fullForm: FormFields = {
         render: () => ([
-            <React.Fragment key="car">{ fields[ExpenseFormFields.Car].render() }</React.Fragment>,
-            <React.Fragment key="type">{ fields[ExpenseFormFields.Type].render() }</React.Fragment>,
-            <React.Fragment key="amount">{ fields[ExpenseFormFields.Amount].render() }</React.Fragment>,
-            <React.Fragment key="date">{ fields[ExpenseFormFields.Date].render() }</React.Fragment>,
-            <React.Fragment key="note">{ fields[ExpenseFormFields.Note].render() }</React.Fragment>
+            <React.Fragment key="car">{ fields[ExpenseFormFieldsEnum.Car].render() }</React.Fragment>,
+            <React.Fragment key="type">{ fields[ExpenseFormFieldsEnum.Type].render() }</React.Fragment>,
+            <React.Fragment key="amount">{ fields[ExpenseFormFieldsEnum.Amount].render() }</React.Fragment>,
+            <React.Fragment key="date">{ fields[ExpenseFormFieldsEnum.Date].render() }</React.Fragment>,
+            <React.Fragment key="note">{ fields[ExpenseFormFieldsEnum.Note].render() }</React.Fragment>
         ]),
         editToastMessages: EditToast
     };

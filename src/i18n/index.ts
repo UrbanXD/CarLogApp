@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import translationEn from "./locales/en-US/translations.json";
 import translationHu from "./locales/hu-HU/translations.json";
 import { BaseConfig } from "../constants/index.ts";
-import dayjs from "dayjs";
+import { default as dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -16,6 +16,7 @@ import isBetween from "dayjs/plugin/isBetween";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import duration from "dayjs/plugin/duration";
 import utc from "dayjs/plugin/utc";
+import localeData from "dayjs/plugin/localeData";
 
 import "dayjs/locale/en";
 import "dayjs/locale/hu";
@@ -30,22 +31,33 @@ dayjs.extend(isBetween);
 dayjs.extend(isSameOrBefore);
 dayjs.extend(duration);
 dayjs.extend(utc);
+dayjs.extend(localeData);
 
 dayjs.updateLocale("hu", {
     relativeTime: {
         future: "%s múlva",
         past: "%s",
-        s: (_, s, ___, isFuture) => `néhány másodperc${ isFuture || s ? "" : "e" }`,
-        m: (_, s, ___, isFuture) => `1 perc${ isFuture || s ? "" : "e" }`,
-        mm: (n, s, ___, isFuture) => `${ n } perc${ isFuture || s ? "" : "e" }`,
-        h: (_, s, ___, isFuture) => `1 ${ isFuture || s ? "óra" : "órával ezelőtt" }`,
-        hh: (n, s, ___, isFuture) => `${ n } ${ isFuture || s ? "óra" : "órával ezelőtt" }`,
-        d: (_, s, ___, isFuture) => `1 ${ isFuture || s ? "nap" : "nappal ezelőtt" }`,
-        dd: (n, s, ___, isFuture) => `${ n } ${ isFuture || s ? "nap" : "nappal ezelőtt" }`,
-        M: (_, s, ___, isFuture) => `1 ${ isFuture || s ? "hónap" : "hónappal ezelőtt" }`,
-        MM: (n, s, ___, isFuture) => `${ n } ${ isFuture || s ? "hónap" : "hónappal ezelőtt" }`,
-        y: (_, s, ___, isFuture) => `1 ${ isFuture || s ? "év" : "évvel ezelőtt" }`,
-        yy: (n, s, ___, isFuture) => `${ n } ${ isFuture || s ? "év" : "évvel ezelőtt" }`
+        s: (n: number, s: boolean, k: string, isFuture: boolean) => `néhány másodperc${ isFuture || s ? "" : "e" }`,
+        m: (n: number, s: boolean, k: string, isFuture: boolean) => `1 perc${ isFuture || s ? "" : "e" }`,
+        mm: (n: number, s: boolean, k: string, isFuture: boolean) => `${ n } perc${ isFuture || s ? "" : "e" }`,
+        h: (n: number, s: boolean, k: string, isFuture: boolean) => `1 ${ isFuture || s ? "óra" : "órával ezelőtt" }`,
+        hh: (n: number, s: boolean, k: string, isFuture: boolean) => `${ n } ${ isFuture || s
+                                                                                ? "óra"
+                                                                                : "órával ezelőtt" }`,
+        d: (n: number, s: boolean, k: string, isFuture: boolean) => `1 ${ isFuture || s ? "nap" : "nappal ezelőtt" }`,
+        dd: (n: number, s: boolean, k: string, isFuture: boolean) => `${ n } ${ isFuture || s
+                                                                                ? "nap"
+                                                                                : "nappal ezelőtt" }`,
+        M: (n: number, s: boolean, k: string, isFuture: boolean) => `1 ${ isFuture || s
+                                                                          ? "hónap"
+                                                                          : "hónappal ezelőtt" }`,
+        MM: (n: number, s: boolean, k: string, isFuture: boolean) => `${ n } ${ isFuture || s
+                                                                                ? "hónap"
+                                                                                : "hónappal ezelőtt" }`,
+        y: (n: number, s: boolean, k: string, isFuture: boolean) => `1 ${ isFuture || s ? "év" : "évvel ezelőtt" }`,
+        yy: (n: number, s: boolean, k: string, isFuture: boolean) => `${ n } ${ isFuture || s
+                                                                                ? "év"
+                                                                                : "évvel ezelőtt" }`
     }
 });
 

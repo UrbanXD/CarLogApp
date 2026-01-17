@@ -79,12 +79,12 @@ export class UserDao extends Dao<UserTableRow, UserAccount, UserMapper> {
         .executeTakeFirst();
     }
 
-    async delete(id: string, safe?: boolean = true): Promise<string> {
+    async delete(id: string, safe: boolean = true): Promise<string | number | null> {
         try {
             const user = await this.getById(id);
 
-            if(user?.avatar && this.attachmentQueue) {
-                await this.attachmentQueue.deleteFile(user.avatar.fileName);
+            if(user?.avatarPath && this.attachmentQueue) {
+                await this.attachmentQueue.deleteFile(user.avatarPath);
             }
         } catch(e) {
             console.log("User image cannot be deleted: ", e);

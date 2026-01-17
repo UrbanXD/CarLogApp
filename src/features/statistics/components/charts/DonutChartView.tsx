@@ -1,4 +1,4 @@
-import { PieChart } from "react-native-gifted-charts";
+import { PieChart, pieDataItem } from "react-native-gifted-charts";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
@@ -7,13 +7,7 @@ import { Legend, LegendData } from "./common/Legend.tsx";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 import { ChartDataNotFound } from "./common/ChartDataNotFound.tsx";
 
-export type DonutChartItem = {
-    label: string
-    description?: string
-    value: number | string
-    color: string
-    focused?: boolean
-}
+export type DonutChartItem = pieDataItem & { label: string, description?: string, focused?: boolean }
 
 type DonutChartViewProps = {
     chartData?: Array<DonutChartItem>
@@ -41,19 +35,19 @@ export function DonutChartView({
     let flexDirection;
     switch(legendPosition) {
         case "top":
-            flexDirection = "column-reverse";
+            flexDirection = "column-reverse" as const;
             break;
         case "bottom":
-            flexDirection = "column";
+            flexDirection = "column" as const;
             break;
         case "left":
-            flexDirection = "row-reverse";
+            flexDirection = "row-reverse" as const;
             break;
         case "right":
-            flexDirection = "row";
+            flexDirection = "row" as const;
             break;
         default:
-            flexDirection = "column";
+            flexDirection = "column" as const;
     }
 
     return (

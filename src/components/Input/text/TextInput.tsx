@@ -1,14 +1,13 @@
 import React, { RefObject, useCallback, useState } from "react";
 import {
+    BlurEvent,
+    FocusEvent,
     KeyboardType,
     NativeSyntheticEvent,
     StyleSheet,
     TextInput as TextInputRN,
     TextInputContentSizeChangeEventData,
-    TextInputFocusEventData,
-    TextStyle,
-    View,
-    ViewStyle
+    View
 } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
@@ -17,6 +16,7 @@ import { useInputFieldContext } from "../../../contexts/inputField/InputFieldCon
 import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
 import { formTheme } from "../../../ui/form/constants/theme.ts";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { TextStyle, ViewStyle } from "../../../types/index.ts";
 
 export type TextInputProps = {
     inputRef?: RefObject<TextInputRN | null>
@@ -60,7 +60,7 @@ const TextInput: React.FC<TextInputProps> = ({
     const inputFieldContext = allowInputFieldContext ? useInputFieldContext() : null;
     const fieldValue = value || inputFieldContext?.field?.value || "";
     const onChange = inputFieldContext?.field?.onChange;
-    let error = inputFieldContext?.fieldState?.error;
+    let error = inputFieldContext?.fieldState?.error ?? null;
     if(error && error.ref?.name !== inputFieldContext?.field.name) error = null;
 
     const height = useSharedValue(formTheme.containerHeight);
@@ -69,7 +69,7 @@ const TextInput: React.FC<TextInputProps> = ({
     const [secure, setSecure] = useState(isSecure);
 
     const changeSecure = () => setSecure(prevState => !prevState);
-    const onFocus = useCallback((args: NativeSyntheticEvent<TextInputFocusEventData>) => {
+    const onFocus = useCallback((event: FocusEvent) => {
         setFocused(true);
 
         if(!bottomSheetInternal) return; // return if not in a bottom sheet
@@ -78,17 +78,18 @@ const TextInput: React.FC<TextInputProps> = ({
 
         animatedKeyboardState.set({
             ...keyboardState,
-            target: args.nativeEvent.target
+            target: event.nativeEvent.target
         });
     }, [bottomSheetInternal?.animatedKeyboardState]);
-    const onBlur = useCallback((args: NativeSyntheticEvent<TextInputFocusEventData>) => {
+
+    const onBlur = useCallback((event: BlurEvent) => {
         setFocused(false);
 
         if(!bottomSheetInternal) return; // return if not in a bottom sheet
         const { animatedKeyboardState } = bottomSheetInternal;
         const keyboardState = animatedKeyboardState.get();
 
-        if(keyboardState.target === args.nativeEvent.target) {
+        if(keyboardState.target === event.nativeEvent.target) {
             animatedKeyboardState.set({
                 ...keyboardState,
                 target: undefined

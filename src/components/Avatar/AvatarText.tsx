@@ -1,39 +1,42 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, ViewStyle } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
 import Button from "../Button/Button.ts";
 import { COLORS, ICON_NAMES } from "../../constants/index.ts";
-import { Color } from "../../types/index.ts";
+import { ViewStyle } from "../../types/index.ts";
 
-interface AvatarTextProps {
+type AvatarTextProps = {
     label: string;
     avatarSize?: number;
-    color?: Color;
-    backgroundColor?: Color;
-    borderColor?: Color;
+    color?: string;
+    backgroundColor?: string | null;
+    borderColor?: string;
     style?: ViewStyle;
     onPress?: () => void;
     onPressBadge?: () => void;
 }
 
-const AvatarText: React.FC<AvatarTextProps> = ({
+function AvatarText({
     label,
-    avatarSize = hp(5),
-    backgroundColor = COLORS.fuelYellow,
-    color = getContrastingColor(backgroundColor, COLORS.white, COLORS.black),
+    avatarSize,
+    backgroundColor,
+    color,
     borderColor,
     style,
     onPress,
     onPressBadge
-}) => {
+}: AvatarTextProps) {
+    const size = avatarSize ?? hp(5);
+    const background = backgroundColor ?? COLORS.fuelYellow;
+    const secondaryColor = getContrastingColor(background, COLORS.white, COLORS.black);
     const BORDER_WIDTH = hp(1);
     const styles =
         useStyles(
-            borderColor ? avatarSize + BORDER_WIDTH : avatarSize,
+            borderColor ? size + BORDER_WIDTH : size,
             label.length,
-            color,
-            backgroundColor,
+            secondaryColor,
+            background,
             borderColor,
             borderColor ? BORDER_WIDTH : 0
         );
@@ -48,7 +51,7 @@ const AvatarText: React.FC<AvatarTextProps> = ({
                 onPressBadge &&
                <Button.Icon
                   icon={ ICON_NAMES.add }
-                  iconSize={ avatarSize / 6 }
+                  iconSize={ size / 6 }
                   style={ styles.badge }
                   backgroundColor={ color }
                   iconColor={ backgroundColor }
@@ -63,14 +66,14 @@ const AvatarText: React.FC<AvatarTextProps> = ({
             </Text>
         </TouchableOpacity>
     );
-};
+}
 
 const useStyles = (
     avatarSize: number,
     labelLength: number,
-    color: Color,
-    backgroundColor: Color,
-    borderColor?: Color,
+    color: string,
+    backgroundColor: string,
+    borderColor?: string,
     borderWidth?: number
 ) => {
     return StyleSheet.create({

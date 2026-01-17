@@ -53,10 +53,12 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         try {
             if(!car) throw new Error("Car not found!");
 
-            const resultId = await fuelLogDao.delete(fuelLog);
+            const resultId = await fuelLogDao.deleteLog(fuelLog);
 
             let odometer: Odometer | null = null;
-            if(resultId && fuelLog.odometer?.carId) odometer = await odometerLogDao.getOdometerByLogId(fuelLog.odometer.carId);
+            if(resultId && fuelLog.odometer?.carId) {
+                odometer = await odometerLogDao.getOdometerByLogId(resultId.toString(), fuelLog.odometer.carId);
+            }
 
             if(odometer) dispatch(updateCarOdometer({ odometer }));
 
@@ -114,20 +116,23 @@ export function FuelLogView({ id }: FuelLogViewProps) {
                   currencyText={ fuelLog.expense.amount.currency.symbol }
                   exchangedAmount={ fuelLog.expense.amount.exchangedAmount }
                   exchangeCurrencyText={ fuelLog.expense.amount.exchangeCurrency.symbol }
-                  amountTextStyle={ textStyle ? [...textStyle, { textAlign: "left" }] : { textAlign: "left" } }
+                  amountTextStyle={ [textStyle, { textAlign: "left" }] }
                />,
             onPress: () => onEdit(FuelLogFormFieldsEnum.Amount),
-            secondaryInfo: fuelLog?.originalPricePerUnit !== 0 && {
-                title: t("currency.price_per_unit"),
-                content: (textStyle) => fuelLog &&
-                   <AmountText
-                      amount={ fuelLog.originalPricePerUnit }
-                      currencyText={ `${ fuelLog.expense.amount.currency.symbol }/${ fuelLog.fuelUnit.short }` }
-                      exchangedAmount={ fuelLog.pricePerUnit }
-                      exchangeCurrencyText={ `${ fuelLog.expense.amount.exchangeCurrency.symbol }/${ fuelLog.fuelUnit.short }` }
-                      amountTextStyle={ textStyle }
-                   />
-            }
+            secondaryInfo:
+                fuelLog?.originalPricePerUnit !== 0
+                ? {
+                        title: t("currency.price_per_unit"),
+                        content: (textStyle) => fuelLog &&
+                           <AmountText
+                              amount={ fuelLog.originalPricePerUnit }
+                              currencyText={ `${ fuelLog.expense.amount.currency.symbol }/${ fuelLog.fuelUnit.short }` }
+                              exchangedAmount={ fuelLog.pricePerUnit }
+                              exchangeCurrencyText={ `${ fuelLog.expense.amount.exchangeCurrency.symbol }/${ fuelLog.fuelUnit.short }` }
+                              amountTextStyle={ textStyle }
+                           />
+                    }
+                : undefined
         },
         {
             icon: ICON_NAMES.calendar,

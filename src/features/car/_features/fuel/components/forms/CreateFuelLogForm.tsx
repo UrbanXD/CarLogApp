@@ -6,15 +6,15 @@ import { useDatabase } from "../../../../../../contexts/database/DatabaseContext
 import useCars from "../../../../hooks/useCars.ts";
 import { FormState, useForm } from "react-hook-form";
 import { useFuelLogFormFields } from "../../hooks/useFuelLogForm.tsx";
-import { FuelLogFields, useCreateFuelLogFormProps } from "../../schemas/form/fuelLogForm.ts";
-import { updateCarOdometer } from "../../../../model/slice/index.ts";
-import { useAppDispatch } from "../../../../../../hooks/index.ts";
-import { CreateToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
+import { FuelLogFormFields, useCreateFuelLogFormProps } from "../../schemas/form/fuelLogForm.ts";
+import { updateCarOdometer } from "../../../../model/slice";
+import { useAppDispatch } from "../../../../../../hooks";
+import { CreateToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast";
 import { useTranslation } from "react-i18next";
-import { SubmitHandlerArgs } from "../../../../../../types/index.ts";
+import { SubmitHandlerArgs } from "../../../../../../types";
 
 type CreateFuelLogFormProps = {
-    onFormStateChange?: (formState: FormState<FuelLogFields>) => void
+    onFormStateChange?: (formState: FormState<FuelLogFormFields>) => void
 }
 
 export function CreateFuelLogForm({ onFormStateChange }: CreateFuelLogFormProps) {
@@ -25,10 +25,10 @@ export function CreateFuelLogForm({ onFormStateChange }: CreateFuelLogFormProps)
     const { fuelLogDao } = useDatabase();
     const { selectedCar } = useCars();
 
-    const form = useForm<FuelLogFields>(useCreateFuelLogFormProps(selectedCar));
+    const form = useForm<FuelLogFormFields, any, FuelLogFormFields>(useCreateFuelLogFormProps(selectedCar));
     const { multiStepFormSteps } = useFuelLogFormFields(form);
 
-    const submitHandler: SubmitHandlerArgs<FuelLogFields> = {
+    const submitHandler: SubmitHandlerArgs<FuelLogFormFields> = {
         onValid: async (formResult) => {
             try {
                 const result = await fuelLogDao.create(formResult);

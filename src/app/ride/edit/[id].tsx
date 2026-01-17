@@ -6,10 +6,11 @@ import { RideLog } from "../../../features/ride/schemas/rideLogSchema.ts";
 import { EditRideLogBottomSheet } from "../../../features/ride/presets/bottomSheet/EditRideLogBottomSheet.tsx";
 import { NotFoundToast } from "../../../ui/alert/presets/toast/index.ts";
 import { useTranslation } from "react-i18next";
+import { RideLogFormFieldsEnum } from "../../../features/ride/enums/RideLogFormFields.ts";
 
 function Page() {
     const { t } = useTranslation();
-    const { id, field } = useLocalSearchParams();
+    const { id, field } = useLocalSearchParams<{ id?: string, field?: string }>();
     const { rideLogDao } = useDatabase();
     const { openToast } = useAlert();
 
@@ -33,9 +34,9 @@ function Page() {
         })();
     }, [id, field]);
 
-    if(!rideLog || !field) return <></>;
+    if(!rideLog || !field || isNaN(Number(field))) return <></>;
 
-    return <EditRideLogBottomSheet rideLog={ rideLog } field={ field }/>;
+    return <EditRideLogBottomSheet rideLog={ rideLog } field={ Number(field) as RideLogFormFieldsEnum }/>;
 }
 
 export default Page;

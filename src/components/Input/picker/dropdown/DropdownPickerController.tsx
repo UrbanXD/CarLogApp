@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { PickerItemType } from "../PickerItem.tsx";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { PickerDisabledToast } from "../../../../ui/alert/presets/toast/index.ts";
@@ -8,6 +8,7 @@ import { formTheme } from "../../../../ui/form/constants/theme.ts";
 import Icon from "../../../Icon.tsx";
 import { IntelligentMarquee } from "../../../marquee/IntelligentMarquee.tsx";
 import { useTranslation } from "react-i18next";
+import { TextStyle, ViewStyle } from "../../../../types/index.ts";
 
 export type DropdownPickerControllerProps = {
     selectedItem: PickerItemType | null
@@ -52,6 +53,9 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
         toggleDropdown();
     };
 
+    const flatStyle = StyleSheet.flatten(textInputStyle);
+    const extractedColor = typeof flatStyle?.color === "string" ? flatStyle.color : undefined;
+
     return (
         <Pressable
             onPress={ onPress }
@@ -69,7 +73,7 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
                   <Icon
                      icon={ icon }
                      size={ formTheme.iconSize }
-                     color={ textInputStyle?.color ?? formTheme.iconColor }
+                     color={ extractedColor ?? formTheme.iconColor }
                   />
                </View>
             }
@@ -110,7 +114,7 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
                 <Icon
                     icon={ ICON_NAMES.downArrowHead }
                     size={ formTheme.iconSize }
-                    color={ textInputStyle?.color ?? formTheme.iconColor }
+                    color={ extractedColor ?? formTheme.iconColor }
                 />
             </View>
         </Pressable>

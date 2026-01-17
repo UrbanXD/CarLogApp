@@ -3,27 +3,33 @@ import { numberToFractionDigit } from "../../../utils/numberToFractionDigit.ts";
 type GetYAxisPropsArgs = {
     maxValue: number
     fontSize: number
-    steps: number
+    steps?: number
     forceFractionValues?: boolean
     fractionValuesThreshold?: number
-    precision?: number
+    fractionValuesPrecision?: number
     formatLabel?: (label: string | number) => string
 }
+
+const DEFAULT_STEPS = 6;
+const DEFAULT_FRACTION_VALUES_THRESHOLD = 10;
+const DEFAULT_FRACTION_VALUES_PRECISION = 2;
 
 export function getYAxisProps({
     maxValue,
     fontSize,
-    steps = 6,
+    steps,
     forceFractionValues = false,
-    fractionValuesThreshold = 10,
-    fractionValuesPrecision = 2,
+    fractionValuesThreshold,
+    fractionValuesPrecision,
     formatLabel
 }: GetYAxisPropsArgs) {
     let chartMaxValue = maxValue + (maxValue * 0.20);
-    if(!forceFractionValues && chartMaxValue > fractionValuesThreshold) chartMaxValue = Math.round(chartMaxValue);
+    if(!forceFractionValues && chartMaxValue > (fractionValuesThreshold ?? DEFAULT_FRACTION_VALUES_THRESHOLD)) {
+        chartMaxValue = Math.round(chartMaxValue);
+    }
 
-    const showFractionalValues = forceFractionValues || chartMaxValue <= fractionValuesThreshold;
-    const precision = showFractionalValues ? fractionValuesPrecision : 0;
+    const showFractionalValues = forceFractionValues || chartMaxValue <= (fractionValuesThreshold ?? DEFAULT_FRACTION_VALUES_THRESHOLD);
+    const precision = showFractionalValues ? (fractionValuesPrecision ?? DEFAULT_FRACTION_VALUES_PRECISION) : 0;
 
     const formatYLabel = (label: string | number) => {
         let labelValue = label.toString();
@@ -36,8 +42,8 @@ export function getYAxisProps({
     };
 
     let longestLabelLength = 0;
-    for(let i = 0; i <= steps; i++) {
-        const formattedLabel = formatYLabel((chartMaxValue / steps) * i);
+    for(let i = 0; i <= (steps ?? DEFAULT_STEPS); i++) {
+        const formattedLabel = formatYLabel((chartMaxValue / (steps ?? DEFAULT_STEPS)) * i);
         if(formattedLabel.length > longestLabelLength) longestLabelLength = formattedLabel.length;
     }
 
@@ -46,7 +52,7 @@ export function getYAxisProps({
         longestLabelLength = zeroLabel.length;
     }
 
-    const yAxisLabelWidth = fontSize * 0.55 * (longestLabelLength + 1.5 ?? 0);
+    const yAxisLabelWidth = fontSize * 0.55 * (longestLabelLength + 1.5);
 
     return {
         chartMaxValue,

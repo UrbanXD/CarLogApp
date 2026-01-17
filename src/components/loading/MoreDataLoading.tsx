@@ -1,6 +1,6 @@
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
-import { Color } from "../../types/index.ts";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { Color, TextStyle, ViewStyle } from "../../types/index.ts";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../constants/index.ts";
 import BounceDot from "./BounceDot.tsx";
 import { useTranslation } from "react-i18next";

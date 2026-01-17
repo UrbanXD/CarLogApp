@@ -1,15 +1,15 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../../constants";
 import Input from "../../../../../../../components/Input/Input.ts";
-import { Control, UseFormSetValue, useWatch } from "react-hook-form";
+import { Control, FieldPathByValue, FieldValues, UseFormSetValue, useWatch } from "react-hook-form";
 import { formTheme } from "../../../../../../../ui/form/constants/theme.ts";
 import { useTranslation } from "react-i18next";
 
-type FuelInputProps = {
-    control: Control<any>
-    setValue: UseFormSetValue<any>
-    fieldName: string
+type FuelInputProps<FormFieldValues extends FieldValues> = {
+    control: Control<FormFieldValues>
+    setValue: UseFormSetValue<FormFieldValues>
+    fieldName: FieldPathByValue<FormFieldValues, number>
     title?: string
     subtitle?: string
     capacity: number
@@ -17,7 +17,7 @@ type FuelInputProps = {
     unitText?: string
 }
 
-export function FuelInput({
+export function FuelInput<FormFieldValues extends FieldValues>({
     control,
     setValue,
     fieldName,
@@ -26,7 +26,7 @@ export function FuelInput({
     capacity,
     fuelTypeText,
     unitText
-}: FuelInputProps) {
+}: FuelInputProps<FormFieldValues>) {
     const { t } = useTranslation();
 
     const fuelValue = useWatch({ control, name: fieldName });
@@ -34,7 +34,7 @@ export function FuelInput({
     const fuelingToFull = useCallback(() => {
         if(fuelValue === capacity) return;
 
-        setValue(fieldName, capacity);
+        setValue(fieldName, capacity as any);
     }, [fuelValue, capacity, setValue, fieldName]);
 
     const modifyFuelValue = useCallback((value: number) => {
@@ -42,8 +42,8 @@ export function FuelInput({
         if(value > 0 && fuelValue === capacity) return;
         if(value < 0 && fuelValue === 0) return;
 
-        setValue(fieldName, Math.min(capacity, Math.max(0, fuelValue + value)));
-    });
+        setValue(fieldName, Math.min(capacity, Math.max(0, fuelValue + value)) as any);
+    }, [fuelValue, capacity]);
 
     const getFieldNameText = useCallback(() => {
         let fieldNameText = title ?? t("fuel.tank");
@@ -53,6 +53,10 @@ export function FuelInput({
 
         return fieldNameText;
     }, [t, title, fuelTypeText]);
+
+    useEffect(() => {
+        console.log(fuelValue);
+    }, [fuelValue]);
 
     const stepperButtons = [-10, -1, +1, +10];
     return (
@@ -64,21 +68,21 @@ export function FuelInput({
             containerStyle={ { gap: SEPARATOR_SIZES.lightSmall } }
         >
             <View style={ styles.actionContainer }>
-                <View style={ styles.actionContainer.stepperButtons }>
+                <View style={ styles.stepperButtons }>
                     {
                         stepperButtons.map((step, index) => (
                             <React.Fragment key={ index }>
                                 <Pressable
                                     onPress={ () => modifyFuelValue(step) }
-                                    style={ styles.actionContainer.stepperButtons.button }
+                                    style={ styles.button }
                                 >
-                                    <Text style={ styles.actionContainer.stepperButtons.button.text }>
+                                    <Text style={ styles.buttonText }>
                                         { step > 0 ? `+${ step }` : step }
                                     </Text>
                                 </Pressable>
                                 {
                                     Math.floor(stepperButtons.length / 2) === index + 1 &&
-                                   <Text style={ styles.actionContainer.stepperButtons.button.text }>
+                                   <Text style={ styles.buttonText }>
                                        { unitText }
                                    </Text>
                                 }
@@ -88,16 +92,9 @@ export function FuelInput({
                 </View>
                 <Pressable
                     onPress={ fuelingToFull }
-                    style={ [
-                        styles.actionContainer.stepperButtons.button,
-                        styles.actionContainer.stepperButtons.fullTankButton
-                    ] }
+                    style={ [styles.button, styles.fullTankButton] }
                 >
-                    <Text style={ [
-                        styles.actionContainer.stepperButtons.button.text,
-                        styles.actionContainer.stepperButtons.fullTankButton.text
-                    ] }
-                    >
+                    <Text style={ [styles.buttonText, styles.fullTankText] }>
                         { t("fuel.full_tank") }
                     </Text>
                 </Pressable>
@@ -133,40 +130,38 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "row",
         justifyContent: "space-between",
-        gap: SEPARATOR_SIZES.lightSmall,
+        gap: SEPARATOR_SIZES.lightSmall
+    },
+    stepperButtons: {
+        flex: 1,
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: SEPARATOR_SIZES.lightSmall
+    },
 
-        stepperButtons: {
-            flex: 1,
-            flexDirection: "row",
-            flexWrap: "wrap",
-            gap: SEPARATOR_SIZES.lightSmall,
+    button: {
+        backgroundColor: COLORS.gray4,
+        paddingVertical: SEPARATOR_SIZES.lightSmall / 2,
+        alignItems: "center",
+        justifyContent: "center",
+        paddingHorizontal: SEPARATOR_SIZES.lightSmall,
+        borderRadius: 8
+    },
+    buttonText: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p4,
+        letterSpacing: FONT_SIZES.p4 * 0.05,
+        color: COLORS.gray1,
+        flexShrink: 1,
+        alignSelf: "center"
+    },
 
-            button: {
-                backgroundColor: COLORS.gray4,
-                paddingVertical: SEPARATOR_SIZES.lightSmall / 2,
-                alignItems: "center",
-                justifyContent: "center",
-                paddingHorizontal: SEPARATOR_SIZES.lightSmall,
-                borderRadius: 8,
+    fullTankButton: {
+        alignSelf: "center",
+        backgroundColor: COLORS.fuelYellow
+    },
 
-                text: {
-                    fontFamily: "Gilroy-Medium",
-                    fontSize: FONT_SIZES.p4,
-                    letterSpacing: FONT_SIZES.p4 * 0.05,
-                    color: COLORS.gray1,
-                    flexShrink: 1,
-                    alignSelf: "center"
-                }
-            },
-
-            fullTankButton: {
-                alignSelf: "center",
-                backgroundColor: COLORS.fuelYellow,
-
-                text: {
-                    color: COLORS.black
-                }
-            }
-        }
+    fullTankText: {
+        color: COLORS.black
     }
 });

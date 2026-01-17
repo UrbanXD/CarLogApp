@@ -7,10 +7,11 @@ import { EditExpenseForm } from "../../../features/expense/components/forms/Edit
 import { NotFoundToast } from "../../../ui/alert/presets/toast/index.ts";
 import { useTranslation } from "react-i18next";
 import { FormBottomSheet } from "../../../ui/bottomSheet/presets/FormBottomSheet.tsx";
+import { ExpenseFormFieldsEnum } from "../../../features/expense/enums/expenseFormFieldsEnum.ts";
 
 function Page() {
     const { t } = useTranslation();
-    const { id, field } = useLocalSearchParams();
+    const { id, field } = useLocalSearchParams<{ id?: string, field?: string }>();
     const { expenseDao } = useDatabase();
     const { openToast } = useAlert();
 
@@ -35,11 +36,18 @@ function Page() {
         })();
     }, [id]);
 
-    if(!expense) return <></>;
+    const fieldIndex = field ? Number(field) : undefined;
+    const isValidField = fieldIndex === undefined || !isNaN(fieldIndex) && fieldIndex in ExpenseFormFieldsEnum;
+    if(!expense || !isValidField) return null;
 
     return (
         <FormBottomSheet
-            content={ <EditExpenseForm expense={ expense } field={ field }/> }
+            content={
+                <EditExpenseForm
+                    expense={ expense }
+                    field={ fieldIndex as ExpenseFormFieldsEnum }
+                />
+            }
             enableDynamicSizing
         />
     );

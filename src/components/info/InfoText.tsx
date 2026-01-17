@@ -1,11 +1,13 @@
-import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { IntelligentMarquee } from "../marquee/IntelligentMarquee.tsx";
 import React, { ReactElement } from "react";
+import { TextStyle, ViewStyle } from "../../types/index.ts";
 
 export type InfoTextProps = {
+    icon?: string
     title?: string
-    content?: string | ((textStyle?: Array<TextStyle>) => ReactElement)
+    content?: string | ((textStyle?: TextStyle) => ReactElement | null)
     contentFirst?: boolean
     marquee?: boolean
     textContainerStyle?: ViewStyle
@@ -23,7 +25,8 @@ export function InfoText({
     contentTextStyle
 }: InfoTextProps) {
     return (
-        <View style={ [styles.container, contentFirst && styles.container.contentFirst, textContainerStyle] }>
+        <View
+            style={ [styles.container, contentFirst && styles.contentFirstContainer, textContainerStyle] }>
             {
                 title && (
                     marquee
@@ -74,11 +77,10 @@ export function InfoText({
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-
-        contentFirst: {
-            flexDirection: "column-reverse"
-        }
+        flex: 1
+    },
+    contentFirstContainer: {
+        flexDirection: "column-reverse"
     },
     title: {
         fontFamily: "Gilroy-Heavy",

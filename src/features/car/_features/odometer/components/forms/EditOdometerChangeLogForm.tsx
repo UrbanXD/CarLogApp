@@ -32,13 +32,12 @@ export function EditOdometerChangeLogForm({ odometerLog, field, onFormStateChang
 
     const form = useForm<OdometerChangeLogFormFields>(useEditOdometerChangeLogFormProps(odometerLog));
     const { fields, fullForm } = useOdometerLogFormFields({ odometerLog, ...form });
-    const editFields: FormFields = fields?.[field] ?? fullForm;
+    const editFields: FormFields = field ? fields?.[field] ?? fullForm : fullForm;
 
     const submitHandler: SubmitHandlerArgs<OdometerChangeLogFormFields> = {
         onValid: async (formResult) => {
             try {
                 const result = await odometerLogDao.updateOdometerChangeLog(formResult);
-
                 const newCarOdometer = await odometerLogDao.getOdometerByCarId(result.carId);
 
                 let oldCarOdometer: Odometer | null = null;

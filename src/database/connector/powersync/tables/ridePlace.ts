@@ -1,6 +1,6 @@
 import { column, Table } from "@powersync/react-native";
 
-export const RIDE_PLACE_TABLE = "ride_place";
+export const RIDE_PLACE_TABLE = "ride_place" as const;
 
 export const ridePlaceTable = new Table({
     id: column.text,

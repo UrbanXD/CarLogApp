@@ -16,7 +16,7 @@ export class UserMapper extends AbstractMapper<UserTableRow, UserAccount> {
     }
 
     async toDto(entity: UserTableRow): Promise<UserAccount> {
-        const currency = await this.currencyDao.getById(entity.currency_id, false);
+        const currency = entity.currency_id ? await this.currencyDao.getById(entity.currency_id, false) : null;
 
         let localCurrency;
         if(!currency) {
@@ -38,11 +38,11 @@ export class UserMapper extends AbstractMapper<UserTableRow, UserAccount> {
         return {
             id: dto.id,
             email: dto.email,
-            firstname: dto.firstname,
-            lastname: dto.lastname,
+            firstname: dto.firstname ?? null,
+            lastname: dto.lastname ?? null,
             currency_id: dto.currency.id,
-            avatar_color: dto.avatarColor,
-            avatar_url: dto.avatar?.fileName ?? null
+            avatar_color: dto.avatarColor ?? null,
+            avatar_url: dto.avatarPath ?? null
         };
     }
 }

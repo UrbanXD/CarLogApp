@@ -31,7 +31,7 @@ export function CreateRideLogForm({ onFormStateChange }: CreateRideLogFormProps)
         onValid: async (formResult) => {
             try {
                 const result = await rideLogDao.create(formResult);
-                if(result?.odometer) dispatch(updateCarOdometer({ odometer: result.odometer }));
+                if(result?.endOdometer) dispatch(updateCarOdometer({ odometer: result.endOdometer }));
 
                 openToast(CreateToast.success(t("rides.log")));
 

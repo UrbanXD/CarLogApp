@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ListRenderItemInfo, useWindowDimensions, View } from "react-native";
-import { DEFAULT_SEPARATOR } from "../constants/index.ts";
-import { RenderComponent } from "../types/index.ts";
+import { DEFAULT_SEPARATOR } from "../constants";
+import { RenderComponent } from "../types";
 import { useBottomSheetInternal, useBottomSheetScrollableCreator } from "@gorhom/bottom-sheet";
 import { FlatList } from "react-native-gesture-handler";
-import { FlashList } from "@shopify/flash-list";
+import { FlashList, ListRenderItemInfo as FlashListRenderItemInfo } from "@shopify/flash-list";
 
 type OnBoardingViewProps = {
     steps: Array<RenderComponent>
@@ -27,9 +27,9 @@ function OnBoardingView({ steps, currentStep = 0 }: OnBoardingViewProps) {
         flatListRef.current?.scrollToOffset({ offset: currentStep * width, animated: true });
     }, [currentStep, width]);
 
-    const keyExtractor = useCallback((_, index: number) => index.toString(), []);
+    const keyExtractor = useCallback((_: any, index: number) => index.toString(), []);
 
-    const renderStep = useCallback(({ item, index }: ListRenderItemInfo<RenderComponent>) => (
+    const renderStep = useCallback(({ item, index }: FlashListRenderItemInfo<RenderComponent>) => (
         <View
             onLayout={
                 (event) => {
@@ -45,10 +45,10 @@ function OnBoardingView({ steps, currentStep = 0 }: OnBoardingViewProps) {
         </View>
     ), []);
 
-    const renderItem = useCallback(({ item, index }: ListRenderItemInfo<RenderComponent>) => (
+    const renderItem = useCallback(({ item }: ListRenderItemInfo<RenderComponent>) => (
         <FlashList
             data={ [item] }
-            renderItem={ () => renderStep({ item, index }) }
+            renderItem={ renderStep }
             keyExtractor={ keyExtractor }
             contentContainerStyle={ { width } }
             nestedScrollEnabled
@@ -58,7 +58,7 @@ function OnBoardingView({ steps, currentStep = 0 }: OnBoardingViewProps) {
     ), [width, renderStep]);
 
     return (
-        <FlatList
+        <FlatList<RenderComponent>
             ref={ flatListRef }
             data={ steps }
             renderItem={ renderItem }
@@ -70,6 +70,6 @@ function OnBoardingView({ steps, currentStep = 0 }: OnBoardingViewProps) {
             style={ { height: currentHeight } }
         />
     );
-};
+}
 
 export default OnBoardingView;

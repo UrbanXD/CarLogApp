@@ -8,7 +8,7 @@ export interface CarouselItemType {
     image?: {
         uri: string
         attachment?: boolean
-    },
+    } | null,
     title?: string,
     subtitle?: string,
     body?: string,
@@ -73,7 +73,7 @@ function Carousel({
                         }
                     </React.Fragment>
             }
-            ListEmptyComponent={ renderDefaultItem ? renderDefaultItem(ITEM_SIZE, SPACER, loading) : <></> }
+            ListEmptyComponent={ renderDefaultItem ? renderDefaultItem(ITEM_SIZE, SPACER, !!loading) : <></> }
             keyExtractor={ (_, index) => index.toString() }
             horizontal
             snapToInterval={ ITEM_SIZE }

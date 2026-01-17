@@ -244,8 +244,9 @@ export function FuelStatistics({
             <LineChartView
                 title={ {
                     title: t("statistics.fuel.consumption.title"),
-                    description: fuelConsumption && fuelConsumption.lineChartData.length > 0 && t(
-                        "statistics.fuel.accuracy")
+                    description: fuelConsumption && fuelConsumption.lineChartData.length > 0
+                                 ? t("statistics.fuel.accuracy")
+                                 : undefined
                 } }
                 yAxisTitle={ t("statistics.fuel.consumption.y_axis", { unit: fuelConsumption?.unitText }) }
                 chartData={ fuelConsumption?.lineChartData }
@@ -256,8 +257,9 @@ export function FuelStatistics({
             <LineChartView
                 title={ {
                     title: t("statistics.fuel.cost_per_distance.title"),
-                    description: fuelCostPerDistance && fuelCostPerDistance.lineChartData.length > 0 && t(
-                        "statistics.fuel.accuracy")
+                    description: fuelCostPerDistance && fuelCostPerDistance.lineChartData.length > 0
+                                 ? t("statistics.fuel.accuracy")
+                                 : undefined
                 } }
                 yAxisTitle={ t("statistics.fuel.cost_per_distance.y_axis", { unit: fuelCostPerDistance?.unitText }) }
                 chartData={ fuelCostPerDistance?.lineChartData }

@@ -9,7 +9,4 @@ export const rideExpenseSchema = z.object({
     expense: expenseSchema
 });
 
-export const formResultRideExpenseSchema = rideExpenseSchema.omit({ ownerId: true, rideLogId: true });
-
 export type RideExpense = z.infer<typeof rideExpenseSchema>;
-export type FormResultRideExpense = z.infer<typeof formResultRideExpenseSchema>;

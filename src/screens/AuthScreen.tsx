@@ -5,7 +5,6 @@ import { widthPercentageToDP } from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button/Button";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { SignInBottomSheet, SignUpBottomSheet } from "../features/user/presets/bottomSheet/index.ts";
 import { useAuth } from "../contexts/auth/AuthContext.ts";
 import Animated, { FadeIn, SlideInRight } from "react-native-reanimated";
 import Divider from "../components/Divider.tsx";
@@ -49,7 +48,7 @@ const AuthScreen: React.FC = () => {
                     <CarlogTitle animated={ false }/>
                     <Animated.View
                         entering={ FadeIn.duration(ENTERING_ANIMATION_DURATION) }
-                        style={ styles.titleContainer.info }
+                        style={ styles.titleContainerInfo }
                     >
                         <Divider
                             size={ widthPercentageToDP(50) }
@@ -129,11 +128,11 @@ const useStyles = (top: number, bottom: number) =>
         titleContainer: {
             flex: 1,
             top: -SEPARATOR_SIZES.lightLarge,
-            gap: SEPARATOR_SIZES.mediumSmall,
+            gap: SEPARATOR_SIZES.mediumSmall
+        },
+        titleContainerInfo: {
+            gap: SEPARATOR_SIZES.mediumSmall
 
-            info: {
-                gap: SEPARATOR_SIZES.mediumSmall
-            }
         },
         subtitle: {
             alignSelf: "center",

@@ -1,6 +1,7 @@
-import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { COLORS, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
+import { TextStyle, ViewStyle } from "../../../../../types/index.ts";
 
 export type ChartTitleProps = {
     title: string

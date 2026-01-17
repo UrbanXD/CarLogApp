@@ -1,5 +1,5 @@
 import { FormState } from "react-hook-form";
-import React, { useState } from "react";
+import React, { ReactElement, useState } from "react";
 import BottomSheet, { BottomSheetProps } from "../components/BottomSheet.tsx";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 
@@ -19,9 +19,9 @@ export function FormBottomSheet({
     const [enableDismissOnClose, setEnableDismissOnClose] = useState(alwaysEnableDismiss);
 
     let contentWithCallback = content;
-    if(!alwaysEnableDismiss && React.isValidElement(content)) {
+    if(!alwaysEnableDismiss && React.isValidElement(content) && content.props) {
         contentWithCallback = React.cloneElement(
-            content,
+            content as ReactElement<any>,
             {
                 onFormStateChange: (formState: FormState<any>) => setEnableDismissOnClose(!formState.isDirty)
             }
@@ -36,6 +36,7 @@ export function FormBottomSheet({
             enableDynamicSizing={ enableDynamicSizing }
             maxDynamicContentSize={ maxDynamicContentSize }
             enableDismissOnClose={ enableDismissOnClose }
+            enableOverDrag={ false }
         />
     );
 }

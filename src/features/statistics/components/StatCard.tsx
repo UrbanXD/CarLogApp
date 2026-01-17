@@ -1,14 +1,15 @@
 import React, { ReactNode } from "react";
-import { ActivityIndicator, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants";
+import { TextStyle, ViewStyle } from "../../../types/index.ts";
 
 export type StatCardProps = {
     label: ReactNode
     value: ReactNode | null
-    trend?: string
-    trendDescription?: string
-    description?: string
-    emptyValueText?: string
+    trend?: string | null
+    trendDescription?: string | null
+    description?: string | null
+    emptyValueText?: string | null
     isPositive?: boolean
     isLoading?: boolean
     containerStyle?: ViewStyle

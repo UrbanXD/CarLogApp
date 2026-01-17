@@ -5,9 +5,10 @@ import Input from "../../../../../components/Input/Input.ts";
 import { AVATAR_COLOR, ICON_NAMES } from "../../../../../constants/index.ts";
 import Avatar from "../../../../../components/Avatar/Avatar.ts";
 import { UseFormReturn, useWatch } from "react-hook-form";
+import { EditUserAvatarRequest } from "../../../schemas/form/editUserAvatarRequest.ts";
 
 type AvatarStepProps = {
-    form: UseFormReturn
+    form: UseFormReturn<EditUserAvatarRequest>
     avatarLabel: string
 }
 
@@ -64,7 +65,7 @@ export function AvatarStep({
                         renderSelectedColor={ (color) => (
                             <Avatar.Text
                                 label={ avatarLabel ?? "TT" }
-                                backgroundColor={ color }
+                                backgroundColor={ color ?? undefined }
                                 avatarSize={ hp(18) }
                                 style={ {
                                     borderWidth: hp(1),

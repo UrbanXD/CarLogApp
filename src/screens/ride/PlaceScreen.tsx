@@ -48,7 +48,7 @@ export function PlaceScreen() {
 
     const openCreateForm = () => router.push("/ride/place/create");
 
-    const onEdit = useCallback((id: string, callback?: () => void) => {
+    const onEdit = useCallback((id: string | number, callback?: () => void) => {
         if(!id) return openToast(NotFoundToast.warning(t("places.title_singular")));
 
         callback?.();
@@ -58,7 +58,7 @@ export function PlaceScreen() {
         });
     }, []);
 
-    const handleDelete = useCallback(async (id: string, callback?: () => void) => {
+    const handleDelete = useCallback(async (id: string | number, callback?: () => void) => {
         if(!id) return openToast(NotFoundToast.warning(t("places.title_singular")));
 
         try {
@@ -76,7 +76,7 @@ export function PlaceScreen() {
         }
     }, [placeDao, openToast, t]);
 
-    const onDelete = useCallback((id: string, callback?: () => void) => {
+    const onDelete = useCallback((id: string | number, callback?: () => void) => {
         openModal(DeleteModal({ name: t("places.title_singular"), acceptAction: () => handleDelete(id, callback) }));
     }, [openModal, t]);
 
@@ -89,8 +89,8 @@ export function PlaceScreen() {
                 onEdit={ onEdit }
                 onDelete={ onDelete }
                 isInitialFetching={ isInitialFetching }
-                fetchNext={ initialFetchHappened && paginator.hasNext() && fetchNext }
-                fetchPrevious={ initialFetchHappened && paginator.hasPrevious() && fetchPrevious }
+                fetchNext={ (initialFetchHappened && paginator.hasNext()) ? fetchNext : undefined }
+                fetchPrevious={ (initialFetchHappened && paginator.hasPrevious()) ? fetchPrevious : undefined }
                 isNextFetching={ isNextFetching }
                 isPreviousFetching={ isPreviousFetching }
             />

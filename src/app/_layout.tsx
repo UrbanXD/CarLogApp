@@ -172,13 +172,15 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="expense/fuel/[id]"
                 options={ ({ route }) => ({
-                    header: () => <Header.Secondary title={ route.params?.title ?? t("log.title") }/>
+                    header: () => <Header.Secondary
+                        title={ (route.params as Record<string, any>)?.title ?? t("log.title") }/>
                 }) }
             />
             <Stack.Screen
                 name="expense/service/[id]"
                 options={ ({ route }) => ({
-                    header: () => <Header.Secondary title={ route.params?.title ?? t("log.title") }/>
+                    header: () => <Header.Secondary
+                        title={ (route.params as Record<string, any>)?.["title"] ?? t("log.title") }/>
                 }) }
             />
             <Stack.Screen

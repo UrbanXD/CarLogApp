@@ -31,8 +31,15 @@ function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
                     state.routes.map((route: any, index: number) => {
                         const { options } = descriptors[route.key];
                         const isFocused = state.index === index;
+                        const iconSize = 26;
 
-                        const icons = JSON.parse(options.tabBarIcon());
+                        const iconNode = options?.tabBarIcon?.({
+                            focused: isFocused,
+                            color: options.tabBarActiveTintColor ?? "",
+                            size: iconSize
+                        });
+
+                        const icons = typeof iconNode === "string" ? JSON.parse(iconNode) : {};
 
                         const onPress = () => {
                             const event = navigation.emit({
@@ -50,7 +57,7 @@ function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
                             <TabBarIcon
                                 key={ index }
                                 isFocused={ isFocused }
-                                title={ options.title }
+                                title={ options.title ?? "??" }
                                 activeIcon={ icons?.["active"] }
                                 inactiveIcon={ icons?.["inactive"] }
                                 iconSize={ 26 }

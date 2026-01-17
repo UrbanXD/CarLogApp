@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import { Text } from "react-native";
 import { act, fireEvent } from "@testing-library/react-native";
 import BottomSheet, { BottomSheetProps } from "./BottomSheet.tsx";
@@ -35,7 +35,8 @@ jest.mock("@gorhom/bottom-sheet", () => {
         return <View testID="BottomSheetModal">{ props.children }</View>;
     });
 
-    const BottomSheetView = ({ children }) => <View testID="BottomSheetView">{ children }</View>;
+    const BottomSheetView = ({ children }: { children: ReactElement }) => <View
+        testID="BottomSheetView">{ children }</View>;
 
     return {
         BottomSheetModal,
@@ -43,7 +44,7 @@ jest.mock("@gorhom/bottom-sheet", () => {
     };
 });
 
-const renderBottomSheet = (props?: BottomSheetProps) => (
+const renderBottomSheet = (props?: Partial<BottomSheetProps>) => (
     <ModalManager>
         <BottomSheet
             title="Test Sheet Title"

@@ -40,7 +40,7 @@ export class OdometerLogTypeMapper extends AbstractMapper<OdometerLogTypeTableRo
 
     async toEntity(dto: OdometerLogType): Promise<OdometerLogTypeTableRow> {
         return {
-            id: dto.id,
+            id: dto.id as never,
             key: dto.key
         };
     }

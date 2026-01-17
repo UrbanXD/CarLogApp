@@ -11,7 +11,7 @@ import { Currency } from "../../../../_shared/currency/schemas/currencySchema.ts
 
 type ResultStepProps = {
     formValues: CarFormFields
-    goTo: (stepIndex?: number) => void
+    goTo: (stepIndex: number) => void
 }
 
 export function ResultStep({
@@ -60,7 +60,7 @@ export function ResultStep({
 
     if(!fuelType || !fuelUnit || !odometerUnit || !currency) return <MoreDataLoading/>;
 
-    const { data, error } = carSchema.partial().safeParse({
+    const { data } = carSchema.partial().safeParse({
         id: formValues.id,
         name: formValues.name,
         model: {

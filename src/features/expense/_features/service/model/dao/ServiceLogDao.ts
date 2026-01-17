@@ -11,7 +11,7 @@ import { OdometerLogDao } from "../../../../../car/_features/odometer/model/dao/
 import { ServiceTypeDao } from "./ServiceTypeDao.ts";
 import { SERVICE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/serviceLog.ts";
 import { Kysely } from "@powersync/kysely-driver";
-import { ServiceLogFields } from "../../schemas/form/serviceLogForm.ts";
+import { ServiceLogFormFields } from "../../schemas/form/serviceLogForm.ts";
 import { EXPENSE_TABLE } from "../../../../../../database/connector/powersync/tables/expense.ts";
 import { ODOMETER_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/odometerLog.ts";
 import { SERVICE_ITEM_TABLE } from "../../../../../../database/connector/powersync/tables/serviceItem.ts";
@@ -21,6 +21,9 @@ import { ServiceItemDao } from "./ServiceItemDao.ts";
 import { CarDao } from "../../../../../car/model/dao/CarDao.ts";
 import { CursorOptions, CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
 import { PaginatorOptions } from "../../../../../../database/paginator/AbstractPaginator.ts";
+import { SelectQueryBuilder } from "kysely";
+
+export type SelectPaginatorServiceLogTableRow = ServiceLogTableRow & ExpenseTableRow;
 
 export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLogMapper> {
     constructor(
@@ -48,7 +51,7 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
         );
     }
 
-    async create(formResult: ServiceLogFields): Promise<ServiceLog | null> {
+    async create(formResult: ServiceLogFormFields): Promise<ServiceLog | null> {
         const { serviceLog, serviceItems, expense, odometerLog } = await this.mapper.formResultToEntities(formResult);
 
         const insertedServiceLogId = await this.db.transaction().execute(async (trx) => {
@@ -87,7 +90,7 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
         return await this.getById(insertedServiceLogId);
     }
 
-    async update(formResult: ServiceLogFields): Promise<ServiceLog | null> {
+    async update(formResult: ServiceLogFormFields): Promise<ServiceLog | null> {
         const { serviceLog, serviceItems, expense, odometerLog } = await this.mapper.formResultToEntities(formResult);
 
         const updatedServiceLogId = await this.db.transaction().execute(async (trx) => {
@@ -176,7 +179,7 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
         return await this.getById(updatedServiceLogId);
     }
 
-    async delete(serviceLog: ServiceLog): Promise<string | number> {
+    async deleteLog(serviceLog: ServiceLog): Promise<string | number> {
         return await this.db.transaction().execute(async (trx) => {
             const result = await trx
             .deleteFrom(SERVICE_LOG_TABLE)
@@ -208,21 +211,21 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
     }
 
     paginator(
-        cursorOptions: CursorOptions<keyof ServiceLogTableRow & keyof ExpenseTableRow>,
-        filterBy?: PaginatorOptions<ServiceLogTableRow & ExpenseTableRow>["filterBy"],
-        perPage?: number = 25
-    ): CursorPaginator<ServiceLogTableRow & ExpenseTableRow, ServiceLog> {
+        cursorOptions: CursorOptions<keyof SelectPaginatorServiceLogTableRow>,
+        filterBy?: PaginatorOptions<SelectPaginatorServiceLogTableRow>["filterBy"],
+        perPage: number = 25
+    ): CursorPaginator<SelectPaginatorServiceLogTableRow, ServiceLog> {
         const query = this.db
         .selectFrom(SERVICE_LOG_TABLE)
         .innerJoin(EXPENSE_TABLE, `${ EXPENSE_TABLE }.id`, `${ SERVICE_LOG_TABLE }.expense_id`)
         .selectAll(SERVICE_LOG_TABLE);
 
-        return new CursorPaginator<ServiceLogTableRow & ExpenseTableRow, ServiceLog>(
+        return new CursorPaginator<SelectPaginatorServiceLogTableRow, ServiceLog>(
             this.db,
             SERVICE_LOG_TABLE,
             cursorOptions,
             {
-                baseQuery: query,
+                baseQuery: query as SelectQueryBuilder<DatabaseType, any, SelectPaginatorServiceLogTableRow>,
                 perPage,
                 filterBy,
                 mapper: this.mapper.toDto.bind(this.mapper)

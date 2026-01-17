@@ -1,7 +1,7 @@
 import { Edges, SafeAreaView } from "react-native-safe-area-context";
-import { ViewStyle } from "react-native";
 import React, { ReactNode } from "react";
 import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../constants/index.ts";
+import { ViewStyle } from "../../types/index.ts";
 
 export type ScreenViewProps = {
     screenHasHeader?: boolean,
@@ -23,7 +23,7 @@ export function ScreenView({
             style={ [
                 {
                     flex: 1,
-                    paddingTop: (screenHasHeader && SIMPLE_HEADER_HEIGHT) + SEPARATOR_SIZES.lightSmall,
+                    paddingTop: (screenHasHeader ? SIMPLE_HEADER_HEIGHT : 0) + SEPARATOR_SIZES.lightSmall,
                     paddingBottom: SEPARATOR_SIZES.lightSmall,
                     paddingHorizontal: DEFAULT_SEPARATOR,
                     backgroundColor: COLORS.black2

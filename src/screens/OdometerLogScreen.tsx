@@ -22,7 +22,7 @@ import { DeleteModal } from "../ui/alert/presets/modal/index.ts";
 export function OdometerLogScreen() {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
-    const { id } = useLocalSearchParams();
+    const { id } = useLocalSearchParams<{ id?: string }>();
     const { getCar } = useCars();
     const { odometerLogDao } = useDatabase();
     const { openModal, openToast } = useAlert();
@@ -33,6 +33,7 @@ export function OdometerLogScreen() {
     useFocusEffect(
         useCallback(() => {
             const getOdometerLog = async () => {
+                if(!id) return;
                 const log = await odometerLogDao.getById(id);
                 setOdometerLog(log);
             };
@@ -44,12 +45,13 @@ export function OdometerLogScreen() {
     useEffect(() => {
         if(car?.id === odometerLog?.carId || !odometerLog?.carId) return;
 
-        setCar(getCar(odometerLog.carId));
+        setCar(getCar(odometerLog.carId) ?? null);
     }, [odometerLog]);
 
     const handleDelete = useCallback(async (odometerLog: OdometerLog) => {
         try {
             if(!car) throw new Error("Car not found!");
+            if(!odometerLog.relatedId) throw new Error("Odometer change log id not found!");
 
             await odometerLogDao.deleteOdometerChangeLog(odometerLog.id, odometerLog.relatedId);
             const odometer = await odometerLogDao.getOdometerByCarId(odometerLog.carId);
@@ -106,7 +108,7 @@ export function OdometerLogScreen() {
         {
             icon: ICON_NAMES.note,
             content: odometerLog?.note ?? t("common.no_notes"),
-            contentTextStyle: !odometerLog?.note && { color: COLORS.gray2 },
+            contentTextStyle: !odometerLog?.note ? { color: COLORS.gray2 } : undefined,
             onPress: () => onEdit(OdometerLogFormFields.Note)
         }
     ]), [car, odometerLog, t]);

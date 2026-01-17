@@ -5,9 +5,9 @@ import { StepProps } from "../../../../../types/index.ts";
 import { CarFormFields } from "../../../schemas/form/carForm.ts";
 import { useTranslation } from "react-i18next";
 
-type NameStepProps<FormFieldsType> = Pick<StepProps<FormFieldsType>, "control">;
+type NameStepProps = Pick<StepProps<CarFormFields>, "control">;
 
-function NameStep<FormFieldsType = CarFormFields>({ control }: NameStepProps<FormFieldsType>) {
+function NameStep({ control }: NameStepProps) {
     const { t } = useTranslation();
 
     return (

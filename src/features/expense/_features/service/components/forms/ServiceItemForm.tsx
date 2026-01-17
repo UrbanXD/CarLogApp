@@ -1,6 +1,9 @@
-import { FormResultServiceItem, ServiceItem } from "../../schemas/serviceItemSchema.ts";
 import { useForm } from "react-hook-form";
-import { ServiceItemFields, useServiceItemFormProps } from "../../schemas/form/serviceItemForm.ts";
+import {
+    ServiceItemFormFields,
+    ServiceItemFormTransformedFields,
+    useServiceItemFormProps
+} from "../../schemas/form/serviceItemForm.ts";
 import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import { StyleSheet, Text, View } from "react-native";
@@ -16,8 +19,8 @@ import { formTheme } from "../../../../../../ui/form/constants/theme.ts";
 
 type ServiceItemFormProps = {
     carCurrencyId: number
-    onSubmit: (result: FormResultServiceItem) => void
-    defaultServiceItem?: ServiceItem
+    onSubmit: (result: ServiceItemFormTransformedFields) => void
+    defaultServiceItem?: ServiceItemFormTransformedFields | null
 }
 
 export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }: ServiceItemFormProps) {
@@ -25,7 +28,7 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
     const { openToast } = useAlert();
     const { serviceItemDao } = useDatabase();
 
-    const form = useForm<ServiceItemFields>(useServiceItemFormProps({
+    const form = useForm<ServiceItemFormFields, any, ServiceItemFormFields>(useServiceItemFormProps({
         carCurrencyId,
         serviceItem: defaultServiceItem
     }));
@@ -33,12 +36,9 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
     const { control, setValue, handleSubmit } = form;
 
     const submitHandler = handleSubmit(
-        async (formResult: ServiceItemFields) => {
+        async (formResult) => {
             try {
-                const result = await serviceItemDao.mapper.formResultToDto({
-                    ...formResult,
-                    carCurrencyId: carCurrencyId
-                });
+                const result = await serviceItemDao.mapper.formResultToDto(formResult, carCurrencyId);
 
                 onSubmit(result);
             } catch(e) {

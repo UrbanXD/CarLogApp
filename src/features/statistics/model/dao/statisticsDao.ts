@@ -42,8 +42,8 @@ type StatisticsFunctionArgs = {
 }
 
 export type Stat = {
-    value: string | number
-    unitText?: string
+    value: number
+    unitText?: string | null
     label?: string
     color?: string
 }
@@ -52,20 +52,20 @@ export type TrendStat = {
     average: number
     lineChartData: Array<LineChartItem>
     rangeUnit: RangeUnit
-    unitText?: string
+    unitText?: string | null
 }
 
 export type ComparisonStatByType = {
     donutChartData: Array<DonutChartItem>
     legend: { [key: string]: LegendData }
-    unitText?: string
+    unitText?: string | null
 }
 
 export type ComparisonStatByDate = {
     barChartData: Array<BarChartItem>
     legend?: { [key: string]: LegendData }
     rangeUnit: RangeUnit
-    unitText?: string
+    unitText?: string | null
 }
 
 export type SummaryStat = {
@@ -82,8 +82,8 @@ export type SummaryStat = {
     totalTrend: Trend
     averageTrend: Trend
     medianTrend: Trend
-    countTrend: Trend
-    unitText?: string
+    countTrend: Trend | null
+    unitText?: string | null
 }
 
 export type TopListItemStat = {
@@ -92,8 +92,8 @@ export type TopListItemStat = {
 }
 
 export type Forecast = {
-    oldValue: number | string
-    value: number | string
+    oldValue: number
+    value: number
     date: string | null
     label?: string
     color?: string
@@ -102,7 +102,7 @@ export type Forecast = {
 export type ServiceForecast = {
     odometer: {
         value: number
-        unitText?: string
+        unitText?: string | null
     }
     major: Forecast | null
     small: Forecast | null
@@ -143,8 +143,8 @@ export class StatisticsDao {
 
         const baseQuery = (from: string, to: string) => {
             let query = this.db
-            .selectFrom(`${ EXPENSE_TABLE } as t1`)
-            .innerJoin(`${ EXPENSE_TYPE_TABLE } as t2`, "t1.type_id", "t2.id")
+            .selectFrom(`${ EXPENSE_TABLE } as t1` as const)
+            .innerJoin(`${ EXPENSE_TYPE_TABLE } as t2` as const, "t1.type_id", "t2.id")
             .where("t1.date", ">=", formatDateToDatabaseFormat(from))
             .where("t1.date", "<=", formatDateToDatabaseFormat(to));
 
@@ -201,14 +201,14 @@ export class StatisticsDao {
         const previousWindowAggregateResult = await aggregateQuery(previousWindowFrom, previousWindowTo)
         .executeTakeFirst();
 
-        const total = numberToFractionDigit(aggregateResult.total_amount ?? 0);
-        const average = numberToFractionDigit(aggregateResult.average_amount ?? 0);
-        const median = numberToFractionDigit(aggregateResult.median_amount ?? 0);
-        const count = numberToFractionDigit(aggregateResult.total_count ?? 0);
-        const previousWindowTotal = numberToFractionDigit(previousWindowAggregateResult.total_amount ?? 0);
-        const previousWindowAverage = numberToFractionDigit(previousWindowAggregateResult.average_amount ?? 0);
-        const previousWindowMedian = numberToFractionDigit(previousWindowAggregateResult.median_amount ?? 0);
-        const previousWindowCount = numberToFractionDigit(previousWindowAggregateResult.total_count ?? 0);
+        const total = numberToFractionDigit(aggregateResult?.total_amount ?? 0);
+        const average = numberToFractionDigit(aggregateResult?.average_amount ?? 0);
+        const median = numberToFractionDigit(aggregateResult?.median_amount ?? 0);
+        const count = numberToFractionDigit(aggregateResult?.total_count ?? 0);
+        const previousWindowTotal = numberToFractionDigit(previousWindowAggregateResult?.total_amount ?? 0);
+        const previousWindowAverage = numberToFractionDigit(previousWindowAggregateResult?.average_amount ?? 0);
+        const previousWindowMedian = numberToFractionDigit(previousWindowAggregateResult?.median_amount ?? 0);
+        const previousWindowCount = numberToFractionDigit(previousWindowAggregateResult?.total_count ?? 0);
 
         return {
             max: maxItemResult
@@ -216,9 +216,10 @@ export class StatisticsDao {
                 {
                     value: numberToFractionDigit(maxItemResult?.amount ?? 0),
                     label: maxItemResult?.key ?? ExpenseTypeEnum.OTHER,
-                    color: selectedExpenseType.primaryColor
+                    color: selectedExpenseType?.primaryColor
                 }
                  : null,
+            min: null,
             total,
             average,
             median,
@@ -231,13 +232,13 @@ export class StatisticsDao {
             averageTrend: calculateTrend(average, previousWindowAverage, trendOptions),
             medianTrend: calculateTrend(median, previousWindowMedian, trendOptions),
             countTrend: calculateTrend(count, previousWindowCount, trendOptions),
-            unitText: carId && await this.getCarCurrencySymbol(carId)
+            unitText: await this.getCarCurrencySymbol(carId)
         };
     }
 
     async getExpenseComparisonByType({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStatByType> {
         let query = this.db
-        .selectFrom(`${ EXPENSE_TABLE } as t1`)
+        .selectFrom(`${ EXPENSE_TABLE } as t1` as const)
         //@formatter:off
         .select([
             sql<number>`SUM(t1.amount)`.as("total"),
@@ -266,15 +267,15 @@ export class StatisticsDao {
         const typesInChart: Set<string> = new Set();
 
         const donutChartData: Array<DonutChartItem> = result.map((r, index) => {
-            typesInChart.add(r.type_id);
+            typesInChart.add(r.type_id!);
 
             return {
                 value: numberToFractionDigit(r.percent ?? 0),
-                label: legend[r.type_id].label,
-                description: numberToFractionDigit(r.total ?? 0),
-                color: legend[r.type_id].color,
+                label: legend[r.type_id!].label,
+                description: numberToFractionDigit(r.total ?? 0).toString(),
+                color: legend[r.type_id!].color,
                 focused: index === 0
-            };
+            } as DonutChartItem;
         });
 
         const filteredLegend: { [key: string]: LegendData } = {};
@@ -286,7 +287,7 @@ export class StatisticsDao {
         return {
             donutChartData,
             legend: filteredLegend,
-            unitText: carId && await this.getCarCurrencySymbol(carId)
+            unitText: await this.getCarCurrencySymbol(carId)
         };
     }
 
@@ -296,7 +297,7 @@ export class StatisticsDao {
         const selectExpression = this.getRangeSelectExpression("t1.date", rangeUnit);
 
         let query = this.db
-        .selectFrom(`${ EXPENSE_TABLE } as t1`)
+        .selectFrom(`${ EXPENSE_TABLE } as t1` as const)
         //@formatter:off
         .select([
             sql<number>`SUM(t1.amount)`.as("total"),
@@ -328,8 +329,7 @@ export class StatisticsDao {
             const total = item.total;
 
             if(!groupedData[time]) groupedData[time] = {};
-
-            groupedData[time][typeId] = total;
+            if(typeId) groupedData[time][typeId] = total;
         });
 
         for(const time in groupedData) {
@@ -364,7 +364,7 @@ export class StatisticsDao {
             barChartData,
             legend: barChartTypes,
             rangeUnit,
-            unitText: carId && await this.getCarCurrencySymbol(carId)
+            unitText: await this.getCarCurrencySymbol(carId)
         };
     }
 
@@ -374,8 +374,8 @@ export class StatisticsDao {
         const selectExpression = this.getRangeSelectExpression("t1.date", rangeUnit);
 
         let query = this.db
-        .selectFrom(`${ EXPENSE_TABLE } as t1`)
-        .innerJoin(`${ SERVICE_LOG_TABLE } as t2`, "t1.id", "t2.expense_id")
+        .selectFrom(`${ EXPENSE_TABLE } as t1` as const)
+        .innerJoin(`${ SERVICE_LOG_TABLE } as t2` as const, "t1.id", "t2.expense_id")
         .select([
             sql<number>`SUM(t1.amount)`.as("total"),
             selectExpression
@@ -391,16 +391,18 @@ export class StatisticsDao {
 
         const result = await query.execute();
         const serviceTypeId = await this.expenseTypeDao.getIdByKey(ExpenseTypeEnum.SERVICE);
-        const serviceType = await this.expenseTypeDao.getById(serviceTypeId);
+        const serviceType = serviceTypeId ? await this.expenseTypeDao.getById(serviceTypeId) : null;
 
         const barChartData: Array<BarChartItem> = [];
 
         result.forEach((r) => {
-            barChartData.push({
-                label: r.time,
-                type: serviceType?.id ?? "0",
-                value: numberToFractionDigit(r.total ?? 0)
-            });
+            if(r.time) {
+                barChartData.push({
+                    label: r.time,
+                    type: serviceType?.id ?? "0",
+                    value: numberToFractionDigit(r.total ?? 0)
+                });
+            }
         });
 
         const barChartTypes: { [key: string]: LegendData } = {
@@ -414,24 +416,24 @@ export class StatisticsDao {
             barChartData,
             legend: barChartTypes,
             rangeUnit,
-            unitText: carId && await this.getCarCurrencySymbol(carId)
+            unitText: await this.getCarCurrencySymbol(carId)
         };
     }
 
     async getServiceComparisonByType({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStatByType> {
         let query = this.db
-        .selectFrom(`${ SERVICE_LOG_TABLE } as t1`)
-        .innerJoin(`${ EXPENSE_TABLE } as t2`, "t1.expense_id", "t2.id")
+        .selectFrom(`${ SERVICE_LOG_TABLE } as t1` as const)
+        .innerJoin(`${ EXPENSE_TABLE } as t2` as const, "t1.expense_id", "t2.id")
         //@formatter:off
         .select([
-            sql<number>`SUM(t2.amount) as total`,
+            sql<number>`SUM(t2.amount)`.as("total"),
             sql<number>`
                 CASE
                 WHEN SUM(SUM(t2.amount)) OVER () = 0
                 THEN 100.0
                 ELSE SUM(t2.amount) * 100.0 / SUM(SUM(t2.amount)) OVER ()
-                END AS percent`,
-            "t1.service_type_id as type_id"
+                END`.as("percent"),
+            "t1.service_type_id as type_id" as const
         ])
         //@formatter:on
         .where("t2.date", ">=", formatDateToDatabaseFormat(from))
@@ -455,15 +457,15 @@ export class StatisticsDao {
         const typesInChart: Set<string> = new Set();
 
         const donutChartData: Array<DonutChartItem> = result.map((r, index) => {
-            typesInChart.add(r.type_id);
+            typesInChart.add(r.type_id!);
 
             return ({
                 value: numberToFractionDigit(r.percent ?? 0),
-                label: legend[r.type_id].label,
-                description: numberToFractionDigit(r.total ?? 0),
-                color: legend[r.type_id].color,
+                label: legend[r.type_id!].label,
+                description: numberToFractionDigit(r.total ?? 0).toString(),
+                color: legend[r.type_id!].color,
                 focused: index === 0
-            });
+            }) as DonutChartItem;
         });
 
         const filteredLegend: { [key: string]: LegendData } = {};
@@ -475,15 +477,15 @@ export class StatisticsDao {
         return {
             donutChartData,
             legend: filteredLegend,
-            unitText: carId && await this.getCarCurrencySymbol(carId)
+            unitText: await this.getCarCurrencySymbol(carId)
         };
     }
 
     async getServiceItemComparisonByType({ carId, from, to }: StatisticsFunctionArgs): Promise<ComparisonStatByType> {
         let query = this.db
-        .selectFrom(`${ SERVICE_LOG_TABLE } as t1`)
-        .innerJoin(`${ SERVICE_ITEM_TABLE } as t2`, "t1.id", "t2.service_log_id")
-        .innerJoin(`${ EXPENSE_TABLE } as t3`, "t1.expense_id", "t3.id")
+        .selectFrom(`${ SERVICE_LOG_TABLE } as t1` as const)
+        .innerJoin(`${ SERVICE_ITEM_TABLE } as t2` as const, "t1.id", "t2.service_log_id")
+        .innerJoin(`${ EXPENSE_TABLE } as t3` as const, "t1.expense_id", "t3.id")
         .select([
             sql<number>`SUM(t2.quantity * t2.price_per_unit * t2.exchange_rate)`.as("total"),
             sql<number>`SUM(t2.quantity * t2.price_per_unit * t2.exchange_rate) * 100.0 / SUM(SUM(t2.quantity * t2.price_per_unit * t2.exchange_rate)) OVER ()`.as(
@@ -511,15 +513,15 @@ export class StatisticsDao {
         const typesInChart: Set<string> = new Set();
 
         const donutChartData: Array<DonutChartItem> = result.map((r, index) => {
-            typesInChart.add(r.item_type_id);
+            typesInChart.add(r.item_type_id!);
 
             return ({
                 value: numberToFractionDigit(r.percent ?? 0),
-                label: legend[r.item_type_id].label,
-                description: numberToFractionDigit(r.total ?? 0),
-                color: legend[r.item_type_id].color,
+                label: legend[r.item_type_id!].label,
+                description: numberToFractionDigit(r.total ?? 0).toString(),
+                color: legend[r.item_type_id!].color,
                 focused: index === 0
-            });
+            }) as DonutChartItem;
         });
 
         const filteredLegend: { [key: string]: LegendData } = {};
@@ -531,7 +533,7 @@ export class StatisticsDao {
         return {
             donutChartData,
             legend: filteredLegend,
-            unitText: carId && await this.getCarCurrencySymbol(carId)
+            unitText: await this.getCarCurrencySymbol(carId)
         };
     }
 
@@ -544,17 +546,17 @@ export class StatisticsDao {
         averageTime: Omit<Stat, "label" | "color">
     }> {
         let query = this.db
-        .selectFrom(`${ SERVICE_LOG_TABLE } as t1`)
-        .innerJoin(`${ ODOMETER_LOG_TABLE } as t2`, "t1.odometer_log_id", "t2.id")
-        .innerJoin(`${ CAR_TABLE } as t3`, "t1.car_id", "t3.id")
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t4`, "t3.odometer_unit_id", "t4.id")
-        .innerJoin(`${ EXPENSE_TABLE } as t5`, "t1.expense_id", "t5.id")
+        .selectFrom(`${ SERVICE_LOG_TABLE } as t1` as const)
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as t2` as const, "t1.odometer_log_id", "t2.id")
+        .innerJoin(`${ CAR_TABLE } as t3` as const, "t1.car_id", "t3.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t4` as const, "t3.odometer_unit_id", "t4.id")
+        .innerJoin(`${ EXPENSE_TABLE } as t5` as const, "t1.expense_id", "t5.id")
         .select([
-            sql`ROUND
+            sql<number>`ROUND
             ((MAX (ROUND(t2.value / t4.conversion_factor)) - MIN (ROUND(t2.value / t4.conversion_factor)))
                 / (COUNT(t1.id) - 1))`.as("average_distance"),
-            sql`(JULIANDAY( MAX (t5.date)) - JULIANDAY(MIN (t5.date)))
-                / (COUNT(t1.id) - 1)`.as("average_time")
+            sql<number>`(JULIANDAY( MAX (t5.date)) - JULIANDAY(MIN (t5.date)))
+                        / (COUNT(t1.id) - 1)`.as("average_time")
         ])
         .where("t5.date", ">=", formatDateToDatabaseFormat(from))
         .where("t5.date", "<=", formatDateToDatabaseFormat(to));
@@ -566,7 +568,7 @@ export class StatisticsDao {
         return {
             averageDistance: {
                 value: numberToFractionDigit(result?.average_distance ?? 0),
-                unitText: carId ? await this.getCarOdometerUnit(carId) : null
+                unitText: await this.getCarOdometerUnit(carId)
             },
             averageTime: {
                 value: result?.average_time ?? 0
@@ -578,15 +580,15 @@ export class StatisticsDao {
         intervalSize?: number
     }): Promise<ComparisonStatByDate> {
         let query = this.db
-        .selectFrom(`${ SERVICE_LOG_TABLE } as t1`)
-        .innerJoin(`${ ODOMETER_LOG_TABLE } as t2`, "t1.odometer_log_id", "t2.id")
-        .innerJoin(`${ CAR_TABLE } as t3`, "t1.car_id", "t3.id")
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t4`, "t3.odometer_unit_id", "t4.id")
-        .innerJoin(`${ EXPENSE_TABLE } as t5`, "t1.expense_id", "t5.id")
+        .selectFrom(`${ SERVICE_LOG_TABLE } as t1` as const)
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as t2` as const, "t1.odometer_log_id", "t2.id")
+        .innerJoin(`${ CAR_TABLE } as t3` as const, "t1.car_id", "t3.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t4` as const, "t3.odometer_unit_id", "t4.id")
+        .innerJoin(`${ EXPENSE_TABLE } as t5` as const, "t1.expense_id", "t5.id")
         //@formatter:off
         .select([
-            sql`COUNT(t1.id)`.as("service_count"),
-            sql`CAST(ROUND(t2.value / t4.conversion_factor) / ${intervalSize} AS INT) * ${intervalSize}`.as("interval_start")
+            sql<number>`COUNT(t1.id)`.as("service_count"),
+            sql<number>`CAST(ROUND(t2.value / t4.conversion_factor) / ${intervalSize} AS INT) * ${intervalSize}`.as("interval_start")
         ])
         //@formatter:on
         .where("t5.date", ">=", formatDateToDatabaseFormat(from))
@@ -603,11 +605,12 @@ export class StatisticsDao {
                 value: r.service_count ?? 0,
                 label: r?.interval_start?.toString() ?? "0"
             })),
-            unitText: carId ? await this.getCarOdometerUnit(carId) : null
+            unitText: await this.getCarOdometerUnit(carId),
+            rangeUnit: getRangeUnit(from, to)
         };
     };
 
-    async getForecastForService(carId: string): ServiceForecast {
+    async getForecastForService(carId: string): Promise<ServiceForecast> {
         const MAJOR_SERVICE_INTERVAL_ODOMETER = 60000; //KM
         const MAJOR_SERVICE_INTERVAL_TIME = 2 * 365; // Day
         const SMALL_SERVICE_INTERVAL_ODOMETER = 15000; //KM
@@ -617,19 +620,19 @@ export class StatisticsDao {
         const smallServiceId = await this.serviceTypeDao.getIdByKey(ServiceTypeEnum.SMALL_SERVICE);
 
         const oldServices = await this.db
-        .selectFrom(`${ SERVICE_LOG_TABLE } as t1`)
-        .innerJoin(`${ ODOMETER_LOG_TABLE } as t2`, "t1.odometer_log_id", "t2.id")
-        .innerJoin(`${ CAR_TABLE } as t3`, "t1.car_id", "t3.id")
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t4`, "t3.odometer_unit_id", "t4.id")
-        .innerJoin(`${ EXPENSE_TABLE } as t5`, "t1.expense_id", "t5.id")
+        .selectFrom(`${ SERVICE_LOG_TABLE } as t1` as const)
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as t2` as const, "t1.odometer_log_id", "t2.id")
+        .innerJoin(`${ CAR_TABLE } as t3` as const, "t1.car_id", "t3.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t4` as const, "t3.odometer_unit_id", "t4.id")
+        .innerJoin(`${ EXPENSE_TABLE } as t5` as const, "t1.expense_id", "t5.id")
         //@formatter:off
         .select([
             "t1.service_type_id as type_id",
-            sql`MAX(ROUND(t2.value / t4.conversion_factor))`.as("odometer_value"),
-            sql`ROUND((MAX(ROUND(t2.value / t4.conversion_factor)) + ROUND(((CASE WHEN t1.service_type_id = ${ sql.val(majorServiceId) } THEN ${ sql.val(MAJOR_SERVICE_INTERVAL_ODOMETER) } ELSE ${ sql.val(SMALL_SERVICE_INTERVAL_ODOMETER) } END) / t4.conversion_factor))) / 1000) * 1000`.as("forecast_odometer"),
+            sql<number>`MAX(ROUND(t2.value / t4.conversion_factor))`.as("odometer_value"),
+            sql<number>`ROUND((MAX(ROUND(t2.value / t4.conversion_factor)) + ROUND(((CASE WHEN t1.service_type_id = ${ sql.val(majorServiceId) } THEN ${ sql.val(MAJOR_SERVICE_INTERVAL_ODOMETER) } ELSE ${ sql.val(SMALL_SERVICE_INTERVAL_ODOMETER) } END) / t4.conversion_factor))) / 1000) * 1000`.as("forecast_odometer"),
             //ROUND(X / n) * n, n = 1000 for round up to first 1000 52899 -> 53000
             "t5.date as date",
-            sql`DATE(
+            sql<Date>`DATE(
                 t5.date, 
                 '+' ||
                 (
@@ -653,12 +656,12 @@ export class StatisticsDao {
         });
 
         const currentOdometer = await this.db
-        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
-        .innerJoin(`${ CAR_TABLE } as t2`, "t1.car_id", "t2.id")
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3`, "t2.odometer_unit_id", "t3.id")
+        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1` as const)
+        .innerJoin(`${ CAR_TABLE } as t2` as const, "t1.car_id", "t2.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3` as const, "t2.odometer_unit_id", "t3.id")
         //@formatter:off
         .select([
-            sql`MAX(ROUND(t1.value / t3.conversion_factor))`.as("value"),
+            sql<number>`MAX(ROUND(t1.value / t3.conversion_factor))`.as("value"),
         ])
         //@formatter:on
         .where("t1.car_id", "=", carId)
@@ -666,9 +669,11 @@ export class StatisticsDao {
 
         const odometer = Number(currentOdometer?.value ?? 0);
         const serviceForecast: ServiceForecast = {
+            major: null,
+            small: null,
             odometer: {
                 value: odometer,
-                unitText: carId ? await this.getCarOdometerUnit(carId) : null
+                unitText: await this.getCarOdometerUnit(carId)
             }
         };
 
@@ -677,9 +682,9 @@ export class StatisticsDao {
             const serviceOdometer = Number(service?.odometer_value ?? 0);
             const serviceForecastOdometer = Number(service?.forecast_odometer ?? 0);
 
-            let nextServiceDate: Dayjs = service.max_forecast_date
-                                         ? dayjs(service.max_forecast_date)
-                                         : now.add(1, "year");
+            let nextServiceDate: Dayjs | null = service.max_forecast_date
+                                                ? dayjs(service.max_forecast_date)
+                                                : now.add(1, "year");
 
             if(averageDistanceDailyInLastMonths <= 0) {
                 nextServiceDate = null;
@@ -715,11 +720,11 @@ export class StatisticsDao {
     }> {
         const baseQuery = (from: string, to: string) => {
             let query = this.db
-            .selectFrom(`${ FUEL_LOG_TABLE } as t1`)
-            .innerJoin(`${ EXPENSE_TABLE } as t2`, "t1.expense_id", "t2.id")
-            .innerJoin(`${ CAR_TABLE } as t3`, "t2.car_id", "t3.id")
-            .innerJoin(`${ FUEL_TANK_TABLE } as t4`, "t3.id", "t4.car_id")
-            .innerJoin(`${ FUEL_UNIT_TABLE } as t5`, "t4.unit_id", "t5.id")
+            .selectFrom(`${ FUEL_LOG_TABLE } as t1` as const)
+            .innerJoin(`${ EXPENSE_TABLE } as t2` as const, "t1.expense_id", "t2.id")
+            .innerJoin(`${ CAR_TABLE } as t3` as const, "t2.car_id", "t3.id")
+            .innerJoin(`${ FUEL_TANK_TABLE } as t4` as const, "t3.id", "t4.car_id")
+            .innerJoin(`${ FUEL_UNIT_TABLE } as t5` as const, "t4.unit_id", "t5.id")
             .where("t2.date", ">=", formatDateToDatabaseFormat(from))
             .where("t2.date", "<=", formatDateToDatabaseFormat(to));
 
@@ -750,13 +755,13 @@ export class StatisticsDao {
             //@formatter:off
             return base
             .select([
-                sql<number>`AVG(${ quantityExpression })`.as("average_quantity"),
-                sql<number>`SUM(${ quantityExpression })`.as("total_quantity"),
-                sql<number>`COUNT(t1.id)`.as("total_count"),
-                sql<number>`AVG(t2.amount)`.as("average_amount"),
-                sql<number>`SUM(t2.amount)`.as("total_amount"),
-                medianSubQuery(this.db, base, "t2.amount").as("median_amount"),
-                medianSubQuery(this.db, base, quantityExpression).as("median_quantity")
+                (sql<number>`AVG(${ quantityExpression })`).as("average_quantity"),
+                (sql<number>`SUM(${ quantityExpression })`).as("total_quantity"),
+                (sql<number>`COUNT(t1.id)`).as("total_count"),
+                (sql<number>`AVG(t2.amount)`).as("average_amount"),
+                (sql<number>`SUM(t2.amount)`).as("total_amount"),
+                (medianSubQuery(this.db, base, "t2.amount")).as("median_amount"),
+                (medianSubQuery(this.db, base, quantityExpression)).as("median_quantity")
             ]);
             //@formatter:on
         };
@@ -765,26 +770,27 @@ export class StatisticsDao {
         const previousWindowAggregateResult = await aggregateQuery(previousWindowFrom, previousWindowTo)
         .executeTakeFirst();
 
-        const count = numberToFractionDigit(aggregateResult.total_count ?? 0);
-        const previousWindowCount = numberToFractionDigit(previousWindowAggregateResult.total_count ?? 0);
+        const count = numberToFractionDigit(aggregateResult?.total_count ?? 0);
+        const previousWindowCount = numberToFractionDigit(previousWindowAggregateResult?.total_count ?? 0);
 
-        const totalQuantity = numberToFractionDigit(aggregateResult.total_quantity ?? 0);
-        const averageQuantity = numberToFractionDigit(aggregateResult.average_quantity ?? 0);
-        const medianQuantity = numberToFractionDigit(aggregateResult.median_quantity ?? 0);
-        const previousWindowTotalQuantity = numberToFractionDigit(previousWindowAggregateResult.total_quantity ?? 0);
-        const previousWindowAverageQuantity = numberToFractionDigit(previousWindowAggregateResult.average_quantity ?? 0);
-        const previousWindowMedianQuantity = numberToFractionDigit(previousWindowAverageQuantity.median_quantity ?? 0);
+        const totalQuantity = numberToFractionDigit(aggregateResult?.total_quantity ?? 0);
+        const averageQuantity = numberToFractionDigit(aggregateResult?.average_quantity ?? 0);
+        const medianQuantity = numberToFractionDigit(aggregateResult?.median_quantity ?? 0);
+        const previousWindowTotalQuantity = numberToFractionDigit(previousWindowAggregateResult?.total_quantity ?? 0);
+        const previousWindowAverageQuantity = numberToFractionDigit(previousWindowAggregateResult?.average_quantity ?? 0);
+        const previousWindowMedianQuantity = numberToFractionDigit(previousWindowAggregateResult?.median_quantity ?? 0);
 
-        const totalAmount = numberToFractionDigit(aggregateResult.total_amount ?? 0);
-        const averageAmount = numberToFractionDigit(aggregateResult.average_amount ?? 0);
-        const medianAmount = numberToFractionDigit(aggregateResult.median_amount ?? 0);
-        const previousWindowTotalAmount = numberToFractionDigit(previousWindowAggregateResult.total_amount ?? 0);
-        const previousWindowAverageAmount = numberToFractionDigit(previousWindowAggregateResult.average_amount ?? 0);
-        const previousWindowMedianAmount = numberToFractionDigit(previousWindowAggregateResult.median_amount ?? 0);
+        const totalAmount = numberToFractionDigit(aggregateResult?.total_amount ?? 0);
+        const averageAmount = numberToFractionDigit(aggregateResult?.average_amount ?? 0);
+        const medianAmount = numberToFractionDigit(aggregateResult?.median_amount ?? 0);
+        const previousWindowTotalAmount = numberToFractionDigit(previousWindowAggregateResult?.total_amount ?? 0);
+        const previousWindowAverageAmount = numberToFractionDigit(previousWindowAggregateResult?.average_amount ?? 0);
+        const previousWindowMedianAmount = numberToFractionDigit(previousWindowAggregateResult?.median_amount ?? 0);
 
         return {
             quantity: {
                 max: { value: numberToFractionDigit(maxItemResultByQuantity?.quantity ?? 0) },
+                min: null,
                 total: totalQuantity,
                 average: averageQuantity,
                 median: medianQuantity,
@@ -797,10 +803,11 @@ export class StatisticsDao {
                 averageTrend: calculateTrend(averageQuantity, previousWindowAverageQuantity, trendOptions),
                 medianTrend: calculateTrend(medianQuantity, previousWindowMedianQuantity, trendOptions),
                 countTrend: calculateTrend(count, previousWindowCount, trendOptions),
-                unitText: carId ? await this.getCarFuelUnit(carId) : null
+                unitText: await this.getCarFuelUnit(carId)
             },
             amount: {
                 max: { value: numberToFractionDigit(maxItemResultByAmount?.amount ?? 0) },
+                min: null,
                 total: totalAmount,
                 average: averageAmount,
                 median: medianAmount,
@@ -813,45 +820,44 @@ export class StatisticsDao {
                 averageTrend: calculateTrend(averageAmount, previousWindowAverageAmount, trendOptions),
                 medianTrend: calculateTrend(medianAmount, previousWindowMedianAmount, trendOptions),
                 countTrend: calculateTrend(count, previousWindowCount, trendOptions),
-                unitText: carId && await this.getCarCurrencySymbol(carId)
+                unitText: await this.getCarCurrencySymbol(carId)
             }
         };
     }
 
-    public async getFuelConsumption(
-        { carId, from, to }: StatisticsFunctionArgs
-    ): Promise<TrendStat> {
-        const { extendedFrom, extendedTo } = getExtendedRange(from, to);
+    public async getFuelConsumption({ carId, from, to }: StatisticsFunctionArgs): Promise<TrendStat> {
+        const { extendedFrom, extendedTo, rangeUnit } = getExtendedRange(from, to);
 
         let unitQuery = this.db
-        .selectFrom(`${ CAR_TABLE } as t1`)
+        .selectFrom(`${ CAR_TABLE } as t1` as const)
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t2` as const, "t1.odometer_unit_id", "t2.id")
+        .innerJoin(`${ FUEL_TANK_TABLE } as t3` as const, "t1.id", "t3.car_id")
+        .innerJoin(`${ FUEL_UNIT_TABLE } as t4` as const, "t3.unit_id", "t4.id")
         .select([
             "t4.short as fuel_unit",
             "t2.short as odometer_unit"
-        ])
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t2`, "t1.odometer_unit_id", "t2.id")
-        .innerJoin(`${ FUEL_TANK_TABLE } as t3`, "t1.id", "t3.car_id")
-        .innerJoin(`${ FUEL_UNIT_TABLE } as t4`, "t3.unit_id", "t4.id")
-        .where("t1.id", "=", carId);
+        ]);
+
+        if(carId) unitQuery = unitQuery.where("t1.id", "=", carId);
 
         const unit = await unitQuery.executeTakeFirst();
-        const unitText = `${ unit.fuel_unit } / 100 ${ unit.odometer_unit }`;
+        const unitText = unit?.fuel_unit && unit?.odometer_unit
+                         ? `${ unit.fuel_unit } / 100 ${ unit.odometer_unit }`
+                         : null;
 
         let query = this.db
-        .selectFrom(`${ FUEL_LOG_TABLE } as t1`)
-        .innerJoin(`${ EXPENSE_TABLE } as t2`, "t1.expense_id", "t2.id")
-        .leftJoin(`${ ODOMETER_LOG_TABLE } as t3`, "t1.odometer_log_id", "t3.id")
-        .innerJoin(`${ CAR_TABLE } as t4`, "t2.car_id", "t4.id")
-        .innerJoin(`${ FUEL_TANK_TABLE } as t5`, "t4.id", "t5.car_id")
-        .innerJoin(`${ FUEL_UNIT_TABLE } as t6`, "t5.unit_id", "t6.id")
-        .leftJoin(`${ ODOMETER_UNIT_TABLE } as t7`, "t4.odometer_unit_id", "t7.id")
-        //@formatter:off
-        .select([
-            "t2.date as date",
-            sql<number>`t1.quantity / t6.conversion_factor`.as("quantity"),
-            sql<number | null>`t3.value / COALESCE(t7.conversion_factor, 1)`.as("odometer_value")
+        .selectFrom(`${ FUEL_LOG_TABLE } as t1` as const)
+        .innerJoin(`${ EXPENSE_TABLE } as t2` as const, "t1.expense_id", "t2.id")
+        .leftJoin(`${ ODOMETER_LOG_TABLE } as t3` as const, "t1.odometer_log_id", "t3.id")
+        .innerJoin(`${ CAR_TABLE } as t4` as const, "t2.car_id", "t4.id")
+        .innerJoin(`${ FUEL_TANK_TABLE } as t5` as const, "t4.id", "t5.car_id")
+        .innerJoin(`${ FUEL_UNIT_TABLE } as t6` as const, "t5.unit_id", "t6.id")
+        .leftJoin(`${ ODOMETER_UNIT_TABLE } as t7` as const, "t4.odometer_unit_id", "t7.id")
+        .select(({ fn, eb }) => [
+            "t2.date",
+            fn.sum<number>(eb("t1.quantity", "/", eb.ref("t6.conversion_factor"))).as("quantity"),
+            eb("t3.value", "/", fn.coalesce("t7.conversion_factor", sql.lit(1))).as("odometer_value")
         ])
-        //@formatter:on
         .where("t2.date", ">=", formatDateToDatabaseFormat(extendedFrom))
         .where("t2.date", "<=", formatDateToDatabaseFormat(extendedTo))
         .orderBy("t2.date", "asc");
@@ -864,12 +870,13 @@ export class StatisticsDao {
 
         const lineChartData: Array<LineChartItem> = [];
 
-        const logsWithOdometerValue = logs.filter(l => l.odometer_value !== null && l.quantity !== null && l.quantity !== undefined);
+        const logsWithOdometerValue = logs.filter(l => l.date !== null && l.quantity !== null && l.quantity !== undefined);
 
         if(logsWithOdometerValue.length < 2) {
             return {
                 lineChartData: [],
                 average: 0,
+                rangeUnit,
                 unitText
             };
         }
@@ -877,8 +884,8 @@ export class StatisticsDao {
         let totalQuantity = 0;
         let totalDistance = 0;
         for(let i = 1; i < logsWithOdometerValue.length; i++) {
-            const prev = logsWithOdometerValue[i - 1];
-            const curr = logsWithOdometerValue[i];
+            const prev = logsWithOdometerValue[i - 1]!;
+            const curr = logsWithOdometerValue[i]!;
 
             const distance = curr.odometer_value! - prev.odometer_value!;
             if(distance <= 0) continue;
@@ -902,7 +909,7 @@ export class StatisticsDao {
 
             if(dayjs(curr.date).isBetween(from, to, undefined, i === 1 ? "[]" : "(]")) {
                 lineChartData.push({
-                    label: curr.date,
+                    label: curr.date ?? undefined,
                     value: consumption
                 });
             }
@@ -911,24 +918,23 @@ export class StatisticsDao {
         return {
             lineChartData,
             average: lineChartData?.[lineChartData.length - 1].value ?? 0,
+            rangeUnit,
             unitText
         };
     }
 
-    public async getFuelCostPerDistance(
-        { carId, from, to }: StatisticsFunctionArgs
-    ): Promise<TrendStat> {
+    public async getFuelCostPerDistance({ carId, from, to }: StatisticsFunctionArgs): Promise<TrendStat> {
         const rangeUnit = getRangeUnit(from, to);
 
         const currency = await this.getCarCurrencySymbol(carId);
         const odometerUnit = await this.getCarOdometerUnit(carId);
 
-        const unitText = `${ currency } / 100 ${ odometerUnit }`;
+        const unitText = currency && odometerUnit ? `${ currency } / 100 ${ odometerUnit }` : null;
 
-        const odometerQuery = this.odometerQuery(carId, from, to)
+        const odometerQuery = this.odometerQuery({ carId, from, to })
         //@formatter:off
         .select([
-            sql`ROUND(t1.value / t3.conversion_factor)`.as("odometer_value"),
+            sql<number>`ROUND(t1.value / t3.conversion_factor)`.as("odometer_value"),
             sql<string>`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`.as("date")
         ])
         //@formatter:on
@@ -937,10 +943,10 @@ export class StatisticsDao {
 
         const fuelExpenseBaseQuery = (from: string, to: string) => {
             let query = this.db
-            .selectFrom(`${ FUEL_LOG_TABLE } as t1`)
-            .innerJoin(`${ EXPENSE_TABLE } as t2`, "t1.expense_id", "t2.id")
+            .selectFrom(`${ FUEL_LOG_TABLE } as t1` as const)
+            .innerJoin(`${ EXPENSE_TABLE } as t2` as const, "t1.expense_id", "t2.id")
             //@formatter:off
-            .select(sql`SUM(t2.amount)`.as("cost"))
+            .select(sql<number>`SUM(t2.amount)`.as("cost"))
             //@formatter:on
             .where("t2.date", ">=", formatDateToDatabaseFormat(from))
             .where("t2.date", "<=", formatDateToDatabaseFormat(to))
@@ -964,7 +970,9 @@ export class StatisticsDao {
 
             const costSum = (await fuelExpenseBaseQuery(
                 prevOdometer.date,
-                dayjs(currOdometer.date).subtract((i === allOdometerLogs.length - 1) ? 0 : 1, "second")
+                dayjs(currOdometer.date)
+                .subtract((i === allOdometerLogs.length - 1) ? 0 : 1, "second")
+                .toISOString()
             )
             .executeTakeFirst())?.cost ?? 0;
 
@@ -983,7 +991,7 @@ export class StatisticsDao {
                 });
             }
         }
-        
+
         return {
             lineChartData,
             average: Number(lineChartData[lineChartData.length - 1]?.value ?? 0) ?? 0,
@@ -1002,8 +1010,8 @@ export class StatisticsDao {
         const selectExpression = this.getRangeSelectExpression("t1.date", rangeUnit);
 
         let query = this.db
-        .selectFrom(`${ EXPENSE_TABLE } as t1`)
-        .innerJoin(`${ FUEL_LOG_TABLE } as t2`, "t1.id", "t2.expense_id")
+        .selectFrom(`${ EXPENSE_TABLE } as t1` as const)
+        .innerJoin(`${ FUEL_LOG_TABLE } as t2` as const, "t1.id", "t2.expense_id")
         .select([
             sql<number>`SUM(t1.amount)`.as("total"),
             selectExpression
@@ -1019,13 +1027,13 @@ export class StatisticsDao {
 
         const result = await query.execute();
         const fuelTypeId = await this.expenseTypeDao.getIdByKey(ExpenseTypeEnum.FUEL);
-        const fuelType = await this.expenseTypeDao.getById(fuelTypeId);
+        const fuelType = fuelTypeId ? await this.expenseTypeDao.getById(fuelTypeId) : null;
 
         const barChartData: Array<BarChartItem> = [];
 
         result.forEach((r) => {
             barChartData.push({
-                label: r.time,
+                label: r.time as string,
                 type: fuelType?.id ?? "0",
                 value: numberToFractionDigit(r.total ?? 0)
             });
@@ -1042,7 +1050,7 @@ export class StatisticsDao {
             barChartData,
             legend: barChartTypes,
             rangeUnit,
-            unitText: carId && await this.getCarCurrencySymbol(carId)
+            unitText: await this.getCarCurrencySymbol(carId)
         };
     }
 
@@ -1052,21 +1060,21 @@ export class StatisticsDao {
         to,
         trendOptions
     }: StatisticsFunctionArgs): Promise<RideSummaryStat> {
-        const totalDistance = await this.getTotalDistance(carId, from, to);
-        const mostVisitedPlaces = await this.getMostVisitedPlaces(carId, from, to);
+        const totalDistance = await this.getTotalDistance({ carId, from, to });
+        const mostVisitedPlaces = await this.getMostVisitedPlaces({ carId, from, to });
 
-        const baseQuery = (from: string, to: string, odometer?: boolean = true) => {
+        const baseQuery = (from: string, to: string, odometer: boolean = true) => {
             let query = this.db
-            .selectFrom(`${ RIDE_LOG_TABLE } as t1`)
+            .selectFrom(`${ RIDE_LOG_TABLE } as t1` as const)
             .where("t1.start_time", ">=", formatDateToDatabaseFormat(from))
             .where("t1.end_time", "<=", formatDateToDatabaseFormat(to));
 
             if(odometer) {
                 query = query
-                .innerJoin(`${ ODOMETER_LOG_TABLE } as t2`, "t1.start_odometer_log_id", "t2.id")
-                .innerJoin(`${ ODOMETER_LOG_TABLE } as t3`, "t1.end_odometer_log_id", "t3.id")
-                .innerJoin(`${ CAR_TABLE } as t4`, "t1.car_id", "t4.id")
-                .innerJoin(`${ ODOMETER_UNIT_TABLE } as t5`, "t4.odometer_unit_id", "t5.id");
+                .innerJoin(`${ ODOMETER_LOG_TABLE } as t2` as const, "t1.start_odometer_log_id", "t2.id")
+                .innerJoin(`${ ODOMETER_LOG_TABLE } as t3` as const, "t1.end_odometer_log_id", "t3.id")
+                .innerJoin(`${ CAR_TABLE } as t4` as const, "t1.car_id", "t4.id")
+                .innerJoin(`${ ODOMETER_UNIT_TABLE } as t5` as const, "t4.odometer_unit_id", "t5.id");
             }
 
             if(carId) query = query.where("t1.car_id", "=", carId);
@@ -1120,26 +1128,27 @@ export class StatisticsDao {
         const previousWindowDistanceAggregateResult = await aggregateDistanceQuery(previousWindowFrom, previousWindowTo)
         .executeTakeFirst();
 
-        const count = numberToFractionDigit(aggregateDistanceResult.total_count ?? 0);
-        const previousWindowCount = numberToFractionDigit(previousWindowDistanceAggregateResult.total_count ?? 0);
+        const count = numberToFractionDigit(aggregateDistanceResult?.total_count ?? 0);
+        const previousWindowCount = numberToFractionDigit(previousWindowDistanceAggregateResult?.total_count ?? 0);
 
-        const totalRideDistance = numberToFractionDigit(aggregateDistanceResult.total_ride_distance ?? 0);
-        const averageRideDistance = numberToFractionDigit(aggregateDistanceResult.average_ride_distance ?? 0);
-        const medianRideDistance = numberToFractionDigit(aggregateDistanceResult.median_ride_distance ?? 0);
-        const previousWindowTotalRideDistance = numberToFractionDigit(previousWindowDistanceAggregateResult.total_ride_distance ?? 0);
-        const previousWindowAverageRideDistance = numberToFractionDigit(previousWindowDistanceAggregateResult.average_ride_distance ?? 0);
-        const previousWindowMedianRideDistance = numberToFractionDigit(previousWindowDistanceAggregateResult.median_ride_distance ?? 0);
+        const totalRideDistance = numberToFractionDigit(Number(aggregateDistanceResult?.total_ride_distance ?? 0));
+        const averageRideDistance = numberToFractionDigit(Number(aggregateDistanceResult?.average_ride_distance ?? 0));
+        const medianRideDistance = numberToFractionDigit(Number(aggregateDistanceResult?.median_ride_distance ?? 0));
+        const previousWindowTotalRideDistance = numberToFractionDigit(Number(previousWindowDistanceAggregateResult?.total_ride_distance ?? 0));
+        const previousWindowAverageRideDistance = numberToFractionDigit(Number(previousWindowDistanceAggregateResult?.average_ride_distance ?? 0));
+        const previousWindowMedianRideDistance = numberToFractionDigit(Number(previousWindowDistanceAggregateResult?.median_ride_distance ?? 0));
 
-        const totalRideDuration = aggregateDurationResult.total_ride_duration ?? 0;
-        const averageRideDuration = aggregateDurationResult.average_ride_duration ?? 0;
-        const medianRideDuration = aggregateDurationResult.median_ride_duration ?? 0;
-        const previousWindowTotalRideDuration = previousWindowDurationAggregateResult.total_ride_duration ?? 0;
-        const previousWindowAverageRideDuration = previousWindowDurationAggregateResult.average_ride_duration ?? 0;
-        const previousWindowMedianRideDuration = previousWindowDurationAggregateResult.median_ride_duration ?? 0;
+        const totalRideDuration = Number(aggregateDurationResult?.total_ride_duration ?? 0);
+        const averageRideDuration = Number(aggregateDurationResult?.average_ride_duration ?? 0);
+        const medianRideDuration = Number(aggregateDurationResult?.median_ride_duration ?? 0);
+        const previousWindowTotalRideDuration = Number(previousWindowDurationAggregateResult?.total_ride_duration ?? 0);
+        const previousWindowAverageRideDuration = Number(previousWindowDurationAggregateResult?.average_ride_duration ?? 0);
+        const previousWindowMedianRideDuration = Number(previousWindowDurationAggregateResult?.median_ride_duration ?? 0);
 
         return {
             distance: {
                 max: { value: numberToFractionDigit(aggregateDistanceResult?.max_ride_distance ?? 0) },
+                min: null,
                 total: totalRideDistance,
                 average: averageRideDistance,
                 median: medianRideDistance,
@@ -1152,12 +1161,13 @@ export class StatisticsDao {
                 averageTrend: calculateTrend(averageRideDistance, previousWindowAverageRideDistance, trendOptions),
                 medianTrend: calculateTrend(medianRideDistance, previousWindowMedianRideDistance, trendOptions),
                 countTrend: calculateTrend(count, previousWindowCount, trendOptions),
-                unitText: carId ? await this.getCarOdometerUnit(carId) : null,
+                unitText: await this.getCarOdometerUnit(carId),
                 totalDistanceByOdometer: totalDistance,
                 mostVisitedPlaces
             },
             duration: {
                 max: { value: aggregateDurationResult?.max_ride_duration ?? 0 },
+                min: null,
                 total: totalRideDuration,
                 average: averageRideDuration,
                 median: medianRideDuration,
@@ -1166,7 +1176,8 @@ export class StatisticsDao {
                 previousWindowMedian: previousWindowMedianRideDuration,
                 totalTrend: calculateTrend(totalRideDuration, previousWindowTotalRideDuration, trendOptions),
                 averageTrend: calculateTrend(averageRideDuration, previousWindowAverageRideDuration, trendOptions),
-                medianTrend: calculateTrend(medianRideDuration, previousWindowMedianRideDuration, trendOptions)
+                medianTrend: calculateTrend(medianRideDuration, previousWindowMedianRideDuration, trendOptions),
+                countTrend: null
             }
         };
     }
@@ -1177,11 +1188,11 @@ export class StatisticsDao {
         const selectExpression = this.getRangeSelectExpression("t1.start_time", rangeUnit);
 
         let query = this.db
-        .selectFrom(`${ RIDE_LOG_TABLE } as t1`)
-        .innerJoin(`${ ODOMETER_LOG_TABLE } as t2`, "t1.start_odometer_log_id", "t2.id")
-        .innerJoin(`${ ODOMETER_LOG_TABLE } as t3`, "t1.end_odometer_log_id", "t3.id")
-        .innerJoin(`${ CAR_TABLE } as t4`, "t1.car_id", "t4.id")
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t5`, "t4.odometer_unit_id", "t5.id")
+        .selectFrom(`${ RIDE_LOG_TABLE } as t1` as const)
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as t2` as const, "t1.start_odometer_log_id", "t2.id")
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as t3` as const, "t1.end_odometer_log_id", "t3.id")
+        .innerJoin(`${ CAR_TABLE } as t4` as const, "t1.car_id", "t4.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t5` as const, "t4.odometer_unit_id", "t5.id")
         .select([
             sql<number>`SUM(ROUND((t3.value - t2.value) / t5.conversion_factor))`.as("activity"),
             selectExpression
@@ -1196,14 +1207,16 @@ export class StatisticsDao {
         .orderBy(groupExpression);
 
         const result = await query.execute();
+        const lineChartData = result.map(r => ({
+            label: r.time,
+            value: r.activity
+        })) as Array<LineChartItem>;
 
         return {
-            lineChartData: result.map(r => ({
-                label: r.time,
-                value: r.activity
-            })),
+            lineChartData,
+            average: Number(lineChartData[lineChartData.length - 1]?.value ?? 0) ?? 0,
             rangeUnit,
-            unitText: carId && await this.getCarOdometerUnit(carId)
+            unitText: await this.getCarOdometerUnit(carId)
         };
     }
 
@@ -1213,7 +1226,7 @@ export class StatisticsDao {
         const selectExpression = this.getRangeSelectExpression("t1.start_time", rangeUnit);
 
         let query = this.db
-        .selectFrom(`${ RIDE_LOG_TABLE } as t1`)
+        .selectFrom(`${ RIDE_LOG_TABLE } as t1` as const)
         .select([
             sql<number>`COUNT(t1.id)`.as("count"),
             selectExpression
@@ -1233,38 +1246,45 @@ export class StatisticsDao {
             barChartData: result.map((r) => ({
                 label: r.time,
                 value: r.count
-            })),
+            })) as Array<BarChartItem>,
             rangeUnit
         };
     }
 
     /* UTILS */
 
-    protected odometerQuery(carId: string, from: string, to: string): SelectQueryBuilder<any, any, any> {
-        const dateExpression = sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`;
+    protected odometerQuery({
+        carId,
+        from,
+        to
+    }: Omit<StatisticsFunctionArgs, "trendOptions">): SelectQueryBuilder<any, any, any> {
+        const dateExpression = sql<string>`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`;
 
-        return this.db
-        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1`)
-        .innerJoin(`${ CAR_TABLE } as t2`, "t1.car_id", "t2.id")
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3`, "t2.odometer_unit_id", "t3.id")
-        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t4`, "t1.id", "t4.odometer_log_id")
-        .leftJoin(`${ FUEL_LOG_TABLE } as t5`, "t1.id", "t5.odometer_log_id")
-        .leftJoin(`${ SERVICE_LOG_TABLE } as t6`, "t1.id", "t6.odometer_log_id")
-        .leftJoin(`${ EXPENSE_TABLE } as t7`, "t5.expense_id", "t7.id")
-        .leftJoin(`${ EXPENSE_TABLE } as t8`, "t6.expense_id", "t8.id")
-        .leftJoin(`${ RIDE_LOG_TABLE } as t9`, "t1.id", "t9.start_odometer_log_id")
-        .leftJoin(`${ RIDE_LOG_TABLE } as t10`, "t1.id", "t10.end_odometer_log_id")
-        .where("t1.car_id", "=", carId)
+        let query = this.db
+        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1` as const)
+        .innerJoin(`${ CAR_TABLE } as t2` as const, "t1.car_id", "t2.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3` as const, "t2.odometer_unit_id", "t3.id")
+        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t4` as const, "t1.id", "t4.odometer_log_id")
+        .leftJoin(`${ FUEL_LOG_TABLE } as t5` as const, "t1.id", "t5.odometer_log_id")
+        .leftJoin(`${ SERVICE_LOG_TABLE } as t6` as const, "t1.id", "t6.odometer_log_id")
+        .leftJoin(`${ EXPENSE_TABLE } as t7` as const, "t5.expense_id", "t7.id")
+        .leftJoin(`${ EXPENSE_TABLE } as t8` as const, "t6.expense_id", "t8.id")
+        .leftJoin(`${ RIDE_LOG_TABLE } as t9` as const, "t1.id", "t9.start_odometer_log_id")
+        .leftJoin(`${ RIDE_LOG_TABLE } as t10` as const, "t1.id", "t10.end_odometer_log_id")
         .where(dateExpression, "is not", null)
         .where(dateExpression, ">=", formatDateToDatabaseFormat(from))
         .where(dateExpression, "<=", formatDateToDatabaseFormat(to))
         .orderBy(dateExpression, "asc")
         .orderBy("t1.value", "asc")
         .orderBy("t1.id", "asc");
+
+        if(carId) query = query.where("t1.car_id", "=", carId);
+
+        return query;
     }
 
-    protected async getTotalDistance(carId: string, from: string, to: string): Promise<number> {
-        const query = this.odometerQuery(carId, from, to)
+    protected async getTotalDistance(args: Omit<StatisticsFunctionArgs, "trendOptions">): Promise<number> {
+        const query = this.odometerQuery(args)
         .select([
             sql<number>`MAX(ROUND(t1.value / t3.conversion_factor)) - MIN(ROUND(t1.value / t3.conversion_factor))`
             .as("distance")
@@ -1273,60 +1293,72 @@ export class StatisticsDao {
         return (await query.executeTakeFirst())?.distance ?? 0;
     }
 
-    protected async getMostVisitedPlaces(carId: string, from: string, to: string): Promise<Array<TopListItemStat>> {
-        const query = this.db
-        .selectFrom(`${ RIDE_PLACE_TABLE } as t1`)
-        .innerJoin(`${ RIDE_LOG_TABLE } as t2`, "t1.ride_log_id", "t2.id")
-        .innerJoin(`${ PLACE_TABLE } as t3`, "t1.place_id", "t3.id")
+    protected async getMostVisitedPlaces({
+        carId,
+        from,
+        to
+    }: Omit<StatisticsFunctionArgs, "trendOptions">): Promise<Array<TopListItemStat>> {
+        let query = this.db
+        .selectFrom(`${ RIDE_PLACE_TABLE } as t1` as const)
+        .innerJoin(`${ RIDE_LOG_TABLE } as t2` as const, "t1.ride_log_id", "t2.id")
+        .innerJoin(`${ PLACE_TABLE } as t3` as const, "t1.place_id", "t3.id")
         .select([
             "t3.name",
-            sql`COUNT(t1.id)`.as("count")
+            sql<number>`COUNT(t1.id)`.as("count")
         ])
-        .where("t2.car_id", "=", carId)
         .where("t2.start_time", ">=", formatDateToDatabaseFormat(from))
         .where("t2.start_time", "<=", formatDateToDatabaseFormat(to))
         .groupBy("t3.id")
         .orderBy("count", "desc")
         .limit(3);
 
-        return query.execute();
+        if(carId) query = query.where("t2.car_id", "=", carId);
+
+        return (await query.execute()) as Array<TopListItemStat>;
     }
 
-    protected async getCarCurrencySymbol(carId: string): string | null {
+    protected async getCarCurrencySymbol(carId?: string): Promise<string | null> {
+        if(!carId) return null;
+
         const query = this.db
-        .selectFrom(`${ CAR_TABLE } as t1`)
-        .innerJoin(`${ CURRENCY_TABLE } as t2`, "t1.currency_id", "t2.id")
+        .selectFrom(`${ CAR_TABLE } as t1` as const)
+        .innerJoin(`${ CURRENCY_TABLE } as t2` as const, "t1.currency_id", "t2.id")
         .select("t2.symbol as currency_symbol")
         .where("t1.id", "=", carId);
 
-        return (await query.executeTakeFirst())?.currency_symbol;
+        return (await query.executeTakeFirst())?.currency_symbol ?? null;
     }
 
-    protected async getCarOdometerUnit(carId: string): string | null {
+    protected async getCarOdometerUnit(carId?: string): Promise<string | null> {
+        if(!carId) return null;
+
         const query = this.db
-        .selectFrom(`${ CAR_TABLE } as t1`)
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t2`, "t1.odometer_unit_id", "t2.id")
+        .selectFrom(`${ CAR_TABLE } as t1` as const)
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t2` as const, "t1.odometer_unit_id", "t2.id")
         .select("t2.short as odometer_unit")
         .where("t1.id", "=", carId);
 
-        return (await query.executeTakeFirst())?.odometer_unit;
+        return (await query.executeTakeFirst())?.odometer_unit ?? null;
     }
 
-    protected async getCarFuelUnit(carId: string): string | null {
+    protected async getCarFuelUnit(carId?: string): Promise<string | null> {
+        if(!carId) return null;
+
         const query = this.db
-        .selectFrom(`${ CAR_TABLE } as t1`)
-        .innerJoin(`${ FUEL_TANK_TABLE } as t2`, "t1.id", "t2.car_id")
-        .innerJoin(`${ FUEL_UNIT_TABLE } as t3`, "t2.unit_id", "t3.id")
+        .selectFrom(`${ CAR_TABLE } as t1` as const)
+        .innerJoin(`${ FUEL_TANK_TABLE } as t2` as const, "t1.id", "t2.car_id")
+        .innerJoin(`${ FUEL_UNIT_TABLE } as t3` as const, "t2.unit_id", "t3.id")
         .select("t3.short as unit")
         .where("t1.id", "=", carId);
 
-        return (await query.executeTakeFirst())?.unit;
+        return (await query.executeTakeFirst())?.unit ?? null;
     }
 
-    protected async getAverageDistanceDaily({ carId, from, to }: StatisticsFunctionArgs): Promise<number> {
+    protected async getAverageDistanceDaily(args: Omit<StatisticsFunctionArgs, "trendOptions">): Promise<number> {
+        const { from, to } = args;
         if(dayjs(to).diff(from, "day") <= 0) return 0;
 
-        const query = this.odometerQuery(carId, from, to)
+        const query = this.odometerQuery(args)
         //@formatter:off
         .select([
             sql<number>`(MAX (ROUND(t1.value / t3.conversion_factor)) - MIN (ROUND(t1.value / t3.conversion_factor))) / (JULIANDAY(${ sql.val(to) }) - JULIANDAY(${ sql.val(from) }))`.as("daily_average")
@@ -1334,20 +1366,20 @@ export class StatisticsDao {
         //@formatter:on
 
         const result = await query.executeTakeFirst();
-        return result?.daily_average ?? 0;
+        return Number(result?.daily_average ?? 0);
     }
 
     protected getRangeGroupByExpression(fieldName: string, unit: RangeUnit) {
         //@formatter:off
         switch(unit) {
             case "hour":
-                return sql`strftime('%Y-%m-%d %H:00:00', ${ sql.raw(fieldName) })`;
+                return sql<string>`strftime('%Y-%m-%d %H:00:00', ${ sql.raw(fieldName) })`;
             case "day":
-                return sql`strftime('%Y-%m-%d', ${ sql.raw(fieldName) })`;
+                return sql<string>`strftime('%Y-%m-%d', ${ sql.raw(fieldName) })`;
             case "month":
-                return sql`strftime('%Y-%m', ${ sql.raw(fieldName) })`;
+                return sql<string>`strftime('%Y-%m', ${ sql.raw(fieldName) })`;
             case "year":
-                return sql`strftime('%Y', ${ sql.raw(fieldName) })`;
+                return sql<string>`strftime('%Y', ${ sql.raw(fieldName) })`;
         }
         //@formatter:on
     }
@@ -1356,13 +1388,13 @@ export class StatisticsDao {
         //@formatter:off
         switch(unit) {
             case "hour":
-                return sql`strftime('%Y-%m-%d %H:00:00', ${ sql.raw(fieldName) })`.as("time");
+                return sql<string>`strftime('%Y-%m-%d %H:00:00', ${ sql.raw(fieldName) })`.as("time");
             case "day":
-                return sql`strftime('%Y-%m-%d', ${ sql.raw(fieldName) })`.as("time");
+                return sql<string>`strftime('%Y-%m-%d', ${ sql.raw(fieldName) })`.as("time");
             case "month":
-                return sql`strftime('%Y-%m', ${ sql.raw(fieldName) })`.as("time");
+                return sql<string>`strftime('%Y-%m', ${ sql.raw(fieldName) })`.as("time");
             case "year":
-                return sql`strftime('%Y', ${ sql.raw(fieldName) })`.as("time");
+                return sql<string>`strftime('%Y', ${ sql.raw(fieldName) })`.as("time");
         }
         //@formatter:on
     }

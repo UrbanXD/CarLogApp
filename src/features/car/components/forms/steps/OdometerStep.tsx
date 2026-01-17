@@ -6,9 +6,9 @@ import { OdometerUnitInput } from "../../../_features/odometer/components/forms/
 import { OdometerValueInput } from "../../../_features/odometer/components/forms/inputFields/OdometerValueInput.tsx";
 import { useTranslation } from "react-i18next";
 
-type OdometerStepProps<FormFields> = Pick<StepProps<FormFields>, "control">;
+type OdometerStepProps = Pick<StepProps<CarFormFields>, "control">;
 
-function OdometerStep<FormFields = CarFormFields>({ control }: OdometerStepProps<FormFields>) {
+function OdometerStep({ control }: OdometerStepProps) {
     const { t } = useTranslation();
 
     return (

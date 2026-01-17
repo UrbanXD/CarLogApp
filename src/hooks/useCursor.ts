@@ -1,27 +1,27 @@
 import { useCallback, useState } from "react";
 import { Cursor, CursorOptions } from "../database/paginator/CursorPaginator.ts";
-import { DatabaseType, ExpenseTableRow } from "../database/connector/powersync/AppSchema.ts";
+import { DatabaseType } from "../database/connector/powersync/AppSchema.ts";
 import { ICON_NAMES } from "../constants/index.ts";
 import { arraySwapByIndex } from "../utils/arraySwapByIndex.ts";
 
-export function useCursor<TableItem, DB = DatabaseType>(
-    options: CursorOptions<keyof TableItem, DB>,
-    defaultTable: keyof DB
+export function useCursor<TableItem>(
+    options: CursorOptions<keyof TableItem>,
+    defaultTable: keyof DatabaseType
 ) {
-    const [cursorOptions, setCursorOptions] = useState<CursorOptions<keyof TableItem, DB>>(options);
+    const [cursorOptions, setCursorOptions] = useState<CursorOptions<keyof TableItem>>(options);
 
     const findCursorIndex = useCallback((
-        cursors: Array<Cursor<keyof TableItem, DB>>,
-        field: string,
-        table?: keyof DB | null
+        cursors: Array<Cursor<keyof TableItem>>,
+        field: keyof TableItem,
+        table?: keyof DatabaseType | null
     ) => {
         return cursors.findIndex((cursor) => {
             return cursor.field === field && (cursor.table === table || (cursor?.table ?? defaultTable) === table);
         });
-    });
+    }, [defaultTable]);
 
     // first in cursor options if its an array
-    const isMainCursor = useCallback((field: keyof TableItem, table?: keyof DB | null) => {
+    const isMainCursor = useCallback((field: keyof TableItem, table?: keyof DatabaseType | null) => {
         return (
             Array.isArray(cursorOptions.cursor)
             ? cursorOptions.cursor?.[0].field === field && (cursorOptions.cursor?.[0]?.table === table || (cursorOptions.cursor?.[0]?.table ?? defaultTable) === table)
@@ -29,7 +29,7 @@ export function useCursor<TableItem, DB = DatabaseType>(
         );
     }, [cursorOptions]);
 
-    const makeFieldMainCursor = useCallback((field: keyof TableItem, table?: keyof DB | null) => {
+    const makeFieldMainCursor = useCallback((field: keyof TableItem, table?: keyof DatabaseType | null) => {
         setCursorOptions(prev => {
             if(!Array.isArray(prev.cursor)) return prev; // it is not an array so we cannot change the order
 
@@ -40,7 +40,7 @@ export function useCursor<TableItem, DB = DatabaseType>(
         });
     }, []);
 
-    const toggleFieldOrder = useCallback((field: keyof TableItem, table?: keyof DB | null) => {
+    const toggleFieldOrder = useCallback((field: keyof TableItem, table?: keyof DatabaseType | null) => {
         setCursorOptions(prev => {
             if(!Array.isArray(prev.cursor) && prev.cursor.field === field && (prev.cursor.table === table || (prev.cursor?.table ?? defaultTable) === table)) { // cursor is not an array and field equals with cursor field
                 const newCursor = { ...prev.cursor };
@@ -57,13 +57,13 @@ export function useCursor<TableItem, DB = DatabaseType>(
             newCursor[fieldIndex] = {
                 ...newCursor[fieldIndex],
                 order: newCursor[fieldIndex].order === "asc" ? "desc" : "asc"
-            } as Cursor<keyof TableItem, DB>;
+            } as Cursor<keyof TableItem>;
 
             return { ...prev, cursor: newCursor };
         });
     }, []);
 
-    const getOrderIconForField = (field: keyof ExpenseTableRow, table?: keyof DB | null) => {
+    const getOrderIconForField = (field: keyof TableItem, table?: keyof DatabaseType | null) => {
         if(!Array.isArray(cursorOptions.cursor) && cursorOptions.cursor.field === field && (cursorOptions.cursor.table === table || (cursorOptions.cursor?.table ?? defaultTable) === table)) { // cursor is not an array and field equals with cursor field
             return cursorOptions.cursor.order === "asc" ? ICON_NAMES.upArrow : ICON_NAMES.downArrow;
         } else if(!Array.isArray(cursorOptions.cursor)) {

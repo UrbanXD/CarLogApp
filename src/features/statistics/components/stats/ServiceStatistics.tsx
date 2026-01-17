@@ -243,7 +243,10 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
                 legendPosition="right"
                 isLoading={ !serviceItemByType }
             />
-            <ServiceForecastView carId={ carId }/>
+            {
+                carId &&
+               <ServiceForecastView carId={ carId }/>
+            }
         </View>
     );
 }

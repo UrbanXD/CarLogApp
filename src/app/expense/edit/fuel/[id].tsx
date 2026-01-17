@@ -6,9 +6,14 @@ import { FuelLog } from "../../../../features/car/_features/fuel/schemas/fuelLog
 import { EditFuelLogForm } from "../../../../features/car/_features/fuel/components/forms/EditFuelLogForm.tsx";
 import { NotFoundToast } from "../../../../ui/alert/presets/toast/index.ts";
 import { FormBottomSheet } from "../../../../ui/bottomSheet/presets/FormBottomSheet.tsx";
+import { useTranslation } from "react-i18next";
+import {
+    ServiceLogFormFieldsEnum
+} from "../../../../features/expense/_features/service/enums/ServiceLogFormFieldsEnum.ts";
 
 function Page() {
-    const { id, field } = useLocalSearchParams();
+    const { id, field } = useLocalSearchParams<{ id?: string, field?: string }>();
+    const { t } = useTranslation();
     const { fuelLogDao } = useDatabase();
     const { openToast } = useAlert();
 
@@ -32,9 +37,11 @@ function Page() {
         })();
     }, [id]);
 
-    if(!fuelLog) return <></>;
+    const fieldIndex = field ? Number(field) : NaN;
+    const isValidField = !isNaN(fieldIndex) && fieldIndex in ServiceLogFormFieldsEnum;
+    if(!fuelLog || !isValidField) return null;
 
-    const CONTENT = <EditFuelLogForm fuelLog={ fuelLog } field={ field }/>;
+    const CONTENT = <EditFuelLogForm fuelLog={ fuelLog } field={ fieldIndex }/>;
 
     return (
         <FormBottomSheet

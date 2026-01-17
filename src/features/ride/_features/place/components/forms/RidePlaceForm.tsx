@@ -1,5 +1,8 @@
-import { RidePlaceFormFields, useRidePlaceFormProps } from "../../schemas/form/ridePlaceForm.ts";
-import { RidePlace } from "../../schemas/ridePlaceSchema.ts";
+import {
+    RidePlaceFormDefaultValues,
+    RidePlaceFormFields,
+    useRidePlaceFormProps
+} from "../../schemas/form/ridePlaceForm.ts";
 import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
 import { useForm, useWatch } from "react-hook-form";
 import { PlaceInput } from "./inputFields/PlaceInput.tsx";
@@ -14,7 +17,7 @@ import { formTheme } from "../../../../../../ui/form/constants/theme.ts";
 
 type RidePlaceFormProps = {
     onSubmit: (result: RidePlaceFormFields) => void
-    defaultRidePlace?: RidePlace
+    defaultRidePlace?: RidePlaceFormFields | null
 }
 
 export function RidePlaceForm({ onSubmit, defaultRidePlace }: RidePlaceFormProps) {
@@ -22,7 +25,7 @@ export function RidePlaceForm({ onSubmit, defaultRidePlace }: RidePlaceFormProps
     const { openToast } = useAlert();
     const { placeDao } = useDatabase();
 
-    const form = useForm<RidePlaceFormFields>(useRidePlaceFormProps(defaultRidePlace));
+    const form = useForm<RidePlaceFormDefaultValues, any, RidePlaceFormFields>(useRidePlaceFormProps(defaultRidePlace));
     const { control, setValue, handleSubmit } = form;
 
     const formPlaceId = useWatch({ control, name: "placeId" });
@@ -32,12 +35,12 @@ export function RidePlaceForm({ onSubmit, defaultRidePlace }: RidePlaceFormProps
             if(!formPlaceId) return;
 
             const place = await placeDao.getById(formPlaceId);
-            setValue("name", place?.name);
+            setValue("name", place?.name ?? "");
         })();
     }, [formPlaceId]);
 
     const submitHandler = handleSubmit(
-        async (formResult: RidePlaceFormFields) => {
+        async (formResult) => {
             try {
                 onSubmit(formResult);
             } catch(e) {

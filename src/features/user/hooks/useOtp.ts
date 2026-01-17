@@ -10,7 +10,7 @@ export const useOtp = () => {
 
     const getOTPTimeLimitStorageKey = (type: string, email: string) => `${ type }-${ email }`;
 
-    const setOTPTimeLimitStorage = async (type: string, email: string, attempts?: number = 0) => {
+    const setOTPTimeLimitStorage = async (type: string, email: string, attempts: number = 0) => {
         const now = Date.now();
 
         await AsyncStorage.setItem(
@@ -30,7 +30,7 @@ export const useOtp = () => {
         }
     };
 
-    const resendOTP = async (args: ResendParams, automatic?: boolean = false) => {
+    const resendOTP = async (args: ResendParams & { email: string }, automatic: boolean = false) => {
         const key = getOTPTimeLimitStorageKey(args.type, args.email);
         const storedData = await AsyncStorage.getItem(key);
         const now = Date.now();

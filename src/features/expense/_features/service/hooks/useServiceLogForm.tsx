@@ -9,23 +9,27 @@ import {
     OdometerValueInput
 } from "../../../../car/_features/odometer/components/forms/inputFields/OdometerValueInput.tsx";
 import { NoteInput } from "../../../../../components/Input/_presets/NoteInput.tsx";
-import { ServiceLogFields } from "../schemas/form/serviceLogForm.ts";
+import { ServiceLogFormFields } from "../schemas/form/serviceLogForm.ts";
 import { ServiceLogFormFieldsEnum } from "../enums/ServiceLogFormFieldsEnum.ts";
 import { ServiceTypeInput } from "../components/forms/inputFields/ServiceTypeInput.tsx";
-import { ServiceItemInput } from "../components/forms/inputFields/ServiceItemInput.tsx";
 import { useTranslation } from "react-i18next";
 import { EditToast } from "../../../../../ui/alert/presets/toast/index.ts";
 import { OdometerLimit } from "../../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { Odometer } from "../../../../car/_features/odometer/schemas/odometerSchema.ts";
+import { ArrayInput } from "../../../../../components/Input/array/ArrayInput.tsx";
+import { useServiceItemToExpandableList } from "./useServiceItemToExpandableList.ts";
+import { CurrencyEnum } from "../../../../_shared/currency/enums/currencyEnum.ts";
+import { ServiceItemForm } from "../components/forms/ServiceItemForm.tsx";
 
-type UseServiceLogFormFieldsProps = UseFormReturn<ServiceLogFields> & { odometer?: Odometer }
+type UseServiceLogFormFieldsProps = UseFormReturn<ServiceLogFormFields> & { odometer?: Odometer | null }
 
 export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
     const { control, setValue, clearErrors, odometer } = props;
     const { t } = useTranslation();
     const { odometerLogDao } = useDatabase();
     const { getCar } = useCars();
+    const { serviceItemToExpandableListItem } = useServiceItemToExpandableList();
 
     const [car, setCar] = useState<Car | null>(null);
     const [odometerLimit, setOdometerLimit] = useState<OdometerLimit | null>(null);
@@ -58,7 +62,27 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
             editToastMessages: EditToast
         },
         [ServiceLogFormFieldsEnum.ServiceItems]: {
-            render: () => <ServiceItemInput control={ control } fieldName="items" carIdFieldName="carId"/>,
+            render: () => (
+                <ArrayInput<ServiceLogFormFields, "items">
+                    control={ control }
+                    fieldName={ "items" }
+                    mapperToExpandableList={ serviceItemToExpandableListItem }
+                    renderForm={ (onSubmit, item) => (
+                        <ServiceItemForm
+                            defaultServiceItem={ item }
+                            carCurrencyId={ car?.currency.id ?? CurrencyEnum.EUR }
+                            onSubmit={ onSubmit }
+                        />
+                    ) }
+                    showTotalAmounts
+                    calculateItemAmount={ (item) => ({
+                        amount: item.quantity * item.pricePerUnit.amount,
+                        exchangedAmount: item.quantity * item.pricePerUnit.amount * item.pricePerUnit.exchangeRate,
+                        currency: item.pricePerUnit.currency,
+                        exchangeCurrency: item.pricePerUnit.exchangeCurrency
+                    }) }
+                />
+            ),
             editToastMessages: EditToast
         },
         [ServiceLogFormFieldsEnum.DateAndOdometerValue]: {

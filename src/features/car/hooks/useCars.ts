@@ -8,7 +8,11 @@ const useCars = () => {
     const selectedCar = useAppSelector(getSelectedCar);
     const loading = useAppSelector(isLoading);
 
-    const getCar = useCallback((id: string): Car | undefined => cars.find(car => car.id === id), [cars]);
+    const getCar = useCallback((id?: string | null): Car | null => {
+        if(!id) return null;
+
+        return cars.find(car => car.id === id) ?? null;
+    }, [cars]);
 
     return { cars, selectedCar, loading, getCar };
 };

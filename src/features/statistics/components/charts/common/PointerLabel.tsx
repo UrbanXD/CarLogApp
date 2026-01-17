@@ -1,8 +1,9 @@
-import { StyleSheet, Text, View, ViewStyle } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import { MeasureElement } from "../../../../../components/marquee/helper/MeasureElement.tsx";
 import { useEffect, useState } from "react";
 import { widthPercentageToDP } from "react-native-responsive-screen";
+import { ViewStyle } from "../../../../../types/index.ts";
 
 export const POINTER_LABEL_FONT_SIZE = FONT_SIZES.p4 * 0.9;
 export const POINTER_LABEL_PADDING = SEPARATOR_SIZES.small;

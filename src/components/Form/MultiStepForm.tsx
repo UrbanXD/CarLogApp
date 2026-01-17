@@ -10,9 +10,9 @@ import { formTheme } from "../../ui/form/constants/theme.ts";
 
 
 type MultiStepFormProps = {
-    form: UseFormReturn
+    form: UseFormReturn<any>
     steps: Steps
-    submitHandler: SubmitHandlerArgs
+    submitHandler: SubmitHandlerArgs<any>
     resultStep?: ResultStep
     isFirstCount?: boolean
     onFormStateChange?: (formState: FormState<any>) => void

@@ -2,10 +2,10 @@ import { RidePlaceTableRow } from "../../../../../../database/connector/powersyn
 import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
 import { RidePlace, ridePlaceSchema } from "../../schemas/ridePlaceSchema.ts";
 
-export type SelectRidePlaceTableRow = RidePlaceTableRow & { name: string };
+export type SelectRidePlaceTableRow = RidePlaceTableRow & { name: string | null };
 
 export class RidePlaceMapper extends AbstractMapper<RidePlaceTableRow, RidePlace, SelectRidePlaceTableRow> {
-    toDto(entity: SelectRidePlaceTableRow): RidePlace {
+    async toDto(entity: SelectRidePlaceTableRow): Promise<RidePlace> {
         return ridePlaceSchema.parse({
             id: entity.id,
             ownerId: entity.owner_id,
@@ -16,13 +16,12 @@ export class RidePlaceMapper extends AbstractMapper<RidePlaceTableRow, RidePlace
         });
     }
 
-    toEntity(dto: RidePlace): RidePlaceTableRow {
+    async toEntity(dto: RidePlace): Promise<RidePlaceTableRow> {
         return {
             id: dto.id,
             owner_id: dto.ownerId,
             ride_log_id: dto.rideLogId,
             place_id: dto.placeId,
-            name: dto.name,
             place_order: dto.order
         };
     }

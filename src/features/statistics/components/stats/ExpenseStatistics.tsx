@@ -56,7 +56,7 @@ export function ExpenseStatistics({ carId, from, to }: ExpenseStatisticsProps) {
         return {
             label: t("statistics.expense.count"),
             value: expenseStat?.count != null ? `${ expenseStat.count } ${ t("common.count") }` : null,
-            isPositive: expenseStat?.countTrend.isTrendPositive,
+            isPositive: expenseStat?.countTrend?.isTrendPositive,
             trend: formatTrend({ trend: trend, trendSymbol: trendSymbol }),
             trendDescription: t("statistics.compared_to_previous_cycle"),
             isLoading: !expenseStat

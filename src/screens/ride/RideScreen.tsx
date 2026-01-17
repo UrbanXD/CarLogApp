@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { RideLogView } from "../../features/ride/components/RideLogView.tsx";
 
 export function RideScreen() {
-    const { id } = useLocalSearchParams();
+    const { id } = useLocalSearchParams<{ id: string }>();
 
     useEffect(() => {
         if(!id) {

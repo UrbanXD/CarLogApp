@@ -5,7 +5,7 @@ import { File } from "expo-file-system";
 import { useDatabase } from "../../contexts/database/DatabaseContext.ts";
 
 type UseFileOptions = {
-    uri?: string
+    uri?: string | null
     attachment?: boolean
 }
 

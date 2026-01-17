@@ -1,5 +1,4 @@
-import { AlertToastProps } from "../components/toast/AlertToast.tsx";
-import { ToastMessages } from "../model/types/index.ts";
+import { Toast, ToastMessages } from "../model/types/index.ts";
 import i18n from "../../../i18n/index.ts";
 
 export const getToastMessage: (
@@ -8,7 +7,7 @@ export const getToastMessage: (
         error?: unknown
         defaultErrorCode?: string
     }
-) => AlertToastProps = ({
+) => Partial<Toast> = ({
     messages,
     error = null,
     defaultErrorCode = "error"

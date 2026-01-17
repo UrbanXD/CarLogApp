@@ -1,6 +1,6 @@
 import { RangeUnit } from "./getRangeUnit.ts";
 
-export function getDateFormatTemplateByRangeUnit(unit: RangeUnit): string {
+export function getDateFormatTemplateByRangeUnit(unit?: RangeUnit): string {
     switch(unit) {
         case "year":
             return "YYYY";

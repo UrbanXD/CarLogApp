@@ -13,7 +13,7 @@ export function useExpenseTimelineItem() {
     const mapper = useCallback((expense: Expense, callback?: () => void): TimelineItemType => {
         const routerPathTitle = t("expenses.title_singular");
         let routerPathName = "/expense/[id]";
-        let itemId = expense.id;
+        let itemId: string | null | undefined = expense.id;
 
         switch(expense.type.key) {
             case ExpenseTypeEnum.FUEL:

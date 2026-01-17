@@ -1,8 +1,9 @@
 import { DEFAULT_SEPARATOR } from "../../../constants/index.ts";
-import { View, ViewStyle } from "react-native";
+import { View } from "react-native";
 import React from "react";
 import { DeleteButton, DeleteButtonProps } from "./DeleteButton.tsx";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ViewStyle } from "../../../types/index.ts";
 
 type FloatingDeleteButtonProps = DeleteButtonProps & { containerStyle?: ViewStyle }
 

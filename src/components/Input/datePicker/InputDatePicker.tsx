@@ -1,5 +1,5 @@
 import { useSharedValue } from "react-native-reanimated";
-import React, { useEffect, useImperativeHandle, useMemo, useState } from "react";
+import React, { Ref, useEffect, useImperativeHandle, useMemo, useState } from "react";
 import { DateType } from "react-native-ui-datepicker";
 import { DatePicker } from "./DatePicker.tsx";
 import { DatePickerProvider } from "../../../contexts/datePicker/DatePickerProvider.tsx";
@@ -18,14 +18,14 @@ export type InputDatePickerRef = {
 }
 
 type InputDatePicker = {
-    ref?: InputDatePickerRef
+    ref?: Ref<InputDatePickerRef>
     title?: string
     mode?: "single" | "range"
     defaultStartDate?: DateType
     defaultEndDate?: DateType
     minDate?: DateType
     maxDate?: DateType
-    setValue?: (date: Date | Array<Date>) => void
+    setValue?: (date: string | Array<string>) => void
     hiddenController?: boolean
     showTimestamps?: boolean
 }
@@ -50,7 +50,7 @@ function InputDatePicker({
         const rawValue = inputFieldContext?.field?.value;
 
         if(mode === "range") {
-            if(rawValue && Array.isArray(rawValue) && rawValue.length === 2) {
+            if(rawValue && (Array.isArray(rawValue) && rawValue.length === 2)) {
                 const [start, end] = rawValue;
 
                 return [
@@ -75,8 +75,8 @@ function InputDatePicker({
     const [view, setView] = useState<DatePickerViews>("calendar");
 
     useEffect(() => {
-        if(onChange) onChange(mode === "single" ? date[0] : date);
-        if(setValue) setValue(mode === "single" ? date[0] : date);
+        if(onChange) onChange(mode === "single" ? date[0].toISOString() : date.map(d => d.toISOString()));
+        if(setValue) setValue(mode === "single" ? date[0].toISOString() : date.map(d => d.toISOString()));
     }, [date]);
 
     useEffect(() => {
@@ -108,13 +108,14 @@ function InputDatePicker({
 
     const submit = (startDate: Date | null, endDate: Date | null) => {
         if(mode === "single") {
-            setDate([startDate]);
+            setDate(startDate ? [startDate] : []);
         } else if(mode === "range") {
             setDate(
-                startDate && endDate &&
-                dayjs(startDate).isAfter(endDate)
-                ? [endDate, startDate]
-                : [startDate, endDate]
+                startDate && endDate
+                ? dayjs(startDate).isAfter(endDate)
+                  ? [endDate, startDate]
+                  : [startDate, endDate]
+                : []
             );
         }
         isExpanded.value = false;
@@ -140,7 +141,6 @@ function InputDatePicker({
                     minDate={ minDate }
                     initialView={ view }
                     onSubmit={ submit }
-                    onClose={ close }
                 >
                     <DatePickerHeader
                         title={ title ?? t("form.date_picker.title") }

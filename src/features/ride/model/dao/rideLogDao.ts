@@ -7,7 +7,7 @@ import { OdometerLogDao } from "../../../car/_features/odometer/model/dao/Odomet
 import { OdometerUnitDao } from "../../../car/_features/odometer/model/dao/OdometerUnitDao.ts";
 import { CarDao } from "../../../car/model/dao/CarDao.ts";
 import { RIDE_LOG_TABLE } from "../../../../database/connector/powersync/tables/rideLog.ts";
-import { RideExpenseDao } from "./rideExpenseDao.ts";
+import { RideExpenseDao } from "../../_features/rideExpense/model/dao/rideExpenseDao.ts";
 import { RidePlaceDao } from "../../_features/place/model/dao/ridePlaceDao.ts";
 import { RidePassengerDao } from "../../_features/passenger/model/dao/ridePassengerDao.ts";
 import { RideLogFormFields } from "../../schemas/form/rideLogForm.ts";
@@ -18,6 +18,12 @@ import { RIDE_PASSENGER_TABLE } from "../../../../database/connector/powersync/t
 import { EXPENSE_TABLE } from "../../../../database/connector/powersync/tables/expense.ts";
 import { CursorOptions, CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
 import { PaginatorOptions } from "../../../../database/paginator/AbstractPaginator.ts";
+
+export type PaginatorSelectRideLogTableRow = RideLogTableRow & {
+    distance: number,
+    total_expense: number,
+    duration: number
+}
 
 export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
     constructor(
@@ -60,19 +66,19 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
         const insertedRideLogId = await this.db.transaction().execute(async (trx) => {
             await trx
             .insertInto(ODOMETER_LOG_TABLE)
-            .values(startOdometerLog)
+            .values(startOdometerLog as any)
             .returning("id")
             .executeTakeFirstOrThrow();
 
             await trx
             .insertInto(ODOMETER_LOG_TABLE)
-            .values(endOdometerLog)
+            .values(endOdometerLog as any)
             .returning("id")
             .executeTakeFirstOrThrow();
 
             const result = await trx
             .insertInto(RIDE_LOG_TABLE)
-            .values(rideLog)
+            .values(rideLog as any)
             .returning("id")
             .executeTakeFirstOrThrow();
 
@@ -80,7 +86,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
             if(expenseArray.length >= 1) {
                 await trx
                 .insertInto(EXPENSE_TABLE)
-                .values(expenseArray)
+                .values(expenseArray as any)
                 .returning("id")
                 .execute();
             }
@@ -89,7 +95,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
             if(rideExpenseArray.length >= 1) {
                 await trx
                 .insertInto(RIDE_EXPENSE_TABLE)
-                .values(rideExpenseArray)
+                .values(rideExpenseArray as any)
                 .returning("id")
                 .execute();
             }
@@ -98,7 +104,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
             if(ridePlaceArray.length >= 1) {
                 await trx
                 .insertInto(RIDE_PLACE_TABLE)
-                .values(ridePlaceArray)
+                .values(ridePlaceArray as any)
                 .returning("id")
                 .execute();
             }
@@ -107,7 +113,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
             if(ridePassengerArray.length >= 1) {
                 await trx
                 .insertInto(RIDE_PASSENGER_TABLE)
-                .values(ridePassengerArray)
+                .values(ridePassengerArray as any)
                 .returning("id")
                 .execute();
             }
@@ -132,21 +138,21 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
         const updatedRideLogId = await this.db.transaction().execute(async (trx) => {
             await trx
             .updateTable(ODOMETER_LOG_TABLE)
-            .set(startOdometerLog)
+            .set(startOdometerLog as any)
             .where("id", "=", startOdometerLog.id)
             .returning("id")
             .executeTakeFirstOrThrow();
 
             await trx
             .updateTable(ODOMETER_LOG_TABLE)
-            .set(endOdometerLog)
+            .set(endOdometerLog as any)
             .where("id", "=", endOdometerLog.id)
             .returning("id")
             .executeTakeFirstOrThrow();
 
             const result = await trx
             .updateTable(RIDE_LOG_TABLE)
-            .set(rideLog)
+            .set(rideLog as any)
             .where("id", "=", rideLog.id)
             .returning("id")
             .executeTakeFirstOrThrow();
@@ -158,11 +164,13 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
             .execute();
 
             for(const originalRideExpense of originalRideExpenses) {
+                if(!originalRideExpense.expense_id) continue;
+
                 const newExpense = expenses.get(originalRideExpense.expense_id);
                 if(newExpense) {
                     await trx
                     .updateTable(EXPENSE_TABLE)
-                    .set(newExpense)
+                    .set(newExpense as any)
                     .where("id", "=", newExpense.id)
                     .returning("id")
                     .executeTakeFirstOrThrow();
@@ -180,7 +188,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
                 if(newRideExpense) {
                     await trx
                     .updateTable(RIDE_EXPENSE_TABLE)
-                    .set(newRideExpense)
+                    .set(newRideExpense as any)
                     .where("id", "=", newRideExpense.id)
                     .returning("id")
                     .executeTakeFirstOrThrow();
@@ -199,7 +207,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
             if(expenseArray.length >= 1) {
                 await trx
                 .insertInto(EXPENSE_TABLE)
-                .values(expenseArray)
+                .values(expenseArray as any)
                 .returning("id")
                 .execute();
             }
@@ -208,7 +216,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
             if(rideExpenseArray.length >= 1) {
                 await trx
                 .insertInto(RIDE_EXPENSE_TABLE)
-                .values(rideExpenseArray)
+                .values(rideExpenseArray as any)
                 .returning("id")
                 .execute();
             }
@@ -244,7 +252,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
             if(ridePlaceArray.length >= 1) {
                 await trx
                 .insertInto(RIDE_PLACE_TABLE)
-                .values(ridePlaceArray)
+                .values(ridePlaceArray as any)
                 .returning("id")
                 .execute();
             }
@@ -279,7 +287,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
             if(ridePassengerArray.length >= 1) {
                 await trx
                 .insertInto(RIDE_PASSENGER_TABLE)
-                .values(ridePassengerArray)
+                .values(ridePassengerArray as any)
                 .returning("id")
                 .execute();
             }
@@ -290,7 +298,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
         return await this.getById(updatedRideLogId);
     }
 
-    async delete(rideLog: RideLog): Promise<string | number> {
+    async deleteLog(rideLog: RideLog): Promise<string> {
         return await this.db.transaction().execute(async (trx) => {
             const result = await trx
             .deleteFrom(RIDE_LOG_TABLE)
@@ -341,42 +349,42 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
     }
 
     paginator(
-        cursorOptions: CursorOptions<keyof RideLogTableRow | "total_expense" | "duration">,
-        filterBy?: PaginatorOptions<RideLogTableRow & { total_expense: number, duration: number | null }>["filterBy"],
-        perPage?: number = 25
-    ): CursorPaginator<RideLogTableRow & { total_expense: number, duration: number | null }, RideLog> {
+        cursorOptions: CursorOptions<keyof PaginatorSelectRideLogTableRow>,
+        filterBy?: PaginatorOptions<PaginatorSelectRideLogTableRow>["filterBy"],
+        perPage: number = 25
+    ): CursorPaginator<PaginatorSelectRideLogTableRow, RideLog> {
         const query = this.db
-        .with("t1", (db) =>
+        .with("t1" as const, (db) =>
             db
             .selectFrom(RIDE_LOG_TABLE)
             .leftJoin(RIDE_EXPENSE_TABLE, `${ RIDE_EXPENSE_TABLE }.ride_log_id`, `${ RIDE_LOG_TABLE }.id`)
             .leftJoin(EXPENSE_TABLE, `${ EXPENSE_TABLE }.id`, `${ RIDE_EXPENSE_TABLE }.expense_id`)
             .innerJoin(
-                `${ ODOMETER_LOG_TABLE } as start_odometer`,
+                `${ ODOMETER_LOG_TABLE } as start_odometer` as const,
                 "start_odometer.id",
                 `${ RIDE_LOG_TABLE }.start_odometer_log_id`
             )
             .innerJoin(
-                `${ ODOMETER_LOG_TABLE } as end_odometer`,
+                `${ ODOMETER_LOG_TABLE } as end_odometer` as const,
                 "end_odometer.id",
                 `${ RIDE_LOG_TABLE }.end_odometer_log_id`
             )
             .selectAll(RIDE_LOG_TABLE)
-            .select((eb) => [
-                eb.fn.coalesce(eb.fn.sum(`${ EXPENSE_TABLE }.amount`), eb.val(0)).as("total_expense"),
+            .select([
                 // @formatter:off
+                sql<number>`COALESCE(SUM(${sql.ref(`${EXPENSE_TABLE}.amount`)}), 0)`.as("total_expense"),
                 sql<number>`COALESCE(end_odometer.value - start_odometer.value, 0)`.as("distance"),
-                sql<number>`(julianday(end_time) - julianday(start_time))* 86400`.as("duration")
+                sql<number>`(julianday(end_time) - julianday(start_time)) * 86400`.as("duration")
                 // @formatter:on
             ])
             .groupBy(`${ RIDE_LOG_TABLE }.id`)
         )
-        .selectFrom("t1")
-        .selectAll();
+        .selectFrom("t1" as const)
+        .selectAll("t1");
 
-        return new CursorPaginator<RideLogTableRow & { total_expense: number }, RideLog>(
+        return new CursorPaginator<PaginatorSelectRideLogTableRow, RideLog>(
             this.db,
-            "t1",
+            "t1" as any,
             cursorOptions,
             {
                 baseQuery: query,

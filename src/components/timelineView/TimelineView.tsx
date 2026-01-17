@@ -1,18 +1,18 @@
 import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
-import React, { ReactNode, useCallback, useState } from "react";
+import React, { Ref, useCallback, useState } from "react";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { TimelineItem, TimelineItemType } from "./item/TimelineItem.tsx";
-import { FlashListRef, ListRenderItem } from "@shopify/flash-list";
+import { FlashList, FlashListRef, ListRenderItemInfo } from "@shopify/flash-list";
 import { MoreDataLoading } from "../loading/MoreDataLoading.tsx";
-import { AnimatedFlashList } from "../AnimatedComponents/index.ts";
 import { RNNativeScrollEvent } from "react-native-reanimated/lib/typescript/hook/commonTypes";
-import { LayoutChangeEvent, StyleSheet, View, ViewStyle } from "react-native";
+import { LayoutChangeEvent, StyleSheet, View } from "react-native";
 import { FilterButton, FilterButtonProps } from "../filter/FilterButton.tsx";
 import { FilterRow } from "../filter/FilterRow.tsx";
 import { useTranslation } from "react-i18next";
+import { ViewStyle } from "../../types/index.ts";
 
 type TimelineViewProps = {
-    ref: FlashListRef<TimelineItemType>
+    ref: Ref<FlashListRef<TimelineItemType>>
     data: Array<TimelineItemType>
     orderButtons?: Array<FilterButtonProps>
     filterButtons?: Array<FilterButtonProps>
@@ -21,7 +21,6 @@ type TimelineViewProps = {
     fetchPrevious?: () => Promise<void>
     isNextFetching?: boolean
     isPreviousFetching?: boolean
-    renderMilestone?: (milestone: string) => ReactNode
     scrollHandler?: (event: RNNativeScrollEvent, context?: Record<string, unknown>) => void
     style?: ViewStyle
     filtersContainerStyle?: ViewStyle
@@ -39,7 +38,6 @@ function ITimelineView({
     fetchPrevious,
     isNextFetching,
     isPreviousFetching,
-    renderMilestone,
     scrollHandler,
     style,
     filtersContainerStyle
@@ -48,15 +46,14 @@ function ITimelineView({
 
     const [filterRowsHeight, setFilterRowsHeight] = useState(0);
 
-    const renderItem = useCallback(({ item, index }: ListRenderItem<TimelineItemType>) => (
+    const renderItem = useCallback(({ item, index }: ListRenderItemInfo<TimelineItemType>) => (
         <TimelineItem
-            renderMilestone={ renderMilestone }
             { ...item }
             iconSize={ DOT_ICON_SIZE }
             isFirst={ index === 0 }
             isLast={ index + 1 === data.length }
         />
-    ), [renderMilestone, data]);
+    ), [data]);
 
     const renderListEmptyComponent = useCallback(() => {
         if(isInitialFetching) return <MoreDataLoading text={ t("log.loading") }/>;
@@ -89,7 +86,7 @@ function ITimelineView({
 
     const filterRowsOnLayout = useCallback((event: LayoutChangeEvent) => {
         setFilterRowsHeight(event.nativeEvent.layout.height);
-    });
+    }, []);
 
     return (
         <View style={ styles.container }>
@@ -110,7 +107,7 @@ function ITimelineView({
                    </FilterRow>
                 }
             </View>
-            <AnimatedFlashList
+            <FlashList<TimelineItemType>
                 ref={ ref }
                 data={ data }
                 renderItem={ renderItem }

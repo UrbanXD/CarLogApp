@@ -4,8 +4,8 @@ import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { FormState, useForm } from "react-hook-form";
 import { Expense } from "../../schemas/expenseSchema.ts";
-import { ExpenseFields, useEditExpenseFormProps } from "../../schemas/form/expenseForm.ts";
-import { ExpenseFormFields } from "../../enums/expenseFormFields.ts";
+import { ExpenseFormFields, useEditExpenseFormProps } from "../../schemas/form/expenseForm.ts";
+import { ExpenseFormFieldsEnum } from "../../enums/expenseFormFieldsEnum.ts";
 import { useExpenseFormFields } from "../../hooks/useExpenseFormFields.tsx";
 import Form from "../../../../components/Form/Form.tsx";
 import { FormFields, SubmitHandlerArgs } from "../../../../types/index.ts";
@@ -14,8 +14,8 @@ import { InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
 type EditExpenseFormProps = {
     expense: Expense
     /** Which field will be edited, if its undefined that means full form view will appear */
-    field?: ExpenseFormFields
-    onFormStateChange?: (formState: FormState<ExpenseFields>) => void
+    field?: ExpenseFormFieldsEnum
+    onFormStateChange?: (formState: FormState<ExpenseFormFields>) => void
 }
 
 export function EditExpenseForm({
@@ -27,12 +27,12 @@ export function EditExpenseForm({
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
 
-    const form = useForm<ExpenseFields>(useEditExpenseFormProps(expense));
+    const form = useForm<ExpenseFormFields, any, ExpenseFormFields>(useEditExpenseFormProps(expense));
 
     const { fields, fullForm } = useExpenseFormFields(form);
-    const editFields: FormFields = fields?.[field] ?? fullForm;
+    const editFields: FormFields = field ? fields?.[field] ?? fullForm : fullForm;
 
-    const submitHandler: SubmitHandlerArgs<ExpenseFields> = {
+    const submitHandler: SubmitHandlerArgs<ExpenseFormFields> = {
         onValid: async (formResult) => {
             try {
                 await expenseDao.update(formResult);

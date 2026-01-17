@@ -1,22 +1,22 @@
-import { OrderByDirectionExpression, SelectQueryBuilder } from "kysely";
+import { OrderByDirectionExpression, RawBuilder, SelectQueryBuilder } from "kysely";
 import { sql } from "@powersync/kysely-driver";
-import { OrderCondition } from "../AbstractPaginator.ts";
+import { DatabaseType } from "../../connector/powersync/AppSchema.ts";
 
 type OrderCondition<FieldName> = {
-    field: FieldName
+    field: string
     direction?: OrderByDirectionExpression
     toLowerCase?: boolean
     reverse?: boolean
 }
 
-export function addOrder<TableItem = any, DB = any>(
-    query: SelectQueryBuilder<DB, TableItem, any>,
+export function addOrder<TableItem>(
+    query: SelectQueryBuilder<DatabaseType, any, TableItem>,
     orderCondition: OrderCondition<keyof TableItem>
-): SelectQueryBuilder<DB, TableItem, any> {
+): SelectQueryBuilder<DatabaseType, any, TableItem> {
     let orderDirection = orderCondition?.direction ?? "asc";
     if(orderCondition.reverse) orderDirection = orderDirection === "asc" ? "desc" : "asc";
 
-    let orderByField = orderCondition.field;
+    let orderByField: string | RawBuilder<any> = orderCondition.field;
     // @formatter:off
     if(orderCondition?.toLowerCase) orderByField = sql`lower(${ sql.ref(orderByField) })`;
     // @formatter:on

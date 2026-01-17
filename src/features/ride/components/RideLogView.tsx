@@ -14,7 +14,6 @@ import { updateCarOdometer } from "../../car/model/slice/index.ts";
 import { RideLogFormFieldsEnum } from "../enums/RideLogFormFields.ts";
 import { ExpandableList } from "../../../components/expandableList/ExpandableList.tsx";
 import { Amount } from "../../_shared/currency/schemas/amountSchema.ts";
-import { FormResultRideExpense } from "../_features/rideExpense/schemas/rideExpenseSchema.ts";
 import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { InfoRowProps } from "../../../components/info/InfoRow.tsx";
 import dayjs from "dayjs";
@@ -53,8 +52,8 @@ export function RideLogView({ id }: RideLogViewProps) {
 
         if(!rideLog) return;
 
-        for(const item: FormResultRideExpense of rideLog.rideExpenses) {
-            const key = item.expense.amount.currency.id;
+        for(const item of rideLog.rideExpenses) {
+            const key = item.expense.amount.currency.id.toString();
 
             const existing = totals.get(key);
             if(existing) {
@@ -88,7 +87,7 @@ export function RideLogView({ id }: RideLogViewProps) {
 
     const handleDelete = useCallback(async (rideLog: RideLog) => {
         try {
-            const resultId = await rideLogDao.delete(rideLog);
+            const resultId = await rideLogDao.deleteLog(rideLog);
 
             let odometer: Odometer | null = null;
             if(resultId) odometer = await odometerLogDao.getOdometerByCarId(rideLog.carId);
@@ -216,7 +215,9 @@ export function RideLogView({ id }: RideLogViewProps) {
                              <AmountText
                                  amount={ totalAmount.reduce((sum, a) => sum + a.exchangedAmount, 0) }
                                  currencyText={ totalAmount[0]?.exchangeCurrency?.symbol ?? "?" }
-                                 exchangedAmount={ totalAmount.length !== 1 && totalAmount.map(a => Number(a.amount ?? 0)) }
+                                 exchangedAmount={ totalAmount.length !== 1
+                                                   ? totalAmount.map(a => Number(a.amount ?? 0))
+                                                   : undefined }
                                  exchangeCurrencyText={ totalAmount.map(a => a.currency.symbol ?? "?") }
                                  amountTextStyle={ textStyle }
                                  freeText={ "-" }
@@ -242,7 +243,7 @@ export function RideLogView({ id }: RideLogViewProps) {
             {
                 icon: ICON_NAMES.note,
                 content: rideLog?.note ?? t("common.no_notes"),
-                contentTextStyle: !rideLog?.note && { color: COLORS.gray2 },
+                contentTextStyle: !rideLog?.note ? { color: COLORS.gray2 } : undefined,
                 onPress: () => onEdit(RideLogFormFieldsEnum.Note)
             }
         ]),

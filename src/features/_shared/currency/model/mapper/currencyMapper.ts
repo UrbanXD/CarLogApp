@@ -18,7 +18,7 @@ export class CurrencyMapper extends AbstractMapper<CurrencyTableRow, Currency> {
 
     async toEntity(dto: Currency): Promise<CurrencyTableRow> {
         return {
-            id: dto.id,
+            id: dto.id as never,
             key: dto.key,
             symbol: dto.symbol
         };
@@ -28,7 +28,7 @@ export class CurrencyMapper extends AbstractMapper<CurrencyTableRow, Currency> {
         dtos: Array<Currency>,
         getControllerTitle?: (dto: Currency) => string,
         getTitle?: (dto: Currency) => string
-    }): Promise<Array<PickerItemType>> {
+    }): Array<PickerItemType> {
         return dtos.map(dto => {
             return ({
                 value: dto.id.toString(),

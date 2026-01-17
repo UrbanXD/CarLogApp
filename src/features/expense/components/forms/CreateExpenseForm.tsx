@@ -1,18 +1,18 @@
 import useCars from "../../../car/hooks/useCars.ts";
 import React from "react";
 import { FormState, useForm } from "react-hook-form";
-import { ExpenseFields, useCreateExpenseFormProps } from "../../schemas/form/expenseForm.ts";
+import { ExpenseFormFields, useCreateExpenseFormProps } from "../../schemas/form/expenseForm.ts";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { useExpenseFormFields } from "../../hooks/useExpenseFormFields.tsx";
 import Form from "../../../../components/Form/Form.tsx";
-import { CreateToast, InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
+import { CreateToast, InvalidFormToast } from "../../../../ui/alert/presets/toast";
 import { useTranslation } from "react-i18next";
-import { SubmitHandlerArgs } from "../../../../types/index.ts";
+import { SubmitHandlerArgs } from "../../../../types";
 
 type CreateExpenseFormProps = {
-    onFormStateChange?: (formState: FormState<ExpenseFields>) => void
+    onFormStateChange?: (formState: FormState<ExpenseFormFields>) => void
 }
 
 export function CreateExpenseForm({ onFormStateChange }: CreateExpenseFormProps) {
@@ -22,10 +22,10 @@ export function CreateExpenseForm({ onFormStateChange }: CreateExpenseFormProps)
     const { expenseDao } = useDatabase();
     const { selectedCar } = useCars();
 
-    const form = useForm<ExpenseFields>(useCreateExpenseFormProps(selectedCar));
+    const form = useForm<ExpenseFormFields, any, ExpenseFormFields>(useCreateExpenseFormProps(selectedCar));
     const { fullForm } = useExpenseFormFields(form);
 
-    const submitHandler: SubmitHandlerArgs<ExpenseFields> = {
+    const submitHandler: SubmitHandlerArgs<ExpenseFormFields> = {
         onValid: async (formResult) => {
             try {
                 await expenseDao.create(formResult, true);

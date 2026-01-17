@@ -10,9 +10,17 @@ export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, Servi
     }
 
     async toDto(entity: ServiceTypeTableRow): Promise<ServiceType> {
-        let icon = SERVICE_ICONS[entity.key] ?? null;
-        let primaryColor = SERVICE_COLORS[entity.key] ?? SERVICE_COLORS.OTHER;
-        let secondaryColor = null;
+        const isServiceIconsKey = (key: unknown): key is keyof typeof SERVICE_ICONS => {
+            return typeof key === "string" && key in SERVICE_ICONS;
+        };
+
+        const isServiceColorsKey = (key: unknown): key is keyof typeof SERVICE_COLORS => {
+            return typeof key === "string" && key in SERVICE_COLORS;
+        };
+
+        const icon = isServiceIconsKey(entity.key) ? SERVICE_ICONS[entity.key] : null;
+        const primaryColor = isServiceColorsKey(entity.key) ? SERVICE_COLORS[entity.key] : SERVICE_COLORS.OTHER;
+        const secondaryColor = null;
 
         return serviceTypeSchema.parse({
             id: entity.id,
@@ -35,7 +43,7 @@ export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, Servi
     entityToPickerItem(
         entity: ServiceTypeTableRow,
         getTitle?: (entity: ServiceTypeTableRow) => string
-    ): Promise<PickerItemType> {
+    ): PickerItemType {
         return {
             value: entity.id.toString(),
             title: getTitle?.(entity) ?? entity.key

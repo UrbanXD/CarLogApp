@@ -1,6 +1,7 @@
-import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { COLORS, FONT_SIZES } from "../../../../../constants/index.ts";
+import { TextStyle, ViewStyle } from "../../../../../types/index.ts";
 
 type ChartDataNotFoundProps = {
     text?: string

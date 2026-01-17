@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
-import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import Icon from "./Icon";
 import { hexToRgba } from "../utils/colors/hexToRgba";
-import { ImageSource } from "../types/index.ts";
+import { ImageSource, ViewStyle } from "../types/index.ts";
 import { debounce } from "es-toolkit";
 import { MoreDataLoading } from "./loading/MoreDataLoading.tsx";
 
@@ -30,7 +30,7 @@ function DefaultElement({
         if(loading) return;
 
         onPress?.();
-    }), [onPress, loading]);
+    }, 250), [onPress, loading]);
 
     return (
         <Pressable

@@ -1,8 +1,11 @@
-import { FormResultRideExpense, RideExpense } from "../../schemas/rideExpenseSchema.ts";
 import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import { useForm } from "react-hook-form";
-import { RideExpenseFormFields, useRideExpenseFormProps } from "../../schemas/form/rideExpenseForm.ts";
+import {
+    RideExpenseFormFields,
+    RideExpenseFormTransformedFields,
+    useRideExpenseFormProps
+} from "../../schemas/form/rideExpenseForm.ts";
 import { StyleSheet, Text, View } from "react-native";
 import { ExpenseTypeInput } from "../../../../../expense/components/forms/inputFields/ExpenseTypeInput.tsx";
 import React from "react";
@@ -20,8 +23,8 @@ import Form from "../../../../../../components/Form/Form.tsx";
 
 type RideExpenseFormProps = {
     car: Car
-    onSubmit: (result: FormResultRideExpense) => void
-    defaultRideExpense?: RideExpense
+    onSubmit: (result: RideExpenseFormTransformedFields) => void
+    defaultRideExpense?: RideExpenseFormTransformedFields
     defaultDate?: string
 }
 
@@ -30,7 +33,7 @@ export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate
     const { openToast } = useAlert();
     const { rideExpenseDao } = useDatabase();
 
-    const form = useForm<RideExpenseFormFields>(useRideExpenseFormProps({
+    const form = useForm<RideExpenseFormFields, any, RideExpenseFormFields>(useRideExpenseFormProps({
         rideExpense: defaultRideExpense,
         defaultCurrencyId: car.currency.id,
         defaultDate: defaultDate
@@ -38,15 +41,11 @@ export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate
     const { control, setValue, handleSubmit } = form;
 
     const submitHandler = handleSubmit(
-        async (formResult: RideExpenseFormFields) => {
+        async (formResult) => {
             try {
-                const result = await rideExpenseDao.mapper.formResultMapper({
-                    ...formResult,
-                    carId: car.id
-                });
+                const result = await rideExpenseDao.mapper.formResultMapper(formResult, car.id);
 
                 onSubmit(result);
-
             } catch(e) {
                 openToast(ArrayInputToast.error());
                 console.error("Hiba a submitHandler-ben log:", e);

@@ -10,5 +10,5 @@ export type SignInRequest = z.infer<typeof signInRequestSchema>;
 export const useSignInFormProps = () => {
     const defaultValues: SignInRequest = { email: "", password: "" };
 
-    return { defaultValues, resolver: zodResolver(signInRequest) };
+    return { defaultValues, resolver: zodResolver(signInRequestSchema) };
 };

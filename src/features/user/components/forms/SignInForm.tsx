@@ -12,18 +12,32 @@ import { useTranslation } from "react-i18next";
 import { formTheme } from "../../../../ui/form/constants/theme.ts";
 import Link from "../../../../components/Link.tsx";
 import { router } from "expo-router";
+import { SubmitHandlerArgs } from "../../../../types/index.ts";
+import { InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
+import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 
 type SignInFormProps = {
     onFormStateChange?: (formState: FormState<SignInRequest>) => void
 }
 
 function SignInForm({ onFormStateChange }: SignInFormProps) {
-    const form = useForm<SignInRequest>(useSignInFormProps);
+    const { t } = useTranslation();
+    const { openToast } = useAlert();
+    const { signIn } = useAuth();
+
+    const form = useForm<SignInRequest>(useSignInFormProps());
     const { control, handleSubmit } = form;
 
-    const { t } = useTranslation();
-    const { signIn } = useAuth();
-    const submitHandler = handleSubmit(signIn);
+    const submitHandler: SubmitHandlerArgs<SignInRequest> = {
+        onValid: async (request) => {
+            await signIn(request);
+        },
+        onInvalid: (errors) => {
+            console.log("Sign in form validation errors", errors);
+            openToast(InvalidFormToast.warning());
+        }
+    };
+    const submit = handleSubmit(submitHandler.onValid, submitHandler.onInvalid);
 
     const openResetPassword = () => {
         router.push({ pathname: "user/resetPassword", params: { email: form.getValues("email") } });
@@ -66,7 +80,7 @@ function SignInForm({ onFormStateChange }: SignInFormProps) {
                     <Button.Text
                         text={ t("auth.sign_in") }
                         loadingIndicator
-                        onPress={ submitHandler }
+                        onPress={ submit }
                     />
                     <TextDivider
                         title={ t("common.or") }

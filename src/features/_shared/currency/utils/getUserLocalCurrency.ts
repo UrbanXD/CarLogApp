@@ -6,9 +6,12 @@ export function getUserLocalCurrency() {
     const currencyCode = locales?.[0]?.currencyCode;
     const regionCode = locales?.[0]?.regionCode ?? "EU";
 
-    const currencyId = Number(
-        (CurrencyEnum?.[currencyCode] ?? (regionCode === "EU" ? CurrencyEnum.EUR : CurrencyEnum.USD))
-    );
+    const defaultCurrency = regionCode === "EU" ? CurrencyEnum.EUR : CurrencyEnum.USD;
 
-    return currencyId;
+    const isValidKey = currencyCode && currencyCode in CurrencyEnum;
+    const currencyId = isValidKey
+                       ? CurrencyEnum[currencyCode as keyof typeof CurrencyEnum]
+                       : defaultCurrency;
+
+    return Number(currencyId);
 }

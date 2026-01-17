@@ -33,7 +33,7 @@ export function EditRideLogForm({
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
 
-    const form = useForm<RideLogFormFields>(useEditRideLogFormProps(rideLog, user?.id));
+    const form = useForm<RideLogFormFields>(useEditRideLogFormProps(rideLog));
     const { fields } = useRideLogFormFields({
         form,
         setCarOdometerValueWhenInputNotTouched: false,

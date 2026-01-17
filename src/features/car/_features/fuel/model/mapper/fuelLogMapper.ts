@@ -7,7 +7,7 @@ import {
 import { FuelLog, fuelLogSchema } from "../../schemas/fuelLogSchema.ts";
 import { FuelUnitDao } from "../dao/FuelUnitDao.ts";
 import { convertOdometerValueToKilometer } from "../../../odometer/utils/convertOdometerUnit.ts";
-import { FuelLogFields } from "../../schemas/form/fuelLogForm.ts";
+import { FuelLogFormFields } from "../../schemas/form/fuelLogForm.ts";
 import { ExpenseTypeEnum } from "../../../../../expense/model/enums/ExpenseTypeEnum.ts";
 import { ExpenseTypeDao } from "../../../../../expense/model/dao/ExpenseTypeDao.ts";
 import { Odometer } from "../../../odometer/schemas/odometerSchema.ts";
@@ -43,22 +43,22 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
 
     async toDto(entity: FuelLogTableRow): Promise<FuelLog> {
         const [fuelUnit, odometer, expense]: [FuelUnit | null, Odometer | null, Expense | null] = await Promise.all([
-            this.fuelUnitDao.getById(entity.fuel_unit_id),
+            this.fuelUnitDao.getById(entity.fuel_unit_id!),
             (async () => {
                 if(!entity.odometer_log_id) return null;
-                return this.odometerLogDao.getOdometerByLogId(entity.odometer_log_id, entity.car_id);
+                return this.odometerLogDao.getOdometerByLogId(entity.odometer_log_id!, entity.car_id!);
             })(),
             this.expenseDao.getById(entity.expense_id)
         ]);
 
         if(!expense) throw new Error("Expense not found!");
 
-        const isPricePerUnit = Boolean(entity.is_price_per_unit);
-        const quantity = numberToFractionDigit(entity.quantity / (fuelUnit?.conversionFactor ?? 1));
+        const isPricePerUnit = Boolean(entity.is_price_per_unit!);
+        const quantity = numberToFractionDigit(entity.quantity! / (fuelUnit?.conversionFactor ?? 1));
 
         return fuelLogSchema.parse({
             id: entity.id,
-            ownerId: entity.owner_id,
+            carId: entity.car_id!,
             expense: expense,
             fuelUnit: fuelUnit,
             odometer: odometer,
@@ -72,16 +72,16 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
     async toEntity(dto: FuelLog): Promise<FuelLogTableRow> {
         return {
             id: dto.id,
-            owner_id: dto.ownerId,
+            car_id: dto.carId,
             expense_id: dto.expense.id,
             fuel_unit_id: dto.fuelUnit.id,
             odometer_log_id: dto.odometer?.id ?? null,
             quantity: dto.quantity * dto.fuelUnit.conversionFactor,
-            is_price_per_unit: dto.isPricePerUnit
+            is_price_per_unit: dto.isPricePerUnit ? 1 : 0
         };
     }
 
-    async formResultToEntities(formResult: FuelLogFields): Promise<{
+    async formResultToEntities(formResult: FuelLogFormFields): Promise<{
         fuelLog: FuelLogTableRow,
         expense: ExpenseTableRow,
         odometerLog: OdometerLogTableRow | null
@@ -109,7 +109,7 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
 
         const fuelLog: FuelLogTableRow = {
             id: formResult.id,
-            owner_id: formResult.ownerId,
+            car_id: formResult.carId,
             expense_id: formResult.expense.id,
             odometer_log_id: !!formResult?.odometerValue ? formResult.odometerLogId : null,
             fuel_unit_id: formResult.fuelUnitId,

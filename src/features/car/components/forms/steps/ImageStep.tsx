@@ -1,14 +1,14 @@
 import React from "react";
-import { StepProps } from "../../../../../types/index.ts";
+import { StepProps } from "../../../../../types";
 import { CarFormFields } from "../../../schemas/form/carForm.ts";
 import { useTranslation } from "react-i18next";
 import Input from "../../../../../components/Input/Input.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { ICON_NAMES } from "../../../../../constants/index.ts";
+import { ICON_NAMES } from "../../../../../constants";
 
-type ImageStepProps<FormFields> = Pick<StepProps<FormFields>, "control">;
+type ImageStepProps = Pick<StepProps<CarFormFields>, "control">;
 
-function ImageStep<FormFields = CarFormFields>({ control }: ImageStepProps<FormFields>) {
+function ImageStep({ control }: ImageStepProps) {
     const { t } = useTranslation();
 
     return (

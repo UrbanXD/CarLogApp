@@ -1,8 +1,8 @@
 import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
 import { RideExpenseTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
-import { FormResultRideExpense, RideExpense, rideExpenseSchema } from "../../schemas/rideExpenseSchema.ts";
+import { RideExpense, rideExpenseSchema } from "../../schemas/rideExpenseSchema.ts";
 import { ExpenseDao } from "../../../../../expense/model/dao/ExpenseDao.ts";
-import { RideExpenseFormFields } from "../../schemas/form/rideExpenseForm.ts";
+import { RideExpenseFormFields, RideExpenseFormTransformedFields } from "../../schemas/form/rideExpenseForm.ts";
 import { CarDao } from "../../../../../car/model/dao/CarDao.ts";
 
 export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideExpense> {
@@ -36,12 +36,15 @@ export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideE
         };
     }
 
-    async formResultMapper(formResult: RideExpenseFormFields & { carId: string }): Promise<FormResultRideExpense> {
-        const carCurrencyId = await this.carDao.getCarCurrencyIdById(formResult.carId);
+    async formResultMapper(
+        formResult: RideExpenseFormFields,
+        carId: string
+    ): Promise<RideExpenseFormTransformedFields> {
+        const carCurrencyId = await this.carDao.getCarCurrencyIdById(carId);
 
         const expenseEntity = this.expenseDao.mapper.formResultToEntity({
             id: formResult.expense.id,
-            carId: formResult.carId,
+            carId: carId,
             typeId: formResult.typeId,
             expense: formResult.expense,
             date: formResult.date,
@@ -50,7 +53,11 @@ export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideE
 
         return {
             id: formResult.id,
-            expense: await this.expenseDao.mapper.toDto({ ...expenseEntity, car_currency_id: carCurrencyId })
+            expense: await this.expenseDao.mapper.toDto({
+                ...expenseEntity,
+                related_id: null,
+                car_currency_id: carCurrencyId
+            })
         };
     }
 }

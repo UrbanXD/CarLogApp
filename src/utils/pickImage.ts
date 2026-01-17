@@ -42,7 +42,7 @@ export async function pickImage(
                     return {
                         uri: copiedFile.uri,
                         fileName: newFileName,
-                        mediaType: img.mimeType ?? getMediaType(copiedFile)
+                        mediaType: img.mimeType ?? getMediaType(copiedFile.name)
                     } as Image;
                 })
             );

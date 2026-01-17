@@ -64,7 +64,7 @@ export const ICON_NAMES = {
     mapMarkers: "map-marker-multiple-outline",
     statistics: "finance",
     gestureTap: "gesture-tap"
-};
+} as const;
 
 export const SERVICE_ICONS = {
     SMALL_SERVICE: "wrench-outline",
@@ -75,7 +75,7 @@ export const SERVICE_ICONS = {
     DIAGNOSTICS: "car-search-outline",
     TIRE_CHANGE: "tire",
     OTHER: "dots-horizontal-circle-outline"
-};
+} as const;
 
 export const SERVICE_ITEM_ICONS = {
     TRANSMISSION_FLUID: "car-shift-pattern",
@@ -95,7 +95,7 @@ export const SERVICE_ITEM_ICONS = {
     BRAKE_PADS: "shield-half-full",
     TIRES: "tire",
     AIR_FILTER: "air-filter"
-};
+} as const;
 
 export const ICON_COLORS = {
     default: COLORS.white,

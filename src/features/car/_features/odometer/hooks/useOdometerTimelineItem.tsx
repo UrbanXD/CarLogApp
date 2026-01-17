@@ -19,19 +19,21 @@ export const useOdometerTimelineItem = () => {
         let routerPathName = "/odometer/log/[id]";
         let itemId = odometerLog.id;
 
-        switch(odometerLog.type.id) {
-            case OdometerLogTypeEnum.FUEL:
-                routerPathName = "/expense/fuel/[id]";
-                itemId = odometerLog.relatedId;
-                break;
-            case OdometerLogTypeEnum.SERVICE:
-                routerPathName = "/expense/service/[id]";
-                itemId = odometerLog.relatedId;
-                break;
-            case OdometerLogTypeEnum.RIDE:
-                routerPathName = "/ride/[id]";
-                itemId = odometerLog.relatedId;
-                break;
+        if(odometerLog.relatedId) {
+            switch(odometerLog.type.id) {
+                case OdometerLogTypeEnum.FUEL:
+                    routerPathName = "/expense/fuel/[id]";
+                    itemId = odometerLog.relatedId;
+                    break;
+                case OdometerLogTypeEnum.SERVICE:
+                    routerPathName = "/expense/service/[id]";
+                    itemId = odometerLog.relatedId;
+                    break;
+                case OdometerLogTypeEnum.RIDE:
+                    routerPathName = "/ride/[id]";
+                    itemId = odometerLog.relatedId;
+                    break;
+            }
         }
 
         const onPress = () => {
@@ -48,7 +50,7 @@ export const useOdometerTimelineItem = () => {
             id: odometerLog.id,
             milestone:
                 <OdometerText
-                    text={ odometerLog.value }
+                    text={ odometerLog.value.toString() }
                     unit={ odometerLog.unit.short }
                     textStyle={ { color: COLORS.white } }
                     unitTextStyle={ { color: COLORS.white } }

@@ -29,7 +29,7 @@ export function SelectedCar({
                 userDontHaveCars
                 ?
                 <View style={ { width: "75%" } }>
-                    <Text style={ styles.textContainer.model }>
+                    <Text style={ styles.model }>
                         { userDontHaveCarsPlaceholder }
                     </Text>
                 </View>
@@ -43,7 +43,7 @@ export function SelectedCar({
                           bounceDelay={ 800 }
                           spacing={ SEPARATOR_SIZES.lightSmall }
                        >
-                          <Text style={ styles.textContainer.name } numberOfLines={ 1 }>
+                          <Text style={ styles.name } numberOfLines={ 1 }>
                               { car.name }
                           </Text>
                        </IntelligentMarquee>
@@ -54,7 +54,7 @@ export function SelectedCar({
                         bounceDelay={ 800 }
                         spacing={ SEPARATOR_SIZES.lightSmall }
                     >
-                        <Text style={ styles.textContainer.model } numberOfLines={ 1 }>
+                        <Text style={ styles.model } numberOfLines={ 1 }>
                             {
                                 car
                                 ? `${ car.model.make.name } ${ car.model.name }`
@@ -74,19 +74,16 @@ const styles = StyleSheet.create({
         alignItems: "center",
         gap: SEPARATOR_SIZES.lightSmall
     },
-    textContainer: {
-        name: {
-            fontFamily: "Gilroy-Heavy",
-            fontSize: FONT_SIZES.p3,
-            letterSpacing: FONT_SIZES.p3 * 0.05,
-            color: COLORS.white
-        },
-
-        model: {
-            fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.p3 * 0.9,
-            letterSpacing: FONT_SIZES.p3 * 0.9 * 0.05,
-            color: COLORS.gray1
-        }
+    name: {
+        fontFamily: "Gilroy-Heavy",
+        fontSize: FONT_SIZES.p3,
+        letterSpacing: FONT_SIZES.p3 * 0.05,
+        color: COLORS.white
+    },
+    model: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p3 * 0.9,
+        letterSpacing: FONT_SIZES.p3 * 0.9 * 0.05,
+        color: COLORS.gray1
     }
 });

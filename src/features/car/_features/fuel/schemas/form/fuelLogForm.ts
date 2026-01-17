@@ -1,4 +1,4 @@
-import { zNumber } from "../../../../../../types/zodTypes.ts";
+import { zNumber, zNumberOptional } from "../../../../../../types/zodTypes.ts";
 import { z } from "zod";
 import { Car } from "../../../../schemas/carSchema.ts";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
@@ -10,22 +10,23 @@ import { odometerLogSchema } from "../../../odometer/schemas/odometerLogSchema.t
 import { OdometerLogDao } from "../../../odometer/model/dao/OdometerLogDao.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import { MIN_ODOMETER_VALUE, zodOdometerValidation } from "../../../odometer/utils/zodOdometerValidation.ts";
-import { inputAmountSchema } from "../../../../../_shared/currency/schemas/inputAmountSchema.ts";
+import {
+    inputAmountSchema,
+    inputAmountWithIsPricePerUnit
+} from "../../../../../_shared/currency/schemas/inputAmountSchema.ts";
 import dayjs from "dayjs";
+import { DefaultValues, UseFormProps } from "react-hook-form";
 
 const fuelLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
 .pick({ carId: true, date: true, note: true })
 .extend({
-    expense: inputAmountSchema({
-        withQuantity: false,
-        withIsPricePerUnit: true,
-        defaultIsPricePerUnit: false
-
-    }).extend({ id: expenseForm.shape.id })
+    expense: inputAmountSchema()
+    .extend(inputAmountWithIsPricePerUnit({ defaultIsPricePerUnit: false }).shape)
+    .extend({ id: expenseForm.shape.id })
 })
 .merge(
     fuelLogSchema
-    .pick({ id: true, ownerId: true })
+    .pick({ id: true })
     .extend({
         quantity: zNumber({
             bounds: { min: fuelLogSchema.shape.quantity.minValue ?? 0 },
@@ -34,8 +35,7 @@ const fuelLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
                 minBound: () => "error.odometer_value_non_negative"
             }
         }).pipe(fuelLogSchema.shape.quantity),
-        odometerValue: zNumber({
-            optional: true,
+        odometerValue: zNumberOptional({
             bounds: { min: MIN_ODOMETER_VALUE },
             errorMessage: { minBound: () => "error.odometer_value_non_negative" }
         }),
@@ -55,12 +55,12 @@ const fuelLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
     });
 });
 
-export type FuelLogFields = z.infer<ReturnType<typeof fuelLogForm>>;
+export type FuelLogFormFields = z.infer<ReturnType<typeof fuelLogForm>>;
 
-export function useCreateFuelLogFormProps(car: Car | null) {
+export function useCreateFuelLogFormProps(car: Car | null): UseFormProps<FuelLogFormFields, any, FuelLogFormFields> {
     const { odometerLogDao } = useDatabase();
 
-    const defaultValues: FuelLogFields = {
+    const defaultValues: DefaultValues<FuelLogFormFields> = {
         id: getUUID(),
         expense: {
             id: getUUID(),
@@ -71,21 +71,20 @@ export function useCreateFuelLogFormProps(car: Car | null) {
         },
         quantity: 0,
         odometerLogId: getUUID(),
-        ownerId: car?.ownerId,
         carId: car?.id,
         fuelUnitId: car?.fuelTank.unit.id,
-        odometerValue: null,
+        odometerValue: undefined,
         note: null,
-        date: new Date()
+        date: new Date().toISOString()
     };
 
     return { defaultValues, resolver: zodResolver(fuelLogForm(odometerLogDao)) };
 }
 
-export const useEditFuelLogFormProps = (fuelLog: FuelLog) => {
+export function useEditFuelLogFormProps(fuelLog: FuelLog): UseFormProps<FuelLogFormFields, any, FuelLogFormFields> {
     const { odometerLogDao } = useDatabase();
 
-    const defaultValues: FuelLogFields = {
+    const defaultValues: DefaultValues<FuelLogFormFields> = {
         id: fuelLog.id,
         expense: {
             id: fuelLog.expense.id,
@@ -96,12 +95,11 @@ export const useEditFuelLogFormProps = (fuelLog: FuelLog) => {
         },
         quantity: fuelLog.quantity,
         odometerLogId: fuelLog.odometer?.id ?? getUUID(),
-        ownerId: fuelLog.ownerId,
         carId: fuelLog.expense.carId,
         fuelUnitId: fuelLog.fuelUnit.id,
-        odometerValue: fuelLog.odometer?.value ?? null,
+        odometerValue: fuelLog.odometer?.value ?? undefined,
         note: fuelLog.expense.note,
-        date: dayjs(fuelLog.expense.date).isValid() ? dayjs(fuelLog.expense.date).toDate() : new Date()
+        date: dayjs(fuelLog.expense.date).isValid() ? fuelLog.expense.date : new Date().toISOString()
     };
 
     return { defaultValues, resolver: zodResolver(fuelLogForm(odometerLogDao)) };

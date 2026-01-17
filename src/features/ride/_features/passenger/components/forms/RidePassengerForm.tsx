@@ -1,9 +1,11 @@
-import { RidePassengerFormFields, useRidePassengerFormProps } from "../../schemas/form/ridePassengerForm.ts";
-import { RidePassenger } from "../../schemas/ridePassengerSchema.ts";
+import {
+    RidePassengerDefaultValues,
+    RidePassengerFormFields,
+    useRidePassengerFormProps
+} from "../../schemas/form/ridePassengerForm.ts";
 import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import { useForm, useWatch } from "react-hook-form";
-import { RidePlaceFormFields } from "../../../place/schemas/form/ridePlaceForm.ts";
 import React, { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import { SaveButton } from "../../../../../../components/Button/presets/SaveButton.tsx";
@@ -14,7 +16,7 @@ import { ArrayInputToast, InvalidFormToast } from "../../../../../../ui/alert/pr
 
 type RidePassengerFormProps = {
     onSubmit: (result: RidePassengerFormFields) => void
-    defaultRidePassenger?: RidePassenger
+    defaultRidePassenger?: RidePassengerFormFields | null
 }
 
 export function RidePassengerForm({ onSubmit, defaultRidePassenger }: RidePassengerFormProps) {
@@ -22,7 +24,8 @@ export function RidePassengerForm({ onSubmit, defaultRidePassenger }: RidePassen
     const { openToast } = useAlert();
     const { passengerDao } = useDatabase();
 
-    const form = useForm<RidePlaceFormFields>(useRidePassengerFormProps(defaultRidePassenger));
+    const form = useForm<RidePassengerDefaultValues, any, RidePassengerFormFields>(useRidePassengerFormProps(
+        defaultRidePassenger));
     const { control, setValue, handleSubmit } = form;
 
     const formPassengerId = useWatch({ control, name: "passengerId" });
@@ -32,12 +35,12 @@ export function RidePassengerForm({ onSubmit, defaultRidePassenger }: RidePassen
             if(!formPassengerId) return;
 
             const passenger = await passengerDao.getById(formPassengerId);
-            setValue("name", passenger?.name);
+            setValue("name", passenger?.name ?? "");
         })();
     }, [formPassengerId]);
 
     const submitHandler = handleSubmit(
-        async (formResult: RidePassengerFormFields) => {
+        async (formResult) => {
             try {
                 onSubmit(formResult);
             } catch(e) {

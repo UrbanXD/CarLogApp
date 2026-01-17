@@ -10,7 +10,7 @@ import { Odometer } from "../../../../../car/_features/odometer/schemas/odometer
 import { useAppDispatch } from "../../../../../../hooks/index.ts";
 import { ServiceLogFormFieldsEnum } from "../../enums/ServiceLogFormFieldsEnum.ts";
 import { ServiceLog } from "../../schemas/serviceLogSchema.ts";
-import { ServiceLogFields, useEditServiceLogFormProps } from "../../schemas/form/serviceLogForm.ts";
+import { ServiceLogFormFields, useEditServiceLogFormProps } from "../../schemas/form/serviceLogForm.ts";
 import { useServiceLogFormFields } from "../../hooks/useServiceLogForm.tsx";
 import { InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
 
@@ -18,7 +18,7 @@ type EditServiceLogFormProps = {
     serviceLog: ServiceLog
     /** Which field will be edited */
     field: ServiceLogFormFieldsEnum
-    onFormStateChange?: (formState: FormState<ServiceLogFields>) => void
+    onFormStateChange?: (formState: FormState<ServiceLogFormFields>) => void
 }
 
 export function EditServiceLogForm({
@@ -31,11 +31,11 @@ export function EditServiceLogForm({
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
 
-    const form = useForm<ServiceLogFields>(useEditServiceLogFormProps(serviceLog));
+    const form = useForm<ServiceLogFormFields>(useEditServiceLogFormProps(serviceLog));
     const { fields } = useServiceLogFormFields({ ...form, odometer: serviceLog.odometer });
     const editFields: FormFields = fields[field];
 
-    const submitHandler: SubmitHandlerArgs<ServiceLogFields> = {
+    const submitHandler: SubmitHandlerArgs<ServiceLogFormFields> = {
         onValid: async (formResult) => {
             try {
                 const result = await serviceLogDao.update(formResult);

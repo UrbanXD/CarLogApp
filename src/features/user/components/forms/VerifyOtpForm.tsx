@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import Input from "../../../../components/Input/Input.ts";
 import { AuthApiError, EmailOtpType } from "@supabase/supabase-js";
 import Divider from "../../../../components/Divider.tsx";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants";
 import { useOtp } from "../../hooks/useOtp.ts";
 import { Trans, useTranslation } from "react-i18next";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
@@ -63,9 +63,9 @@ function VerifyOtpForm({
         }
     };
 
-    const resend = async (automatic?: boolean = false) => {
+    const resend = async (automatic: boolean = false) => {
         try {
-            await resendOTP({ type, email }, automatic);
+            if(type === "signup" || type === "email_change") await resendOTP({ type, email }, automatic);
         } catch(e) {
             console.log("Resend OTP error: ", e);
         }
@@ -96,16 +96,19 @@ function VerifyOtpForm({
                 thickness={ 3.5 }
                 color={ COLORS.gray3 }
             />
-            <Text style={ styles.didntReceivedCodeText }>
-                { t("auth.otp_verification.expired_or_didnt_received") }
-                { "\n" }
-                <Text
-                    style={ styles.didntReceivedCodeLinkText }
-                    onPress={ resend }
-                >
-                    { t("auth.otp_verification.resend") }
-                </Text>
-            </Text>
+            {
+                type === "signup" || type === "email_change" &&
+               <Text style={ styles.didntReceivedCodeText }>
+                   { t("auth.otp_verification.expired_or_didnt_received") }
+                   { "\n" }
+                  <Text
+                     style={ styles.didntReceivedCodeLinkText }
+                     onPress={ () => resend() }
+                  >
+                      { t("auth.otp_verification.resend") }
+                  </Text>
+               </Text>
+            }
         </View>
     );
 }

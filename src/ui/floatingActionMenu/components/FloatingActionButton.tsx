@@ -65,7 +65,7 @@ export function FloatingActionButton({
             onLayout={ (event) => setWidth(event.nativeEvent.layout.width) }
         >
             <View style={ styles.labelContainer }>
-                <Animated.Text style={ [styles.labelContainer.text, labelStyle] }>{ label }</Animated.Text>
+                <Animated.Text style={ [styles.labelContainerText, labelStyle] }>{ label }</Animated.Text>
             </View>
             <View style={ styles.iconContainer }>
                 <Icon icon={ icon } size={ FONT_SIZES.h3 } color={ COLORS.white2 }/>
@@ -92,13 +92,12 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "flex-start",
         paddingLeft: SEPARATOR_SIZES.lightSmall,
-        paddingVertical: SEPARATOR_SIZES.lightSmall / 2,
-
-        text: {
-            fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.p2,
-            color: COLORS.white2
-        }
+        paddingVertical: SEPARATOR_SIZES.lightSmall / 2
+    },
+    labelContainerText: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p2,
+        color: COLORS.white2
     },
     iconContainer: {
         position: "absolute",

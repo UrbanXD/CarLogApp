@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+    BlurEvent,
+    FocusEvent,
     GestureResponderEvent,
     Keyboard,
     LayoutChangeEvent,
-    NativeSyntheticEvent,
     Pressable,
     StyleSheet,
     Text,
-    TextInputFocusEventData,
+    TextInput,
     TouchableWithoutFeedback,
     View
 } from "react-native";
@@ -24,8 +25,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import { Color } from "../../../types/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants";
+import { Color } from "../../../types";
 import type {
     PanGestureHandlerEventPayload
 } from "react-native-gesture-handler/src/handlers/GestureHandlerEventPayload.ts";
@@ -86,7 +87,7 @@ const Slider: React.FC<SliderProps> = ({
 }) => {
     const bottomSheetInternal = useBottomSheetInternal(true);
 
-    const tooltipInputRef = useAnimatedRef();
+    const tooltipInputRef = useAnimatedRef<TextInput>();
 
     const {
         borderRadius = 25,
@@ -115,6 +116,7 @@ const Slider: React.FC<SliderProps> = ({
     const tooltipPaddingHorizontal = SEPARATOR_SIZES.small / 2;
     const tooltipBorderRadius = 7.5;
     const tooltipBottomTriangleHeight = 10;
+
     const [tooltipLayout, setTooltipLayout] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
 
     const inputFieldContext = useInputFieldContext();
@@ -126,22 +128,17 @@ const Slider: React.FC<SliderProps> = ({
     const percent = useSharedValue(0);
     const inputValue = useSharedValue(value ? value.toString() : minValue.toString());
     const bounds = useSharedValue({ min: minValue, max: maxValue });
-    const [trackLayoutReady, setTrackLayoutReady] = useState(false);
 
+    const [trackLayoutReady, setTrackLayoutReady] = useState(false);
     const [currentValue, setCurrentValue] = useState(value ?? 0);
 
     useEffect(() => {
-        if(isNaN(value)) return;
-        setCurrentValue(Math.min(maxValue, Math.max(minValue, Number(value))).toString());
-    }, [value]);
-
-    useEffect(() => {
-        const rawValue = inputFieldContext?.field?.value;
+        const rawValue = inputFieldContext?.field?.value ?? value;
         const numericValue = (rawValue === "" || rawValue == null) ? NaN : Number(rawValue);
         const fieldValue = (isNaN(numericValue)) ? minValue : Math.min(maxValue, Math.max(minValue, numericValue));
 
         setCurrentValue(fieldValue);
-    }, [inputFieldContext?.field?.value]);
+    }, [inputFieldContext?.field?.value, value, minValue, maxValue]);
 
     useEffect(() => {
         if(!trackLayoutReady) return;
@@ -155,6 +152,7 @@ const Slider: React.FC<SliderProps> = ({
             Math.min(100, (currentValue - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
         );
         inputValue.value = currentValue.toString();
+
         scheduleOnUI(calculateThumbOffsetByPercent);
     }, [currentValue, trackLayoutReady]);
 
@@ -172,23 +170,23 @@ const Slider: React.FC<SliderProps> = ({
         bounds.value = { min: minValue, max: maxValue };
     }, [maxValue, minValue]);
 
-    const onFocus = useCallback((args: NativeSyntheticEvent<TextInputFocusEventData>) => {
+    const onFocus = useCallback((event: FocusEvent) => {
         if(!bottomSheetInternal) return; // return if not in a bottom sheet
         const { animatedKeyboardState } = bottomSheetInternal;
         const keyboardState = animatedKeyboardState.get();
 
         animatedKeyboardState.set({
             ...keyboardState,
-            target: args.nativeEvent.target
+            target: event.nativeEvent.target
         });
     }, [bottomSheetInternal?.animatedKeyboardState]);
 
-    const onBlur = useCallback((args: NativeSyntheticEvent<TextInputFocusEventData>) => {
+    const onBlur = useCallback((event: BlurEvent) => {
         if(!bottomSheetInternal) return; // return if not in a bottom sheet
         const { animatedKeyboardState } = bottomSheetInternal;
         const keyboardState = animatedKeyboardState.get();
 
-        if(keyboardState.target === args.nativeEvent.target) {
+        if(keyboardState.target === event.nativeEvent.target) {
             animatedKeyboardState.set({
                 ...keyboardState,
                 target: undefined
@@ -312,7 +310,7 @@ const Slider: React.FC<SliderProps> = ({
         .onStart(panOnStart)
         .onChange(panOnChange)
         .onEnd(panOnEnd)
-    );
+        , []);
 
     const tooltipDoubleTap = useMemo(
         () => Gesture.Tap()
@@ -322,7 +320,7 @@ const Slider: React.FC<SliderProps> = ({
         .onStart(() => {
             dispatchCommand(tooltipInputRef, "focus");
         })
-    );
+        , []);
 
     const tooltipGesture = Gesture.Exclusive(tooltipPan, tooltipDoubleTap);
 
@@ -371,14 +369,14 @@ const Slider: React.FC<SliderProps> = ({
             [0, trackWidth.value]
         );
 
-        let backgroundColor = barColor;
+        let backgroundColor = barColor as string;
         if(Array.isArray(barColor)) {
             const inputRange: Array<number> = [];
-            const outputRange: Array<Color> = [];
+            const outputRange: Array<string> = [];
 
             barColor.map(element => {
                 inputRange.push(element.percent);
-                outputRange.push(element.color);
+                outputRange.push(element.color as string);
             });
 
             backgroundColor = interpolateColor(percent.value, inputRange, outputRange);
@@ -464,7 +462,7 @@ const Slider: React.FC<SliderProps> = ({
         );
 
         const toolbarX = handleX - tooltipLayout.width / 2;
-        let left = undefined;
+        let left = -1;
         if(toolbarX + tooltipLayout.width / 2 >= trackWidth.value - tooltipLayout.width) {
             left = tooltipLayout.width;
         } else if(toolbarX - tooltipLayout.width / 2 <= 0) {
@@ -513,28 +511,28 @@ const Slider: React.FC<SliderProps> = ({
     const animatedTooltipProps = useAnimatedProps(() => {
         let text = inputValue.value;
 
-        return { text };
+        return { text, defaultValue: text };
     });
 
     const animatedPercentTextProps = useAnimatedProps(() => {
         let text = `${ percent.value.toFixed(2) }%`;
 
-        return { text };
+        return { text, defaultValue: text };
     });
 
     return (
         <View style={ styles.container }>
-            <View style={ styles.slider }>
+            <View style={ styles.sliderContainer }>
                 {
                     showsTooltip &&
                    <GestureDetector gesture={ tooltipGesture }>
                       <Animated.View
-                         style={ [styles.slider.tooltip, tooltipContainerStyle] }
+                         style={ [styles.tooltip, tooltipContainerStyle] }
                       >
                           {
                               !innerTooltip &&
                              <Animated.View
-                                style={ [styles.slider.tooltip.bottomTriangle, tooltipBottomTriangleStyle] }
+                                style={ [styles.tooltipBottomTriangle, tooltipBottomTriangleStyle] }
                              />
                           }
                          <View
@@ -543,23 +541,23 @@ const Slider: React.FC<SliderProps> = ({
                             style={ { flexDirection: "row", alignItems: "center" } }
                          >
                             <AnimatedTextInput
-                               ref={ tooltipInputRef }
-                               defaultValue={ currentValue }
+                               ref={ tooltipInputRef as any }
+                               defaultValue={ currentValue.toString() }
                                editable={ tooltipAsInputField }
                                animatedProps={ animatedTooltipProps }
                                keyboardType="numeric"
-                               style={ styles.slider.tooltip.text }
+                               style={ styles.tooltipText }
                                onChangeText={ onTooltipTextChange }
                                onBlur={ onBlur }
                                onFocus={ onFocus }
                             />
-                             { unit && <Text style={ styles.slider.tooltip.text }>{ unit }</Text> }
+                             { unit && <Text style={ styles.tooltipText }>{ unit }</Text> }
                          </View>
                       </Animated.View>
                    </GestureDetector>
                 }
                 <Pressable
-                    style={ [styles.slider.track, error && styles.slider.track.error] }
+                    style={ [styles.track, error && styles.trackError] }
                     onLayout={ onTrackLayout }
                     onPress={ onTrackPress }
                     disabled={ (disabled || !tapToSeek) }
@@ -573,14 +571,14 @@ const Slider: React.FC<SliderProps> = ({
                        </>
                     }
                     <GestureDetector gesture={ barPan }>
-                        <Animated.View style={ [styles.slider.bar, sliderBarStyle] }/>
+                        <Animated.View style={ [styles.bar, sliderBarStyle] }/>
                     </GestureDetector>
                     {
                         showsHandle &&
                        <GestureDetector gesture={ handlePan }>
                           <TouchableWithoutFeedback>
-                             <Animated.View style={ [styles.slider.handle, sliderHandleStyle] }>
-                                <View style={ styles.slider.handle.innerHandle }/>
+                             <Animated.View style={ [styles.handle, sliderHandleStyle] }>
+                                <View style={ styles.innerHandle }/>
                              </Animated.View>
                           </TouchableWithoutFeedback>
                        </GestureDetector>
@@ -589,10 +587,10 @@ const Slider: React.FC<SliderProps> = ({
             </View>
             {
                 (showsBoundingValues || showsPercent) &&
-               <View style={ styles.boundingValues }>
+               <View style={ styles.boundingValuesContainer }>
                    {
                        showsBoundingValues &&
-                      <Text style={ styles.boundingValues.text }>{ minValue } { unit }</Text>
+                      <Text style={ styles.boundingValueText }>{ minValue } { unit }</Text>
                    }
                    {
                        showsPercent &&
@@ -600,12 +598,12 @@ const Slider: React.FC<SliderProps> = ({
                          defaultValue={ "0%" }
                          editable={ false }
                          animatedProps={ animatedPercentTextProps }
-                         style={ [styles.boundingValues.text, { padding: 0 }] }
+                         style={ [styles.boundingValuesContainer, { padding: 0 }] }
                       />
                    }
                    {
                        showsBoundingValues &&
-                      <Text style={ styles.boundingValues.text }>{ maxValue } { unit }</Text>
+                      <Text style={ styles.boundingValueText }>{ maxValue } { unit }</Text>
                    }
                </View>
             }
@@ -614,7 +612,7 @@ const Slider: React.FC<SliderProps> = ({
 };
 
 type UseStylesArg =
-    Omit<SliderStyle, "showsBoundingValues" | "barColor"> &
+    Partial<Omit<SliderStyle, "showsBoundingValues" | "barColor">> &
     {
         tooltipBottomTriangleHeight: number,
         tooltipPaddingVertical: number,
@@ -647,21 +645,18 @@ const useStyles = ({
         alignItems: "center",
         marginTop: showsTooltip && !innerTooltip ? tooltipLayout.height : 0
     },
-
-    boundingValues: {
+    boundingValuesContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
         gap: SEPARATOR_SIZES.lightSmall,
-        width: "100%",
-
-        text: {
-            fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.p4,
-            color: boundingValuesTextColor,
-            textAlign: "center"
-        }
+        width: "100%"
     },
-
+    boundingValueText: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p4,
+        color: boundingValuesTextColor,
+        textAlign: "center"
+    },
     tag: {
         position: "absolute",
         left: "25%",
@@ -670,84 +665,75 @@ const useStyles = ({
         backgroundColor: COLORS.black,
         zIndex: 1
     },
-
-    slider: {
+    sliderContainer: {
         flex: 1,
         width: "100%",
         position: "relative",
         minHeight: handleHeight,
+        justifyContent: "center"
+    },
+    track: {
+        position: "relative",
+        height: trackHeight,
         justifyContent: "center",
-
-        track: {
-            position: "relative",
-            height: trackHeight,
-            justifyContent: "center",
-            backgroundColor: trackColor,
-            borderRadius: borderRadius,
-            borderColor: COLORS.gray1,
-            borderWidth: trackBorderWidth,
-
-            error: {
-                borderColor: COLORS.redLight
-            }
-        },
-
-        bar: {
-            position: "absolute",
-            bottom: 0,
-            height: "100%",
-            minWidth: !showsHandle ? minBarWidth : 0,
-            borderRadius: borderRadius
-        },
-
-        handle: {
-            position: "absolute",
-            width: handleWidth,
-            height: handleHeight,
-            backgroundColor: handleColor,
-            justifyContent: "center",
-            alignItems: "center",
-            borderRadius: 50,
-            zIndex: 5,
-
-            innerHandle: {
-                width: innerHandleWidth,
-                height: innerHandleHeight,
-                backgroundColor: innerHandleColor,
-                borderRadius: 50
-            }
-        },
-
-        tooltip: {
-            position: "absolute",
-            zIndex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: tooltipColor,
-            paddingVertical: tooltipPaddingVertical,
-
-            bottomTriangle: {
-                position: "absolute",
-                width: 0,
-                height: 0,
-                backgroundColor: "transparent",
-                borderStyle: "solid",
-                borderLeftWidth: tooltipBottomTriangleHeight / 2,
-                borderRightWidth: tooltipBottomTriangleHeight / 2,
-                borderBottomWidth: tooltipBottomTriangleHeight,
-                borderLeftColor: "transparent",
-                borderRightColor: "transparent",
-                borderBottomColor: tooltipColor
-            },
-
-            text: {
-                fontFamily: "Gilroy-Medium",
-                fontWeight: "bold",
-                fontSize: FONT_SIZES.p4,
-                color: valueTextColor,
-                textAlign: "center"
-            }
-        }
+        backgroundColor: trackColor,
+        borderRadius: borderRadius,
+        borderColor: COLORS.gray1,
+        borderWidth: trackBorderWidth
+    },
+    trackError: {
+        borderColor: COLORS.redLight
+    },
+    bar: {
+        position: "absolute",
+        bottom: 0,
+        height: "100%",
+        minWidth: !showsHandle ? minBarWidth : 0,
+        borderRadius: borderRadius
+    },
+    handle: {
+        position: "absolute",
+        width: handleWidth,
+        height: handleHeight,
+        backgroundColor: handleColor,
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 50,
+        zIndex: 5
+    },
+    innerHandle: {
+        width: innerHandleWidth,
+        height: innerHandleHeight,
+        backgroundColor: innerHandleColor,
+        borderRadius: 50
+    },
+    tooltip: {
+        position: "absolute",
+        zIndex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: tooltipColor,
+        paddingVertical: tooltipPaddingVertical
+    },
+    tooltipBottomTriangle: {
+        position: "absolute",
+        width: 0,
+        height: 0,
+        backgroundColor: "transparent",
+        borderStyle: "solid",
+        borderLeftWidth: tooltipBottomTriangleHeight / 2,
+        borderRightWidth: tooltipBottomTriangleHeight / 2,
+        borderBottomWidth: tooltipBottomTriangleHeight,
+        borderLeftColor: "transparent",
+        borderRightColor: "transparent",
+        borderBottomColor: tooltipColor
+    },
+    tooltipText: {
+        fontFamily: "Gilroy-Medium",
+        fontWeight: "bold",
+        fontSize: FONT_SIZES.p4,
+        color: valueTextColor,
+        textAlign: "center"
     }
 });
 

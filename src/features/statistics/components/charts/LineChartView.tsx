@@ -1,4 +1,4 @@
-import { LineChart, lineDataItem } from "react-native-gifted-charts";
+import { LineChart, lineDataItem, yAxisSides } from "react-native-gifted-charts";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import React, { useMemo, useState } from "react";
 import { ChartTitle, ChartTitleProps } from "./common/ChartTitle.tsx";
@@ -65,7 +65,11 @@ export function LineChartView({
 
 
     const maxLabelWidth = Math.max(
-        ...formattedChartData.map(item => AXIS_FONT_SIZE * 0.55 * (item.label?.length ?? 0))
+        ...formattedChartData.map(item => {
+            let length = item.label?.length ?? 0;
+
+            return (AXIS_FONT_SIZE * 0.55 * (length)) + EXTRA_SPACING * 2;
+        })
     );
 
     const maxValue = Math.max(0, ...chartData.map(d => d.value ?? 0));
@@ -134,9 +138,11 @@ export function LineChartView({
                                     showFractionalValues={ showFractionalValues }
                                     roundToDigits={ precision }
                                     formatYLabel={ formatYLabel }
-                                    lineSegments={ formattedChartData.length > 0 && [
-                                        { startIndex: 0, endIndex: 1, strokeDashArray: [6, 4] }
-                                    ] }
+                                    lineSegments={
+                                        formattedChartData.length > 0
+                                        ? [{ startIndex: 0, endIndex: 1, strokeDashArray: [6, 4] }]
+                                        : undefined
+                                    }
                                     spacing={ spacing }
                                     initialSpacing={ initialSpacing }
                                     endSpacing={ endSpacing }
@@ -148,7 +154,7 @@ export function LineChartView({
                                     endOpacity={ 0.075 }
                                     rulesType="dashed"
                                     rulesColor={ COLORS.gray4 }
-                                    yAxisSide="right"
+                                    yAxisSide={ yAxisSides.LEFT }
                                     yAxisLabelWidth={ yAxisLabelWidth }
                                     yAxisThickness={ 0 }
                                     yAxisTextStyle={ styles.axisLabel }
@@ -158,9 +164,10 @@ export function LineChartView({
                                         styles.axisLabel,
                                         {
                                             width: maxLabelWidth,
-                                            marginLeft: (-maxLabelWidth + EXTRA_SPACING / 2) / 2
+                                            marginLeft: (-maxLabelWidth + EXTRA_SPACING) / 2
                                         }
                                     ] }
+                                    xAxisTextNumberOfLines={ 2 }
                                     customDataPoint={
                                         () => (
                                             <Pointer
@@ -195,14 +202,18 @@ export function LineChartView({
                                         pointerStripUptoDataPoint: true,
                                         activatePointersOnLongPress: true,
                                         autoAdjustPointerLabelPosition: true,
-                                        pointerLabelComponent: (items) => (
-                                            <PointerLabel
-                                                dataPointSize={ FOCUSED_DATA_POINT_SIZE }
-                                                abovePoint={ Number(items[0].value) < chartMaxValue * 0.25 }
-                                                value={ formatValue?.(items[0].value) ?? items[0].value }
-                                                label={ items[0].label }
-                                            />
-                                        )
+                                        pointerLabelComponent: (items: Array<lineDataItem>) => {
+                                            if(!items?.[0]) return null;
+
+                                            return (
+                                                <PointerLabel
+                                                    dataPointSize={ FOCUSED_DATA_POINT_SIZE }
+                                                    abovePoint={ Number(items[0]?.value ?? 0) < chartMaxValue * 0.25 }
+                                                    value={ formatValue?.(items[0]?.value ?? "") ?? items[0]?.value?.toString() ?? "" }
+                                                    label={ items[0]?.label }
+                                                />
+                                            );
+                                        }
                                     } }
                                 />
                                 {

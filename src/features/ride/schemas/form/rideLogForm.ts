@@ -2,25 +2,26 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RideLog, rideLogSchema } from "../rideLogSchema.ts";
 import { odometerSchema } from "../../../car/_features/odometer/schemas/odometerSchema.ts";
-import { zDate, zNumber } from "../../../../types/zodTypes.ts";
+import { zDate, zNumber, zPickerRequiredString } from "../../../../types/zodTypes.ts";
 import { getUUID } from "../../../../database/utils/uuid.ts";
 import { Car } from "../../../car/schemas/carSchema.ts";
 import { ridePlaceForm } from "../../_features/place/schemas/form/ridePlaceForm.ts";
 import { ridePassengerForm } from "../../_features/passenger/schemas/form/ridePassengerForm.ts";
-import { formResultRideExpenseSchema } from "../../_features/rideExpense/schemas/rideExpenseSchema.ts";
 import { zodOdometerValidation } from "../../../car/_features/odometer/utils/zodOdometerValidation.ts";
 import { OdometerLogDao } from "../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import dayjs from "dayjs";
+import { transformedRideExpenseForm } from "../../_features/rideExpense/schemas/form/rideExpenseForm.ts";
+import { DefaultValues, UseFormProps } from "react-hook-form";
 
 const rideLogForm = (odometerLogDao: OdometerLogDao) => rideLogSchema
-.pick({ id: true, carId: true, note: true })
+.pick({ id: true, note: true })
 .extend({
+    carId: zPickerRequiredString().pipe(rideLogSchema.shape.carId),
     startTime: zDate().pipe(rideLogSchema.shape.startTime),
     endTime: zDate().pipe(rideLogSchema.shape.endTime),
     startOdometerLogId: odometerSchema.shape.id, // hidden
     startOdometerValue: zNumber({
-        optional: false,
         bounds: { min: 0 },
         errorMessage: {
             required: "error.odometer_value_required",
@@ -29,14 +30,13 @@ const rideLogForm = (odometerLogDao: OdometerLogDao) => rideLogSchema
     }),
     endOdometerLogId: odometerSchema.shape.id, // hidden
     endOdometerValue: zNumber({
-        optional: false,
         bounds: { min: 0 },
         errorMessage: {
             required: "error.odometer_value_required",
             minBound: () => "error.odometer_value_non_negative"
         }
     }),
-    expenses: z.array(formResultRideExpenseSchema),
+    expenses: z.array(transformedRideExpenseForm),
     places: z.array(ridePlaceForm).min(2, {
         message: "error.start_and_end_place_required"
     }),
@@ -45,13 +45,15 @@ const rideLogForm = (odometerLogDao: OdometerLogDao) => rideLogSchema
 .superRefine(async (data, ctx) => {
     if(data.endTime && data.startTime && data.endTime < data.startTime) {
         ctx.addIssue({
+            code: "custom",
             path: ["endTime"],
             message: "error.ride_end_time_must_be_later_than_start_time"
         });
     }
 
-    if(data.endOdometerValue <= data.startOdometerValue) {
+    if(data.startOdometerValue && data.endOdometerValue && data.endOdometerValue <= data.startOdometerValue) {
         ctx.addIssue({
+            code: "custom",
             path: ["endOdometerValue"],
             message: "error.ride_odometer_end_must_be_bigger_than_start_odometer"
         });
@@ -78,19 +80,19 @@ const rideLogForm = (odometerLogDao: OdometerLogDao) => rideLogSchema
     });
 });
 
-export type RideLogFormFields = z.infer<typeof rideLogForm>;
+export type RideLogFormFields = z.infer<ReturnType<typeof rideLogForm>>;
 
-export function useCreateRideLogFormProps(car: Car | null) {
+export function useCreateRideLogFormProps(car: Car | null): UseFormProps<RideLogFormFields> {
     const { odometerLogDao } = useDatabase();
 
-    const now = new Date();
-    const defaultValues: RideLogFormFields = {
+    const now = new Date().toISOString();
+    const defaultValues: DefaultValues<RideLogFormFields> = {
         id: getUUID(),
         carId: car?.id,
         startOdometerLogId: getUUID(),
-        startOdometerValue: car?.odometer.value ?? null,
+        startOdometerValue: car?.odometer.value,
         endOdometerLogId: getUUID(),
-        endOdometerValue: car?.odometer.value ?? null,
+        endOdometerValue: car?.odometer.value,
         expenses: [],
         places: [],
         passengers: [],
@@ -102,13 +104,12 @@ export function useCreateRideLogFormProps(car: Car | null) {
     return { defaultValues, resolver: zodResolver(rideLogForm(odometerLogDao)) };
 }
 
-export function useEditRideLogFormProps(rideLog: RideLog, ownerId: string) {
+export function useEditRideLogFormProps(rideLog: RideLog): UseFormProps<RideLogFormFields> {
     const { odometerLogDao } = useDatabase();
 
-    const defaultValues: RideLogFormFields = {
+    const defaultValues: DefaultValues<RideLogFormFields> = {
         id: rideLog.id,
         carId: rideLog.carId,
-        ownerId: ownerId,
         startOdometerLogId: rideLog.startOdometer.id,
         startOdometerValue: rideLog.startOdometer.value,
         endOdometerLogId: rideLog.endOdometer.id,
@@ -116,8 +117,8 @@ export function useEditRideLogFormProps(rideLog: RideLog, ownerId: string) {
         expenses: rideLog.rideExpenses,
         places: rideLog.ridePlaces,
         passengers: rideLog.ridePassengers,
-        startTime: dayjs(rideLog.startTime).isValid() ? dayjs(rideLog.startTime).toDate() : new Date(),
-        endTime: dayjs(rideLog.endTime).isValid() ? dayjs(rideLog.endTime).toDate() : new Date(),
+        startTime: dayjs(rideLog.startTime).isValid() ? rideLog.startTime : new Date().toISOString(),
+        endTime: dayjs(rideLog.endTime).isValid() ? rideLog.endTime : new Date().toISOString(),
         note: rideLog.note
     };
 

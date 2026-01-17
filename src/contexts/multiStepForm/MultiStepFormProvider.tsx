@@ -8,7 +8,7 @@ type MultiStepFormProviderProps = {
     children: ReactNode | null
     form: UseFormReturn
     steps: Steps
-    submitHandler: SubmitHandlerArgs
+    submitHandler: SubmitHandlerArgs<any>
     resultStep?: ResultStep
     isFirstCount?: boolean
 }
@@ -26,14 +26,14 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
 
     useEffect(() => {
         const tmpSteps = steps;
-        if(resultStep) tmpSteps.push({ ...resultStep, render: () => resultStep.render(goTo) });
+        if(resultStep) tmpSteps.push({ ...resultStep, fields: [], render: () => resultStep.render(goTo) });
 
         setFormSteps(tmpSteps);
     }, [steps, resultStep]);
 
     const submit = useMemo(() => (
         form.handleSubmit(submitHandler.onValid, (errors, event) => {
-            submitHandler.onInvalid(errors, event);
+            submitHandler.onInvalid?.(errors, event);
             if(Object.keys(errors).length > 0) {
                 const firstErrorStepIndex = steps.findIndex(step => step.fields.some(field => errors[field]));
 
@@ -55,6 +55,7 @@ export const MultiStepFormProvider: React.FC<MultiStepFormProviderProps> = ({
         const currentStepFields = formSteps[currentStep]?.fields;
         if(currentStepFields && currentStepFields.length > 0) {
             const isValid = await form.trigger(currentStepFields);
+
             if(!isValid) return;
         }
 

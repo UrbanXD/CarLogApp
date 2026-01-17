@@ -8,7 +8,7 @@ import { AmountInput } from "../../../../_shared/currency/components/AmountInput
 import Input from "../../../../../components/Input/Input.ts";
 import { NoteInput } from "../../../../../components/Input/_presets/NoteInput.tsx";
 import { FuelLogFormFieldsEnum } from "../enums/fuelLogFormFields.tsx";
-import { FuelLogFields } from "../schemas/form/fuelLogForm.ts";
+import { FuelLogFormFields } from "../schemas/form/fuelLogForm.ts";
 import { OdometerValueInput } from "../../odometer/components/forms/inputFields/OdometerValueInput.tsx";
 import { FuelInput } from "../components/forms/inputFields/FuelInput.tsx";
 import { EditToast } from "../../../../../ui/alert/presets/toast/index.ts";
@@ -17,7 +17,9 @@ import { Odometer } from "../../odometer/schemas/odometerSchema.ts";
 import { OdometerLimit } from "../../odometer/model/dao/OdometerLogDao.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 
-type UseFuelLogFormFieldsProps = UseFormReturn<FuelLogFields> & { odometer?: Odometer }
+type UseFuelLogFormFieldsProps = UseFormReturn<FuelLogFormFields, any, FuelLogFormFields> & {
+    odometer?: Odometer | null
+}
 
 export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
     const { t } = useTranslation();
@@ -28,24 +30,22 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
     const [car, setCar] = useState<Car | null>(null);
     const [odometerLimit, setOdometerLimit] = useState<OdometerLimit | null>(null);
 
+    const formLogId = useWatch({ control, name: "odometerLogId" });
     const formCarId = useWatch({ control, name: "carId" });
     const formDate = useWatch({ control, name: "date" });
 
     useEffect(() => {
         const car = getCar(formCarId);
         setCar(car ?? null);
-        setValue("ownerId", car?.ownerId);
-        setValue("fuelUnitId", car?.fuelTank.unit.id);
+        if(car?.fuelTank.unit.id) setValue("fuelUnitId", car.fuelTank.unit.id);
         clearErrors();
     }, [formCarId]);
 
     useEffect(() => {
         (async () => {
-            if(!formCarId || !formDate) return;
-
-            setOdometerLimit(await odometerLogDao.getOdometerLimitByDate(formCarId, formDate));
+            setOdometerLimit(await odometerLogDao.getOdometerLimitByDate(formCarId, formDate, [formLogId]));
         })();
-    }, [formCarId, formDate]);
+    }, [formCarId, formDate, formLogId]);
 
     const fields: Record<FuelLogFormFieldsEnum, FormFields> = useMemo(() => ({
         [FuelLogFormFieldsEnum.Car]: {
@@ -53,11 +53,11 @@ export function useFuelLogFormFields(props: UseFuelLogFormFieldsProps) {
             editToastMessages: EditToast
         },
         [FuelLogFormFieldsEnum.Quantity]: {
-            render: () => <FuelInput
+            render: () => <FuelInput<FuelLogFormFields>
                 control={ control }
                 setValue={ setValue }
                 fieldName="quantity"
-                capacity={ car?.fuelTank.capacity }
+                capacity={ car?.fuelTank.capacity ?? 0 }
                 fuelTypeText={ t(`fuel.types.${ car?.fuelTank.type.key }`) }
                 unitText={ car?.fuelTank.unit.short }
             />,

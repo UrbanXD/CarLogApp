@@ -4,21 +4,25 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Car } from "../../car/schemas/carSchema.ts";
 import useCars from "../../car/hooks/useCars.ts";
 import { RideLogFormFieldsEnum } from "../enums/RideLogFormFields.ts";
-import { FormFields, Steps } from "../../../types/index.ts";
+import { FormFields, Steps } from "../../../types";
 import { CarPickerInput } from "../../car/components/forms/inputFields/CarPickerInput.tsx";
-import { RidePlaceInput } from "../_features/place/components/forms/inputFields/RidePlaceInput.tsx";
 import { OdometerValueInput } from "../../car/_features/odometer/components/forms/inputFields/OdometerValueInput.tsx";
 import Input from "../../../components/Input/Input.ts";
 import { NoteInput } from "../../../components/Input/_presets/NoteInput.tsx";
-import { RidePassengerInput } from "../_features/passenger/components/forms/inputFields/RidePassengerInput.tsx";
-import { RideExpenseInput } from "../_features/rideExpense/components/forms/inputFields/RideExpenseInput.tsx";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
-import { EditToast } from "../../../ui/alert/presets/toast/index.ts";
+import { EditToast } from "../../../ui/alert/presets/toast";
 import { formatWithUnit } from "../../../utils/formatWithUnit.ts";
 import { Odometer } from "../../car/_features/odometer/schemas/odometerSchema.ts";
 import { OdometerLimit } from "../../car/_features/odometer/model/dao/OdometerLogDao.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
+import { useRidePlaceToExpandableList } from "../_features/place/hooks/useRidePlaceToExpandableList.ts";
+import { ArrayInput } from "../../../components/Input/array/ArrayInput.tsx";
+import { RidePlaceForm } from "../_features/place/components/forms/RidePlaceForm.tsx";
+import { useRidePassengerToExpandableList } from "../_features/passenger/hooks/useRidePassengerToExpandableList.ts";
+import { RidePassengerForm } from "../_features/passenger/components/forms/RidePassengerForm.tsx";
+import { useRideExpenseToExpandableList } from "../_features/rideExpense/hooks/useRideExpenseToExpandableList.ts";
+import { RideExpenseForm } from "../_features/rideExpense/components/forms/RideExpenseForm.tsx";
 
 type UseRideLogFormFieldsProps = {
     form: UseFormReturn<RideLogFormFields>
@@ -35,10 +39,13 @@ export function useRideLogFormFields({
     startOdometer,
     endOdometer
 }: UseRideLogFormFieldsProps) {
-    const { control, setValue, getFieldState, clearErrors } = form;
+    const { control, setValue, getFieldState, clearErrors, handleSubmit } = form;
     const { t } = useTranslation();
     const { odometerLogDao } = useDatabase();
     const { getCar } = useCars();
+    const { ridePlaceToExpandableList } = useRidePlaceToExpandableList();
+    const { ridePassengerToExpandableList } = useRidePassengerToExpandableList();
+    const { rideExpenseToExpandableList } = useRideExpenseToExpandableList();
 
     const [car, setCar] = useState<Car | null>(null);
     const [startOdometerLimit, setStartOdometerLimit] = useState<OdometerLimit | null>(null);
@@ -86,20 +93,70 @@ export function useRideLogFormFields({
                 editToastMessages: EditToast
             },
             [RideLogFormFieldsEnum.Expenses]: {
-                render: () => <RideExpenseInput
-                    control={ control }
-                    fieldName="expenses"
-                    carIdFieldName="carId"
-                    startTimeFieldName="startTime"
-                />,
+                render: () => (
+                    <ArrayInput<RideLogFormFields, "expenses">
+                        control={ control }
+                        fieldName="expenses"
+                        title={ t("rides.other_expenses") }
+                        mapperToExpandableList={ rideExpenseToExpandableList }
+                        renderForm={
+                            (onSubmit, item) => {
+                                if(!car) return null;
+
+                                return (
+                                    <RideExpenseForm
+                                        car={ car }
+                                        defaultRideExpense={ item ?? undefined }
+                                        defaultDate={ formStartTime }
+                                        onSubmit={ onSubmit }
+                                    />
+                                );
+                            }
+                        }
+                        calculateItemAmount={ (item) => item.expense.amount }
+                        showTotalAmounts
+                    />
+                ),
                 editToastMessages: EditToast
             },
             [RideLogFormFieldsEnum.Places]: {
-                render: () => <RidePlaceInput control={ control } fieldName="places"/>,
+                render: () => (
+                    <ArrayInput<RideLogFormFields, "places">
+                        control={ control }
+                        fieldName="places"
+                        title={ t("places.title") }
+                        mapperToExpandableList={ ridePlaceToExpandableList }
+                        renderForm={
+                            (onSubmit, item) => (
+                                <RidePlaceForm
+                                    onSubmit={ onSubmit }
+                                    defaultRidePlace={ item }
+                                />
+                            )
+                        }
+                    />
+                ),
                 editToastMessages: EditToast
             },
             [RideLogFormFieldsEnum.Passengers]: {
-                render: () => <RidePassengerInput control={ control } fieldName="passengers"/>,
+                render: () => (
+                    <ArrayInput<RideLogFormFields, "passengers">
+                        control={ control }
+                        fieldName="passengers"
+                        title={ t("passengers.title") }
+                        mapperToExpandableList={ ridePassengerToExpandableList }
+                        renderForm={
+                            (onSubmit, item) => (
+                                <RidePassengerForm
+                                    onSubmit={ onSubmit }
+                                    defaultRidePassenger={ item }
+                                />
+                            )
+                        }
+                        checkItemAlreadyAdded
+                        alreadyAddedItemExpression={ (itemA, itemB) => itemA.passengerId === itemB.passengerId }
+                    />
+                ),
                 editToastMessages: EditToast
             },
             [RideLogFormFieldsEnum.StartTimeAndOdometer]: {
@@ -119,10 +176,14 @@ export function useRideLogFormFields({
                     control={ control }
                     odometerValueFieldName="endOdometerValue"
                     odometerValueTitle={ t("rides.end_odometer") }
-                    odometerValueSubtitle={ t(
-                        "rides.start_odometer_value",
-                        { value: formatWithUnit(formStartOdometerValue, car?.odometer.unit.short) }
-                    ) }
+                    odometerValueSubtitle={
+                        formStartOdometerValue
+                        ? t(
+                            "rides.start_odometer_value",
+                            { value: formatWithUnit(formStartOdometerValue, car?.odometer.unit.short) }
+                        )
+                        : undefined
+                    }
                     dateFieldName="endTime"
                     dateTitle={ t("rides.end") }
                     dateSubtitle={ t(

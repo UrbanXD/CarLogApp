@@ -66,8 +66,6 @@ export function useOdometerLogFormFields({
                 [formOdometerLogId]
             ));
         })();
-
-        setOdometerLimit();
     }, [formCarId, formDate, formOdometerLogId]);
 
     const fields: Record<OdometerLogFormFields, FormFields> = useMemo(() => ({

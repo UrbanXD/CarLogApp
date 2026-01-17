@@ -1,15 +1,16 @@
 import React, { ReactNode } from "react";
 import { ActivityIndicator, Image as ImageRN, ImageStyle, StyleSheet, View } from "react-native";
 import DefaultElement from "./DefaultElement";
-import { COLORS, ICON_NAMES } from "../constants/index.ts";
+import { COLORS, ICON_NAMES } from "../constants";
 import { hexToRgba } from "../utils/colors/hexToRgba";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFile } from "../database/hooks/useFile.ts";
+import { ViewStyle } from "../types/index.ts";
 
 type ImageProps = {
-    path?: string
+    path?: string | null
     alt?: string
-    imageStyle?: ImageStyle
+    imageStyle?: ImageStyle | ViewStyle
     overlay?: boolean
     attachment?: boolean
     children?: ReactNode
@@ -36,7 +37,7 @@ function Image({
                 </View>
                 : error || !source
                   ? <DefaultElement icon={ alt } style={ [styles.image, imageStyle] }/>
-                  : <ImageRN source={ { uri: source } } style={ [styles.image, imageStyle] }/>
+                  : <ImageRN source={ { uri: source } } style={ [styles.image, imageStyle as any] }/>
             }
             {
                 children &&
@@ -48,7 +49,7 @@ function Image({
                          colors={ [hexToRgba(COLORS.black, 0.15), hexToRgba(COLORS.black, 0.60)] }
                          style={ [
                              styles.imageOverlay,
-                             imageStyle?.borderRadius && { borderRadius: imageStyle.borderRadius }
+                             { borderRadius: StyleSheet.flatten(imageStyle)?.borderRadius ?? undefined }
                          ] }
                       />
                    }

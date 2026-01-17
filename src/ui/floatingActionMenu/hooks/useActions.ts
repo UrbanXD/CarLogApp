@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import { ImageSource } from "../../../types/index.ts";
 import { ICON_NAMES } from "../../../constants/index.ts";
 import { router } from "expo-router";
 import { useAlert } from "../../alert/hooks/useAlert.ts";
@@ -8,7 +7,7 @@ import { useCallback } from "react";
 import { UserDoesNotHaveCarToast } from "../../alert/presets/toast/index.ts";
 
 export type Action = {
-    icon: ImageSource
+    icon: string
     label: string
     onPress: () => void
 }

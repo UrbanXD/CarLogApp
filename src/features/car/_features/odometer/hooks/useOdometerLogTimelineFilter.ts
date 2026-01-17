@@ -7,9 +7,10 @@ import { Car } from "../../../schemas/carSchema.ts";
 import { SelectOdometerLogTableRow } from "../model/dao/OdometerLogDao.ts";
 import { TimelineFilterManagement } from "../../../../../hooks/useTimelinePaginator.ts";
 import { useTranslation } from "react-i18next";
+import { FilterCondition } from "../../../../../database/paginator/AbstractPaginator.ts";
 
 const TYPES_FILTER_KEY = "type_filter";
-const TYPES_FILTER_FIELD_NAME = "type_id";
+const TYPES_FILTER_FIELD_NAME = "type_id" as keyof SelectOdometerLogTableRow;
 
 type UseOdometerLogTimelineFilterProps = {
     timelineFilterManagement: TimelineFilterManagement<SelectOdometerLogTableRow>
@@ -55,7 +56,7 @@ export function useOdometerLogTimelineFilter({
         filters.forEach(((item, key) => {
             switch(key) {
                 case TYPES_FILTER_KEY:
-                    const ids: Array<string> = [];
+                    const ids: Array<OdometerLogType["id"]> = [];
 
                     item.filters.forEach(filter => {
                         if(filter.field === TYPES_FILTER_FIELD_NAME) ids.push(filter.value);
@@ -73,7 +74,11 @@ export function useOdometerLogTimelineFilter({
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {
         const active = selectedTypesId.includes(type.id);
-        const filter = { field: TYPES_FILTER_FIELD_NAME, operator: "=", value: type.id };
+        const filter: FilterCondition<SelectOdometerLogTableRow> = {
+            field: TYPES_FILTER_FIELD_NAME,
+            operator: "=",
+            value: type.id
+        };
         const onPress = () => {
             if(!active) {
                 addFilter({ groupKey: TYPES_FILTER_KEY, filter, logic: "OR" });

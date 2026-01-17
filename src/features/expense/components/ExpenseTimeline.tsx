@@ -72,8 +72,8 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
                 orderButtons={ orderButtons }
                 filterButtons={ filterButtons }
                 isInitialFetching={ isInitialFetching }
-                fetchNext={ initialFetchHappened && paginator.hasNext() && fetchNext }
-                fetchPrevious={ initialFetchHappened && paginator.hasPrevious() && fetchPrevious }
+                fetchNext={ initialFetchHappened && paginator.hasNext() ? fetchNext : undefined }
+                fetchPrevious={ initialFetchHappened && paginator.hasPrevious() ? fetchPrevious : undefined }
                 isNextFetching={ isNextFetching }
                 isPreviousFetching={ isPreviousFetching }
                 style={ { paddingBottom: SIMPLE_TABBAR_HEIGHT } }

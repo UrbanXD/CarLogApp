@@ -24,7 +24,7 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
     constructor(
         db: Kysely<DatabaseType>,
         storage: SupabaseStorageAdapter,
-        attachmentQueue?: PhotoAttachmentQueue,
+        attachmentQueue: PhotoAttachmentQueue | undefined,
         makeDao: MakeDao,
         modelDao: ModelDao,
         odometerLogDao: OdometerLogDao,
@@ -67,7 +67,7 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
         .where("id", "=", id)
         .executeTakeFirstOrThrow();
 
-        return result.currency_id;
+        return result.currency_id as number;
     }
 
     async getCarOwnerById(id: string): Promise<string> {
@@ -77,7 +77,7 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper> {
         .where("id", "=", id)
         .executeTakeFirstOrThrow();
 
-        return result.owner_id;
+        return result.owner_id!;
     }
 
     async getCarImagePath(id: string): Promise<string | null> {

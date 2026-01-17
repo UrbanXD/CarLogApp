@@ -29,7 +29,7 @@ export type ServiceLogViewProps = {
 export function ServiceLogView({ id }: ServiceLogViewProps) {
     const dispatch = useAppDispatch();
     const { t } = useTranslation();
-    const { serviceLogDao } = useDatabase();
+    const { serviceLogDao, odometerLogDao } = useDatabase();
     const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
     const { serviceItemToExpandableListItem } = useServiceItemToExpandableList();
@@ -54,7 +54,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
 
     const handleDelete = useCallback(async (serviceLog: ServiceLog) => {
         try {
-            const resultId = await serviceLogDao.delete(serviceLog);
+            const resultId = await serviceLogDao.deleteLog(serviceLog);
 
             let odometer: Odometer | null = null;
             if(resultId && serviceLog.odometer?.carId) odometer = await odometerLogDao.getOdometerByCarId(serviceLog.odometer.carId);
@@ -139,13 +139,13 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
             content: serviceLog?.odometer
                      ? `${ serviceLog.odometer.value } ${ serviceLog.odometer.unit.short }`
                      : t("common.not_assigned"),
-            contentTextStyle: !serviceLog?.odometer && { color: COLORS.gray2 },
+            contentTextStyle: !serviceLog?.odometer ? { color: COLORS.gray2 } : undefined,
             onPress: () => onEdit(ServiceLogFormFieldsEnum.DateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.note,
             content: serviceLog?.expense?.note ?? t("common.no_notes"),
-            contentTextStyle: !serviceLog?.expense?.note && { color: COLORS.gray2 },
+            contentTextStyle: !serviceLog?.expense?.note ? { color: COLORS.gray2 } : undefined,
             onPress: () => onEdit(ServiceLogFormFieldsEnum.Note)
         }
     ]), [car, serviceLog, isServiceItemListExpanded, getAmountSubtitle, t]);

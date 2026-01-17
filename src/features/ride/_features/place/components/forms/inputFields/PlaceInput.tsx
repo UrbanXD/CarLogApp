@@ -9,8 +9,8 @@ import { AddItemToDropdownInput } from "../../../../../../../components/Input/_p
 import { useTranslation } from "react-i18next";
 
 type PlaceInputProps = {
-    control?: Control<any>
-    fieldName?: string
+    control: Control<any>
+    fieldName: string
     title?: string
 }
 

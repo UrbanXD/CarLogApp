@@ -30,7 +30,7 @@ export function Odometer({ value, unit }: OdometerProps) {
                             <OdometerText
                                 text={ digit }
                                 containerStyle={ { alignSelf: "center" } }
-                                textStyle={ index < (value.length - DEFAULT_VALUE_LENGTH) && { opacity: 0 } }
+                                textStyle={ index < (value.length - DEFAULT_VALUE_LENGTH) ? { opacity: 0 } : undefined }
                             />
                         </View>
                     ))
@@ -62,7 +62,7 @@ const useStyles = (numberOfDigits: number, odometerContainerWidth: number) => St
     },
     digitContainer: {
         minHeight: FONT_SIZES.p1 * 2,
-        width: (odometerContainerWidth - SEPARATOR_SIZES.lightSmall * (numberOfDigits - 1)) / numberOfDigits,
+        width: (odometerContainerWidth - SEPARATOR_SIZES.lightSmall * (numberOfDigits)) / numberOfDigits,
         position: "relative",
         backgroundColor: COLORS.gray5,
         alignItems: "center",

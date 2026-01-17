@@ -40,7 +40,7 @@ export const SERVICE_COLORS = {
     DIAGNOSTICS: "#6C5CE7",
     TIRE_CHANGE: "#2ECC71",
     OTHER: "#BFBFBF"
-};
+} as const;
 
 export const SERVICE_ITEM_COLORS = {
     TRANSMISSION_FLUID: "#FF7F50",
@@ -60,7 +60,7 @@ export const SERVICE_ITEM_COLORS = {
     BRAKE_PADS: "#E74C3C",
     TIRES: "#2C3E50",
     AIR_FILTER: "#BDC3C7"
-};
+} as const;
 
 export const PRIMARY_COLOR = COLORS.white;
 export const SECONDARY_COLOR = COLORS.black2;

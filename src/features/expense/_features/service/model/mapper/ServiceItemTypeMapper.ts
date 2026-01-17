@@ -6,8 +6,18 @@ import { SERVICE_COLORS, SERVICE_ITEM_COLORS, SERVICE_ITEM_ICONS } from "../../.
 
 export class ServiceItemTypeMapper extends AbstractMapper<ServiceItemTypeTableRow, ServiceItemType> {
     async toDto(entity: ServiceItemTypeTableRow): Promise<ServiceItemType> {
-        let icon = SERVICE_ITEM_ICONS[entity.key] ?? null;
-        let primaryColor = SERVICE_ITEM_COLORS[entity.key] ?? SERVICE_COLORS.OTHER;
+        const isServiceItemIconsKey = (key: unknown): key is keyof typeof SERVICE_ITEM_ICONS => {
+            return typeof key === "string" && key in SERVICE_ITEM_ICONS;
+        };
+
+        const isServiceItemColorsKey = (key: unknown): key is keyof typeof SERVICE_ITEM_COLORS => {
+            return typeof key === "string" && key in SERVICE_ITEM_COLORS;
+        };
+
+        const icon = isServiceItemIconsKey(entity.key) ? SERVICE_ITEM_ICONS[entity.key] : null;
+        const primaryColor = isServiceItemColorsKey(entity.key)
+                             ? SERVICE_ITEM_COLORS[entity.key]
+                             : SERVICE_COLORS.OTHER;
         let secondaryColor = null;
 
         return serviceItemTypeSchema.parse({
@@ -31,7 +41,7 @@ export class ServiceItemTypeMapper extends AbstractMapper<ServiceItemTypeTableRo
     entityToPickerItem(
         entity: ServiceItemTypeTableRow,
         getTitle?: (entity: ServiceItemTypeTableRow) => string
-    ): Promise<PickerItemType> {
+    ): PickerItemType {
         return {
             value: entity.id.toString(),
             title: getTitle?.(entity) ?? entity.key

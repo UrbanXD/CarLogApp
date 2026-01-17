@@ -14,16 +14,16 @@ export type TrendOptions = {
         negative?: string
         equal?: string
     }
-    formatTrend?: (value: number) => string
+    formatTrend?: (value: number | string) => string
 }
 
-export function calculateTrend(current?: number = 0, previous?: number = 0, options?: TrendOptions = {}): Trend {
+export function calculateTrend(current: number = 0, previous: number = 0, options: TrendOptions = {}): Trend {
     const { diffFormat = "percent", trendSymbols, formatTrend } = options;
 
     const diff = numberToFractionDigit(current - previous);
     const absoluteDiff = Math.abs(diff);
 
-    let trend = 0;
+    let trend = "";
 
     if(diffFormat === "percent") {
         if(previous === 0) {
@@ -37,7 +37,7 @@ export function calculateTrend(current?: number = 0, previous?: number = 0, opti
         }
     } else {
         trend = !diffFormat
-                ? absoluteDiff
+                ? absoluteDiff.toString()
                 : absoluteDiff.toLocaleString(i18n.language, { notation: diffFormat, maximumFractionDigits: 2 });
     }
 

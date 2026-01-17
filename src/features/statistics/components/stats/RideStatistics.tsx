@@ -137,7 +137,7 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
             isPositive: null,
             isLoading: !rideSummaryStat
         };
-    });
+    }, [rideSummaryStat, t]);
 
     const getTotalRideDistance = useCallback(() => {
         return {

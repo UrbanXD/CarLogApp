@@ -1,12 +1,12 @@
 import { useCallback } from "react";
-import { ServiceItem } from "../schemas/serviceItemSchema.ts";
 import { ExpandableListItemProps } from "../../../../../components/expandableList/ExpandableListItem.tsx";
 import { useTranslation } from "react-i18next";
+import { ServiceItemFormTransformedFields } from "../schemas/form/serviceItemForm.ts";
 
 export function useServiceItemToExpandableList() {
     const { t } = useTranslation();
 
-    const serviceItemToExpandableListItem = useCallback((item: ServiceItem): ExpandableListItemProps => {
+    const serviceItemToExpandableListItem = useCallback((item: ServiceItemFormTransformedFields): ExpandableListItemProps => {
         return {
             id: item.id,
             title: t(`service.items.types.${ item.type.key }`),

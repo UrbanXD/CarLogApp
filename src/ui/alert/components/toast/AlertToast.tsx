@@ -28,7 +28,7 @@ const AlertToast: React.FC<AlertToastProps> = ({ toast }) => {
     const height = useMemo(() => (!body ? hp(5.5) : hp(7.5)), [body]);
     const [removable, setRemovable] = useState(false);
 
-    const timoutRef = useRef<NodeJS.Timeout>();
+    const timoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const styles = useStyles(type, height);
     const animatedStyle = useAnimatedStyle(() => {
@@ -66,13 +66,15 @@ const AlertToast: React.FC<AlertToastProps> = ({ toast }) => {
 
     const dismissWithPress = () => {
         setRemovable(true);
-        clearTimeout(timoutRef.current);
+        if(timoutRef.current) clearTimeout(timoutRef.current);
     };
 
     useEffect(() => {
         startAnimation();
 
-        return () => clearTimeout(timoutRef.current);
+        return () => {
+            if(timoutRef.current) clearTimeout(timoutRef.current);
+        };
     }, []);
 
     useEffect(() => {

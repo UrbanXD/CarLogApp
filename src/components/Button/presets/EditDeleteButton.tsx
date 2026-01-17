@@ -1,10 +1,11 @@
-import { StyleSheet, ViewStyle } from "react-native";
+import { StyleSheet } from "react-native";
 import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import React from "react";
 import { DeleteButton } from "./DeleteButton.tsx";
 import { useTranslation } from "react-i18next";
 import ButtonsRow from "../ButtonsRow.tsx";
 import TextButton from "../TextButton.tsx";
+import { ViewStyle } from "../../../types/index.ts";
 
 type EditDeleteButton = {
     deleteIcon?: string

@@ -58,7 +58,7 @@ export function OdometerValueInput({
                         dayjs(odometerLimit.min.date).isValid()
                         ?
                         t(
-                            "odometer.limit",
+                            "odometer.min_limit",
                             {
                                 value: formatWithUnit(odometerLimit.min.value, odometerLimit.unitText),
                                 date: dayjs(odometerLimit.min.date).format("L")
@@ -66,7 +66,7 @@ export function OdometerValueInput({
                         )
                         :
                         t(
-                            "odometer.limit_without_date",
+                            "odometer.min_limit_without_date",
                             { value: formatWithUnit(odometerLimit.min.value, odometerLimit.unitText) }
                         );
                 }
@@ -76,7 +76,7 @@ export function OdometerValueInput({
                         dayjs(odometerLimit.max.date).isValid()
                         ?
                         t(
-                            "odometer.limit",
+                            "odometer.max_limit",
                             {
                                 value: formatWithUnit(odometerLimit.max.value, odometerLimit.unitText),
                                 date: dayjs(odometerLimit.max.date).format("L")
@@ -84,7 +84,7 @@ export function OdometerValueInput({
                         )
                         :
                         t(
-                            "odometer.limit_without_date",
+                            "odometer.max_limit_without_date",
                             { value: formatWithUnit(odometerLimit.max.value, odometerLimit.unitText) }
                         );
 

@@ -22,19 +22,19 @@ export function DatePickerHeader({ title, showTimestamps }: DatePickerHeaderProp
         view.value = currentView;
     }, [currentView]);
 
-    const dateArrowRotate = useDerivedValue(() =>
-        withTiming(view.value === "wheel_picker" ? -180 : 0, { duration: 200 })
+    const leftDateArrowRotate = useDerivedValue(() =>
+        withTiming(view.value === "start_date_picker" ? -180 : 0, { duration: 200 })
     );
-    const timeArrowRotate = useDerivedValue(() =>
-        withTiming(view.value === "time" ? -180 : 0, { duration: 200 })
+    const rightDateArrowRotate = useDerivedValue(() =>
+        withTiming(view.value === "time" || view.value === "end_date_picker" ? -180 : 0, { duration: 200 })
     );
 
-    const dateArrowStyle = useAnimatedStyle(() => ({
-        transform: [{ rotate: `${ dateArrowRotate.value }deg` }]
+    const leftDateArrowStyle = useAnimatedStyle(() => ({
+        transform: [{ rotate: `${ leftDateArrowRotate.value }deg` }]
     }));
 
-    const timeArrowStyle = useAnimatedStyle(() => ({
-        transform: [{ rotate: `${ timeArrowRotate.value }deg` }]
+    const rightDateArrowStyle = useAnimatedStyle(() => ({
+        transform: [{ rotate: `${ rightDateArrowRotate.value }deg` }]
     }));
 
     const onPressStartDateSelector = () => openView(
@@ -45,7 +45,7 @@ export function DatePickerHeader({ title, showTimestamps }: DatePickerHeaderProp
     const onPressEndDateSelector = () => openView(currentView === "end_date_picker" ? "calendar" : "end_date_picker");
     const onPressTimeSelector = () => openView(currentView === "time" ? "calendar" : "time");
 
-    const getRangeLabel = (value: number, unit: dayjs.ManipulateType) => {
+    const getRangeLabel = (value: number, unit: dayjs.QUnitType) => {
         return dayjs().to(dayjs().subtract(value, unit), true);
     };
 
@@ -55,16 +55,16 @@ export function DatePickerHeader({ title, showTimestamps }: DatePickerHeaderProp
 
         switch(type) {
             case "year":
-                setStartDate(now.subtract(1, "year"));
+                setStartDate(now.subtract(1, "year").toDate());
                 break;
             case "halfYear":
-                setStartDate(now.subtract(6, "month"));
+                setStartDate(now.subtract(6, "month").toDate());
                 break;
             case "quarter":
-                setStartDate(now.subtract(1, "quarter"));
+                setStartDate(now.subtract(1, "quarter").toDate());
                 break;
             case "month":
-                setStartDate(now.subtract(1, "month"));
+                setStartDate(now.subtract(1, "month").toDate());
         }
     };
 
@@ -87,7 +87,7 @@ export function DatePickerHeader({ title, showTimestamps }: DatePickerHeaderProp
                      <Text style={ styles.label }>
                          { startDate ? dayjs(startDate).format("L") : t("form.date_picker.date_placeholder") }
                      </Text>
-                     <Animated.View style={ dateArrowStyle }>
+                     <Animated.View style={ leftDateArrowStyle }>
                         <Icon
                            icon={ ICON_NAMES.downArrowHead }
                            size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
@@ -106,7 +106,7 @@ export function DatePickerHeader({ title, showTimestamps }: DatePickerHeaderProp
                      <Text numberOfLines={ 1 } adjustsFontSizeToFit style={ styles.label }>
                          { endDate ? dayjs(endDate).format("L") : t("form.date_picker.date_placeholder") }
                      </Text>
-                     <Animated.View style={ timeArrowStyle }>
+                     <Animated.View style={ rightDateArrowStyle }>
                         <Icon
                            icon={ ICON_NAMES.downArrowHead }
                            size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
@@ -127,7 +127,7 @@ export function DatePickerHeader({ title, showTimestamps }: DatePickerHeaderProp
                      />
                      <Text style={ styles.label }>{ startDate ? dayjs(startDate).format("L") : t(
                          "form.date_picker.date_placeholder") }</Text>
-                     <Animated.View style={ dateArrowStyle }>
+                     <Animated.View style={ leftDateArrowStyle }>
                         <Icon
                            icon={ ICON_NAMES.downArrowHead }
                            size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
@@ -146,7 +146,7 @@ export function DatePickerHeader({ title, showTimestamps }: DatePickerHeaderProp
                      <Text numberOfLines={ 1 } adjustsFontSizeToFit style={ styles.label }>
                          { startDate ? dayjs(startDate).format("LT") : t("form.date_picker.date_placeholder") }
                      </Text>
-                     <Animated.View style={ timeArrowStyle }>
+                     <Animated.View style={ rightDateArrowStyle }>
                         <Icon
                            icon={ ICON_NAMES.downArrowHead }
                            size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }

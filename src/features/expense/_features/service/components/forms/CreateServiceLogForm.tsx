@@ -4,7 +4,7 @@ import { useBottomSheet } from "../../../../../../ui/bottomSheet/contexts/Bottom
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import useCars from "../../../../../car/hooks/useCars.ts";
 import { FormState, useForm } from "react-hook-form";
-import { ServiceLogFields, useCreateServiceLogFormProps } from "../../schemas/form/serviceLogForm.ts";
+import { ServiceLogFormFields, useCreateServiceLogFormProps } from "../../schemas/form/serviceLogForm.ts";
 import { updateCarOdometer } from "../../../../../car/model/slice/index.ts";
 import MultiStepForm from "../../../../../../components/Form/MultiStepForm.tsx";
 import React from "react";
@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 import { SubmitHandlerArgs } from "../../../../../../types/index.ts";
 
 type CreateServiceLogFormProps = {
-    onFormStateChange?: (formState: FormState<ServiceLogFields>) => void
+    onFormStateChange?: (formState: FormState<ServiceLogFormFields>) => void
 }
 
 export function CreateServiceLogForm({ onFormStateChange }: CreateServiceLogFormProps) {
@@ -25,10 +25,10 @@ export function CreateServiceLogForm({ onFormStateChange }: CreateServiceLogForm
     const { serviceLogDao } = useDatabase();
     const { selectedCar } = useCars();
 
-    const form = useForm<ServiceLogFields>(useCreateServiceLogFormProps(selectedCar));
+    const form = useForm<ServiceLogFormFields, any, ServiceLogFormFields>(useCreateServiceLogFormProps(selectedCar));
     const { multiStepFormSteps } = useServiceLogFormFields(form);
 
-    const submitHandler: SubmitHandlerArgs<ServiceLogFields> = {
+    const submitHandler: SubmitHandlerArgs<ServiceLogFormFields> = {
         onValid: async (formResult) => {
             try {
                 const result = await serviceLogDao.create(formResult);

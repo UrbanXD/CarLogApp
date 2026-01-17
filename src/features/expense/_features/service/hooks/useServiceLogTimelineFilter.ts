@@ -6,9 +6,10 @@ import { Car } from "../../../../car/schemas/carSchema.ts";
 import { ExpenseTableRow, ServiceLogTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
 import { TimelineFilterManagement } from "../../../../../hooks/useTimelinePaginator.ts";
 import { useTranslation } from "react-i18next";
+import { FilterCondition } from "../../../../../database/paginator/AbstractPaginator.ts";
 
 const TYPES_FILTER_KEY = "type_filter";
-const TYPES_FILTER_FIELD_NAME = "service_type_id";
+const TYPES_FILTER_FIELD_NAME = "service_type_id" as keyof (ExpenseTableRow & ServiceLogTableRow);
 
 type UseServiceLogTimelineFilterProps = {
     timelineFilterManagement: TimelineFilterManagement<ExpenseTableRow & ServiceLogTableRow>,
@@ -69,7 +70,11 @@ export function useServiceLogTimelineFilter({
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {
         const active = selectedTypesId.includes(type.id);
-        const filter = { field: TYPES_FILTER_FIELD_NAME, operator: "=", value: type.id };
+        const filter: FilterCondition<ExpenseTableRow & ServiceLogTableRow> = {
+            field: TYPES_FILTER_FIELD_NAME,
+            operator: "=",
+            value: type.id
+        };
         const onPress = () => {
             if(!active) {
                 addFilter({ groupKey: TYPES_FILTER_KEY, filter, logic: "OR" });

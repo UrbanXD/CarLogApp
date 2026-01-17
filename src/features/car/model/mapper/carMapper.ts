@@ -31,16 +31,16 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
         super();
     }
 
-    async toDto(entity: CarTableRow): Promise<Car | null> {
+    async toDto(entity: CarTableRow): Promise<Car> {
         const model = await this.modelDao.getById(entity.model_id);
-        const carModel = await this.modelDao.mapper.toCarModelDto(model, entity.model_year);
+        const carModel = model ? await this.modelDao.mapper.toCarModelDto(model, entity.model_year!) : null;
 
         const fuelTank = await this.fuelTankDao.getByCarId(entity.id);
         const odometer = await this.odometerLogDao.getOdometerByCarId(entity.id);
 
         const currency = await this.currencyDao.getById(entity.currency_id);
 
-        const { data } = carSchema.safeParse({
+        return carSchema.parse({
             id: entity.id,
             ownerId: entity.owner_id,
             name: entity.name,
@@ -51,10 +51,6 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
             imagePath: entity.image_url,
             createdAt: entity.created_at
         });
-
-        if(!data) return null;
-
-        return data;
     }
 
     async toEntity(dto: Car): Promise<CarTableRow> {
@@ -62,12 +58,12 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
             id: dto.id,
             owner_id: dto.ownerId,
             name: dto.name,
-            odometer_unit_id: dto.odometer.unit,
+            odometer_unit_id: dto.odometer.unit.id,
             currency_id: dto.currency.id,
             model_id: dto.model.id,
             model_year: dto.model.year,
             created_at: dto.createdAt,
-            image_url: dto.image?.fileName ?? null
+            image_url: dto.imagePath ?? null
         };
     }
 
@@ -81,7 +77,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
         odometerChangeLog: OdometerChangeLogTableRow | null,
         fuelTank: FuelTankTableRow
     }> {
-        const odometerUnit = await this.odometerUnitDao.getById(request.odometer.unitId);
+        const odometerUnit = (await this.odometerUnitDao.getById(request.odometer.unitId))!;
 
         let path = request?.image?.fileName ?? null;
 
@@ -102,7 +98,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
             model_id: request.model.id,
             model_year: request.model.year,
             image_url: path ?? null,
-            created_at: createdAt
+            created_at: createdAt ?? request.createdAt
         };
 
         const odometerLog: OdometerLogTableRow = {
@@ -116,10 +112,10 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
         if(request.odometer.odometerChangeLogId) {
             odometerChangeLog = {
                 id: request.odometer.odometerChangeLogId,
-                owner_id: request.ownerId,
+                car_id: request.id,
                 odometer_log_id: odometerLog.id,
                 note: null,
-                date: createdAt
+                date: createdAt ?? car.created_at
             };
         }
 

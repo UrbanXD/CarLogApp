@@ -18,6 +18,6 @@ type DatePickerContextValue = {
     submit: () => void
 }
 
-export const DatePickerContext = createContext<DropdownPickerContextValue | null>(null);
+export const DatePickerContext = createContext<DatePickerContextValue | null>(null);
 
 export const useDatePicker = () => useContext<DatePickerContextValue>(DatePickerContext as Context<DatePickerContextValue>);

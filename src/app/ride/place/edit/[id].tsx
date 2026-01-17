@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 
 function Page() {
     const { t } = useTranslation();
-    const { id } = useLocalSearchParams();
+    const { id } = useLocalSearchParams<{ id?: string }>();
     const { placeDao } = useDatabase();
     const { openToast } = useAlert();
 

@@ -48,7 +48,7 @@ export function PassengerScreen() {
 
     const openCreateForm = () => router.push("/ride/passenger/create");
 
-    const onEdit = useCallback((id: string, callback?: () => void) => {
+    const onEdit = useCallback((id: string | number, callback?: () => void) => {
         if(!id) return openToast(NotFoundToast.warning(t("passengers.title_singular")));
 
         callback?.();
@@ -58,7 +58,7 @@ export function PassengerScreen() {
         });
     }, [openToast, t]);
 
-    const handleDelete = useCallback(async (id: string, callback?: () => void) => {
+    const handleDelete = useCallback(async (id: string | number, callback?: () => void) => {
         if(!id) return openToast(NotFoundToast.warning(t("passengers.title_singular")));
 
         try {
@@ -76,7 +76,7 @@ export function PassengerScreen() {
         }
     }, [passengerDao, openToast, t]);
 
-    const onDelete = useCallback((id: string, callback?: () => void) => {
+    const onDelete = useCallback((id: string | number, callback?: () => void) => {
         openModal(DeleteModal({
             name: t("passengers.title_singular"),
             acceptAction: () => handleDelete(id, callback)
@@ -92,8 +92,8 @@ export function PassengerScreen() {
                 onEdit={ onEdit }
                 onDelete={ onDelete }
                 isInitialFetching={ isInitialFetching }
-                fetchNext={ initialFetchHappened && paginator.hasNext() && fetchNext }
-                fetchPrevious={ initialFetchHappened && paginator.hasPrevious() && fetchPrevious }
+                fetchNext={ (initialFetchHappened && paginator.hasNext()) ? fetchNext : undefined }
+                fetchPrevious={ (initialFetchHappened && paginator.hasPrevious()) ? fetchPrevious : undefined }
                 isNextFetching={ isNextFetching }
                 isPreviousFetching={ isPreviousFetching }
             />

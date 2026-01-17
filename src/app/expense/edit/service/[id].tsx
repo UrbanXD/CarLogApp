@@ -7,9 +7,14 @@ import {
     EditServiceLogBottomSheet
 } from "../../../../features/expense/_features/service/presets/bottomSheet/EditServiceLogBottomSheet.tsx";
 import { NotFoundToast } from "../../../../ui/alert/presets/toast/index.ts";
+import {
+    ServiceLogFormFieldsEnum
+} from "../../../../features/expense/_features/service/enums/ServiceLogFormFieldsEnum.ts";
+import { useTranslation } from "react-i18next";
 
 function Page() {
-    const { id, field } = useLocalSearchParams();
+    const { id, field } = useLocalSearchParams<{ id?: string, field?: string }>();
+    const { t } = useTranslation();
     const { serviceLogDao } = useDatabase();
     const { openToast } = useAlert();
 
@@ -33,9 +38,11 @@ function Page() {
         })();
     }, [id, field]);
 
-    if(!serviceLog || !field) return <></>;
+    const fieldIndex = field ? Number(field) : NaN;
+    const isValidField = !isNaN(fieldIndex) && fieldIndex in ServiceLogFormFieldsEnum;
+    if(!serviceLog || !isValidField) return null;
 
-    return <EditServiceLogBottomSheet serviceLog={ serviceLog } field={ field }/>;
+    return <EditServiceLogBottomSheet serviceLog={ serviceLog } field={ fieldIndex }/>;
 }
 
 export default Page;

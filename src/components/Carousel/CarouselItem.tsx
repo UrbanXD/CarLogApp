@@ -1,10 +1,11 @@
 import React, { ReactElement } from "react";
-import { StyleSheet, Text, View, ViewStyle } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
-import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../constants";
 import { CarouselItemType } from "./Carousel";
 import Image from "../Image";
-import { AnimatedPressable } from "../AnimatedComponents/index.ts";
+import { AnimatedPressable } from "../AnimatedComponents";
+import { ViewStyle } from "../../types";
 
 type CarouselItemProps = {
     index: number
@@ -44,7 +45,6 @@ function CarouselItem({
     return (
         <AnimatedPressable
             key={ item.id }
-            activeOpacity={ 1 }
             style={ [{ width: size }, containerStyle] }
             onPress={ cardAction }
             disabled={ !cardAction }

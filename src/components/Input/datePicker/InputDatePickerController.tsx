@@ -20,8 +20,8 @@ export function InputDatePickerController({ date, mode, open }: InputDatePickerC
 
     const is12HourFormat = dayjs().localeData().longDateFormat("LT").includes("A");
 
-    const onPressDate = useCallback(() => open("calendar"));
-    const onPressTime = useCallback(() => open("time"));
+    const onPressDate = useCallback(() => open("calendar"), [open]);
+    const onPressTime = useCallback(() => open("time"), [open]);
 
     const styles = useStyles(is12HourFormat);
 
@@ -48,31 +48,34 @@ export function InputDatePickerController({ date, mode, open }: InputDatePickerC
                     }
                 </Text>
             </Pressable>
-            {
-                mode === "single" &&
-               <>
-                  <Divider isVertical size={ formTheme.containerHeight } color={ formTheme.activeColor }/>
-                  <Pressable
-                     onPress={ onPressTime }
-                     style={ [styles.container, styles.timeContainer] }
-                  >
-                     <Text
-                        numberOfLines={ 1 }
-                        adjustsFontSizeToFit
-                        style={ [styles.text, !date && styles.placeholder] }
-                     >
-                         {
-                             date
-                             ? dayjs(date).format("LT")
-                             : t("form.date_picker.time_placeholder")
-                         }
-                     </Text>
-                     <View style={ styles.iconContainer }>
-                        <Icon icon={ ICON_NAMES.clock } size={ formTheme.iconSize } color={ formTheme.valueTextColor }/>
-                     </View>
-                  </Pressable>
-               </>
-            }
+            <>
+                {
+                    mode === "single" &&
+                   <>
+                      <Divider isVertical size={ formTheme.containerHeight } color={ formTheme.activeColor }/>
+                      <Pressable
+                         onPress={ onPressTime }
+                         style={ [styles.container, styles.timeContainer] }
+                      >
+                         <Text
+                            numberOfLines={ 1 }
+                            adjustsFontSizeToFit
+                            style={ [styles.text, !date && styles.placeholder] }
+                         >
+                             {
+                                 date
+                                 ? dayjs(date[0]).format("LT")
+                                 : t("form.date_picker.time_placeholder")
+                             }
+                         </Text>
+                         <View style={ styles.iconContainer }>
+                            <Icon icon={ ICON_NAMES.clock } size={ formTheme.iconSize }
+                                  color={ formTheme.valueTextColor }/>
+                         </View>
+                      </Pressable>
+                   </>
+                }
+            </>
         </InputRow>
     );
 }

@@ -1,18 +1,9 @@
 import React, { useMemo, useState } from "react";
-import {
-    ActivityIndicator,
-    Platform,
-    StyleSheet,
-    Text,
-    TextStyle,
-    TouchableOpacity,
-    View,
-    ViewStyle
-} from "react-native";
+import { ActivityIndicator, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
 import Icon from "../Icon";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
-import { Color, ImageSource } from "../../types/index.ts";
+import { Color, ImageSource, TextStyle, ViewStyle } from "../../types/index.ts";
 import { debounce } from "es-toolkit";
 import { useTranslation } from "react-i18next";
 

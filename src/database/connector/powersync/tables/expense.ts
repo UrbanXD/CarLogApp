@@ -1,6 +1,6 @@
 import { column, Table } from "@powersync/react-native";
 
-export const EXPENSE_TABLE = "expense";
+export const EXPENSE_TABLE = "expense" as const;
 
 export const expenseTable = new Table({
     id: column.text,

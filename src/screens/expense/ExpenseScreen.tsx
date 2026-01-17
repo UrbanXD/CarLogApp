@@ -10,7 +10,7 @@ import useCars from "../../features/car/hooks/useCars.ts";
 import dayjs from "dayjs";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { InfoContainer } from "../../components/info/InfoContainer.tsx";
-import { ExpenseFormFields } from "../../features/expense/enums/expenseFormFields.ts";
+import { ExpenseFormFieldsEnum } from "../../features/expense/enums/expenseFormFieldsEnum.ts";
 import { InfoRowProps } from "../../components/info/InfoRow.tsx";
 import { FloatingDeleteButton } from "../../components/Button/presets/FloatingDeleteButton.tsx";
 import { AmountText } from "../../components/AmountText.tsx";
@@ -20,7 +20,7 @@ import { DeleteModal } from "../../ui/alert/presets/modal/index.ts";
 
 export function ExpenseScreen() {
     const { t } = useTranslation();
-    const { id } = useLocalSearchParams();
+    const { id } = useLocalSearchParams<{ id: string }>();
     const { expenseDao } = useDatabase();
     const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
@@ -70,7 +70,7 @@ export function ExpenseScreen() {
         return subtitle;
     }, [expense, t]);
 
-    const onEdit = useCallback((field?: ExpenseFormFields) => {
+    const onEdit = useCallback((field?: ExpenseFormFieldsEnum) => {
         if(!expense) return openToast(NotFoundToast.warning(t("expenses.title_singular")));
 
         router.push({
@@ -84,32 +84,38 @@ export function ExpenseScreen() {
             icon: ICON_NAMES.car,
             title: car?.name,
             content: `${ car?.model.make.name } ${ car?.model.name }`,
-            onPress: () => onEdit(ExpenseFormFields.Car)
+            onPress: () => onEdit(ExpenseFormFieldsEnum.Car)
         },
         {
             icon: ICON_NAMES.money,
             title: t("currency.price"),
-            content: (textStyle) => expense &&
-               <AmountText
-                  amount={ expense.amount.amount }
-                  currencyText={ expense.amount.currency.symbol }
-                  exchangedAmount={ expense.amount.exchangedAmount }
-                  exchangeCurrencyText={ expense.amount.exchangeCurrency.symbol }
-                  amountTextStyle={ textStyle ? [...textStyle, { textAlign: "left" }] : { textAlign: "left" } }
-               />,
-            onPress: () => onEdit(ExpenseFormFields.Amount)
+            content: (textStyle) => expense
+                                    ?
+                                    <AmountText
+                                        amount={ expense.amount.amount }
+                                        currencyText={ expense.amount.currency.symbol }
+                                        exchangedAmount={ expense.amount.exchangedAmount }
+                                        exchangeCurrencyText={ expense.amount.exchangeCurrency.symbol }
+                                        amountTextStyle={
+                                            textStyle
+                                            ? [textStyle, { textAlign: "left" as const }].flat()
+                                            : { textAlign: "left" as const }
+                                        }
+                                    />
+                                    : <></>,
+            onPress: () => onEdit(ExpenseFormFieldsEnum.Amount)
         },
         {
             icon: ICON_NAMES.calendar,
             title: t("date.text"),
             content: dayjs(expense?.date).format("LLL"),
-            onPress: () => onEdit(ExpenseFormFields.Date)
+            onPress: () => onEdit(ExpenseFormFieldsEnum.Date)
         },
         {
             icon: ICON_NAMES.note,
             content: expense?.note ?? t("common.no_notes"),
-            contentTextStyle: !expense?.note && { color: COLORS.gray2 },
-            onPress: () => onEdit(ExpenseFormFields.Note)
+            contentTextStyle: !expense?.note ? { color: COLORS.gray2 } : undefined,
+            onPress: () => onEdit(ExpenseFormFieldsEnum.Note)
         }
     ]), [car, expense, getAmountSubtitle, t]);
 

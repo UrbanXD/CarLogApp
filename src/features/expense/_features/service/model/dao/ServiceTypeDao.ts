@@ -12,7 +12,7 @@ export class ServiceTypeDao extends Dao<ServiceTypeTableRow, ServiceType, Servic
         super(db, SERVICE_TYPE_TABLE, new ServiceTypeMapper());
     }
 
-    async getIdByKey(key: string, safe?: boolean = true): Promise<string | null> {
+    async getIdByKey(key: string, safe: boolean = true): Promise<string | null> {
         const result = await this.db
         .selectFrom(SERVICE_TYPE_TABLE)
         .select("id")

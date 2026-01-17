@@ -2,9 +2,9 @@ import { RidePassengerTableRow } from "../../../../../../database/connector/powe
 import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
 import { RidePassenger, ridePassengerSchema } from "../../schemas/ridePassengerSchema.ts";
 
-export type SelectRidePassengerTableRow = RidePassengerTableRow & { name: string };
+export type SelectRidePassengerTableRow = RidePassengerTableRow & { name: string | null };
 
-export class RidePassengerMapper extends AbstractMapper<SelectRidePassengerTableRow, RidePassenger> {
+export class RidePassengerMapper extends AbstractMapper<RidePassengerTableRow, RidePassenger, SelectRidePassengerTableRow> {
     async toDto(entity: SelectRidePassengerTableRow): Promise<RidePassenger> {
         return ridePassengerSchema.parse({
             id: entity.id,
@@ -16,13 +16,12 @@ export class RidePassengerMapper extends AbstractMapper<SelectRidePassengerTable
         });
     }
 
-    toEntity(dto: RidePassenger): RidePassengerTableRow {
+    async toEntity(dto: RidePassenger): Promise<RidePassengerTableRow> {
         return {
             id: dto.id,
             owner_id: dto.ownerId,
             ride_log_id: dto.rideLogId,
             passenger_id: dto.passengerId,
-            name: dto.name,
             passenger_order: dto.order
         };
     }

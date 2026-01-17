@@ -39,7 +39,6 @@ export function ExpenseTypeInput({
         setExpenseTypes(
             expenseTypeDao.mapper.dtoToPicker({
                 dtos: rawExpenseTypes,
-                getControllerTitle: (dto) => dto.symbol,
                 getTitle: (dto) => t(`expenses.types.${ dto.key }`)
             })
         );

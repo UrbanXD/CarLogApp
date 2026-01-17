@@ -6,7 +6,7 @@ import { FormBottomSheet } from "../../../../../../ui/bottomSheet/presets/FormBo
 
 export function CreateOdometerLogBottomSheet() {
     const { t } = useTranslation();
-    const { carId } = useLocalSearchParams();
+    const { carId } = useLocalSearchParams<{ carId?: string }>();
 
     const TITLE = t("odometer.create");
     const CONTENT = <CreateOdometerChangeLogForm defaultCarId={ carId }/>;

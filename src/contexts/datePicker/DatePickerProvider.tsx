@@ -5,7 +5,7 @@ import { DatePickerContext, DatePickerViews } from "./DatePickerContext.ts";
 import { MAX_DATE, MIN_DATE } from "../../constants/index.ts";
 
 export type DatePickerProviderProps = {
-    children: ReactElement
+    children: ReactElement | Array<ReactElement>;
     mode?: "single" | "range"
     initialStartDate?: DateType
     initialEndDate?: DateType

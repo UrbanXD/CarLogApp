@@ -45,8 +45,8 @@ export class Database {
     supabaseConnector: SupabaseConnector;
     storage: SupabaseStorageAdapter;
     attachmentQueue?: PhotoAttachmentQueue;
-    private initPromise = null;
-    private readonly syncSeedDatabase = false;
+    private initPromise: Promise<void> | null = null;
+    private readonly syncSeedDatabase: boolean = false;
     private _userDao?: UserDao;
     private _carDao?: CarDao;
     private _makeDao?: MakeDao;
@@ -108,7 +108,7 @@ export class Database {
                 schema: AppSchema,
                 database: { dbFilename: BaseConfig.MAIN_DATABASE_NAME }
             });
-            const db = wrapPowerSyncWithKysely(powersync);
+            const db = wrapPowerSyncWithKysely<DatabaseType>(powersync);
             const supabaseConnector = new SupabaseConnector(supabaseClient);
             const storage = supabaseConnector.storage;
 
@@ -197,11 +197,11 @@ export class Database {
 
             const newFile = new File(Paths.document.uri, SEED_DATABASE_NAME);
             const file = await File.downloadFileAsync(seedDatabaseUrl, newFile, { idempotent: true });
-            if(file.exists && file.info().size > 0) {
+            if(file.exists && (file.info()?.size ?? 0) > 0) {
                 syncSeedDatabase = true;
                 await AsyncStorage.setItem(
                     BaseConfig.LOCAL_STORAGE_KEY_GLOBAL_SEED_DB_LAST_MODIFICATION,
-                    dayjs(file.info().modificationTime).toISOString()
+                    dayjs(file.info()?.modificationTime).toISOString()
                 );
             }
         }

@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { ReactElement, useCallback, useEffect, useRef, useState } from "react";
 import PickerItem, { PickerItemType } from "../PickerItem.tsx";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
-import { ListRenderItemInfo, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP, heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { FlashList, FlashListRef } from "@shopify/flash-list";
+import { FlashList, FlashListRef, ListRenderItem } from "@shopify/flash-list";
 import { useTranslation } from "react-i18next";
 
 type DropdownPickerElementsProps = {
@@ -60,13 +60,13 @@ function DropdownPickerItems({
     }, [listReady, selectedItem]);
 
     const onStartReached = useCallback(() => {
-        if((flashListRef.current.getAbsoluteLastScrollOffset() === 0 && selectedItem) || !fetchingEnabled) return;
+        if((flashListRef.current?.getAbsoluteLastScrollOffset() === 0 && selectedItem) || !fetchingEnabled || !fetchByScrolling) return;
 
         fetchByScrolling("prev");
     }, [fetchingEnabled, selectedItem, fetchByScrolling]);
 
     const onEndReached = useCallback(() => {
-        if(!fetchingEnabled) return;
+        if(!fetchingEnabled || !fetchByScrolling) return;
 
         fetchByScrolling("next");
     }, [fetchingEnabled, fetchByScrolling]);
@@ -80,10 +80,11 @@ function DropdownPickerItems({
         []
     );
 
-    const renderItem = useCallback(
-        ({ item, index }: ListRenderItemInfo<PickerItemType>) => {
+    const renderItem: ListRenderItem<PickerItemType> = useCallback(
+        ({ item, index }) => {
             const gap = SEPARATOR_SIZES.lightSmall;
-            const marginLeft = ((index % numColumns) / (numColumns - 1)) * gap;
+            const columns = numColumns ?? 1;
+            const marginLeft = ((index % columns) / (columns - 1)) * gap;
             const marginRight = gap - marginLeft;
 
             return (
@@ -93,7 +94,7 @@ function DropdownPickerItems({
                     selected={ item.value === selectedItem?.value }
                     style={ [
                         { paddingVertical: SEPARATOR_SIZES.lightSmall },
-                        masonry && { marginLeft, marginRight }
+                        masonry ? { marginLeft, marginRight } : {}
                     ] }
                 />
             );

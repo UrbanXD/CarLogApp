@@ -1,7 +1,8 @@
 import { ScrollView } from "react-native-gesture-handler";
 import { ReactNode } from "react";
 import { SEPARATOR_SIZES } from "../../constants/index.ts";
-import { StyleSheet, ViewStyle } from "react-native";
+import { StyleSheet } from "react-native";
+import { ViewStyle } from "../../types/index.ts";
 
 type TimelineFilterRowProps = {
     children: ReactNode

@@ -3,14 +3,14 @@ import { ExpenseTypeDao } from "../dao/ExpenseTypeDao.ts";
 import { Expense, expenseSchema } from "../../schemas/expenseSchema.ts";
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
 import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
-import { ExpenseFields } from "../../schemas/form/expenseForm.ts";
+import { ExpenseFormFields } from "../../schemas/form/expenseForm.ts";
 import { ExpenseType } from "../../schemas/expenseTypeSchema.ts";
 import { Currency } from "../../../_shared/currency/schemas/currencySchema.ts";
 import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
 import { amountSchema } from "../../../_shared/currency/schemas/amountSchema.ts";
 
 export type SelectExpenseTableRow = ExpenseTableRow & {
-    related_id: string,
+    related_id: string | null,
     car_currency_id: CarTableRow["currency_id"]
 }
 
@@ -38,9 +38,9 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, Sele
             relatedId: entity?.related_id ?? null,
             type: type,
             amount: amountSchema.parse({
-                amount: numberToFractionDigit(entity.original_amount),
-                exchangedAmount: numberToFractionDigit(entity.original_amount * entity.exchange_rate),
-                exchangeRate: numberToFractionDigit(entity.exchange_rate),
+                amount: numberToFractionDigit(entity.original_amount ?? 0),
+                exchangedAmount: numberToFractionDigit((entity.original_amount ?? 0) * (entity.exchange_rate ?? 0)),
+                exchangeRate: numberToFractionDigit(entity.exchange_rate ?? 0),
                 currency: currency,
                 exchangeCurrency: carCurrency
             }),
@@ -63,7 +63,7 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, Sele
         };
     }
 
-    formResultToEntity(formResult: ExpenseFields): ExpenseTableRow {
+    formResultToEntity(formResult: ExpenseFormFields): ExpenseTableRow {
         return {
             id: formResult.id,
             car_id: formResult.carId,

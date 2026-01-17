@@ -3,7 +3,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 
 export function FuelScreen() {
-    const { id } = useLocalSearchParams();
+    const { id } = useLocalSearchParams<{ id?: string }>();
 
     useEffect(() => {
         if(!id) {
@@ -12,7 +12,7 @@ export function FuelScreen() {
         }
     }, [id]);
 
-    if(!id) return <></>;
+    if(!id) return null;
 
     return <FuelLogView id={ id }/>;
 }

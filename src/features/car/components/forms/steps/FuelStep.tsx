@@ -7,9 +7,9 @@ import { FuelTankCapacityInput } from "../../../_features/fuel/components/forms/
 import { useTranslation } from "react-i18next";
 import { FuelTypeInput } from "../../../_features/fuel/components/forms/inputFields/FuelTypeInput.tsx";
 
-type FuelStepProps<FormFields> = Pick<StepProps<FormFields>, "control">
+type FuelStepProps = Pick<StepProps<CarFormFields>, "control">
 
-function FuelStep<FormFields = CarFormFields>({ control }: FuelStepProps<FormFields>) {
+function FuelStep({ control }: FuelStepProps) {
     const { t } = useTranslation();
 
     return (

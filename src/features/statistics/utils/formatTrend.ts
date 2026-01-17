@@ -1,7 +1,7 @@
 type FormatTrendArgs = {
-    trend?: string | number | null
+    trend?: string | null
     trendSymbol?: string
-    customFormat?: (trend: string | number, trendSymbol?: string) => string
+    customFormat?: (trend: string, trendSymbol?: string) => string
 }
 
 export function formatTrend({ trend, trendSymbol, customFormat }: FormatTrendArgs): string | null {

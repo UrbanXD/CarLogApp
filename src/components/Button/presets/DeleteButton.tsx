@@ -1,7 +1,7 @@
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import React from "react";
-import { ViewStyle } from "react-native";
 import IconButton from "../IconButton.tsx";
+import { ViewStyle } from "../../../types/index.ts";
 
 export type DeleteButtonProps = {
     icon?: string

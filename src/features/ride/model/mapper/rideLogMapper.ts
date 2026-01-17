@@ -56,11 +56,11 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
                 (async () => this.ridePlaceDao.getAllByRideLogId(entity.id))(),
                 (async () => this.ridePassengerDao.getAllByRideLogId(entity.id))(),
                 (async () => {
-                    if(!entity.start_odometer_log_id) return null;
+                    if(!entity.start_odometer_log_id || !entity.car_id) return null;
                     return this.odometerLogDao.getOdometerByLogId(entity.start_odometer_log_id, entity.car_id);
                 })(),
                 (async () => {
-                    if(!entity.end_odometer_log_id) return null;
+                    if(!entity.end_odometer_log_id || !entity.car_id) return null;
                     return this.odometerLogDao.getOdometerByLogId(entity.end_odometer_log_id, entity.car_id);
                 })()
             ]);
@@ -109,14 +109,14 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
             id: formResult.startOdometerLogId,
             car_id: formResult.carId,
             type_id: OdometerLogTypeEnum.RIDE,
-            value: convertOdometerValueToKilometer(formResult.startOdometerValue, odometerUnit.conversionFactor)
+            value: convertOdometerValueToKilometer(formResult.startOdometerValue!, odometerUnit.conversionFactor)
         };
 
         const endOdometerLog: OdometerLogTableRow = {
             id: formResult.endOdometerLogId,
             car_id: formResult.carId,
             type_id: OdometerLogTypeEnum.RIDE,
-            value: convertOdometerValueToKilometer(formResult.endOdometerValue, odometerUnit.conversionFactor)
+            value: convertOdometerValueToKilometer(formResult.endOdometerValue!, odometerUnit.conversionFactor)
         };
 
         const rideLog: RideLogTableRow = {

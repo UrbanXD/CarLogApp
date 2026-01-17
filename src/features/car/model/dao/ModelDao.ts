@@ -14,33 +14,18 @@ export class ModelDao extends Dao<ModelTableRow, Model, ModelMapper> {
         super(db, MODEL_TABLE, new ModelMapper(makeDao));
     }
 
-    async getModelYearsById(id: string, desc?: boolean): Promise<Array<PickerItemType>> {
+    async getModelYearsById(id: string): Promise<{ start?: number, end?: number }> {
         const model = await this.getById(id);
 
-        const years = {
-            start: Number(model?.startYear),
-            end: !model?.endYear
-                 ? new Date().getFullYear()
-                 : Number(model.endYear)
-        };
+        const start = model?.startYear ? Number(model.startYear) : undefined;
+        const end = model?.endYear ? Number(model.endYear) : undefined;
 
-        let result: Array<PickerItemType> = Array.from({ length: years.end - years.start + 1 }, (_, key) => {
-            const year = (years.start + key).toString();
-
-            return {
-                title: year,
-                value: year
-            };
-        });
-
-        if(desc) result = result.reverse();
-
-        return result;
+        return { start, end };
     }
 
     paginatorByMakeId(
-        makeId: string | undefined,
-        perPage?: number = 50
+        makeId: string | null,
+        perPage: number = 50
     ): CursorPaginator<ModelTableRow, PickerItemType> {
         return new CursorPaginator<ModelTableRow, PickerItemType>(
             this.db,
@@ -49,7 +34,7 @@ export class ModelDao extends Dao<ModelTableRow, Model, ModelMapper> {
             {
                 perPage,
                 filterBy: makeId ? {
-                    group: MAKE_TABLE,
+                    group: MAKE_TABLE as string,
                     filters: [{ field: "make_id", value: makeId, operator: "=" }]
                 } : undefined,
                 mapper: this.mapper.toPickerItem

@@ -8,7 +8,7 @@ import { FuelUnitDao } from "./FuelUnitDao.ts";
 import { FUEL_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/fuelLog.ts";
 import { EXPENSE_TABLE } from "../../../../../../database/connector/powersync/tables/expense.ts";
 import { OdometerLogDao } from "../../../odometer/model/dao/OdometerLogDao.ts";
-import { FuelLogFields } from "../../schemas/form/fuelLogForm.ts";
+import { FuelLogFormFields } from "../../schemas/form/fuelLogForm.ts";
 import { ODOMETER_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/odometerLog.ts";
 import { OdometerUnitDao } from "../../../odometer/model/dao/OdometerUnitDao.ts";
 import { ExpenseDao } from "../../../../../expense/model/dao/ExpenseDao.ts";
@@ -29,7 +29,7 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper> {
         );
     }
 
-    async create(formResult: FuelLogFields): Promise<FuelLog | null> {
+    async create(formResult: FuelLogFormFields): Promise<FuelLog | null> {
         const { expense, fuelLog, odometerLog } = await this.mapper.formResultToEntities(formResult);
 
         const insertedFuelLogId = await this.db.transaction().execute(async trx => {
@@ -60,7 +60,7 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper> {
     }
 
 
-    async update(formResult: FuelLogFields): Promise<FuelLog | null> {
+    async update(formResult: FuelLogFormFields): Promise<FuelLog | null> {
         const { expense, fuelLog, odometerLog } = await this.mapper.formResultToEntities(formResult);
 
         const updatedFuelLogId = await this.db.transaction().execute(async trx => {
@@ -113,7 +113,7 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper> {
         return await this.getById(updatedFuelLogId);
     }
 
-    async delete(fuelLog: FuelLog): Promise<string | number> {
+    async deleteLog(fuelLog: FuelLog): Promise<string | number> {
         return await this.db.transaction().execute(async trx => {
             const result = await trx
             .deleteFrom(FUEL_LOG_TABLE)

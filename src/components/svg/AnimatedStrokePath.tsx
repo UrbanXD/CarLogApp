@@ -1,8 +1,9 @@
-import React, { useRef } from "react";
+import React, { Component, useRef } from "react";
 import { AnimatedPath } from "../AnimatedComponents/index.ts";
 import { PathProps } from "react-native-svg";
 import { COLORS } from "../../constants/index.ts";
 import {
+    AnimatedProps,
     Easing,
     interpolate,
     useAnimatedProps,
@@ -15,7 +16,7 @@ import {
 type AnimatedStrokePath = {
     disabled: boolean
     pathProps: PathProps
-    delay?: boolean
+    delay?: number
     onAnimateFinish?: () => void
     onAnimationProgress?: (visiblePartWidth: number) => void
 }
@@ -27,7 +28,7 @@ const AnimatedStrokePath: React.FC<AnimatedStrokePath> = ({
     onAnimateFinish,
     onAnimationProgress
 }) => {
-    const ref = useRef<typeof AnimatedPath>(null);
+    const ref = useRef<Component<AnimatedProps<any>>>(null);
 
     const DURATION = 1000;
     const DEFAULT_STROKE_DASH_ARRAY = Number.MAX_SAFE_INTEGER; //minnel nagyobb annal jobb, mivel az elejen beugrana a teljes ha ez nincs
@@ -59,7 +60,7 @@ const AnimatedStrokePath: React.FC<AnimatedStrokePath> = ({
 
     const onLayout = () => {
         if(disabled) return strokeDashArray.value = 0;
-        strokeDashArray.value = ref.current?.getTotalLength?.() ?? DEFAULT_STROKE_DASH_ARRAY;
+        strokeDashArray.value = (ref.current as any)?.getTotalLength?.() ?? DEFAULT_STROKE_DASH_ARRAY;
 
         progress.value = withDelay(
             delay,
