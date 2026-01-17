@@ -29,6 +29,7 @@ export class FuelTankMapper extends AbstractMapper<FuelTankTableRow, FuelTank> {
     async toEntity(dto: FuelTank): Promise<FuelTankTableRow> {
         return {
             id: dto.id,
+            car_id: null,
             type_id: dto.type.id,
             unit_id: dto.unit.id,
             capacity: dto.capacity
