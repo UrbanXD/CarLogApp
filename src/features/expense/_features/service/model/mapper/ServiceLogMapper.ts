@@ -12,7 +12,7 @@ import { ServiceTypeDao } from "../dao/ServiceTypeDao.ts";
 import { Odometer } from "../../../../../car/_features/odometer/schemas/odometerSchema.ts";
 import { Expense } from "../../../../schemas/expenseSchema.ts";
 import { ServiceType } from "../../schemas/serviceTypeSchema.ts";
-import { ServiceLogFields } from "../../schemas/form/serviceLogForm.ts";
+import { ServiceLogFormFields } from "../../schemas/form/serviceLogForm.ts";
 import { OdometerUnitDao } from "../../../../../car/_features/odometer/model/dao/OdometerUnitDao.ts";
 import { ExpenseTypeEnum } from "../../../../model/enums/ExpenseTypeEnum.ts";
 import { ExpenseTypeDao } from "../../../../model/dao/ExpenseTypeDao.ts";
@@ -62,7 +62,7 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
                 })(),
                 (async () => {
                     if(!entity.odometer_log_id) return null;
-                    return this.odometerLogDao.getOdometerByLogId(entity.odometer_log_id, entity.car_id);
+                    return this.odometerLogDao.getOdometerByLogId(entity.odometer_log_id, entity.car_id!);
                 })(),
                 this.serviceTypeDao.getById(entity.service_type_id),
                 this.serviceItemDao.getTotalAmountByServiceLogId(entity.id),
@@ -90,7 +90,7 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
         };
     }
 
-    async formResultToEntities(formResult: ServiceLogFields): Promise<{
+    async formResultToEntities(formResult: ServiceLogFormFields): Promise<{
         serviceLog: ServiceLogTableRow,
         serviceItems: Map<string, ServiceItemTableRow>,
         expense: ExpenseTableRow,

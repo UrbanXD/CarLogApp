@@ -1,182 +1,93 @@
-import React, { useMemo } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import Date from "../../../components/Date.tsx";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { useForm } from "react-hook-form";
-import { getToday } from "../../../utils/getDate.ts";
-import { EditRideFormFieldType, editRideUseFormProps } from "../schemas/editRideFormSchema.ts";
-import ProgressBar from "../../../components/ProgressBar.tsx";
-import Icon from "../../../components/Icon.tsx";
+import React, { useCallback, useState } from "react";
+import { Text, View } from "react-native";
+import { COLORS, GLOBAL_STYLE, ICON_NAMES } from "../../../constants/index.ts";
+import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
+import { useRideLogTimelineItem } from "../hooks/useRideLogTimelineItem.tsx";
+import { RideLog } from "../schemas/rideLogSchema.ts";
+import { router, useFocusEffect } from "expo-router";
+import { TimelineItem } from "../../../components/timelineView/item/TimelineItem.tsx";
+import { MoreDataLoading } from "../../../components/loading/MoreDataLoading.tsx";
+import Link from "../../../components/Link.tsx";
+import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
+import "dayjs/locale/en";
+import "dayjs/locale/hu";
 
-type RideType = {
-    carUID: string
-    carOwnerUID: string
-    dateTitle: string
-    dateSubtitle: string
-    time: string
-    locations: Array<{
-        city: string,
-        place?: string
-    }>
-    client: string,
-    passengerCount?: number,
-    comment?: string
+type UpcomingRidesProps = {
+    carId: string
 }
 
-interface UpcomingRidesProps {
-    rides: Array<RideType>;
-}
+export function UpcomingRides({ carId }: UpcomingRidesProps) {
+    const { t } = useTranslation();
+    const { rideLogDao } = useDatabase();
+    const { mapper } = useRideLogTimelineItem();
 
-const UpcomingRides: React.FC<UpcomingRidesProps> = ({ rides }) => {
+    const [rides, setRides] = useState<Array<RideLog>>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [today] = useState(dayjs().hour(0).minute(0).second(0).toDate());
 
-    return (
-        <View style={ styles.container }>
-            {
-                rides.map((ride, index) =>
-                    <View key={ index } style={ styles.contentContainer }>
-                        <View style={ styles.rowContainer }>
-                            <Date
-                                dateTitle={ ride.dateTitle }
-                                dateUpperSubtitle={ ride.time }
-                                dateUnderSubtitle={ ride.dateSubtitle }
-                            />
-                            <View style={ { flex: 1, gap: SEPARATOR_SIZES.lightSmall } }>
-                                <Text numberOfLines={ 2 }
-                                      style={ [GLOBAL_STYLE.containerText, { color: COLORS.white }] }>
-                                    { ride.client }
-                                </Text>
-                                <ScrollView contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }>
-                                    <ProgressBar
-                                        isVertical
-                                        stepsCount={ 3 }
-                                        titles={ ["Zenta", "Kamenica"] }
-                                    />
-                                </ScrollView>
-                                <Text numberOfLines={ 1 }
-                                      style={ [GLOBAL_STYLE.containerText, { color: COLORS.white }] }>
-                                    100 km
-                                </Text>
-                            </View>
-                            <Icon
-                                icon={ ICON_NAMES.info }
-                                size={ FONT_SIZES.h2 }
-                                color={ COLORS.white }
-                                onPress={ () => { /*open bottom sheet*/ } }
-                            />
-                        </View>
-                    </View>
-                )
-            }
-        </View>
+    useFocusEffect(
+        useCallback(() => {
+            setIsLoading(true);
+            rideLogDao.getUpcomingRides(carId, today.toISOString()).then(result => {
+                setIsLoading(false);
+                setRides(result);
+            });
+        }, [carId])
     );
-};
 
-interface EditRideFormProps {
-    ride: RideType;
-}
-
-const EditRideForm: React.FC<EditRideFormProps> = React.memo(({ ride }) => {
-    const rideValue = useMemo(() => ({
-        ...ride,
-        passengerCount: ride.passengerCount || 1,
-        comment: ride.comment || "",
-        date: getToday()
-    }), [ride]);
-
-    const { control, setValue } =
-        useForm<EditRideFormFieldType>(
-            {
-                ...editRideUseFormProps,
-                values: rideValue
-            }
+    const renderRideLog = (rideLog: RideLog, index: number) => {
+        return (
+            <TimelineItem
+                key={ rideLog.id }
+                { ...mapper(rideLog) }
+                isFirst={ index === 0 }
+                isLast={ false }
+            />
         );
+    };
 
+    const renderEmptyComponent = useCallback(() => {
+        return (
+            <TimelineItem
+                id="not-found"
+                milestone={ t("rides.not_found") }
+                title={ t("rides.not_found_upcoming_rides_action_call") }
+                onPress={ openCreateRideLogBottomSheet }
+                color={ COLORS.gray2 }
+                isFirst
+                isLast
+            />
+        );
+    }, [t]);
+
+    const goToRideLogTab = () => router.push("/(main)/workbook");
+    const openCreateRideLogBottomSheet = () => router.push("/ride/create/");
 
     return (
-        <View style={ styles.infoContainer }>
-            <View style={ styles.infoTitleContainer }>
-                <Date
-                    dateTitle={ ride.dateTitle }
-                    dateUnderSubtitle={ ride.dateSubtitle }
-                    flexDirection="row"
-                />
-                <Text style={ { color: "white" } }>
-                    { ride.time }
+        <View style={ GLOBAL_STYLE.contentContainer }>
+            <View>
+                <Text style={ GLOBAL_STYLE.containerTitleText }>
+                    { t("rides.upcoming") }
+                </Text>
+                <Text style={ GLOBAL_STYLE.containerText }>
+                    { dayjs(today).format("dddd") }, { dayjs(today).format("LL") } ({ t("date.today") })
                 </Text>
             </View>
-            <View style={ styles.infoContentContainer }>
-                <View style={ { flexDirection: "row", justifyContent: "space-between" } }>
-                    {/*<InputText*/ }
-                    {/*    control={ control }*/ }
-                    {/*    fieldName={ "carUID" }*/ }
-                    {/*    isEditable={ true }*/ }
-                    {/*/>*/ }
-                    <View style={ { backgroundColor: "blue" } }>
-                        <Text style={ { color: "white" } }>Szemelyek szama { ride.client }</Text>
-                    </View>
-                </View>
-                <View style={ { flexDirection: "row" } }>
-                    <View style={ { flex: 1, backgroundColor: "red" } }>
-                        <Text style={ { color: "white" } }>CAr ID</Text>
-                    </View>
-                </View>
-                <View style={ { flexDirection: "row" } }>
-                    <View style={ { flex: 1, backgroundColor: "red" } }>
-                        <Text style={ { color: "white" } }>Comment</Text>
-                    </View>
-                </View>
-                <Text style={ { color: "white" } }> Locations pl: Utca 21. (Zenta) </Text>
-            </View>
+            {
+                isLoading
+                ?
+                <MoreDataLoading/>
+                :
+                rides.length > 0
+                ? <View>{ rides.map(renderRideLog) }</View>
+                : renderEmptyComponent()
+            }
+            <Link
+                text={ t("rides.more") }
+                icon={ ICON_NAMES.rightArrowHead }
+                onPress={ goToRideLogTab }
+            />
         </View>
     );
-});
-
-const styles = StyleSheet.create({
-    infoContainer: {
-        flex: 1,
-        gap: SEPARATOR_SIZES.extraMedium
-    },
-    infoTitleContainer: {
-        alignItems: "center",
-        // justifyContent: "center",
-        transform: [{ scale: 1.25 }]
-    },
-    infoContentContainer: {
-        gap: SEPARATOR_SIZES.small
-    },
-    container: {
-        gap: SEPARATOR_SIZES.small
-    },
-    container2: {
-        flexDirection: "row",
-        gap: SEPARATOR_SIZES.lightSmall * 0.5,
-        paddingLeft: SEPARATOR_SIZES.lightSmall * 0.75,
-        alignItems: "center"
-    },
-    text: {
-        flexWrap: "wrap",
-        fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.p3,
-        color: COLORS.white
-    },
-    contentContainer: {
-        flexDirection: "row",
-        gap: SEPARATOR_SIZES.lightSmall
-    },
-    rowContainer: {
-        flex: 1,
-        flexDirection: "row",
-        height: hp(22.5),
-        backgroundColor: COLORS.black2,
-        borderRadius: 15,
-        padding: SEPARATOR_SIZES.small
-    },
-    rowContentContainer: {
-        flex: 1,
-        gap: SEPARATOR_SIZES.lightSmall,
-        justifyContent: "center"
-    }
-});
-
-export default UpcomingRides;
+}

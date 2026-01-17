@@ -1,12 +1,13 @@
-import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { COLORS, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { ViewStyle } from "../../../types/index.ts";
 
 export type PickerItemType = {
     value: string
-    controllerTitle?: string
-    title?: string
-    subtitle?: string
+    controllerTitle?: string | null
+    title?: string | null
+    subtitle?: string | null
 }
 
 type PickerItemProps = {
@@ -17,7 +18,7 @@ type PickerItemProps = {
 }
 
 const PickerItem: React.FC<PickerItemProps> = ({
-    item: { value, title = value, subtitle, icon },
+    item: { value, title = value, subtitle },
     onPress,
     selected,
     style

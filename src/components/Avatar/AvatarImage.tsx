@@ -1,13 +1,13 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { ICON_NAMES } from "../../constants/index.ts";
 import Button from "../Button/Button.ts";
 import Image from "../Image.tsx";
-import { Color, ImageSource } from "../../types/index.ts";
+import { Color, ImageSource, ViewStyle } from "../../types/index.ts";
 
 interface AvatarImageProps {
-    source: ImageSource;
+    path: string;
     avatarSize?: number;
     borderColor?: Color;
     style?: ViewStyle;
@@ -17,7 +17,7 @@ interface AvatarImageProps {
 }
 
 const AvatarImage: React.FC<AvatarImageProps> = ({
-    source,
+    path,
     avatarSize = hp(5),
     borderColor,
     style,
@@ -48,7 +48,7 @@ const AvatarImage: React.FC<AvatarImageProps> = ({
                />
             }
             <Image
-                source={ source }
+                path={ path }
                 alt={ ICON_NAMES.user }
                 imageStyle={ styles.image }
             />
@@ -69,13 +69,15 @@ const useStyles = (
         image: {
             width: avatarSize,
             height: avatarSize,
-            resizeMode: "cover",
+            resizeMode: "stretch",
             borderRadius: avatarSize / 2,
             borderWidth,
             borderColor
         },
         badge: {
             position: "absolute",
+            width: avatarSize / 5,
+            height: avatarSize / 5,
             right: avatarSize / 12,
             bottom: avatarSize / 20,
             zIndex: 1

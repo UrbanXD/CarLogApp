@@ -1,59 +1,59 @@
 import React, { useMemo } from "react";
-import { useAppDispatch } from "../../../../hooks/index.ts";
-import { useForm } from "react-hook-form";
+import { FormState, useForm } from "react-hook-form";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
-import { editCar } from "../../model/actions/editCar.ts";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { CarFormFields, useEditCarFormProps } from "../../schemas/form/carForm.ts";
 import { Car } from "../../schemas/carSchema.ts";
 import { EDIT_CAR_FORM_STEPS } from "../../constants/index.ts";
 import { useEditCarSteps } from "../../hooks/useEditCarSteps.tsx";
-import Form from "../../../../components/Form/Form.tsx";
-import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
+import { InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
+import { Form } from "../../../../components/Form/Form.tsx";
+import { SubmitHandlerArgs } from "../../../../types/index.ts";
 
 export type EditCarFormProps = {
     car: Car
     stepIndex: EDIT_CAR_FORM_STEPS
+    onFormStateChange?: (formState: FormState<CarFormFields>) => void
 }
 
-const EditCarForm: React.FC<EditCarFormProps> = ({
+export function EditCarForm({
     car,
-    stepIndex
-}) => {
-    const dispatch = useAppDispatch();
-    const database = useDatabase();
+    stepIndex,
+    onFormStateChange
+}: EditCarFormProps) {
+    const { carDao, attachmentQueue } = useDatabase();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
 
-    const form = useForm<CarFormFields>(useEditCarFormProps(car));
-    const { handleSubmit, reset } = form;
-
+    const form = useForm<CarFormFields>(useEditCarFormProps(car, attachmentQueue));
     const editFields = useEditCarSteps({ ...form, index: stepIndex, car });
 
-    const submitHandler = useMemo(() => handleSubmit(
-        async (formResult: CarFormFields) => {
+    const submitHandler: SubmitHandlerArgs<CarFormFields> = useMemo(() => ({
+        onValid: async (formResult) => {
             try {
-                await dispatch(editCar({ database, formResult }));
-
-                openToast(editFields.editToastMessages.success());
+                await carDao.update(formResult);
 
                 if(dismissBottomSheet) dismissBottomSheet(true);
+                openToast(editFields.editToastMessages.success());
             } catch(e) {
+                openToast(editFields.editToastMessages.error());
                 console.error("Hiba a submitHandler-ben:", e);
             }
         },
-        (errors) => {
+        onInvalid: (errors) => {
             console.log("Edit car validation errors", errors);
+            openToast(InvalidFormToast.warning());
         }
-    ), [handleSubmit, editFields]);
+    }), [editFields]);
 
     return (
-        <Form>
-            { editFields.render() }
-            <FormButtons reset={ reset } submit={ submitHandler }/>
-        </Form>
+        <Form
+            edit
+            form={ form }
+            formFields={ editFields.render() }
+            submitHandler={ submitHandler }
+            onFormStateChange={ onFormStateChange }
+        />
     );
-};
-
-export default EditCarForm;
+}

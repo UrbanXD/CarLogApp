@@ -9,24 +9,27 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import Compactor from "../components/Compactor";
 import { ScreenScrollViewProvider } from "../contexts/screenScrollView/ScreenScrollViewProvider.tsx";
 import { AuthProvider } from "../contexts/auth/AuthProvider.tsx";
-import { useDatabase } from "../contexts/database/DatabaseContext.ts";
 import { DatabaseProvider } from "../contexts/database/DatabaseProvider.tsx";
 import { store } from "../database/redux/store.ts";
 import Header from "../components/Navigation/Header/Header.tsx";
 import ToastManager from "../ui/alert/components/toast/ToastManager.tsx";
 import ModalManager from "../ui/alert/components/modal/ModalManager.tsx";
-import * as SystemUI from "expo-system-ui";
 import { SystemBars } from "react-native-edge-to-edge";
 import { SECONDARY_COLOR } from "../constants/index.ts";
 import { PortalHost, PortalProvider } from "@gorhom/portal";
+import { useTranslation } from "react-i18next";
+import { setBackgroundColorAsync } from "expo-system-ui";
 
 
 const Layout: React.FC = () => {
-    const database = useDatabase();
+    const { t } = useTranslation();
 
     useEffect(() => {
-        SystemUI.setBackgroundColorAsync(SECONDARY_COLOR);
-        database.init();
+        (async () => {
+            try {
+                await setBackgroundColorAsync(SECONDARY_COLOR);
+            } catch(_) {}
+        })();
     }, []);
 
     return (
@@ -46,15 +49,6 @@ const Layout: React.FC = () => {
                 options={ {
                     header: () => <SystemBars style={ { statusBar: "dark", navigationBar: "light" } }/>,
                     animation: "none"
-                } }
-            />
-            <Stack.Screen
-                name="bottomSheet/createCar"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
                 } }
             />
             <Stack.Screen
@@ -103,13 +97,31 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="(profile)/user"
                 options={ {
-                    header: () => <Header.Secondary title="Profil"/>
+                    header: () => <Header.Secondary title={ t("profile.title") }/>
                 } }
             />
             <Stack.Screen
                 name="(edit)/car"
                 options={ {
-                    header: () => <Header.Secondary title="Autó adatlap"/>
+                    header: () => <Header.Secondary title={ t("car.title") }/>
+                } }
+            />
+            <Stack.Screen
+                name="user/resetPassword"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="car/create"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
                 } }
             />
             <Stack.Screen
@@ -124,13 +136,13 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="odometer/log"
                 options={ {
-                    header: () => <Header.Secondary title="Kilométeróra-állás napló"/>
+                    header: () => <Header.Secondary title={ t("odometer.title") }/>
                 } }
             />
             <Stack.Screen
                 name="odometer/log/[id]"
                 options={ {
-                    header: () => <Header.Secondary title="Napló bejegyzés"/>
+                    header: () => <Header.Secondary title={ t("common.log_title") }/>
                 } }
             />
             <Stack.Screen
@@ -154,19 +166,21 @@ const Layout: React.FC = () => {
             <Stack.Screen
                 name="expense/[id]"
                 options={ {
-                    header: () => <Header.Secondary title="Kiadás"/>
+                    header: () => <Header.Secondary title={ t("expenses.title_singular") }/>
                 } }
             />
             <Stack.Screen
                 name="expense/fuel/[id]"
                 options={ ({ route }) => ({
-                    header: () => <Header.Secondary title={ route.params?.title ?? "Napló bejegyzés" }/>
+                    header: () => <Header.Secondary
+                        title={ (route.params as Record<string, any>)?.title ?? t("log.title") }/>
                 }) }
             />
             <Stack.Screen
                 name="expense/service/[id]"
                 options={ ({ route }) => ({
-                    header: () => <Header.Secondary title={ route.params?.title ?? "Napló bejegyzés" }/>
+                    header: () => <Header.Secondary
+                        title={ (route.params as Record<string, any>)?.["title"] ?? t("log.title") }/>
                 }) }
             />
             <Stack.Screen
@@ -221,6 +235,78 @@ const Layout: React.FC = () => {
                     animation: "slide_from_bottom",
                     presentation: "transparentModal",
                     contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="ride/place/index"
+                options={ {
+                    header: () => <Header.Secondary title={ t("places.title") }/>
+                } }
+            />
+            <Stack.Screen
+                name="ride/place/create"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="ride/place/edit/[id]"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="ride/passenger/index"
+                options={ {
+                    header: () => <Header.Secondary title={ t("passengers.title") }/>
+                } }
+            />
+            <Stack.Screen
+                name="ride/passenger/create"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="ride/passenger/edit/[id]"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="ride/create"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="ride/edit/[id]"
+                options={ {
+                    header: () => <></>,
+                    animation: "slide_from_bottom",
+                    presentation: "transparentModal",
+                    contentStyle: { backgroundColor: "transparent" }
+                } }
+            />
+            <Stack.Screen
+                name="ride/[id]"
+                options={ {
+                    header: () => <Header.Secondary title={ t("rides.log") }/>
                 } }
             />
         </Stack>

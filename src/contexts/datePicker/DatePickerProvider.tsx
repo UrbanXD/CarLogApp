@@ -1,68 +1,99 @@
 import { ReactElement, useEffect, useState } from "react";
 import dayjs from "dayjs";
-import { CalendarViews } from "react-native-ui-datepicker/lib/typescript/enums";
 import { DateType } from "react-native-ui-datepicker";
 import { DatePickerContext, DatePickerViews } from "./DatePickerContext.ts";
 import { MAX_DATE, MIN_DATE } from "../../constants/index.ts";
 
 export type DatePickerProviderProps = {
-    children: ReactElement
-    initialDate?: DateType
+    children: ReactElement | Array<ReactElement>;
+    mode?: "single" | "range"
+    initialStartDate?: DateType
+    initialEndDate?: DateType
     initialView?: DatePickerViews
-    locale?: string
     minDate?: DateType
     maxDate?: DateType
-    onSubmit: (date: dayjs.Dayjs) => void
+    onSubmit: (startDate: Date | null, endDate: Date | null) => void
 }
 
 export function DatePickerProvider({
     children,
-    initialDate,
+    mode = "single",
+    initialStartDate,
+    initialEndDate = mode === "range" ? initialStartDate : null,
     initialView = "calendar",
-    locale = "hu",
     minDate = MIN_DATE,
     maxDate = MAX_DATE,
     onSubmit
 }: DatePickerProviderProps) {
-    const [date, setDate] = useState<dayjs.Dayjs>(dayjs(initialDate).locale(locale));
-    const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs(initialDate).locale(locale));
-    const [view, setView] = useState<CalendarViews>(initialView);
-
-    useEffect(() => {
-        setCalendarDate(date);
-    }, [date]);
+    const [startDate, setStartDate] = useState<Date | null>(dayjs(initialStartDate).toDate());
+    const [endDate, setEndDate] = useState<Date | null>(initialEndDate ? dayjs(initialEndDate).toDate() : null);
+    const [calendarDate, setCalendarDate] = useState<Date>(dayjs(initialStartDate).toDate());
+    const [view, setView] = useState<DatePickerViews>(initialView);
 
     useEffect(() => {
         setView(initialView);
     }, [initialView]);
 
+    useEffect(() => {
+        if(mode === "range" && startDate && endDate && dayjs(startDate).isAfter(endDate)) {
+            setStartDate(prevState => {
+                setEndDate(prevState);
+                return endDate;
+            });
+        }
+    }, [startDate, endDate]);
+
+    useEffect(() => {
+        if(
+            startDate &&
+            (
+                !dayjs(calendarDate).isSame(startDate, "year") ||
+                !dayjs(calendarDate).isSame(startDate, "month")
+            )
+        ) setCalendarDate(startDate);
+
+    }, [startDate]);
+
+    useEffect(() => {
+        if(
+            endDate &&
+            (
+                !dayjs(calendarDate).isSame(endDate, "year") ||
+                !dayjs(calendarDate).isSame(endDate, "month")
+            )
+        ) setCalendarDate(endDate);
+
+    }, [endDate]);
+
     const nextMonthInCalendar = () => {
-        setCalendarDate(prevState => prevState.add(1, "month"));
+        setCalendarDate(prevState => dayjs(prevState).add(1, "month").toDate());
     };
 
     const previousMonthInCalendar = () => {
-        setCalendarDate(prevState => prevState.subtract(1, "month"));
+        setCalendarDate(prevState => dayjs(prevState).subtract(1, "month").toDate());
     };
 
     const openView = (view: DatePickerViews) => setView(view);
 
     const submit = () => {
-        onSubmit(date);
+        onSubmit(startDate, endDate);
     };
 
     return (
         <DatePickerContext.Provider
             value={ {
-                date,
-                setDate,
+                mode,
+                startDate,
+                setStartDate,
+                endDate,
+                setEndDate,
                 calendarDate,
                 nextMonthInCalendar,
                 previousMonthInCalendar,
                 currentView: view,
                 openView,
-                locale,
-                minDate: dayjs(minDate),
-                maxDate: dayjs(maxDate),
+                minDate: dayjs(minDate).toDate(),
+                maxDate: dayjs(maxDate).toDate(),
                 submit
             } }
         >

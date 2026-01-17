@@ -1,65 +1,56 @@
-import React, { ReactNode, useEffect, useState } from "react";
-import { Image as ImageRN, ImageSourcePropType, ImageStyle, StyleSheet, View } from "react-native";
+import React, { ReactNode } from "react";
+import { ActivityIndicator, Image as ImageRN, ImageStyle, StyleSheet, View } from "react-native";
 import DefaultElement from "./DefaultElement";
-import { COLORS, ICON_NAMES } from "../constants/index.ts";
+import { COLORS, ICON_NAMES } from "../constants";
 import { hexToRgba } from "../utils/colors/hexToRgba";
 import { LinearGradient } from "expo-linear-gradient";
-import { ImageSource } from "../types/index.ts";
+import { useFile } from "../database/hooks/useFile.ts";
+import { ViewStyle } from "../types/index.ts";
 
-interface ImageProps {
-    source?: ImageSource;
-    alt?: string;
-    imageStyle?: ImageStyle;
-    overlay?: boolean;
-    children?: ReactNode;
+type ImageProps = {
+    path?: string | null
+    alt?: string
+    imageStyle?: ImageStyle | ViewStyle
+    overlay?: boolean
+    attachment?: boolean
+    children?: ReactNode
 }
 
-const Image: React.FC<ImageProps> = ({
-    source,
+function Image({
+    path,
     alt = ICON_NAMES.image,
     imageStyle,
     overlay = true,
+    attachment = true,
     children
-}) => {
-    const [imageError, setImageError] = useState<boolean>(!source);
-
-    const handleImageLoadError = () => setImageError(true);
-    const handleImageLoaded = () => setImageError(false);
-
-    useEffect(() => {
-        setImageError(!source);
-    }, [source]);
-
-    const formatImageSource =
-        (source: ImageSourcePropType | string = "") =>
-            typeof source === "string"
-            ? { uri: `data:image/jpeg;base64,${ source }` }
-            : source;
+}: ImageProps) {
+    const { source, loading, error } = useFile({ uri: path, attachment: attachment });
 
     return (
         <>
             {
-                !imageError
-                ? <ImageRN
-                    source={ formatImageSource(source) }
-                    onError={ handleImageLoadError }
-                    onLoad={ handleImageLoaded }
-                    style={ [styles.image, imageStyle] }
-                />
-                : <DefaultElement
-                    icon={ alt }
-                    style={ [styles.image, imageStyle] }
-                />
+                loading
+                ?
+                <View
+                    style={ [styles.image, imageStyle, { backgroundColor: COLORS.black5, justifyContent: "center" }] }>
+                    <ActivityIndicator size="large" color={ COLORS.gray2 }/>
+                </View>
+                : error || !source
+                  ? <DefaultElement icon={ alt } style={ [styles.image, imageStyle] }/>
+                  : <ImageRN source={ { uri: source } } style={ [styles.image, imageStyle as any] }/>
             }
             {
                 children &&
-               <View style={ styles.contentContainer }>
+               <View style={ [styles.contentContainer, imageStyle] }>
                    {
-                       overlay && !imageError &&
+                       overlay &&
                       <LinearGradient
                          locations={ [0, 0.85] }
-                         colors={ [hexToRgba(COLORS.black, 0.15), hexToRgba(COLORS.black, 0.90)] }
-                         style={ styles.imageOverlay }
+                         colors={ [hexToRgba(COLORS.black, 0.15), hexToRgba(COLORS.black, 0.60)] }
+                         style={ [
+                             styles.imageOverlay,
+                             { borderRadius: StyleSheet.flatten(imageStyle)?.borderRadius ?? undefined }
+                         ] }
                       />
                    }
                    { children }
@@ -67,27 +58,21 @@ const Image: React.FC<ImageProps> = ({
             }
         </>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        zIndex: 1,
-        backgroundColor: hexToRgba(COLORS.white, 0.035),
-        borderRadius: 35
-    },
     contentContainer: {
         flex: 1,
-        borderWidth: 1.5,
-        borderRadius: 35,
-        borderColor: COLORS.gray4
+        width: "100%"
     },
     image: {
         position: "absolute",
         width: "100%",
         height: "100%",
-        // resizeMode: "cover",
-        borderRadius: 35
+        resizeMode: "stretch",
+        borderRadius: 35,
+        borderWidth: 1.5,
+        borderColor: COLORS.gray4
     },
     imageOverlay: {
         ...StyleSheet.absoluteFillObject,
@@ -95,4 +80,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Image;
+export default React.memo(Image);

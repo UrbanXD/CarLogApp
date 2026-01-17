@@ -3,6 +3,7 @@ import { useDatabase } from "../../../../../../../contexts/database/DatabaseCont
 import React, { useMemo } from "react";
 import Input from "../../../../../../../components/Input/Input.ts";
 import { ICON_NAMES } from "../../../../../../../constants/index.ts";
+import { useTranslation } from "react-i18next";
 
 type FuelTypeInputProps = {
     control: Control<any>
@@ -14,21 +15,25 @@ type FuelTypeInputProps = {
 export function ServiceTypeInput({
     control,
     fieldName,
-    title = "Szervíz típus",
+    title,
     subtitle
 }: FuelTypeInputProps) {
+    const { t } = useTranslation();
     const { serviceTypeDao } = useDatabase();
-    const paginator = useMemo(() => serviceTypeDao.paginator(50), []);
+
+    const paginator = useMemo(() => serviceTypeDao.paginator({
+        getTitle: (entity) => t(`service.types.${ entity.key }`)
+    }), [t]);
 
     return (
         <Input.Field
             control={ control }
             fieldName={ fieldName }
-            fieldNameText={ title }
+            fieldNameText={ title ?? t("service.types.title") }
             fieldInfoText={ subtitle }
         >
             <Input.Picker.Dropdown
-                title={ title }
+                title={ title ?? t("service.types.title") }
                 paginator={ paginator }
                 searchBy="key"
                 icon={ ICON_NAMES.serviceOutline }

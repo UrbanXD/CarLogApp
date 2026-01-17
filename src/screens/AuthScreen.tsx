@@ -5,26 +5,26 @@ import { widthPercentageToDP } from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button/Button";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { SignInBottomSheet, SignUpBottomSheet } from "../features/user/presets/bottomSheet/index.ts";
 import { useAuth } from "../contexts/auth/AuthContext.ts";
 import Animated, { FadeIn, SlideInRight } from "react-native-reanimated";
 import Divider from "../components/Divider.tsx";
 import CarlogTitle from "../components/CarlogTitle.tsx";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
+
+const ENTERING_ANIMATION_DURATION = 300;
 
 const AuthScreen: React.FC = () => {
+    const { t } = useTranslation();
     const { top, bottom } = useSafeAreaInsets();
-    const { authenticated, notVerifiedUser, openAccountVerification } = useAuth();
-
-    const ENTERING_ANIMATION_DURATION = 300;
+    const { notVerifiedEmail, openAccountVerification } = useAuth();
 
     const openSignUp = () => router.push("bottomSheet/signUp");
     const openSignIn = () => router.push("bottomSheet/signIn");
 
-
     const openVerification = useCallback(() => {
-        if(notVerifiedUser && notVerifiedUser.email) openAccountVerification(notVerifiedUser.email);
-    }, [notVerifiedUser]);
+        if(notVerifiedEmail) openAccountVerification(notVerifiedEmail, true);
+    }, [notVerifiedEmail]);
 
     const styles = useStyles(top, bottom);
 
@@ -33,7 +33,7 @@ const AuthScreen: React.FC = () => {
             <View style={ styles.imageContainer }>
                 <Animated.Image
                     entering={ FadeIn.duration(ENTERING_ANIMATION_DURATION) }
-                    source={ require("../assets/images/home2.jpg") }
+                    source={ require("../assets/images/home.jpg") }
                     style={ { width: "100%", height: "100%" } }
                     resizeMode="cover"
                 />
@@ -48,14 +48,14 @@ const AuthScreen: React.FC = () => {
                     <CarlogTitle animated={ false }/>
                     <Animated.View
                         entering={ FadeIn.duration(ENTERING_ANIMATION_DURATION) }
-                        style={ styles.titleContainer.info }
+                        style={ styles.titleContainerInfo }
                     >
                         <Divider
                             size={ widthPercentageToDP(50) }
                             thickness={ 2 }
                             color={ COLORS.gray2 }
                         />
-                        <Text style={ styles.subtitle }>Kezelje nálunk autóit</Text>
+                        <Text style={ styles.subtitle }>{ t("auth.description") }</Text>
                     </Animated.View>
                 </View>
                 <Animated.View
@@ -63,23 +63,23 @@ const AuthScreen: React.FC = () => {
                     style={ styles.actionContainer }
                 >
                     <Button.Text
-                        text="Regisztráció"
+                        text={ t("auth.sign_up.title") }
                         onPress={ openSignUp }
                     />
                     <Text style={ styles.underButtonText }>
-                        Már rendelkezel felhasználóval?
+                        { t("auth.already_have_account") }
                         { "\n" }
                         <Text
                             style={ styles.linkText }
                             onPress={ openSignIn }
                         >
-                            Jelentkezz be
+                            { t("auth.sign_in_now") }
                         </Text>
                     </Text>
                 </Animated.View>
             </View>
             {
-                !authenticated && notVerifiedUser &&
+                notVerifiedEmail &&
                <Animated.View
                   entering={ SlideInRight.duration(ENTERING_ANIMATION_DURATION * 1.5) }
                   style={ styles.verificationContainer }
@@ -93,7 +93,7 @@ const AuthScreen: React.FC = () => {
                      onPress={ openVerification }
                      style={ styles.verificationText }
                   >
-                     Hitelesítés{ "\n" }folytatása
+                      { t("auth.resume_verification") }
                   </Text>
                </Animated.View>
             }
@@ -128,11 +128,11 @@ const useStyles = (top: number, bottom: number) =>
         titleContainer: {
             flex: 1,
             top: -SEPARATOR_SIZES.lightLarge,
-            gap: SEPARATOR_SIZES.mediumSmall,
+            gap: SEPARATOR_SIZES.mediumSmall
+        },
+        titleContainerInfo: {
+            gap: SEPARATOR_SIZES.mediumSmall
 
-            info: {
-                gap: SEPARATOR_SIZES.mediumSmall
-            }
         },
         subtitle: {
             alignSelf: "center",
@@ -170,14 +170,16 @@ const useStyles = (top: number, bottom: number) =>
         },
         verificationIcon: {
             borderColor: COLORS.gray4,
-            borderWidth: 0.75
+            borderWidth: 1.5
         },
         verificationText: {
             fontFamily: "Gilroy-Medium",
             fontSize: FONT_SIZES.p3,
             color: COLORS.white,
             textShadowColor: COLORS.black,
-            textShadowRadius: 15
+            textShadowRadius: 30,
+            flexWrap: "wrap",
+            textAlign: "center"
         }
     });
 

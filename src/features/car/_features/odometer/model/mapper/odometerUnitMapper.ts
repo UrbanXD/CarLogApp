@@ -12,7 +12,6 @@ export class OdometerUnitMapper extends AbstractMapper<OdometerUnitTableRow, Odo
         return odometerUnitSchema.parse({
             id: entity.id,
             key: entity.key,
-            locale: entity.key, //todo localize
             short: entity.short,
             conversionFactor: entity.conversion_factor
         });
@@ -20,17 +19,17 @@ export class OdometerUnitMapper extends AbstractMapper<OdometerUnitTableRow, Odo
 
     async toEntity(dto: OdometerUnit): Promise<OdometerUnitTableRow> {
         return {
-            id: dto.id,
+            id: dto.id as never,
             key: dto.key,
             short: dto.short,
             conversion_factor: dto.conversionFactor
         };
     }
 
-    dtoToPicker(dtos: Array<OdometerUnit>): Promise<Array<PickerItemType>> {
+    dtoToPicker(dtos: Array<OdometerUnit>, getTitle?: (dto: OdometerUnit) => string): Array<PickerItemType> {
         return dtos.map(dto => ({
             value: dto.id.toString(),
-            title: `${ dto.locale } (${ dto.short })`
+            title: getTitle?.(dto) ?? dto.key
         }));
     }
 }

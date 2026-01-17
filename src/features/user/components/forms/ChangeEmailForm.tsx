@@ -1,52 +1,65 @@
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
-import { useForm } from "react-hook-form";
-import { EditUserNameRequest } from "../../schemas/form/editUserNameRequest.ts";
+import { FormState, useForm } from "react-hook-form";
 import { UserAccount } from "../../schemas/userSchema.ts";
 import { EmailStep } from "./steps/index.ts";
 import { router } from "expo-router";
 import { getToastMessage } from "../../../../ui/alert/utils/getToastMessage.ts";
 import { ChangeEmailToast } from "../../presets/toast/index.ts";
-import { OtpVerificationHandlerType } from "../../../../app/bottomSheet/otpVerification.tsx";
 import { ChangeEmailRequest, useChangeEmailFormProps } from "../../schemas/form/changeEmailRequest.ts";
 import Form from "../../../../components/Form/Form.tsx";
-import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
+import { useTranslation } from "react-i18next";
+import { SubmitHandlerArgs } from "../../../../types/index.ts";
+import { InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
+import { OtpVerificationHandlerType } from "../../hooks/useOtpVerificationHandler.ts";
 
-export type ChangeEmailFormProps = { user: UserAccount }
+export type ChangeEmailFormProps = {
+    user: UserAccount
+    onFormStateChange?: (formState: FormState<ChangeEmailRequest>) => void
+}
 
-export function ChangeEmailForm({ user }: ChangeEmailFormProps) {
+export function ChangeEmailForm({ user, onFormStateChange }: ChangeEmailFormProps) {
+    const { t } = useTranslation();
     const { supabaseConnector } = useDatabase();
     const { openToast } = useAlert();
 
-    const form = useForm<EditUserNameRequest>(useChangeEmailFormProps({ email: user.email }));
-    const { reset, handleSubmit } = form;
+    const form = useForm<ChangeEmailRequest>(useChangeEmailFormProps({ email: user.email }));
 
-    const submitHandler = handleSubmit(async (request: ChangeEmailRequest) => {
-        try {
-            const { error } = await supabaseConnector.client.auth.updateUser({ email: request.email });
+    const submitHandler: SubmitHandlerArgs<ChangeEmailRequest> = {
+        onValid: async (request) => {
+            try {
+                const { error } = await supabaseConnector.client.auth.updateUser({ email: request.email });
 
-            if(error) throw error;
+                if(error) throw error;
 
-            router.push({
-                pathname: "bottomSheet/otpVerification",
-                params: {
-                    type: "email_change",
-                    title: "Email módosítási kérelem hitelesítés",
-                    email: user.email, //current email
-                    newEmail: request.email,
-                    handlerType: OtpVerificationHandlerType.CurrentEmailChange
-                }
-            });
-        } catch(error) {
-            console.log("Change Email error: ", error);
-            openToast(getToastMessage({ messages: ChangeEmailToast, error }));
+                router.push({
+                    pathname: "bottomSheet/otpVerification",
+                    params: {
+                        type: "email_change",
+                        title: t("auth.otp_verification.email_change"),
+                        email: user.email, //current email
+                        newEmail: request.email,
+                        handlerType: OtpVerificationHandlerType.CurrentEmailChange
+                    }
+                });
+            } catch(error) {
+                console.log("Change Email error: ", error);
+                openToast(getToastMessage({ messages: ChangeEmailToast, error }));
+            }
+        },
+        onInvalid: (errors) => {
+            console.log("Edit email change validation errors", errors);
+            openToast(InvalidFormToast.warning());
         }
-    });
+    };
 
     return (
-        <Form>
-            <EmailStep { ...form }/>
-            <FormButtons reset={ reset } submit={ submitHandler }/>
-        </Form>
+        <Form
+            edit
+            form={ form }
+            formFields={ <EmailStep { ...form } /> }
+            submitHandler={ submitHandler }
+            onFormStateChange={ onFormStateChange }
+        />
     );
 }

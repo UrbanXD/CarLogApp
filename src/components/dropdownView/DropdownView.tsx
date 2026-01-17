@@ -1,6 +1,7 @@
 import React, { ReactNode, useCallback, useEffect } from "react";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
-import { LayoutChangeEvent, StyleSheet, View, ViewStyle } from "react-native";
+import { LayoutChangeEvent, StyleSheet, View } from "react-native";
+import { ViewStyle } from "../../types/index.ts";
 
 type DropdownViewProps = {
     children?: ReactNode

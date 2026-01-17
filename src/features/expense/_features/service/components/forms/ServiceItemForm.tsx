@@ -1,28 +1,34 @@
-import { ServiceItem } from "../../schemas/serviceItemSchema.ts";
 import { useForm } from "react-hook-form";
-import { ServiceItemFields, useServiceItemFormProps } from "../../schemas/form/serviceItemForm.ts";
-import { CarCreateToast } from "../../../../../car/presets/toast/index.ts";
+import {
+    ServiceItemFormFields,
+    ServiceItemFormTransformedFields,
+    useServiceItemFormProps
+} from "../../schemas/form/serviceItemForm.ts";
 import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import { StyleSheet, Text, View } from "react-native";
 import { ServiceItemTypeInput } from "./inputFields/ServiceItemTypeInput.tsx";
 import { AmountInput } from "../../../../../_shared/currency/components/AmountInput.tsx";
-import React, { useCallback } from "react";
+import React from "react";
 import { SaveButton } from "../../../../../../components/Button/presets/SaveButton.tsx";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../constants/index.ts";
+import { COLORS, FONT_SIZES } from "../../../../../../constants/index.ts";
 import Form from "../../../../../../components/Form/Form.tsx";
+import { useTranslation } from "react-i18next";
+import { ArrayInputToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
+import { formTheme } from "../../../../../../ui/form/constants/theme.ts";
 
 type ServiceItemFormProps = {
     carCurrencyId: number
-    onSubmit: (result: Omit<ServiceItem, "serviceLogId" | "carId">) => void
-    defaultServiceItem?: ServiceItem
+    onSubmit: (result: ServiceItemFormTransformedFields) => void
+    defaultServiceItem?: ServiceItemFormTransformedFields | null
 }
 
 export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }: ServiceItemFormProps) {
+    const { t } = useTranslation();
     const { openToast } = useAlert();
     const { serviceItemDao } = useDatabase();
 
-    const form = useForm<ServiceItemFields>(useServiceItemFormProps({
+    const form = useForm<ServiceItemFormFields, any, ServiceItemFormFields>(useServiceItemFormProps({
         carCurrencyId,
         serviceItem: defaultServiceItem
     }));
@@ -30,56 +36,47 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
     const { control, setValue, handleSubmit } = form;
 
     const submitHandler = handleSubmit(
-        async (formResult: ServiceItemFields) => {
+        async (formResult) => {
             try {
-                const result = await serviceItemDao.mapper.formResultToDto({
-                    ...formResult,
-                    carCurrencyId: carCurrencyId
-                });
+                const result = await serviceItemDao.mapper.formResultToDto(formResult, carCurrencyId);
 
                 onSubmit(result);
-
             } catch(e) {
-                openToast(CarCreateToast.error());
+                openToast(ArrayInputToast.error());
                 console.error("Hiba a submitHandler-ben log:", e);
             }
         },
         (errors) => {
             console.log("Service item form validation errors", errors);
-            openToast(CarCreateToast.error());
+            openToast(InvalidFormToast.warning());
         }
     );
 
-    const amountFieldExchangeText = useCallback((exchangedAmount: string) => {
-        return (
-            <>
-                Az autó alapvalutájában számolt egységár{ " " }
-                <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
-            </>
-        );
-    }, []);
-
     return (
         <View style={ styles.container }>
-            <Text style={ styles.title }>Szervizelési tétel</Text>
-            <Form style={ styles.formContainer }>
-                <ServiceItemTypeInput
-                    control={ control }
-                    fieldName="typeId"
-                />
-                <AmountInput
-                    control={ control }
-                    setValue={ setValue }
-                    title={ "Egységár" }
-                    amountPlaceholder={ "Egységár" }
-                    amountFieldName="pricePerUnit"
-                    currencyFieldName="currencyId"
-                    quantityFieldName="quantity"
-                    exchangeRateFieldName="exchangeRate"
-                    exchangeText={ amountFieldExchangeText }
-                    defaultCurrency={ carCurrencyId }
-                />
-            </Form>
+            <Text style={ styles.title }>{ t("service.items.title_singular") }</Text>
+            <Form
+                form={ form }
+                formFields={
+                    [
+                        <ServiceItemTypeInput
+                            control={ control }
+                            fieldName="typeId"
+                        />,
+                        <AmountInput
+                            control={ control }
+                            setValue={ setValue }
+                            fieldName="expense"
+                            title={ t("currency.price_per_unit") }
+                            amountPlaceholder={ t("currency.price_per_unit") }
+                            defaultCurrency={ carCurrencyId }
+                            isPricePerUnitFallback={ true }
+                            showsQuantityInput={ true }
+                        />
+                    ]
+                }
+                containerStyle={ styles.formContainer }
+            />
             <SaveButton onPress={ submitHandler }/>
         </View>
     );
@@ -89,10 +86,13 @@ const styles = StyleSheet.create({
     container: {
         width: "100%",
         alignSelf: "center",
-        gap: SEPARATOR_SIZES.lightSmall
+        gap: formTheme.gap
     },
     formContainer: {
         flex: 1,
+        width: "100%",
+        alignSelf: "center",
+        gap: formTheme.gap,
         overflow: "hidden"
     },
     title: {

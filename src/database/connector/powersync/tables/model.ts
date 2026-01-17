@@ -1,6 +1,6 @@
 import { column, Table } from "@powersync/react-native";
 
-export const MODEL_TABLE = "model";
+export const MODEL_TABLE = "model" as const;
 
 export const modelTable = new Table({
     id: column.text,
@@ -8,4 +8,4 @@ export const modelTable = new Table({
     name: column.text,
     start_year: column.text,
     end_year: column.text
-});
+}, { localOnly: true });

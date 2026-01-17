@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
+    BaseConfig,
     COLORS,
     DEFAULT_SEPARATOR,
     FONT_SIZES,
@@ -20,29 +21,64 @@ import { useAppSelector } from "../hooks/index.ts";
 import { getUser } from "../features/user/model/selectors/index.ts";
 import { EDIT_USER_FORM_TYPE } from "../features/user/presets/bottomSheet/index.ts";
 import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
+import { FlagUs } from "../components/flags/FlagUs.tsx";
+import { FlagHu } from "../components/flags/FlagHu.tsx";
+import { useTranslation } from "react-i18next";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AnimatedPressable } from "../components/AnimatedComponents/index.ts";
+import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 const ProfileScreen: React.FC = () => {
+    const { t, i18n } = useTranslation();
     const user = useAppSelector(getUser);
     const { hasPassword, signOut, deleteAccount } = useAuth();
     const { bottom } = useSafeAreaInsets();
 
-    if(!user) return <Redirect href={ "backToRootIndex" }/>;
-
-    const name = `${ user.lastname } ${ user.firstname }`;
-    const avatarColor = user.avatarColor;
+    const selectedLanguage = useSharedValue(i18n.language);
 
     const openEditUser = (type: EDIT_USER_FORM_TYPE) => router.push({
         pathname: "bottomSheet/editUser",
         params: { type }
     });
 
-    const openEditName = () => openEditUser(EDIT_USER_FORM_TYPE.EditName);
+    const openEditUserInformation = () => openEditUser(EDIT_USER_FORM_TYPE.EditUserInformation);
     const openLinkPasswordToOAuth = () => openEditUser(EDIT_USER_FORM_TYPE.LinkPasswordToOAuth);
     const openResetPassword = () => openEditUser(EDIT_USER_FORM_TYPE.ResetPassword);
     const openChangeEmail = () => openEditUser(EDIT_USER_FORM_TYPE.ChangeEmail);
     const openEditAvatar = () => openEditUser(EDIT_USER_FORM_TYPE.EditAvatar);
 
+    const changeLanguage = async (language: string) => {
+        try {
+            await i18n.changeLanguage(language);
+            selectedLanguage.value = language;
+            await AsyncStorage.setItem(BaseConfig.LOCAL_STORAGE_KEY_LANGUAGE, language);
+        } catch(error) {
+            console.error("Error changing language:", error);
+        }
+    };
+
+    const useFlagStyle = (language: Array<string> | string) => useAnimatedStyle(() => {
+        const languages = typeof language === "string" ? [language] : language;
+
+        return ({
+            transform: [
+                {
+                    scale: withTiming(languages.includes(selectedLanguage.value) ? 1.175 : 1, {
+                        duration: 200
+                    })
+                }
+            ]
+        });
+    });
+
+    const enFlagStyle = useFlagStyle(["en", "en-US"]);
+    const huFlagStyle = useFlagStyle(["hu", "hu-HU"]);
     const styles = useStyles(bottom);
+
+    if(!user) return <Redirect href={ "backToRootIndex" }/>;
+
+    const name = `${ user.lastname } ${ user.firstname }`;
+    const avatarColor = user.avatarColor;
 
     return (
         <ScreenScrollView
@@ -53,9 +89,9 @@ const ProfileScreen: React.FC = () => {
             <View style={ styles.container }>
                 <View style={ styles.informationContainer }>
                     {
-                        user?.userAvatar
+                        user?.avatarPath
                         ? <Avatar.Image
-                            source={ user.userAvatar.image }
+                            path={ user.avatarPath }
                             avatarSize={ hp(20) }
                             borderColor={ COLORS.black5 }
                             style={ styles.profileImage }
@@ -77,15 +113,29 @@ const ProfileScreen: React.FC = () => {
                         <Text style={ styles.emailText }>
                             { user?.email }
                         </Text>
+                        <View style={ styles.flagContainer }>
+                            <AnimatedPressable
+                                style={ enFlagStyle }
+                                onPress={ () => changeLanguage("en-US") }
+                            >
+                                <FlagUs width={ 36 } height={ 36 }/>
+                            </AnimatedPressable>
+                            <AnimatedPressable
+                                style={ huFlagStyle }
+                                onPress={ () => changeLanguage("hu-HU") }
+                            >
+                                <FlagHu width={ 36 } height={ 36 }/>
+                            </AnimatedPressable>
+                        </View>
                     </View>
                 </View>
                 <View style={ styles.actionButtonsContainer }>
                     <Button.Text
                         iconLeft={ ICON_NAMES.settings }
                         iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Személyes adatok"
+                        text={ t("profile.personal_information") }
                         textStyle={ { textAlign: "left" } }
-                        onPress={ openEditName }
+                        onPress={ openEditUserInformation }
                         backgroundColor="transparent"
                         fontSize={ FONT_SIZES.p1 }
                         loadingIndicator
@@ -106,7 +156,7 @@ const ProfileScreen: React.FC = () => {
                     <Button.Text
                         iconLeft={ ICON_NAMES.email }
                         iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Email csere"
+                        text={ t("profile.change_email") }
                         textStyle={ { textAlign: "left" } }
                         onPress={ openChangeEmail }
                         backgroundColor="transparent"
@@ -117,7 +167,7 @@ const ProfileScreen: React.FC = () => {
                     <Button.Text
                         iconLeft={ ICON_NAMES.password }
                         iconRight={ ICON_NAMES.rightArrowHead }
-                        text={ hasPassword ? "Jelszó csere" : "Jelszó hozzáadás" }
+                        text={ hasPassword ? t("profile.change_password") : t("profile.add_password") }
                         textStyle={ { textAlign: "left" } }
                         onPress={ hasPassword ? openResetPassword : openLinkPasswordToOAuth }
                         backgroundColor="transparent"
@@ -128,7 +178,7 @@ const ProfileScreen: React.FC = () => {
                     <Button.Text
                         iconLeft={ ICON_NAMES.trashCan }
                         iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Fiók törlése"
+                        text={ t("profile.delete_account") }
                         onPress={ deleteAccount }
                         textStyle={ { textAlign: "left" } }
                         backgroundColor="transparent"
@@ -139,7 +189,7 @@ const ProfileScreen: React.FC = () => {
                 </View>
                 <Button.Text
                     iconLeft={ ICON_NAMES.signOut }
-                    text="Kijelentkezés"
+                    text={ t("profile.sign_out") }
                     onPress={ signOut }
                     backgroundColor={ COLORS.googleRed }
                     textColor={ COLORS.black2 }
@@ -196,6 +246,11 @@ const useStyles = (bottom: number) => StyleSheet.create({
         ...GLOBAL_STYLE.containerText,
         lineHeight: GLOBAL_STYLE.containerText.fontSize,
         textAlign: "center"
+    },
+    flagContainer: {
+        flexDirection: "row",
+        gap: SEPARATOR_SIZES.mediumSmall,
+        alignSelf: "center"
     },
     actionButtonsContainer: {
         top: -hp(10) //4.5

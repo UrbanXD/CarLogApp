@@ -1,38 +1,68 @@
-import React from "react";
-import { StyleSheet, Text, View, ViewStyle } from "react-native";
+import React, { useMemo } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import Icon from "./Icon";
 import { hexToRgba } from "../utils/colors/hexToRgba";
-import { ImageSource } from "../types/index.ts";
+import { ImageSource, ViewStyle } from "../types/index.ts";
+import { debounce } from "es-toolkit";
+import { MoreDataLoading } from "./loading/MoreDataLoading.tsx";
 
-interface DefaultElementProps {
-    icon?: ImageSource;
-    text?: string;
-    loadingText?: string;
-    style?: ViewStyle;
+type DefaultElementProps = {
+    icon?: ImageSource
+    text?: string
+    onPress?: () => void
+    loading?: boolean
+    loadingText?: string
+    activityIndicatorSize?: "large" | "small" | number
+    style?: ViewStyle
 }
 
-const DefaultElement: React.FC<DefaultElementProps> = ({
+function DefaultElement({
     icon = ICON_NAMES.image,
     text,
+    onPress,
+    loading,
+    loadingText,
+    activityIndicatorSize = "large",
     style
-}) => {
+}: DefaultElementProps) {
+    const debouncedOnPress = useMemo(() => debounce(() => {
+        if(loading) return;
+
+        onPress?.();
+    }, 250), [onPress, loading]);
+
     return (
-        <View style={ [styles.container, style] }>
+        <Pressable
+            onPress={ debouncedOnPress }
+            disabled={ !onPress || loading }
+            style={ [styles.container, style] }
+        >
             <View style={ { alignItems: "center" } }>
-                <Icon
-                    icon={ icon }
-                    size={ FONT_SIZES.title }
-                    color={ COLORS.gray3 }
-                />
                 {
-                    text &&
-                   <Text style={ styles.text }>{ text }</Text>
+                    loading
+                    ?
+                    <MoreDataLoading
+                        text={ loadingText }
+                        activityIndicatorSize={ activityIndicatorSize }
+                    />
+                    :
+                    <>
+                        <Icon
+                            icon={ icon }
+                            size={ FONT_SIZES.title }
+                            color={ COLORS.gray3 }
+                        />
+                        {
+                            text &&
+                           <Text style={ styles.text }>{ text }</Text>
+                        }
+                    </>
                 }
             </View>
-        </View>
+        </Pressable>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {

@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
-import { StyleSheet, View, ViewStyle } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../constants/index.ts";
+import { ViewStyle } from "../../types/index.ts";
 
 interface ButtonsRowProps {
     style?: ViewStyle;

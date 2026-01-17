@@ -1,6 +1,6 @@
 import { CarFormFields } from "../../../schemas/form/carForm.ts";
 import { MoreDataLoading } from "../../../../../components/loading/MoreDataLoading.tsx";
-import { Car } from "../../../schemas/carSchema.ts";
+import { carSchema } from "../../../schemas/carSchema.ts";
 import CarProfile from "../../carProfile/CarProfile.ts";
 import React, { useEffect, useState } from "react";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
@@ -11,7 +11,7 @@ import { Currency } from "../../../../_shared/currency/schemas/currencySchema.ts
 
 type ResultStepProps = {
     formValues: CarFormFields
-    goTo: (stepIndex?: number) => void
+    goTo: (stepIndex: number) => void
 }
 
 export function ResultStep({
@@ -60,7 +60,8 @@ export function ResultStep({
 
     if(!fuelType || !fuelUnit || !odometerUnit || !currency) return <MoreDataLoading/>;
 
-    const car: Car = {
+    const { data } = carSchema.partial().safeParse({
+        id: formValues.id,
         name: formValues.name,
         model: {
             id: formValues.model.id,
@@ -69,18 +70,23 @@ export function ResultStep({
             year: formValues.model.year
         },
         odometer: {
-            value: formValues.odometer.value,
+            id: formValues.odometer.id,
+            carId: formValues.id,
+            value: Number(formValues.odometer.value),
+            valueInKm: Number(formValues.odometer.value),
             unit: odometerUnit
         },
         currency,
         fuelTank: {
+            id: formValues.fuelTank.id,
             type: fuelType,
             unit: fuelUnit,
-            capacity: formValues.fuelTank.capacity,
-            value: formValues.fuelTank.value
+            capacity: Number(formValues.fuelTank.capacity)
         },
-        image: formValues.image
-    };
+        imagePath: formValues.image?.uri
+    });
 
-    return <CarProfile.ByObj car={ car } goTo={ goTo }/>;
+    if(!data) return <></>;
+
+    return <CarProfile.ByObj car={ data } goTo={ goTo }/>;
 }

@@ -1,9 +1,8 @@
 import { AbstractPowerSyncDatabase, CrudEntry, PowerSyncBackendConnector, UpdateType } from "@powersync/react-native";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { SupabaseClient } from "@supabase/supabase-js";
 import "react-native-url-polyfill/auto";
 import { BaseConfig } from "../../constants/index.ts";
 import { SupabaseStorageAdapter } from "./storage/SupabaseStorageAdapter.ts";
-import LargeSecureStore from "./storage/LargeSecureStorage.ts";
 
 /// Postgres Response codes that we cannot recover from by retrying.
 const FATAL_RESPONSE_CODES = [
@@ -19,22 +18,10 @@ const FATAL_RESPONSE_CODES = [
 
 export class SupabaseConnector implements PowerSyncBackendConnector {
     client: SupabaseClient;
-    powersync: AbstractPowerSyncDatabase;
     storage: SupabaseStorageAdapter;
 
-    constructor(powersync: AbstractPowerSyncDatabase) {
-        this.client = createClient(
-            BaseConfig.SUPABASE_URL,
-            BaseConfig.SUPABASE_ANON_KEY,
-            {
-                auth: {
-                    persistSession: true,
-                    storage: new LargeSecureStore()
-                }
-            }
-        );
-
-        this.powersync = powersync;
+    constructor(client: SupabaseClient) {
+        this.client = client;
         this.storage = new SupabaseStorageAdapter({ client: this.client });
     }
 
@@ -47,11 +34,11 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
         if(!session || error) throw new Error(`Could not fetch Supabase credentials: ${ error }`);
 
         return {
-            client: this.client,
             endpoint: BaseConfig.POWERSYNC_URL,
-            token: session.access_token ?? "",
-            expiresAt: session.expires_at ? new Date(session.expires_at * 1000) : undefined,
-            userID: session.user.id
+            token: session?.access_token ?? "",
+            expiresAt: session?.expires_at
+                       ? new Date(session.expires_at * 1000)
+                       : undefined
         };
     }
 

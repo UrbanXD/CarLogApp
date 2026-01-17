@@ -33,13 +33,19 @@ export type Modal = {
     title?: string
     body?: string
     color: string
-    acceptAction?: () => void
+    acceptAction?: () => (void | Promise<void>)
     acceptText: string
-    dismissAction?: () => void
+    dismissAction?: () => (void | Promise<void>)
     dismissText: string
 }
 
+export type ModalAction = ({ name, acceptAction, dismissAction }: {
+    name?: string
+    acceptAction?: () => (void | Promise<void>)
+    dismissAction?: () => (void | Promise<void>)
+}) => Partial<Modal>
+
 export type AlertState = {
     toasts: Array<Toast>
-    modal: Modal
+    modal: Modal | null
 }

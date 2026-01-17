@@ -13,28 +13,36 @@ import { useServiceLogTimelineItem } from "../hooks/useServiceLogTimelineItem.ts
 import { YearPicker } from "../../../../../components/Input/_presets/YearPicker.tsx";
 import { sql } from "@powersync/kysely-driver";
 import { Title } from "../../../../../components/Title.tsx";
+import { TimelineItemType } from "../../../../../components/timelineView/item/TimelineItem.tsx";
+import { useTranslation } from "react-i18next";
+import { CAR_TABLE } from "../../../../../database/connector/powersync/tables/car.ts";
+import { RawBuilder } from "kysely";
 
 type ServiceLogTimelineProps = {
     car: Car
 };
 
 export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
+    const { t } = useTranslation();
     const { serviceLogDao } = useDatabase();
-    const { mapper } = useServiceLogTimelineItem(car.currency);
-    const paginator = useMemo(() =>
-        serviceLogDao.paginator(
-            {
-                cursor: [
-                    { table: EXPENSE_TABLE, field: "date", order: "desc" },
-                    { table: EXPENSE_TABLE, field: "amount", order: "desc" },
-                    { field: "id" }
-                ]
-            },
-            {
-                group: "car",
-                filters: [{ field: "car_id", operator: "=", value: car.id }]
-            }
-        ), []);
+    const { mapper } = useServiceLogTimelineItem();
+    const paginator = useMemo(
+        () =>
+            serviceLogDao.paginator(
+                {
+                    cursor: [
+                        { table: EXPENSE_TABLE, field: "date", order: "desc" },
+                        { table: EXPENSE_TABLE, field: "amount", order: "desc" },
+                        { field: "id" }
+                    ]
+                },
+                {
+                    group: CAR_TABLE,
+                    filters: [{ field: "car_id", operator: "=", value: car.id }]
+                }
+            ),
+        []
+    );
 
     const {
         ref,
@@ -47,19 +55,19 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
         isPreviousFetching,
         timelineFilterManagement,
         orderButtons
-    } = useTimelinePaginator<ServiceLogTableRow & ExpenseTableRow, ServiceLog>({
+    } = useTimelinePaginator<ServiceLogTableRow & ExpenseTableRow, ServiceLog, TimelineItemType>({
         paginator,
         mapper,
         cursorOrderButtons: [
-            { table: EXPENSE_TABLE, field: "date", title: "Dátum" },
-            { table: EXPENSE_TABLE, field: "amount", title: "Ár" }
+            { table: EXPENSE_TABLE, field: "date", title: t("date.text") },
+            { table: EXPENSE_TABLE, field: "amount", title: t("currency.price") }
         ]
     });
     const { filterButtons } = useServiceLogTimelineFilter({ timelineFilterManagement, car });
 
     const setYearFilter = useCallback((year: string) => {
         // @formatter:off
-        const customSql = (fieldRef: string) => sql<number>`strftime('%Y', ${ fieldRef })`;
+        const customSql = (fieldRef: string | RawBuilder<any>) => sql<number>`strftime('%Y', ${ fieldRef })`;
         // @formatter:on
         timelineFilterManagement.replaceFilter({
             groupKey: "year",
@@ -71,13 +79,13 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
         <View style={ styles.container }>
             <View style={ styles.headerContainer }>
                 <Title
-                    title={ "Szervízkönyv" }
-                    containerStyle={ styles.headerContainer.titleContainer }
+                    title={ t("service.title") }
+                    containerStyle={ styles.titleContainer }
                 />
                 <YearPicker
-                    containerStyle={ styles.headerContainer.yearPicker }
-                    textInputStyle={ styles.headerContainer.yearPicker.label }
-                    inputPlaceholder={ "Év" }
+                    containerStyle={ styles.yearPicker }
+                    textInputStyle={ styles.yearPickerLabel }
+                    inputPlaceholder={ t("date.year") }
                     hiddenBackground={ true }
                     setValue={ setYearFilter }
                 />
@@ -88,8 +96,8 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
                 orderButtons={ orderButtons }
                 filterButtons={ filterButtons }
                 isInitialFetching={ isInitialFetching }
-                fetchNext={ initialFetchHappened && paginator.hasNext() && fetchNext }
-                fetchPrevious={ initialFetchHappened && paginator.hasPrevious() && fetchPrevious }
+                fetchNext={ initialFetchHappened && paginator.hasNext() ? fetchNext : undefined }
+                fetchPrevious={ initialFetchHappened && paginator.hasPrevious() ? fetchPrevious : undefined }
                 isNextFetching={ isNextFetching }
                 isPreviousFetching={ isPreviousFetching }
                 style={ { paddingBottom: SIMPLE_TABBAR_HEIGHT } }
@@ -106,20 +114,17 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "space-between",
         flexDirection: "row",
-        alignItems: "flex-start",
-
-        titleContainer: {
-            flexShrink: 1
-        },
-
-        yearPicker: {
-            minHeight: 0,
-            height: FONT_SIZES.p1,
-
-            label: {
-                fontFamily: "Gilroy-Heavy",
-                color: COLORS.white
-            }
-        }
+        alignItems: "flex-start"
+    },
+    titleContainer: {
+        flexShrink: 1
+    },
+    yearPicker: {
+        minHeight: 0,
+        height: FONT_SIZES.p1
+    },
+    yearPickerLabel: {
+        fontFamily: "Gilroy-Heavy",
+        color: COLORS.white
     }
 });

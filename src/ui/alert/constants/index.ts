@@ -7,13 +7,6 @@ export const ALERT_ICONS = {
     error: "alert-circle-outline"
 };
 
-export const ALERT_TITLES = {
-    success: "Sikeres művelet",
-    info: "Információ",
-    warning: "Figyelmeztetés",
-    error: "Hiba"
-};
-
 export const ALERT_COLORS = {
     success: COLORS.greenLight,
     info: COLORS.blueLight,

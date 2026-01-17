@@ -1,46 +1,71 @@
 import React from "react";
-import { editUserAvatar } from "../../model/actions/editUserAvatar.ts";
 import { EditUserAvatarRequest, useEditUserAvatarFormProps } from "../../schemas/form/editUserAvatarRequest.ts";
-import { useForm } from "react-hook-form";
+import { FormState, useForm } from "react-hook-form";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
-import { useAppDispatch } from "../../../../hooks/index.ts";
 import { UserAccount } from "../../schemas/userSchema.ts";
-import { ChangeNameToast } from "../../presets/toast/index.ts";
-import { router } from "expo-router";
+import { ChangePersonalInformationToast } from "../../presets/toast/index.ts";
 import { getToastMessage } from "../../../../ui/alert/utils/getToastMessage.ts";
 import { AvatarStep } from "./steps/AvatarStep.tsx";
 import Form from "../../../../components/Form/Form.tsx";
-import { FormButtons } from "../../../../components/Button/presets/FormButtons.tsx";
+import { SubmitHandlerArgs } from "../../../../types/index.ts";
+import { InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
+import { getLabelByName } from "../../../../utils/getLabelByName.ts";
+import { router } from "expo-router";
+import { getMediaType } from "../../../../database/utils/getFileExtension.ts";
 
-type EditUserAvatarFormProps = { user: UserAccount }
+type EditUserAvatarFormProps = {
+    user: UserAccount
+    onFormStateChange?: (formState: FormState<EditUserAvatarRequest>) => void
+}
 
-export function EditUserAvatarForm({ user }: EditUserAvatarFormProps) {
-    const dispatch = useAppDispatch();
-    const database = useDatabase();
+export function EditUserAvatarForm({ user, onFormStateChange }: EditUserAvatarFormProps) {
+    const { userDao, attachmentQueue } = useDatabase();
     const { openToast } = useAlert();
 
     const form = useForm<EditUserAvatarRequest>(useEditUserAvatarFormProps({
-        avatar: user.avatar,
-        avatarColor: user.avatarColor
+        avatar:
+            user.avatarPath
+            ?
+                {
+                    uri: attachmentQueue
+                         ? attachmentQueue.getLocalUri(attachmentQueue.getLocalFilePathSuffix(user.avatarPath))
+                         : user.avatarPath,
+                    fileName: user.avatarPath,
+                    mediaType: getMediaType(user.avatarPath)
+                }
+            : null,
+        avatarColor: user.avatarColor,
+        isImageAvatar: !!user.avatarPath
     }));
-    const { handleSubmit, reset } = form;
 
-    const submitHandler = handleSubmit(async (request: EditUserAvatarRequest) => {
-        try {
-            await dispatch(editUserAvatar({ database, request: { ...request } }));
+    const submitHandler: SubmitHandlerArgs<EditUserAvatarRequest> = {
+        onValid: async (request) => {
+            try {
+                await userDao.updateAvatar(user.id, request);
 
-            openToast(ChangeNameToast.success());
-            router.dismissTo("(profile)/user");
-        } catch(error) {
-            openToast(getToastMessage({ messages: ChangeNameToast, error }));
+                openToast(ChangePersonalInformationToast.success());
+                router.dismissTo("(profile)/user");
+            } catch(error) {
+                console.log(error);
+                openToast(getToastMessage({ messages: ChangePersonalInformationToast, error }));
+            }
+        },
+        onInvalid: (errors) => {
+            console.log("Edit user avatar validation errors", errors);
+            openToast(InvalidFormToast.warning());
         }
-    });
+    };
+
+    const name = `${ user?.lastname } ${ user?.firstname }`;
 
     return (
-        <Form>
-            <AvatarStep { ...form } />
-            <FormButtons reset={ reset } submit={ submitHandler }/>
-        </Form>
+        <Form
+            edit
+            form={ form }
+            formFields={ <AvatarStep form={ form } avatarLabel={ getLabelByName(name) }/> }
+            submitHandler={ submitHandler }
+            onFormStateChange={ onFormStateChange }
+        />
     );
 }

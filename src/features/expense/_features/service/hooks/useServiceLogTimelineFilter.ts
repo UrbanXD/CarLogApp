@@ -5,9 +5,11 @@ import { ServiceType } from "../schemas/serviceTypeSchema.ts";
 import { Car } from "../../../../car/schemas/carSchema.ts";
 import { ExpenseTableRow, ServiceLogTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
 import { TimelineFilterManagement } from "../../../../../hooks/useTimelinePaginator.ts";
+import { useTranslation } from "react-i18next";
+import { FilterCondition } from "../../../../../database/paginator/AbstractPaginator.ts";
 
 const TYPES_FILTER_KEY = "type_filter";
-const TYPES_FILTER_FIELD_NAME = "service_type_id";
+const TYPES_FILTER_FIELD_NAME = "service_type_id" as keyof (ExpenseTableRow & ServiceLogTableRow);
 
 type UseServiceLogTimelineFilterProps = {
     timelineFilterManagement: TimelineFilterManagement<ExpenseTableRow & ServiceLogTableRow>,
@@ -24,7 +26,9 @@ export function useServiceLogTimelineFilter({
     },
     car
 }: UseServiceLogTimelineFilterProps) {
+    const { t } = useTranslation();
     const { serviceTypeDao } = useDatabase();
+
     const [types, setTypes] = useState<Array<ServiceType>>([]);
     const [selectedTypesId, setSelectedTypesId] = useState<Array<ServiceType["id"]>>([]);
 
@@ -34,7 +38,7 @@ export function useServiceLogTimelineFilter({
 
             // sort based on locale
             const sorted = types.sort((a, b) => {
-                return a.key.localeCompare(b.key);
+                return t(`service.types.${ a.key }`).localeCompare(t(`service.types.${ b.key }`));
             });
 
 
@@ -61,12 +65,16 @@ export function useServiceLogTimelineFilter({
     }, [filters]);
 
     useEffect(() => {
-        replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: car.id } });
+        if(car) replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: car.id } });
     }, [car]);
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {
         const active = selectedTypesId.includes(type.id);
-        const filter = { field: TYPES_FILTER_FIELD_NAME, operator: "=", value: type.id };
+        const filter: FilterCondition<ExpenseTableRow & ServiceLogTableRow> = {
+            field: TYPES_FILTER_FIELD_NAME,
+            operator: "=",
+            value: type.id
+        };
         const onPress = () => {
             if(!active) {
                 addFilter({ groupKey: TYPES_FILTER_KEY, filter, logic: "OR" });
@@ -76,7 +84,7 @@ export function useServiceLogTimelineFilter({
         };
 
         return {
-            title: type.key,
+            title: t(`service.types.${ type.key }`),
             active,
             activeColor: type?.primaryColor ?? undefined,
             onPress
@@ -84,7 +92,7 @@ export function useServiceLogTimelineFilter({
     });
 
     filterButtons.unshift({
-        title: "Mind",
+        title: t("common.filters.all"),
         active: selectedTypesId.length === 0,
         onPress: () => clearFilters(TYPES_FILTER_KEY)
     });

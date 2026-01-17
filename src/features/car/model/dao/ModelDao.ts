@@ -4,53 +4,37 @@ import { ModelMapper } from "../mapper/modelMapper.ts";
 import { MODEL_TABLE } from "../../../../database/connector/powersync/tables/model.ts";
 import { Model } from "../../schemas/modelSchema.ts";
 import { MakeDao } from "./MakeDao.ts";
-import { getToday } from "../../../../utils/getDate.ts";
 import { CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
+import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";
 
 export class ModelDao extends Dao<ModelTableRow, Model, ModelMapper> {
     constructor(db: Kysely<DatabaseType>, makeDao: MakeDao) {
         super(db, MODEL_TABLE, new ModelMapper(makeDao));
     }
 
-    async getModelYearsById(id: string, desc?: boolean): Promise<Array<PickerItemType>> {
+    async getModelYearsById(id: string): Promise<{ start?: number, end?: number }> {
         const model = await this.getById(id);
 
-        const years = {
-            start: Number(model?.startYear),
-            end: !model?.endYear
-                 ? getToday().getFullYear()
-                 : Number(model.endYear)
-        };
+        const start = model?.startYear ? Number(model.startYear) : undefined;
+        const end = model?.endYear ? Number(model.endYear) : undefined;
 
-        let result: Array<PickerItemType> = Array.from({ length: years.end - years.start + 1 }, (_, key) => {
-            const year = (years.start + key).toString();
-
-            return {
-                title: year,
-                value: year
-            };
-        });
-
-        if(desc) result = result.reverse();
-
-        return result;
+        return { start, end };
     }
 
     paginatorByMakeId(
-        makeId: string | undefined,
-        perPage?: number = 50
+        makeId: string | null,
+        perPage: number = 50
     ): CursorPaginator<ModelTableRow, PickerItemType> {
-        console.log(makeId, "paginator ");
         return new CursorPaginator<ModelTableRow, PickerItemType>(
             this.db,
             MODEL_TABLE,
-            { cursor: [{ field: "name", order: "asc" }, { field: "id" }], defaultOrder: "asc" },
+            { cursor: [{ field: "name", order: "asc", toLowerCase: true }, { field: "id" }], defaultOrder: "asc" },
             {
                 perPage,
                 filterBy: makeId ? {
-                    group: "make",
+                    group: MAKE_TABLE as string,
                     filters: [{ field: "make_id", value: makeId, operator: "=" }]
                 } : undefined,
                 mapper: this.mapper.toPickerItem

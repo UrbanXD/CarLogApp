@@ -1,13 +1,8 @@
 import { Context, createContext, useContext } from "react";
 import { Steps } from "../../types/index.ts";
-import { Control, SubmitHandler, UseFormResetField, UseFormTrigger } from "react-hook-form";
 
 type MultiStepFormContextValue = {
     steps: Steps
-    control: Control<any>
-    submitHandler: SubmitHandler<any>
-    trigger: UseFormTrigger<any>
-    resetField?: UseFormResetField<any>
     currentStep: number
     currentStepText: string
     realStepsCount: number

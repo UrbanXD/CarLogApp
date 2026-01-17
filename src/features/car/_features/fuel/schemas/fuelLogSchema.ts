@@ -6,7 +6,7 @@ import { expenseSchema } from "../../../../expense/schemas/expenseSchema.ts";
 export const fuelLogSchema = z
 .object({
     id: z.string().uuid(),
-    ownerId: z.string().uuid(),
+    carId: z.string().uuid(),
     expense: expenseSchema,
     fuelUnit: fuelUnitSchema,
     odometer: odometerSchema.nullable(),

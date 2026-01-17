@@ -3,12 +3,20 @@ import { getToastMessage } from "../../../ui/alert/utils/getToastMessage.ts";
 import { ChangeEmailToast, DeleteUserToast, ResetPasswordToast, SignUpToast } from "../presets/toast/index.ts";
 import { router } from "expo-router";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
-import { OtpVerificationHandlerType } from "../../../app/bottomSheet/otpVerification.tsx";
 import { useAuth } from "../../../contexts/auth/AuthContext.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
+import { useTranslation } from "react-i18next";
 
+export enum OtpVerificationHandlerType {
+    SignUp,
+    CurrentEmailChange,
+    NewEmailChange,
+    PasswordReset,
+    UserDelete
+}
 
 export const useOtpVerificationHandler = () => {
+    const { t } = useTranslation();
     const { supabaseConnector } = useDatabase();
     const { openToast } = useAlert();
     const { signOut } = useAuth();
@@ -45,9 +53,9 @@ export const useOtpVerificationHandler = () => {
             await signOut(true);
         };
 
-    const handleCurrentEmailVerification = (email?: string): HandleVerificationOtpType =>
+    const handleCurrentEmailVerification = (newEmail?: string): HandleVerificationOtpType =>
         async (errorCode) => {
-            if(errorCode || !email) {
+            if(errorCode || !newEmail) {
                 return openToast(
                     getToastMessage({
                         messages: ChangeEmailToast,
@@ -60,8 +68,8 @@ export const useOtpVerificationHandler = () => {
                 pathname: "bottomSheet/otpVerification",
                 params: {
                     type: "email_change",
-                    title: "Új email cím hitelesítés",
-                    email,
+                    title: t("auth.otp_verification.new_email"),
+                    email: newEmail,
                     handlerType: OtpVerificationHandlerType.NewEmailChange
                 }
             });

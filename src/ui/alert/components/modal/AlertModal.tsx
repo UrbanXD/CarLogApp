@@ -5,6 +5,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Icon from "../../../../components/Icon.tsx";
 import Button from "../../../../components/Button/Button.ts";
 import { Color } from "../../../../types/index.ts";
+import { useTranslation } from "react-i18next";
 
 export interface AlertModalProps {
     icon?: string;
@@ -23,11 +24,13 @@ const AlertModal: React.FC<AlertModalProps> = ({
     body,
     color = COLORS.fuelYellow,
     accept = () => {},
-    acceptText = "Folytatás",
+    acceptText,
     dismiss = () => {},
-    dismissText = "Mégse"
+    dismissText
 }) => {
-    const iconSize = hp(11.5);
+    const { t } = useTranslation();
+
+    const iconSize = hp(10);
 
     const styles = useStyles(iconSize);
 
@@ -61,15 +64,13 @@ const AlertModal: React.FC<AlertModalProps> = ({
                 </View>
                 <View style={ styles.buttonContainer }>
                     <Button.Text
-                        text={ acceptText }
+                        text={ acceptText ?? t("modal.accept") }
                         fontSize={ FONT_SIZES.p2 }
                         backgroundColor={ color }
-                        height={ hp(5.5) }
                         onPress={ accept }
                     />
                     <Button.Text
-                        text={ dismissText }
-                        height={ hp(5.5) }
+                        text={ dismissText ?? t("modal.dismiss") }
                         backgroundColor={ "transparent" }
                         fontSize={ FONT_SIZES.p2 }
                         textColor={ color }

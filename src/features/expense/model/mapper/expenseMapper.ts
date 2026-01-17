@@ -1,14 +1,18 @@
-import { ExpenseTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
+import { CarTableRow, ExpenseTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
 import { ExpenseTypeDao } from "../dao/ExpenseTypeDao.ts";
 import { Expense, expenseSchema } from "../../schemas/expenseSchema.ts";
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
 import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
-import { ExpenseFields } from "../../schemas/form/expenseForm.ts";
+import { ExpenseFormFields } from "../../schemas/form/expenseForm.ts";
 import { ExpenseType } from "../../schemas/expenseTypeSchema.ts";
 import { Currency } from "../../../_shared/currency/schemas/currencySchema.ts";
 import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
+import { amountSchema } from "../../../_shared/currency/schemas/amountSchema.ts";
 
-export type SelectExpenseTableRow = ExpenseTableRow & { related_id: string }
+export type SelectExpenseTableRow = ExpenseTableRow & {
+    related_id: string | null,
+    car_currency_id: CarTableRow["currency_id"]
+}
 
 export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, SelectExpenseTableRow> {
     private readonly expenseTypeDao: ExpenseTypeDao;
@@ -21,20 +25,25 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, Sele
     }
 
     async toDto(entity: SelectExpenseTableRow): Promise<Expense> {
-        const [type, currency]: [ExpenseType | null, Currency | null] = await Promise.all([
-            this.expenseTypeDao.getById(entity.type_id),
-            this.currencyDao.getById(entity.currency_id)
-        ]);
+        const [type, carCurrency, currency]: [ExpenseType | null, Currency | null, Currency | null] = await Promise.all(
+            [
+                this.expenseTypeDao.getById(entity.type_id),
+                this.currencyDao.getById(entity.car_currency_id),
+                this.currencyDao.getById(entity.currency_id)
+            ]);
 
         return expenseSchema.parse({
             id: entity.id,
             carId: entity.car_id,
             relatedId: entity?.related_id ?? null,
             type: type,
-            currency: currency,
-            originalAmount: numberToFractionDigit(entity.original_amount),
-            exchangeRate: entity.exchange_rate,
-            amount: numberToFractionDigit(entity.amount),
+            amount: amountSchema.parse({
+                amount: numberToFractionDigit(entity.original_amount ?? 0),
+                exchangedAmount: numberToFractionDigit((entity.original_amount ?? 0) * (entity.exchange_rate ?? 0)),
+                exchangeRate: numberToFractionDigit(entity.exchange_rate ?? 0),
+                currency: currency,
+                exchangeCurrency: carCurrency
+            }),
             note: entity.note,
             date: entity.date
         });
@@ -45,24 +54,24 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, Sele
             id: dto.id,
             car_id: dto.carId,
             type_id: dto.type.id,
-            currency_id: dto.currency.id,
-            original_amount: dto.originalAmount,
-            exchange_rate: dto.exchangeRate,
-            amount: dto.amount,
+            currency_id: dto.amount.exchangeCurrency.id,
+            amount: dto.amount.exchangedAmount,
+            original_amount: dto.amount.amount,
+            exchange_rate: dto.amount.exchangeRate,
             note: dto.note,
             date: dto.date
         };
     }
 
-    formResultToEntity(formResult: ExpenseFields): ExpenseTableRow {
+    formResultToEntity(formResult: ExpenseFormFields): ExpenseTableRow {
         return {
             id: formResult.id,
             car_id: formResult.carId,
             type_id: formResult.typeId,
-            currency_id: formResult.currencyId,
-            original_amount: formResult.amount,
-            exchange_rate: formResult.exchangeRate,
-            amount: formResult.amount * formResult.exchangeRate,
+            currency_id: formResult.expense.currencyId,
+            amount: numberToFractionDigit(formResult.expense.amount * formResult.expense.exchangeRate),
+            original_amount: formResult.expense.amount,
+            exchange_rate: formResult.expense.exchangeRate,
             note: formResult.note,
             date: formResult.date
         };

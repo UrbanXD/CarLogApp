@@ -1,21 +1,29 @@
 import { StyleSheet, Text } from "react-native";
 import { COLORS, FONT_SIZES } from "../../../../constants/index.ts";
 import { useDatePicker } from "../../../../contexts/datePicker/DatePickerContext.ts";
-import { DatePicker, RenderItemProps } from "@quidone/react-native-wheel-picker";
-import React, { ReactNode, useCallback } from "react";
+import { DatePicker, PickerItem, RenderItemProps } from "@quidone/react-native-wheel-picker";
+import React, { Dispatch, ReactNode, SetStateAction, useCallback } from "react";
 import dayjs from "dayjs";
 import { OnlyDateFormat } from "@quidone/react-native-wheel-picker/dest/typescript/date/date";
 import { DateNodeType } from "@quidone/react-native-wheel-picker/dest/typescript/date/DatePickerContainer";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 
-export function WheelDatePicker() {
-    const { date, setDate, maxDate, minDate, locale } = useDatePicker();
+type WheelDatePickerProps = {
+    date: Date | null,
+    setDate: Dispatch<SetStateAction<Date | null>>;
+}
+
+export function WheelDatePicker({ date, setDate }: WheelDatePickerProps) {
+    const { maxDate, minDate } = useDatePicker();
 
     const renderDate = useCallback(() => (
-        <DatePicker.Date renderItem={ renderDateText } enableScrollByTapOnItem/>
+        <DatePicker.Date
+            renderItem={ renderDateText }
+            // enableScrollByTapOnItem
+        />
     ), []);
 
-    const renderDateText = useCallback((props: RenderItemProps<number>) => (
+    const renderDateText = useCallback((props: RenderItemProps<PickerItem<number>>) => (
         <Text key={ props.index } style={ props.itemTextStyle }>
             { props.item.value.toString().padStart(2, "0") }
         </Text>
@@ -28,20 +36,21 @@ export function WheelDatePicker() {
     const onDateChanged = useCallback((event: { date: OnlyDateFormat }) => {
         const newDate = dayjs(event.date);
 
-        setDate(prevState => prevState
+        setDate(prevState => dayjs(prevState)
             .set("year", newDate.year())
             .set("month", newDate.month())
             .set("date", newDate.date())
+            .toDate()
         );
     }, []);
 
     return (
         <DatePicker
-            date={ date.format("YYYY-MM-DD") }
-            minDate={ minDate.format("YYYY-MM-DD") }
-            maxDate={ maxDate.format("YYYY-MM-DD") }
-            locale={ locale }
-            enableScrollByTapOnItem
+            date={ dayjs(date).format("YYYY-MM-DD") }
+            minDate={ dayjs(minDate).format("YYYY-MM-DD") }
+            maxDate={ dayjs(maxDate).format("YYYY-MM-DD") }
+            locale={ dayjs.locale() }
+            // enableScrollByTapOnItem
             scrollEventThrottle={ 16 }
             pickerStyle={ styles.picker }
             itemTextStyle={ styles.label }

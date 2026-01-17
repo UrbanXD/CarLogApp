@@ -17,17 +17,17 @@ const ModalManager: React.FC<ModalManagerProps> = ({
     const modal = useAppSelector(getModal);
     const { dismissModal } = useAlert();
 
-    const closeModal = () => {
+    const closeModal = async () => {
         if(!modal) return;
 
-        if(modal?.dismissAction) modal.dismissAction();
+        if(modal?.dismissAction) await modal.dismissAction();
         dismissModal();
     };
 
-    const acceptModal = () => {
+    const acceptModal = async () => {
         if(!modal) return;
 
-        if(modal?.acceptAction) modal.acceptAction();
+        if(modal?.acceptAction) await modal.acceptAction();
         dismissModal();
     };
     return (

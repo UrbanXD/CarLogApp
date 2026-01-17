@@ -124,7 +124,7 @@ const CarlogTitle: React.FC<TitleProps> = ({
                 width={ WIDTH }
                 height={ HEIGHT }
                 viewBox={ `0 0 ${ VIEW_BOX_WIDTH } ${ VIEW_BOX_HEIGHT }` }
-                style={ [styles.text, styles.text.effect, textEffect1Style] }
+                style={ [styles.text, styles.textEffect, textEffect1Style] }
             >
                 {
                     PATHS.map((path, index) => (
@@ -145,7 +145,7 @@ const CarlogTitle: React.FC<TitleProps> = ({
                 width={ WIDTH }
                 height={ HEIGHT }
                 viewBox={ `0 0 ${ VIEW_BOX_WIDTH } ${ VIEW_BOX_HEIGHT }` }
-                style={ [styles.text, styles.text.effect, textEffect2Style] }
+                style={ [styles.text, styles.textEffect, textEffect2Style] }
             >
                 {
                     PATHS.map((path, index) => (
@@ -169,10 +169,9 @@ const CarlogTitle: React.FC<TitleProps> = ({
 const styles = StyleSheet.create({
     text: {
         zIndex: 1,
-        alignSelf: "center",
-
-        effect: { position: "absolute" }
-    }
+        alignSelf: "center"
+    },
+    textEffect: { position: "absolute" }
 });
 
 export default CarlogTitle;

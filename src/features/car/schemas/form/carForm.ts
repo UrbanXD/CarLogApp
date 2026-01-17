@@ -2,50 +2,59 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Car, carSchema } from "../carSchema.ts";
 import { modelSchema } from "../modelSchema.ts";
-import { zNumber, zPickerRequired } from "../../../../types/zodTypes.ts";
+import { zImage, zNumber, zPickerRequiredNumber, zPickerRequiredString } from "../../../../types/zodTypes.ts";
 import { getUUID } from "../../../../database/utils/uuid.ts";
 import { currencySchema } from "../../../_shared/currency/schemas/currencySchema.ts";
-import { CurrencyEnum } from "../../../_shared/currency/enums/currencyEnum.ts";
-import { getLocales } from "expo-localization";
-import { odometerChangeLogForm } from "../../_features/odometer/schemas/form/odometerChangeLogForm.ts";
+import { UserAccount } from "../../../user/schemas/userSchema.ts";
+import { getMediaType } from "../../../../database/utils/getFileExtension.ts";
+import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
+import { DefaultValues } from "react-hook-form";
+import { odometerLogSchema } from "../../_features/odometer/schemas/odometerLogSchema.ts";
+import { MIN_ODOMETER_VALUE } from "../../_features/odometer/utils/zodOdometerValidation.ts";
 
 export const carFormSchema = carSchema
-.pick({ id: true, ownerId: true, name: true, image: true })
+.pick({ id: true, ownerId: true, name: true, createdAt: true })
 .extend({
     model: z.object({
-        id: zPickerRequired("Válasszon ki egy modellt!").pipe(modelSchema.shape.id),
+        id: zPickerRequiredString({ errorMessage: "error.car_model_picker_required" }).pipe(modelSchema.shape.id),
         name: z.string().optional(), // hidden input only for result screen
-        makeId: zPickerRequired("Válasszon ki egy gyártót!").pipe(modelSchema.shape.makeId),
+        makeId: zPickerRequiredString({ errorMessage: "error.car_make_picker_required" })
+        .pipe(modelSchema.shape.makeId),
         makeName: z.string().optional(), // hidden input only for result screen
-        year: zPickerRequired("Válasszon ki egy gyártási évet!").pipe(modelSchema.shape.startYear)
+        year: zPickerRequiredString({ errorMessage: "error.car_model_year_picker_required" })
+        .pipe(modelSchema.shape.startYear)
     }),
-    odometer: odometerChangeLogForm(0)
-    .pick({ id: true, value: true })
-    .extend({
-        odometerChangeLogId: odometerChangeLogForm(0).shape.odometerChangeLogId.nullable(),
-        unitId: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
+    odometer: z.object({
+        id: odometerLogSchema.shape.id,
+        odometerChangeLogId: z.string().uuid().nullable(),
+        value: zNumber({
+                bounds: { min: MIN_ODOMETER_VALUE },
+                errorMessage: {
+                    required: "error.odometer_value_required",
+                    minBound: () => "error.odometer_value_non_negative"
+                }
+            }
+        ).pipe(odometerLogSchema.shape.value),
+        unitId: zPickerRequiredNumber({ errorMessage: "error.unit_picker_required" })
         .pipe(carSchema.shape.odometer.shape.unit.shape.id)
     }),
     currencyId: currencySchema.shape.id,
     fuelTank: carSchema.shape.fuelTank.pick({ id: true }).extend({
-        typeId: zPickerRequired("Kérem válasszon ki egy üzemanyag típust!")
+        typeId: zPickerRequiredNumber({ errorMessage: "error.fuel_type_picker_required" })
         .pipe(carSchema.shape.fuelTank.shape.type.shape.id),
         capacity: zNumber({ bounds: { min: 0 } }).pipe(carSchema.shape.fuelTank.shape.capacity),
-        unitId: zPickerRequired("Kérem válasszon ki egy mértékegységet!")
+        unitId: zPickerRequiredNumber({ errorMessage: "error.unit_picker_required" })
         .pipe(carSchema.shape.fuelTank.shape.unit.shape.id)
-    })
+    }),
+    image: zImage.optional().nullable()
 });
 
 export type CarFormFields = z.infer<typeof carFormSchema>;
 
-export const useCreatCarFormProps = (userId: string) => {
-    const locales = getLocales();
-    const currencyCode = locales?.[0]?.currencyCode;
-    const regionCode = locales?.[0]?.regionCode ?? "US";
-
-    const defaultValues: CarFormFields = {
+export const useCreatCarFormProps = (user: UserAccount) => {
+    const defaultValues: DefaultValues<CarFormFields> = {
         id: getUUID(),
-        ownerId: userId,
+        ownerId: user.id,
         name: "",
         image: null,
         model: {
@@ -58,28 +67,38 @@ export const useCreatCarFormProps = (userId: string) => {
         odometer: {
             id: getUUID(),
             odometerChangeLogId: getUUID(),
-            value: NaN,
-            unitId: ""
+            value: undefined,
+            unitId: undefined
         },
-        currencyId: Number((CurrencyEnum?.[currencyCode] ??
-            (regionCode === "EU" ? CurrencyEnum.EUR : CurrencyEnum.USD))),
+        currencyId: user.currency.id,
         fuelTank: {
             id: getUUID(),
-            typeId: "",
-            unitId: "",
-            capacity: NaN
-        }
+            typeId: undefined,
+            unitId: undefined,
+            capacity: undefined
+        },
+        createdAt: new Date().toISOString()
     };
 
     return { defaultValues, resolver: zodResolver(carFormSchema) };
 };
 
-export const useEditCarFormProps = (car: Car) => {
-    const defaultValues: CarFormFields = {
+export const useEditCarFormProps = (car: Car, attachmentQueue?: PhotoAttachmentQueue) => {
+    const defaultValues: DefaultValues<CarFormFields> = {
         id: car.id,
         ownerId: car.ownerId,
         name: car.name,
-        image: car.image,
+        image:
+            car.imagePath
+            ?
+                {
+                    uri: attachmentQueue
+                         ? attachmentQueue.getLocalUri(attachmentQueue.getLocalFilePathSuffix(car.imagePath))
+                         : car.imagePath,
+                    fileName: car.imagePath,
+                    mediaType: getMediaType(car.imagePath)
+                }
+            : null,
         model: {
             id: car.model.id,
             name: car.model.name,
@@ -99,7 +118,8 @@ export const useEditCarFormProps = (car: Car) => {
             typeId: car.fuelTank.type.id,
             unitId: car.fuelTank.unit.id,
             capacity: car.fuelTank.capacity
-        }
+        },
+        createdAt: car.createdAt
     };
 
     return { defaultValues, resolver: zodResolver(carFormSchema) };

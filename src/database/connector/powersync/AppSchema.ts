@@ -19,6 +19,12 @@ import { serviceTypeTable } from "./tables/serviceType.ts";
 import { serviceLog } from "./tables/serviceLog.ts";
 import { serviceItem } from "./tables/serviceItem.ts";
 import { serviceItemTypeTable } from "./tables/serviceItemType.ts";
+import { rideLogTable } from "./tables/rideLog.ts";
+import { ridePlaceTable } from "./tables/ridePlace.ts";
+import { ridePassengerTable } from "./tables/ridePassenger.ts";
+import { placeTable } from "./tables/place.ts";
+import { passengerTable } from "./tables/passenger.ts";
+import { rideExpenseTable } from "./tables/rideExpense.ts";
 
 export const AppSchema = new Schema({
     attachments: new AttachmentTable(),
@@ -40,7 +46,13 @@ export const AppSchema = new Schema({
     service_log: serviceLog,
     service_type: serviceTypeTable,
     service_item: serviceItem,
-    service_item_type: serviceItemTypeTable
+    service_item_type: serviceItemTypeTable,
+    ride_log: rideLogTable,
+    ride_expense: rideExpenseTable,
+    ride_place: ridePlaceTable,
+    ride_passenger: ridePassengerTable,
+    place: placeTable,
+    passenger: passengerTable
 });
 
 export type DatabaseType = (typeof AppSchema)["types"];
@@ -63,3 +75,9 @@ export type ServiceLogTableRow = DatabaseType["service_log"];
 export type ServiceTypeTableRow = DatabaseType["service_type"];
 export type ServiceItemTableRow = DatabaseType["service_item"];
 export type ServiceItemTypeTableRow = DatabaseType["service_item_type"];
+export type RideLogTableRow = DatabaseType["ride_log"];
+export type RideExpenseTableRow = DatabaseType["ride_expense"];
+export type RidePlaceTableRow = DatabaseType["ride_place"];
+export type RidePassengerTableRow = DatabaseType["ride_passenger"];
+export type PlaceTableRow = DatabaseType["place"];
+export type PassengerTableRow = DatabaseType["passenger"];

@@ -10,14 +10,18 @@ import { Expense } from "../schemas/expenseSchema.ts";
 import { Car } from "../../car/schemas/carSchema.ts";
 import { useExpenseTimelineFilter } from "../hooks/useExpenseTimelineFilter.ts";
 import { SelectExpenseTableRow } from "../model/mapper/expenseMapper.ts";
+import { TimelineItemType } from "../../../components/timelineView/item/TimelineItem.tsx";
+import { useTranslation } from "react-i18next";
+import { CAR_TABLE } from "../../../database/connector/powersync/tables/car.ts";
 
 type ExpenseTimelineProps = {
     car: Car
 };
 
 export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
+    const { t } = useTranslation();
     const { expenseDao } = useDatabase();
-    const { mapper } = useExpenseTimelineItem(car.currency);
+    const { mapper } = useExpenseTimelineItem();
     const paginator = useMemo(
         () =>
             expenseDao.paginator(
@@ -28,7 +32,10 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
                         { field: "id" }
                     ]
                 },
-                { field: "car_id", operator: "=", value: car.id }
+                {
+                    group: CAR_TABLE,
+                    filters: [{ field: "car_id", operator: "=", value: car.id }]
+                }
             ),
         []
     );
@@ -44,10 +51,10 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
         isPreviousFetching,
         timelineFilterManagement,
         orderButtons
-    } = useTimelinePaginator<SelectExpenseTableRow, Expense>({
+    } = useTimelinePaginator<SelectExpenseTableRow, Expense, TimelineItemType>({
         paginator,
         mapper,
-        cursorOrderButtons: [{ field: "date", title: "Dátum" }, { field: "amount", title: "Ár" }]
+        cursorOrderButtons: [{ field: "date", title: t("date.text") }, { field: "amount", title: t("currency.price") }]
     });
     const { filterButtons } = useExpenseTimelineFilter({ timelineFilterManagement, car });
 
@@ -56,8 +63,8 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
     return (
         <View style={ styles.container }>
             <Title
-                title={ "Pénzügyek" }
-                subtitle={ `Az alábbi pénzügyi naplóban különböző kiadásai szerepelnek mely a kiválasztott autójához tartoznak.` }
+                title={ t("expenses.title") }
+                subtitle={ t("expenses.description") }
             />
             <TimelineView
                 ref={ ref }
@@ -65,8 +72,8 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
                 orderButtons={ orderButtons }
                 filterButtons={ filterButtons }
                 isInitialFetching={ isInitialFetching }
-                fetchNext={ initialFetchHappened && paginator.hasNext() && fetchNext }
-                fetchPrevious={ initialFetchHappened && paginator.hasPrevious() && fetchPrevious }
+                fetchNext={ initialFetchHappened && paginator.hasNext() ? fetchNext : undefined }
+                fetchPrevious={ initialFetchHappened && paginator.hasPrevious() ? fetchPrevious : undefined }
                 isNextFetching={ isNextFetching }
                 isPreviousFetching={ isPreviousFetching }
                 style={ { paddingBottom: SIMPLE_TABBAR_HEIGHT } }

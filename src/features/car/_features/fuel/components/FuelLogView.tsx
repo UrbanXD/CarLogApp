@@ -4,7 +4,6 @@ import useCars from "../../../hooks/useCars.ts";
 import { useAlert } from "../../../../../ui/alert/hooks/useAlert.ts";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Car } from "../../../schemas/carSchema.ts";
-import { DeleteExpenseToast } from "../../../../expense/presets/toasts/DeleteExpenseToast.ts";
 import { InfoRowProps } from "../../../../../components/info/InfoRow.tsx";
 import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import dayjs from "dayjs";
@@ -17,12 +16,18 @@ import { FloatingDeleteButton } from "../../../../../components/Button/presets/F
 import { AmountText } from "../../../../../components/AmountText.tsx";
 import { updateCarOdometer } from "../../../model/slice/index.ts";
 import { Odometer } from "../../odometer/schemas/odometerSchema.ts";
+import { useTranslation } from "react-i18next";
+import { DeleteToast, NotFoundToast } from "../../../../../ui/alert/presets/toast/index.ts";
+import { DeleteModal } from "../../../../../ui/alert/presets/modal/index.ts";
+import { useAppDispatch } from "../../../../../hooks/index.ts";
 
 export type FuelLogViewProps = {
     id: string
 }
 
 export function FuelLogView({ id }: FuelLogViewProps) {
+    const { t } = useTranslation();
+    const dispatch = useAppDispatch();
     const { fuelLogDao, odometerLogDao } = useDatabase();
     const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
@@ -48,42 +53,46 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         try {
             if(!car) throw new Error("Car not found!");
 
-            const resultId = await fuelLogDao.delete(fuelLog);
+            const resultId = await fuelLogDao.deleteLog(fuelLog);
 
             let odometer: Odometer | null = null;
-            if(resultId && fuelLog.odometer?.carId) odometer = await odometerLogDao.getOdometerByLogId(fuelLog.odometer.carId);
+            if(resultId && fuelLog.odometer?.carId) {
+                odometer = await odometerLogDao.getOdometerByLogId(resultId.toString(), fuelLog.odometer.carId);
+            }
 
             if(odometer) dispatch(updateCarOdometer({ odometer }));
 
-            openToast(DeleteExpenseToast.success());
+            openToast(DeleteToast.success(t("fuel.log")));
 
             if(router.canGoBack()) return router.back();
             router.replace("/(main)/expense");
         } catch(e) {
             console.log(e);
-            openToast(DeleteExpenseToast.error());
+            openToast(DeleteToast.error(t("fuel.log")));
         }
-    }, [fuelLog, car]);
+    }, [fuelLog, car, t]);
 
     const onDelete = useCallback(() => {
-        if(!fuelLog) return openToast({ type: "warning", title: "Kiadás nem található!" });
+        if(!fuelLog) {
+            return openToast(NotFoundToast.warning(t("fuel.log")));
+        }
 
-        openModal({
-            title: `Kiadás napló bejegyzés törlése`,
-            body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
-            acceptText: "Törlés",
+        openModal(DeleteModal({
+            name: t("fuel.log"),
             acceptAction: () => handleDelete(fuelLog)
-        });
-    }, [fuelLog, openToast, openModal]);
+        }));
+    }, [fuelLog, openToast, openModal, t]);
 
     const onEdit = useCallback((field?: FuelLogFormFieldsEnum) => {
-        if(!fuelLog) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
+        if(!fuelLog) {
+            return openToast(NotFoundToast.warning(t("fuel.log")));
+        }
 
         router.push({
             pathname: "/expense/edit/fuel/[id]",
             params: { id: fuelLog.id, field: field }
         });
-    }, [fuelLog, openToast]);
+    }, [fuelLog, openToast, t]);
 
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
@@ -94,62 +103,65 @@ export function FuelLogView({ id }: FuelLogViewProps) {
         },
         {
             icon: ICON_NAMES.fuelPump,
-            title: "Tankolás",
+            title: t("fuel.fueling"),
             content: `${ fuelLog?.quantity } ${ fuelLog?.fuelUnit.short }`,
             onPress: () => onEdit(FuelLogFormFieldsEnum.Quantity)
         },
         {
             icon: ICON_NAMES.money,
-            title: "Ár",
+            title: t("currency.price"),
             content: (textStyle) => fuelLog &&
                <AmountText
-                  amount={ fuelLog.expense.originalAmount }
-                  currencyText={ fuelLog.expense.currency.symbol }
-                  exchangedAmount={ fuelLog.expense.amount }
-                  exchangeCurrencyText={ car?.currency.symbol }
-                  amountTextStyle={ textStyle ? [...textStyle, { textAlign: "left" }] : { textAlign: "left" } }
+                  amount={ fuelLog.expense.amount.amount }
+                  currencyText={ fuelLog.expense.amount.currency.symbol }
+                  exchangedAmount={ fuelLog.expense.amount.exchangedAmount }
+                  exchangeCurrencyText={ fuelLog.expense.amount.exchangeCurrency.symbol }
+                  amountTextStyle={ [textStyle, { textAlign: "left" }] }
                />,
             onPress: () => onEdit(FuelLogFormFieldsEnum.Amount),
-            secondaryInfo: {
-                title: "Egységár",
-                content: (textStyle) => fuelLog &&
-                   <AmountText
-                      amount={ fuelLog.originalPricePerUnit }
-                      currencyText={ `${ fuelLog.expense.currency.symbol }/${ fuelLog.fuelUnit.short }` }
-                      exchangedAmount={ fuelLog.pricePerUnit }
-                      exchangeCurrencyText={ `${ car?.currency.symbol }/${ fuelLog.fuelUnit.short }` }
-                      amountTextStyle={ textStyle }
-                   />
-            }
+            secondaryInfo:
+                fuelLog?.originalPricePerUnit !== 0
+                ? {
+                        title: t("currency.price_per_unit"),
+                        content: (textStyle) => fuelLog &&
+                           <AmountText
+                              amount={ fuelLog.originalPricePerUnit }
+                              currencyText={ `${ fuelLog.expense.amount.currency.symbol }/${ fuelLog.fuelUnit.short }` }
+                              exchangedAmount={ fuelLog.pricePerUnit }
+                              exchangeCurrencyText={ `${ fuelLog.expense.amount.exchangeCurrency.symbol }/${ fuelLog.fuelUnit.short }` }
+                              amountTextStyle={ textStyle }
+                           />
+                    }
+                : undefined
         },
         {
             icon: ICON_NAMES.calendar,
-            title: "Dátum",
-            content: dayjs(fuelLog?.expense?.date).format("YYYY. MM DD. HH:mm"),
-            onPress: () => onEdit(FuelLogFormFieldsEnum.Date)
+            title: t("date.text"),
+            content: dayjs(fuelLog?.expense?.date).format("LLL"),
+            onPress: () => onEdit(FuelLogFormFieldsEnum.DateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.odometer,
-            title: "Kilométeróra-állás",
+            title: t("odometer.value"),
             content: fuelLog?.odometer
                      ? `${ fuelLog?.odometer?.value } ${ fuelLog.odometer.unit.short }`
-                     : "Nincs hozzárendelve",
+                     : t("common.not_assigned"),
             contentTextStyle: !fuelLog?.odometer && { color: COLORS.gray2 },
-            onPress: () => onEdit(FuelLogFormFieldsEnum.OdometerValue)
+            onPress: () => onEdit(FuelLogFormFieldsEnum.DateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.note,
-            content: fuelLog?.expense?.note ?? "Nincs megjegyzés",
+            content: fuelLog?.expense?.note ?? t("common.no_notes"),
             contentTextStyle: !fuelLog?.expense?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(FuelLogFormFieldsEnum.Note)
         }
-    ]), [car, fuelLog]);
+    ]), [car, fuelLog, t]);
 
     return (
         <>
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
                 <Title
-                    title={ fuelLog?.expense.type?.locale }
+                    title={ t("expenses.types.FUEL") }
                     dividerStyle={ {
                         backgroundColor: fuelLog?.expense.type?.primaryColor ?? COLORS.gray2,
                         marginBottom: SEPARATOR_SIZES.normal

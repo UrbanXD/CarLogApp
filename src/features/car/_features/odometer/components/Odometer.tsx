@@ -16,7 +16,7 @@ export function Odometer({ value, unit }: OdometerProps) {
     const [odometerContainerWidth, setOdometerContainerWidth] = React.useState(0);
 
     const onOdometerContainerLayout = useCallback((event: LayoutChangeEvent) => {
-        setOdometerContainerWidth(event.nativeEvent.layout.width);
+        setOdometerContainerWidth(Math.min(event.nativeEvent.layout.width, 475));
     }, []);
 
     const styles = useStyles(value.length, odometerContainerWidth);
@@ -30,7 +30,7 @@ export function Odometer({ value, unit }: OdometerProps) {
                             <OdometerText
                                 text={ digit }
                                 containerStyle={ { alignSelf: "center" } }
-                                textStyle={ index < (value.length - DEFAULT_VALUE_LENGTH) && { opacity: 0 } }
+                                textStyle={ index < (value.length - DEFAULT_VALUE_LENGTH) ? { opacity: 0 } : undefined }
                             />
                         </View>
                     ))
@@ -48,18 +48,21 @@ const useStyles = (numberOfDigits: number, odometerContainerWidth: number) => St
     container: {
         flexGrow: 1,
         flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
         gap: SEPARATOR_SIZES.lightSmall
     },
     odometerContainer: {
         flexGrow: 1,
         flexDirection: "row",
         gap: SEPARATOR_SIZES.lightSmall,
+        alignSelf: "center",
         alignItems: "center",
         justifyContent: "center"
     },
     digitContainer: {
         minHeight: FONT_SIZES.p1 * 2,
-        width: (odometerContainerWidth - SEPARATOR_SIZES.lightSmall * (numberOfDigits - 1)) / numberOfDigits,
+        width: (odometerContainerWidth - SEPARATOR_SIZES.lightSmall * (numberOfDigits)) / numberOfDigits,
         position: "relative",
         backgroundColor: COLORS.gray5,
         alignItems: "center",

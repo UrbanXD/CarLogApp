@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { PickerItemType } from "../PickerItem.tsx";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { PickerDisabledToast } from "../../../../ui/alert/presets/toast/index.ts";
@@ -7,6 +7,8 @@ import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { formTheme } from "../../../../ui/form/constants/theme.ts";
 import Icon from "../../../Icon.tsx";
 import { IntelligentMarquee } from "../../../marquee/IntelligentMarquee.tsx";
+import { useTranslation } from "react-i18next";
+import { TextStyle, ViewStyle } from "../../../../types/index.ts";
 
 export type DropdownPickerControllerProps = {
     selectedItem: PickerItemType | null
@@ -16,6 +18,8 @@ export type DropdownPickerControllerProps = {
     icon?: string
     /** Placeholder text displayed in the controller when no item is selected */
     inputPlaceholder?: string
+    /** When true, the controller style change */
+    error?: boolean
     /** When true, the dropdown is disabled and cannot be opened */
     disabled?: boolean
     /** Message shown in a toast when trying to open a disabled dropdown */
@@ -32,13 +36,15 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
     selectedItem,
     toggleDropdown,
     icon,
-    inputPlaceholder = "Válasszon a listából",
+    inputPlaceholder,
+    error,
     disabled,
     disabledText,
     hiddenBackground,
     containerStyle,
     textInputStyle
 }) => {
+    const { t } = useTranslation();
     const { openToast } = useAlert();
 
     const onPress = () => {
@@ -47,10 +53,18 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
         toggleDropdown();
     };
 
+    const flatStyle = StyleSheet.flatten(textInputStyle);
+    const extractedColor = typeof flatStyle?.color === "string" ? flatStyle.color : undefined;
+
     return (
         <Pressable
             onPress={ onPress }
-            style={ [styles.container, !hiddenBackground && styles.backgroundContainer, containerStyle] }
+            style={ [
+                styles.container,
+                !hiddenBackground && styles.backgroundContainer,
+                error && styles.errorFormFieldContainer,
+                containerStyle
+            ] }
             pointerEvents={ "box-only" }
         >
             {
@@ -59,7 +73,7 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
                   <Icon
                      icon={ icon }
                      size={ formTheme.iconSize }
-                     color={ textInputStyle?.color ?? formTheme.iconColor }
+                     color={ extractedColor ?? formTheme.iconColor }
                   />
                </View>
             }
@@ -92,14 +106,15 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
                            </IntelligentMarquee>
                         }
                     </>
-                    : <Text style={ [styles.titleText, styles.placeholderText] }>{ inputPlaceholder }</Text>
+                    : <Text style={ [styles.titleText, styles.placeholderText] }>{ inputPlaceholder ?? t(
+                        "form.picker.choose") }</Text>
                 }
             </View>
             <View style={ styles.formFieldIconContainer }>
                 <Icon
                     icon={ ICON_NAMES.downArrowHead }
                     size={ formTheme.iconSize }
-                    color={ textInputStyle?.color ?? formTheme.iconColor }
+                    color={ extractedColor ?? formTheme.iconColor }
                 />
             </View>
         </Pressable>

@@ -2,13 +2,18 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import React, { useEffect, useState } from "react";
-import { heightPercentageToDP } from "react-native-responsive-screen";
-import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
 import { FuelLog } from "../../../../features/car/_features/fuel/schemas/fuelLogSchema.ts";
 import { EditFuelLogForm } from "../../../../features/car/_features/fuel/components/forms/EditFuelLogForm.tsx";
+import { NotFoundToast } from "../../../../ui/alert/presets/toast/index.ts";
+import { FormBottomSheet } from "../../../../ui/bottomSheet/presets/FormBottomSheet.tsx";
+import { useTranslation } from "react-i18next";
+import {
+    ServiceLogFormFieldsEnum
+} from "../../../../features/expense/_features/service/enums/ServiceLogFormFieldsEnum.ts";
 
 function Page() {
-    const { id, field } = useLocalSearchParams();
+    const { id, field } = useLocalSearchParams<{ id?: string, field?: string }>();
+    const { t } = useTranslation();
     const { fuelLogDao } = useDatabase();
     const { openToast } = useAlert();
 
@@ -24,7 +29,7 @@ function Page() {
             try {
                 setFuelLog(await fuelLogDao.getById(id));
             } catch(e) {
-                openToast({ type: "error", title: "not-found" });
+                openToast(NotFoundToast.warning(t("fuel.log")));
 
                 if(router.canGoBack()) return router.back();
                 router.replace("(main)/index");
@@ -32,18 +37,16 @@ function Page() {
         })();
     }, [id]);
 
-    if(!fuelLog) return <></>;
+    const fieldIndex = field ? Number(field) : NaN;
+    const isValidField = !isNaN(fieldIndex) && fieldIndex in ServiceLogFormFieldsEnum;
+    if(!fuelLog || !isValidField) return null;
 
-    const CONTENT = <EditFuelLogForm fuelLog={ fuelLog } field={ field }/>;
-    const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
+    const CONTENT = <EditFuelLogForm fuelLog={ fuelLog } field={ fieldIndex }/>;
 
     return (
-        <BottomSheet
+        <FormBottomSheet
             content={ CONTENT }
-            maxDynamicContentSize={ MAX_DYNAMIC_CONTENT_SIZE }
             enableDynamicSizing
-            enableDismissOnClose={ false }
-            enableOverDrag={ false }
         />
     );
 }

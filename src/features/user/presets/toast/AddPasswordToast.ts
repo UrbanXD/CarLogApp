@@ -1,16 +1,17 @@
 import { ToastMessage, ToastMessages } from "../../../../ui/alert/model/types/index.ts";
+import i18n from "../../../../i18n/index.ts";
 
 const success: ToastMessage = () => {
     return {
         type: "success",
-        title: "Sikeres jelszó hozzárendelés!"
+        title: i18n.t("auth.toast.add_password.success.title")
     };
 };
 
 const error: ToastMessage = () => {
     return {
         type: "error",
-        body: "Váratlan hiba lépett fel a jelszó hozzárendelés sorám!"
+        body: i18n.t("auth.toast.add_password.error.body")
     };
 };
 

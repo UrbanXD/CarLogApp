@@ -11,49 +11,40 @@ export class ExpenseTypeMapper extends AbstractMapper<ExpenseTypeTableRow, Expen
     }
 
     async toDto(entity: ExpenseTypeTableRow): Promise<ExpenseType> {
-        let locale = "Egyéb";
         let icon = null;
-        let primaryColor = null;
+        let primaryColor = COLORS.gray2;
         let secondaryColor = null;
 
         switch(entity.key) {
             case ExpenseTypeEnum.FUEL:
-                locale = "Tankolás";
                 icon = ICON_NAMES.fuelPump;
                 primaryColor = COLORS.fuelYellow;
                 break;
             case ExpenseTypeEnum.SERVICE:
-                locale = "Szervíz";
                 icon = ICON_NAMES.service;
                 primaryColor = COLORS.service;
                 break;
             case ExpenseTypeEnum.VEHICLE_INSPECTION:
-                locale = "Műszaki vizsgálat";
                 icon = ICON_NAMES.vehicleInspection;
                 primaryColor = COLORS.vehicleInspection;
                 break;
             case ExpenseTypeEnum.WASH:
-                locale = "Autómosás";
                 icon = ICON_NAMES.carWash;
                 primaryColor = COLORS.wash;
                 break;
             case ExpenseTypeEnum.TOLL:
-                locale = "Útdíj";
                 icon = ICON_NAMES.road;
                 primaryColor = COLORS.toll;
                 break;
             case ExpenseTypeEnum.PARKING:
-                locale = "Parkolás";
                 icon = ICON_NAMES.parking;
                 primaryColor = COLORS.parking;
                 break;
             case ExpenseTypeEnum.INSURANCE:
-                locale = "Biztosítás";
                 icon = ICON_NAMES.insurance;
                 primaryColor = COLORS.insurance;
                 break;
             case ExpenseTypeEnum.REGISTRATION:
-                locale = "Regisztráció";
                 icon = ICON_NAMES.registration;
                 primaryColor = COLORS.registration;
                 break;
@@ -63,7 +54,6 @@ export class ExpenseTypeMapper extends AbstractMapper<ExpenseTypeTableRow, Expen
             id: entity.id,
             key: entity.key,
             ownerId: entity.owner_id,
-            locale,
             icon: icon,
             primaryColor: primaryColor,
             secondaryColor: secondaryColor
@@ -78,10 +68,13 @@ export class ExpenseTypeMapper extends AbstractMapper<ExpenseTypeTableRow, Expen
         };
     }
 
-    dtoToPicker(dtos: Array<ExpenseType>): Array<PickerItemType> {
+    dtoToPicker({ dtos, getTitle }: {
+        dtos: Array<ExpenseType>,
+        getTitle?: (dto: ExpenseType) => string
+    }): Array<PickerItemType> {
         return dtos.map(dto => ({
             value: dto.id.toString(),
-            title: dto.locale
+            title: getTitle?.(dto) ?? dto.key
         }));
     }
 }

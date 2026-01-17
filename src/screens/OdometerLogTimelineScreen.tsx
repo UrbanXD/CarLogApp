@@ -1,11 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../constants/index.ts";
 import { OdometerLogTimeline } from "../features/car/_features/odometer/components/OdometerLogTimeline.tsx";
+import { ScreenView } from "../components/screenView/ScreenView.tsx";
+import useCars from "../features/car/hooks/useCars.ts";
 
 export function OdometerLogTimelineScreen() {
-    const { id } = useLocalSearchParams();
+    const { id } = useLocalSearchParams<{ id: string }>();
+    const { getCar } = useCars();
+
+    const car = useMemo(() => getCar(id), [id, getCar]);
 
     useEffect(() => {
         if(id) return;
@@ -14,19 +17,11 @@ export function OdometerLogTimelineScreen() {
         router.replace("(main)/index");
     }, [id]);
 
-    if(!id) return <></>;
+    if(!car) return null;
 
     return (
-        <SafeAreaView
-            style={ {
-                flex: 1,
-                paddingTop: SIMPLE_HEADER_HEIGHT + SEPARATOR_SIZES.lightSmall,
-                paddingHorizontal: DEFAULT_SEPARATOR,
-                paddingBottom: SEPARATOR_SIZES.lightSmall,
-                backgroundColor: COLORS.black2
-            } }
-        >
-            <OdometerLogTimeline carId={ id }/>
-        </SafeAreaView>
+        <ScreenView>
+            <OdometerLogTimeline car={ car }/>
+        </ScreenView>
     );
 }

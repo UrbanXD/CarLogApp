@@ -6,6 +6,7 @@ export const ICON_NAMES = {
     password: "lock-outline",
     user: "account-outline",
     checkMark: "check-circle-outline",
+    check: "check",
     eye: "eye-outline",
     eyeOff: "eye-off-outline",
     pencil: "pencil-outline",
@@ -30,6 +31,7 @@ export const ICON_NAMES = {
     expensesOutline: "account-cash-outline",
     expenses: "account-cash",
     car: "car-outline",
+    carOff: "car-off",
     nametag: "tag-text-outline",
     odometer: "speedometer", //gauge
     odometerLow: "speedometer-slow",
@@ -39,7 +41,8 @@ export const ICON_NAMES = {
     trashCan: "delete-outline",
     calendar: "calendar-range-outline",
     reset: "refresh",
-    upload: "upload-outline",
+    upload: "tray-arrow-up",
+    cameraPlus: "camera-plus-outline",
     fuelPump: "gas-station",
     fuelCan: "fuel",
     settings: "cog-outline",
@@ -55,8 +58,44 @@ export const ICON_NAMES = {
     registration: "clipboard-text-multiple",
     note: "text",
     money: "cash",
-    expenseItem: "invoice-text-multiple-outline"
-};
+    expenseItem: "invoice-text-multiple-outline",
+    passenger: "account-outline",
+    passengers: "account-multiple-outline",
+    mapMarkers: "map-marker-multiple-outline",
+    statistics: "finance",
+    gestureTap: "gesture-tap"
+} as const;
+
+export const SERVICE_ICONS = {
+    SMALL_SERVICE: "wrench-outline",
+    MAJOR_SERVICE: "tools",
+    REPAIR: "car-wrench",
+    HOME_MAINTENANCE: "home",
+    INSPECTION: "clipboard-check-outline",
+    DIAGNOSTICS: "car-search-outline",
+    TIRE_CHANGE: "tire",
+    OTHER: "dots-horizontal-circle-outline"
+} as const;
+
+export const SERVICE_ITEM_ICONS = {
+    TRANSMISSION_FLUID: "car-shift-pattern",
+    FUEL_FILTER: "filter-outline",
+    BRAKE_FLUID: "car-brake-fluid-level",
+    LIGHT_BULB: "lightbulb-outline",
+    WIPER_BLADES: "car-wash",
+    DIAGNOSTICS: "car-search-outline",
+    OIL: "oil",
+    COOLANT: "coolant-temperature",
+    CABIN_FILTER: "air-filter",
+    OIL_FILTER: "oil-filter",
+    BRAKE_DISCS: "car-brake-disc",
+    BATTERY: "car-battery",
+    SPARK_PLUGS: "car-spark-plug",
+    SOFTWARE_UPDATE: "update",
+    BRAKE_PADS: "shield-half-full",
+    TIRES: "tire",
+    AIR_FILTER: "air-filter"
+} as const;
 
 export const ICON_COLORS = {
     default: COLORS.white,

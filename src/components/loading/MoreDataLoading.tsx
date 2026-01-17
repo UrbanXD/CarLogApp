@@ -1,12 +1,13 @@
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
-import { Color } from "../../types/index.ts";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { Color, TextStyle, ViewStyle } from "../../types/index.ts";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../constants/index.ts";
 import BounceDot from "./BounceDot.tsx";
+import { useTranslation } from "react-i18next";
 
 type MoreDataLoadingProps = {
     text?: string
-    activityIndicatorSize?: "small" | "large"
+    activityIndicatorSize?: "small" | "large" | number
     activityIndicatorColor?: Color
     containerStyle?: ViewStyle
     textStyle?: TextStyle
@@ -14,18 +15,20 @@ type MoreDataLoadingProps = {
 }
 
 export function MoreDataLoading({
-    text = "Adatok betöltése",
+    text,
     activityIndicatorSize = "small",
     activityIndicatorColor = COLORS.gray2,
     containerStyle,
     textStyle,
     withBounceDot = true
 }: MoreDataLoadingProps) {
+    const { t } = useTranslation();
+
     return (
         <View style={ [styles.container, containerStyle] }>
             <ActivityIndicator size={ activityIndicatorSize } color={ activityIndicatorColor }/>
             <View style={ styles.textContainer }>
-                <Text style={ [styles.text, textStyle] }>{ text }</Text>
+                <Text style={ [styles.text, textStyle] }>{ text ?? t("common.data_loading") }</Text>
                 {
                     withBounceDot &&
                    <>

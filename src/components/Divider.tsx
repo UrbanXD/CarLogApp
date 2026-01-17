@@ -1,11 +1,10 @@
 import React from "react";
-import { ColorValue, StyleSheet, View, ViewStyle } from "react-native";
-import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { ColorValue, DimensionValue, StyleSheet, View } from "react-native";
 import { COLORS } from "../constants/index.ts";
-import { Color } from "../types/index.ts";
+import { Color, ViewStyle } from "../types/index.ts";
 
 type DividerProps = {
-    size?: number
+    size?: DimensionValue
     thickness?: number
     color?: Color
     margin?: number
@@ -15,7 +14,7 @@ type DividerProps = {
 
 const Divider: React.FC<DividerProps> = ({
     isVertical = false,
-    size = isVertical ? hp(100) : wp(100),
+    size = "100%",
     thickness = 1,
     color = COLORS.white,
     margin = 0,
@@ -30,7 +29,7 @@ const Divider: React.FC<DividerProps> = ({
     );
 };
 
-const useStyles = (size: number, thickness: number, color: ColorValue | string, margin: number) => {
+const useStyles = (size: DimensionValue, thickness: number, color: ColorValue | string, margin: number) => {
     return StyleSheet.create({
         horizontalLine: {
             alignSelf: "center",

@@ -1,13 +1,17 @@
 import { router, useLocalSearchParams } from "expo-router";
-import BottomSheet from "../../../../../../ui/bottomSheet/components/BottomSheet.tsx";
 import React, { useEffect, useState } from "react";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
 import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
 import { EditOdometerChangeLogForm } from "../../components/forms/EditOdometerChangeLogForm.tsx";
-import { heightPercentageToDP } from "react-native-responsive-screen";
+import { NotFoundToast } from "../../../../../../ui/alert/presets/toast/index.ts";
+import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
+import { useTranslation } from "react-i18next";
+import { FormBottomSheet } from "../../../../../../ui/bottomSheet/presets/FormBottomSheet.tsx";
+import { ExpenseFormFieldsEnum } from "../../../../../expense/enums/expenseFormFieldsEnum.ts";
 
 export function EditOdometerLogBottomSheet() {
-    const { id, field } = useLocalSearchParams();
+    const { t } = useTranslation();
+    const { id, field } = useLocalSearchParams<{ id?: string, field?: string }>();
     const { odometerLogDao } = useDatabase();
     const { openToast } = useAlert();
 
@@ -23,7 +27,7 @@ export function EditOdometerLogBottomSheet() {
             try {
                 setOdometerLog(await odometerLogDao.getById(id));
             } catch(e) {
-                openToast({ type: "error", title: "not-found" });
+                openToast(NotFoundToast.warning(t("odometer.log")));
 
                 if(router.canGoBack()) return router.back();
                 router.replace("(main)/index");
@@ -31,18 +35,16 @@ export function EditOdometerLogBottomSheet() {
         })();
     }, [id]);
 
-    if(!odometerLog) return <></>;
+    const fieldIndex = field ? Number(field) : undefined;
+    const isValidField = fieldIndex === undefined || !isNaN(fieldIndex) && fieldIndex in ExpenseFormFieldsEnum;
+    if(!odometerLog || !isValidField) return null;
 
-    const CONTENT = <EditOdometerChangeLogForm odometerLog={ odometerLog } field={ field }/>;
-    const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
+    const CONTENT = <EditOdometerChangeLogForm odometerLog={ odometerLog } field={ fieldIndex }/>;
 
     return (
-        <BottomSheet
+        <FormBottomSheet
             content={ CONTENT }
-            maxDynamicContentSize={ MAX_DYNAMIC_CONTENT_SIZE }
             enableDynamicSizing
-            enableDismissOnClose={ false }
-            enableOverDrag={ false }
         />
     );
 }

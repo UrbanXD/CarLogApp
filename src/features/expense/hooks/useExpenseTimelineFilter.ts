@@ -6,9 +6,11 @@ import { ExpenseTypeEnum } from "../model/enums/ExpenseTypeEnum.ts";
 import { Car } from "../../car/schemas/carSchema.ts";
 import { SelectExpenseTableRow } from "../model/mapper/expenseMapper.ts";
 import { TimelineFilterManagement } from "../../../hooks/useTimelinePaginator.ts";
+import { useTranslation } from "react-i18next";
+import { FilterCondition } from "../../../database/paginator/AbstractPaginator.ts";
 
 const TYPES_FILTER_KEY = "type_filter";
-const TYPES_FILTER_FIELD_NAME = "type_id";
+const TYPES_FILTER_FIELD_NAME = "type_id" as keyof SelectExpenseTableRow;
 
 type UseExpenseTimelineFilterProps = {
     timelineFilterManagement: TimelineFilterManagement<SelectExpenseTableRow>,
@@ -25,7 +27,9 @@ export function useExpenseTimelineFilter({
     },
     car
 }: UseExpenseTimelineFilterProps) {
+    const { t, i18n } = useTranslation();
     const { expenseTypeDao } = useDatabase();
+
     const [types, setTypes] = useState<Array<ExpenseType>>([]);
     const [selectedTypesId, setSelectedTypesId] = useState<Array<ExpenseType["id"]>>([]);
 
@@ -36,16 +40,15 @@ export function useExpenseTimelineFilter({
             // sort based on locale
             const sorted = types.sort((a, b) => {
                 //Make other first
-                if(a.key === ExpenseTypeEnum.OTHER) return -1;
+                if(a.key === t(ExpenseTypeEnum.OTHER)) return -1;
                 if(b.key === ExpenseTypeEnum.OTHER) return 1;
 
-                return a.locale.localeCompare(b.locale);
+                return t(`expenses.types.${ a.key }`).localeCompare(t(`expenses.types.${ a.key }`));
             });
-
 
             setTypes(sorted);
         })();
-    }, []);
+    }, [i18n.language]);
 
     useEffect(() => {
         if(!filters.has(TYPES_FILTER_KEY)) setSelectedTypesId([]);
@@ -66,12 +69,16 @@ export function useExpenseTimelineFilter({
     }, [filters]);
 
     useEffect(() => {
-        replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: car.id } });
+        if(car) replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: car.id } });
     }, [car]);
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {
         const active = selectedTypesId.includes(type.id);
-        const filter = { field: TYPES_FILTER_FIELD_NAME, operator: "=", value: type.id };
+        const filter: FilterCondition<SelectExpenseTableRow> = {
+            field: TYPES_FILTER_FIELD_NAME,
+            operator: "=",
+            value: type.id
+        };
         const onPress = () => {
             if(!active) {
                 addFilter({ groupKey: TYPES_FILTER_KEY, filter, logic: "OR" });
@@ -81,7 +88,7 @@ export function useExpenseTimelineFilter({
         };
 
         return {
-            title: type.locale,
+            title: t(`expenses.types.${ type.key }`),
             active,
             activeColor: type?.primaryColor ?? undefined,
             onPress
@@ -89,7 +96,7 @@ export function useExpenseTimelineFilter({
     });
 
     filterButtons.unshift({
-        title: "Mind",
+        title: t("common.filters.all"),
         active: selectedTypesId.length === 0,
         onPress: () => clearFilters(TYPES_FILTER_KEY)
     });

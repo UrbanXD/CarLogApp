@@ -6,7 +6,6 @@ import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx"
 import { InfoRowProps } from "../components/info/InfoRow.tsx";
 import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
 import { useAlert } from "../ui/alert/hooks/useAlert.ts";
-import { DeleteOdometerLogToast } from "../features/car/_features/odometer/presets/toast/DeleteOdometerLogToast.ts";
 import { OdometerLog } from "../features/car/_features/odometer/schemas/odometerLogSchema.ts";
 import dayjs from "dayjs";
 import { Title } from "../components/Title.tsx";
@@ -16,10 +15,14 @@ import useCars from "../features/car/hooks/useCars.ts";
 import { InfoContainer } from "../components/info/InfoContainer.tsx";
 import { OdometerLogFormFields } from "../features/car/_features/odometer/enums/odometerLogFormFields.ts";
 import { FloatingDeleteButton } from "../components/Button/presets/FloatingDeleteButton.tsx";
+import { useTranslation } from "react-i18next";
+import { DeleteToast, NotFoundToast } from "../ui/alert/presets/toast/index.ts";
+import { DeleteModal } from "../ui/alert/presets/modal/index.ts";
 
 export function OdometerLogScreen() {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
-    const { id } = useLocalSearchParams();
+    const { id } = useLocalSearchParams<{ id?: string }>();
     const { getCar } = useCars();
     const { odometerLogDao } = useDatabase();
     const { openModal, openToast } = useAlert();
@@ -30,6 +33,7 @@ export function OdometerLogScreen() {
     useFocusEffect(
         useCallback(() => {
             const getOdometerLog = async () => {
+                if(!id) return;
                 const log = await odometerLogDao.getById(id);
                 setOdometerLog(log);
             };
@@ -41,46 +45,46 @@ export function OdometerLogScreen() {
     useEffect(() => {
         if(car?.id === odometerLog?.carId || !odometerLog?.carId) return;
 
-        setCar(getCar(odometerLog.carId));
+        setCar(getCar(odometerLog.carId) ?? null);
     }, [odometerLog]);
 
     const handleDelete = useCallback(async (odometerLog: OdometerLog) => {
         try {
             if(!car) throw new Error("Car not found!");
+            if(!odometerLog.relatedId) throw new Error("Odometer change log id not found!");
 
             await odometerLogDao.deleteOdometerChangeLog(odometerLog.id, odometerLog.relatedId);
             const odometer = await odometerLogDao.getOdometerByCarId(odometerLog.carId);
 
             dispatch(updateCarOdometer({ odometer }));
 
-            openToast(DeleteOdometerLogToast.success());
+            openToast(DeleteToast.success(t("odometer.log")));
 
             if(router.canGoBack()) return router.back();
             router.replace("/odometer/log");
         } catch(e) {
             console.log(e);
-            openToast(DeleteOdometerLogToast.error());
+            openToast(DeleteToast.error(t("odometer.log")));
         }
-    }, [odometerLogDao, car]);
+    }, [odometerLogDao, car, t]);
 
     const onDelete = useCallback(() => {
-        if(!odometerLog) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
-        openModal({
-            title: `Kilométeróra-állás napló bejegyzés  törlése`,
-            body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
-            acceptText: "Törlés",
+        if(!odometerLog) return openToast(NotFoundToast.warning(t("odometer.log")));
+
+        openModal(DeleteModal({
+            name: t("odometer.log"),
             acceptAction: () => handleDelete(odometerLog)
-        });
-    }, [odometerLog, openToast, openModal]);
+        }));
+    }, [odometerLog, openToast, openModal, t]);
 
     const onEdit = useCallback((field?: OdometerLogFormFields) => {
-        if(!odometerLog) return openToast({ type: "warning", title: "Napló bejegyzés nem található!" });
+        if(!odometerLog) return openToast(NotFoundToast.warning(t("odometer.log")));
 
         router.push({
             pathname: "/odometer/log/edit/[id]",
             params: { id: odometerLog.id, field: field }
         });
-    });
+    }, [t, odometerLog]);
 
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
@@ -91,29 +95,29 @@ export function OdometerLogScreen() {
         },
         {
             icon: ICON_NAMES.odometer,
-            title: "Kilométeróra-állás",
+            title: t("odometer.value"),
             content: `${ odometerLog?.value } ${ odometerLog?.unit.short }`,
-            onPress: () => onEdit(OdometerLogFormFields.OdometerValue)
+            onPress: () => onEdit(OdometerLogFormFields.DateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.calendar,
-            title: "Dátum",
-            content: dayjs(odometerLog?.date).format("YYYY. MM DD. HH:mm"),
-            onPress: () => onEdit(OdometerLogFormFields.Date)
+            title: t("date.text"),
+            content: dayjs(odometerLog?.date).format("LLL"),
+            onPress: () => onEdit(OdometerLogFormFields.DateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.note,
-            content: odometerLog?.note ?? "Nincs megjegyzés",
-            contentTextStyle: !odometerLog?.note && { color: COLORS.gray2 },
+            content: odometerLog?.note ?? t("common.no_notes"),
+            contentTextStyle: !odometerLog?.note ? { color: COLORS.gray2 } : undefined,
             onPress: () => onEdit(OdometerLogFormFields.Note)
         }
-    ]), [car, odometerLog]);
+    ]), [car, odometerLog, t]);
 
     return (
         <>
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
                 <Title
-                    title={ odometerLog?.type.locale }
+                    title={ t(`odometer.types.${ odometerLog?.type.key }`) }
                     dividerStyle={ {
                         backgroundColor: odometerLog?.type.primaryColor ?? COLORS.gray2,
                         marginBottom: SEPARATOR_SIZES.normal

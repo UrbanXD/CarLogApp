@@ -2,19 +2,18 @@ import React, { ReactNode, useCallback } from "react";
 import { TimelineItemType } from "../../../components/timelineView/item/TimelineItem.tsx";
 import dayjs from "dayjs";
 import { Expense } from "../schemas/expenseSchema.ts";
-import utc from "dayjs/plugin/utc";
 import { router } from "expo-router";
-import { Currency } from "../../_shared/currency/schemas/currencySchema.ts";
 import { ExpenseTypeEnum } from "../model/enums/ExpenseTypeEnum.ts";
 import { AmountText } from "../../../components/AmountText.tsx";
+import { useTranslation } from "react-i18next";
 
-dayjs.extend(utc);
+export function useExpenseTimelineItem() {
+    const { t } = useTranslation();
 
-export function useExpenseTimelineItem(currency?: Currency) {
-    const mapper = useCallback((expense: Expense): TimelineItemType => {
-        const routerPathTitle = "Kiadás";
+    const mapper = useCallback((expense: Expense, callback?: () => void): TimelineItemType => {
+        const routerPathTitle = t("expenses.title_singular");
         let routerPathName = "/expense/[id]";
-        let itemId = expense.id;
+        let itemId: string | null | undefined = expense.id;
 
         switch(expense.type.key) {
             case ExpenseTypeEnum.FUEL:
@@ -29,6 +28,7 @@ export function useExpenseTimelineItem(currency?: Currency) {
         const onPress = () => {
             if(!itemId) return;
 
+            callback?.();
             router.push({
                 pathname: routerPathName,
                 params: { id: itemId, title: routerPathTitle }
@@ -37,17 +37,17 @@ export function useExpenseTimelineItem(currency?: Currency) {
 
         let footer: ReactNode = (
             <AmountText
-                amount={ expense.originalAmount }
-                currencyText={ expense.currency.symbol }
-                exchangedAmount={ expense.amount }
-                exchangeCurrencyText={ currency?.symbol }
+                amount={ expense.amount.amount }
+                currencyText={ expense.amount.currency.symbol }
+                exchangedAmount={ expense.amount.exchangedAmount }
+                exchangeCurrencyText={ expense.amount.exchangeCurrency.symbol }
             />
         );
 
         return {
             id: expense.id,
-            milestone: dayjs(expense.date).format("YYYY. MM DD. HH:mm"),
-            title: expense.type.locale,
+            milestone: dayjs(expense.date).format("LLL"),
+            title: t(`expenses.types.${ expense.type.key }`),
             icon: expense.type.icon,
             color: expense.type.primaryColor ?? undefined,
             iconColor: expense.type.secondaryColor ?? undefined,
@@ -55,7 +55,7 @@ export function useExpenseTimelineItem(currency?: Currency) {
             footerText: footer,
             onPress
         };
-    }, [currency]);
+    }, [t]);
 
     return { mapper };
 }

@@ -4,8 +4,8 @@ import { Car } from "../../schemas/carSchema.ts";
 import { CAR_FORM_STEPS, EDIT_CAR_FORM_STEPS } from "../../constants/index.ts";
 
 type CarProfileByObjProps = {
-    car: Car
-    goTo?: (stepIndex: number) => void
+    car: Partial<Car>
+    goTo: (stepIndex: number) => void
 }
 
 function CarProfileByObj({ car, goTo }: CarProfileByObjProps) {
@@ -33,7 +33,8 @@ function CarProfileByObj({ car, goTo }: CarProfileByObjProps) {
 
     return (
         <CarProfileView
-            car={ car }
+            car={ car as Car }
+            imageIsAttachment={ false }
             openEditCarStep={ openEditCarStep }
             openEditOdometerValue={ () => goTo(CAR_FORM_STEPS.OdometerStep) }
         />

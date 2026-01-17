@@ -3,5 +3,5 @@ export enum CurrencyEnum {
     RSD,
     EUR,
     USD,
-    GPB
+    GBP
 }

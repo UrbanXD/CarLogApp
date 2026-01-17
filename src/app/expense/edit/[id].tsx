@@ -1,14 +1,17 @@
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { heightPercentageToDP } from "react-native-responsive-screen";
-import BottomSheet from "../../../ui/bottomSheet/components/BottomSheet.tsx";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 import { Expense } from "../../../features/expense/schemas/expenseSchema.ts";
 import { EditExpenseForm } from "../../../features/expense/components/forms/EditExpenseForm.tsx";
+import { NotFoundToast } from "../../../ui/alert/presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
+import { FormBottomSheet } from "../../../ui/bottomSheet/presets/FormBottomSheet.tsx";
+import { ExpenseFormFieldsEnum } from "../../../features/expense/enums/expenseFormFieldsEnum.ts";
 
 function Page() {
-    const { id, field } = useLocalSearchParams();
+    const { t } = useTranslation();
+    const { id, field } = useLocalSearchParams<{ id?: string, field?: string }>();
     const { expenseDao } = useDatabase();
     const { openToast } = useAlert();
 
@@ -25,7 +28,7 @@ function Page() {
                 const expenseResult = await expenseDao.getById(id);
                 setExpense(expenseResult);
             } catch(e) {
-                openToast({ type: "error", title: "not-found" });
+                openToast(NotFoundToast.warning(t("expenses.title_singular")));
 
                 if(router.canGoBack()) return router.back();
                 router.replace("(main)/index");
@@ -33,18 +36,19 @@ function Page() {
         })();
     }, [id]);
 
-    if(!expense) return <></>;
-
-    const CONTENT = <EditExpenseForm expense={ expense } field={ field }/>;
-    const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
+    const fieldIndex = field ? Number(field) : undefined;
+    const isValidField = fieldIndex === undefined || !isNaN(fieldIndex) && fieldIndex in ExpenseFormFieldsEnum;
+    if(!expense || !isValidField) return null;
 
     return (
-        <BottomSheet
-            content={ CONTENT }
-            maxDynamicContentSize={ MAX_DYNAMIC_CONTENT_SIZE }
+        <FormBottomSheet
+            content={
+                <EditExpenseForm
+                    expense={ expense }
+                    field={ fieldIndex as ExpenseFormFieldsEnum }
+                />
+            }
             enableDynamicSizing
-            enableDismissOnClose={ false }
-            enableOverDrag={ false }
         />
     );
 }

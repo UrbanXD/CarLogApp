@@ -4,7 +4,6 @@ import useCars from "../../../../car/hooks/useCars.ts";
 import { useAlert } from "../../../../../ui/alert/hooks/useAlert.ts";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Car } from "../../../../car/schemas/carSchema.ts";
-import { DeleteExpenseToast } from "../../../presets/toasts/DeleteExpenseToast.ts";
 import { InfoRowProps } from "../../../../../components/info/InfoRow.tsx";
 import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
 import dayjs from "dayjs";
@@ -13,19 +12,27 @@ import { Title } from "../../../../../components/Title.tsx";
 import { InfoContainer } from "../../../../../components/info/InfoContainer.tsx";
 import { FloatingDeleteButton } from "../../../../../components/Button/presets/FloatingDeleteButton.tsx";
 import { ServiceLog } from "../schemas/serviceLogSchema.ts";
-import { ServiceItemExpandableList } from "./ServiceItemExpandableList.tsx";
 import { ServiceLogFormFieldsEnum } from "../enums/ServiceLogFormFieldsEnum.ts";
 import { Odometer } from "../../../../car/_features/odometer/schemas/odometerSchema.ts";
 import { updateCarOdometer } from "../../../../car/model/slice/index.ts";
+import { ExpandableList } from "../../../../../components/expandableList/ExpandableList.tsx";
+import { useServiceItemToExpandableList } from "../hooks/useServiceItemToExpandableList.ts";
+import { useAppDispatch } from "../../../../../hooks/index.ts";
+import { useTranslation } from "react-i18next";
+import { DeleteToast, NotFoundToast } from "../../../../../ui/alert/presets/toast/index.ts";
+import { DeleteModal } from "../../../../../ui/alert/presets/modal/index.ts";
 
 export type ServiceLogViewProps = {
     id: string
 }
 
 export function ServiceLogView({ id }: ServiceLogViewProps) {
-    const { serviceLogDao } = useDatabase();
+    const dispatch = useAppDispatch();
+    const { t } = useTranslation();
+    const { serviceLogDao, odometerLogDao } = useDatabase();
     const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
+    const { serviceItemToExpandableListItem } = useServiceItemToExpandableList();
 
     const [car, setCar] = useState<Car | null>(null);
     const [serviceLog, setServiceLog] = useState<ServiceLog | null>(null);
@@ -47,52 +54,63 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
 
     const handleDelete = useCallback(async (serviceLog: ServiceLog) => {
         try {
-            if(!car) throw new Error("Car not found!");
-
-            const resultId = await serviceLogDao.delete(serviceLog);
+            const resultId = await serviceLogDao.deleteLog(serviceLog);
 
             let odometer: Odometer | null = null;
             if(resultId && serviceLog.odometer?.carId) odometer = await odometerLogDao.getOdometerByCarId(serviceLog.odometer.carId);
 
             if(odometer) dispatch(updateCarOdometer({ odometer }));
 
-            openToast(DeleteExpenseToast.success());
+            openToast(DeleteToast.success(t("service.log")));
 
             if(router.canGoBack()) return router.back();
             router.replace("/(main)/expense");
         } catch(e) {
             console.log(e);
-            openToast(DeleteExpenseToast.error());
+            openToast(DeleteToast.error(t("service.log")));
         }
-    }, [serviceLogDao, car]);
+    }, [serviceLogDao, t]);
 
     const onDelete = useCallback(() => {
-        if(!serviceLog) return openToast({ type: "warning", title: "Kiadás nem található!" });
+        if(!serviceLog) return openToast(NotFoundToast.warning(t("service.log")));
 
-        openModal({
-            title: `Szervíz napló bejegyzés törlése`,
-            body: `A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet`,
-            acceptText: "Törlés",
-            acceptAction: () => handleDelete(serviceLog)
-        });
-    }, [serviceLog, handleDelete, openToast, openModal]);
+        openModal(DeleteModal({ name: t("service.log"), acceptAction: () => handleDelete(serviceLog) }));
+    }, [serviceLog, handleDelete, openToast, openModal, t]);
 
     const onEdit = useCallback((field: ServiceLogFormFieldsEnum) => {
-        if(!serviceLog) return openToast({ type: "warning", title: "Szervíz napló bejegyzés nem található!" });
+        if(!serviceLog) return openToast(NotFoundToast.warning(t("service.log")));
 
         router.push({
             pathname: "/expense/edit/service/[id]",
             params: { id: serviceLog.id, field: field }
         });
-    }, [serviceLog, openToast]);
+    }, [serviceLog, openToast, t]);
 
     const getAmountSubtitle = useCallback(() => {
-        let subtitle = `${ serviceLog?.expense.originalAmount } ${ serviceLog?.expense.currency.symbol }`;
-        if(serviceLog?.expense.currency.id === car?.currency.id && serviceLog?.expense.exchangeRate === 1) return subtitle;
+        let subtitle = `${ serviceLog?.expense.amount.amount } ${ serviceLog?.expense.amount.currency.symbol }`;
+        if(serviceLog?.expense.amount.currency.id === serviceLog?.expense.amount.currency.id && serviceLog?.expense.amount.exchangeRate === 1) return subtitle;
 
-        subtitle += ` (${ serviceLog?.expense.amount } ${ car?.currency.symbol })`;
+        subtitle += ` (${ serviceLog?.expense.amount.exchangedAmount } ${ serviceLog?.expense.amount.exchangeCurrency.symbol })`;
         return subtitle;
-    }, [serviceLog, car]);
+    }, [serviceLog]);
+
+    const renderServiceItems = useCallback(() => {
+        if(!serviceLog) return <></>;
+
+        return (
+            <ExpandableList
+                data={ serviceLog.items.map(serviceItemToExpandableListItem) }
+                subtitle={ t("currency.price_per_unit") }
+                totalAmount={ serviceLog.totalAmount }
+                expanded={ isServiceItemListExpanded }
+                actionIcon={ ICON_NAMES.pencil }
+                onAction={ () => {
+                    setServiceItemListExpanded(false);
+                    onEdit(ServiceLogFormFieldsEnum.ServiceItems);
+                } }
+            />
+        );
+    }, [serviceLog, onEdit, serviceItemToExpandableListItem, isServiceItemListExpanded, t]);
 
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
@@ -103,49 +121,40 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
         },
         {
             icon: ICON_NAMES.expenseItem,
-            title: "Szervizelési tételek",
+            title: t("service.items.title"),
             content: isServiceItemListExpanded ? " " : getAmountSubtitle(),
-            secondaryInfo: { icon: isServiceItemListExpanded ? ICON_NAMES.upArrowHead : ICON_NAMES.downArrowHead },
+            actionIcon: isServiceItemListExpanded ? ICON_NAMES.upArrowHead : ICON_NAMES.downArrowHead,
             onPress: () => setServiceItemListExpanded(prevState => !prevState),
-            renderContent: () => serviceLog && <ServiceItemExpandableList
-               data={ serviceLog.items }
-               totalAmount={ serviceLog.totalAmount }
-               expanded={ isServiceItemListExpanded }
-               actionIcon={ ICON_NAMES.pencil }
-               onAction={ () => {
-                   setServiceItemListExpanded(false);
-                   onEdit(ServiceLogFormFieldsEnum.ServiceItems);
-               } }
-            />
+            renderContent: renderServiceItems
         },
         {
             icon: ICON_NAMES.calendar,
-            title: "Dátum",
-            content: dayjs(serviceLog?.expense?.date).format("YYYY. MM DD. HH:mm"),
-            onPress: () => onEdit(ServiceLogFormFieldsEnum.Date)
+            title: t("date.text"),
+            content: dayjs(serviceLog?.expense?.date).format("LLL"),
+            onPress: () => onEdit(ServiceLogFormFieldsEnum.DateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.odometer,
-            title: "Kilométeróra-állás",
+            title: t("odometer.value"),
             content: serviceLog?.odometer
                      ? `${ serviceLog.odometer.value } ${ serviceLog.odometer.unit.short }`
-                     : "Nincs hozzárendelve",
-            contentTextStyle: !serviceLog?.odometer && { color: COLORS.gray2 },
-            onPress: () => onEdit(ServiceLogFormFieldsEnum.OdometerValue)
+                     : t("common.not_assigned"),
+            contentTextStyle: !serviceLog?.odometer ? { color: COLORS.gray2 } : undefined,
+            onPress: () => onEdit(ServiceLogFormFieldsEnum.DateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.note,
-            content: serviceLog?.expense?.note ?? "Nincs megjegyzés",
-            contentTextStyle: !serviceLog?.expense?.note && { color: COLORS.gray2 },
+            content: serviceLog?.expense?.note ?? t("common.no_notes"),
+            contentTextStyle: !serviceLog?.expense?.note ? { color: COLORS.gray2 } : undefined,
             onPress: () => onEdit(ServiceLogFormFieldsEnum.Note)
         }
-    ]), [car, serviceLog, isServiceItemListExpanded, getAmountSubtitle]);
+    ]), [car, serviceLog, isServiceItemListExpanded, getAmountSubtitle, t]);
 
     return (
         <>
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
                 <Title
-                    title={ serviceLog?.serviceType.key }
+                    title={ t(`service.types.${ serviceLog?.serviceType.key }`) }
                     dividerStyle={ {
                         backgroundColor: serviceLog?.expense.type?.primaryColor ?? COLORS.gray2,
                         marginBottom: SEPARATOR_SIZES.normal

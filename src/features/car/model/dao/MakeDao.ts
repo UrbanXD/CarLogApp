@@ -12,11 +12,11 @@ export class MakeDao extends Dao<MakeTableRow, Make, MakeMapper> {
         super(db, MAKE_TABLE, new MakeMapper());
     }
 
-    paginator(perPage?: number = 50): CursorPaginator<MakeTableRow, PickerItemType> {
-        return new CursorPaginator<MakeTableRow>(
+    paginator(perPage: number = 50): CursorPaginator<MakeTableRow, PickerItemType> {
+        return new CursorPaginator<MakeTableRow, PickerItemType>(
             this.db,
             MAKE_TABLE,
-            { cursor: [{ field: "name", order: "asc" }, { field: "id" }], defaultOrder: "asc" },
+            { cursor: [{ field: "name", order: "asc", toLowerCase: true }, { field: "id" }], defaultOrder: "asc" },
             { perPage, mapper: this.mapper.toPickerItem }
         );
     }

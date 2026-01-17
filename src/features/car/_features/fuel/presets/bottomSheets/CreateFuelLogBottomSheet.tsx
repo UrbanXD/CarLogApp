@@ -1,20 +1,19 @@
 import React from "react";
-import BottomSheet from "../../../../../../ui/bottomSheet/components/BottomSheet.tsx";
 import { CreateFuelLogForm } from "../../components/forms/CreateFuelLogForm.tsx";
+import { useTranslation } from "react-i18next";
+import { FormBottomSheet } from "../../../../../../ui/bottomSheet/presets/FormBottomSheet.tsx";
 
 export function CreateFuelLogBottomSheet() {
-    const TITLE = "Tankolás rögzítése";
+    const { t } = useTranslation();
+
+    const TITLE = t("fuel.create");
     const CONTENT = <CreateFuelLogForm/>;
-    const SNAP_POINTS = ["90%"];
 
     return (
-        <BottomSheet
+        <FormBottomSheet
             title={ TITLE }
             content={ CONTENT }
-            snapPoints={ SNAP_POINTS }
-            enableDismissOnClose={ false }
             enableDynamicSizing={ false }
-            enableOverDrag={ false }
         />
     );
 }

@@ -1,18 +1,11 @@
-import React, { useState } from "react";
-import {
-    ActivityIndicator,
-    Platform,
-    StyleSheet,
-    Text,
-    TextStyle,
-    TouchableOpacity,
-    View,
-    ViewStyle
-} from "react-native";
+import React, { useMemo, useState } from "react";
+import { ActivityIndicator, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
 import Icon from "../Icon";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
-import { Color, ImageSource } from "../../types/index.ts";
+import { Color, ImageSource, TextStyle, ViewStyle } from "../../types/index.ts";
+import { debounce } from "es-toolkit";
+import { useTranslation } from "react-i18next";
 
 interface TextButtonProps {
     text?: string;
@@ -30,6 +23,7 @@ interface TextButtonProps {
     inverse?: boolean;
     disabled?: boolean;
     loadingIndicator?: boolean;
+    debounceMs?: number;
     onPress: () => void;
 }
 
@@ -49,8 +43,11 @@ const TextButton: React.FC<TextButtonProps> = ({
     inverse = false,
     disabled = false,
     loadingIndicator = false,
+    debounceMs = 350,
     onPress
 }) => {
+    const { t } = useTranslation();
+
     const [isLoading, setIsLoading] = useState(false);
 
     const styles = useButtonStyles(
@@ -78,10 +75,11 @@ const TextButton: React.FC<TextButtonProps> = ({
         }
     };
 
+    const debouncedPress = useMemo(() => debounce(handlePress, debounceMs), [handlePress, debounceMs]);
 
     return (
         <TouchableOpacity
-            onPress={ handlePress }
+            onPress={ debouncedPress }
             disabled={ disabled || isLoading }
             style={ [styles.buttonContainer, style] }
         >
@@ -115,7 +113,7 @@ const TextButton: React.FC<TextButtonProps> = ({
                       </View>
                    }
                   <Text numberOfLines={ 2 } style={ [styles.buttonText, textStyle] }>
-                      { text }
+                      { t(text) }
                   </Text>
                    {
                        (iconLeft || iconRight) &&

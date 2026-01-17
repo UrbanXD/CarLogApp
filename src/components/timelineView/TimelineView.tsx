@@ -1,17 +1,18 @@
 import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
-import React, { ReactNode, useCallback, useState } from "react";
+import React, { Ref, useCallback, useState } from "react";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { TimelineItem, TimelineItemType } from "./item/TimelineItem.tsx";
-import { FlashListRef, ListRenderItem } from "@shopify/flash-list";
+import { FlashList, FlashListRef, ListRenderItemInfo } from "@shopify/flash-list";
 import { MoreDataLoading } from "../loading/MoreDataLoading.tsx";
-import { AnimatedFlashList } from "../AnimatedComponents/index.ts";
 import { RNNativeScrollEvent } from "react-native-reanimated/lib/typescript/hook/commonTypes";
-import { LayoutChangeEvent, StyleSheet, View, ViewStyle } from "react-native";
+import { LayoutChangeEvent, StyleSheet, View } from "react-native";
 import { FilterButton, FilterButtonProps } from "../filter/FilterButton.tsx";
 import { FilterRow } from "../filter/FilterRow.tsx";
+import { useTranslation } from "react-i18next";
+import { ViewStyle } from "../../types/index.ts";
 
 type TimelineViewProps = {
-    ref: FlashListRef<TimelineItemType>
+    ref: Ref<FlashListRef<TimelineItemType>>
     data: Array<TimelineItemType>
     orderButtons?: Array<FilterButtonProps>
     filterButtons?: Array<FilterButtonProps>
@@ -20,7 +21,6 @@ type TimelineViewProps = {
     fetchPrevious?: () => Promise<void>
     isNextFetching?: boolean
     isPreviousFetching?: boolean
-    renderMilestone?: (milestone: string) => ReactNode
     scrollHandler?: (event: RNNativeScrollEvent, context?: Record<string, unknown>) => void
     style?: ViewStyle
     filtersContainerStyle?: ViewStyle
@@ -38,55 +38,55 @@ function ITimelineView({
     fetchPrevious,
     isNextFetching,
     isPreviousFetching,
-    renderMilestone,
     scrollHandler,
     style,
     filtersContainerStyle
 }: TimelineViewProps) {
+    const { t } = useTranslation();
+
     const [filterRowsHeight, setFilterRowsHeight] = useState(0);
 
-    const renderItem = useCallback(({ item, index }: ListRenderItem<TimelineItemType>) => (
+    const renderItem = useCallback(({ item, index }: ListRenderItemInfo<TimelineItemType>) => (
         <TimelineItem
-            renderMilestone={ renderMilestone }
             { ...item }
             iconSize={ DOT_ICON_SIZE }
             isFirst={ index === 0 }
             isLast={ index + 1 === data.length }
         />
-    ), [renderMilestone, data]);
+    ), [data]);
 
     const renderListEmptyComponent = useCallback(() => {
-        if(isInitialFetching) return <MoreDataLoading text={ "Napló adatok olvasása" }/>;
+        if(isInitialFetching) return <MoreDataLoading text={ t("log.loading") }/>;
 
         return (
             <TimelineItem
                 id="not-found"
-                milestone="Nem található adat"
-                title="Rögzítse első adatát itt..."
+                milestone={ t("log.item_not_found") }
+                title={ t("log.item_not_found_description") }
                 color={ COLORS.gray2 }
                 isFirst
                 isLast
             />
         );
-    }, [isInitialFetching]);
+    }, [isInitialFetching, t]);
 
     const renderHeader = useCallback(() => {
         if(!isPreviousFetching) return <></>;
 
-        return <MoreDataLoading text={ "Korábbi napló adatok olvasása" }/>;
-    }, [isPreviousFetching]);
+        return <MoreDataLoading text={ t("log.previous_data_loading") }/>;
+    }, [isPreviousFetching, t]);
 
     const renderFooter = useCallback(() => {
         if(!isNextFetching) return <></>;
 
-        return <MoreDataLoading text={ "Régebbi napló adatok olvasása" }/>;
-    }, [isNextFetching]);
+        return <MoreDataLoading text={ t("log.next_data_loading") }/>;
+    }, [isNextFetching, t]);
 
     const keyExtractor = useCallback((item: TimelineItemType) => item.id, []);
 
     const filterRowsOnLayout = useCallback((event: LayoutChangeEvent) => {
         setFilterRowsHeight(event.nativeEvent.layout.height);
-    });
+    }, []);
 
     return (
         <View style={ styles.container }>
@@ -96,18 +96,18 @@ function ITimelineView({
             >
                 {
                     orderButtons &&
-                   <FilterRow>
+                   <FilterRow style={ { paddingHorizontal: DEFAULT_SEPARATOR } }>
                        { orderButtons.map((props, index) => <FilterButton key={ index.toString() } { ...props } />) }
                    </FilterRow>
                 }
                 {
                     filterButtons &&
-                   <FilterRow>
+                   <FilterRow style={ { paddingHorizontal: DEFAULT_SEPARATOR } }>
                        { filterButtons.map((props, index) => <FilterButton key={ index.toString() } { ...props } />) }
                    </FilterRow>
                 }
             </View>
-            <AnimatedFlashList
+            <FlashList<TimelineItemType>
                 ref={ ref }
                 data={ data }
                 renderItem={ renderItem }
@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
     },
     filtersContainer: {
         position: "absolute",
+        backgroundColor: COLORS.black2,
         left: -DEFAULT_SEPARATOR,
         right: -DEFAULT_SEPARATOR,
         zIndex: 1

@@ -9,7 +9,7 @@ import Animated, {
     useSharedValue,
     withTiming
 } from "react-native-reanimated";
-import { ViewStyle } from "react-native";
+import { ViewStyle } from "../../types/index.ts";
 
 type FloatingViewProps = {
     ref?: AnimatedRef<Animated.View>
@@ -33,7 +33,7 @@ function FloatingView({
     hiddenOnScroll = false,
     hideAnimationThresholdY = 0,
     hideAnimationDirection,
-    hideAnimationDistance,
+    hideAnimationDistance = 0,
     top,
     bottom,
     right,

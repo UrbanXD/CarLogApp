@@ -1,20 +1,20 @@
 import React from "react";
 import SignUpForm from "../../components/forms/SignUpForm.tsx";
-import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
+import { useTranslation } from "react-i18next";
+import { FormBottomSheet } from "../../../../ui/bottomSheet/presets/FormBottomSheet.tsx";
 
 const SignUpBottomSheet: React.FC = () => {
-    const TITLE = "Regisztráció";
+    const { t } = useTranslation();
+
+    const TITLE = t("auth.sign_up.title");
     const CONTENT = <SignUpForm/>;
     const SNAP_POINTS = ["62.5%"];
 
     return (
-        <BottomSheet
+        <FormBottomSheet
             title={ TITLE }
             content={ CONTENT }
             snapPoints={ SNAP_POINTS }
-            enableDynamicSizing={ false }
-            enableOverDrag={ false }
-            enableDismissOnClose={ false }
         />
     );
 };

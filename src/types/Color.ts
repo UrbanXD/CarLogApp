@@ -1,3 +1,1 @@
-import { ColorValue } from "react-native";
-
-export type Color = ColorValue | string;
+export type Color = string;

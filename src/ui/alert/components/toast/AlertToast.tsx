@@ -25,10 +25,10 @@ const AlertToast: React.FC<AlertToastProps> = ({ toast }) => {
 
     const opacity = useSharedValue(0.5);
     const x = useSharedValue(-width / 2);
-    const height = useMemo(() => (!body ? hp(8) : hp(10)), [body]);
+    const height = useMemo(() => (!body ? hp(5.5) : hp(7.5)), [body]);
     const [removable, setRemovable] = useState(false);
 
-    const timoutRef = useRef<NodeJS.Timeout>();
+    const timoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const styles = useStyles(type, height);
     const animatedStyle = useAnimatedStyle(() => {
@@ -66,13 +66,15 @@ const AlertToast: React.FC<AlertToastProps> = ({ toast }) => {
 
     const dismissWithPress = () => {
         setRemovable(true);
-        clearTimeout(timoutRef.current);
+        if(timoutRef.current) clearTimeout(timoutRef.current);
     };
 
     useEffect(() => {
         startAnimation();
 
-        return () => clearTimeout(timoutRef.current);
+        return () => {
+            if(timoutRef.current) clearTimeout(timoutRef.current);
+        };
     }, []);
 
     useEffect(() => {
@@ -101,16 +103,14 @@ const AlertToast: React.FC<AlertToastProps> = ({ toast }) => {
                 <View style={ styles.contentContainer }>
                     <Text
                         numberOfLines={ 1 }
+                        adjustsFontSizeToFit
                         style={ styles.titleText }
                     >
                         { title }
                     </Text>
                     {
                         body &&
-                       <Text
-                          numberOfLines={ 2 }
-                          style={ styles.text }
-                       >
+                       <Text style={ styles.text }>
                            { body }
                        </Text>
                     }
@@ -124,7 +124,7 @@ const useStyles = (type: AlertType, height: number) =>
     StyleSheet.create({
         container: {
             alignSelf: "center",
-            height,
+            minHeight: height,
             backgroundColor: COLORS.black5,
             borderRadius: 35,
             borderColor: ALERT_COLORS[type],
@@ -132,6 +132,7 @@ const useStyles = (type: AlertType, height: number) =>
             paddingVertical: SEPARATOR_SIZES.lightSmall,
             paddingHorizontal: SEPARATOR_SIZES.small,
             flexDirection: "row",
+            alignItems: "center",
             gap: SEPARATOR_SIZES.lightSmall
         },
         contentContainer: {

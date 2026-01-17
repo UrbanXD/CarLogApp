@@ -8,12 +8,17 @@ import Animated, {
     withTiming
 } from "react-native-reanimated";
 import React, { useCallback, useEffect } from "react";
-import { LayoutChangeEvent, Pressable, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
+import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from "react-native";
 import { formTheme } from "../../../ui/form/constants/theme.ts";
-import { Color } from "../../../types/index.ts";
 import { SEPARATOR_SIZES } from "../../../constants/index.ts";
 import { scheduleOnRN } from "react-native-worklets";
 import { widthPercentageToDP } from "react-native-responsive-screen";
+import { Color, TextStyle, ViewStyle } from "../../../types/index.ts";
+
+type SwitchColorSchema = {
+    on: Color;
+    off: Color;
+};
 
 export type SwitchProps = {
     value?: boolean
@@ -24,18 +29,16 @@ export type SwitchProps = {
         on: string,
         off: string
     }
-    thumbColor?: Color | {
-        on: Color,
-        off: Color
-    }
-    trackColor?: Color | {
-        on: Color,
-        off: Color
-    },
+    thumbColor?: Color | SwitchColorSchema
+    trackColor?: Color | SwitchColorSchema,
     trackStyle?: ViewStyle,
     thumbStyle?: ViewStyle,
     labelStyle?: TextStyle
 }
+
+const isSwitchColor = (value: Color | SwitchColorSchema): value is SwitchColorSchema => {
+    return typeof value === "object" && value !== null && ("on" in value) && ("off" in value);
+};
 
 export function Switch({
     value,
@@ -54,17 +57,15 @@ export function Switch({
 
     const status = useSharedValue<boolean>(false);
     const layout = useSharedValue({ width: 0, height: 0 });
-    const width = useSharedValue(undefined);
+    const width = useSharedValue<number | undefined>(undefined);
 
-    const trackColorRange = typeof trackColor === "string" ? [trackColor, trackColor] : [
-        trackColor.off,
-        trackColor.on
-    ];
+    const trackColorRange = isSwitchColor(trackColor)
+                            ? [trackColor.off as string, trackColor.on as string]
+                            : [trackColor as string, trackColor as string];
 
-    const thumbColorRange = typeof thumbColor === "string" ? [thumbColor, thumbColor] : [
-        thumbColor.off,
-        thumbColor.on
-    ];
+    const thumbColorRange = isSwitchColor(thumbColor)
+                            ? [thumbColor.off as string, thumbColor.on as string]
+                            : [thumbColor as string, thumbColor as string];
 
     useEffect(() => {
         status.value = !!value;
@@ -88,7 +89,7 @@ export function Switch({
 
     const onPress = useCallback(() => {
         status.value = !status.value;
-    });
+    }, []);
 
     const onTrackLayout = (event: LayoutChangeEvent) => {
         layout.value = { width: event.nativeEvent.layout.width, height: event.nativeEvent.layout.height };
@@ -100,7 +101,7 @@ export function Switch({
 
     const trackAnimatedStyle = useAnimatedStyle(() => {
         const color = interpolateColor(
-            status.value,
+            Number(status.value),
             [0, 1],
             trackColorRange
         );
@@ -114,7 +115,7 @@ export function Switch({
 
     const thumbAnimatedStyle = useAnimatedStyle(() => {
         const color = interpolateColor(
-            status.value,
+            Number(status.value),
             [0, 1],
             thumbColorRange
         );
@@ -136,7 +137,7 @@ export function Switch({
 
     const labelAnimatedStyle = useAnimatedStyle(() => {
         const color = interpolateColor(
-            status.value,
+            Number(status.value),
             [0, 1],
             thumbColorRange
         );

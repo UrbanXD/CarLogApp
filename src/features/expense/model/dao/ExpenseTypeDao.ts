@@ -22,7 +22,7 @@ export class ExpenseTypeDao extends Dao<ExpenseTypeTableRow, ExpenseType, Expens
         return await this.mapper.toDtoArray(entities);
     }
 
-    async getIdByKey(key: string, safe?: boolean = true): Promise<string | null> {
+    async getIdByKey(key: string, safe: boolean = true): Promise<string | null> {
         const result = await this.db
         .selectFrom(EXPENSE_TYPE_TABLE)
         .select("id")

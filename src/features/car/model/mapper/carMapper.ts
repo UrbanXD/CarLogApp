@@ -5,7 +5,6 @@ import {
     OdometerLogTableRow
 } from "../../../../database/connector/powersync/AppSchema.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
-import { getImageFromAttachmentQueue } from "../../../../database/utils/getImageFromAttachmentQueue.ts";
 import { Car, carSchema } from "../../schemas/carSchema.ts";
 import { MakeDao } from "../dao/MakeDao.ts";
 import { ModelDao } from "../dao/ModelDao.ts";
@@ -32,17 +31,16 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
         super();
     }
 
-    async toDto(entity: CarTableRow): Promise<Car | null> {
-        const image = await getImageFromAttachmentQueue(this.attachmentQueue, entity.image_url);
+    async toDto(entity: CarTableRow): Promise<Car> {
         const model = await this.modelDao.getById(entity.model_id);
-        const carModel = await this.modelDao.mapper.toCarModelDto(model, entity.model_year);
+        const carModel = model ? await this.modelDao.mapper.toCarModelDto(model, entity.model_year!) : null;
 
         const fuelTank = await this.fuelTankDao.getByCarId(entity.id);
         const odometer = await this.odometerLogDao.getOdometerByCarId(entity.id);
 
         const currency = await this.currencyDao.getById(entity.currency_id);
 
-        const { data } = carSchema.safeParse({
+        return carSchema.parse({
             id: entity.id,
             ownerId: entity.owner_id,
             name: entity.name,
@@ -50,13 +48,9 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
             odometer,
             currency,
             fuelTank,
-            image,
+            imagePath: entity.image_url,
             createdAt: entity.created_at
         });
-
-        if(!data) return null;
-
-        return data;
     }
 
     async toEntity(dto: Car): Promise<CarTableRow> {
@@ -64,22 +58,36 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
             id: dto.id,
             owner_id: dto.ownerId,
             name: dto.name,
-            odometer_unit_id: dto.odometer.unit,
+            odometer_unit_id: dto.odometer.unit.id,
             currency_id: dto.currency.id,
             model_id: dto.model.id,
             model_year: dto.model.year,
             created_at: dto.createdAt,
-            image_url: dto.image?.path ?? null
+            image_url: dto.imagePath ?? null
         };
     }
 
-    async formResultToCarEntities(request: CarFormFields, createdAt?: string): Promise<{
+    async formResultToCarEntities(
+        request: CarFormFields,
+        previousCarImagePath?: string | null,
+        createdAt?: string
+    ): Promise<{
         car: CarTableRow
         odometerLog: OdometerLogTableRow
         odometerChangeLog: OdometerChangeLogTableRow | null,
         fuelTank: FuelTankTableRow
     }> {
-        const odometerUnit = await this.odometerUnitDao.getById(request.odometer.unitId);
+        const odometerUnit = (await this.odometerUnitDao.getById(request.odometer.unitId))!;
+
+        let path = request?.image?.fileName ?? null;
+
+        if(this.attachmentQueue) {
+            path = await this.attachmentQueue.changeEntityAttachment(
+                request.image ?? null,
+                previousCarImagePath ?? null,
+                request.ownerId
+            );
+        }
 
         const car: CarTableRow = {
             id: request.id,
@@ -89,8 +97,8 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
             currency_id: request.currencyId,
             model_id: request.model.id,
             model_year: request.model.year,
-            image_url: request.image?.path ?? null,
-            created_at: createdAt
+            image_url: path ?? null,
+            created_at: createdAt ?? request.createdAt
         };
 
         const odometerLog: OdometerLogTableRow = {
@@ -104,10 +112,10 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car> {
         if(request.odometer.odometerChangeLogId) {
             odometerChangeLog = {
                 id: request.odometer.odometerChangeLogId,
-                owner_id: request.ownerId,
+                car_id: request.id,
                 odometer_log_id: odometerLog.id,
                 note: null,
-                date: createdAt
+                date: createdAt ?? car.created_at
             };
         }
 

@@ -25,7 +25,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
 
     async toDto(entity: SelectOdometerLogTableRow): Promise<OdometerLog> {
         const [odometerUnit, odometerLogType]: [OdometerUnit, OdometerLogType | null] = await Promise.all([
-            this.odometerUnitDao.getUnitByCarId(entity.car_id),
+            this.odometerUnitDao.getUnitByCarId(entity.car_id!),
             this.odometerLogTypeDao.getById(entity.type_id)
         ]);
 
@@ -34,8 +34,8 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
             carId: entity.car_id,
             relatedId: entity.related_id,
             type: odometerLogType,
-            valueInKm: entity.value,
-            value: convertOdometerValueFromKilometer(entity.value, odometerUnit.conversionFactor),
+            valueInKm: entity.value!,
+            value: convertOdometerValueFromKilometer(entity.value!, odometerUnit.conversionFactor!),
             unit: odometerUnit,
             note: entity.note,
             date: entity.date
@@ -43,13 +43,13 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
     }
 
     async toOdometerDto(entity: OdometerLogTableRow): Promise<Odometer> {
-        const odometerUnit = await this.odometerUnitDao.getUnitByCarId(entity.car_id);
+        const odometerUnit = await this.odometerUnitDao.getUnitByCarId(entity.car_id!);
 
         return odometerSchema.parse({
             id: entity.id,
             carId: entity.car_id,
             valueInKm: entity.value,
-            value: convertOdometerValueFromKilometer(entity.value, odometerUnit.conversionFactor),
+            value: convertOdometerValueFromKilometer(entity.value!, odometerUnit.conversionFactor!),
             unit: odometerUnit
         });
     }
@@ -59,9 +59,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
             id: dto.id,
             car_id: dto.carId,
             type_id: dto.type.id,
-            value: dto.valueInKm,
-            note: dto.note,
-            date: dto.date
+            value: dto.valueInKm
         };
     }
 
@@ -79,7 +77,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
             odometerChangeLog: {
                 id: formResult.odometerChangeLogId,
                 odometer_log_id: formResult.id,
-                owner_id: formResult.ownerId,
+                car_id: formResult.carId,
                 note: formResult.note,
                 date: formResult.date
             }

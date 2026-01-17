@@ -1,29 +1,30 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { useTranslation } from "react-i18next";
 
-interface InputTitleProps {
-    title: string,
-    subtitle?: string
+type InputTitleProps = {
+    title: string
+    subtitle?: string | ReactElement
     optional?: boolean
 }
 
-const InputTitle: React.FC<InputTitleProps> = ({
+function InputTitle({
     title,
     subtitle,
     optional = false
-}) => {
+}: InputTitleProps) {
+    const { t } = useTranslation();
+
     return (
         <View style={ styles.container }>
             <View>
                 <Text style={ styles.inputNameText }>
-                    {
-                        `${ title } `
-                    }
+                    { title }
                     {
                         optional &&
                        <Text style={ styles.optionalText }>
-                          (opcionális)
+                          ({ t("form.optional") })
                        </Text>
                     }
                 </Text>
@@ -40,7 +41,7 @@ const InputTitle: React.FC<InputTitleProps> = ({
 
 const styles = StyleSheet.create({
     container: {
-        gap: SEPARATOR_SIZES.lightSmall / 2
+        gap: SEPARATOR_SIZES.lightSmall / 4
     },
     inputNameText: {
         fontSize: FONT_SIZES.p1,
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZES.p3,
         fontFamily: "Gilroy-Medium",
         color: COLORS.gray1,
-        lineHeight: FONT_SIZES.p2 * 1.2,
+        lineHeight: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.05
     }
 });

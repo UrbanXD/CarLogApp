@@ -1,0 +1,765 @@
+{
+  "common": {
+    "main_screen": "Home",
+    "not_assigned": "Not assigned",
+    "no_notes": "No notes",
+    "note": "Note",
+    "unknown": "Unknown",
+    "data_loading": "Loading data",
+    "no_data_found": "No data found",
+    "loading": "Loading",
+    "or": "or",
+    "log_title": "Log entry",
+    "count": "pcs",
+    "filters": {
+      "all": "All"
+    },
+    "unit": "Unit",
+    "type": "Type",
+    "image": "Image",
+    "element": "Item"
+  },
+  "permission": {
+    "title": "requested feature",
+    "camera": "camera",
+    "media_library": "media library"
+  },
+  "first_select_car": {
+    "title": "Select a vehicle first!",
+    "description": "To access the requested data, please select your primary vehicle. You can do this using the menu at the top of the screen. If you don't have a car parked in your virtual garage yet, please create one."
+  },
+  "form_button": {
+    "edit": "Edit",
+    "save": "Save",
+    "delete": "Delete",
+    "record": "Record",
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "google_auth": "Continue with Google",
+    "otp_next": "Next"
+  },
+  "multistep_form": {
+    "go_to_next_step": "Next",
+    "submit_multistep_form": "Finish",
+    "next_step": "Next: {{step}}",
+    "result_step": "Summary"
+  },
+  "form": {
+    "optional": "optional",
+    "searchbar": {
+      "placeholder": "Search..."
+    },
+    "picker": {
+      "choose": "Select from the list",
+      "new_item": "New item",
+      "no_item_found": "No items found"
+    },
+    "image_picker": {
+      "selectable_images": "Available images"
+    },
+    "date_picker": {
+      "title": "$t(date.text)",
+      "year": "$t(date.year)",
+      "date_placeholder": "$t(date.text)",
+      "time_placeholder": "$t(date.time)"
+    }
+  },
+  "toast": {
+    "types": {
+      "success": "Success",
+      "info": "Information",
+      "warning": "Warning",
+      "error": "Error"
+    },
+    "default_error": "An unexpected error has occurred!",
+    "picker_disabled": {
+      "default_body": "Action not possible! Something is missing."
+    },
+    "denied_permission": {
+      "body": "Access to {{permission}} was denied. Please enable it in settings."
+    },
+    "not_found": {
+      "body": "{{name}} not found"
+    },
+    "invalid_form": {
+      "title": "Invalid data",
+      "body": "Please check the provided information!"
+    },
+    "create": {
+      "success": {
+        "body": "{{name}} created"
+      },
+      "error": {
+        "body": "Failed to create {{name}}"
+      }
+    },
+    "edit": {
+      "success": {
+        "body": "Changes saved"
+      },
+      "error": {
+        "body": "Failed to save changes"
+      }
+    },
+    "delete": {
+      "success": {
+        "body": "{{name}} deleted"
+      },
+      "error": {
+        "body": "Failed to delete {{name}}"
+      }
+    },
+    "array_input": {
+      "limit": {
+        "body": "Upper limit reached, no more items can be added"
+      },
+      "already_added": {
+        "body": "This item has already been added and cannot be duplicated"
+      },
+      "error": {
+        "body": "An unexpected error has occurred"
+      }
+    },
+    "user_does_not_have_car": {
+      "body": "First create your first car"
+    }
+  },
+  "modal": {
+    "accept": "Continue",
+    "dismiss": "Cancel",
+    "bottom_sheet_leaving": {
+      "title": "Your data may be lost!",
+      "body": "If you close the form now, the changes you made will be lost. Are you sure you want to close it?",
+      "accept": "Close form"
+    },
+    "delete": {
+      "title": "Delete {{name}}",
+      "body": "Deletion is irreversible. Please make sure you wish to continue.",
+      "accept": "$t(form_button.delete)"
+    },
+    "log_delete_title": "Delete {{name}} log entry",
+    "not_found": "{{name}} not found!",
+    "log_not_found": "Log entry not found!"
+  },
+  "error": {
+    "email_format": "Invalid email address format",
+    "password_min_length": "The password must be at least {{0}} characters long",
+    "password_format": "The password must contain at least one lowercase and uppercase letter, one number, and one special character",
+    "passwords_not_equals": "The two passwords do not match",
+    "number_required": "Please enter a number",
+    "number_min_limit": "The number must be greater than or equal to {{0}}",
+    "number_max_limit": "The number must be less than {{0}}",
+    "date_required": "Please select a date",
+    "picker_required": "Please select an item",
+    "car_picker_required": "Please select a car",
+    "type_picker_required": "Please select a type",
+    "unit_picker_required": "Please select a unit",
+    "currency_picker_required": "Please select a currency",
+    "price_per_unit_required": "Please enter the unit price",
+    "price_per_unit_non_negative": "The unit price cannot be negative",
+    "price_per_unit_min_limit": "The unit price must be at least {{0}}",
+    "expense_amount_required": "Please enter the expense amount",
+    "expense_amount_non_negative": "The expense amount cannot be negative",
+    "expense_amount_min_limit": "The expense amount must be at least {{0}}",
+    "exchange_rate_required": "Please enter the exchange rate",
+    "exchange_rate_non_negative": "The exchange rate cannot be negative",
+    "exchange_rate_min_limit": "The exchange rate must be at least {{0}}",
+    "quantity_required": "Please enter the quantity",
+    "quantity_non_negative": "Quantity cannot be a negative number",
+    "car_name_required": "Please provide an identifier for your car",
+    "car_name_max_limit": "The car identifier can be a maximum of {{0}} characters",
+    "car_make_picker_required": "Please select a manufacturer",
+    "car_model_picker_required": "Please select a model",
+    "car_model_year_picker_required": "Please select a model year",
+    "fuel_type_picker_required": "Please select a fuel type",
+    "fuel_quantity_required": "Please enter the amount of fuel filled",
+    "fuel_quantity_non_negative": "The filled amount cannot be negative",
+    "fuel_quantity_min_limit": "The filled amount must be at least {{0}}",
+    "odometer_value_required": "Please enter the current odometer reading",
+    "odometer_value_non_negative": "The odometer reading cannot be negative",
+    "odometer_value_min_limit": "The odometer reading cannot go backwards. Based on the date, the previous reading was: {{0}} {{1}} (recorded: {{2}}).",
+    "odometer_value_min_limit_without_date": "The odometer reading cannot go backwards. Based on the date, the previous reading was: {{0}} {{1}}.",
+    "odometer_value_max_limit": "The entered value contradicts the odometer history. Based on the date, the subsequent reading was: {{0}} {{1}} (recorded: {{2}}).",
+    "odometer_value_max_limit_without_date": "The entered value contradicts the odometer history. Based on the date, the subsequent reading was: {{0}} {{1}}.",
+    "service_type_required": "Please select a service type",
+    "service_item_quantity_required": "Please enter the item quantity",
+    "service_item_quantity_non_negative": "The item quantity cannot be negative",
+    "service_item_quantity_min_limit": "The item quantity must be at least {{0}}",
+    "start_and_end_place_required": "You must provide at least a start and end location",
+    "ride_end_time_must_be_later_than_start_time": "The end time must be later than the start time",
+    "ride_odometer_end_must_be_bigger_than_start_odometer": "The odometer reading cannot decrease compared to the start",
+    "passenger_name_required": "Passenger name is required",
+    "passenger_name_already_exists": "A passenger with this name already exists",
+    "place_name_required": "Place name is required",
+    "place_name_already_exists": "A place with this name already exists"
+  },
+  "action_menu": {
+    "create_car": "Add car",
+    "create_service": "Service",
+    "create_fuel_log": "Fuel log",
+    "create_expense": "Expense",
+    "create_ride": "Plan trip",
+    "create_odometer_log": "Odometer update",
+    "places": "Places",
+    "passengers": "Passengers"
+  },
+  "auth": {
+    "description": "Manage your cars with us",
+    "forgot_your_password": "Forgot your password?",
+    "already_have_account": "Already have an account?",
+    "sign_in_now": "Sign in",
+    "resume_verification": "Resume\nverification",
+    "password_recovery": "Password Recovery",
+    "sign_in": "Sign in",
+    "sign_up": {
+      "title": "Sign Up",
+      "steps": {
+        "personal_information": "Personal Information",
+        "password": "$t(auth.user.password)"
+      }
+    },
+    "otp_verification": {
+      "use_otp_code_for_verification": "Use the code sent to <email>{{email}}</email> for verification.",
+      "expired_or_didnt_received": "Did not receive the code or has it expired?",
+      "resend": "Resend",
+      "email": "Email verification",
+      "new_email": "Verify new email",
+      "email_change": "Email change verification",
+      "password_reset": "Reset password",
+      "delete_account": "Delete account"
+    },
+    "user": {
+      "firstname": "First Name",
+      "firstname_placeholder": "John",
+      "lastname": "Last Name",
+      "lastname_placeholder": "Doe",
+      "profile_picture": "Profile Picture",
+      "email": "Email",
+      "email_placeholder": "carlog@gmail.com",
+      "password": "Password",
+      "password_placeholder": "Password",
+      "repeat_password": "Repeat Password",
+      "repeat_password_placeholder": "Repeat Password",
+      "avatar": {
+        "title": "Avatar",
+        "type_of_avatar": "Avatar type",
+        "image": "Image",
+        "monogram": "Monogram"
+      }
+    },
+    "toast": {
+      "otp": {
+        "expired": {
+          "body": "The code you entered is invalid or has expired."
+        },
+        "over_email_send_rate_limit": {
+          "title": "Please wait!",
+          "body": "Too many email requests in a short period. Please wait {{seconds}} seconds."
+        }
+      },
+      "google": {
+        "auth_flow_cancelled": {
+          "body": "Google authentication process was cancelled!"
+        },
+        "already_in_progress": {
+          "body": "A Google authentication is already in progress. Please wait!"
+        },
+        "error": {
+          "body": "An unexpected error occurred during Google authentication!"
+        }
+      },
+      "sign_in": {
+        "success": {
+          "title": "Successfully signed in!"
+        },
+        "invalid_credentials": {
+          "body": "Incorrect email and/or password!"
+        },
+        "error": {
+          "body": "An unexpected error occurred during sign in!"
+        }
+      },
+      "sign_up": {
+        "success": {
+          "title": "Successfully registered!"
+        },
+        "email_exists": {
+          "body": "The email you provided is already registered!"
+        },
+        "error": {
+          "body": "An unexpected error occurred during registration!"
+        },
+        "otp_error": {
+          "body": "An unexpected error occurred while verifying your account!"
+        }
+      },
+      "sign_out": {
+        "success": {
+          "title": "Successfully signed out!"
+        },
+        "error": {
+          "body": "An unexpected error occurred during sign out!"
+        }
+      },
+      "reset_password": {
+        "success": {
+          "title": "Password updated!"
+        },
+        "error": {
+          "body": "An unexpected error occurred while resetting the password!"
+        }
+      },
+      "add_password": {
+        "success": {
+          "title": "Password successfully added!"
+        },
+        "error": {
+          "body": "An unexpected error occurred while adding the password!"
+        }
+      },
+      "change_email": {
+        "success": {
+          "title": "Email updated!"
+        },
+        "error": {
+          "body": "An unexpected error occurred while updating the email!"
+        }
+      },
+      "change_personal_information": {
+        "success": {
+          "title": "Personal information updated"
+        },
+        "error": {
+          "body": "An unexpected error occurred while updating personal information!"
+        }
+      },
+      "delete_user": {
+        "success": {
+          "title": "User account deleted!"
+        },
+        "error": {
+          "body": "An unexpected error occurred while deleting the user account!"
+        }
+      }
+    }
+  },
+  "log": {
+    "title": "Log entry",
+    "item_not_found": "Entry not found",
+    "item_not_found_description": "Record your first data here...",
+    "loading": "Loading log data",
+    "previous_data_loading": "Loading previous log data",
+    "next_data_loading": "Loading older log data",
+    "delete": "Delete entry {{name}}"
+  },
+  "profile": {
+    "title": "Profile",
+    "personal_information": "Personal information",
+    "change_email": "Change email",
+    "change_password": "Change password",
+    "add_password": "Add password",
+    "delete_account": "Delete account",
+    "sign_out": "Sign out"
+  },
+  "currency": {
+    "primary": "Primary currency",
+    "text": "Currency",
+    "price": "Price",
+    "price_per_unit": "Unit price",
+    "cost": "Amount",
+    "total_cost": "Total cost",
+    "free": "Free",
+    "cost_in_car_currency": "Amount in car's base currency",
+    "price_per_unit_in_car_currency": "Unit price in car's base currency",
+    "price_per_unit_based_on_total_cost": "Unit price based on total cost is <amount>{{amount}}</amount>, calculated in the car's base currency as <amount>{{carAmount}}</amount>",
+    "price_per_unit_based_on_total_cost_in_car_currency": "Total cost per unit based on the unit price <amount>{{amount}}</amount>",
+    "names": {
+      "HUF": "Hungarian Forint",
+      "RSD": "Serbian Dinar",
+      "EUR": "Euro",
+      "USD": "US Dollar",
+      "GBP": "British Pound"
+    }
+  },
+  "date": {
+    "text": "Date",
+    "time": "Time",
+    "year": "Year",
+    "today": "today",
+    "days": "{{value}} days",
+    "hours": "{{value}} hours",
+    "minutes": "{{value}} minutes",
+    "seconds": "{{value}} seconds",
+    "few_seconds": "a few seconds",
+    "now": "now"
+  },
+  "car": {
+    "title": "Car profile",
+    "text": "Car",
+    "make": "Make",
+    "model": "Model",
+    "model_year": "Year",
+    "basic_information": "Basic information",
+    "picker": {
+      "title": "Car",
+      "placeholder": "Select a car",
+      "no_cars": "Click here to add your first car"
+    },
+    "steps": {
+      "name": {
+        "title": "Name",
+        "name_field": {
+          "title": "Car identifier",
+          "info": "The car name or identifier that may be important for you to identify the car.",
+          "placeholder": "My new car"
+        }
+      },
+      "model": {
+        "title": "$t(car.model)",
+        "make_field": {
+          "title": "$t(car.make)"
+        },
+        "model_field": {
+          "title": "$t(car.model)",
+          "disabled_text": "Please select the car make first!"
+        },
+        "model_year_field": {
+          "title": "$t(car.model_year)",
+          "disabled_text": "Please select the car model first!"
+        }
+      },
+      "odometer": {
+        "title": "$t(odometer.text)",
+        "unit_field": {
+          "title": "$t(common.unit)"
+        }
+      },
+      "fuel": {
+        "title": "$t(fuel.text)",
+        "type_field": {
+          "title": "$t(common.type)"
+        },
+        "unit_field": {
+          "title": "$t(common.unit)"
+        }
+      },
+      "image": {
+        "title": "$t(common.image)",
+        "image_field": {
+          "title": "Car profile picture"
+        }
+      }
+    },
+    "create": "Create car",
+    "car_name": "Car named {{name}}",
+    "toast": {
+      "create": {
+        "success": {
+          "body": "The car has been parked in your virtual garage!"
+        },
+        "error": {
+          "body": "Unexpected error occurred while creating the car, please try again!"
+        }
+      }
+    }
+  },
+  "fuel": {
+    "title": "Fuel log",
+    "log": "Fuel log entry",
+    "text": "Fuel",
+    "fueling": "Fueling",
+    "create": "Record fueling",
+    "types": {
+      "title": "Fuel type",
+      "undefined": "$t(common.unknown)",
+      "GASOLINE": "Gasoline",
+      "DIESEL": "Diesel",
+      "ELECTRIC": "Electric",
+      "HYBRID": "Hybrid"
+    },
+    "tank": "Fuel gauge",
+    "tank_capacity": "Tank capacity",
+    "full_tank": "Full tank",
+    "unit_types": {
+      "title": "Fuel units",
+      "undefined": "$t(common.unknown)",
+      "LITER": "Liter",
+      "GALLON": "Gallon",
+      "CUBIC_METER": "Cubic meter",
+      "KWH": "kWh"
+    },
+    "steps": {
+      "basic_information": "Basic information",
+      "fueling_information": "$t(fuel.fueling)"
+    }
+  },
+  "odometer": {
+    "title": "Odometer log",
+    "log": "Odometer log entry",
+    "text": "Odometer",
+    "value": "Odometer reading",
+    "create": "Record odometer reading",
+    "open_log": "Odometer log",
+    "current_value": "Current odometer reading: {{value}}",
+    "original_value": "Original odometer reading {{value}}",
+    "min_limit": "Previous: {{value}} ({{date}})",
+    "min_limit_without_date": "Previous: {{value}}",
+    "max_limit": "Subsequent: {{value}} ({{date}})",
+    "max_limit_without_date": "Subsequent: {{value}}",
+    "unit_types": {
+      "title": "Odometer units",
+      "undefined": "$t(common.unknown)",
+      "KILOMETER": "Kilometer",
+      "MILE": "Mile"
+    },
+    "types": {
+      "undefined": "$t(common.unknown)",
+      "SIMPLE": "Odometer update",
+      "FUEL": "Fueling",
+      "SERVICE": "Service",
+      "RIDE": "Ride"
+    }
+  },
+  "expenses": {
+    "title": "Expenses",
+    "title_singular": "Expense",
+    "description": "This financial log contains various expenses related to your selected car.",
+    "not_found": "No expenses found",
+    "not_found_action_call": "Create your first expense here",
+    "create": "Record expense",
+    "latest": "Latest expenses",
+    "more": "More expenses",
+    "types": {
+      "title": "Expense type",
+      "undefined": "Unknown",
+      "OTHER": "Other",
+      "FUEL": "Fueling",
+      "SERVICE": "Service",
+      "VEHICLE_INSPECTION": "Vehicle inspection",
+      "WASH": "Car wash",
+      "TOLL": "Toll",
+      "PARKING": "Parking",
+      "INSURANCE": "Insurance",
+      "REGISTRATION": "Registration"
+    }
+  },
+  "service": {
+    "title": "Service book",
+    "log": "Service log entry",
+    "create": "Record service",
+    "items": {
+      "title": "Service items",
+      "title_singular": "Service item",
+      "types": {
+        "title": "Item type",
+        "undefined": "$t(common.unknown)",
+        "TRANSMISSION_FLUID": "Transmission fluid",
+        "FUEL_FILTER": "Fuel filter",
+        "BRAKE_FLUID": "Brake fluid",
+        "LIGHT_BULB": "Light bulb",
+        "WIPER_BLADES": "Wiper blades",
+        "DIAGNOSTICS": "Diagnostics",
+        "OIL": "Oil",
+        "COOLANT": "Coolant",
+        "CABIN_FILTER": "Cabin filter",
+        "OIL_FILTER": "Oil filter",
+        "BRAKE_DISCS": "Brake discs",
+        "BATTERY": "Battery",
+        "SPARK_PLUGS": "Spark plugs",
+        "SOFTWARE_UPDATE": "Software update",
+        "BRAKE_PADS": "Brake pads",
+        "TIRES": "Tires",
+        "AIR_FILTER": "Air filter"
+      }
+    },
+    "types": {
+      "title": "Service type",
+      "undefined": "$t(common.unknown)",
+      "TIRE_CHANGE": "Tire change",
+      "SMALL_SERVICE": "Minor service",
+      "REPAIR": "Repair",
+      "MAJOR_SERVICE": "Major service",
+      "DIAGNOSTICS": "Diagnostics",
+      "HOME_MAINTENANCE": "Home maintenance",
+      "INSPECTION": "Inspection"
+    },
+    "steps": {
+      "basic_information": "Basic information",
+      "items": "$t(service.items.title)"
+    },
+    "modal": {
+      "delete": {
+        "title": "Delete $t(service.log)",
+        "body": "$t(modal.delete_message)"
+      }
+    }
+  },
+  "places": {
+    "title": "Places",
+    "title_singular": "Place",
+    "new": "New place",
+    "create": "Create place",
+    "start": "Start",
+    "stop": "Stop {{index}}",
+    "end": "End",
+    "modal": {
+      "delete": {
+        "title": "Delete $t(places.title_singular)"
+      }
+    }
+  },
+  "passengers": {
+    "title": "Passengers",
+    "title_singular": "Passenger",
+    "new": "New passenger",
+    "create": "Create passenger",
+    "modal": {
+      "delete": "Delete $t(passengers.title_singular)"
+    }
+  },
+  "rides": {
+    "title": "Ride log",
+    "item": "Ride",
+    "ride_planning": "Ride planning",
+    "log": "Ride log entry",
+    "upcoming": "Upcoming rides",
+    "more": "More rides",
+    "not_found": "No rides found",
+    "not_found_upcoming_rides_action_call": "Create your next ride",
+    "start": "Start",
+    "end": "End",
+    "start_time": "Start time",
+    "start_time_value": "Start time: {{value}}",
+    "end_time": "End time",
+    "duration": "Duration",
+    "distance": "Distance",
+    "start_odometer": "Start odometer",
+    "start_odometer_value": "Start odometer: {{value}}",
+    "end_odometer": "End odometer",
+    "expenses": "Expenses",
+    "other_expenses": "Other expenses",
+    "other_expense": "Other expense",
+    "route": "Route",
+    "passengers": "Passenger list",
+    "steps": {
+      "car_and_start": "Car and start",
+      "end": "End",
+      "note": "Note"
+    }
+  },
+  "garage": {
+    "garage": "Garage",
+    "use_garage": "Manage cars parked in your virtual garage!",
+    "add_new_car": "Add car",
+    "empty_car_list": "No cars are parked in your virtual garage yet",
+    "loading": "Virtual garage loading"
+  },
+  "statistics": {
+    "title": "Statistics",
+    "types": {
+      "fuel": "Fueling",
+      "ride": "Ride",
+      "expense": "Expense",
+      "service": "Service"
+    },
+    "compared_to_previous_cycle": "compared to the previous cycle",
+    "chart": {
+      "not_enough_data": "Not enough data to display the chart"
+    },
+    "range_unit": {
+      "year": "Yearly breakdown",
+      "month": "Monthly breakdown",
+      "day": "Daily breakdown",
+      "hour": "Hourly breakdown",
+      "undefined": "Periodic breakdown"
+    },
+    "distance": {
+      "ride_distance": "Mileage",
+      "duration": "Duration",
+      "count": "Trips",
+      "total_distance_by_odometer": "Total Distance",
+      "total_ride_distance": "Total Trip Distance",
+      "max_ride_distance": "Longest Trip Distance",
+      "avg_ride_distance": "Average Trip Distance",
+      "median_ride_distance": "Median Trip Distance",
+      "most_visited_places": "Most Visited Places",
+      "total_ride_duration": "Total Trip Duration",
+      "max_ride_duration": "Longest Trip Duration",
+      "avg_ride_duration": "Average Trip Duration",
+      "median_ride_duration": "Median Trip Duration",
+      "ride_frequency": {
+        "title": "Trip Frequency",
+        "y_axis": "Frequency"
+      },
+      "driving_activity": {
+        "title": "Driving",
+        "y_axis": "Distance traveled ({{unit}})"
+      }
+    },
+    "expense": {
+      "count": "Expenses",
+      "total_amount": "Total expenses",
+      "max_amount": "Most expensive expense",
+      "avg_amount": "Average expenses",
+      "median_amount": "Median of expenses",
+      "total_amount_by_date": {
+        "title": "Expense distribution",
+        "y_axis": "Cost ({{unit}})"
+      },
+      "distribution_by_type": "Expense distribution by type"
+    },
+    "fuel": {
+      "log_count": "Fuel-ups",
+      "total_amount": "Total amount of fuel-ups",
+      "max_amount": "Most expensive fuel-up",
+      "avg_amount": "Average fuel-up amount",
+      "median_amount": "Median of fuel-up amounts",
+      "total_quantity": "Total quantity fueled",
+      "max_quantity": "Largest quantity fueled",
+      "avg_quantity": "Average quantity fueled",
+      "median_quantity": "Median quantity fueled",
+      "amount": "Expenses",
+      "quantity": "Quantity",
+      "total_amount_by_date": {
+        "title": "Refueling costs",
+        "y_axis": "Cost ({{unit}})"
+      },
+      "consumption": {
+        "title": "Fuel consumption",
+        "y_axis": "Average consumption ({{unit}})"
+      },
+      "cost_per_distance": {
+        "title": "Consumption cost analysis",
+        "y_axis": "Average cost ({{unit}})"
+      },
+      "accuracy": "The accuracy of this indicator is affected by whether you enter the odometer reading during your fuel-ups"
+    },
+    "service": {
+      "log_count": "Services",
+      "total_amount": "Total service amount",
+      "max_amount": "Most expensive service",
+      "avg_amount": "Average service cost",
+      "median_amount": "Median service cost",
+      "total_amount_by_date": {
+        "title": "Service costs",
+        "y_axis": "Cost ({{unit}})"
+      },
+      "average_distance_between_services": "Average distance between services",
+      "average_time_between_services": "Average time between services",
+      "expense_distribution_by_service_item": "Expense distribution by service item",
+      "expense_distribution_by_type": "Expense distribution by service type",
+      "frequency_distribution_by_odometer": {
+        "title": "Frequency distribution by odometer intervals",
+        "description": "Interval range: {{value}}",
+        "y_axis": "Frequency"
+      },
+      "forecast": "Service Forecast",
+      "last_odometer_value": "Latest",
+      "forecast_odometer_value": "Next",
+      "forecast_not_possible": "Accurate estimate not possible",
+      "forecast_not_possible_try_to_add_new_service": "Accurate estimate not possible, please create this type of service first.",
+      "is_on_time": "Due",
+      "forecast_date": "Estimated Date"
+    }
+  }
+}

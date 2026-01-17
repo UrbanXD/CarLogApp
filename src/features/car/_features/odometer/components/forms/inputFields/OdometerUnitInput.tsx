@@ -4,6 +4,8 @@ import { OdometerUnit } from "../../../schemas/odometerUnitSchema.ts";
 import { Control } from "react-hook-form";
 import Input from "../../../../../../../components/Input/Input.ts";
 import { MoreDataLoading } from "../../../../../../../components/loading/MoreDataLoading.tsx";
+import { useTranslation } from "react-i18next";
+import { PickerItemType } from "../../../../../../../components/Input/picker/PickerItem.tsx";
 
 type OdometerUnitInputProps = {
     control: Control<any>
@@ -15,30 +17,41 @@ type OdometerUnitInputProps = {
 export function OdometerUnitInput({
     control,
     fieldName,
-    title = "Kilométeróra Mértékegység",
+    title,
     subtitle
 }: OdometerUnitInputProps) {
+    const { t } = useTranslation();
     const { odometerUnitDao } = useDatabase();
 
-    const [odometerUnits, setOdometerUnits] = useState<Array<OdometerUnit>>();
+    const [rawOdometerUnits, setRawOdometerUnits] = useState<Array<OdometerUnit> | null>(null);
+    const [odometerUnits, setOdometerUnits] = useState<Array<PickerItemType>>([]);
 
     useEffect(() => {
         (async () => {
-            const odometerUnitsDto = await odometerUnitDao.getAll();
-
-            setOdometerUnits(odometerUnitDao.mapper.dtoToPicker(odometerUnitsDto));
+            setRawOdometerUnits(await odometerUnitDao.getAll());
         })();
     }, []);
+
+    useEffect(() => {
+        if(!rawOdometerUnits) return;
+
+        setOdometerUnits(
+            odometerUnitDao.mapper.dtoToPicker(
+                rawOdometerUnits,
+                (dto) => `${ t(`odometer.unit_types.${ dto.key }`) } (${ dto.short })`
+            )
+        );
+    }, [rawOdometerUnits, t]);
 
     return (
         <Input.Field
             control={ control }
             fieldName={ fieldName }
-            fieldNameText={ title }
+            fieldNameText={ title ?? t("odometer.unit_types.title") }
             fieldInfoText={ subtitle }
         >
             {
-                odometerUnits
+                rawOdometerUnits
                 ?
                 <Input.Picker.Simple items={ odometerUnits }/>
                 :

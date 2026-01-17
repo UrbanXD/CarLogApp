@@ -1,5 +1,5 @@
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
-import { Keyboard, StyleSheet, Text, View } from "react-native";
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Keyboard, Platform, StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import {
     BottomSheetRoutes,
@@ -18,6 +18,7 @@ import { BottomSheetLeavingModal } from "../presets/modal/index.ts";
 import { useAlert } from "../../alert/hooks/useAlert.ts";
 import { BottomSheetProvider } from "../contexts/BottomSheetProvider.tsx";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { isArray } from "es-toolkit/compat";
 
 export interface BottomSheetProps extends Partial<BottomSheetModalProps> {
     title?: string;
@@ -28,7 +29,7 @@ export interface BottomSheetProps extends Partial<BottomSheetModalProps> {
 const BottomSheet: React.FC<BottomSheetProps> = ({
     title, content, closeButton, ...restProps
 }) => {
-    const { top } = useSafeAreaInsets();
+    const { top, bottom } = useSafeAreaInsets();
     const { openModal } = useAlert();
     const navigation = useNavigation();
 
@@ -36,10 +37,12 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     const manuallyClosed = useRef(false);
     const forceClosed = useRef(false);
 
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
+
     const { snapPoints, enableHandlePanningGesture, enableDynamicSizing, enableDismissOnClose } = restProps;
 
-    const isBottomSheet = (pathname?: string) => !!pathname?.startsWith("bottomSheet") || BottomSheetRoutes.includes(
-        pathname);
+    const isBottomSheet = (pathname?: string) => pathname && (pathname.startsWith("bottomSheet") || BottomSheetRoutes.includes(
+        pathname));
 
     useFocusEffect(
         useCallback(() => {
@@ -62,18 +65,28 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         return navigation.addListener("beforeRemove", (_event) => {
             forceClosed.current = true;
             KeyboardController.dismiss();
-            bottomSheetRef.current?.dismiss();
+            bottomSheetRef.current?.forceClose();
         });
     }, []);
 
     useEffect(() => {
-        Keyboard.addListener("keyboardDidHide", () => {
+        const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+        const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+        const showSubscription = Keyboard.addListener(showEvent, () => setKeyboardVisible(true));
+        const hideSubscription = Keyboard.addListener(hideEvent, () => {
             bottomSheetRef.current?.snapToIndex(0);
+            setKeyboardVisible(false);
         });
+
+        return () => {
+            showSubscription.remove();
+            hideSubscription.remove();
+        };
     }, []);
 
     const reopenBottomSheet = useCallback(() => {
-        bottomSheetRef.current.expand();
+        bottomSheetRef.current?.expand();
     }, []);
 
     const dismissBottomSheet = useCallback((dismissPreviousSheets = false) => {
@@ -89,7 +102,27 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
             const route = stackOfRoutes.pop();
             if(!route) continue;
             if(!route.name.startsWith("bottomSheet/") && !BottomSheetRoutes.includes(route.name)) {
-                router.dismissTo({ pathname: route.name, params: route.params });
+                let pathname = route.name;
+                let params = { ...route.params };
+
+                if(route.state) {
+                    const activeRouteIndex = route.state.index;
+                    if(activeRouteIndex) {
+                        const activeSubRoute = route.state.routes[activeRouteIndex];
+
+                        if(activeSubRoute) {
+                            pathname = `/${ route.name }/${ activeSubRoute.name }`;
+                            params = { ...params, ...activeSubRoute.params };
+                        }
+                    }
+                } else if(pathname.endsWith("index")) {
+                    pathname = pathname.slice(0, pathname.length - 5);
+                }
+
+                router.dismissTo({
+                    pathname: pathname.startsWith("/") ? pathname : `/${ pathname }`,
+                    params
+                });
                 return;
             }
         }
@@ -108,15 +141,22 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         if(enableDismissOnClose) return dismissBottomSheet();
 
         openModal(BottomSheetLeavingModal(reopenBottomSheet, dismissBottomSheet));
-    }, [reopenBottomSheet, dismissBottomSheet]);
+    }, [reopenBottomSheet, dismissBottomSheet, enableDismissOnClose]);
 
-    const renderBackdrop = useMemo(() => (props: BottomSheetBackdropProps) => <BottomSheetBackdrop { ...props }/>);
+    const renderBackdrop = useMemo(() => (props: BottomSheetBackdropProps) => <BottomSheetBackdrop { ...props }/>, []);
 
-    const styles = useStyles(snapPoints?.[0] === "100%", !!enableHandlePanningGesture, !!enableDynamicSizing);
+    const styles = useStyles(
+        isArray(snapPoints) && snapPoints?.[0] === "100%",
+        !!enableHandlePanningGesture,
+        !!enableDynamicSizing,
+        keyboardVisible,
+        bottom
+    );
 
     return (
         <BottomSheetModal
             ref={ bottomSheetRef }
+            enableOverDrag={ false }
             { ...restProps }
             topInset={ top }
             keyboardBehavior="interactive"
@@ -149,14 +189,18 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
 const useStyles = (
     isFullScreen: boolean,
     isHandlePanningGesture: boolean,
-    enableDynamicSizing: number
+    enableDynamicSizing: boolean,
+    keyboardVisible: boolean,
+    bottom: number
 ) => StyleSheet.create({
     container: {
         flex: 1,
         height: enableDynamicSizing ? undefined : "100%",
         gap: DEFAULT_SEPARATOR,
         paddingHorizontal: DEFAULT_SEPARATOR,
-        paddingBottom: SEPARATOR_SIZES.small
+        paddingBottom: keyboardVisible
+                       ? SEPARATOR_SIZES.small
+                       : SEPARATOR_SIZES.small + bottom
     },
     containerBackground: {
         backgroundColor: COLORS.black2,

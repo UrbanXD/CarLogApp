@@ -1,27 +1,32 @@
 import React from "react";
 import MultiStepForm from "../../../../components/Form/MultiStepForm.tsx";
 import { useSignUpSteps } from "../../hooks/useSignUpSteps.tsx";
-import { useForm } from "react-hook-form";
+import { FormState, useForm } from "react-hook-form";
 import { useAuth } from "../../../../contexts/auth/AuthContext.ts";
 import { SignUpRequest, useSignUpFormProps } from "../../schemas/form/signUpRequest.ts";
+import { SubmitHandlerArgs } from "../../../../types";
 
-const SignUpForm: React.FC = () => {
-    const form = useForm<SignUpRequest>(useSignUpFormProps);
-    const { control, handleSubmit, trigger, resetField } = form;
+type SignUpFormProps = {
+    onFormStateChange?: (formState: FormState<SignUpRequest>) => void
+}
+
+function SignUpForm({ onFormStateChange }: SignUpFormProps) {
+    const form = useForm<SignUpRequest>(useSignUpFormProps());
     const { signUp } = useAuth();
 
-    const submitHandler = handleSubmit(signUp);
+    const submitHandler: SubmitHandlerArgs<SignUpRequest> = {
+        onValid: signUp
+    };
 
     return (
         <MultiStepForm
+            form={ form }
             steps={ useSignUpSteps(form) }
             isFirstCount={ false }
-            control={ control }
             submitHandler={ submitHandler }
-            trigger={ trigger }
-            resetField={ resetField }
+            onFormStateChange={ onFormStateChange }
         />
     );
-};
+}
 
 export default SignUpForm;

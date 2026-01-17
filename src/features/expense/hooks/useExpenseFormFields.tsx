@@ -1,23 +1,24 @@
 import { UseFormReturn, useWatch } from "react-hook-form";
 import { Car } from "../../car/schemas/carSchema.ts";
-import { ExpenseFormFields } from "../enums/expenseFormFields.ts";
-import { ExpenseFields } from "../schemas/form/expenseForm.ts";
+import { ExpenseFormFieldsEnum } from "../enums/expenseFormFieldsEnum.ts";
 import { FormFields } from "../../../types/index.ts";
 import { CarPickerInput } from "../../car/components/forms/inputFields/CarPickerInput.tsx";
-import { CarEditNameToast } from "../../car/presets/toast/index.ts";
 import { ExpenseTypeInput } from "../components/forms/inputFields/ExpenseTypeInput.tsx";
 import { AmountInput } from "../../_shared/currency/components/AmountInput.tsx";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import InputDatePicker from "../../../components/Input/datePicker/InputDatePicker.tsx";
 import Input from "../../../components/Input/Input.ts";
 import { NoteInput } from "../../../components/Input/_presets/NoteInput.tsx";
 import useCars from "../../car/hooks/useCars.ts";
-import { Text } from "react-native";
+import { EditToast } from "../../../ui/alert/presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
+import { ExpenseFormFields } from "../schemas/form/expenseForm.ts";
 
-type UseExpenseFormFieldsProps = UseFormReturn<ExpenseFields>
+type UseExpenseFormFieldsProps = UseFormReturn<ExpenseFormFields, any, ExpenseFormFields>
 
 export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
     const { control, setValue, clearErrors } = props;
+    const { t } = useTranslation();
     const { getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(null);
@@ -30,67 +31,55 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
         clearErrors();
     }, [formCarId]);
 
-    const amountFieldExchangeText = useCallback((exchangedAmount: string) => {
-        return (
-            <>
-                Az autó alapvalutájában számolt összeg{ " " }
-                <Text style={ { fontWeight: "bold" } }>{ exchangedAmount }</Text>
-            </>
-        );
-    }, []);
-
-    const fields: Record<ExpenseFormFields, FormFields> = useMemo(() => ({
-        [ExpenseFormFields.Car]: {
+    const fields: Record<ExpenseFormFieldsEnum, FormFields> = useMemo(() => ({
+        [ExpenseFormFieldsEnum.Car]: {
             render: () => <CarPickerInput control={ control } fieldName="carId"/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
-        [ExpenseFormFields.Type]: {
+        [ExpenseFormFieldsEnum.Type]: {
             render: () => <ExpenseTypeInput control={ control } fieldName="typeId"/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
-        [ExpenseFormFields.Amount]: {
+        [ExpenseFormFieldsEnum.Amount]: {
             render: () => <AmountInput
                 control={ control }
                 setValue={ setValue }
-                amountFieldName="amount"
-                currencyFieldName="currencyId"
-                exchangeRateFieldName="exchangeRate"
-                exchangeText={ amountFieldExchangeText }
+                fieldName="expense"
                 defaultCurrency={ car?.currency.id }
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
-        [ExpenseFormFields.Date]: {
+        [ExpenseFormFieldsEnum.Date]: {
             render: () => (
                 <Input.Field
                     control={ control }
                     fieldName="date"
-                    fieldNameText="Dátum"
+                    fieldNameText={ t("date.text") }
                 >
                     <InputDatePicker/>
                 </Input.Field>
             ),
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
-        [ExpenseFormFields.Note]: {
+        [ExpenseFormFieldsEnum.Note]: {
             render: () => <NoteInput
                 control={ control }
                 setValue={ setValue }
                 fieldName="note"
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         }
     }), [control, setValue, car]);
 
     const fullForm: FormFields = {
         render: () => ([
-            <React.Fragment key="car">{ fields[ExpenseFormFields.Car].render() }</React.Fragment>,
-            <React.Fragment key="type">{ fields[ExpenseFormFields.Type].render() }</React.Fragment>,
-            <React.Fragment key="amount">{ fields[ExpenseFormFields.Amount].render() }</React.Fragment>,
-            <React.Fragment key="date">{ fields[ExpenseFormFields.Date].render() }</React.Fragment>,
-            <React.Fragment key="note">{ fields[ExpenseFormFields.Note].render() }</React.Fragment>
+            <React.Fragment key="car">{ fields[ExpenseFormFieldsEnum.Car].render() }</React.Fragment>,
+            <React.Fragment key="type">{ fields[ExpenseFormFieldsEnum.Type].render() }</React.Fragment>,
+            <React.Fragment key="amount">{ fields[ExpenseFormFieldsEnum.Amount].render() }</React.Fragment>,
+            <React.Fragment key="date">{ fields[ExpenseFormFieldsEnum.Date].render() }</React.Fragment>,
+            <React.Fragment key="note">{ fields[ExpenseFormFieldsEnum.Note].render() }</React.Fragment>
         ]),
-        editToastMessages: CarEditNameToast
+        editToastMessages: EditToast
     };
 
     return { fields, fullForm };

@@ -1,52 +1,38 @@
 import { AbstractAttachmentQueue, AttachmentRecord, AttachmentState } from "@powersync/attachments";
-import * as FileSystem from "expo-file-system/legacy";
 import { BaseConfig } from "../../../constants/index.ts";
 import { getUUID } from "../../utils/uuid.ts";
-import { ImageType } from "../../utils/pickImage.ts";
-import { encode } from "base64-arraybuffer";
 import { USER_TABLE } from "./tables/user.ts";
 import { CAR_TABLE } from "./tables/car.ts";
+import { Image } from "../../../types/zodTypes.ts";
+import { Directory, File } from "expo-file-system";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
+    imageUrlSql = `
+        SELECT image_url as path
+        FROM ${ CAR_TABLE }
+        WHERE image_url IS NOT NULL
+        UNION ALL
+        SELECT avatar_url as path
+        FROM ${ USER_TABLE }
+        WHERE avatar_url IS NOT NULL
+    `;
 
     async init() {
-        if(!BaseConfig.SUPABASE_BUCKET) {
+        if(!BaseConfig.SUPABASE_ATTACHMENT_BUCKET) {
             console.debug("No Supabase bucket configured, skip setting up PhotoAttachmentQueue watches");
             // Disable sync interval to prevent errors from trying to sync to a non-existent bucket
             this.options.syncInterval = 0;
             return;
         }
-        // this.options.syncInterval = 300; //30mp = 30000
         await super.init();
     }
 
-    // async downloadRecord(record: AttachmentRecord) {
-    //     console.log('ads')
-    //     this.downloadRecord(record)
-    //     return true;
-    // }
-
     onAttachmentIdsChange(onUpdate: (ids: string[]) => void): void {
-        console.log(this.table, "taxxx");
-        const imgSQL = `
-            SELECT image as image
-            FROM ${ CAR_TABLE }
-            WHERE image IS NOT NULL
-            UNION ALL
-            SELECT avatarImage as image
-            FROM ${ USER_TABLE }
-            WHERE avatarImage IS NOT NULL
-        `;
-        // UNION-nal lehet meg tobb tablat hozza irni es onnan is kiszedni ha lesz
-
-        this.powersync.watch(imgSQL, [], {
+        this.powersync.watch(this.imageUrlSql, [], {
             onResult:
                 async (result) => {
-                    return onUpdate(
-                        result.rows?._array.map(
-                            (r) => r.image
-                        ) ?? []
-                    );
+                    return onUpdate(result.rows?._array.map((r) => r.path) ?? []);
                 }
         });
     }
@@ -64,55 +50,99 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
         };
     }
 
-    async saveFile(image: ImageType, storagePath?: string): Promise<AttachmentRecord> {
-        storagePath =
-            storagePath
-            ? storagePath[storagePath.length - 1] !== "/"
-              ? `${ storagePath }/`
-              : storagePath
-            : "";
-        const filename = `${ storagePath }${ image.id }.${ image.fileExtension }`;
+    getPathWithStoragePath(filePath: string, storagePath?: string): string {
+        return storagePath && !filePath.startsWith(storagePath)
+               ? storagePath[storagePath.length - 1] !== "/"
+                 ? `${ storagePath }/${ filePath }`
+                 : `${ storagePath }${ filePath }`
+               : filePath;
+    }
+
+    getLocalFilePathSuffix(filename?: string): string {
+        const suffix = super.getLocalFilePathSuffix(filename ?? "");
+        return filename ? suffix : suffix.slice(0, suffix.length - 1);
+    }
+
+    async saveFile(image: Image, storagePath?: string): Promise<AttachmentRecord> {
+        const path = this.getPathWithStoragePath(image.fileName, storagePath);
 
         const attachmentRecord = await this.newAttachmentRecord({
-            id: filename,
-            media_type: image.mediaType,
+            id: path,
+            media_type: image.mediaType ?? undefined,
             state: AttachmentState.QUEUED_UPLOAD
         });
 
-        const localURI = this.getLocalUri(attachmentRecord.local_uri || this.getLocalFilePathSuffix(filename));
-        await this.storage.writeFile(localURI, encode(image.buffer), { encoding: FileSystem.EncodingType.Base64 });
+        const localURI = this.getLocalUri(attachmentRecord.local_uri || this.getLocalFilePathSuffix(path));
+        const file = new File(image.uri);
+        const copiedFile = new File(localURI);
+        if(!copiedFile.parentDirectory.exists) copiedFile.parentDirectory.create({ intermediates: true });
 
-        const fileInfo = await FileSystem.getInfoAsync(localURI);
-        if(fileInfo.exists) {
-            attachmentRecord.size = fileInfo.size;
-        }
+        file.copy(copiedFile);
+
+        if(copiedFile.exists && copiedFile.size > 0) attachmentRecord.size = copiedFile.size;
 
         return this.saveToQueue(attachmentRecord);
     }
 
-    async getFile(filename: string): Promise<ArrayBuffer | null> {
-        const localURI = `${ this.storageDirectory }/${ filename }`;
-
-        let attachmentRecord = await this.record(filename);
-        if(!attachmentRecord) {
-            attachmentRecord = await this.newAttachmentRecord({
-                id: filename,
+    async getFile(path: string): Promise<string | null> {
+        let record = await this.record(path);
+        if(!record) {
+            record = await this.newAttachmentRecord({
+                id: path,
                 state: AttachmentState.QUEUED_DOWNLOAD
             });
 
-            await this.saveToQueue(attachmentRecord);
+            this.saveToQueue(record).catch(e => console.error("Queue error", e));
         }
 
-        const { exists } = await FileSystem.getInfoAsync(localURI);
-        if(!exists) {
-            const directoryPath = localURI.substring(0, localURI.lastIndexOf("/") + 1);
-            if(!await this.storage.fileExists(directoryPath)) {
-                await this.storage.makeDir(directoryPath);
-            }
+        const localURI = `${ this.storageDirectory }/${ path }`;
+        const file = new File(localURI);
 
+        if(file.exists && file.size > 0) {
+            return file.uri;
+        } else {
             return null;
         }
+    }
 
-        return await this.storage.readFile(localURI, { encoding: FileSystem.EncodingType.Base64 });
+    async deleteFile(path: string): Promise<void> {
+        const localURI = this.getLocalUri(this.getLocalFilePathSuffix(path));
+        await this.storage.deleteFile(localURI, { filename: path });
+    }
+
+    async changeEntityAttachment(
+        image: Image | null,
+        previousFilePath: string | null,
+        storagePath?: string
+    ): Promise<string | null> {
+        if(!image) {
+            if(previousFilePath) await this.deleteFile(previousFilePath);
+            return null;
+        }
+        const path = this.getPathWithStoragePath(image.fileName, storagePath);
+        if(previousFilePath === path) return previousFilePath;
+
+        const newAttachment = await this.saveFile(image, storagePath);
+        if(previousFilePath) await this.deleteFile(previousFilePath);
+
+        return newAttachment.filename;
+    }
+
+    async cleanUpLocalFiles(storagePath?: string): Promise<void> {
+        const now = Date.now();
+        const lastLocalImageCleanupTime = Number(await AsyncStorage.getItem(BaseConfig.LOCAL_STORAGE_KEY_LAST_LOCAL_IMAGE_CLEANUP));
+
+        const maxLocalImageCleanupTime = now - BaseConfig.LOCAL_IMAGE_CLEANUP_INTERVAL_MS;
+        if(isNaN(lastLocalImageCleanupTime) || maxLocalImageCleanupTime <= lastLocalImageCleanupTime) return;
+        await AsyncStorage.setItem(BaseConfig.LOCAL_STORAGE_KEY_LAST_LOCAL_IMAGE_CLEANUP, now.toString());
+
+        const localURI = this.getLocalUri(this.getLocalFilePathSuffix(storagePath));
+        const images = (await this.powersync.getAll<{ path: string }>(this.imageUrlSql))
+        .map(file => this.getLocalUri(this.getLocalFilePathSuffix(file.path)));
+
+        const maxModificationTime = now - BaseConfig.LOCAL_IMAGE_CLEANUP_GRACE_PERIOD_MS;
+        new Directory(localURI).list().map(file => {
+            if(!images.includes(file.uri) && maxModificationTime > (file.info()?.modificationTime ?? 0)) file.delete();
+        });
     }
 }

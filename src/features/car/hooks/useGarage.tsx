@@ -8,13 +8,13 @@ const useGarage = () => {
 
     const toCarouselItem = (car: Car): CarouselItemType => ({
         id: car.id,
-        image: car.image?.image,
+        image: car.imagePath ? { uri: car.imagePath, attachment: true } : null,
         title: car.name,
         subtitle: car.model.make.name,
         body: car.model.name
     });
 
-    const openNewCarForm = () => router.push("bottomSheet/createCar");
+    const openNewCarForm = () => router.push("car/create");
 
     const openCarProfile = (id: string) => router.push({ pathname: "(edit)/car", params: { id } });
 

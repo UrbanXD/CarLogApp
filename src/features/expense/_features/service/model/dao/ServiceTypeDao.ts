@@ -12,7 +12,7 @@ export class ServiceTypeDao extends Dao<ServiceTypeTableRow, ServiceType, Servic
         super(db, SERVICE_TYPE_TABLE, new ServiceTypeMapper());
     }
 
-    async getIdByKey(key: string, safe?: boolean = true): Promise<string | null> {
+    async getIdByKey(key: string, safe: boolean = true): Promise<string | null> {
         const result = await this.db
         .selectFrom(SERVICE_TYPE_TABLE)
         .select("id")
@@ -35,14 +35,17 @@ export class ServiceTypeDao extends Dao<ServiceTypeTableRow, ServiceType, Servic
         return result.id;
     }
 
-    paginator(perPage?: number = 20): CursorPaginator<ServiceTypeTableRow, PickerItemType> {
+    paginator({ perPage = 20, getTitle }: {
+        perPage?: number,
+        getTitle?: (entity: ServiceTypeTableRow) => string
+    }): CursorPaginator<ServiceTypeTableRow, PickerItemType> {
         return new CursorPaginator<ServiceTypeTableRow, PickerItemType>(
             this.db,
             SERVICE_TYPE_TABLE,
-            { field: ["key", "id"], order: "asc" },
+            { cursor: [{ field: "key", order: "asc", toLowerCase: true }, { field: "id" }], defaultOrder: "asc" },
             {
                 perPage,
-                mapper: this.mapper.entityToPickerItem.bind(this.mapper)
+                mapper: (entity) => this.mapper.entityToPickerItem(entity, getTitle)
             }
         );
     }

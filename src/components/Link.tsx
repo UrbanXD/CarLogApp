@@ -1,7 +1,8 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, TextStyle, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 import { COLORS, FONT_SIZES } from "../constants/index.ts";
 import Icon from "./Icon";
+import { TextStyle, ViewStyle } from "../types/index.ts";
 
 type LinkProps = {
     text?: string

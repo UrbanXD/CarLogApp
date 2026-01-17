@@ -1,16 +1,17 @@
 import { ToastMessage, ToastMessages } from "../../../../ui/alert/model/types/index.ts";
+import i18n from "../../../../i18n/index.ts";
 
 const success: ToastMessage = () => {
     return {
         type: "success",
-        body: "Az autó már be is parkolt az Ön virtuális garázsába!"
+        body: i18n.t("car.toast.create.success.body")
     };
 };
 
 const error: ToastMessage = () => {
     return {
         type: "error",
-        body: "Váratlan hiba lépett fel az új autó létrehozása során, próbálja újra!"
+        body: i18n.t("car.toast.create.error.body")
     };
 };
 

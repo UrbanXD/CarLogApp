@@ -1,8 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import DropdownPickerController, { DropdownPickerControllerProps } from "./dropdown/DropdownPickerController.tsx";
 import DropdownPickerItems from "./dropdown/DropdownPickerItems.tsx";
-import { Paginator } from "../../../database/paginator/AbstractPaginator.ts";
-import { DatabaseType } from "../../../database/connector/powersync/AppSchema.ts";
 import { PopupView } from "../../popupView/PopupView.tsx";
 import { useAnimatedReaction, useSharedValue } from "react-native-reanimated";
 import { PickerItemType } from "./PickerItem.tsx";
@@ -11,21 +9,25 @@ import { useInputFieldContext } from "../../../contexts/inputField/InputFieldCon
 import { DropdownPickerFooter } from "./dropdown/DropdownPickerFooter.tsx";
 import { debounce } from "es-toolkit";
 import { scheduleOnRN } from "react-native-worklets";
+import { CursorPaginator } from "../../../database/paginator/CursorPaginator.ts";
 
-type ConditionalDropdownPickerProps<Item, DB> = | {
+type ConditionalDropdownPickerProps<Item extends { id: any }> = | {
     /** Used when the dropdown fetches data with pagination */
-    paginator: Paginator<Item, PickerItemType, DB>
+    paginator: CursorPaginator<Item, PickerItemType>
     /** The key of the item property used for search filtering in the paginator. */
     searchBy?: keyof Item
+    /** Replace search bar and user can add an item to dropdown list */
+    renderCreateItemForm?: (callback: () => void) => ReactElement
     /** Used when the dropdown has static data and no pagination is required */
     data?: never
 } | {
     paginator?: never
     searchBy?: never
+    renderCreateItemForm?: never
     data: Array<PickerItemType>
 }
 
-type CommonDropdownPickerProps = {
+export type CommonDropdownPickerProps = {
     /** The item that will be selected by default on first render */
     defaultSelectedItemValue?: string
     /** Callback function for set the selected value outside the dropdown picker **/
@@ -42,16 +44,21 @@ type CommonDropdownPickerProps = {
     selectWithoutSubmit?: boolean
     /** The title displayed at the top of the dropdown menu */
     title?: string
+    /** Show content inside a popup view, default is true */
+    popUpView?: boolean
+    /** Hide the picker controller, if true then content is always visible */
+    hideController?: boolean
 } & Omit<DropdownPickerControllerProps, "selectedItem" | "toggleDropdown">;
 
-export type DropdownPickerProps<Item, DB> =
-    ConditionalDropdownPickerProps<Item, DB> & CommonDropdownPickerProps;
+export type DropdownPickerProps<Item extends { id: any } = { id: any }> =
+    ConditionalDropdownPickerProps<Item> & CommonDropdownPickerProps;
 
-const DropdownPicker = <Item, DB = DatabaseType, >({
+const DropdownPicker = <Item extends { id: any } = { id: any }, >({
     title,
     data,
     paginator,
     searchBy,
+    renderCreateItemForm,
     searchBarEnabled = true,
     selectWithoutSubmit = false,
     icon,
@@ -61,22 +68,27 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     numColumns,
     defaultSelectedItemValue,
     setValue,
+    popUpView = true,
+    hideController,
     disabled,
     disabledText,
     hiddenBackground,
     containerStyle,
     textInputStyle
-}: DropdownPickerProps<Item, DB>) => {
+}: DropdownPickerProps<Item>) => {
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field.onChange;
     const inputFieldValue = inputFieldContext?.field?.value?.toString() ?? defaultSelectedItemValue;
+    const error = inputFieldContext?.fieldState?.error;
 
     const IS_STATIC = !!data;
+
+    const userSearching = useRef(false);
 
     const [initialLoadCompleted, setInitialLoadCompleted] = useState(false);
     const [items, setItems] = useState<Array<PickerItemType>>([]);
     const [selectedItem, setSelectedItem] = useState<PickerItemType | null>(null);
-    const [tmpSelectedItem, setTmpSelectedItem] = useState<PickerItemType | null>(selectedItem);
+    const [tmpSelectedItem, setTmpSelectedItem] = useState<PickerItemType | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
 
     const isOpened = useSharedValue(false);
@@ -90,9 +102,12 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
                 field: searchBy,
                 operator: "like",
                 value: `%${ searchTerm.toLowerCase() }%`
-            }
+            },
+            defaultItemId: userSearching.current ? undefined : selectedItem?.value
         }).then(result => setItems(result));
-    }, [paginator, searchTerm]);
+
+        userSearching.current = true;
+    }, [paginator, selectedItem, searchTerm]);
 
     const staticSearching = useCallback(() => {
         if(!IS_STATIC || !data) return;
@@ -123,7 +138,7 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
                 case "prev":
                     return [...result, ...prevState];
                 default:
-                    return [...prevState];
+                    return prevState;
             }
         });
     }, [initialLoadCompleted, paginator]);
@@ -142,13 +157,16 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
         if(!inputFieldValue || inputFieldValue === "") return setSelectedItem(null);
 
         const item = items.find(item => item.value.toString() === inputFieldValue.toString());
-        if(item && item !== selectedItem) setSelectedItem(item);
+        if(item && item.value !== selectedItem?.value) setSelectedItem(item);
     }, [items, inputFieldValue, initialLoadCompleted]);
 
     useEffect(() => {
         if(!data && !paginator) throw new Error("DropdownPicker did not get Data nor Paginator");
 
-        if(searchTerm !== "") setSearchTerm("");
+        if(searchTerm !== "") {
+            userSearching.current = false;
+            setSearchTerm("");
+        }
 
         if(IS_STATIC && data) {
             setItems(data);
@@ -165,6 +183,12 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     }, [data, paginator, inputFieldValue]);
 
     useEffect(() => {
+        if(selectedItem?.value === tmpSelectedItem?.value) return;
+
+        setTmpSelectedItem(selectedItem);
+    }, [selectedItem]);
+
+    useEffect(() => {
         if(!initialLoadCompleted) return;
 
         debouncedFilter();
@@ -174,6 +198,12 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
     const togglePopup = useCallback(() => {
         isOpened.value = true;
     }, []);
+
+    const renderForm = useCallback(() => {
+        if(!renderCreateItemForm) return <></>;
+
+        return renderCreateItemForm(() => paginator?.refresh().then((result) => setItems(result)));
+    }, [renderCreateItemForm, paginator]);
 
     const submit = useCallback((item: PickerItemType | null) => {
         setSelectedItem(item);
@@ -189,50 +219,62 @@ const DropdownPicker = <Item, DB = DatabaseType, >({
         if(selectWithoutSubmit) return submit(item);
 
         if(tmpSelectedItem?.value === item.value) return setTmpSelectedItem(null);
-        setTmpSelectedItem(item);
+        if(tmpSelectedItem?.value !== item.value) setTmpSelectedItem(item);
     }, [selectWithoutSubmit, submit, tmpSelectedItem]);
 
     const onSubmit = useCallback(() => {
         submit(tmpSelectedItem);
     }, [submit, tmpSelectedItem]);
 
+    const renderContent = () => (
+        <>
+            <DropdownPickerHeader
+                title={ title }
+                renderCreateItemForm={ renderCreateItemForm ? renderForm : undefined }
+                searchTerm={ searchTerm }
+                setSearchTerm={ setSearchTerm }
+                searchBarEnabled={ searchBarEnabled }
+                searchBarPlaceholder={ searchBarPlaceholder }
+            />
+            <DropdownPickerItems
+                items={ items }
+                fetchByScrolling={ IS_STATIC ? null : fetchByScrolling }
+                fetchingEnabled={ IS_STATIC ? false : initialLoadCompleted }
+                selectedItem={ tmpSelectedItem }
+                onSelect={ onSelect }
+                searchTerm={ searchTerm }
+                masonry={ masonry }
+                numColumns={ numColumns }
+            />
+            {
+                !selectWithoutSubmit &&
+               <DropdownPickerFooter onSubmit={ onSubmit }/>
+            }
+        </>
+    );
+
     return (
         <>
-            <DropdownPickerController
-                selectedItem={ selectedItem }
-                toggleDropdown={ togglePopup }
-                icon={ icon }
-                inputPlaceholder={ inputPlaceholder }
-                disabled={ disabled }
-                disabledText={ disabledText }
-                hiddenBackground={ hiddenBackground }
-                containerStyle={ containerStyle }
-                textInputStyle={ textInputStyle }
-            />
-            <PopupView opened={ isOpened }>
-                <DropdownPickerHeader
-                    title={ title }
-                    searchTerm={ searchTerm }
-                    setSearchTerm={ setSearchTerm }
-                    searchBarEnabled={ searchBarEnabled }
-                    searchBarPlaceholder={ searchBarPlaceholder }
-                />
-                <DropdownPickerItems
-                    items={ items }
-                    fetchByScrolling={ IS_STATIC ? null : fetchByScrolling }
-                    fetchingEnabled={ IS_STATIC ? false : initialLoadCompleted }
-                    maintainVisibleContentPosition={ { disabled: true } }
-                    selectedItem={ tmpSelectedItem }
-                    onSelect={ onSelect }
-                    searchTerm={ searchTerm }
-                    masonry={ masonry }
-                    numColumns={ numColumns }
-                />
-                {
-                    !selectWithoutSubmit &&
-                   <DropdownPickerFooter onSubmit={ onSubmit }/>
-                }
-            </PopupView>
+            {
+                !hideController &&
+               <DropdownPickerController
+                  selectedItem={ selectedItem }
+                  toggleDropdown={ togglePopup }
+                  icon={ icon }
+                  inputPlaceholder={ inputPlaceholder }
+                  error={ !!error }
+                  disabled={ disabled }
+                  disabledText={ disabledText }
+                  hiddenBackground={ hiddenBackground }
+                  containerStyle={ containerStyle }
+                  textInputStyle={ textInputStyle }
+               />
+            }
+            {
+                popUpView
+                ? <PopupView opened={ isOpened }>{ renderContent() }</PopupView>
+                : renderContent()
+            }
         </>
     );
 };

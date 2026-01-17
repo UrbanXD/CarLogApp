@@ -4,20 +4,23 @@ import { StepProps } from "../../../../../types/index.ts";
 import { CarFormFields } from "../../../schemas/form/carForm.ts";
 import { OdometerUnitInput } from "../../../_features/odometer/components/forms/inputFields/OdometerUnitInput.tsx";
 import { OdometerValueInput } from "../../../_features/odometer/components/forms/inputFields/OdometerValueInput.tsx";
+import { useTranslation } from "react-i18next";
 
-type OdometerStepProps<FormFields> = Pick<StepProps<FormFields>, "control">;
+type OdometerStepProps = Pick<StepProps<CarFormFields>, "control">;
 
-function OdometerStep<FormFields = CarFormFields>({ control }: OdometerStepProps<FormFields>) {
+function OdometerStep({ control }: OdometerStepProps) {
+    const { t } = useTranslation();
+
     return (
         <Input.Group>
             <OdometerValueInput
                 control={ control }
-                fieldName="odometer.value"
+                odometerValueFieldName="odometer.value"
             />
             <OdometerUnitInput
                 control={ control }
                 fieldName="odometer.unitId"
-                title={ "Mértékegység" }
+                title={ t("car.steps.odometer.unit_field.title") }
             />
         </Input.Group>
     );

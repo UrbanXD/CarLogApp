@@ -3,14 +3,15 @@ import { MAX_DATE, MIN_DATE } from "../../../constants/index.ts";
 import Input from "../Input.ts";
 import { PickerItemType } from "../picker/PickerItem.tsx";
 import dayjs from "dayjs";
-import { DropdownPickerProps } from "../picker/DropdownPicker.tsx";
+import { useTranslation } from "react-i18next";
+import { CommonDropdownPickerProps } from "../picker/DropdownPicker.tsx";
 
 export type YearPickerProps = {
     defaultYear?: number
     minYear?: number
     maxYear?: number
     desc?: boolean
-} & DropdownPickerProps
+} & CommonDropdownPickerProps;
 
 export function YearPicker({
     defaultYear = dayjs().year(),
@@ -19,6 +20,8 @@ export function YearPicker({
     desc = true,
     ...restProps
 }: YearPickerProps) {
+    const { t } = useTranslation();
+
     const [years, setYears] = useState<Array<PickerItemType>>([]);
 
     useEffect(() => {
@@ -32,12 +35,12 @@ export function YearPicker({
 
     return (
         <Input.Picker.Dropdown
-            title={ restProps.title ?? "Év" }
+            { ...restProps }
+            title={ restProps.title ?? t("form.date_picker.year") }
             defaultSelectedItemValue={ defaultYear?.toString() }
             data={ years }
             masonry
             numColumns={ 3 }
-            { ...restProps }
         />
     );
 }

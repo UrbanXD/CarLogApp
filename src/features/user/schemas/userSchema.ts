@@ -1,13 +1,14 @@
 import { z } from "zod";
-import { zImage } from "../../../types/zodTypes.ts";
+import { currencySchema } from "../../_shared/currency/schemas/currencySchema.ts";
 
 export const userSchema = z
 .object({
     id: z.string(),
-    email: z.string().email("Nem megfelelő email cím formátum"),
+    email: z.string().email("error.email_format"),
     firstname: z.string().optional(),
     lastname: z.string().optional(),
-    avatar: zImage.optional().nullable(),
+    currency: currencySchema,
+    avatarPath: z.string().optional().nullable(),
     avatarColor: z.string().optional().nullable()
 });
 

@@ -26,7 +26,6 @@ const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId, fuelSliderDisabl
         <CarProfileView
             car={ car }
             handleDeleteCar={ handleDeleteCar }
-            fuelSliderDisabled={ fuelSliderDisabled }
             openEditCarStep={ openEditCarStep }
             openOdometerLog={ openOdometerLog }
         />

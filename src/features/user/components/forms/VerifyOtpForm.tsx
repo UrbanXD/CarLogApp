@@ -1,36 +1,54 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Input from "../../../../components/Input/Input.ts";
 import { AuthApiError, EmailOtpType } from "@supabase/supabase-js";
 import Divider from "../../../../components/Divider.tsx";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants";
 import { useOtp } from "../../hooks/useOtp.ts";
+import { Trans, useTranslation } from "react-i18next";
+import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 
 export type HandleVerificationOtpType = (errorCode?: string) => (Promise<void> | void)
 
-interface VerifyOTPProps {
-    type: EmailOtpType;
-    email: string;
-    otpLength?: number;
-    title?: string;
-    subtitle?: string;
-    handleVerification: HandleVerificationOtpType;
+type VerifyOTPProps = {
+    type: EmailOtpType
+    email: string
+    otpLength?: number
+    title?: string
+    subtitle?: string
+    handleVerification: HandleVerificationOtpType
+    automaticResend?: boolean
+    dismissOnSuccess?: boolean
 }
 
-const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
+function VerifyOtpForm({
     type,
     email,
     otpLength = 6,
     title,
     subtitle,
-    handleVerification
-}) => {
+    handleVerification,
+    automaticResend = false,
+    dismissOnSuccess = true
+}: VerifyOTPProps) {
+    const { t } = useTranslation();
     const { verifyOTP, resendOTP } = useOtp();
+    const { dismissBottomSheet } = useBottomSheet();
+
+    useEffect(() => {
+        if(automaticResend) resend(true);
+    }, [automaticResend]);
 
     const defaultSubtitle = () =>
         <Text style={ styles.subtitleText }>
-            Ehhez használja azt a kódódot amely a(z) <Text style={ styles.subtitleEmailText }>{ email }</Text> címre
-            került kiküldésre.
+            <Trans
+                i18nKey="auth.otp_verification.use_otp_code_for_verification"
+                values={ { email } }
+                parent={ Text }
+                components={ {
+                    email: <Text style={ styles.subtitleEmailText }/>
+                } }
+            />
         </Text>;
 
     const onSubmit = async (token: string) => {
@@ -38,12 +56,20 @@ const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
             await verifyOTP({ email, token, type });
 
             await handleVerification();
+
+            if(dismissOnSuccess && !!dismissBottomSheet) dismissBottomSheet(true);
         } catch(error: AuthApiError | any) {
             await handleVerification(error.code || "otp_error");
         }
     };
 
-    const resend = async () => await resendOTP({ type, email });
+    const resend = async (automatic: boolean = false) => {
+        try {
+            if(type === "signup" || type === "email_change") await resendOTP({ type, email }, automatic);
+        } catch(e) {
+            console.log("Resend OTP error: ", e);
+        }
+    };
 
     return (
         <View style={ styles.pageContainer }>
@@ -70,14 +96,22 @@ const VerifyOtpForm: React.FC<VerifyOTPProps> = ({
                 thickness={ 3.5 }
                 color={ COLORS.gray3 }
             />
-            <Text style={ styles.didntReceivedCodeText }>
-                Nem érkezett meg a kód az adott email címére, esetleg a kód már lejárt?
-                { "\n" }
-                <Text style={ styles.didntReceivedCodeLinkText } onPress={ resend }>Újra küldés</Text>
-            </Text>
+            {
+                type === "signup" || type === "email_change" &&
+               <Text style={ styles.didntReceivedCodeText }>
+                   { t("auth.otp_verification.expired_or_didnt_received") }
+                   { "\n" }
+                  <Text
+                     style={ styles.didntReceivedCodeLinkText }
+                     onPress={ () => resend() }
+                  >
+                      { t("auth.otp_verification.resend") }
+                  </Text>
+               </Text>
+            }
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     pageContainer: {

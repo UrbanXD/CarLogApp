@@ -1,5 +1,5 @@
-import { AlertToastProps } from "../components/toast/AlertToast.tsx";
-import { ToastMessages } from "../model/types/index.ts";
+import { Toast, ToastMessages } from "../model/types/index.ts";
+import i18n from "../../../i18n/index.ts";
 
 export const getToastMessage: (
     args: {
@@ -7,7 +7,7 @@ export const getToastMessage: (
         error?: unknown
         defaultErrorCode?: string
     }
-) => AlertToastProps = ({
+) => Partial<Toast> = ({
     messages,
     error = null,
     defaultErrorCode = "error"
@@ -28,9 +28,9 @@ export const getToastMessage: (
         }
 
         const getToast = messages[error.code] || messages[defaultErrorCode] || messages.error;
-        return getToast ? getToast(message) : { type: "error", body: "Váratlan hiba lépett fel!" };
+        return getToast ? getToast(message) : { type: "error", body: i18n.t("toast.default_error") };
     }
 
     const getToast = messages[defaultErrorCode] || messages.error;
-    return getToast ? getToast() : { type: "error", body: "Váratlan hiba lépett fel!" };
+    return getToast ? getToast() : { type: "error", body: i18n.t("toast.default_error") };
 };

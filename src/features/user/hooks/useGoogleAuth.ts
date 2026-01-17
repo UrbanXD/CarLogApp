@@ -5,6 +5,7 @@ import { getToastMessage } from "../../../ui/alert/utils/getToastMessage.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 import { router } from "expo-router";
+import { getUserLocalCurrency } from "../../_shared/currency/utils/getUserLocalCurrency.ts";
 
 export const useGoogleAuth = () => {
     GoogleSignin.configure({
@@ -49,13 +50,14 @@ export const useGoogleAuth = () => {
             }
 
             // uj fiok kerult letrehozasra, mentsuk le a nevet a felhasznalonak
-            await userDao.insertUser({
+            await userDao.create({
                 id: user.id,
                 email: user.email,
                 firstname: googleData.user.givenName || "",
                 lastname: googleData.user.familyName || "",
-                avatarColor: AVATAR_COLOR[Math.floor(Math.random() * AVATAR_COLOR.length)],
-                avatarImage: null
+                currency_id: getUserLocalCurrency(),
+                avatar_color: AVATAR_COLOR[Math.floor(Math.random() * AVATAR_COLOR.length)],
+                avatar_url: null
             });
 
             openToast(SignUpToast.success());

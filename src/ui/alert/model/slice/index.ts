@@ -22,9 +22,7 @@ const alertSlice = createSlice({
         openModal: (state, action: PayloadAction<Modal>) => {
             state.modal = action.payload;
         },
-        closeModal: (state, _) => {
-            // if(state.modal?.dismissAction) state.modal.dismissAction();
-
+        closeModal: (state) => {
             state.modal = null;
         }
     }

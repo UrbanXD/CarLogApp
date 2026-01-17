@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ListRenderItemInfo, StyleSheet, View } from "react-native";
-import { FlashList, FlashListRef } from "@shopify/flash-list";
+import { StyleSheet, View } from "react-native";
+import { FlashList, FlashListRef, ListRenderItemInfo } from "@shopify/flash-list";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { Car } from "../../schemas/carSchema.ts";
-import { useAppDispatch } from "../../../../hooks/index.ts";
+import { useAppDispatch } from "../../../../hooks";
 import { selectCar } from "../../model/actions/selectCar.ts";
 import { CarPickerItem } from "./CarPickerItem.tsx";
 import Button from "../../../../components/Button/Button.ts";
@@ -18,11 +18,11 @@ import Animated, {
 } from "react-native-reanimated";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { scheduleOnRN } from "react-native-worklets";
-import { AnimatedPressable } from "../../../../components/AnimatedComponents/index.ts";
-import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
+import { AnimatedPressable } from "../../../../components/AnimatedComponents";
 import { router } from "expo-router";
 import useCars from "../../hooks/useCars.ts";
 import { SelectedCar } from "./SelectedCar.tsx";
+import { useTranslation } from "react-i18next";
 
 const CLOSE_ICON_SIZE = FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE;
 const MAX_TRANSLATE = widthPercentageToDP(100);
@@ -32,7 +32,7 @@ type CarPickerProps = {
 }
 
 export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
-    const database = useDatabase();
+    const { t } = useTranslation();
     const { cars, selectedCar } = useCars();
     const dispatch = useAppDispatch();
 
@@ -47,13 +47,13 @@ export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
         let selectedIndex = cars.findIndex(car => car.id === selectedCar?.id);
         if(selectedIndex === -1) selectedIndex = 0;
 
-        flashListRef.current.scrollToIndex({ index: selectedIndex, animated: true, viewPosition: 0 });
+        flashListRef.current?.scrollToIndex({ index: selectedIndex, animated: true, viewPosition: 0 });
     }, [selectedCar, carListVisible]);
 
     const delayCarListVisibleState = (visible: boolean) => {
         setTimeout(() => {
             setCarListVisible(visible);
-            onCarListVisibleChange(visible);
+            onCarListVisibleChange?.(visible);
         }, visible ? 0 : 250); // delay for smooth exiting animation of close icon and car list
     };
 
@@ -62,10 +62,10 @@ export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
         (visible) => scheduleOnRN(delayCarListVisibleState, visible)
     );
 
-    const select = useCallback((carId: string) => dispatch(selectCar({ database, carId })), []);
+    const select = useCallback((carId: string) => dispatch(selectCar(carId)), []);
     const closeList = useCallback(() => isCarsListVisible.value = false, []);
     const openList = useCallback(() => isCarsListVisible.value = true, []);
-    const openCreateCarBottomSheet = useCallback(() => router.push("bottomSheet/createCar"), []);
+    const openCreateCarBottomSheet = useCallback(() => router.push("car/create"), []);
 
     const renderItem = ({ item }: ListRenderItemInfo<Car>) =>
         <CarPickerItem
@@ -115,9 +115,9 @@ export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
                >
                   <SelectedCar
                      car={ selectedCar }
-                     placeholder={ "Válasszon autót" }
+                     placeholder={ t("car.picker.placeholder") }
                      userDontHaveCars={ cars.length === 0 }
-                     userDontHaveCarsPlaceholder={ "Kattintson ide és adja hozzá első autóját" }
+                     userDontHaveCarsPlaceholder={ t("car.picker.no_cars") }
                   />
                </AnimatedPressable>
             }
@@ -127,12 +127,12 @@ export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
                     iconSize={ CLOSE_ICON_SIZE }
                     iconColor={ COLORS.white }
                     backgroundColor="transparent"
-                    style={ styles.closeIconContainer.icon }
+                    style={ styles.closeIcon }
                     onPress={ closeList }
                 />
             </Animated.View>
             <Animated.View style={ carPickerStyle }>
-                <FlashList
+                <FlashList<Car>
                     ref={ flashListRef }
                     data={ cars }
                     renderItem={ renderItem }
@@ -156,34 +156,14 @@ const styles = StyleSheet.create({
         overflow: "hidden",
         gap: SEPARATOR_SIZES.lightSmall
     },
-    textContainer: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-
-        name: {
-            fontFamily: "Gilroy-Heavy",
-            fontSize: FONT_SIZES.p3,
-            letterSpacing: FONT_SIZES.p3 * 0.05,
-            color: COLORS.white
-        },
-
-        model: {
-            fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.p3 * 0.9,
-            letterSpacing: FONT_SIZES.p3 * 0.9 * 0.05,
-            color: COLORS.gray1
-        }
-    },
     closeIconContainer: {
         alignItems: "center",
-        justifyContent: "center",
-
-        icon: {
-            width: CLOSE_ICON_SIZE,
-            height: CLOSE_ICON_SIZE,
-            alignSelf: "center"
-        }
+        justifyContent: "center"
+    },
+    closeIcon: {
+        width: CLOSE_ICON_SIZE,
+        height: CLOSE_ICON_SIZE,
+        alignSelf: "center"
     },
     controllerContainer: {
         flexDirection: "row",

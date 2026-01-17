@@ -1,15 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import CarProfile from "../features/car/components/carProfile/CarProfile.ts";
 import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
 
 const EditCarScreen: React.FC = () => {
-    const { id } = useLocalSearchParams();
+    const { id } = useLocalSearchParams<{ id: string }>();
 
-    if(!id) {
-        if(router.canGoBack()) return router.back();
-        return router.replace("(main)/index");
-    }
+    useEffect(() => {
+        if(!id) {
+            if(router.canGoBack()) return router.back();
+            return router.replace("(main)/index");
+        }
+    }, [id]);
+
+    if(!id) return <></>;
 
     return (
         <ScreenScrollView screenHasTabBar={ false }>

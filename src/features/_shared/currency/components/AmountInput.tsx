@@ -1,73 +1,90 @@
 import Input from "../../../../components/Input/Input.ts";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
-import React, { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Control, UseFormSetValue, useWatch } from "react-hook-form";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { formTheme } from "../../../..//ui/form/constants/theme.ts";
 import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
+import { useTranslation } from "react-i18next";
+import { Currency } from "../schemas/currencySchema.ts";
+import { AmountInCarCurrency } from "./AmountInCarCurrency.tsx";
+import { PricePerUnitTotalCostInCarCurrency } from "./PricePerUnitTotalCostInCarCurrency.tsx";
 
 type AmountInputProps = {
     control: Control<any>
     setValue: UseFormSetValue<any>
+    fieldName: string
     title?: string
     subtitle?: string
+    outsideQuantityFieldName?: string
     amountPlaceholder?: string
-    amountFieldName: string
-    currencyFieldName: string
-    quantityFieldName?: string
-    isPricePerUnitFieldName?: string
-    exchangeRateFieldName?: string
-    exchangeText?: (exchangedAmount: string, isTotalAmount?: boolean) => ReactNode
-    totalAmountText?: (
-        amount: number,
-        exchangedAmount: number,
-        defaultCurrencyText: string,
-        currencyText: string
-    ) => ReactNode
-    showsExchangeRate?: boolean
+    showsExchangeRateInput?: boolean
+    showsQuantityInput?: boolean
+    showsIsPricePerUnitInput?: boolean
     defaultCurrency?: string | number
+    isPricePerUnitFallback?: boolean
 }
 
 export function AmountInput({
     control,
     setValue,
-    title = "Összeg",
+    fieldName,
+    title,
     subtitle,
-    amountPlaceholder = "Összeg",
-    amountFieldName,
-    currencyFieldName,
-    quantityFieldName,
-    isPricePerUnitFieldName,
-    exchangeRateFieldName,
-    exchangeText,
-    totalAmountText,
-    showsExchangeRate = !!exchangeRateFieldName,
-    defaultCurrency
+    outsideQuantityFieldName,
+    amountPlaceholder,
+    showsExchangeRateInput = true,
+    showsQuantityInput = false,
+    showsIsPricePerUnitInput = false,
+    defaultCurrency,
+    isPricePerUnitFallback = false
 }: AmountInputProps) {
+    const { t } = useTranslation();
     const { currencyDao } = useDatabase();
 
-    const [currencies, setCurrencies] = useState<Array<PickerItemType> | null>(null);
+    const [rawCurrencies, setRawCurrencies] = useState<Array<Currency> | null>(null);
+    const [currencies, setCurrencies] = useState<Array<PickerItemType>>([]);
 
     const latestExchangeRate = useRef(1);
 
+    const amountFieldName = `${ fieldName }.amount`;
+    const currencyFieldName = `${ fieldName }.currencyId`;
+    const exchangeRateFieldName = `${ fieldName }.exchangeRate`;
+    const quantityFieldName = outsideQuantityFieldName ?? `${ fieldName }.quantity`;
+    const isPricePerUnitFieldName = `${ fieldName }.isPricePerUnit`;
+
     const formCurrency = useWatch({ control, name: currencyFieldName });
     const formAmount = useWatch({ control, name: amountFieldName });
-    const formExchangeRate = exchangeRateFieldName ? useWatch({ control, name: exchangeRateFieldName }) : null;
-    const formIsPricePerUnit = isPricePerUnitFieldName ? useWatch({ control, name: isPricePerUnitFieldName }) : null;
+    const formExchangeRate = useWatch({ control, name: exchangeRateFieldName });
+    const formQuantity = useWatch({ control, name: quantityFieldName });
+    const formIsPricePerUnit =
+        showsIsPricePerUnitInput
+        ? useWatch({ control, name: isPricePerUnitFieldName })
+        : isPricePerUnitFallback;
 
     useEffect(() => {
         (async () => {
-            const currenciesDto = await currencyDao.getAll();
-            setCurrencies(currencyDao.mapper.dtoToPicker(currenciesDto));
+            setRawCurrencies(await currencyDao.getAll());
         })();
     }, []);
 
     useEffect(() => {
-        if(!exchangeRateFieldName) return;
+        if(!rawCurrencies) return;
 
+        setCurrencies(
+            currencyDao.mapper.dtoToPicker({
+                dtos: rawCurrencies,
+                getControllerTitle: (dto: Currency) => dto.symbol,
+                getTitle: (dto: Currency) => `${ t(`currency.names.${ dto.key }`) } - ${ dto.symbol }`
+            })
+        );
+
+    }, [rawCurrencies, t]);
+
+    useEffect(() => {
         if(formCurrency?.toString() === defaultCurrency?.toString()) {
             latestExchangeRate.current = formExchangeRate;
             setValue(exchangeRateFieldName, 1);
@@ -76,8 +93,9 @@ export function AmountInput({
         }
     }, [formCurrency]);
 
-    const getCurrencyText = useCallback((currencyId: string) => {
-        const currency = currencies?.find((currency: PickerItemType) => currency.value === currencyId);
+    const getCurrencyText = useCallback((currencyId?: string) => {
+        if(!currencyId) return "";
+        const currency = currencies.find((currency: PickerItemType) => currency.value === currencyId);
 
         return currency?.controllerTitle ?? currency?.title ?? "";
     }, [currencies]);
@@ -91,11 +109,12 @@ export function AmountInput({
             exchangedAmount = numberToFractionDigit(Number(formAmount) * Number(formExchangeRate ?? 1));
         }
 
-        return `${ exchangedAmount }${ "\u00A0" }${ defaultCurrencyText }`; // "\u00A0" - for prevent only currency wrap to the next line
+        return `${ exchangedAmount }\u00A0${ defaultCurrencyText }`; // "\u00A0" - for prevent only currency wrap to the next line
     }, [formAmount, formExchangeRate, defaultCurrency, getCurrencyText]);
 
-    const getTotalAmountText = useCallback(() => {
-        if(!totalAmountText) return;
+    const getTotalAmountTextByPricePerUnit = useCallback(() => {
+        let quantity = quantityFieldName ? 0 : 1;
+        if(formQuantity && !isNaN(Number(formQuantity))) quantity = Number(formQuantity);
 
         const defaultCurrencyText = getCurrencyText(defaultCurrency?.toString());
         const currencyText = getCurrencyText(formCurrency?.toString());
@@ -108,25 +127,50 @@ export function AmountInput({
             exchangedAmount = amount * Number(formExchangeRate ?? 1);
         }
 
-        return totalAmountText(amount, exchangedAmount, defaultCurrencyText, currencyText);
-    }, [formAmount, formExchangeRate, formCurrency, defaultCurrency, totalAmountText, getCurrencyText]);
+        return (
+            <PricePerUnitTotalCostInCarCurrency
+                amountText={ `${ numberToFractionDigit(quantity * amount) } ${ currencyText }` }
+                carAmountText={
+                    defaultCurrency !== formCurrency
+                    ? `${ numberToFractionDigit(quantity * exchangedAmount) } ${ defaultCurrencyText }`
+                    : undefined
+                }
+            />
+        );
+    }, [formAmount, formQuantity, formExchangeRate, formCurrency, defaultCurrency, getCurrencyText]);
 
     return (
-        <View style={ styles.container }>
-            {
-                title &&
-               <Input.Title title={ title } subtitle={ subtitle }/>
+        <Input.Field
+            control={ control }
+            fieldName={ fieldName }
+            fieldNameText={ title ?? t("currency.cost") }
+            fieldInfoText={
+                subtitle
+                ??
+                (
+                    (
+                        isPricePerUnitFallback &&
+                        (!isNaN(Number(formQuantity)) && Number(formQuantity) > 1)
+                    )
+                    ? getTotalAmountTextByPricePerUnit()
+                    : undefined
+                )
             }
+            containerStyle={ styles.container }
+        >
             {
-                isPricePerUnitFieldName &&
-               <Input.Field control={ control } fieldName={ isPricePerUnitFieldName }>
+                showsIsPricePerUnitInput &&
+               <Input.Field
+                  control={ control }
+                  fieldName={ isPricePerUnitFieldName }
+               >
                   <View style={ styles.isPricePerUnitContainer }>
-                     <Input.Switch label={ { on: "Egységár", off: "Összköltség" } }/>
+                     <Input.Switch label={ { on: t("currency.price_per_unit"), off: t("currency.total_cost") } }/>
                       {
                           formIsPricePerUnit &&
-                         <View style={ styles.isPricePerUnitContainer.textContainer }>
+                         <View style={ styles.isPricePerUnitTextContainer }>
                             <Text style={ styles.label }>
-                                { getTotalAmountText() }
+                                { getTotalAmountTextByPricePerUnit() }
                             </Text>
                          </View>
                       }
@@ -135,13 +179,17 @@ export function AmountInput({
             }
             <View style={ styles.quantityAmountContainer }>
                 {
-                    quantityFieldName &&
+                    showsQuantityInput &&
                    <View style={ styles.quantityContainer }>
-                      <Input.Row style={ { gap: 0 } }>
+                      <Input.Row
+                         errorFieldNames={ [quantityFieldName] }
+                         style={ { gap: 0 } }
+                      >
                          <View style={ { flex: 1 } }>
                             <Input.Field
                                control={ control }
                                fieldName={ quantityFieldName }
+                               hideError
                             >
                                <Input.Text
                                   placeholder={ "1" }
@@ -150,32 +198,40 @@ export function AmountInput({
                                />
                             </Input.Field>
                          </View>
-                         <Text style={ styles.quantityContainer.countText }>db</Text>
+                         <Text style={ styles.quantityCountText }>{ t("common.count") }</Text>
                       </Input.Row>
                    </View>
                 }
-                <Input.Row style={ { gap: 0 } }>
+                <Input.Row
+                    errorFieldNames={ [amountFieldName, currencyFieldName] }
+                    style={ { gap: 0 } }
+                >
                     <View style={ styles.amountContainer }>
-                        <View style={ styles.amountContainer.amount }>
+                        <View style={ styles.amountContent }>
                             <Input.Field
                                 control={ control }
                                 fieldName={ amountFieldName }
+                                hideError
                             >
                                 <Input.Text
                                     icon={ ICON_NAMES.money }
-                                    placeholder={ amountPlaceholder }
+                                    placeholder={ amountPlaceholder ?? t("currency.cost") }
                                     keyboardType="numeric"
                                     type="secondary"
                                 />
                             </Input.Field>
                         </View>
-                        <Input.Field control={ control } fieldName={ currencyFieldName }>
+                        <Input.Field
+                            control={ control }
+                            fieldName={ currencyFieldName }
+                            hideError
+                        >
                             {
                                 currencies
                                 ?
                                 <Input.Picker.Dropdown
                                     data={ currencies }
-                                    title={ "Valuta" }
+                                    title={ t("currency.text") }
                                     hiddenBackground={ true }
                                 />
                                 :
@@ -186,29 +242,29 @@ export function AmountInput({
                 </Input.Row>
             </View>
             {
-                showsExchangeRate && exchangeRateFieldName && (formCurrency?.toString() !== defaultCurrency?.toString()) &&
+                showsExchangeRateInput && (defaultCurrency && formCurrency?.toString() !== defaultCurrency?.toString()) &&
                <View style={ styles.exchangeContainer }>
-                  <View style={ styles.exchangeContainer.textContainer }>
+                  <View style={ styles.exchangeTextContainer }>
                      <Text style={ styles.label }>
-                         {
-                             exchangeText &&
-                             exchangeText(getExchangedAmount(), !formIsPricePerUnit)
-                         }
+                        <AmountInCarCurrency amountText={ getExchangedAmount() } isPricePerUnit={ formIsPricePerUnit }/>
                      </Text>
                   </View>
-                  <View style={ styles.exchangeContainer.inputContainer }>
-                     <Input.Row style={ styles.exchangeContainer.inputContainer.row }>
-                        <View style={ styles.exchangeContainer.inputContainer.label }>
-                           <Text style={ styles.exchangeContainer.inputContainer.label.baseText }>1</Text>
-                           <Text
-                              style={ styles.exchangeContainer.inputContainer.label.currencyText }>
+                  <View style={ styles.exchangeInputContainer }>
+                     <Input.Row
+                        errorFieldNames={ [exchangeRateFieldName] }
+                        style={ styles.exchangeInputRow }
+                     >
+                        <View style={ styles.exchangeLabel }>
+                           <Text style={ styles.exchangeLabelBaseText }>1</Text>
+                           <Text style={ styles.labelCurrencyText }>
                                { getCurrencyText(formCurrency?.toString()) }
                            </Text>
-                           <Text style={ styles.exchangeContainer.inputContainer.label.arrow }>⇄</Text>
+                           <Text style={ styles.labelArrow }>⇄</Text>
                         </View>
                         <Input.Field
                            control={ control }
                            fieldName={ exchangeRateFieldName }
+                           hideError
                            style={ { flex: 1 } }
                         >
                            <Input.Text
@@ -217,14 +273,14 @@ export function AmountInput({
                               type="secondary"
                            />
                         </Input.Field>
-                        <Text style={ styles.exchangeContainer.inputContainer.label.currencyText }>
+                        <Text style={ styles.labelCurrencyText }>
                             { getCurrencyText(defaultCurrency?.toString()) }
                         </Text>
                      </Input.Row>
                   </View>
                </View>
             }
-        </View>
+        </Input.Field>
     );
 }
 
@@ -236,85 +292,77 @@ const styles = StyleSheet.create({
     isPricePerUnitContainer: {
         flexDirection: "row",
         alignItems: "center",
-        gap: SEPARATOR_SIZES.lightSmall,
-
-        textContainer: {
-            flexShrink: 1,
-            height: "100%"
-        }
+        gap: SEPARATOR_SIZES.lightSmall
+    },
+    isPricePerUnitTextContainer: {
+        flexShrink: 1,
+        height: "100%"
     },
     quantityAmountContainer: {
         flexDirection: "row",
         gap: SEPARATOR_SIZES.lightSmall
     },
     quantityContainer: {
-        flex: 0.4,
-
-        countText: {
-            alignSelf: "flex-end",
-            marginBottom: SEPARATOR_SIZES.small,
-            fontSize: formTheme.valueTextFontSize / 1.35,
-            color: COLORS.gray1
-        }
+        flex: 0.4
+    },
+    quantityCountText: {
+        alignSelf: "flex-end",
+        marginBottom: SEPARATOR_SIZES.small,
+        fontSize: formTheme.valueTextFontSize / 1.35,
+        color: COLORS.gray1
     },
     amountContainer: {
         flex: 1,
         flexDirection: "row",
         justifyContent: "space-between",
-        gap: SEPARATOR_SIZES.lightSmall / 2,
-
-        amount: {
-            flex: 1
-        }
+        gap: SEPARATOR_SIZES.lightSmall / 2
+    },
+    amountContent: {
+        flex: 1
     },
     label: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p3,
-        color: COLORS.gray1
+        color: COLORS.gray1,
+        lineHeight: FONT_SIZES.p2,
+        letterSpacing: FONT_SIZES.p2 * 0.05
     },
     exchangeContainer: {
         width: "100%",
         flexDirection: "row",
         alignItems: "flex-start",
         justifyContent: "space-between",
-        gap: SEPARATOR_SIZES.lightSmall,
-
-        textContainer: {
-            flex: 1
-        },
-
-        inputContainer: {
-            flex: 0.55,
-
-            row: {
-                flex: 0,
-                alignItems: "center",
-                gap: 0
-            },
-
-            label: {
-                flexDirection: "row",
-                alignItems: "center",
-
-                baseText: {
-                    fontSize: formTheme.valueTextFontSize,
-                    color: formTheme.valueTextColor,
-                    marginRight: 2
-                },
-
-                arrow: {
-                    fontSize: formTheme.valueTextFontSize,
-                    color: COLORS.gray1,
-                    fontWeight: 600,
-                    marginLeft: 2,
-                    marginBottom: formTheme.valueTextFontSize / 4
-                },
-
-                currencyText: {
-                    fontSize: formTheme.valueTextFontSize / 1.35,
-                    color: COLORS.gray1
-                }
-            }
-        }
+        gap: SEPARATOR_SIZES.lightSmall
+    },
+    exchangeTextContainer: {
+        flex: 1
+    },
+    exchangeInputContainer: {
+        flex: 0.55
+    },
+    exchangeInputRow: {
+        flex: 0,
+        alignItems: "center",
+        gap: 0
+    },
+    exchangeLabel: {
+        flexDirection: "row",
+        alignItems: "center"
+    },
+    exchangeLabelBaseText: {
+        fontSize: formTheme.valueTextFontSize,
+        color: formTheme.valueTextColor,
+        marginRight: 2
+    },
+    labelArrow: {
+        fontSize: formTheme.valueTextFontSize,
+        color: COLORS.gray1,
+        fontWeight: 600,
+        marginLeft: 2,
+        marginBottom: formTheme.valueTextFontSize / 4
+    },
+    labelCurrencyText: {
+        fontSize: formTheme.valueTextFontSize / 1.35,
+        color: COLORS.gray1
     }
 });

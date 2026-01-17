@@ -1,24 +1,23 @@
 import { Context, createContext, useContext } from "react";
-import dayjs from "dayjs";
 
-export type DatePickerViews = "calendar" | "wheel_picker" | "time";
-
-export type ManipulateDateType = "add" | "subtract" | "set";
+export type DatePickerViews = "calendar" | "start_date_picker" | "end_date_picker" | "time";
 
 type DatePickerContextValue = {
-    date: dayjs.Dayjs
-    setDate: (value: (((prevState: dayjs.Dayjs) => dayjs.Dayjs) | dayjs.Dayjs)) => void
-    calendarDate: dayjs.Dayjs
+    mode: "single" | "range"
+    startDate: Date | null
+    endDate: Date | null
+    setStartDate: (value: (((prevState: Date | null) => Date | null) | Date | null)) => void
+    setEndDate: (value: (((prevState: Date | null) => Date | null) | Date | null)) => void
+    calendarDate: Date
     nextMonthInCalendar: () => void
     previousMonthInCalendar: () => void
     currentView: DatePickerViews
     openView: (view: DatePickerViews) => void
-    locale: string
-    minDate: dayjs.Dayjs
-    maxDate: dayjs.Dayjs
+    minDate: Date
+    maxDate: Date
     submit: () => void
 }
 
-export const DatePickerContext = createContext<DropdownPickerContextValue | null>(null);
+export const DatePickerContext = createContext<DatePickerContextValue | null>(null);
 
 export const useDatePicker = () => useContext<DatePickerContextValue>(DatePickerContext as Context<DatePickerContextValue>);

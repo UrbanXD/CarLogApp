@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
         width: "80%",
         alignSelf: "center",
         gap: SEPARATOR_SIZES.lightSmall,
-        zIndex: 1
+        zIndex: 99
     }
 });
 

@@ -1,32 +1,28 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import TabBarIcon from "./TabBarIcon.tsx";
-import {
-    COLORS,
-    FONT_SIZES,
-    SECONDARY_COLOR,
-    SEPARATOR_SIZES,
-    SIMPLE_TABBAR_HEIGHT
-} from "../../../constants/index.ts";
+import { COLORS, SECONDARY_COLOR, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
 import { LinearGradient } from "expo-linear-gradient";
 import FloatingActionMenu from "../../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
-import { ACTIONS } from "../../../ui/floatingActionMenu/constants/index.ts";
+import { useActions } from "../../../ui/floatingActionMenu/hooks/useActions.ts";
 
 function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
+    const { actions } = useActions();
+    const styles = useStyles(insets.bottom);
+
     return (
         <>
             <FloatingActionMenu
-                action={ ACTIONS }
-                containerStyle={ { bottom: SIMPLE_TABBAR_HEIGHT + SEPARATOR_SIZES.normal } }
+                action={ actions }
+                containerStyle={ { bottom: SIMPLE_TABBAR_HEIGHT + SEPARATOR_SIZES.small + insets.bottom } }
             />
-            <SafeAreaView style={ [styles.container, { paddingBottom: insets.bottom }] }>
+            <View style={ [styles.container] }>
                 <LinearGradient
-                    locations={ [0, 0.75] }
+                    locations={ [0, 0.65] }
                     colors={ [
-                        hexToRgba(SECONDARY_COLOR, 0.35),
+                        hexToRgba(SECONDARY_COLOR, 0.5),
                         hexToRgba(SECONDARY_COLOR, 1)
                     ] }
                     style={ StyleSheet.absoluteFillObject }
@@ -35,8 +31,15 @@ function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
                     state.routes.map((route: any, index: number) => {
                         const { options } = descriptors[route.key];
                         const isFocused = state.index === index;
+                        const iconSize = 26;
 
-                        const icons = JSON.parse(options.tabBarIcon());
+                        const iconNode = options?.tabBarIcon?.({
+                            focused: isFocused,
+                            color: options.tabBarActiveTintColor ?? "",
+                            size: iconSize
+                        });
+
+                        const icons = typeof iconNode === "string" ? JSON.parse(iconNode) : {};
 
                         const onPress = () => {
                             const event = navigation.emit({
@@ -54,10 +57,10 @@ function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
                             <TabBarIcon
                                 key={ index }
                                 isFocused={ isFocused }
-                                title={ options.title }
+                                title={ options.title ?? "??" }
                                 activeIcon={ icons?.["active"] }
                                 inactiveIcon={ icons?.["inactive"] }
-                                iconSize={ FONT_SIZES.h2 }
+                                iconSize={ 26 }
                                 activeColor={ COLORS.white }
                                 inactiveColor={ COLORS.white2 }
                                 onPress={ onPress }
@@ -66,12 +69,12 @@ function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
                         );
                     })
                 }
-            </SafeAreaView>
+            </View>
         </>
     );
-};
+}
 
-const styles = StyleSheet.create({
+const useStyles = (bottom: number) => StyleSheet.create({
     container: {
         position: "absolute",
         left: 0,
@@ -81,8 +84,9 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         justifyContent: "space-between",
         alignItems: "center",
-        height: SIMPLE_TABBAR_HEIGHT,
-        gap: SEPARATOR_SIZES.small,
+        height: SIMPLE_TABBAR_HEIGHT + bottom,
+        paddingBottom: bottom,
+        gap: SEPARATOR_SIZES.lightSmall,
         width: "100%",
         backgroundColor: "transparent"
     }

@@ -1,34 +1,39 @@
 import React, { ReactElement, useEffect, useRef } from "react";
-import { ImageSourcePropType, useWindowDimensions, View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import Animated, { SharedValue, useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
 
 export interface CarouselItemType {
     id: string,
-    image?: ImageSourcePropType | string
+    image?: {
+        uri: string
+        attachment?: boolean
+    } | null,
     title?: string,
     subtitle?: string,
     body?: string,
     selected?: boolean
 }
 
-export interface CarouselProps {
-    data: Array<any>;
-    renderItem: (item: any, index: number, size: number, x: SharedValue<number>) => ReactElement;
-    renderDefaultItem?: (size: number, spacerWidth: number) => ReactElement;
-    contentWidth?: number;
-    itemSizePercentage?: number;
-    spacer?: number;
+export type CarouselProps = {
+    data: Array<any>
+    loading?: boolean
+    renderItem: (item: any, index: number, size: number, x: SharedValue<number>) => ReactElement
+    renderDefaultItem?: (size: number, spacerWidth: number, loading: boolean) => ReactElement
+    contentWidth?: number
+    itemSizePercentage?: number
+    spacer?: number
 }
 
-const Carousel: React.FC<CarouselProps> = ({
+function Carousel({
     data,
+    loading,
     renderItem,
     renderDefaultItem,
     contentWidth,
     itemSizePercentage = 0.8,
     spacer
-}) => {
+}: CarouselProps) {
     const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
     const flatlistRef = useRef<FlatList>(null);
 
@@ -53,7 +58,7 @@ const Carousel: React.FC<CarouselProps> = ({
     return (
         <AnimatedFlatList
             ref={ flatlistRef }
-            data={ data }
+            data={ !loading ? data : [] }
             renderItem={
                 ({ item, index }) =>
                     <React.Fragment key={ index }>
@@ -68,7 +73,7 @@ const Carousel: React.FC<CarouselProps> = ({
                         }
                     </React.Fragment>
             }
-            ListEmptyComponent={ renderDefaultItem ? renderDefaultItem(ITEM_SIZE, SPACER) : <></> }
+            ListEmptyComponent={ renderDefaultItem ? renderDefaultItem(ITEM_SIZE, SPACER, !!loading) : <></> }
             keyExtractor={ (_, index) => index.toString() }
             horizontal
             snapToInterval={ ITEM_SIZE }
@@ -86,6 +91,6 @@ const Carousel: React.FC<CarouselProps> = ({
             } }
         />
     );
-};
+}
 
 export default Carousel;

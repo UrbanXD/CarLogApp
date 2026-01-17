@@ -12,10 +12,12 @@ import { IntelligentMarquee } from "../../../../components/marquee/IntelligentMa
 import Link from "../../../../components/Link.tsx";
 import { InfoContainer } from "../../../../components/info/InfoContainer.tsx";
 import { InfoRowProps } from "../../../../components/info/InfoRow.tsx";
+import { useTranslation } from "react-i18next";
 
 type CarProfileViewProps = {
     car: Car
     openEditCarStep: (stepIndex: EDIT_CAR_FORM_STEPS) => void
+    imageIsAttachment?: boolean
     handleDeleteCar?: () => void
     openOdometerLog?: () => void
     openEditOdometerValue?: () => void
@@ -28,39 +30,43 @@ const MARQUEE_BOUNCE_DELAY = 500;
 function CarProfileView({
     car,
     openEditCarStep,
+    imageIsAttachment = true,
     handleDeleteCar,
     openOdometerLog,
     openEditOdometerValue
 }: CarProfileViewProps) {
+    const { t } = useTranslation();
+
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
-            title: car.fuelTank.type.key,
-            content: "Üzemanyag Típus",
+            title: t(`fuel.types.${ car.fuelTank.type.key }`),
+            content: t("fuel.types.title"),
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelType)
         }, {
             title: car.fuelTank.capacity.toString(),
-            content: "Tartálytérfogat",
+            content: t("fuel.tank_capacity"),
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelTankCapacity)
         }, {
             title: car.fuelTank.unit.short,
-            content: "Üzemanyag mértékegység",
+            content: t("fuel.unit_types.title"),
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.FuelUnit)
         }, {
             title: car.odometer.unit.short,
-            content: "Kilométeróra Mértékegység",
+            content: t("odometer.unit_types.title"),
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.OdometerUnit)
         }, {
             title: car.currency.symbol,
-            content: "Elsődleges Valuta",
+            content: t("currency.primary"),
             onPress: () => openEditCarStep(EDIT_CAR_FORM_STEPS.Currency)
         }
-    ]), [car, openEditCarStep]);
+    ]), [car, openEditCarStep, t]);
 
     return (
         <View style={ styles.container }>
             <View style={ styles.imageContainer }>
                 <Image
-                    source={ car.image?.image }
+                    path={ car.imagePath }
+                    attachment={ imageIsAttachment }
                     alt={ ICON_NAMES.car }
                     overlay
                 >
@@ -105,8 +111,8 @@ function CarProfileView({
                     margin={ SEPARATOR_SIZES.lightSmall / 2.5 }
                 />
                 <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoRow.title }>Gyártó</Text>
-                    <View style={ styles.carInfoRow.infoContainer }>
+                    <Text style={ styles.carInfoRowTitle }>{ t("car.make") }</Text>
+                    <View style={ styles.carInfoRowContentContainer }>
                         <IntelligentMarquee
                             speed={ MARQUEE_SPEED }
                             bounceDelay={ MARQUEE_BOUNCE_DELAY }
@@ -114,13 +120,13 @@ function CarProfileView({
                             spacing={ SEPARATOR_SIZES.medium }
                             style={ { alignSelf: "flex-end" } }
                         >
-                            <Text style={ styles.carInfoRow.infoContainer.text }>{ car.model.make.name }</Text>
+                            <Text style={ styles.carInfoRowText }>{ car.model.make.name }</Text>
                         </IntelligentMarquee>
                     </View>
                 </View>
                 <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoRow.title }>Model</Text>
-                    <View style={ styles.carInfoRow.infoContainer }>
+                    <Text style={ styles.carInfoRowTitle }>{ t("car.model") }</Text>
+                    <View style={ styles.carInfoRowContentContainer }>
                         <IntelligentMarquee
                             speed={ 0.75 }
                             bounceDelay={ 500 }
@@ -128,13 +134,13 @@ function CarProfileView({
                             spacing={ SEPARATOR_SIZES.medium }
                             style={ { alignSelf: "flex-end" } }
                         >
-                            <Text style={ styles.carInfoRow.infoContainer.text }>{ car.model.name }</Text>
+                            <Text style={ styles.carInfoRowText }>{ car.model.name }</Text>
                         </IntelligentMarquee>
                     </View>
                 </View>
                 <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoRow.title }>Évjárat</Text>
-                    <View style={ styles.carInfoRow.infoContainer }>
+                    <Text style={ styles.carInfoRowTitle }>{ t("car.model_year") }</Text>
+                    <View style={ styles.carInfoRowContentContainer }>
                         <IntelligentMarquee
                             speed={ MARQUEE_SPEED }
                             bounceDelay={ MARQUEE_BOUNCE_DELAY }
@@ -142,14 +148,16 @@ function CarProfileView({
                             spacing={ SEPARATOR_SIZES.medium }
                             style={ { alignSelf: "flex-end" } }
                         >
-                            <Text style={ styles.carInfoRow.infoContainer.text }>{ car.model.year }</Text>
+                            <Text style={ styles.carInfoRowText }>{ car.model.year }</Text>
                         </IntelligentMarquee>
                     </View>
                 </View>
-                <Button.Row style={ {
-                    marginTop: SEPARATOR_SIZES.mediumSmall,
-                    justifyContent: handleDeleteCar ? "space-between" : "center"
-                } }>
+                <Button.Row
+                    style={ {
+                        marginTop: SEPARATOR_SIZES.mediumSmall,
+                        justifyContent: handleDeleteCar ? "space-between" : "center"
+                    } }
+                >
                     {
                         handleDeleteCar &&
                        <Button.Icon
@@ -162,7 +170,7 @@ function CarProfileView({
                        />
                     }
                     <Button.Text
-                        text="Módosítás"
+                        text={ t("form_button.edit") }
                         textColor={ COLORS.gray1 }
                         fontSize={ FONT_SIZES.p2 }
                         height={ FONT_SIZES.p2 * 2 }
@@ -173,19 +181,21 @@ function CarProfileView({
                 </Button.Row>
             </View>
             <View style={ styles.block }>
-                <Text style={ styles.block.title }>Alap információk</Text>
+                <Text style={ styles.blockTitle }>{ t("car.basic_information") }</Text>
                 <InfoContainer data={ infos } flexDirection={ "column" } maxItemInRow={ 3 }/>
             </View>
             <View style={ styles.block }>
-                <View style={ {
-                    flexDirection: "row",
-                    justifyContent: openEditOdometerValue ? "space-between" : "center"
-                } }>
+                <View
+                    style={ {
+                        flexDirection: "row",
+                        justifyContent: openEditOdometerValue ? "space-between" : "center"
+                    } }
+                >
                     {
                         openEditOdometerValue &&
                        <View style={ { width: FONT_SIZES.h3, height: FONT_SIZES.h3, backgroundColor: "transparent" } }/>
                     }
-                    <Text style={ styles.block.title }>Kilóméteróra</Text>
+                    <Text style={ styles.blockTitle }>{ t("odometer.text") }</Text>
                     {
                         openEditOdometerValue &&
                        <Button.Icon
@@ -203,7 +213,7 @@ function CarProfileView({
                 {
                     openOdometerLog &&
                    <Link
-                      text="Kilométeróra-állás napló"
+                      text={ t("odometer.open_log") }
                       icon={ ICON_NAMES.rightArrowHead }
                       onPress={ openOdometerLog }
                    />
@@ -228,7 +238,7 @@ const styles = StyleSheet.create({
     editImageIconContainer: {
         flex: 1,
         justifyContent: "flex-end",
-        padding: SEPARATOR_SIZES.lightSmall
+        padding: SEPARATOR_SIZES.small
     },
     editImageIcon: {
         alignSelf: "flex-end"
@@ -249,39 +259,35 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "row",
         justifyContent: "space-between",
-        gap: SEPARATOR_SIZES.lightSmall,
-
-        title: {
-            fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.p2,
-            letterSpacing: FONT_SIZES.p2 * 0.05,
-            color: COLORS.gray1
-        },
-
-        infoContainer: {
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "flex-end",
-
-            text: {
-                fontFamily: "Gilroy-Heavy",
-                fontSize: FONT_SIZES.p2,
-                letterSpacing: FONT_SIZES.p2 * 0.05,
-                color: COLORS.gray1
-            }
-        }
+        gap: SEPARATOR_SIZES.lightSmall
+    },
+    carInfoRowTitle: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p2,
+        letterSpacing: FONT_SIZES.p2 * 0.05,
+        color: COLORS.gray1
+    },
+    carInfoRowText: {
+        fontFamily: "Gilroy-Heavy",
+        fontSize: FONT_SIZES.p2,
+        letterSpacing: FONT_SIZES.p2 * 0.05,
+        color: COLORS.gray1
+    },
+    carInfoRowContentContainer: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "flex-end"
     },
     block: {
-        gap: SEPARATOR_SIZES.lightSmall,
-
-        title: {
-            flexShrink: 1,
-            fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.p2,
-            letterSpacing: FONT_SIZES.p2 * 0.05,
-            textAlign: "center",
-            color: COLORS.gray1
-        }
+        gap: SEPARATOR_SIZES.lightSmall
+    },
+    blockTitle: {
+        flexShrink: 1,
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p2,
+        letterSpacing: FONT_SIZES.p2 * 0.05,
+        textAlign: "center",
+        color: COLORS.gray1
     }
 });
 

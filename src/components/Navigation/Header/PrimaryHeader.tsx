@@ -34,9 +34,9 @@ const PrimaryHeader: React.FC = () => {
                             ? <Avatar.Skeleton
                                 avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
                             />
-                            : user.avatar
+                            : user.avatarPath
                               ? <Avatar.Image
-                                  source={ user.avatar.image }
+                                  path={ user.avatarPath }
                                   avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
                                   onPress={ openProfile }
                               />

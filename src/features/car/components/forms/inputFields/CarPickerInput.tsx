@@ -6,6 +6,7 @@ import { Control } from "react-hook-form";
 import { PickerItemType } from "../../../../../components/Input/picker/PickerItem.tsx";
 import useCars from "../../../hooks/useCars.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
+import { useTranslation } from "react-i18next";
 
 type CarPickerInputProps = {
     control: Control<any>
@@ -17,9 +18,10 @@ type CarPickerInputProps = {
 export function CarPickerInput({
     control,
     fieldName,
-    title = "Autó",
+    title,
     subtitle
 }: CarPickerInputProps) {
+    const { t } = useTranslation();
     const { cars } = useCars();
     const { carDao } = useDatabase();
 
@@ -33,14 +35,14 @@ export function CarPickerInput({
         <Input.Field
             control={ control }
             fieldName={ fieldName }
-            fieldNameText={ title }
+            fieldNameText={ title ?? t("car.picker.title") }
             fieldInfoText={ subtitle }
         >
             {
                 carsData
                 ?
                 <Input.Picker.Dropdown
-                    title={ title }
+                    title={ title ?? t("car.picker.title") }
                     data={ carsData }
                     icon={ ICON_NAMES.car }
                 />

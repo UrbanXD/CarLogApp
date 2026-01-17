@@ -1,16 +1,15 @@
 import React from "react";
-import { heightPercentageToDP } from "react-native-responsive-screen";
-import BottomSheet from "../../../../ui/bottomSheet/components/BottomSheet.tsx";
-import { EditUserNameForm } from "../../components/forms/EditUserNameForm.tsx";
+import { EditUserInformationForm } from "../../components/forms/EditUserInformationForm.tsx";
 import { UserAccount } from "../../schemas/userSchema.ts";
 import { EditUserAvatarForm } from "../../components/forms/EditUserAvatarForm.tsx";
 import { ChangeEmailForm } from "../../components/forms/ChangeEmailForm.tsx";
 import { ResetPasswordForm } from "../../components/forms/ResetPasswordForm.tsx";
 import { LinkPasswordToOAuthForm } from "../../components/forms/LinkPasswordToOAuthForm.tsx";
+import { FormBottomSheet } from "../../../../ui/bottomSheet/presets/FormBottomSheet.tsx";
 
 export enum EDIT_USER_FORM_TYPE {
     ChangeEmail,
-    EditName,
+    EditUserInformation,
     EditAvatar,
     ResetPassword,
     LinkPasswordToOAuth
@@ -25,8 +24,8 @@ const EditUserBottomSheet: React.FC<EditUserBottomSheetProps> = ({ user, type })
     let CONTENT = null;
 
     switch(type) {
-        case EDIT_USER_FORM_TYPE.EditName:
-            CONTENT = <EditUserNameForm user={ user }/>;
+        case EDIT_USER_FORM_TYPE.EditUserInformation:
+            CONTENT = <EditUserInformationForm user={ user }/>;
             break;
         case EDIT_USER_FORM_TYPE.EditAvatar:
             CONTENT = <EditUserAvatarForm user={ user }/>;
@@ -35,22 +34,18 @@ const EditUserBottomSheet: React.FC<EditUserBottomSheetProps> = ({ user, type })
             CONTENT = <ChangeEmailForm user={ user }/>;
             break;
         case EDIT_USER_FORM_TYPE.ResetPassword:
-            CONTENT = <ResetPasswordForm user={ user }/>;
+            CONTENT = <ResetPasswordForm defaultEmail={ user.email }/>;
             break;
         case EDIT_USER_FORM_TYPE.LinkPasswordToOAuth:
             CONTENT = <LinkPasswordToOAuthForm/>;
             break;
     }
 
-    const MAX_DYNAMIC_CONTENT_SIZE = heightPercentageToDP(85);
 
     return (
-        <BottomSheet
+        <FormBottomSheet
             content={ CONTENT }
-            maxDynamicContentSize={ MAX_DYNAMIC_CONTENT_SIZE }
             enableDynamicSizing
-            enableOverDrag={ false }
-            enableDismissOnClose={ false }
         />
     );
 };

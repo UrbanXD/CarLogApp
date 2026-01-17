@@ -15,6 +15,7 @@ import Animated, {
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
 import BounceDot from "./BounceDot.tsx";
 import { AnimatedPath, AnimatedSvg } from "../AnimatedComponents/index.ts";
+import { useTranslation } from "react-i18next";
 
 type CarLoadingIndicatorProps = {
     loaded: boolean,
@@ -24,9 +25,11 @@ type CarLoadingIndicatorProps = {
 
 const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({
     loaded,
-    loadingText = "Betöltés",
+    loadingText,
     onAnimationFinished
 }) => {
+    const { t } = useTranslation();
+
     const ROAD_HEIGHT = hp(0.25);
     const ROAD_ANIMATION_DURATION = 1000;
     const ROAD_STROKE_DASH = [20, 5];
@@ -171,13 +174,13 @@ const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({
                     <Animated.Image
                         source={ require("../../assets/images/car_body.png") }
                         resizeMode="stretch"
-                        style={ styles.car.body }
+                        style={ styles.carBody }
                     />
                     <Animated.Image
                         source={ require("../../assets/images/rim.png") }
                         resizeMode="contain"
                         style={ [
-                            styles.car.rim,
+                            styles.rim,
                             { left: (CAR_WIDTH - RIM_SIZE) / 6 },
                             rimStyle
                         ] }
@@ -186,7 +189,7 @@ const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({
                         source={ require("../../assets/images/rim.png") }
                         resizeMode="contain"
                         style={ [
-                            styles.car.rim,
+                            styles.rim,
                             { right: RIM_SIZE - RIM_SIZE / 8 },
                             rimStyle
                         ] }
@@ -204,7 +207,7 @@ const CarLoadingIndicator: React.FC<CarLoadingIndicatorProps> = ({
                 </AnimatedSvg>
             </Animated.View>
             <View style={ styles.loadingTextContainer }>
-                <Text style={ styles.loadingTextContainer.text }>{ loadingText }</Text>
+                <Text style={ styles.loadingText }>{ loadingText ?? t("common.loading") }</Text>
                 <BounceDot delay={ 0 }/>
                 <BounceDot delay={ 200 }/>
                 <BounceDot delay={ 400 }/>
@@ -232,29 +235,26 @@ const useStyles = (
     car: {
         position: "relative",
         width: carWidth,
-        height: carHeight,
-
-        body: {
-            position: "absolute",
-            width: "100%",
-            height: "100%"
-        },
-
-        rim: {
-            position: "absolute",
-            bottom: rimSize / 7,
-            width: rimSize,
-            height: rimSize
-        }
+        height: carHeight
+    },
+    carBody: {
+        position: "absolute",
+        width: "100%",
+        height: "100%"
+    },
+    rim: {
+        position: "absolute",
+        bottom: rimSize / 7,
+        width: rimSize,
+        height: rimSize
     },
     loadingTextContainer: {
-        flexDirection: "row",
-
-        text: {
-            fontFamily: "Gilroy-Heavy",
-            fontSize: FONT_SIZES.p1,
-            color: COLORS.gray1
-        }
+        flexDirection: "row"
+    },
+    loadingText: {
+        fontFamily: "Gilroy-Heavy",
+        fontSize: FONT_SIZES.p1,
+        color: COLORS.gray1
     }
 });
 

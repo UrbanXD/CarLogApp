@@ -1,6 +1,6 @@
 import { column, Table } from "@powersync/react-native";
 
-export const SERVICE_TYPE_TABLE = "service_type";
+export const SERVICE_TYPE_TABLE = "service_type" as const;
 
 export const serviceTypeTable = new Table({
     id: column.text,

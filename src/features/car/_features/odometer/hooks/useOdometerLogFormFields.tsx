@@ -1,18 +1,19 @@
 import { UseFormReturn, useWatch } from "react-hook-form";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Car } from "../../../schemas/carSchema.ts";
 import useCars from "../../../hooks/useCars.ts";
 import { FormFields } from "../../../../../types/index.ts";
 import { CarPickerInput } from "../../../components/forms/inputFields/CarPickerInput.tsx";
-import { CarEditNameToast } from "../../../presets/toast/index.ts";
-import Input from "../../../../../components/Input/Input.ts";
-import InputDatePicker from "../../../../../components/Input/datePicker/InputDatePicker.tsx";
 import { NoteInput } from "../../../../../components/Input/_presets/NoteInput.tsx";
 import { OdometerLogFormFields } from "../enums/odometerLogFormFields.ts";
 import { OdometerValueInput } from "../components/forms/inputFields/OdometerValueInput.tsx";
 import { OdometerLog } from "../schemas/odometerLogSchema.ts";
 import { OdometerChangeLogFormFields } from "../schemas/form/odometerChangeLogForm.ts";
 import { convertOdometerValueFromKilometer } from "../utils/convertOdometerUnit.ts";
+import { EditToast } from "../../../../../ui/alert/presets/toast/index.ts";
+import { useTranslation } from "react-i18next";
+import { OdometerLimit } from "../model/dao/OdometerLogDao.ts";
+import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 
 type UseOdometerLogFormFieldsProps = UseFormReturn<OdometerChangeLogFormFields> & {
     odometerLog?: OdometerLog
@@ -25,6 +26,8 @@ export function useOdometerLogFormFields({
     ...restProps
 }: UseOdometerLogFormFieldsProps) {
     const { control, setValue, clearErrors, getFieldState } = restProps;
+    const { t } = useTranslation();
+    const { odometerLogDao } = useDatabase();
     const { selectedCar, getCar } = useCars();
 
     const [car, setCar] = useState<Car | null>(
@@ -34,8 +37,11 @@ export function useOdometerLogFormFields({
           ? getCar(defaultCarId) ?? selectedCar
           : selectedCar
     );
+    const [odometerLimit, setOdometerLimit] = useState<OdometerLimit | null>(null);
 
+    const formOdometerLogId = useWatch({ control, name: "id" });
     const formCarId = useWatch({ control, name: "carId" });
+    const formDate = useWatch({ control, name: "date" });
 
     useEffect(() => {
         const car = getCar(formCarId);
@@ -50,47 +56,38 @@ export function useOdometerLogFormFields({
         clearErrors();
     }, [formCarId, odometerLog]);
 
-    const getOdometerLogSubtitle = useCallback(() => {
-        if(!odometerLog) return undefined;
+    useEffect(() => {
+        (async () => {
+            if(!formCarId || !formDate) return;
 
-        let subtitle = `A bejegyzés eredeti kilométeróra-állása ${ odometerLog.value } ${ odometerLog.unit.short }`;
-        if(car && odometerLog.unit.id !== car.odometer.unit.id) {
-            const odometerValueConvertToCarOdometerUnit = convertOdometerValueFromKilometer(
-                odometerLog.valueInKm,
-                car.odometer.unit.conversionFactor
-            );
-            subtitle += ` (${ odometerValueConvertToCarOdometerUnit } ${ car.odometer.unit.short })`;
-        }
-
-        return subtitle;
-    }, [odometerLog, car]);
+            setOdometerLimit(await odometerLogDao.getOdometerLimitByDate(
+                formCarId,
+                formDate,
+                [formOdometerLogId]
+            ));
+        })();
+    }, [formCarId, formDate, formOdometerLogId]);
 
     const fields: Record<OdometerLogFormFields, FormFields> = useMemo(() => ({
         [OdometerLogFormFields.Car]: {
             render: () => <CarPickerInput control={ control } fieldName="carId"/>,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
-        [OdometerLogFormFields.OdometerValue]: {
+        [OdometerLogFormFields.DateAndOdometerValue]: {
             render: () => <OdometerValueInput
                 control={ control }
-                fieldName="value"
-                subtitle={ getOdometerLogSubtitle() }
-                currentOdometerValue={ car?.odometer.value }
+                odometerValueFieldName="value"
+                dateFieldName="date"
+                currentOdometerValueTranslationKey={
+                    odometerLog
+                    ? "odometer.original_value"
+                    : "odometer.current_value"
+                }
+                currentOdometerValue={ odometerLog?.value ?? car?.odometer.value }
+                odometerLimit={ odometerLimit }
                 unitText={ car?.odometer.unit.short }
             />,
-            editToastMessages: CarEditNameToast
-        },
-        [OdometerLogFormFields.Date]: {
-            render: () => (
-                <Input.Field
-                    control={ control }
-                    fieldName="date"
-                    fieldNameText="Dátum"
-                >
-                    <InputDatePicker/>
-                </Input.Field>
-            ),
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         },
         [OdometerLogFormFields.Note]: {
             render: () => <NoteInput
@@ -98,18 +95,23 @@ export function useOdometerLogFormFields({
                 setValue={ setValue }
                 fieldName="note"
             />,
-            editToastMessages: CarEditNameToast
+            editToastMessages: EditToast
         }
-    }), [control, setValue, car, getOdometerLogSubtitle]);
+    }), [control, setValue, car, t, odometerLog, odometerLimit]);
 
     const fullForm: FormFields = {
         render: () => ([
-            <React.Fragment key="car">{ fields[OdometerLogFormFields.Car].render() }</React.Fragment>,
-            <React.Fragment key="value">{ fields[OdometerLogFormFields.OdometerValue].render() }</React.Fragment>,
-            <React.Fragment key="date">{ fields[OdometerLogFormFields.Date].render() }</React.Fragment>,
-            <React.Fragment key="note">{ fields[OdometerLogFormFields.Note].render() }</React.Fragment>
+            <React.Fragment key="car">
+                { fields[OdometerLogFormFields.Car].render() }
+            </React.Fragment>,
+            <React.Fragment key="value">
+                { fields[OdometerLogFormFields.DateAndOdometerValue].render() }
+            </React.Fragment>,
+            <React.Fragment key="note">
+                { fields[OdometerLogFormFields.Note].render() }
+            </React.Fragment>
         ]),
-        editToastMessages: CarEditNameToast
+        editToastMessages: EditToast
     };
 
     return { fields, fullForm };

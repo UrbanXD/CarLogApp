@@ -27,6 +27,10 @@ export function InfoContainer({
         rows.push(data.slice(i, i + (flexDirection === "row" ? 1 : maxItemInRow)));
     }
 
+    const containerStyle = flexDirection === "row" ? styles.rowContainer : styles.columnContainer;
+    const titleStyle = flexDirection === "row" ? styles.rowTitle : styles.columnTitle;
+    const contentTextStyle = flexDirection === "row" ? styles.rowContentText : styles.columnContentText;
+
     return (
         <View style={ styles.container }>
             {
@@ -38,24 +42,9 @@ export function InfoContainer({
                                     <React.Fragment key={ index }>
                                         <InfoRow
                                             { ...item }
-                                            containerStyle={ [
-                                                flexDirection === "row"
-                                                ? styles.infoContainer.row
-                                                : styles.infoContainer.column,
-                                                item.containerStyle
-                                            ] }
-                                            titleStyle={ [
-                                                flexDirection === "row"
-                                                ? styles.infoContainer.row.title
-                                                : styles.infoContainer.column.title,
-                                                item.titleStyle
-                                            ] }
-                                            contentTextStyle={ [
-                                                flexDirection === "row"
-                                                ? styles.infoContainer.row.subtitle
-                                                : styles.infoContainer.column.subtitle,
-                                                item.contentTextStyle
-                                            ] }
+                                            containerStyle={ [containerStyle, item.containerStyle] }
+                                            titleStyle={ [titleStyle, item.titleStyle] }
+                                            contentTextStyle={ [contentTextStyle, item.contentTextStyle] }
                                         />
 
                                         {
@@ -95,32 +84,26 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        width: "100%",
-
-        row: {
-            flexDirection: "row",
-            alignItems: "center",
-            height: "100%",
-
-            title: {
-                textAlign: "left"
-            },
-
-            subtitle: {
-                textAlign: "left"
-            }
-        },
-
-        column: {
-            flexDirection: "column",
-
-            title: {
-                textAlign: "center"
-            },
-
-            subtitle: {
-                textAlign: "center"
-            }
-        }
+        width: "100%"
+    },
+    rowContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        height: "100%"
+    },
+    rowTitle: {
+        textAlign: "left"
+    },
+    rowContentText: {
+        textAlign: "left"
+    },
+    columnContainer: {
+        flexDirection: "column"
+    },
+    columnTitle: {
+        textAlign: "center"
+    },
+    columnContentText: {
+        textAlign: "center"
     }
 });

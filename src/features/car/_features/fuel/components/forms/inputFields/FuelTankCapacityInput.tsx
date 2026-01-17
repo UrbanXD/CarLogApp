@@ -4,6 +4,7 @@ import React from "react";
 import { Control } from "react-hook-form";
 import { View } from "react-native";
 import { UnitText } from "../../../../../../../components/UnitText.tsx";
+import { useTranslation } from "react-i18next";
 
 type FuelTankCapacityInputProps = {
     control: Control<any>
@@ -16,16 +17,18 @@ type FuelTankCapacityInputProps = {
 export function FuelTankCapacityInput({
     control,
     fieldName,
-    title = "Üzemanyagtartály Térfogat",
+    title,
     subtitle,
     unitText
 }: FuelTankCapacityInputProps) {
+    const { t } = useTranslation();
+
     return (
         <Input.Field
             control={ control }
             fieldName={ fieldName }
-            fieldNameText={ title }
-            fullWidth={ subtitle }
+            fieldNameText={ title ?? t("fuel.tank_capacity") }
+            fieldInfoText={ subtitle }
         >
             <Input.Row style={ { gap: 0 } }>
                 <View style={ { flex: 1 } }>
@@ -37,7 +40,7 @@ export function FuelTankCapacityInput({
                     />
                 </View>
                 {
-                    unitText &&
+                    !!unitText &&
                    <UnitText
                       text={ unitText }
                       style={ { padding: SEPARATOR_SIZES.lightSmall } }

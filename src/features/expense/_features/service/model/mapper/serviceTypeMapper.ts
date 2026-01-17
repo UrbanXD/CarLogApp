@@ -2,6 +2,7 @@ import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts
 import { ServiceTypeTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { ServiceType, serviceTypeSchema } from "../../schemas/serviceTypeSchema.ts";
 import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
+import { SERVICE_COLORS, SERVICE_ICONS } from "../../../../../../constants/index.ts";
 
 export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, ServiceType> {
     constructor() {
@@ -9,17 +10,17 @@ export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, Servi
     }
 
     async toDto(entity: ServiceTypeTableRow): Promise<ServiceType> {
-        let icon = null;
-        let primaryColor = null;
-        let secondaryColor = null;
+        const isServiceIconsKey = (key: unknown): key is keyof typeof SERVICE_ICONS => {
+            return typeof key === "string" && key in SERVICE_ICONS;
+        };
 
-        // switch(entity.key) {
-        //     case ServiceTypeEnum.SMALL_SERVICE:
-        //         icon = ICON_NAMES.service;
-        //         primaryColor = COLORS.service;
-        //         secondaryColor = COLORS.service;
-        //         break;
-        // }
+        const isServiceColorsKey = (key: unknown): key is keyof typeof SERVICE_COLORS => {
+            return typeof key === "string" && key in SERVICE_COLORS;
+        };
+
+        const icon = isServiceIconsKey(entity.key) ? SERVICE_ICONS[entity.key] : null;
+        const primaryColor = isServiceColorsKey(entity.key) ? SERVICE_COLORS[entity.key] : SERVICE_COLORS.OTHER;
+        const secondaryColor = null;
 
         return serviceTypeSchema.parse({
             id: entity.id,
@@ -39,10 +40,13 @@ export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, Servi
         };
     }
 
-    entityToPickerItem(entity: ServiceTypeTableRow): Promise<PickerItemType> {
+    entityToPickerItem(
+        entity: ServiceTypeTableRow,
+        getTitle?: (entity: ServiceTypeTableRow) => string
+    ): PickerItemType {
         return {
             value: entity.id.toString(),
-            title: entity.key
+            title: getTitle?.(entity) ?? entity.key
         };
     }
 }

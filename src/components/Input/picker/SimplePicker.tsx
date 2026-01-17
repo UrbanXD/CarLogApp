@@ -43,7 +43,7 @@ const SimplePicker: React.FC<SimplePickerProps> = ({
 
         const item = findItemByValue(inputFieldContext?.field?.value?.toString());
         setSelectedItem(item);
-    }, [inputFieldContext?.field.value]);
+    }, [inputFieldContext?.field.value, items]);
 
     const onSelect = useCallback((value: string) => {
         const item = findItemByValue(value);

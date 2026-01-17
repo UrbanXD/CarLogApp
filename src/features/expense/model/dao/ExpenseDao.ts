@@ -8,10 +8,11 @@ import { CursorOptions, CursorPaginator } from "../../../../database/paginator/C
 import { PaginatorOptions } from "../../../../database/paginator/AbstractPaginator.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
-import { ExpenseFields } from "../../schemas/form/expenseForm.ts";
+import { ExpenseFormFields } from "../../schemas/form/expenseForm.ts";
 import { SelectQueryBuilder } from "kysely";
 import { FUEL_LOG_TABLE } from "../../../../database/connector/powersync/tables/fuelLog.ts";
 import { SERVICE_LOG_TABLE } from "../../../../database/connector/powersync/tables/serviceLog.ts";
+import { CAR_TABLE } from "../../../../database/connector/powersync/tables/car.ts";
 
 export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, SelectExpenseTableRow> {
     constructor(
@@ -26,18 +27,20 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         );
     }
 
-    selectQuery(): SelectQueryBuilder<DatabaseType, SelectExpenseTableRow> {
+    selectQuery(): SelectQueryBuilder<DatabaseType, any, SelectExpenseTableRow> {
         return this.db
         .selectFrom(EXPENSE_TABLE)
+        .innerJoin(CAR_TABLE, `${ CAR_TABLE }.id`, `${ EXPENSE_TABLE }.car_id`)
         .leftJoin(FUEL_LOG_TABLE, `${ FUEL_LOG_TABLE }.expense_id`, `${ EXPENSE_TABLE }.id`)
         .leftJoin(SERVICE_LOG_TABLE, `${ SERVICE_LOG_TABLE }.expense_id`, `${ EXPENSE_TABLE }.id`)
         .selectAll(EXPENSE_TABLE)
         .select([
-            eb => eb.fn.coalesce(`${ FUEL_LOG_TABLE }.id`, `${ SERVICE_LOG_TABLE }.id`).as("related_id")
+            eb => eb.fn.coalesce(`${ FUEL_LOG_TABLE }.id`, `${ SERVICE_LOG_TABLE }.id`).as("related_id"),
+            `${ CAR_TABLE }.currency_id as car_currency_id`
         ]);
     }
 
-    async getLatestExpenses(carId: string, count?: number = 3): Promise<Array<Expense>> {
+    async getLatestExpenses(carId: string, count: number = 3): Promise<Array<Expense>> {
         const result = await (
             this.selectQuery()
             .whereRef(`${ EXPENSE_TABLE }.car_id`, "=", carId)
@@ -48,12 +51,12 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         return await this.mapper.toDtoArray(result);
     }
 
-    async create(formResult: ExpenseFields, safe?: boolean): Promise<Expense | null> {
+    async create(formResult: ExpenseFormFields, safe?: boolean): Promise<Expense | null> {
         const expenseEntity = this.mapper.formResultToEntity(formResult);
         return await super.create(expenseEntity, safe);
     }
 
-    async update(formResult: ExpenseFields, safe?: boolean): Promise<Expense | null> {
+    async update(formResult: ExpenseFormFields, safe?: boolean): Promise<Expense | null> {
         const expenseEntity = this.mapper.formResultToEntity(formResult);
         return await super.update(expenseEntity, safe);
     }
@@ -61,7 +64,7 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
     paginator(
         cursorOptions: CursorOptions<keyof SelectExpenseTableRow>,
         filterBy?: PaginatorOptions<SelectExpenseTableRow>["filterBy"],
-        perPage?: number = 25
+        perPage: number = 25
     ): CursorPaginator<SelectExpenseTableRow, Expense> {
         return new CursorPaginator<SelectExpenseTableRow, Expense>(
             this.db,
@@ -70,7 +73,7 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
             {
                 baseQuery: this.selectQuery(),
                 perPage,
-                filterBy,
+                filterBy: filterBy,
                 mapper: this.mapper.toDto.bind(this.mapper)
             }
         );

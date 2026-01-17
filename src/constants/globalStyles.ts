@@ -16,7 +16,6 @@ export const GLOBAL_STYLE = StyleSheet.create({
     },
     formLinkText: {
         fontSize: FONT_SIZES.p3,
-        paddingLeft: SEPARATOR_SIZES.small,
         fontFamily: "Gilroy-Medium",
         color: COLORS.fuelYellow
     },
@@ -26,15 +25,16 @@ export const GLOBAL_STYLE = StyleSheet.create({
     },
     containerTitleText: {
         fontFamily: "Gilroy-Heavy",
+        flexWrap: "wrap",
         fontSize: FONT_SIZES.p1,
-        letterSpacing: FONT_SIZES.p1 * 0.05,
+        letterSpacing: FONT_SIZES.p1 * 0.035,
         color: COLORS.white
     },
     containerText: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
-        lineHeight: FONT_SIZES.p2 * 1.2,
-        letterSpacing: FONT_SIZES.p2 * 0.05,
+        lineHeight: FONT_SIZES.p2 * 1.15,
+        letterSpacing: FONT_SIZES.p2 * 0.035,
         color: COLORS.gray1
     },
     rowContainer: {

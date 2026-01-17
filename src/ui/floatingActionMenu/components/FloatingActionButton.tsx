@@ -1,5 +1,5 @@
 import Animated, { SharedValue, useAnimatedStyle, withDelay, withSpring, withTiming } from "react-native-reanimated";
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { AnimatedPressable } from "../../../components/AnimatedComponents/index.ts";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
@@ -29,19 +29,29 @@ export function FloatingActionButton({
     label,
     onPress
 }: FloatingActionButtonProps) {
+    const [width, setWidth] = useState<number>(0);
+
     const animatedStyles = useAnimatedStyle(() => {
-        const translateY = withSpring(
-            isMenuExpanded.value ? (-BUTTON_SIZE - SEPARATOR_SIZES.lightSmall / 2) * index : 0,
-            SPRING_CONFIG
+        const delay = index * 30;
+
+        const translateY = withDelay(
+            delay,
+            withSpring(
+                isMenuExpanded.value ? (-BUTTON_SIZE - SEPARATOR_SIZES.lightSmall / 2) * index : 0,
+                SPRING_CONFIG
+            )
         );
-        const translateX = withSpring(isMenuExpanded.value ? 0 : BUTTON_SIZE, SPRING_CONFIG);
-        const scale = withDelay(index * 100, withTiming(Number(isMenuExpanded.value)));
+        const translateX = withDelay(
+            delay,
+            withSpring(isMenuExpanded.value ? 0 : (width - BUTTON_SIZE) / 2, SPRING_CONFIG)
+        );
+        const scale = withDelay(delay, withTiming(Number(isMenuExpanded.value), { duration: 500 }));
 
         return { transform: [{ translateY }, { translateX }, { scale }] };
     });
 
     const labelStyle = useAnimatedStyle(() => {
-        const opacity = withTiming(Number(isMenuExpanded.value), { duration: 500 });
+        const opacity = withTiming(Number(isMenuExpanded.value), { duration: 350 });
 
         return { opacity };
     });
@@ -50,11 +60,12 @@ export function FloatingActionButton({
         <AnimatedPressable
             style={ [animatedStyles, styles.container] }
             onPress={ onPress }
-            pointerEvents="auto"
+            pointerEvents={ "auto" }
             hitSlop={ 10 }
+            onLayout={ (event) => setWidth(event.nativeEvent.layout.width) }
         >
             <View style={ styles.labelContainer }>
-                <Animated.Text style={ [styles.labelContainer.text, labelStyle] }>{ label }</Animated.Text>
+                <Animated.Text style={ [styles.labelContainerText, labelStyle] }>{ label }</Animated.Text>
             </View>
             <View style={ styles.iconContainer }>
                 <Icon icon={ icon } size={ FONT_SIZES.h3 } color={ COLORS.white2 }/>
@@ -81,13 +92,12 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "flex-start",
         paddingLeft: SEPARATOR_SIZES.lightSmall,
-        paddingVertical: SEPARATOR_SIZES.lightSmall / 2,
-
-        text: {
-            fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.p2,
-            color: COLORS.white2
-        }
+        paddingVertical: SEPARATOR_SIZES.lightSmall / 2
+    },
+    labelContainerText: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p2,
+        color: COLORS.white2
     },
     iconContainer: {
         position: "absolute",

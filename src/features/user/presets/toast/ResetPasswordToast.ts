@@ -1,31 +1,32 @@
 import { ToastMessage, ToastMessages } from "../../../../ui/alert/model/types/index.ts";
+import i18n from "../../../../i18n/index.ts";
 
 const success: ToastMessage = () => {
     return {
         type: "success",
-        title: "Jelszó módosítva!"
+        title: i18n.t("auth.toast.reset_password.success.title")
     };
 };
 
 const over_email_send_rate_limit: ToastMessage = (seconds?: string) => {
     return {
         type: "warning",
-        title: "Pihenjen kicsit!",
-        body: `Túl sok email kérelem rövid időn belül, kérjük várjon ${ seconds } másodpercet.`
+        title: i18n.t("auth.toast.otp.over_email_send_rate_limit.title"),
+        body: i18n.t("auth.toast.otp.over_email_send_rate_limit.body", { seconds: seconds ?? 0 })
     };
 };
 
 const otp_expired: ToastMessage = () => {
     return {
         type: "warning",
-        body: "Az Ön által megadott kód érvénytelen, esetleg lejárt."
+        body: i18n.t("auth.toast.otp.expired.body")
     };
 };
 
 const error: ToastMessage = () => {
     return {
         type: "error",
-        body: "Váratlan hiba lépett fel a jelszó módosítása közben!"
+        body: i18n.t("auth.toast.reset_password.error.body")
     };
 };
 

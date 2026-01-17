@@ -16,14 +16,14 @@ function PickerItem({
     selected
 }: CarPickerItemProps) {
     return (
-        <Pressable onPress={ onPress } style={ [styles.container, selected && styles.container.selected] }>
+        <Pressable onPress={ onPress } style={ [styles.container, selected && styles.selected] }>
             <View style={ styles.textContainer }>
-                <Text style={ styles.textContainer.name } numberOfLines={ 1 }>
+                <Text style={ styles.name } numberOfLines={ 1 }>
                     { name }
                 </Text>
                 {
                     model &&
-                   <Text style={ styles.textContainer.model } numberOfLines={ 1 }>
+                   <Text style={ styles.model } numberOfLines={ 1 }>
                        { model }
                    </Text>
                 }
@@ -40,33 +40,30 @@ const styles = StyleSheet.create({
         height: "80%",
         backgroundColor: COLORS.gray4,
         padding: SEPARATOR_SIZES.lightSmall,
-        borderRadius: 10,
-
-        selected: {
-            borderWidth: 1.5,
-            borderColor: COLORS.gray1
-        }
+        borderRadius: 10
+    },
+    selected: {
+        borderWidth: 1.5,
+        borderColor: COLORS.gray1
     },
     textContainer: {
         flex: 1,
         alignItems: "center",
-        justifyContent: "center",
-
-        name: {
-            fontFamily: "Gilroy-Heavy",
-            fontSize: FONT_SIZES.p4,
-            letterSpacing: FONT_SIZES.p4 * 0.05,
-            color: COLORS.white,
-            textAlign: "center"
-        },
-
-        model: {
-            fontFamily: "Gilroy-Medium",
-            fontSize: FONT_SIZES.p4 * 0.95,
-            letterSpacing: FONT_SIZES.p4 * 0.95 * 0.05,
-            color: COLORS.gray1,
-            textAlign: "center"
-        }
+        justifyContent: "center"
+    },
+    name: {
+        fontFamily: "Gilroy-Heavy",
+        fontSize: FONT_SIZES.p4,
+        letterSpacing: FONT_SIZES.p4 * 0.05,
+        color: COLORS.white,
+        textAlign: "center"
+    },
+    model: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p4 * 0.95,
+        letterSpacing: FONT_SIZES.p4 * 0.95 * 0.05,
+        color: COLORS.gray1,
+        textAlign: "center"
     }
 });
 

@@ -7,13 +7,14 @@ import Animated, {
     withSpring,
     withTiming
 } from "react-native-reanimated";
-import { Dimensions, Keyboard, LayoutChangeEvent, StyleSheet, ViewStyle } from "react-native";
+import { Dimensions, Keyboard, LayoutChangeEvent, StyleSheet } from "react-native";
 import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../../constants/index.ts";
 import { Overlay } from "../overlay/Overlay.tsx";
 import { Portal } from "@gorhom/portal";
 import { scheduleOnRN } from "react-native-worklets";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { widthPercentageToDP } from "react-native-responsive-screen";
+import { ViewStyle } from "../../types/index.ts";
 
 type PopupViewProps = {
     opened: SharedValue<boolean>
