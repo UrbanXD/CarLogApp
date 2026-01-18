@@ -4,7 +4,6 @@ export abstract class AbstractMapper<Entity, Dto, SelectEntity = Entity> {
     abstract toEntity(dto: Dto): Entity;
 
     toDtoArray(entities: Array<SelectEntity>): Array<Dto> {
-        console.log(entities.length);
         return entities.map(entity => this.toDto(entity));
     }
 
