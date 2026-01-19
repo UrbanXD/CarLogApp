@@ -2,38 +2,40 @@ import { OrderByDirectionExpression, SelectQueryBuilder, SqlBool } from "kysely"
 import { addOrder } from "./addOrder.ts";
 import { getCursorOperator } from "./getCursorOperation.ts";
 import { sql } from "@powersync/kysely-driver";
-import { CursorDirection, CursorOptions, CursorValue } from "../CursorPaginator.ts";
-import { DatabaseType } from "../../connector/powersync/AppSchema.ts";
+import { CursorDirection, CursorOptions, CursorValue } from "../hooks/useInfiniteQuery.ts";
+import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 
 export function addCursor<TableItem>(
-    table: keyof DatabaseType,
+    table: keyof DatabaseType | string | undefined,
     query: SelectQueryBuilder<DatabaseType, any, TableItem>,
     cursorOptions: CursorOptions<keyof TableItem>,
     value: CursorValue<TableItem> | Array<CursorValue<TableItem>> | null,
-    direction: CursorDirection
+    direction: CursorDirection,
+    shouldOrder: boolean = true
 ): SelectQueryBuilder<DatabaseType, any, TableItem> {
     const cursors = Array.isArray(cursorOptions.cursor) ? cursorOptions.cursor : [cursorOptions.cursor];
     const cursorValues: Array<CursorValue<TableItem>> | null = value ? Array.isArray(value) ? value : [value] : null;
 
     let subQuery = query;
 
-    cursors.map((cursor) => {
-        const orderDirection: OrderByDirectionExpression = cursor.order ?? cursorOptions.defaultOrder ?? "asc"
-        ;
-        // if table name is null that means no table name need (if undefined then set default table)
-        const tableName = cursor?.table === null ? null : cursor?.table ?? table;
-        const fieldName = tableName ? `${ String(tableName) }.${ String(cursor.field) }` : String(cursor.field);
+    if(shouldOrder) {
+        cursors.map((cursor) => {
+            const orderDirection: OrderByDirectionExpression = cursor.order ?? cursorOptions.defaultOrder ?? "asc";
+            // if table name is null that means no table name need (if undefined then set default table)
+            const tableName = cursor?.table === null ? null : cursor?.table ?? table;
+            const fieldName = tableName ? `${ String(tableName) }.${ String(cursor.field) }` : String(cursor.field);
 
-        subQuery = addOrder<TableItem>(
-            subQuery,
-            {
-                field: fieldName,
-                direction: orderDirection,
-                reverse: direction === "prev",
-                toLowerCase: cursor?.toLowerCase ?? false
-            }
-        );
-    });
+            subQuery = addOrder<TableItem>(
+                subQuery,
+                {
+                    field: fieldName,
+                    direction: orderDirection,
+                    reverse: direction === "prev",
+                    toLowerCase: cursor?.toLowerCase ?? false
+                }
+            );
+        });
+    }
 
     if(direction === "initial" || !cursorValues || cursorValues.length === 0) return subQuery;
 

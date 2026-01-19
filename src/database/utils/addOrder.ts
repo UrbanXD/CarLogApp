@@ -1,6 +1,6 @@
 import { OrderByDirectionExpression, RawBuilder, SelectQueryBuilder } from "kysely";
 import { sql } from "@powersync/kysely-driver";
-import { DatabaseType } from "../../connector/powersync/AppSchema.ts";
+import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 
 type OrderCondition<FieldName> = {
     field: string

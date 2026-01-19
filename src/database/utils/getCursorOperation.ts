@@ -1,5 +1,5 @@
 import { OrderByDirectionExpression } from "kysely";
-import { CursorDirection } from "../CursorPaginator.ts";
+import { CursorDirection } from "../hooks/useInfiniteQuery.ts";
 
 /*
  * If main order is 'desc' and cursor direction is 'next' -> '<'

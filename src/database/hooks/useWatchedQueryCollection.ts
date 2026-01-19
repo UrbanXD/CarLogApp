@@ -1,7 +1,15 @@
-import { Dao } from "../dao/Dao.ts";
+import { Dao, WatcherOptions } from "../dao/Dao.ts";
 import { useEffect, useState } from "react";
 
-export function useWatchedCollection<Dto>(dao: Dao<any, Dto, any, any>): { data: Array<Dto>, isLoading: boolean } {
+type UseWatchedCollectionResult<Dto> = {
+    data: Array<Dto>
+    isLoading: boolean
+}
+
+export function useWatchedCollection<Dto>(
+    dao: Dao<any, Dto, any, any>,
+    options?: WatcherOptions
+): UseWatchedCollectionResult<Dto> {
     const [data, setData] = useState<Dto[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -10,7 +18,7 @@ export function useWatchedCollection<Dto>(dao: Dao<any, Dto, any, any>): { data:
         const unwatch = dao.watchCollection((updatedList) => {
             setData(updatedList);
             setIsLoading(false);
-        });
+        }, options);
 
         return unwatch;
     }, [dao]);

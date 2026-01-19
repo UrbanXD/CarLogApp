@@ -5,7 +5,11 @@ import { SelectQueryBuilder } from "kysely";
 import { AbstractPowerSyncDatabase, WatchedQuery } from "@powersync/react-native";
 
 type SingleCallback<Dto> = (data: Dto) => void;
-type CollectionCallback<Dto> = (data: Array<Dto>) => void;
+type CollectionCallback<Dto> = (data: Array<Dto>) => void
+
+export type WatcherOptions = {
+    queryOnce?: boolean
+}
 
 type WatcherEntry<Dto> =
     | {
@@ -60,16 +64,12 @@ export class Dao<
     private _internalWatch(
         key: string,
         isCollection: boolean,
-        onData: any
+        onData: any,
+        watcherOptions?: WatcherOptions
     ): () => void {
-        let entry = this.activeWatchers.get(key) as WatcherEntry<Dto> | undefined;
+        const queryOnce = watcherOptions?.queryOnce ?? false;
 
-        if(entry?.timeoutId) {
-            clearTimeout(entry.timeoutId);
-            entry.timeoutId = undefined;
-        }
-
-        if(!entry) {
+        const getWatchedQuery = () => {
             const query = isCollection
                           ? this.selectQuery()
                           : this.selectQuery().where(`${ this.table }.id` as any, "=", key);
@@ -86,6 +86,46 @@ export class Dao<
                     }
                 }
             });
+
+            return watchedQuery;
+        };
+
+        let entry = this.activeWatchers.get(key) as WatcherEntry<Dto> | undefined;
+
+        if(queryOnce && entry?.lastData) {
+            setTimeout(() => onData(entry?.lastData), 0);
+            return () => {};
+        }
+
+        if(queryOnce && !entry) {
+            const watchedQuery = getWatchedQuery();
+
+            const unregister = watchedQuery.registerListener({
+                onData: (results) => {
+                    if(!results) return;
+                    const data = isCollection
+                                 ? this.mapper.toDtoArray(results as Array<SelectEntity>)
+                                 : (results.length > 0 ? this.mapper.toDto(results[0]) : null);
+                    onData(data);
+                    unregister();
+                },
+                onError: (err) => {
+                    console.error(`DAO QueryOnce Error:`, err);
+                    unregister();
+                }
+            });
+            return () => unregister();
+        }
+
+        if(queryOnce) return () => {};
+
+        if(entry?.timeoutId) {
+            clearTimeout(entry.timeoutId);
+            entry.timeoutId = undefined;
+        }
+
+        if(!entry) {
+            const watchedQuery = getWatchedQuery();
 
             const newEntry: WatcherEntry<Dto> = isCollection ? {
                 type: "collection",
@@ -152,12 +192,12 @@ export class Dao<
         };
     }
 
-    watch(id: string | number, onData: SingleCallback<Dto>): () => void {
-        return this._internalWatch(String(id), false, onData);
+    watch(id: string | number, onData: SingleCallback<Dto>, options?: WatcherOptions): () => void {
+        return this._internalWatch(String(id), false, onData, options);
     }
 
-    watchCollection(onData: CollectionCallback<Dto>): () => void {
-        return this._internalWatch(`COLLECTION_${ this.table }`, true, onData);
+    watchCollection(onData: CollectionCallback<Dto>, options?: WatcherOptions): () => void {
+        return this._internalWatch(`COLLECTION_${ this.table }`, true, onData, options);
     }
 
     async getAll(): Promise<Array<Dto>> {
