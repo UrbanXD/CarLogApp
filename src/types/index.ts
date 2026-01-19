@@ -27,3 +27,9 @@ export type SubmitHandlerArgs<FormResult extends FieldValues> = {
     onValid: SubmitHandler<FormResult>,
     onInvalid?: SubmitErrorHandler<FormResult>
 }
+
+export type WithPrefix<T, P extends string> = {
+    [K in keyof T as `${ P }_${ string & K }`]: T[K];
+};
+
+export type Nullable<T> = { [K in keyof T]: T[K] | null };

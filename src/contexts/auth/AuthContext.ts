@@ -3,6 +3,7 @@ import { SignUpRequest } from "../../features/user/schemas/form/signUpRequest.ts
 import { SignInRequest } from "../../features/user/schemas/form/signInRequest.ts";
 
 type AuthContextValue = {
+    sessionUserId: string | null
     providers: Array<string>
     hasPassword: boolean // if the user use google oauth then dont have (without identity link)
     authenticated: boolean | null
