@@ -1,5 +1,10 @@
 import { Dao } from "../../../../../../database/dao/Dao.ts";
-import { DatabaseType, OdometerLogTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
+import {
+    DatabaseType,
+    OdometerLogTableRow,
+    OdometerLogTypeTableRow,
+    OdometerUnitTableRow
+} from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
 import { OdometerLogMapper } from "../mapper/odometerLogMapper.ts";
 import { Kysely } from "@powersync/kysely-driver";
@@ -7,26 +12,34 @@ import { ODOMETER_LOG_TABLE } from "../../../../../../database/connector/powersy
 import { CursorOptions, CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
 import { PaginatorOptions } from "../../../../../../database/paginator/AbstractPaginator.ts";
 import { OdometerChangeLogFormFields } from "../../schemas/form/odometerChangeLogForm.ts";
-import { OdometerUnitDao } from "./OdometerUnitDao.ts";
 import { OdometerLogTypeDao } from "./OdometerLogTypeDao.ts";
-import { Odometer } from "../../schemas/odometerSchema.ts";
 import { FUEL_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/fuelLog.ts";
 import { ODOMETER_CHANGE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/odometerChangeLog.ts";
 import { EXPENSE_TABLE } from "../../../../../../database/connector/powersync/tables/expense.ts";
 import { SelectQueryBuilder, sql } from "kysely";
 import { OdometerLogTypeEnum } from "../enums/odometerLogTypeEnum.ts";
-import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { SERVICE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/serviceLog.ts";
 import { RIDE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/rideLog.ts";
 import { CAR_TABLE } from "../../../../../../database/connector/powersync/tables/car.ts";
 import { ODOMETER_UNIT_TABLE } from "../../../../../../database/connector/powersync/tables/odometerUnit.ts";
 import { formatDateToDatabaseFormat } from "../../../../../statistics/utils/formatDateToDatabaseFormat.ts";
+import { WithPrefix } from "../../../../../../types";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { ODOMETER_LOG_TYPE_TABLE } from "../../../../../../database/connector/powersync/tables/odometerLogType.ts";
 
-export type SelectOdometerLogTableRow = OdometerLogTableRow & {
-    note: string | null,
-    date: string | null,
-    related_id: string | null
-};
+export type SelectOdometerLogTableRow =
+    OdometerLogTableRow &
+    WithPrefix<OdometerUnitTableRow, "unit"> &
+    {
+        related_id: string | null
+        type_key: OdometerLogTypeTableRow["key"]
+        note: string | null
+        date: string | null
+    };
+
+export type SelectOdometerTableRow =
+    WithPrefix<Omit<OdometerLogTableRow, "type_id">, "log">
+    & WithPrefix<OdometerUnitTableRow, "unit">
 
 export type OdometerLimit = {
     min: { value: number, date: string } | null,
@@ -35,86 +48,58 @@ export type OdometerLimit = {
 }
 
 export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, OdometerLogMapper, SelectOdometerLogTableRow> {
-    constructor(db: Kysely<DatabaseType>, odometerUnitDao: OdometerUnitDao, odometerLogTypeDao: OdometerLogTypeDao) {
-        super(db, ODOMETER_LOG_TABLE, new OdometerLogMapper(odometerUnitDao, odometerLogTypeDao));
+    constructor(
+        db: Kysely<DatabaseType>,
+        powersync: AbstractPowerSyncDatabase,
+        odometerLogTypeDao: OdometerLogTypeDao
+    ) {
+        super(db, powersync, ODOMETER_LOG_TABLE, new OdometerLogMapper(odometerLogTypeDao));
     }
 
-    selectQuery(): SelectQueryBuilder<DatabaseType, any, SelectOdometerLogTableRow> {
-        return this.db
-        .selectFrom(ODOMETER_LOG_TABLE)
-        .leftJoin(
-            ODOMETER_CHANGE_LOG_TABLE,
-            `${ ODOMETER_CHANGE_LOG_TABLE }.odometer_log_id`,
-            `${ ODOMETER_LOG_TABLE }.id`
-        )
-        .leftJoin(FUEL_LOG_TABLE, `${ FUEL_LOG_TABLE }.odometer_log_id`, `${ ODOMETER_LOG_TABLE }.id`)
-        .leftJoin(SERVICE_LOG_TABLE, `${ SERVICE_LOG_TABLE }.odometer_log_id`, `${ ODOMETER_LOG_TABLE }.id`)
-        .leftJoin(`${ RIDE_LOG_TABLE } as rl1` as const, "rl1.start_odometer_log_id", `${ ODOMETER_LOG_TABLE }.id`)
-        .leftJoin(`${ RIDE_LOG_TABLE } as rl2` as const, "rl2.end_odometer_log_id", `${ ODOMETER_LOG_TABLE }.id`)
-        .leftJoin(`${ EXPENSE_TABLE } as e1` as const, "e1.id", `${ FUEL_LOG_TABLE }.expense_id`)
-        .leftJoin(`${ EXPENSE_TABLE } as e2` as const, "e2.id", `${ SERVICE_LOG_TABLE }.expense_id`)
+    selectQuery(id?: any | null): SelectQueryBuilder<DatabaseType, any, SelectOdometerLogTableRow> {
+        let query = this.db
+        .selectFrom(`${ ODOMETER_LOG_TABLE } as ol` as const)
+        .innerJoin(`${ ODOMETER_LOG_TYPE_TABLE } as ot` as const, "ot.id", "ol.type_id")
+        .innerJoin(`${ CAR_TABLE } as c` as const, "c.id", "ol.car_id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as u` as const, "u.id", "c.odometer_unit_id")
+        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as ocl` as const, "ocl.odometer_log_id", "ol.id")
+        .leftJoin(`${ FUEL_LOG_TABLE } as fl` as const, "fl.odometer_log_id", "ol.id")
+        .leftJoin(`${ SERVICE_LOG_TABLE } as sl` as const, "sl.odometer_log_id", "ol.id")
+        .leftJoin(`${ RIDE_LOG_TABLE } as rl1` as const, "rl1.start_odometer_log_id", "ol.id")
+        .leftJoin(`${ RIDE_LOG_TABLE } as rl2` as const, "rl2.end_odometer_log_id", "ol.id")
+        .leftJoin(`${ EXPENSE_TABLE } as e1` as const, "e1.id", "fl.expense_id")
+        .leftJoin(`${ EXPENSE_TABLE } as e2` as const, "e2.id", "sl.expense_id")
+        .selectAll("ol")
         .select((eb) => [
-            `${ ODOMETER_LOG_TABLE }.id`,
-            `${ ODOMETER_LOG_TABLE }.car_id`,
-            `${ ODOMETER_LOG_TABLE }.value`,
-            `${ ODOMETER_LOG_TABLE }.type_id`,
-            eb => eb.fn.coalesce(
+            "ot.key as type_key",
+            "u.id as unit_id",
+            "u.key as unit_key",
+            "u.short as unit_short",
+            "u.conversion_factor as unit_conversion_factor",
+            eb.fn.coalesce(
                 "e1.date",
                 "e2.date",
-                `${ ODOMETER_CHANGE_LOG_TABLE }.date`,
+                "ocl.date",
                 "rl1.start_time",
-                eb.fn.coalesce("rl2.end_time", eb.val("1970-01-01")) // kysely coalasce only accept 5 arg max
-            ).as("date"),
-            eb => eb.fn.coalesce(
+                eb.fn.coalesce("rl2.end_time", eb.val("1970-01-01"))
+            ).$castTo<string>().as("date"),
+            eb.fn.coalesce(
                 "e1.note",
                 "e2.note",
-                `${ ODOMETER_CHANGE_LOG_TABLE }.note`
-            ).as("note"),
-            eb => eb.fn.coalesce(
-                `${ FUEL_LOG_TABLE }.id`,
-                `${ ODOMETER_CHANGE_LOG_TABLE }.id`,
-                `${ SERVICE_LOG_TABLE }.id`,
+                "ocl.note"
+            ).$castTo<string | null>().as("note"),
+            eb.fn.coalesce(
+                "fl.id",
+                "ocl.id",
+                "sl.id",
                 "rl1.id",
                 "rl2.id"
-            ).as("related_id")
+            ).$castTo<string | null>().as("related_id")
         ]);
-    }
 
-    async getOdometerByCarId(carId: string): Promise<Odometer> {
-        const result = await this.db
-        .selectFrom(ODOMETER_LOG_TABLE)
-        .selectAll()
-        .where("car_id", "=", carId)
-        .orderBy("value", "desc")
-        .limit(1)
-        .executeTakeFirst();
+        if(id) query = query.where("ol.id", "=", id);
 
-        const defaultOdometer: OdometerLogTableRow = { // when no odometer found fallback to 0
-            id: getUUID(),
-            car_id: carId,
-            type_id: OdometerLogTypeEnum.SIMPLE,
-            value: 0
-        };
-
-        return await this.mapper.toOdometerDto(result ?? defaultOdometer);
-    }
-
-    async getOdometerByLogId(logId: string, fallbackCarId: string): Promise<Odometer> {
-        const entity = await this.db
-        .selectFrom(ODOMETER_LOG_TABLE)
-        .selectAll()
-        .where("id", "=", logId)
-        .orderBy("value", "desc")
-        .executeTakeFirst();
-
-        const defaultOdometer: OdometerLogTableRow = { // when no odometer found fallback to 0
-            id: getUUID(),
-            car_id: fallbackCarId,
-            type_id: OdometerLogTypeEnum.SIMPLE,
-            value: 0
-        };
-
-        return await this.mapper.toOdometerDto(entity ?? defaultOdometer);
+        return query;
     }
 
     async getOdometerLimitByDate(

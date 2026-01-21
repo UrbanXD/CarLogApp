@@ -2,14 +2,14 @@ import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts
 import { ServiceTypeTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { ServiceType, serviceTypeSchema } from "../../schemas/serviceTypeSchema.ts";
 import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
-import { SERVICE_COLORS, SERVICE_ICONS } from "../../../../../../constants/index.ts";
+import { SERVICE_COLORS, SERVICE_ICONS } from "../../../../../../constants";
 
 export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, ServiceType> {
     constructor() {
         super();
     }
 
-    async toDto(entity: ServiceTypeTableRow): Promise<ServiceType> {
+    toDto(entity: ServiceTypeTableRow): ServiceType {
         const isServiceIconsKey = (key: unknown): key is keyof typeof SERVICE_ICONS => {
             return typeof key === "string" && key in SERVICE_ICONS;
         };
@@ -32,7 +32,7 @@ export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, Servi
         });
     }
 
-    async toEntity(dto: ServiceType): Promise<ServiceTypeTableRow> {
+    toEntity(dto: ServiceType): ServiceTypeTableRow {
         return {
             id: dto.id,
             key: dto.key,

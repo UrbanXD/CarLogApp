@@ -8,14 +8,14 @@ export class MakeMapper extends AbstractMapper<MakeTableRow, Make> {
         super();
     }
 
-    async toDto(entity: MakeTableRow): Promise<Make> {
+    toDto(entity: MakeTableRow): Make {
         return makeSchema.parse({
             id: entity.id,
             name: entity.name
         });
     }
 
-    async toEntity(dto: Make): Promise<MakeTableRow> {
+    toEntity(dto: Make): MakeTableRow {
         return {
             id: dto.id,
             name: dto.name

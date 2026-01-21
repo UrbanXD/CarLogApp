@@ -7,37 +7,54 @@ import { ExpenseMapper, SelectExpenseTableRow } from "../mapper/expenseMapper.ts
 import { CursorOptions, CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
 import { PaginatorOptions } from "../../../../database/paginator/AbstractPaginator.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
-import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
 import { ExpenseFormFields } from "../../schemas/form/expenseForm.ts";
 import { SelectQueryBuilder } from "kysely";
 import { FUEL_LOG_TABLE } from "../../../../database/connector/powersync/tables/fuelLog.ts";
 import { SERVICE_LOG_TABLE } from "../../../../database/connector/powersync/tables/serviceLog.ts";
 import { CAR_TABLE } from "../../../../database/connector/powersync/tables/car.ts";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { EXPENSE_TYPE_TABLE } from "../../../../database/connector/powersync/tables/expenseType.ts";
+import { CURRENCY_TABLE } from "../../../../database/connector/powersync/tables/currency.ts";
 
 export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, SelectExpenseTableRow> {
     constructor(
         db: Kysely<DatabaseType>,
-        expenseTypeDao: ExpenseTypeDao,
-        currencyDao: CurrencyDao
+        powersync: AbstractPowerSyncDatabase,
+        expenseTypeDao: ExpenseTypeDao
     ) {
         super(
             db,
+            powersync,
             EXPENSE_TABLE,
-            new ExpenseMapper(expenseTypeDao, currencyDao)
+            new ExpenseMapper(expenseTypeDao)
         );
     }
 
-    selectQuery(): SelectQueryBuilder<DatabaseType, any, SelectExpenseTableRow> {
-        return this.db
-        .selectFrom(EXPENSE_TABLE)
-        .innerJoin(CAR_TABLE, `${ CAR_TABLE }.id`, `${ EXPENSE_TABLE }.car_id`)
-        .leftJoin(FUEL_LOG_TABLE, `${ FUEL_LOG_TABLE }.expense_id`, `${ EXPENSE_TABLE }.id`)
-        .leftJoin(SERVICE_LOG_TABLE, `${ SERVICE_LOG_TABLE }.expense_id`, `${ EXPENSE_TABLE }.id`)
-        .selectAll(EXPENSE_TABLE)
+    selectQuery(id?: any | null): SelectQueryBuilder<DatabaseType, any, SelectExpenseTableRow> {
+        let query = this.db
+        .selectFrom(`${ EXPENSE_TABLE } as expense` as const)
+        .innerJoin(`${ CAR_TABLE } as car` as const, `car.id`, `expense.car_id`)
+        .leftJoin(`${ FUEL_LOG_TABLE } as fuel` as const, `fuel.expense_id`, `expense.id`)
+        .leftJoin(`${ SERVICE_LOG_TABLE } as service` as const, `service.expense_id`, `expense.id`)
+        .innerJoin(`${ EXPENSE_TYPE_TABLE } as type` as const, `type.id`, `expense.type_id`)
+        .innerJoin(`${ CURRENCY_TABLE } as car_curr` as const, `car_curr.id`, `car.currency_id`)
+        .innerJoin(`${ CURRENCY_TABLE } as exp_curr` as const, `exp_curr.id`, `expense.currency_id`)
+        .selectAll("expense")
         .select([
-            eb => eb.fn.coalesce(`${ FUEL_LOG_TABLE }.id`, `${ SERVICE_LOG_TABLE }.id`).as("related_id"),
-            `${ CAR_TABLE }.currency_id as car_currency_id`
-        ]);
+            eb => eb.fn.coalesce("fuel.id", "service.id").as("related_id"),
+            "car.currency_id as car_currency_id",
+            "car_curr.key as car_currency_key",
+            "car_curr.symbol as car_currency_symbol",
+            "exp_curr.key as currency_key",
+            "exp_curr.symbol as currency_symbol",
+            "type.id as type_id",
+            "type.owner_id as type_owner_id",
+            "type.key as type_key"
+        ]).$castTo<SelectExpenseTableRow>();
+
+        if(id) query = query.where("expense.id", "=", id);
+
+        return query;
     }
 
     async getLatestExpenses(carId: string, count: number = 3): Promise<Array<Expense>> {
@@ -48,17 +65,17 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
             .limit(count).execute()
         );
 
-        return await this.mapper.toDtoArray(result);
+        return this.mapper.toDtoArray(result);
     }
 
-    async create(formResult: ExpenseFormFields, safe?: boolean): Promise<Expense | null> {
+    async createFromFormResult(formResult: ExpenseFormFields) {
         const expenseEntity = this.mapper.formResultToEntity(formResult);
-        return await super.create(expenseEntity, safe);
+        return await super.create(expenseEntity);
     }
 
-    async update(formResult: ExpenseFormFields, safe?: boolean): Promise<Expense | null> {
+    async updateFromFormResult(formResult: ExpenseFormFields) {
         const expenseEntity = this.mapper.formResultToEntity(formResult);
-        return await super.update(expenseEntity, safe);
+        return await super.update(expenseEntity);
     }
 
     paginator(

@@ -10,10 +10,11 @@ import { SERVICE_ITEM_TYPE_TABLE } from "../../../../../../database/connector/po
 import { Kysely } from "@powersync/kysely-driver";
 import { CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
 import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
 
 export class ServiceItemTypeDao extends Dao<ServiceItemTypeTableRow, ServiceItemType, ServiceItemTypeMapper> {
-    constructor(db: Kysely<DatabaseType>) {
-        super(db, SERVICE_ITEM_TYPE_TABLE, new ServiceItemTypeMapper());
+    constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
+        super(db, powersync, SERVICE_ITEM_TYPE_TABLE, new ServiceItemTypeMapper());
     }
 
     async getIdByKey(key: string, safe: boolean = true): Promise<string | null> {

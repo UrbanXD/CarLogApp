@@ -1,21 +1,54 @@
-import { Kysely } from "@powersync/kysely-driver";
-import { DatabaseType, UserTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
+import { Kysely, sql } from "@powersync/kysely-driver";
+import { CurrencyTableRow, DatabaseType, UserTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
 import { USER_TABLE } from "../../../../database/connector/powersync/tables/user.ts";
 import { UserMapper } from "../mapper/userMapper.ts";
 import { UserAccount } from "../../schemas/userSchema.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
-import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { EditUserAvatarRequest } from "../../schemas/form/editUserAvatarRequest.ts";
-import { AVATAR_COLOR } from "../../../../constants/index.ts";
+import { AVATAR_COLOR } from "../../../../constants";
 import { EditUserInformationRequest } from "../../schemas/form/editUserInformation.ts";
+import { SelectQueryBuilder } from "kysely";
+import { getUserLocalCurrency } from "../../../_shared/currency/utils/getUserLocalCurrency.ts";
+import { CURRENCY_TABLE } from "../../../../database/connector/powersync/tables/currency.ts";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { WithPrefix } from "../../../../types";
 
-export class UserDao extends Dao<UserTableRow, UserAccount, UserMapper> {
+export type SelectUserTableRow = UserTableRow & WithPrefix<Omit<CurrencyTableRow, "id">, "currency">;
+
+export class UserDao extends Dao<UserTableRow, UserAccount, UserMapper, SelectUserTableRow> {
     private readonly attachmentQueue?: PhotoAttachmentQueue;
 
-    constructor(db: Kysely<DatabaseType>, currencyDao: CurrencyDao, attachmentQueue?: PhotoAttachmentQueue) {
-        super(db, USER_TABLE, new UserMapper(currencyDao, attachmentQueue));
+    constructor(
+        db: Kysely<DatabaseType>,
+        powersync: AbstractPowerSyncDatabase,
+        attachmentQueue?: PhotoAttachmentQueue
+    ) {
+        super(db, powersync, USER_TABLE, new UserMapper());
         this.attachmentQueue = attachmentQueue;
+    }
+
+    selectQuery(id?: any | null): SelectQueryBuilder<DatabaseType, any, SelectUserTableRow> {
+        let query = this.db
+        .selectFrom(`${ USER_TABLE } as u` as const)
+        .innerJoin(`${ CURRENCY_TABLE } as curr` as const, (join) =>
+            join.on(
+                (eb) => eb.fn("coalesce", [
+                    eb.ref(`u.currency_id`),
+                    eb.val(getUserLocalCurrency())
+                ]),
+                "=",
+                sql.ref(`curr.id`)
+            ))
+        .selectAll("u")
+        .select([
+            "curr.key as currency_key",
+            "curr.symbol as currency_symbol"
+        ]);
+
+        if(id) query = query.where("u.id", "=", id);
+
+        return query;
     }
 
     async getPreviousAvatarImagePath(id: string): Promise<string | null> {
@@ -28,17 +61,13 @@ export class UserDao extends Dao<UserTableRow, UserAccount, UserMapper> {
         return result?.avatar_url ?? null;
     }
 
-    async update(user: UserAccount, safe?: boolean): Promise<UserAccount | null> {
-        const entity = await this.mapper.toEntity(user);
-        return super.update(entity, safe);
-    }
-
     async updateUserInformation(userId: string, request: EditUserInformationRequest): Promise<void> {
         const user: Partial<UserTableRow> = {
             firstname: request.firstname,
             lastname: request.lastname,
             currency_id: request.currencyId
         };
+
         await this.db
         .updateTable(USER_TABLE)
         .set(user)
@@ -79,7 +108,8 @@ export class UserDao extends Dao<UserTableRow, UserAccount, UserMapper> {
         .executeTakeFirst();
     }
 
-    async delete(id: string, safe: boolean = true): Promise<string | number | null> {
+
+    async delete(id: string | number | null): Promise<UserTableRow["id"]> {
         try {
             const user = await this.getById(id);
 
@@ -90,6 +120,6 @@ export class UserDao extends Dao<UserTableRow, UserAccount, UserMapper> {
             console.log("User image cannot be deleted: ", e);
         }
 
-        return super.delete(id, safe);
+        return super.delete(id);
     }
 }

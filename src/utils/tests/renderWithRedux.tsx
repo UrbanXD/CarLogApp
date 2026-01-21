@@ -1,8 +1,7 @@
-import { RootState } from "../../database/redux/index.ts";
+import { RootState } from "../../database/redux";
 import { configureStore } from "@reduxjs/toolkit";
-import { alertReducer } from "../../ui/alert/model/slice/index.ts";
-import { carsReducer } from "../../features/car/model/slice/index.ts";
-import { userReducer } from "../../features/user/model/slice/index.ts";
+import { alertReducer } from "../../ui/alert/model/slice";
+import { carsReducer } from "../../features/car/model/slice";
 import { render } from "@testing-library/react-native";
 import { ReactNode } from "react";
 import { Provider } from "react-redux";
@@ -14,22 +13,14 @@ const setupStore = (preloadedState?: Partial<RootState>) => {
             toasts: [],
             modal: null
         },
-        user: {
-            user: null,
-            loading: false
-        },
         cars: {
-            cars: [],
-            selectedCar: null,
-            loading: false,
-            loadError: false
+            selectedCarId: null
         },
         ...preloadedState
     };
 
     return configureStore({
         reducer: {
-            user: userReducer,
             cars: carsReducer,
             alert: alertReducer
         },

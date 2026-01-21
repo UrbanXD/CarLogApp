@@ -6,10 +6,11 @@ import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make
 import { CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
 
 export class MakeDao extends Dao<MakeTableRow, Make, MakeMapper> {
-    constructor(db: Kysely<DatabaseType>) {
-        super(db, MAKE_TABLE, new MakeMapper());
+    constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
+        super(db, powersync, MAKE_TABLE, new MakeMapper());
     }
 
     paginator(perPage: number = 50): CursorPaginator<MakeTableRow, PickerItemType> {

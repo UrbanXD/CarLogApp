@@ -2,7 +2,7 @@ import { ExpenseTypeTableRow } from "../../../../database/connector/powersync/Ap
 import { ExpenseType, expenseTypeSchema } from "../../schemas/expenseTypeSchema.ts";
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
 import { ExpenseTypeEnum } from "../enums/ExpenseTypeEnum.ts";
-import { COLORS, ICON_NAMES } from "../../../../constants/index.ts";
+import { COLORS, ICON_NAMES } from "../../../../constants";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 
 export class ExpenseTypeMapper extends AbstractMapper<ExpenseTypeTableRow, ExpenseType> {
@@ -10,7 +10,7 @@ export class ExpenseTypeMapper extends AbstractMapper<ExpenseTypeTableRow, Expen
         super();
     }
 
-    async toDto(entity: ExpenseTypeTableRow): Promise<ExpenseType> {
+    toDto(entity: ExpenseTypeTableRow): ExpenseType {
         let icon = null;
         let primaryColor = COLORS.gray2;
         let secondaryColor = null;
@@ -60,7 +60,7 @@ export class ExpenseTypeMapper extends AbstractMapper<ExpenseTypeTableRow, Expen
         });
     }
 
-    async toEntity(dto: ExpenseType): Promise<ExpenseTypeTableRow> {
+    toEntity(dto: ExpenseType): ExpenseTypeTableRow {
         return {
             id: dto.id,
             key: dto.key,

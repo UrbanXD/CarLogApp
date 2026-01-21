@@ -1,55 +1,66 @@
-import { CarTableRow, ExpenseTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
+import {
+    CurrencyTableRow,
+    ExpenseTableRow,
+    ExpenseTypeTableRow
+} from "../../../../database/connector/powersync/AppSchema.ts";
 import { ExpenseTypeDao } from "../dao/ExpenseTypeDao.ts";
 import { Expense, expenseSchema } from "../../schemas/expenseSchema.ts";
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
-import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
 import { ExpenseFormFields } from "../../schemas/form/expenseForm.ts";
-import { ExpenseType } from "../../schemas/expenseTypeSchema.ts";
-import { Currency } from "../../../_shared/currency/schemas/currencySchema.ts";
+import { currencySchema } from "../../../_shared/currency/schemas/currencySchema.ts";
 import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
 import { amountSchema } from "../../../_shared/currency/schemas/amountSchema.ts";
+import { WithPrefix } from "../../../../types";
 
-export type SelectExpenseTableRow = ExpenseTableRow & {
-    related_id: string | null,
-    car_currency_id: CarTableRow["currency_id"]
-}
+export type SelectAmountCurrencyTableRow =
+    WithPrefix<CurrencyTableRow, "currency"> &
+    WithPrefix<CurrencyTableRow, "car_currency">;
+
+export type SelectExpenseTableRow =
+    ExpenseTableRow &
+    Omit<SelectAmountCurrencyTableRow, "currency_id"> &
+    WithPrefix<ExpenseTypeTableRow, "type"> &
+    { related_id: string | null }
 
 export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, SelectExpenseTableRow> {
     private readonly expenseTypeDao: ExpenseTypeDao;
-    private readonly currencyDao: CurrencyDao;
 
-    constructor(expenseTypeDao: ExpenseTypeDao, currencyDao: CurrencyDao) {
+    constructor(expenseTypeDao: ExpenseTypeDao) {
         super();
         this.expenseTypeDao = expenseTypeDao;
-        this.currencyDao = currencyDao;
     }
 
-    async toDto(entity: SelectExpenseTableRow): Promise<Expense> {
-        const [type, carCurrency, currency]: [ExpenseType | null, Currency | null, Currency | null] = await Promise.all(
-            [
-                this.expenseTypeDao.getById(entity.type_id),
-                this.currencyDao.getById(entity.car_currency_id),
-                this.currencyDao.getById(entity.currency_id)
-            ]);
-
+    toDto(entity: SelectExpenseTableRow): Expense {
         return expenseSchema.parse({
             id: entity.id,
             carId: entity.car_id,
             relatedId: entity?.related_id ?? null,
-            type: type,
+            type: this.expenseTypeDao.mapper.toDto({
+                id: entity.type_id,
+                owner_id: entity.type_owner_id,
+                key: entity.type_key
+            }),
             amount: amountSchema.parse({
                 amount: numberToFractionDigit(entity.original_amount ?? 0),
                 exchangedAmount: numberToFractionDigit((entity.original_amount ?? 0) * (entity.exchange_rate ?? 0)),
                 exchangeRate: numberToFractionDigit(entity.exchange_rate ?? 0),
-                currency: currency,
-                exchangeCurrency: carCurrency
+                currency: currencySchema.parse({
+                    id: entity.currency_id,
+                    key: entity.currency_key,
+                    symbol: entity.currency_symbol
+                }),
+                exchangeCurrency: currencySchema.parse({
+                    id: entity.car_currency_id,
+                    key: entity.car_currency_key,
+                    symbol: entity.car_currency_symbol
+                })
             }),
             note: entity.note,
             date: entity.date
         });
     }
 
-    async toEntity(dto: Expense): Promise<ExpenseTableRow> {
+    toEntity(dto: Expense): ExpenseTableRow {
         return {
             id: dto.id,
             car_id: dto.carId,

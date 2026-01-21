@@ -10,60 +10,64 @@ import {
 import { OdometerLogDao } from "../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
 import { OdometerUnitDao } from "../../../car/_features/odometer/model/dao/OdometerUnitDao.ts";
 import { CarDao } from "../../../car/model/dao/CarDao.ts";
-import { Odometer } from "../../../car/_features/odometer/schemas/odometerSchema.ts";
 import { RideLog, rideLogSchema } from "../../schemas/rideLogSchema.ts";
-import { RidePassengerDao } from "../../_features/passenger/model/dao/ridePassengerDao.ts";
-import { RidePlaceDao } from "../../_features/place/model/dao/ridePlaceDao.ts";
-import { RideExpenseDao } from "../../_features/rideExpense/model/dao/rideExpenseDao.ts";
-import { RideExpense } from "../../_features/rideExpense/schemas/rideExpenseSchema.ts";
-import { RidePlace } from "../../_features/place/schemas/ridePlaceSchema.ts";
-import { RidePassenger } from "../../_features/passenger/schemas/ridePassengerSchema.ts";
 import { RideLogFormFields } from "../../schemas/form/rideLogForm.ts";
 import { OdometerLogTypeEnum } from "../../../car/_features/odometer/model/enums/odometerLogTypeEnum.ts";
 import { convertOdometerValueToKilometer } from "../../../car/_features/odometer/utils/convertOdometerUnit.ts";
 import { OdometerUnit } from "../../../car/_features/odometer/schemas/odometerUnitSchema.ts";
+import { SelectRideLogTableRow } from "../dao/rideLogDao.ts";
+import { RideExpenseMapper } from "../../_features/rideExpense/model/mapper/rideExpenseMapper.ts";
+import { RidePlaceMapper } from "../../_features/place/model/mapper/ridePlaceMapper.ts";
+import { RidePassengerMapper } from "../../_features/passenger/model/mapper/ridePassengerMapper.ts";
 
 export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
-    private readonly rideExpenseDao: RideExpenseDao;
-    private readonly ridePlaceDao: RidePlaceDao;
-    private readonly ridePassengerDao: RidePassengerDao;
+    private readonly rideExpenseMapper: RideExpenseMapper;
+    private readonly ridePlaceMapper: RidePlaceMapper;
+    private readonly ridePassengerMapper: RidePassengerMapper;
     private readonly odometerLogDao: OdometerLogDao;
     private readonly odometerUnitDao: OdometerUnitDao;
     private readonly carDao: CarDao;
 
     constructor(
-        rideExpenseDao: RideExpenseDao,
-        ridePlaceDao: RidePlaceDao,
-        ridePassengerDao: RidePassengerDao,
+        rideExpenseMapper: RideExpenseMapper,
+        ridePlaceMapper: RidePlaceMapper,
+        ridePassengerMapper: RidePassengerMapper,
         odometerLogDao: OdometerLogDao,
         odometerUnitDao: OdometerUnitDao,
         carDao: CarDao
     ) {
         super();
 
-        this.rideExpenseDao = rideExpenseDao;
-        this.ridePlaceDao = ridePlaceDao;
-        this.ridePassengerDao = ridePassengerDao;
+        this.rideExpenseMapper = rideExpenseMapper;
+        this.ridePlaceMapper = ridePlaceMapper;
+        this.ridePassengerMapper = ridePassengerMapper;
         this.odometerLogDao = odometerLogDao;
         this.odometerUnitDao = odometerUnitDao;
         this.carDao = carDao;
     }
 
-    async toDto(entity: RideLogTableRow): Promise<RideLog> {
-        const [rideExpenses, ridePlaces, ridePassengers, startOdometer, endOdometer]: [Array<RideExpense>, Array<RidePlace>, Array<RidePassenger>, Odometer | null, Odometer | null] = await Promise.all(
-            [
-                (async () => this.rideExpenseDao.getAllByRideLogId(entity.id))(),
-                (async () => this.ridePlaceDao.getAllByRideLogId(entity.id))(),
-                (async () => this.ridePassengerDao.getAllByRideLogId(entity.id))(),
-                (async () => {
-                    if(!entity.start_odometer_log_id || !entity.car_id) return null;
-                    return this.odometerLogDao.getOdometerByLogId(entity.start_odometer_log_id, entity.car_id);
-                })(),
-                (async () => {
-                    if(!entity.end_odometer_log_id || !entity.car_id) return null;
-                    return this.odometerLogDao.getOdometerByLogId(entity.end_odometer_log_id, entity.car_id);
-                })()
-            ]);
+    toDto(entity: SelectRideLogTableRow): RideLog {
+        const rideExpenses = this.rideExpenseMapper.toDtoArray(entity.expenses);
+        const ridePlaces = this.ridePlaceMapper.toDtoArray(entity.places);
+        const ridePassengers = this.ridePassengerMapper.toDtoArray(entity.passengers);
+        const startOdometer = this.odometerLogDao.mapper.toOdometerDto({
+            log_id: entity.start_odometer_log_id,
+            log_car_id: entity.car_id,
+            log_value: entity.start_odometer_log_value,
+            unit_id: entity.odometer_unit_id,
+            unit_key: entity.odometer_unit_key,
+            unit_short: entity.odometer_unit_short,
+            unit_conversion_factor: entity.odometer_unit_conversion_factor
+        });
+        const endOdometer = this.odometerLogDao.mapper.toOdometerDto({
+            log_id: entity.end_odometer_log_id,
+            log_car_id: entity.car_id,
+            log_value: entity.end_odometer_log_value,
+            unit_id: entity.odometer_unit_id,
+            unit_key: entity.odometer_unit_key,
+            unit_short: entity.odometer_unit_short,
+            unit_conversion_factor: entity.odometer_unit_conversion_factor
+        });
 
         return rideLogSchema.parse({
             id: entity.id,
@@ -79,7 +83,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         });
     }
 
-    async toEntity(dto: RideLog): Promise<RideLogTableRow> {
+    toEntity(dto: RideLog): RideLogTableRow {
         return {
             id: dto.id,
             car_id: dto.carId,

@@ -6,54 +6,89 @@ import {
 } from "../../../../database/connector/powersync/AppSchema.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 import { Car, carSchema } from "../../schemas/carSchema.ts";
-import { MakeDao } from "../dao/MakeDao.ts";
-import { ModelDao } from "../dao/ModelDao.ts";
-import { FuelTankDao } from "../../_features/fuel/model/dao/FuelTankDao.ts";
 import { CarFormFields } from "../../schemas/form/carForm.ts";
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
-import { OdometerLogDao } from "../../_features/odometer/model/dao/OdometerLogDao.ts";
-import { OdometerUnitDao } from "../../_features/odometer/model/dao/OdometerUnitDao.ts";
-import { convertOdometerValueToKilometer } from "../../_features/odometer/utils/convertOdometerUnit.ts";
+import {
+    convertOdometerValueFromKilometer,
+    convertOdometerValueToKilometer
+} from "../../_features/odometer/utils/convertOdometerUnit.ts";
 import { OdometerLogTypeEnum } from "../../_features/odometer/model/enums/odometerLogTypeEnum.ts";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
-import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
+import { SelectCarTableRow } from "../dao/CarDao.ts";
+import { carModelSchema } from "../../schemas/carModelSchema.ts";
+import { makeSchema } from "../../schemas/makeSchema.ts";
+import { odometerSchema } from "../../_features/odometer/schemas/odometerSchema.ts";
+import { odometerUnitSchema } from "../../_features/odometer/schemas/odometerUnitSchema.ts";
+import { currencySchema } from "../../../_shared/currency/schemas/currencySchema.ts";
+import { fuelTankSchema } from "../../_features/fuel/schemas/fuelTankSchema.ts";
+import { fuelTypeSchema } from "../../_features/fuel/schemas/fuelTypeSchema.ts";
+import { fuelUnitSchema } from "../../_features/fuel/schemas/fuelUnitSchema.ts";
+import { OdometerUnitDao } from "../../_features/odometer/model/dao/OdometerUnitDao.ts";
 
-export class CarMapper extends AbstractMapper<CarTableRow, Car> {
+export class CarMapper extends AbstractMapper<CarTableRow, Car, SelectCarTableRow> {
     constructor(
-        private readonly makeDao: MakeDao,
-        private readonly modelDao: ModelDao,
-        private readonly odometerLogDao: OdometerLogDao,
-        private readonly odometerUnitDao: OdometerUnitDao,
-        private readonly fuelTankDao: FuelTankDao,
-        private readonly currencyDao: CurrencyDao,
-        private readonly attachmentQueue?: PhotoAttachmentQueue
+        private readonly attachmentQueue: PhotoAttachmentQueue | undefined,
+        private readonly odometerUnitDao: OdometerUnitDao
     ) {
         super();
     }
 
-    async toDto(entity: CarTableRow): Promise<Car> {
-        const model = await this.modelDao.getById(entity.model_id);
-        const carModel = model ? await this.modelDao.mapper.toCarModelDto(model, entity.model_year!) : null;
-
-        const fuelTank = await this.fuelTankDao.getByCarId(entity.id);
-        const odometer = await this.odometerLogDao.getOdometerByCarId(entity.id);
-
-        const currency = await this.currencyDao.getById(entity.currency_id);
-
+    toDto(entity: SelectCarTableRow): Car {
         return carSchema.parse({
             id: entity.id,
             ownerId: entity.owner_id,
             name: entity.name,
-            model: carModel,
-            odometer,
-            currency,
-            fuelTank,
+            model: carModelSchema.parse({
+                id: entity.model_id,
+                name: entity.model_name,
+                make: makeSchema.parse({
+                    id: entity.make_id,
+                    name: entity.make_name
+                }),
+                year: entity.model_year
+            }),
+            odometer: odometerSchema.parse({
+                id: entity.odometer_log_id,
+                carId: entity.id,
+                valueInKm: entity.odometer_log_value,
+                value: convertOdometerValueFromKilometer(
+                    entity.odometer_log_value!,
+                    entity.odometer_unit_conversion_factor!
+                ),
+                unit: odometerUnitSchema.parse({
+                    id: entity.odometer_unit_id,
+                    key: entity.odometer_unit_key,
+                    short: entity.odometer_unit_short,
+                    conversionFactor: entity.odometer_unit_conversion_factor
+                })
+            }),
+            currency: currencySchema.parse({
+                id: entity.currency_id,
+                key: entity.currency_key,
+                symbol: entity.currency_symbol
+            }),
+            fuelTank: fuelTankSchema.parse({
+                id: entity.fuel_tank_id,
+                type: fuelTypeSchema.parse({
+                    id: entity.fuel_type_id,
+                    key: entity.fuel_type_key
+                }),
+                unit: fuelUnitSchema.parse({
+                    id: entity.fuel_unit_id,
+                    key: entity.fuel_unit_key,
+                    short: entity.fuel_unit_short,
+                    conversionFactor: entity.fuel_unit_conversion_factor
+                }),
+                capacity: (entity.fuel_tank_capacity != null && entity.fuel_tank_capacity > 0)
+                          ? entity.fuel_tank_capacity
+                          : 0
+            }),
             imagePath: entity.image_url,
             createdAt: entity.created_at
         });
     }
 
-    async toEntity(dto: Car): Promise<CarTableRow> {
+    toEntity(dto: Car): CarTableRow {
         return {
             id: dto.id,
             owner_id: dto.ownerId,

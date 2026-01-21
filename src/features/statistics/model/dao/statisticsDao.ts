@@ -171,7 +171,7 @@ export class StatisticsDao {
         const selectedExpenseType =
             maxItemResult
             ?
-            await this.expenseTypeDao.mapper.toDto({
+            this.expenseTypeDao.mapper.toDto({
                 id: maxItemResult.type_id,
                 owner_id: maxItemResult.owner_id,
                 key: maxItemResult.key

@@ -1,15 +1,16 @@
 import { Dao } from "../../../../database/dao/Dao.ts";
-import { DatabaseType, RideLogTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
+import {
+    DatabaseType,
+    OdometerUnitTableRow,
+    RideLogTableRow
+} from "../../../../database/connector/powersync/AppSchema.ts";
 import { RideLog } from "../../schemas/rideLogSchema.ts";
 import { RideLogMapper } from "../mapper/rideLogMapper.ts";
 import { Kysely, sql } from "@powersync/kysely-driver";
-import { OdometerLogDao } from "../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
+import { OdometerLogDao, SelectOdometerTableRow } from "../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
 import { OdometerUnitDao } from "../../../car/_features/odometer/model/dao/OdometerUnitDao.ts";
 import { CarDao } from "../../../car/model/dao/CarDao.ts";
 import { RIDE_LOG_TABLE } from "../../../../database/connector/powersync/tables/rideLog.ts";
-import { RideExpenseDao } from "../../_features/rideExpense/model/dao/rideExpenseDao.ts";
-import { RidePlaceDao } from "../../_features/place/model/dao/ridePlaceDao.ts";
-import { RidePassengerDao } from "../../_features/passenger/model/dao/ridePassengerDao.ts";
 import { RideLogFormFields } from "../../schemas/form/rideLogForm.ts";
 import { ODOMETER_LOG_TABLE } from "../../../../database/connector/powersync/tables/odometerLog.ts";
 import { RIDE_EXPENSE_TABLE } from "../../../../database/connector/powersync/tables/rideExpense.ts";
@@ -18,6 +19,24 @@ import { RIDE_PASSENGER_TABLE } from "../../../../database/connector/powersync/t
 import { EXPENSE_TABLE } from "../../../../database/connector/powersync/tables/expense.ts";
 import { CursorOptions, CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
 import { PaginatorOptions } from "../../../../database/paginator/AbstractPaginator.ts";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { RidePlaceMapper, SelectRidePlaceTableRow } from "../../_features/place/model/mapper/ridePlaceMapper.ts";
+import {
+    RidePassengerMapper,
+    SelectRidePassengerTableRow
+} from "../../_features/passenger/model/mapper/ridePassengerMapper.ts";
+import { WithPrefix } from "../../../../types";
+import { SelectQueryBuilder } from "kysely";
+import { CAR_TABLE } from "../../../../database/connector/powersync/tables/car.ts";
+import { ODOMETER_UNIT_TABLE } from "../../../../database/connector/powersync/tables/odometerUnit.ts";
+import { CURRENCY_TABLE } from "../../../../database/connector/powersync/tables/currency.ts";
+import { jsonArrayFrom } from "kysely/helpers/sqlite";
+import {
+    RideExpenseMapper,
+    SelectRideExpenseTableRow
+} from "../../_features/rideExpense/model/mapper/rideExpenseMapper.ts";
+import { PASSENGER_TABLE } from "../../../../database/connector/powersync/tables/passenger.ts";
+import { EXPENSE_TYPE_TABLE } from "../../../../database/connector/powersync/tables/expenseType.ts";
 
 export type PaginatorSelectRideLogTableRow = RideLogTableRow & {
     distance: number,
@@ -25,21 +44,167 @@ export type PaginatorSelectRideLogTableRow = RideLogTableRow & {
     duration: number
 }
 
-export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
+export type SelectBaseRideLogTableRow = RideLogTableRow
+    & WithPrefix<Omit<SelectOdometerTableRow, "log_car_id" | keyof WithPrefix<OdometerUnitTableRow, "unit">>, "start_odometer">
+    & WithPrefix<Omit<SelectOdometerTableRow, "log_car_id" | keyof WithPrefix<OdometerUnitTableRow, "unit">>, "end_odometer">
+    & WithPrefix<OdometerUnitTableRow, "odometer_unit">
+
+export type SelectRideLogTableRow =
+    SelectBaseRideLogTableRow
+    & {
+    expenses: Array<SelectRideExpenseTableRow>
+    places: Array<SelectRidePlaceTableRow>
+    passengers: Array<SelectRidePassengerTableRow>
+}
+
+export type SelectTimelineRideLogTableRow =
+    SelectBaseRideLogTableRow
+    & {
+    distance: number
+    total_expense: number
+    duration: number
+}
+
+export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, SelectRideLogTableRow> {
+    readonly rideExpenseMapper: RideExpenseMapper;
+    readonly ridePlaceMapper: RidePlaceMapper;
+    readonly ridePassengerMapper: RidePassengerMapper;
+
     constructor(
         db: Kysely<DatabaseType>,
-        rideExpenseDao: RideExpenseDao,
-        ridePlaceDao: RidePlaceDao,
-        ridePassengerDao: RidePassengerDao,
+        powersync: AbstractPowerSyncDatabase,
+        rideExpenseMapper: RideExpenseMapper,
+        ridePlaceMapper: RidePlaceMapper,
+        ridePassengerMapper: RidePassengerMapper,
         odometerLogDao: OdometerLogDao,
         odometerUnitDao: OdometerUnitDao,
         carDao: CarDao
     ) {
         super(
             db,
+            powersync,
             RIDE_LOG_TABLE,
-            new RideLogMapper(rideExpenseDao, ridePlaceDao, ridePassengerDao, odometerLogDao, odometerUnitDao, carDao)
+            new RideLogMapper(
+                rideExpenseMapper,
+                ridePlaceMapper,
+                ridePassengerMapper,
+                odometerLogDao,
+                odometerUnitDao,
+                carDao
+            )
         );
+        this.rideExpenseMapper = rideExpenseMapper;
+        this.ridePlaceMapper = ridePlaceMapper;
+        this.ridePassengerMapper = ridePassengerMapper;
+    }
+
+    baseQuery() {
+        return this.db
+        .selectFrom(`${ RIDE_LOG_TABLE } as rl` as const)
+        .innerJoin(`${ CAR_TABLE } as c` as const, "c.id", "rl.car_id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as ou` as const, "ou.id", "c.odometer_unit_id")
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as sol` as const, "sol.id", "rl.start_odometer_log_id")
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as eol` as const, "eol.id", "rl.end_odometer_log_id")
+        .innerJoin(`${ CURRENCY_TABLE } as ccur` as const, "ccur.id", "c.currency_id")
+        .select([
+            "rl.id",
+            "rl.start_time",
+            "rl.end_time",
+            "rl.note",
+            "c.id as car_id",
+            "sol.id as start_odometer_log_id",
+            "sol.value as start_odometer_log_value",
+            "eol.id as end_odometer_log_id",
+            "eol.value as end_odometer_log_value",
+            "ou.id as odometer_unit_id",
+            "ou.key as odometer_unit_key",
+            "ou.short as odometer_unit_short",
+            "ou.conversion_factor as odometer_unit_conversion_factor"
+        ]);
+    }
+
+    selectQuery(id?: any | null): SelectQueryBuilder<DatabaseType, any, SelectRideLogTableRow> {
+        let query = this.baseQuery()
+        .select((eb) => [
+            jsonArrayFrom(
+                eb
+                .selectFrom(`${ RIDE_EXPENSE_TABLE } as re` as const)
+                .innerJoin(`${ EXPENSE_TABLE } as e` as const, "e.id", "re.expense_id")
+                .innerJoin(`${ CAR_TABLE } as c` as const, "c.id", "e.car_id")
+                .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "et.id", "e.type_id")
+                .innerJoin(`${ CURRENCY_TABLE } as cur` as const, "cur.id", "e.currency_id")
+                .innerJoin(`${ CURRENCY_TABLE } as ccur` as const, "ccur.id", "c.currency_id")
+                .select([
+                    "re.id",
+                    "re.owner_id",
+                    "re.ride_log_id",
+                    "e.id as expense_id",
+                    "e.car_id as expense_car_id",
+                    "e.amount as expense_amount",
+                    "e.original_amount as expense_original_amount",
+                    "e.exchange_rate as expense_exchange_rate",
+                    "e.date as expense_date",
+                    "e.note as expense_note",
+                    "et.id as expense_type_id",
+                    "et.key as expense_type_key",
+                    "et.owner_id as expense_type_owner_id",
+                    "cur.id as expense_currency_id",
+                    "cur.symbol as expense_currency_symbol",
+                    "cur.key as expense_currency_key",
+                    "ccur.id as expense_car_currency_id",
+                    "ccur.symbol as expense_car_currency_symbol",
+                    "ccur.key as expense_car_currency_key"
+                ])
+                .whereRef("re.ride_log_id", "=", "rl.id")
+            ).as("expenses"),
+            jsonArrayFrom(
+                eb
+                .selectFrom(`${ RIDE_PASSENGER_TABLE } as rp` as const)
+                .innerJoin(`${ PASSENGER_TABLE } as p` as const, "p.id", "rp.passenger_id")
+                .select([
+                    "rp.id",
+                    "rp.owner_id",
+                    "rp.ride_log_id",
+                    "p.id as passenger_id",
+                    "rp.passenger_order",
+                    "p.name"
+                ])
+                .whereRef("rp.ride_log_id", "=", "rl.id")
+                .orderBy("rp.passenger_order", "asc")
+            ).as("passengers"),
+            jsonArrayFrom(
+                eb
+                .selectFrom(`${ RIDE_PLACE_TABLE } as rp` as const)
+                .innerJoin(`${ PASSENGER_TABLE } as p` as const, "p.id", "rp.place_id")
+                .select([
+                    "rp.id",
+                    "rp.owner_id",
+                    "rp.ride_log_id",
+                    "p.id as place_id",
+                    "rp.place_order",
+                    "p.name"
+                ])
+                .whereRef("rp.ride_log_id", "=", "rl.id")
+                .orderBy("rp.place_order", "asc")
+            ).as("places")
+        ]);
+
+        if(id) query = query.where("rl.id", "=", id);
+
+        return query;
+    }
+
+    selectTimelineQuery(): SelectQueryBuilder<DatabaseType, any, SelectTimelineRideLogTableRow> {
+        return this.baseQuery()
+        .leftJoin(`${ RIDE_EXPENSE_TABLE } as re` as const, "re.ride_log_id", "rl.id")
+        .leftJoin(`${ EXPENSE_TABLE } as e` as const, "e.id", "re.expense_id")
+        .select([
+            sql<number>`COALESCE(eol.value - sol.value, 0)`.as("distance"),
+            sql<number>`(julianday(rl.end_time) - julianday(rl.start_time))
+                        * 86400`.as("duration"),
+            sql<number>`COALESCE(SUM(e.amount), 0)`.as("total_expense")
+        ])
+        .groupBy("rl.id");
     }
 
     async getUpcomingRides(carId: string, startTime: string): Promise<Array<RideLog>> {
@@ -47,12 +212,13 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
         .where("car_id", "=", carId)
         .where("start_time", ">=", startTime)
         .orderBy("start_time", "asc")
+        .limit(3)
         .execute();
 
-        return await this.mapper.toDtoArray(result);
+        return this.mapper.toDtoArray(result);
     }
 
-    async create(formResult: RideLogFormFields): Promise<RideLog | null> {
+    async createFromFormResult(formResult: RideLogFormFields): Promise<RideLogTableRow["id"]> {
         const {
             rideLog,
             expenses,
@@ -121,10 +287,10 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
             return result.id;
         });
 
-        return await this.getById(insertedRideLogId);
+        return insertedRideLogId;
     }
 
-    async update(formResult: RideLogFormFields): Promise<RideLog | null> {
+    async updateFromFormResult(formResult: RideLogFormFields): Promise<RideLogTableRow["id"]> {
         const {
             rideLog,
             expenses,
@@ -295,7 +461,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
             return result.id;
         });
 
-        return await this.getById(updatedRideLogId);
+        return updatedRideLogId;
     }
 
     async deleteLog(rideLog: RideLog): Promise<string> {
@@ -349,10 +515,10 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
     }
 
     paginator(
-        cursorOptions: CursorOptions<keyof PaginatorSelectRideLogTableRow>,
-        filterBy?: PaginatorOptions<PaginatorSelectRideLogTableRow>["filterBy"],
+        cursorOptions: CursorOptions<keyof SelectRideLogTableRow>,
+        filterBy?: PaginatorOptions<SelectRideLogTableRow>["filterBy"],
         perPage: number = 25
-    ): CursorPaginator<PaginatorSelectRideLogTableRow, RideLog> {
+    ): CursorPaginator<SelectRideLogTableRow, RideLog> {
         const query = this.db
         .with("t1" as const, (db) =>
             db
@@ -382,12 +548,12 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper> {
         .selectFrom("t1" as const)
         .selectAll("t1");
 
-        return new CursorPaginator<PaginatorSelectRideLogTableRow, RideLog>(
+        return new CursorPaginator<SelectRideLogTableRow, RideLog>(
             this.db,
             "t1" as any,
             cursorOptions,
             {
-                baseQuery: query,
+                baseQuery: query as any,
                 perPage,
                 filterBy: filterBy,
                 mapper: this.mapper.toDto.bind(this.mapper)

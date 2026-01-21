@@ -5,10 +5,11 @@ import { EXPENSE_TYPE_TABLE } from "../../../../database/connector/powersync/tab
 import { ExpenseType } from "../../schemas/expenseTypeSchema.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { ExpenseTypeEnum } from "../enums/ExpenseTypeEnum.ts";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
 
 export class ExpenseTypeDao extends Dao<ExpenseTypeTableRow, ExpenseType, ExpenseTypeMapper> {
-    constructor(db: Kysely<DatabaseType>) {
-        super(db, EXPENSE_TYPE_TABLE, new ExpenseTypeMapper());
+    constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
+        super(db, powersync, EXPENSE_TYPE_TABLE, new ExpenseTypeMapper());
     }
 
     async getAllOtherExpenseType(): Promise<Array<ExpenseType>> {
@@ -19,19 +20,17 @@ export class ExpenseTypeDao extends Dao<ExpenseTypeTableRow, ExpenseType, Expens
         .where("key", "is not", ExpenseTypeEnum.SERVICE)
         .execute();
 
-        return await this.mapper.toDtoArray(entities);
+        return this.mapper.toDtoArray(entities);
     }
 
-    async getIdByKey(key: string, safe: boolean = true): Promise<string | null> {
+    async getIdByKey(key: string): Promise<string> {
         const result = await this.db
         .selectFrom(EXPENSE_TYPE_TABLE)
         .select("id")
         .where("key", "=", key)
-        .executeTakeFirst();
+        .executeTakeFirstOrThrow();
 
-        if(safe && !result?.id) throw new Error(`Table item not found by ${ key } key. [${ this.table }]`);
-
-        return result?.id ? result.id : null;
+        return result.id;
     }
 
     async delete(id: string): Promise<string> {

@@ -7,10 +7,11 @@ import { Passenger } from "../../schemas/passengerSchema.ts";
 import { PassengerMapper } from "../mapper/passengerMapper.ts";
 import { PassengerFormFields } from "../../schemas/form/passengerForm.ts";
 import { PASSENGER_TABLE } from "../../../../../../database/connector/powersync/tables/passenger.ts";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
 
 export class PassengerDao extends Dao<PassengerTableRow, Passenger, PassengerMapper> {
-    constructor(db: Kysely<DatabaseType>) {
-        super(db, PASSENGER_TABLE, new PassengerMapper());
+    constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
+        super(db, powersync, PASSENGER_TABLE, new PassengerMapper());
     }
 
     async isNameAlreadyExists(id: string, ownerId: string, name: string): Promise<boolean> {
@@ -25,14 +26,14 @@ export class PassengerDao extends Dao<PassengerTableRow, Passenger, PassengerMap
         return !result;
     }
 
-    async create(formResult: PassengerFormFields, safe?: boolean): Promise<Passenger | null> {
+    async createFromFormResult(formResult: PassengerFormFields) {
         const entity = this.mapper.formResultToEntity(formResult);
-        return await super.create(entity, safe);
+        return await super.create(entity);
     }
 
-    async update(formResult: PassengerFormFields, safe?: boolean): Promise<Passenger | null> {
+    async updateFromFormResult(formResult: PassengerFormFields) {
         const entity = this.mapper.formResultToEntity(formResult);
-        return super.update(entity, safe);
+        return super.update(entity);
     }
 
     paginator(perPage: number = 30): CursorPaginator<PassengerTableRow, Passenger> {

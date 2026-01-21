@@ -8,7 +8,7 @@ export class CurrencyMapper extends AbstractMapper<CurrencyTableRow, Currency> {
         super();
     }
 
-    async toDto(entity: CurrencyTableRow): Promise<Currency> {
+    toDto(entity: CurrencyTableRow): Currency {
         return currencySchema.parse({
             id: entity.id,
             key: entity.key,
@@ -16,7 +16,7 @@ export class CurrencyMapper extends AbstractMapper<CurrencyTableRow, Currency> {
         });
     }
 
-    async toEntity(dto: Currency): Promise<CurrencyTableRow> {
+    toEntity(dto: Currency): CurrencyTableRow {
         return {
             id: dto.id as never,
             key: dto.key,

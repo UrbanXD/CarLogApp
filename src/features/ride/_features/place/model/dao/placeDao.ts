@@ -7,10 +7,11 @@ import { PLACE_TABLE } from "../../../../../../database/connector/powersync/tabl
 import { Place } from "../../schemas/placeSchema.ts";
 import { PlaceMapper } from "../mapper/placeMapper.ts";
 import { PlaceFormFields } from "../../schemas/form/placeForm.ts";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
 
 export class PlaceDao extends Dao<PlaceTableRow, Place, PlaceMapper> {
-    constructor(db: Kysely<DatabaseType>) {
-        super(db, PLACE_TABLE, new PlaceMapper());
+    constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
+        super(db, powersync, PLACE_TABLE, new PlaceMapper());
     }
 
     async isNameAlreadyExists(id: string, ownerId: string, name: string): Promise<boolean> {
@@ -25,14 +26,14 @@ export class PlaceDao extends Dao<PlaceTableRow, Place, PlaceMapper> {
         return !result;
     }
 
-    async create(formResult: PlaceFormFields, safe?: boolean): Promise<Place | null> {
+    async createFromFormResult(formResult: PlaceFormFields) {
         const entity = this.mapper.formResultToEntity(formResult);
-        return await super.create(entity, safe);
+        return await super.create(entity);
     }
 
-    async update(formResult: PlaceFormFields, safe?: boolean): Promise<Place | null> {
+    async updateFromFormResult(formResult: PlaceFormFields) {
         const entity = this.mapper.formResultToEntity(formResult);
-        return super.update(entity, safe);
+        return super.update(entity);
     }
 
     paginator(perPage: number = 30): CursorPaginator<PlaceTableRow, Place> {

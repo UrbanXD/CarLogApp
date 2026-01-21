@@ -8,7 +8,7 @@ export class OdometerUnitMapper extends AbstractMapper<OdometerUnitTableRow, Odo
         super();
     }
 
-    async toDto(entity: OdometerUnitTableRow): Promise<OdometerUnit> {
+    toDto(entity: OdometerUnitTableRow): OdometerUnit {
         return odometerUnitSchema.parse({
             id: entity.id,
             key: entity.key,
@@ -17,7 +17,7 @@ export class OdometerUnitMapper extends AbstractMapper<OdometerUnitTableRow, Odo
         });
     }
 
-    async toEntity(dto: OdometerUnit): Promise<OdometerUnitTableRow> {
+    toEntity(dto: OdometerUnit): OdometerUnitTableRow {
         return {
             id: dto.id as never,
             key: dto.key,

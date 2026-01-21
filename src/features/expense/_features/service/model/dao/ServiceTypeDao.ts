@@ -6,22 +6,23 @@ import { Kysely } from "@powersync/kysely-driver";
 import { SERVICE_TYPE_TABLE } from "../../../../../../database/connector/powersync/tables/serviceType.ts";
 import { CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
 import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
 
 export class ServiceTypeDao extends Dao<ServiceTypeTableRow, ServiceType, ServiceTypeMapper> {
-    constructor(db: Kysely<DatabaseType>) {
-        super(db, SERVICE_TYPE_TABLE, new ServiceTypeMapper());
+    constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
+        super(db, powersync, SERVICE_TYPE_TABLE, new ServiceTypeMapper());
     }
 
-    async getIdByKey(key: string, safe: boolean = true): Promise<string | null> {
+    async getIdByKey(key: string): Promise<string> {
         const result = await this.db
         .selectFrom(SERVICE_TYPE_TABLE)
         .select("id")
         .where("key", "=", key)
         .executeTakeFirst();
 
-        if(safe && !result?.id) throw new Error(`Table item not found by ${ key } key. [${ this.table }]`);
+        if(!result?.id) throw new Error(`Table item not found by ${ key } key. [${ this.table }]`);
 
-        return result?.id ? result.id : null;
+        return result.id;
     }
 
     async delete(id: string): Promise<string> {

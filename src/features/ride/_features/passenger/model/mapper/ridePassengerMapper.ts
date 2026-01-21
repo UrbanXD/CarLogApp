@@ -1,11 +1,11 @@
-import { RidePassengerTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
+import { PassengerTableRow, RidePassengerTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
 import { RidePassenger, ridePassengerSchema } from "../../schemas/ridePassengerSchema.ts";
 
-export type SelectRidePassengerTableRow = RidePassengerTableRow & { name: string | null };
+export type SelectRidePassengerTableRow = RidePassengerTableRow & Pick<PassengerTableRow, "name">;
 
 export class RidePassengerMapper extends AbstractMapper<RidePassengerTableRow, RidePassenger, SelectRidePassengerTableRow> {
-    async toDto(entity: SelectRidePassengerTableRow): Promise<RidePassenger> {
+    toDto(entity: SelectRidePassengerTableRow): RidePassenger {
         return ridePassengerSchema.parse({
             id: entity.id,
             ownerId: entity.owner_id,
@@ -16,7 +16,7 @@ export class RidePassengerMapper extends AbstractMapper<RidePassengerTableRow, R
         });
     }
 
-    async toEntity(dto: RidePassenger): Promise<RidePassengerTableRow> {
+    toEntity(dto: RidePassenger): RidePassengerTableRow {
         return {
             id: dto.id,
             owner_id: dto.ownerId,
