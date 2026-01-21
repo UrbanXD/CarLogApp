@@ -4,16 +4,22 @@ import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 import { watchQuery, WatchQueryOptions } from "../watcher/watcher.ts";
 import { useDatabase } from "../../contexts/database/DatabaseContext.ts";
 
+export type UseWatchedQueryCollectionProps<Dto, WatchEntity = any> = {
+    query: SelectQueryBuilder<DatabaseType, any, WatchEntity>,
+    mapper: (watchEntity: Array<WatchEntity>) => Array<Dto>,
+    options?: WatchQueryOptions
+}
+
 type UseWatchedCollectionResult<Dto> = {
     data: Array<Dto>
     isLoading: boolean
 }
 
-export function useWatchedQueryCollection<Dto, WatchEntity = any>(
-    query: SelectQueryBuilder<DatabaseType, any, WatchEntity>,
-    mapper: (watchEntities: Array<WatchEntity>) => Array<Dto>,
-    options?: WatchQueryOptions
-): UseWatchedCollectionResult<Dto> {
+export function useWatchedQueryCollection<Dto, WatchEntity = any>({
+    query,
+    mapper,
+    options
+}: UseWatchedQueryCollectionProps<Dto, WatchEntity>): UseWatchedCollectionResult<Dto> {
     const { powersync } = useDatabase();
 
     const [data, setData] = useState<Array<Dto>>([]);
@@ -37,7 +43,7 @@ export function useWatchedQueryCollection<Dto, WatchEntity = any>(
         );
 
         return unwatch;
-    }, [query, mapper]);
+    }, [query, mapper, options]);
 
     return { data, isLoading };
 }

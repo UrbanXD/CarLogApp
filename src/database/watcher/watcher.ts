@@ -61,7 +61,11 @@ export function watchQuery<WatchEntity>(
             onData: (results: any) => {
                 entry!.lastData = results;
                 entry!.callbacks.forEach(cb => cb(results));
-                if(queryOnce) unregister();
+
+                if(queryOnce) {
+                    unregister();
+                    onData(results);
+                }
             },
             onError: (error) => {
                 console.log(`Watch Query Error [${ sql }, ${ params }]:`, error);
@@ -69,27 +73,23 @@ export function watchQuery<WatchEntity>(
             }
         });
 
-        if(queryOnce) return () => unregister();
-
         entry.cleanup = unregister;
-        activeWatchers.set(watchKey, entry);
+        if(!queryOnce) activeWatchers.set(watchKey, entry);
     }
 
     if(entry.lastData) {
         const cachedData = entry.lastData;
         setTimeout(() => onData(cachedData), 0);
-
-        if(queryOnce) return () => {};
     }
 
-    if(queryOnce) return () => {};
+    if(!queryOnce) {
+        entry.callbacks.add(onData);
+        entry.count++;
 
-    entry.callbacks.add(onData);
-    entry.count++;
-
-    if(entry.timeoutId) {
-        clearTimeout(entry.timeoutId);
-        entry.timeoutId = undefined;
+        if(entry.timeoutId) {
+            clearTimeout(entry.timeoutId);
+            entry.timeoutId = undefined;
+        }
     }
 
     return () => {
