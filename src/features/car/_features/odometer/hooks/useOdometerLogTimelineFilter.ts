@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { OdometerLogTypeEnum } from "../model/enums/odometerLogTypeEnum.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { OdometerLogType } from "../schemas/odometerLogTypeSchema.ts";
-import { Car } from "../../../schemas/carSchema.ts";
 import { SelectOdometerLogTableRow } from "../model/dao/OdometerLogDao.ts";
 import { TimelineFilterManagement } from "../../../../../hooks/useTimelinePaginator.ts";
 import { useTranslation } from "react-i18next";
@@ -14,7 +13,7 @@ const TYPES_FILTER_FIELD_NAME = "type_id" as keyof SelectOdometerLogTableRow;
 
 type UseOdometerLogTimelineFilterProps = {
     timelineFilterManagement: TimelineFilterManagement<SelectOdometerLogTableRow>
-    car: Car
+    carId: string
 }
 
 export function useOdometerLogTimelineFilter({
@@ -25,7 +24,7 @@ export function useOdometerLogTimelineFilter({
         removeFilter,
         clearFilters
     },
-    car
+    carId
 }: UseOdometerLogTimelineFilterProps) {
     const { t } = useTranslation();
     const { odometerLogTypeDao } = useDatabase();
@@ -69,8 +68,8 @@ export function useOdometerLogTimelineFilter({
     }, [filters]);
 
     useEffect(() => {
-        replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: car.id } });
-    }, [car]);
+        replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: carId } });
+    }, [carId]);
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {
         const active = selectedTypesId.includes(type.id);

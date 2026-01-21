@@ -28,10 +28,12 @@ import { CURRENCY_TABLE } from "../../../../../../database/connector/powersync/t
 import { ODOMETER_UNIT_TABLE } from "../../../../../../database/connector/powersync/tables/odometerUnit.ts";
 import { MAKE_TABLE } from "../../../../../../database/connector/powersync/tables/make.ts";
 import { MODEL_TABLE } from "../../../../../../database/connector/powersync/tables/model.ts";
+import { WatchQueryOptions } from "../../../../../../database/watcher/watcher.ts";
+import { UseWatchedQueryItemProps } from "../../../../../../database/hooks/useWatchedQueryItem.ts";
 
 export type SelectFuelLogTableRow =
     FuelLogTableRow
-    & WithPrefix<Omit<SelectExpenseTableRow, "related_id" | "car_id" | "id">, "expense">
+    & WithPrefix<Omit<SelectExpenseTableRow, "related_id" | "car_id" | "id" | keyof WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">>, "expense">
     & WithPrefix<Omit<FuelUnitTableRow, "id">, "fuel_unit">
     & WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">
     & Nullable<WithPrefix<Omit<SelectOdometerTableRow, "log_car_id">, "odometer">>
@@ -103,6 +105,17 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
         if(id) query = query.where("fl.id", "=", id);
 
         return query;
+    }
+
+    fuelLogWatchedQueryItem(
+        id: string | null | undefined,
+        options?: WatchQueryOptions
+    ): UseWatchedQueryItemProps<FuelLog> {
+        return {
+            query: this.selectQuery(id),
+            mapper: this.mapper.toDto.bind(this.mapper),
+            options: { enabled: !!id, ...options }
+        };
     }
 
     async createFromFormResult(formResult: FuelLogFormFields): Promise<FuelLog | null> {

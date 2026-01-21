@@ -1,35 +1,29 @@
 import Input from "../../../../../components/Input/Input.ts";
-import { ICON_NAMES } from "../../../../../constants/index.ts";
+import { ICON_NAMES } from "../../../../../constants";
 import { MoreDataLoading } from "../../../../../components/loading/MoreDataLoading.tsx";
-import React, { useEffect, useState } from "react";
-import { Control } from "react-hook-form";
+import React from "react";
+import { Control, FieldPathByValue, FieldValues } from "react-hook-form";
 import { PickerItemType } from "../../../../../components/Input/picker/PickerItem.tsx";
 import useCars from "../../../hooks/useCars.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { useTranslation } from "react-i18next";
 
-type CarPickerInputProps = {
-    control: Control<any>
-    fieldName: string
+type CarPickerInputProps<FormFieldValues extends FieldValues> = {
+    control: Control<FormFieldValues>
+    fieldName: FieldPathByValue<FormFieldValues, string>
     title?: string
     subtitle?: string
 }
 
-export function CarPickerInput({
+export function CarPickerInput<FormFieldValues extends FieldValues>({
     control,
     fieldName,
     title,
     subtitle
-}: CarPickerInputProps) {
+}: CarPickerInputProps<FormFieldValues>) {
     const { t } = useTranslation();
-    const { cars } = useCars();
     const { carDao } = useDatabase();
-
-    const [carsData, setCarsData] = useState<Array<PickerItemType> | null>(null);
-
-    useEffect(() => {
-        setCarsData(carDao.mapper.dtoToPicker(cars));
-    }, [cars]);
+    const { cars, isLoading } = useCars<PickerItemType>({ extraMapper: carDao.mapper.dtoToPicker });
 
     return (
         <Input.Field
@@ -39,11 +33,11 @@ export function CarPickerInput({
             fieldInfoText={ subtitle }
         >
             {
-                carsData
+                cars && !isLoading
                 ?
                 <Input.Picker.Dropdown
                     title={ title ?? t("car.picker.title") }
-                    data={ carsData }
+                    data={ cars }
                     icon={ ICON_NAMES.car }
                 />
                 :

@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ComparisonStatByDate, SummaryStat, TrendStat } from "../../model/dao/statisticsDao.ts";
 import { LineChartView } from "../charts/LineChartView.tsx";
 import { StyleSheet, View } from "react-native";
-import { SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { SEPARATOR_SIZES } from "../../../../constants";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import { MasonryStatView } from "../MasonryStatView.tsx";
@@ -14,7 +14,7 @@ import { getDateFormatTemplateByRangeUnit } from "../../utils/getDateFormatTempl
 import { BarChartView } from "../charts/BarChartView.tsx";
 
 type FuelConsumptionStatisticsProps = {
-    carId?: string
+    carId?: string | null
     from: string
     to: string
 }

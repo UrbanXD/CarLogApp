@@ -410,8 +410,7 @@ export class Database {
                 this.db,
                 this.powersync,
                 this.attachmentQueue,
-                this.odometerUnitDao,
-                this.currencyDao
+                this.odometerUnitDao
             );
         }
 

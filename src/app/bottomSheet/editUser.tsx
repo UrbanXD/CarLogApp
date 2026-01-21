@@ -1,19 +1,18 @@
 import React, { useEffect } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import EditUserBottomSheet from "../../features/user/presets/bottomSheet/EditUserBottomSheet.tsx";
-import { useAppSelector } from "../../hooks/index.ts";
-import { getUser } from "../../features/user/model/selectors/index.ts";
+import { useUser } from "../../features/user/hooks/useUser.ts";
 
 const Page: React.FC = () => {
     const { type } = useLocalSearchParams();
-    const user = useAppSelector(getUser);
+    const { user, isLoading } = useUser();
 
     useEffect(() => {
-        if(user) return;
+        if(user || isLoading) return;
 
         if(router.canGoBack()) return router.back();
         router.replace("backToRootIndex");
-    }, [user]);
+    }, [user, isLoading]);
 
     if(!user) return <></>;
 

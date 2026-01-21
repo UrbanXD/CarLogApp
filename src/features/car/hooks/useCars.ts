@@ -1,20 +1,26 @@
-import { useAppSelector } from "../../../hooks/index.ts";
-import { getCars, getSelectedCar, isLoading } from "../model/selectors/index.ts";
+import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { Car } from "../schemas/carSchema.ts";
-import { useCallback } from "react";
+import { WatchQueryOptions } from "../../../database/watcher/watcher.ts";
+import { useWatchedQueryCollection } from "../../../database/hooks/useWatchedQueryCollection.ts";
+import { useMemo } from "react";
 
-const useCars = () => {
-    const cars = useAppSelector(getCars);
-    const selectedCar = useAppSelector(getSelectedCar);
-    const loading = useAppSelector(isLoading);
+function useCars<Mapped = Car>(options?: WatchQueryOptions & { extraMapper?: (cars: Array<Car>) => Array<Mapped> }) {
+    const { carDao } = useDatabase();
+    const { extraMapper, ...queryOptions } = options ?? {};
 
-    const getCar = useCallback((id?: string | null): Car | null => {
-        if(!id) return null;
+    const carsQuery = useMemo(() => {
+        return carDao.carWatchedQueryCollection(options);
+    }, [options]);
 
-        return cars.find(car => car.id === id) ?? null;
-    }, [cars]);
+    const { data: rawCars, isLoading } = useWatchedQueryCollection(carsQuery);
 
-    return { cars, selectedCar, loading, getCar };
-};
+    const cars = useMemo(() => {
+        if(extraMapper) return extraMapper(rawCars);
+
+        return rawCars as unknown as Array<Mapped>;
+    }, [rawCars, extraMapper]);
+
+    return { cars, isLoading };
+}
 
 export default useCars;

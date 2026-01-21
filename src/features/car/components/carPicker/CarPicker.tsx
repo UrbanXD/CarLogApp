@@ -23,6 +23,8 @@ import { router } from "expo-router";
 import useCars from "../../hooks/useCars.ts";
 import { SelectedCar } from "./SelectedCar.tsx";
 import { useTranslation } from "react-i18next";
+import { useCar } from "../../hooks/useCar.ts";
+import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 
 const CLOSE_ICON_SIZE = FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE;
 const MAX_TRANSLATE = widthPercentageToDP(100);
@@ -33,7 +35,8 @@ type CarPickerProps = {
 
 export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
     const { t } = useTranslation();
-    const { cars, selectedCar } = useCars();
+    const { cars, isLoading } = useCars();
+    const { car: selectedCar } = useCar();
     const dispatch = useAppDispatch();
 
     const flashListRef = useRef<FlashListRef<Car>>(null);
@@ -132,16 +135,22 @@ export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
                 />
             </Animated.View>
             <Animated.View style={ carPickerStyle }>
-                <FlashList<Car>
-                    ref={ flashListRef }
-                    data={ cars }
-                    renderItem={ renderItem }
-                    keyExtractor={ keyExtractor }
-                    ItemSeparatorComponent={ renderSeparatorComponent }
-                    contentContainerStyle={ { flexGrow: 1 } }
-                    horizontal
-                    showsHorizontalScrollIndicator={ false }
-                />
+                {
+                    isLoading
+                    ?
+                    <MoreDataLoading/>
+                    :
+                    <FlashList<Car>
+                        ref={ flashListRef }
+                        data={ cars }
+                        renderItem={ renderItem }
+                        keyExtractor={ keyExtractor }
+                        ItemSeparatorComponent={ renderSeparatorComponent }
+                        contentContainerStyle={ { flexGrow: 1 } }
+                        horizontal
+                        showsHorizontalScrollIndicator={ false }
+                    />
+                }
             </Animated.View>
         </View>
     );

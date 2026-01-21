@@ -3,10 +3,9 @@ import { useDatabase } from "../../../../../../../contexts/database/DatabaseCont
 import React, { useMemo } from "react";
 import Input from "../../../../../../../components/Input/Input.ts";
 import { useCreatePlace } from "../../../hooks/useCreatePlace.ts";
-import { useAppSelector } from "../../../../../../../hooks/index.ts";
-import { getUser } from "../../../../../../user/model/selectors/index.ts";
 import { AddItemToDropdownInput } from "../../../../../../../components/Input/_presets/AddItemToDropdownInput.tsx";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../../../../../../contexts/auth/AuthContext.ts";
 
 type PlaceInputProps = {
     control: Control<any>
@@ -21,12 +20,13 @@ export function PlaceInput({
 }: PlaceInputProps) {
     const { t } = useTranslation();
     const { placeDao } = useDatabase();
-    const user = useAppSelector(getUser);
-    if(!user) return <></>;
+    const { sessionUserId } = useAuth();
+
+    if(!sessionUserId) return null;
 
     const paginator = useMemo(() => placeDao.pickerPaginator(), []);
 
-    const { form, submitHandler } = useCreatePlace({ userId: user.id, dismissSheet: false });
+    const { form, submitHandler } = useCreatePlace({ userId: sessionUserId, dismissSheet: false });
     return (
         <Input.Field
             control={ control }

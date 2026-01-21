@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
-import { Control } from "react-hook-form";
+import { Control, FieldPath, FieldValues } from "react-hook-form";
 import Input from "../../../../../../../components/Input/Input.ts";
-import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../../../../constants/index.ts";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../../../../constants";
 import { View } from "react-native";
 import { UnitText } from "../../../../../../../components/UnitText.tsx";
 import { useTranslation } from "react-i18next";
@@ -11,14 +11,14 @@ import { formatWithUnit } from "../../../../../../../utils/formatWithUnit.ts";
 import { OdometerLimit } from "../../../model/dao/OdometerLogDao.ts";
 import dayjs from "dayjs";
 
-type OdometerValueInputProps = {
-    control: Control<any>
-    odometerValueFieldName: string
+type OdometerValueInputProps<FormFieldValues extends FieldValues> = {
+    control: Control<FormFieldValues>
+    odometerValueFieldName: FieldPath<FormFieldValues>
     odometerValueTitle?: string
     odometerValueSubtitle?: string
     odometerValueOptional?: boolean
     odometerValuePlaceholder?: string
-    dateFieldName?: string
+    dateFieldName?: FieldPath<FormFieldValues>
     dateTitle?: string
     dateSubtitle?: string
     currentOdometerValueTranslationKey?: string
@@ -28,7 +28,7 @@ type OdometerValueInputProps = {
     showCurrentOdometerValueAsSubtitle?: boolean
 }
 
-export function OdometerValueInput({
+export function OdometerValueInput<FormFieldValues extends FieldValues>({
     control,
     odometerValueFieldName,
     odometerValueTitle,
@@ -43,7 +43,7 @@ export function OdometerValueInput({
     odometerLimit,
     unitText,
     showCurrentOdometerValueAsSubtitle = false
-}: OdometerValueInputProps) {
+}: OdometerValueInputProps<FormFieldValues>) {
     const { t } = useTranslation();
 
     const getSubtitle = useCallback(

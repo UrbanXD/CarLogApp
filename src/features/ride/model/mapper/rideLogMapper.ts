@@ -86,7 +86,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
     toEntity(dto: RideLog): RideLogTableRow {
         return {
             id: dto.id,
-            car_id: dto.carId,
+            car_id: dto.car.id,
             start_odometer_log_id: dto.startOdometer?.id ?? null,
             end_odometer_log_id: dto.endOdometer?.id ?? null,
             start_time: dto.startTime,

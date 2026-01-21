@@ -13,12 +13,12 @@ import { formatWithUnit } from "../../../../utils/formatWithUnit.ts";
 import { StatCard } from "../StatCard.tsx";
 import { ServiceForecastView } from "../forecasts/ServiceForecastView.tsx";
 import { StyleSheet, View } from "react-native";
-import { SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { SEPARATOR_SIZES } from "../../../../constants";
 
 const SERVICE_FREQUENCY_INTERVAL = 25000;
 
 type ServiceStatisticsProps = {
-    carId?: string
+    carId?: string | null
     from: string
     to: string
 }

@@ -6,7 +6,7 @@ import { formatTrend } from "../../utils/formatTrend.ts";
 import { formatWithUnit } from "../../../../utils/formatWithUnit.ts";
 import { MasonryStatView } from "../MasonryStatView.tsx";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants";
 import { StatCard } from "../StatCard.tsx";
 import dayjs from "dayjs";
 import { ChartTitle } from "../charts/common/ChartTitle.tsx";
@@ -15,7 +15,7 @@ import { getDateFormatTemplateByRangeUnit } from "../../utils/getDateFormatTempl
 import { LineChartView } from "../charts/LineChartView.tsx";
 
 type RideStatisticsProps = {
-    carId?: string
+    carId?: string | null
     from: string
     to: string
 }

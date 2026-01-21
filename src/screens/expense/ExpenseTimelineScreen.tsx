@@ -1,17 +1,17 @@
 import React from "react";
 import { ExpenseTimeline } from "../../features/expense/components/ExpenseTimeline.tsx";
-import useCars from "../../features/car/hooks/useCars.ts";
 import { ScreenView } from "../../components/screenView/ScreenView.tsx";
 import { FirstSelectCar } from "../../components/firstSelectCar/FirstSelectCar.tsx";
+import { useSelectedCarId } from "../../features/car/hooks/useSelectedCarId.ts";
 
 export function ExpenseTimelineScreen() {
-    const { selectedCar } = useCars();
+    const { selectedCarId } = useSelectedCarId();
 
-    if(!selectedCar) return <FirstSelectCar/>;
+    if(!selectedCarId) return <FirstSelectCar/>;
 
     return (
         <ScreenView>
-            <ExpenseTimeline car={ selectedCar }/>
+            <ExpenseTimeline carId={ selectedCarId }/>
         </ScreenView>
     );
 }

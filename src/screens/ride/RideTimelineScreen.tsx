@@ -1,16 +1,16 @@
-import useCars from "../../features/car/hooks/useCars.ts";
 import { ScreenScrollView } from "../../components/screenView/ScreenScrollView.tsx";
 import { RideLogTimeline } from "../../features/ride/components/RideLogTimeline.tsx";
 import { FirstSelectCar } from "../../components/firstSelectCar/FirstSelectCar.tsx";
+import { useSelectedCarId } from "../../features/car/hooks/useSelectedCarId.ts";
 
 export function RideTimelineScreen() {
-    const { selectedCar } = useCars();
+    const { selectedCarId } = useSelectedCarId();
 
-    if(!selectedCar) return <FirstSelectCar/>;
+    if(!selectedCarId) return <FirstSelectCar/>;
 
     return (
         <ScreenScrollView>
-            <RideLogTimeline car={ selectedCar }/>
+            <RideLogTimeline carId={ selectedCarId }/>
         </ScreenScrollView>
     );
 }

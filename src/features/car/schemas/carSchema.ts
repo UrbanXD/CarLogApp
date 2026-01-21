@@ -20,4 +20,6 @@ export const carSchema = z
     createdAt: z.string()
 });
 
+export const carNameAndModelSchema = carSchema.pick({ id: true, name: true, model: true });
+
 export type Car = z.infer<typeof carSchema>;

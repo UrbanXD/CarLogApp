@@ -24,7 +24,7 @@ export function useCreatePassenger({ userId, dismissSheet = true }: UseCreatePas
     const submitHandler = (onDone?: () => void): SubmitHandlerArgs<PassengerFormFields> => ({
         onValid: async (formResult) => {
             try {
-                await passengerDao.create(formResult);
+                await passengerDao.createFromFormResult(formResult);
                 openToast(CreateToast.success(t("passengers.title_singular")));
 
                 onDone?.();

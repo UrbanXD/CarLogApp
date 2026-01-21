@@ -15,6 +15,10 @@ import { CAR_TABLE } from "../../../../database/connector/powersync/tables/car.t
 import { AbstractPowerSyncDatabase } from "@powersync/react-native";
 import { EXPENSE_TYPE_TABLE } from "../../../../database/connector/powersync/tables/expenseType.ts";
 import { CURRENCY_TABLE } from "../../../../database/connector/powersync/tables/currency.ts";
+import { WatchQueryOptions } from "../../../../database/watcher/watcher.ts";
+import { UseWatchedQueryItemProps } from "../../../../database/hooks/useWatchedQueryItem.ts";
+import { MODEL_TABLE } from "../../../../database/connector/powersync/tables/model.ts";
+import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";
 
 export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, SelectExpenseTableRow> {
     constructor(
@@ -34,14 +38,22 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         let query = this.db
         .selectFrom(`${ EXPENSE_TABLE } as expense` as const)
         .innerJoin(`${ CAR_TABLE } as car` as const, `car.id`, `expense.car_id`)
+        .innerJoin(`${ MODEL_TABLE } as model` as const, "model.id", "car.model_id")
+        .innerJoin(`${ MAKE_TABLE } as make` as const, "make.id", "model.make_id")
         .leftJoin(`${ FUEL_LOG_TABLE } as fuel` as const, `fuel.expense_id`, `expense.id`)
         .leftJoin(`${ SERVICE_LOG_TABLE } as service` as const, `service.expense_id`, `expense.id`)
         .innerJoin(`${ EXPENSE_TYPE_TABLE } as type` as const, `type.id`, `expense.type_id`)
         .innerJoin(`${ CURRENCY_TABLE } as car_curr` as const, `car_curr.id`, `car.currency_id`)
         .innerJoin(`${ CURRENCY_TABLE } as exp_curr` as const, `exp_curr.id`, `expense.currency_id`)
         .selectAll("expense")
-        .select([
+        .select((eb) => [
             eb => eb.fn.coalesce("fuel.id", "service.id").as("related_id"),
+            "car.name as car_name",
+            "model.id as car_model_id",
+            "model.name as car_model_name",
+            "car.model_year as car_model_year",
+            "make.id as car_make_id",
+            "make.name as car_make_name",
             "car.currency_id as car_currency_id",
             "car_curr.key as car_currency_key",
             "car_curr.symbol as car_currency_symbol",
@@ -57,12 +69,24 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         return query;
     }
 
+    expenseWatchedQueryItem(
+        id: string | null | undefined,
+        options?: WatchQueryOptions
+    ): UseWatchedQueryItemProps<Expense, SelectExpenseTableRow> {
+        return {
+            query: this.selectQuery(id),
+            mapper: this.mapper.toDto.bind(this.mapper),
+            options: { enabled: !!id, ...options }
+        };
+    }
+
     async getLatestExpenses(carId: string, count: number = 3): Promise<Array<Expense>> {
         const result = await (
             this.selectQuery()
-            .whereRef(`${ EXPENSE_TABLE }.car_id`, "=", carId)
-            .orderBy(`${ EXPENSE_TABLE }.date`, "desc")
-            .limit(count).execute()
+            .whereRef("expense.car_id", "=", carId)
+            .orderBy("expense.date", "desc")
+            .limit(count)
+            .execute()
         );
 
         return this.mapper.toDtoArray(result);

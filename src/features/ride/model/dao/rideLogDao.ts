@@ -37,6 +37,10 @@ import {
 } from "../../_features/rideExpense/model/mapper/rideExpenseMapper.ts";
 import { PASSENGER_TABLE } from "../../../../database/connector/powersync/tables/passenger.ts";
 import { EXPENSE_TYPE_TABLE } from "../../../../database/connector/powersync/tables/expenseType.ts";
+import { WatchQueryOptions } from "../../../../database/watcher/watcher.ts";
+import { UseWatchedQueryItemProps } from "../../../../database/hooks/useWatchedQueryItem.ts";
+import { MODEL_TABLE } from "../../../../database/connector/powersync/tables/model.ts";
+import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";
 
 export type PaginatorSelectRideLogTableRow = RideLogTableRow & {
     distance: number,
@@ -131,6 +135,8 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
                 .selectFrom(`${ RIDE_EXPENSE_TABLE } as re` as const)
                 .innerJoin(`${ EXPENSE_TABLE } as e` as const, "e.id", "re.expense_id")
                 .innerJoin(`${ CAR_TABLE } as c` as const, "c.id", "e.car_id")
+                .innerJoin(`${ MODEL_TABLE } as mo` as const, "mo.id", "c.model_id")
+                .innerJoin(`${ MAKE_TABLE } as ma` as const, "ma.id", "mo.make_id")
                 .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "et.id", "e.type_id")
                 .innerJoin(`${ CURRENCY_TABLE } as cur` as const, "cur.id", "e.currency_id")
                 .innerJoin(`${ CURRENCY_TABLE } as ccur` as const, "ccur.id", "c.currency_id")
@@ -140,6 +146,12 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
                     "re.ride_log_id",
                     "e.id as expense_id",
                     "e.car_id as expense_car_id",
+                    "c.name as expense_car_name",
+                    "mo.id as expense_car_model_id",
+                    "mo.name as expense_car_model_name",
+                    "c.model_year as expense_car_model_year",
+                    "ma.id as expense_car_make_id",
+                    "ma.name as expense_car_make_name",
                     "e.amount as expense_amount",
                     "e.original_amount as expense_original_amount",
                     "e.exchange_rate as expense_exchange_rate",
@@ -207,11 +219,22 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
         .groupBy("rl.id");
     }
 
+    rideLogWatchedQueryItem(
+        id: string | null | undefined,
+        options?: WatchQueryOptions
+    ): UseWatchedQueryItemProps<RideLog, SelectRideLogTableRow> {
+        return {
+            query: this.selectQuery(id),
+            mapper: this.mapper.toDto.bind(this.mapper),
+            options: { enabled: !!id, ...options }
+        };
+    }
+
     async getUpcomingRides(carId: string, startTime: string): Promise<Array<RideLog>> {
         const result = await this.selectQuery()
-        .where("car_id", "=", carId)
-        .where("start_time", ">=", startTime)
-        .orderBy("start_time", "asc")
+        .where("rl.car_id", "=", carId as any)
+        .where("rl.start_time", ">=", startTime as any)
+        .orderBy("rl.start_time", "asc")
         .limit(3)
         .execute();
 

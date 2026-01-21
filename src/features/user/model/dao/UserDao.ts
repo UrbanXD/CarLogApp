@@ -13,6 +13,7 @@ import { getUserLocalCurrency } from "../../../_shared/currency/utils/getUserLoc
 import { CURRENCY_TABLE } from "../../../../database/connector/powersync/tables/currency.ts";
 import { AbstractPowerSyncDatabase } from "@powersync/react-native";
 import { WithPrefix } from "../../../../types";
+import { UseWatchedQueryItemProps } from "../../../../database/hooks/useWatchedQueryItem.ts";
 
 export type SelectUserTableRow = UserTableRow & WithPrefix<Omit<CurrencyTableRow, "id">, "currency">;
 
@@ -49,6 +50,14 @@ export class UserDao extends Dao<UserTableRow, UserAccount, UserMapper, SelectUs
         if(id) query = query.where("u.id", "=", id);
 
         return query;
+    }
+
+    userWatchedQueryItem(userId: string | null | undefined): UseWatchedQueryItemProps<UserAccount> {
+        return {
+            query: this.selectQuery(userId),
+            mapper: this.mapper.toDto.bind(this.mapper),
+            options: { enabled: !!userId }
+        };
     }
 
     async getPreviousAvatarImagePath(id: string): Promise<string | null> {

@@ -1,33 +1,28 @@
 import { UseFormReturn, useWatch } from "react-hook-form";
-import { Car } from "../../car/schemas/carSchema.ts";
 import { ExpenseFormFieldsEnum } from "../enums/expenseFormFieldsEnum.ts";
-import { FormFields } from "../../../types/index.ts";
+import { FormFields } from "../../../types";
 import { CarPickerInput } from "../../car/components/forms/inputFields/CarPickerInput.tsx";
 import { ExpenseTypeInput } from "../components/forms/inputFields/ExpenseTypeInput.tsx";
 import { AmountInput } from "../../_shared/currency/components/AmountInput.tsx";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import InputDatePicker from "../../../components/Input/datePicker/InputDatePicker.tsx";
 import Input from "../../../components/Input/Input.ts";
 import { NoteInput } from "../../../components/Input/_presets/NoteInput.tsx";
-import useCars from "../../car/hooks/useCars.ts";
-import { EditToast } from "../../../ui/alert/presets/toast/index.ts";
+import { EditToast } from "../../../ui/alert/presets/toast";
 import { useTranslation } from "react-i18next";
 import { ExpenseFormFields } from "../schemas/form/expenseForm.ts";
+import { useCar } from "../../car/hooks/useCar.ts";
 
 type UseExpenseFormFieldsProps = UseFormReturn<ExpenseFormFields, any, ExpenseFormFields>
 
 export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
     const { control, setValue, clearErrors } = props;
     const { t } = useTranslation();
-    const { getCar } = useCars();
-
-    const [car, setCar] = useState<Car | null>(null);
 
     const formCarId = useWatch({ control, name: "carId" });
+    const { car } = useCar({ carId: formCarId });
 
     useEffect(() => {
-        const car = getCar(formCarId);
-        setCar(car ?? null);
         clearErrors();
     }, [formCarId]);
 

@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Image from "../../../../components/Image.tsx";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants";
 import Button from "../../../../components/Button/Button.ts";
-import { EDIT_CAR_FORM_STEPS } from "../../constants/index.ts";
+import { EDIT_CAR_FORM_STEPS } from "../../constants";
 import Divider from "../../../../components/Divider.tsx";
 import { Odometer } from "../../_features/odometer/components/Odometer.tsx";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";

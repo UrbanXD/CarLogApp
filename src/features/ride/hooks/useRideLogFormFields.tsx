@@ -1,8 +1,6 @@
 import { UseFormReturn, useWatch } from "react-hook-form";
 import { RideLogFormFields } from "../schemas/form/rideLogForm.ts";
-import React, { useEffect, useMemo, useState } from "react";
-import { Car } from "../../car/schemas/carSchema.ts";
-import useCars from "../../car/hooks/useCars.ts";
+import React, { useEffect, useMemo } from "react";
 import { RideLogFormFieldsEnum } from "../enums/RideLogFormFields.ts";
 import { FormFields, Steps } from "../../../types";
 import { CarPickerInput } from "../../car/components/forms/inputFields/CarPickerInput.tsx";
@@ -14,7 +12,6 @@ import { useTranslation } from "react-i18next";
 import { EditToast } from "../../../ui/alert/presets/toast";
 import { formatWithUnit } from "../../../utils/formatWithUnit.ts";
 import { Odometer } from "../../car/_features/odometer/schemas/odometerSchema.ts";
-import { OdometerLimit } from "../../car/_features/odometer/model/dao/OdometerLogDao.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useRidePlaceToExpandableList } from "../_features/place/hooks/useRidePlaceToExpandableList.ts";
 import { ArrayInput } from "../../../components/Input/array/ArrayInput.tsx";
@@ -23,6 +20,8 @@ import { useRidePassengerToExpandableList } from "../_features/passenger/hooks/u
 import { RidePassengerForm } from "../_features/passenger/components/forms/RidePassengerForm.tsx";
 import { useRideExpenseToExpandableList } from "../_features/rideExpense/hooks/useRideExpenseToExpandableList.ts";
 import { RideExpenseForm } from "../_features/rideExpense/components/forms/RideExpenseForm.tsx";
+import { useCar } from "../../car/hooks/useCar.ts";
+import { useWatchedQueryItem } from "../../../database/hooks/useWatchedQueryItem.ts";
 
 type UseRideLogFormFieldsProps = {
     form: UseFormReturn<RideLogFormFields>
@@ -39,16 +38,12 @@ export function useRideLogFormFields({
     startOdometer,
     endOdometer
 }: UseRideLogFormFieldsProps) {
-    const { control, setValue, getFieldState, clearErrors, handleSubmit } = form;
+    const { control, setValue, getFieldState, clearErrors } = form;
     const { t } = useTranslation();
     const { odometerLogDao } = useDatabase();
-    const { getCar } = useCars();
     const { ridePlaceToExpandableList } = useRidePlaceToExpandableList();
     const { ridePassengerToExpandableList } = useRidePassengerToExpandableList();
     const { rideExpenseToExpandableList } = useRideExpenseToExpandableList();
-
-    const [car, setCar] = useState<Car | null>(null);
-    const [startOdometerLimit, setStartOdometerLimit] = useState<OdometerLimit | null>(null);
 
     const formStartOdometerLogId = useWatch({ control, name: "startOdometerLogId" });
     const formEndOdometerLogId = useWatch({ control, name: "endOdometerLogId" });
@@ -56,14 +51,24 @@ export function useRideLogFormFields({
     const formStartOdometerValue = useWatch({ control, name: "startOdometerValue" });
     const formStartTime = useWatch({ control, name: "startTime" });
 
+    const memoizedLimitQuery = useMemo(() => odometerLogDao.odometerLimitWatchedQueryItem(
+        formCarId,
+        formStartTime,
+        [formStartOdometerLogId, formEndOdometerLogId]
+    ), [odometerLogDao, formCarId, formStartTime, formStartOdometerLogId, formEndOdometerLogId]);
+
+    const { car } = useCar({ carId: formCarId, options: { queryOnce: true } });
+    const { data: startOdometerLimit } = useWatchedQueryItem(memoizedLimitQuery);
+
+
     useEffect(() => {
-        const car = getCar(formCarId);
-        setCar(car ?? null);
-        if(car && !getFieldState("startOdometerValue").isDirty && setCarOdometerValueWhenInputNotTouched) {
-            setValue("startOdometerValue", car.odometer.value, { shouldDirty: false });
+        if(car && car.id === formCarId) {
+            if(car && !getFieldState("startOdometerValue").isDirty && setCarOdometerValueWhenInputNotTouched) {
+                setValue("startOdometerValue", car.odometer.value, { shouldDirty: false });
+            }
+            clearErrors();
         }
-        clearErrors();
-    }, [formCarId]);
+    }, [car, formCarId]);
 
     useEffect(() => {
         if(formStartOdometerValue && !getFieldState("endOdometerValue").isDirty && setCarOdometerValueWhenInputNotTouched) {
@@ -72,19 +77,10 @@ export function useRideLogFormFields({
     }, [formStartOdometerValue]);
 
     useEffect(() => {
-        (async () => {
-            if(formStartTime && !getFieldState("endTime").isDirty && setEndTimeWhenInputNotTouched) {
-                setValue("endTime", formStartTime);
-            }
-            if(!formCarId || !formStartTime) return;
-
-            setStartOdometerLimit(await odometerLogDao.getOdometerLimitByDate(
-                formCarId,
-                formStartTime,
-                [formStartOdometerLogId, formEndOdometerLogId]
-            ));
-        })();
-    }, [formCarId, formStartTime, formStartOdometerLogId, formEndOdometerLogId]);
+        if(formStartTime && !getFieldState("endTime").isDirty && setEndTimeWhenInputNotTouched) {
+            setValue("endTime", formStartTime);
+        }
+    }, [formStartTime]);
 
     const fields: Record<RideLogFormFieldsEnum, FormFields> = useMemo(
         () => ({

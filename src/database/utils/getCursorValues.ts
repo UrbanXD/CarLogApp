@@ -1,4 +1,4 @@
-import { CursorOptions, CursorValue } from "../../hooks/useInfiniteQuery.ts";
+import { CursorOptions, CursorValue } from "../hooks/useInfiniteQuery.ts";
 
 export function getCursorValues<TableItem>(
     item: TableItem,

@@ -21,7 +21,7 @@ import { SERVICE_ITEM_TABLE } from "../../../../../../database/connector/powersy
 import { OdometerUnitDao } from "../../../../../car/_features/odometer/model/dao/OdometerUnitDao.ts";
 import { ExpenseTypeDao } from "../../../../model/dao/ExpenseTypeDao.ts";
 import { SelectServiceItemTableRow, ServiceItemDao } from "./ServiceItemDao.ts";
-import { CarDao } from "../../../../../car/model/dao/CarDao.ts";
+import { CarDao, SelectCarModelTableRow } from "../../../../../car/model/dao/CarDao.ts";
 import { CursorOptions, CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
 import { PaginatorOptions } from "../../../../../../database/paginator/AbstractPaginator.ts";
 import { SelectQueryBuilder } from "kysely";
@@ -36,16 +36,22 @@ import { SERVICE_TYPE_TABLE } from "../../../../../../database/connector/powersy
 import { AbstractPowerSyncDatabase } from "@powersync/react-native";
 import { ServiceItemTotalAmountTableRow } from "../mapper/ServiceItemMapper.ts";
 import { SERVICE_ITEM_TYPE_TABLE } from "../../../../../../database/connector/powersync/tables/serviceItemType.ts";
+import { MODEL_TABLE } from "../../../../../../database/connector/powersync/tables/model.ts";
+import { MAKE_TABLE } from "../../../../../../database/connector/powersync/tables/make.ts";
+import { WatchQueryOptions } from "../../../../../../database/watcher/watcher.ts";
+import { UseWatchedQueryItemProps } from "../../../../../../database/hooks/useWatchedQueryItem.ts";
 
 export type SelectServiceLogTableRow =
     Omit<ServiceLogTableRow, "odometer_log_id">
     & WithPrefix<Omit<ServiceTypeTableRow, "id">, "service_type">
-    & WithPrefix<Omit<SelectExpenseTableRow, "related_id" | "car_id" | "id">, "expense">
+    & WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">
+    & WithPrefix<Omit<SelectExpenseTableRow, "related_id" | "car_id" | "id" | keyof WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">>, "expense">
     & WithPrefix<Omit<SelectOdometerTableRow, "log_car_id">, "odometer">
-    & {
-    items: Array<SelectServiceItemTableRow>
-    totalAmount: Array<ServiceItemTotalAmountTableRow>
-};
+    &
+    {
+        items: Array<SelectServiceItemTableRow>
+        totalAmount: Array<ServiceItemTotalAmountTableRow>
+    };
 
 export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLogMapper, SelectServiceLogTableRow> {
     constructor(
@@ -82,6 +88,8 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
         .innerJoin(`${ EXPENSE_TABLE } as e` as const, "e.id", "sl.expense_id")
         .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "et.id", "e.type_id")
         .innerJoin(`${ CAR_TABLE } as c` as const, "c.id", "sl.car_id")
+        .innerJoin(`${ MODEL_TABLE } as mo` as const, "mo.id", "c.model_id")
+        .innerJoin(`${ MAKE_TABLE } as ma` as const, "ma.id", "mo.make_id")
         .innerJoin(`${ ODOMETER_LOG_TABLE } as ol` as const, "ol.id", "sl.odometer_log_id")
         .innerJoin(`${ ODOMETER_UNIT_TABLE } as u` as const, "u.id", "c.odometer_unit_id")
         .innerJoin(`${ CURRENCY_TABLE } as cur` as const, "cur.id", "e.currency_id")
@@ -98,6 +106,12 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
             "et.id as expense_type_id",
             "et.key as expense_type_key",
             "et.owner_id as expense_type_owner_id",
+            "c.name as car_name",
+            "mo.id as car_model_id",
+            "mo.name as car_model_name",
+            "c.model_year as car_model_year",
+            "ma.id as car_make_id",
+            "ma.name as car_make_name",
             "cur.id as expense_currency_id",
             "cur.symbol as expense_currency_symbol",
             "cur.key as expense_currency_key",
@@ -163,6 +177,17 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
         if(id) query = query.where("sl.id", "=", id);
 
         return query;
+    }
+
+    serviceLogWatchedQueryItem(
+        id: string | null | undefined,
+        options?: WatchQueryOptions
+    ): UseWatchedQueryItemProps<ServiceLog, SelectServiceLogTableRow> {
+        return {
+            query: this.selectQuery(id),
+            mapper: this.mapper.toDto.bind(this.mapper),
+            options: { enabled: !!id, ...options }
+        };
     }
 
     async createFromFormResult(formResult: ServiceLogFormFields): Promise<ServiceLogTableRow["id"]> {

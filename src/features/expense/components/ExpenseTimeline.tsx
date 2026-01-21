@@ -4,10 +4,9 @@ import React, { useMemo } from "react";
 import { TimelineView } from "../../../components/timelineView/TimelineView.tsx";
 import { Title } from "../../../components/Title.tsx";
 import { StyleSheet, View } from "react-native";
-import { SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
+import { SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants";
 import { useTimelinePaginator } from "../../../hooks/useTimelinePaginator.ts";
 import { Expense } from "../schemas/expenseSchema.ts";
-import { Car } from "../../car/schemas/carSchema.ts";
 import { useExpenseTimelineFilter } from "../hooks/useExpenseTimelineFilter.ts";
 import { SelectExpenseTableRow } from "../model/mapper/expenseMapper.ts";
 import { TimelineItemType } from "../../../components/timelineView/item/TimelineItem.tsx";
@@ -15,10 +14,10 @@ import { useTranslation } from "react-i18next";
 import { CAR_TABLE } from "../../../database/connector/powersync/tables/car.ts";
 
 type ExpenseTimelineProps = {
-    car: Car
+    carId: string
 };
 
-export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
+export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
     const { t } = useTranslation();
     const { expenseDao } = useDatabase();
     const { mapper } = useExpenseTimelineItem();
@@ -34,7 +33,7 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
                 },
                 {
                     group: CAR_TABLE,
-                    filters: [{ field: "car_id", operator: "=", value: car.id }]
+                    filters: [{ field: "car_id", operator: "=", value: carId }]
                 }
             ),
         []
@@ -56,9 +55,7 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
         mapper,
         cursorOrderButtons: [{ field: "date", title: t("date.text") }, { field: "amount", title: t("currency.price") }]
     });
-    const { filterButtons } = useExpenseTimelineFilter({ timelineFilterManagement, car });
-
-    if(!car) return <></>;
+    const { filterButtons } = useExpenseTimelineFilter({ timelineFilterManagement, carId });
 
     return (
         <View style={ styles.container }>

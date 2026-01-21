@@ -234,7 +234,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             };
         },
         [
-            session,
+            session?.user,
             authenticated,
             openAccountVerification,
             signUp,

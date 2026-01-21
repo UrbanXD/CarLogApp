@@ -30,7 +30,9 @@ import { FUEL_UNIT_TABLE } from "../../../../database/connector/powersync/tables
 import { ODOMETER_UNIT_TABLE } from "../../../../database/connector/powersync/tables/odometerUnit.ts";
 import { SelectOdometerTableRow } from "../../_features/odometer/model/dao/OdometerLogDao.ts";
 import { WithPrefix } from "../../../../types";
-import { CurrencyDao } from "../../../_shared/currency/model/dao/CurrencyDao.ts";
+import { UseWatchedQueryItemProps } from "../../../../database/hooks/useWatchedQueryItem.ts";
+import { WatchQueryOptions } from "../../../../database/watcher/watcher.ts";
+import { UseWatchedQueryCollectionProps } from "../../../../database/hooks/useWatchedQueryCollection.ts";
 
 export type SelectCarModelTableRow =
     Pick<CarTableRow, "id" | "name" | "model_year"> &
@@ -50,14 +52,12 @@ export type SelectCarTableRow =
 
 export class CarDao extends Dao<CarTableRow, Car, CarMapper, SelectCarTableRow> {
     private readonly attachmentQueue?: PhotoAttachmentQueue;
-    private readonly currencyDao: CurrencyDao;
 
     constructor(
         db: Kysely<DatabaseType>,
         powersync: AbstractPowerSyncDatabase,
         attachmentQueue: PhotoAttachmentQueue | undefined,
-        odometerUnitDao: OdometerUnitDao,
-        currencyDao: CurrencyDao
+        odometerUnitDao: OdometerUnitDao
     ) {
         super(
             db,
@@ -66,7 +66,6 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper, SelectCarTableRow> 
             new CarMapper(attachmentQueue, odometerUnitDao)
         );
         this.attachmentQueue = attachmentQueue;
-        this.currencyDao = currencyDao;
     }
 
     selectQuery(id?: any | null): SelectQueryBuilder<DatabaseType, any, SelectCarTableRow> {
@@ -127,6 +126,22 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper, SelectCarTableRow> 
         if(id) query = query.where("car.id", "=", id);
 
         return query;
+    }
+
+    carWatchedQueryCollection(options?: WatchQueryOptions): UseWatchedQueryCollectionProps<Car> {
+        return {
+            query: this.selectQuery(),
+            mapper: this.mapper.toDtoArray.bind(this.mapper),
+            options: options
+        };
+    }
+
+    carWatchedQueryItem(carId: string | null | undefined, options?: WatchQueryOptions): UseWatchedQueryItemProps<Car> {
+        return {
+            query: this.selectQuery(carId),
+            mapper: this.mapper.toDto.bind(this.mapper),
+            options: { queryOnce: true, enabled: !!carId, ...options }
+        };
     }
 
     async getAll(): Promise<Array<Car>> {

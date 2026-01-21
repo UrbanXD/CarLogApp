@@ -1,8 +1,6 @@
 import { UseFormReturn, useWatch } from "react-hook-form";
-import useCars from "../../../../car/hooks/useCars.ts";
-import React, { useEffect, useMemo, useState } from "react";
-import { Car } from "../../../../car/schemas/carSchema.ts";
-import { FormFields, Steps } from "../../../../../types/index.ts";
+import React, { useEffect, useMemo } from "react";
+import { FormFields, Steps } from "../../../../../types";
 import { CarPickerInput } from "../../../../car/components/forms/inputFields/CarPickerInput.tsx";
 import Input from "../../../../../components/Input/Input.ts";
 import {
@@ -13,14 +11,15 @@ import { ServiceLogFormFields } from "../schemas/form/serviceLogForm.ts";
 import { ServiceLogFormFieldsEnum } from "../enums/ServiceLogFormFieldsEnum.ts";
 import { ServiceTypeInput } from "../components/forms/inputFields/ServiceTypeInput.tsx";
 import { useTranslation } from "react-i18next";
-import { EditToast } from "../../../../../ui/alert/presets/toast/index.ts";
-import { OdometerLimit } from "../../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
+import { EditToast } from "../../../../../ui/alert/presets/toast";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { Odometer } from "../../../../car/_features/odometer/schemas/odometerSchema.ts";
 import { ArrayInput } from "../../../../../components/Input/array/ArrayInput.tsx";
 import { useServiceItemToExpandableList } from "./useServiceItemToExpandableList.ts";
 import { CurrencyEnum } from "../../../../_shared/currency/enums/currencyEnum.ts";
 import { ServiceItemForm } from "../components/forms/ServiceItemForm.tsx";
+import { useCar } from "../../../../car/hooks/useCar.ts";
+import { useWatchedQueryItem } from "../../../../../database/hooks/useWatchedQueryItem.ts";
 
 type UseServiceLogFormFieldsProps = UseFormReturn<ServiceLogFormFields> & { odometer?: Odometer | null }
 
@@ -28,29 +27,24 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
     const { control, setValue, clearErrors, odometer } = props;
     const { t } = useTranslation();
     const { odometerLogDao } = useDatabase();
-    const { getCar } = useCars();
     const { serviceItemToExpandableListItem } = useServiceItemToExpandableList();
-
-    const [car, setCar] = useState<Car | null>(null);
-    const [odometerLimit, setOdometerLimit] = useState<OdometerLimit | null>(null);
 
     const formOdometerLogId = useWatch({ control, name: "odometerLogId" });
     const formCarId = useWatch({ control, name: "carId" });
     const formDate = useWatch({ control, name: "date" });
 
+    const memoizedLimitQuery = useMemo(() => odometerLogDao.odometerLimitWatchedQueryItem(
+        formCarId,
+        formDate,
+        formOdometerLogId ? [formOdometerLogId] : []
+    ), [odometerLogDao, formCarId, formDate, formOdometerLogId]);
+
+    const { car } = useCar({ carId: formCarId, options: { queryOnce: true } });
+    const { data: odometerLimit } = useWatchedQueryItem(memoizedLimitQuery);
+
     useEffect(() => {
-        const car = getCar(formCarId);
-        setCar(car ?? null);
         clearErrors();
     }, [formCarId]);
-
-    useEffect(() => {
-        (async () => {
-            if(!formCarId || !formDate) return;
-
-            setOdometerLimit(await odometerLogDao.getOdometerLimitByDate(formCarId, formDate, [formOdometerLogId]));
-        })();
-    }, [formCarId, formDate, formOdometerLogId]);
 
     const fields: Record<ServiceLogFormFieldsEnum, FormFields> = useMemo(() => ({
         [ServiceLogFormFieldsEnum.Car]: {

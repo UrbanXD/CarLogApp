@@ -1,10 +1,9 @@
-import { Car } from "../../../../car/schemas/carSchema.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import React, { useCallback, useMemo } from "react";
 import { useTimelinePaginator } from "../../../../../hooks/useTimelinePaginator.ts";
 import { StyleSheet, View } from "react-native";
 import { TimelineView } from "../../../../../components/timelineView/TimelineView.tsx";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../../../constants";
 import { EXPENSE_TABLE } from "../../../../../database/connector/powersync/tables/expense.ts";
 import { useServiceLogTimelineFilter } from "../hooks/useServiceLogTimelineFilter.ts";
 import { ExpenseTableRow, ServiceLogTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
@@ -19,10 +18,10 @@ import { CAR_TABLE } from "../../../../../database/connector/powersync/tables/ca
 import { RawBuilder } from "kysely";
 
 type ServiceLogTimelineProps = {
-    car: Car
+    carId: string
 };
 
-export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
+export function ServiceLogTimeline({ carId }: ServiceLogTimelineProps) {
     const { t } = useTranslation();
     const { serviceLogDao } = useDatabase();
     const { mapper } = useServiceLogTimelineItem();
@@ -38,7 +37,7 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
                 },
                 {
                     group: CAR_TABLE,
-                    filters: [{ field: "car_id", operator: "=", value: car.id }]
+                    filters: [{ field: "car_id", operator: "=", value: carId }]
                 }
             ),
         []
@@ -63,7 +62,7 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
             { table: EXPENSE_TABLE, field: "amount", title: t("currency.price") }
         ]
     });
-    const { filterButtons } = useServiceLogTimelineFilter({ timelineFilterManagement, car });
+    const { filterButtons } = useServiceLogTimelineFilter({ timelineFilterManagement, carId });
 
     const setYearFilter = useCallback((year: string) => {
         // @formatter:off

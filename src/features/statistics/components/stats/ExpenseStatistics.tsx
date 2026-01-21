@@ -4,7 +4,7 @@ import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { BarChartView } from "../charts/BarChartView.tsx";
 import { ComparisonStatByDate, ComparisonStatByType, SummaryStat } from "../../model/dao/statisticsDao.ts";
 import { StyleSheet, View } from "react-native";
-import { SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { SEPARATOR_SIZES } from "../../../../constants";
 import { useTranslation } from "react-i18next";
 import { DonutChartView } from "../charts/DonutChartView.tsx";
 import { getDateFormatTemplateByRangeUnit } from "../../utils/getDateFormatTemplateByRangeUnit.ts";
@@ -13,7 +13,7 @@ import { MasonryStatView } from "../MasonryStatView.tsx";
 import { formatWithUnit } from "../../../../utils/formatWithUnit.ts";
 
 type ExpenseStatisticsProps = {
-    carId?: string
+    carId?: string | null
     from: string
     to: string
 }

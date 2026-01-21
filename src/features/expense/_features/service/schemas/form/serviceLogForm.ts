@@ -3,7 +3,6 @@ import { expenseForm } from "../../../../schemas/form/expenseForm.ts";
 import { ServiceLog, serviceLogSchema } from "../serviceLogSchema.ts";
 import { zNumber, zPickerRequiredString } from "../../../../../../types/zodTypes.ts";
 import { odometerLogSchema } from "../../../../../car/_features/odometer/schemas/odometerLogSchema.ts";
-import { Car } from "../../../../../car/schemas/carSchema.ts";
 import { getUUID } from "../../../../../../database/utils/uuid.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OdometerLogDao } from "../../../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
@@ -17,11 +16,11 @@ import { transformedServiceItemForm } from "./serviceItemForm.ts";
 import { DefaultValues, UseFormProps } from "react-hook-form";
 
 const serviceLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
-.pick({ date: true, note: true })
+.pick({ carId: true, date: true, note: true })
 .extend({ expenseId: expenseForm.shape.id })
 .merge(
     serviceLogSchema
-    .pick({ id: true, carId: true })
+    .pick({ id: true })
     .extend({
         items: z.array(transformedServiceItemForm),
         serviceTypeId: zPickerRequiredString({ errorMessage: "error.service_type_required" })
@@ -48,17 +47,16 @@ const serviceLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
     });
 });
 
-export type ServiceLogDefaultValues = z.infer<ReturnType<typeof serviceLogForm>>;
 export type ServiceLogFormFields = z.infer<ReturnType<typeof serviceLogForm>>;
 
-export function useCreateServiceLogFormProps(car: Car | null): UseFormProps<ServiceLogFormFields, any, ServiceLogFormFields> {
+export function useCreateServiceLogFormProps(carId?: string | null): UseFormProps<ServiceLogFormFields, any, ServiceLogFormFields> {
     const { odometerLogDao } = useDatabase();
 
     const defaultValues: DefaultValues<ServiceLogFormFields> = {
         id: getUUID(),
         expenseId: getUUID(),
         odometerLogId: getUUID(),
-        carId: car?.id,
+        carId: carId ?? undefined,
         serviceTypeId: undefined,
         items: [],
         odometerValue: undefined,
@@ -76,7 +74,7 @@ export function useEditServiceLogFormProps(serviceLog: ServiceLog): UseFormProps
         id: serviceLog.id,
         expenseId: serviceLog.expense.id,
         odometerLogId: serviceLog.odometer?.id ?? getUUID(),
-        carId: serviceLog.carId,
+        carId: serviceLog.car.id,
         serviceTypeId: serviceLog.serviceType.id,
         items: serviceLog.items,
         odometerValue: serviceLog.odometer?.value,

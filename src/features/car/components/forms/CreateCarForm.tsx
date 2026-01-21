@@ -1,8 +1,6 @@
 import React from "react";
 import MultiStepForm from "../../../../components/Form/MultiStepForm.tsx";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
-import { useAppSelector } from "../../../../hooks";
-import { getUser } from "../../../user/model/selectors";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { FormState, useForm } from "react-hook-form";
@@ -11,26 +9,25 @@ import useCarSteps from "../../hooks/useCarSteps.tsx";
 import { CarCreateToast } from "../../presets/toast";
 import { InvalidFormToast } from "../../../../ui/alert/presets/toast";
 import { SubmitHandlerArgs } from "../../../../types";
+import { UserAccount } from "../../../user/schemas/userSchema.ts";
 
 type CreateCarFormProps = {
+    user: UserAccount
     onFormStateChange?: (formState: FormState<CarFormFields>) => void
 }
 
-export function CreateCarForm({ onFormStateChange }: CreateCarFormProps) {
-    const user = useAppSelector(getUser);
+export function CreateCarForm({ user, onFormStateChange }: CreateCarFormProps) {
     const { carDao } = useDatabase();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
 
-    if(!user) throw new Error("User not found");
-
-    const form = useForm<CarFormFields>(useCreatCarFormProps(user));
+    const form = useForm<CarFormFields>(useCreatCarFormProps(user.id, user.currency.id));
     const steps = useCarSteps(form);
 
     const submitHandler: SubmitHandlerArgs<CarFormFields> = {
         onValid: async (formResult) => {
             try {
-                await carDao.create(formResult);
+                await carDao.createFromFormResult(formResult);
 
                 if(dismissBottomSheet) dismissBottomSheet(true);
                 openToast(CarCreateToast.success());

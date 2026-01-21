@@ -1,17 +1,17 @@
 import React from "react";
 import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
 import { ServiceLogTimeline } from "../features/expense/_features/service/components/ServiceLogTimeline.tsx";
-import useCars from "../features/car/hooks/useCars.ts";
 import { FirstSelectCar } from "../components/firstSelectCar/FirstSelectCar.tsx";
+import { useSelectedCarId } from "../features/car/hooks/useSelectedCarId.ts";
 
 export function ServiceLogScreen() {
-    const { selectedCar } = useCars();
+    const { selectedCarId } = useSelectedCarId();
 
-    if(!selectedCar) return <FirstSelectCar/>;
+    if(!selectedCarId) return <FirstSelectCar/>;
 
     return (
         <ScreenScrollView>
-            <ServiceLogTimeline car={ selectedCar }/>
+            <ServiceLogTimeline carId={ selectedCarId }/>
         </ScreenScrollView>
 
     );

@@ -50,9 +50,29 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
     }
 
     toDto(entity: SelectServiceLogTableRow): ServiceLog {
+        const car = {
+            id: entity.car_id,
+            name: entity.car_name,
+            model: {
+                id: entity.car_model_id,
+                name: entity.car_model_name,
+                year: entity.car_model_year,
+                make: {
+                    id: entity.car_make_id,
+                    name: entity.car_make_name
+                }
+            }
+        };
+
         const expense = this.expenseDao.mapper.toDto({
             id: entity.expense_id!,
             car_id: entity.car_id,
+            car_name: entity.car_name,
+            car_model_id: entity.car_model_id,
+            car_model_name: entity.car_model_name,
+            car_model_year: entity.car_model_year,
+            car_make_id: entity.car_make_id,
+            car_make_name: entity.car_make_name,
             related_id: entity.id,
             type_id: entity.expense_type_id,
             type_owner_id: entity.expense_type_owner_id,
@@ -92,7 +112,7 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
 
         return serviceLogSchema.parse({
             id: entity.id,
-            carId: entity.car_id,
+            car: car,
             expense: expense,
             odometer: odometer,
             serviceType: serviceType,
@@ -104,7 +124,7 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
     toEntity(dto: ServiceLog): ServiceLogTableRow {
         return {
             id: dto.id,
-            car_id: dto.carId,
+            car_id: dto.car.id,
             expense_id: dto.expense?.id ?? null,
             odometer_log_id: dto.odometer?.id ?? null,
             service_type_id: dto.serviceType.id

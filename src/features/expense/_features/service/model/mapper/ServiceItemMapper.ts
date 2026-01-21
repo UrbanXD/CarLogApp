@@ -14,9 +14,11 @@ import {
 } from "../../schemas/form/serviceItemForm.ts";
 import { SelectServiceItemTableRow } from "../dao/ServiceItemDao.ts";
 import { SelectExpenseTableRow } from "../../../../model/mapper/expenseMapper.ts";
+import { WithPrefix } from "../../../../../../types";
+import { SelectCarModelTableRow } from "../../../../../car/model/dao/CarDao.ts";
 
 export type ServiceItemTotalAmountTableRow =
-    Omit<SelectExpenseTableRow, "related_id" | "car_id" | "id" | "date" | "note" | "type_id" | "type_key" | "type_owner_id">
+    Omit<SelectExpenseTableRow, "related_id" | "car_id" | "id" | "date" | "note" | "type_id" | "type_key" | "type_owner_id" | keyof WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">>
 
 export class ServiceItemMapper extends AbstractMapper<ServiceItemTableRow, ServiceItem, SelectServiceItemTableRow> {
     private readonly serviceItemTypeDao: ServiceItemTypeDao;

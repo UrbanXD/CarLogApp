@@ -7,6 +7,7 @@ import { CurrencyDao } from "../../../../../_shared/currency/model/dao/CurrencyD
 import { ExpenseTypeDao } from "../../../../../expense/model/dao/ExpenseTypeDao.ts";
 import { WithPrefix } from "../../../../../../types";
 import { SelectExpenseTableRow } from "../../../../../expense/model/mapper/expenseMapper.ts";
+import { Car } from "../../../../../car/schemas/carSchema.ts";
 
 export type SelectRideExpenseTableRow =
     RideExpenseTableRow
@@ -28,6 +29,12 @@ export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideE
         const expense = this.expenseDao.mapper.toDto({
             id: entity.expense_id!,
             car_id: entity.expense_car_id,
+            car_name: entity.expense_car_name,
+            car_model_id: entity.expense_car_model_id,
+            car_model_name: entity.expense_car_model_name,
+            car_model_year: entity.expense_car_model_year,
+            car_make_id: entity.expense_car_make_id,
+            car_make_name: entity.expense_car_make_name,
             related_id: null,
             type_id: entity.expense_type_id,
             type_owner_id: entity.expense_type_owner_id,
@@ -64,12 +71,11 @@ export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideE
 
     async toFormTransformedFields(
         formResult: RideExpenseFormFields,
-        carId: string,
-        carCurrencyId: number
+        car: Car
     ): Promise<RideExpenseFormTransformedFields> {
         const expenseEntity = this.expenseDao.mapper.formResultToEntity({
             id: formResult.expense.id,
-            carId: carId,
+            carId: car.id,
             typeId: formResult.typeId,
             expense: formResult.expense,
             date: formResult.date,
@@ -78,12 +84,18 @@ export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideE
 
         const expenseType = await this.expenseTypeDao.getById(expenseEntity.type_id);
         const currency = await this.currencyDao.getById(expenseEntity.currency_id);
-        const carCurrency = await this.currencyDao.getById(carCurrencyId);
+        const carCurrency = await this.currencyDao.getById(car.currency.id);
 
         return {
             id: formResult.id,
             expense: this.expenseDao.mapper.toDto({
                 ...expenseEntity,
+                car_name: car.name,
+                car_model_id: car.model.id,
+                car_model_name: car.model.name,
+                car_model_year: car.model.year,
+                car_make_id: car.model.make.id,
+                car_make_name: car.model.make.name,
                 type_id: expenseType.id,
                 type_owner_id: expenseType.ownerId,
                 type_key: expenseType.key,

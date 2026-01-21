@@ -38,7 +38,7 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
     const submitHandler = handleSubmit(
         async (formResult) => {
             try {
-                const result = await serviceItemDao.mapper.formResultToDto(formResult, carCurrencyId);
+                const result = await serviceItemDao.mapper.toFormTransformedFields(formResult, carCurrencyId);
 
                 onSubmit(result);
             } catch(e) {

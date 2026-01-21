@@ -1,32 +1,32 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import useCars from "../features/car/hooks/useCars.ts";
 import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
 import Garage from "../features/car/components/Garage.tsx";
-import { UpcomingRides } from "../features/ride/components/UpcomingRides.tsx";
 import { LatestExpenses } from "../features/expense/components/LatestExpense.tsx";
-import { DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants/index.ts";
+import { DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants";
 import { ServiceForecastView } from "../features/statistics/components/forecasts/ServiceForecastView.tsx";
+import { useSelectedCarId } from "../features/car/hooks/useSelectedCarId.ts";
+import { UpcomingRides } from "../features/ride/components/UpcomingRides.tsx";
 
 export function HomeScreen() {
-    const { selectedCar } = useCars();
+    const { selectedCarId } = useSelectedCarId();
 
     return (
         <ScreenScrollView style={ { paddingHorizontal: 0 } }>
             <Garage/>
             <View style={ styles.contentContainer }>
                 {
-                    selectedCar &&
+                    selectedCarId &&
                    <>
-                      <UpcomingRides carId={ selectedCar.id }/>
-                      <LatestExpenses carId={ selectedCar.id }/>
-                      <ServiceForecastView carId={ selectedCar.id }/>
+                      <UpcomingRides carId={ selectedCarId }/>
+                      <LatestExpenses carId={ selectedCarId }/>
+                      <ServiceForecastView carId={ selectedCarId }/>
                    </>
                 }
             </View>
         </ScreenScrollView>
     );
-};
+}
 
 const styles = StyleSheet.create({
     titleContainer: {

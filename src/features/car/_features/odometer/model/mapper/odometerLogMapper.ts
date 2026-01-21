@@ -8,7 +8,12 @@ import {
 } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { OdometerLogTypeDao } from "../dao/OdometerLogTypeDao.ts";
 import { Odometer, odometerSchema } from "../../schemas/odometerSchema.ts";
-import { SelectOdometerLogTableRow, SelectOdometerTableRow } from "../dao/OdometerLogDao.ts";
+import {
+    OdometerLimit,
+    SelectOdometerLimitTableRow,
+    SelectOdometerLogTableRow,
+    SelectOdometerTableRow
+} from "../dao/OdometerLogDao.ts";
 
 export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, OdometerLog> {
     private readonly odometerLogTypeDao: OdometerLogTypeDao;
@@ -19,6 +24,19 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
     }
 
     toDto(entity: SelectOdometerLogTableRow): OdometerLog {
+        const car = {
+            id: entity.car_id,
+            name: entity.car_name,
+            model: {
+                id: entity.car_model_id,
+                name: entity.car_model_name,
+                year: entity.car_model_year,
+                make: {
+                    id: entity.car_make_id,
+                    name: entity.car_make_name
+                }
+            }
+        };
 
         const odometerLogType = this.odometerLogTypeDao.mapper.toDto({
             id: entity.type_id as never,
@@ -27,7 +45,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
 
         return odometerLogSchema.parse({
             id: entity.id,
-            carId: entity.car_id,
+            car: car,
             relatedId: entity.related_id,
             type: odometerLogType,
             valueInKm: entity.value!,
@@ -58,10 +76,18 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
         });
     }
 
+    toOdometerLimitDto(entity: SelectOdometerLimitTableRow): OdometerLimit {
+        return {
+            min: entity?.min_value ? { value: Number(entity.min_value), date: String(entity.min_date) } : null,
+            max: entity?.max_value ? { value: Number(entity.max_value), date: String(entity.max_date) } : null,
+            unitText: entity?.unit ?? ""
+        };
+    }
+
     toEntity(dto: OdometerLog): OdometerLogTableRow {
         return {
             id: dto.id,
-            car_id: dto.carId,
+            car_id: dto.car.id,
             type_id: dto.type.id,
             value: dto.valueInKm
         };

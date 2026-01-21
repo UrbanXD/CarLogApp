@@ -95,7 +95,7 @@ export function useEditFuelLogFormProps(fuelLog: FuelLog): UseFormProps<FuelLogF
         },
         quantity: fuelLog.quantity,
         odometerLogId: fuelLog.odometer?.id ?? getUUID(),
-        carId: fuelLog.expense.carId,
+        carId: fuelLog.car.id,
         fuelUnitId: fuelLog.fuelUnit.id,
         odometerValue: fuelLog.odometer?.value ?? undefined,
         note: fuelLog.expense.note,

@@ -22,7 +22,7 @@ import { LegendData } from "../../components/charts/common/Legend.tsx";
 import { DonutChartItem } from "../../components/charts/DonutChartView.tsx";
 import { EXPENSE_TYPE_TABLE } from "../../../../database/connector/powersync/tables/expenseType.ts";
 import { ExpenseTypeEnum } from "../../../expense/model/enums/ExpenseTypeEnum.ts";
-import { COLORS } from "../../../../constants/index.ts";
+import { COLORS } from "../../../../constants";
 import { SERVICE_ITEM_TABLE } from "../../../../database/connector/powersync/tables/serviceItem.ts";
 import { ServiceItemTypeDao } from "../../../expense/_features/service/model/dao/ServiceItemTypeDao.ts";
 import { ServiceTypeDao } from "../../../expense/_features/service/model/dao/ServiceTypeDao.ts";
@@ -35,7 +35,7 @@ import { ServiceTypeEnum } from "../../../expense/_features/service/model/enums/
 import { formatDateToDatabaseFormat } from "../../utils/formatDateToDatabaseFormat.ts";
 
 type StatisticsFunctionArgs = {
-    carId?: string
+    carId?: string | null
     from: string
     to: string
     trendOptions?: TrendOptions
@@ -1317,7 +1317,7 @@ export class StatisticsDao {
         return (await query.execute()) as Array<TopListItemStat>;
     }
 
-    protected async getCarCurrencySymbol(carId?: string): Promise<string | null> {
+    protected async getCarCurrencySymbol(carId?: string | null): Promise<string | null> {
         if(!carId) return null;
 
         const query = this.db
@@ -1329,7 +1329,7 @@ export class StatisticsDao {
         return (await query.executeTakeFirst())?.currency_symbol ?? null;
     }
 
-    protected async getCarOdometerUnit(carId?: string): Promise<string | null> {
+    protected async getCarOdometerUnit(carId?: string | null): Promise<string | null> {
         if(!carId) return null;
 
         const query = this.db
@@ -1341,7 +1341,7 @@ export class StatisticsDao {
         return (await query.executeTakeFirst())?.odometer_unit ?? null;
     }
 
-    protected async getCarFuelUnit(carId?: string): Promise<string | null> {
+    protected async getCarFuelUnit(carId?: string | null): Promise<string | null> {
         if(!carId) return null;
 
         const query = this.db

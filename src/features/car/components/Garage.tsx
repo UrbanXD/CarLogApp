@@ -1,7 +1,7 @@
 import React from "react";
 import Carousel, { CarouselItemType } from "../../../components/Carousel/Carousel.tsx";
 import { StyleSheet, Text, View } from "react-native";
-import { DEFAULT_SEPARATOR, GLOBAL_STYLE, ICON_NAMES } from "../../../constants/index.ts";
+import { DEFAULT_SEPARATOR, GLOBAL_STYLE, ICON_NAMES } from "../../../constants";
 import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../../../components/Carousel/CarouselItem.tsx";
 import DefaultElement from "../../../components/DefaultElement.tsx";
@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 
 const Garage: React.FC = () => {
     const { t } = useTranslation();
-    const { cars, loading, openNewCarForm, openCarProfile } = useGarage();
+    const { cars, isLoading, openNewCarForm, openCarProfile } = useGarage();
 
     const renderDefaultElement =
         (size: number, spacerSize: number, loading: boolean) => {
@@ -52,7 +52,7 @@ const Garage: React.FC = () => {
             <View style={ styles.carouselContainer }>
                 <Carousel
                     data={ cars }
-                    loading={ loading }
+                    loading={ isLoading }
                     renderItem={ renderCarouselItem }
                     renderDefaultItem={ renderDefaultElement }
                 />

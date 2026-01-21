@@ -2,7 +2,6 @@ import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts
 import { useEffect, useState } from "react";
 import { FilterButtonProps } from "../../../../../components/filter/FilterButton.tsx";
 import { ServiceType } from "../schemas/serviceTypeSchema.ts";
-import { Car } from "../../../../car/schemas/carSchema.ts";
 import { ExpenseTableRow, ServiceLogTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
 import { TimelineFilterManagement } from "../../../../../hooks/useTimelinePaginator.ts";
 import { useTranslation } from "react-i18next";
@@ -13,7 +12,7 @@ const TYPES_FILTER_FIELD_NAME = "service_type_id" as keyof (ExpenseTableRow & Se
 
 type UseServiceLogTimelineFilterProps = {
     timelineFilterManagement: TimelineFilterManagement<ExpenseTableRow & ServiceLogTableRow>,
-    car: Car
+    carId: string
 }
 
 export function useServiceLogTimelineFilter({
@@ -24,7 +23,7 @@ export function useServiceLogTimelineFilter({
         removeFilter,
         clearFilters
     },
-    car
+    carId
 }: UseServiceLogTimelineFilterProps) {
     const { t } = useTranslation();
     const { serviceTypeDao } = useDatabase();
@@ -65,8 +64,8 @@ export function useServiceLogTimelineFilter({
     }, [filters]);
 
     useEffect(() => {
-        if(car) replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: car.id } });
-    }, [car]);
+        if(carId) replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: carId } });
+    }, [carId]);
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {
         const active = selectedTypesId.includes(type.id);

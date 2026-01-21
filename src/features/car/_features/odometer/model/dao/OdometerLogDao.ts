@@ -26,10 +26,17 @@ import { formatDateToDatabaseFormat } from "../../../../../statistics/utils/form
 import { WithPrefix } from "../../../../../../types";
 import { AbstractPowerSyncDatabase } from "@powersync/react-native";
 import { ODOMETER_LOG_TYPE_TABLE } from "../../../../../../database/connector/powersync/tables/odometerLogType.ts";
+import { UseWatchedQueryItemProps } from "../../../../../../database/hooks/useWatchedQueryItem.ts";
+import { WatchQueryOptions } from "../../../../../../database/watcher/watcher.ts";
+import { MODEL_TABLE } from "../../../../../../database/connector/powersync/tables/model.ts";
+import { MAKE_TABLE } from "../../../../../../database/connector/powersync/tables/make.ts";
+import { SelectCarModelTableRow } from "../../../../model/dao/CarDao.ts";
 
 export type SelectOdometerLogTableRow =
-    OdometerLogTableRow &
-    WithPrefix<OdometerUnitTableRow, "unit"> &
+    OdometerLogTableRow
+    & WithPrefix<OdometerUnitTableRow, "unit">
+    & WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">
+    &
     {
         related_id: string | null
         type_key: OdometerLogTypeTableRow["key"]
@@ -40,6 +47,14 @@ export type SelectOdometerLogTableRow =
 export type SelectOdometerTableRow =
     WithPrefix<Omit<OdometerLogTableRow, "type_id">, "log">
     & WithPrefix<OdometerUnitTableRow, "unit">
+
+export type SelectOdometerLimitTableRow = {
+    min_value: number | null
+    min_date: string | null
+    max_value: number | null
+    max_date: string | null
+    unit: string | null
+}
 
 export type OdometerLimit = {
     min: { value: number, date: string } | null,
@@ -61,6 +76,8 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         .selectFrom(`${ ODOMETER_LOG_TABLE } as ol` as const)
         .innerJoin(`${ ODOMETER_LOG_TYPE_TABLE } as ot` as const, "ot.id", "ol.type_id")
         .innerJoin(`${ CAR_TABLE } as c` as const, "c.id", "ol.car_id")
+        .innerJoin(`${ MODEL_TABLE } as mo` as const, "mo.id", "c.model_id")
+        .innerJoin(`${ MAKE_TABLE } as ma` as const, "ma.id", "mo.make_id")
         .innerJoin(`${ ODOMETER_UNIT_TABLE } as u` as const, "u.id", "c.odometer_unit_id")
         .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as ocl` as const, "ocl.odometer_log_id", "ol.id")
         .leftJoin(`${ FUEL_LOG_TABLE } as fl` as const, "fl.odometer_log_id", "ol.id")
@@ -71,6 +88,12 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         .leftJoin(`${ EXPENSE_TABLE } as e2` as const, "e2.id", "sl.expense_id")
         .selectAll("ol")
         .select((eb) => [
+            "c.name as car_name",
+            "mo.id as car_model_id",
+            "mo.name as car_model_name",
+            "c.model_year as car_model_year",
+            "ma.id as car_make_id",
+            "ma.name as car_make_name",
             "ot.key as type_key",
             "u.id as unit_id",
             "u.key as unit_key",
@@ -102,12 +125,15 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         return query;
     }
 
-    async getOdometerLimitByDate(
+    odometerLimitQuery(
         carId: string,
         date: string,
-        skipOdometerLogs: Array<string> = []
-    ): Promise<OdometerLimit> {
-        let baseQuery = this.db
+        skipOdometerLogs: Array<OdometerLogTableRow["id"]> = []
+    ): SelectQueryBuilder<DatabaseType, any, SelectOdometerLimitTableRow> {
+        const dbDate = formatDateToDatabaseFormat(date);
+        const dateSql = sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`;
+
+        return this.db
         .selectFrom(`${ ODOMETER_LOG_TABLE } as t1` as const)
         .innerJoin(`${ CAR_TABLE } as t2` as const, "t1.car_id", "t2.id")
         .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3` as const, "t2.odometer_unit_id", "t3.id")
@@ -118,61 +144,52 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         .leftJoin(`${ EXPENSE_TABLE } as t8` as const, "t6.expense_id", "t8.id")
         .leftJoin(`${ RIDE_LOG_TABLE } as t9` as const, "t1.id", "t9.start_odometer_log_id")
         .leftJoin(`${ RIDE_LOG_TABLE } as t10` as const, "t1.id", "t10.end_odometer_log_id")
+        .select([
+            //@formatter:off
+            "t3.short as unit",
+            sql<number | null>`MAX(CASE WHEN ${dateSql} < ${dbDate} THEN ROUND(t1.value / t3.conversion_factor) END)`.as("min_value"),
+            sql<string | null>`MAX(CASE WHEN ${dateSql} < ${dbDate} THEN ${dateSql} END)`.as("min_date"),
+            sql<number | null>`MIN(CASE WHEN ${dateSql} > ${dbDate} THEN ROUND(t1.value / t3.conversion_factor) END)`.as("max_value"),
+            sql<string | null>`MIN(CASE WHEN ${dateSql} > ${dbDate} THEN ${dateSql} END)`.as("max_date")
+            //@formatter:on
+        ])
         .where("t1.car_id", "=", carId)
-        .where("t1.id", "not in", skipOdometerLogs)
-        .where(
-            sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`,
-            "is not",
-            null
-        );
+        .where("t1.id", "not in", skipOdometerLogs.length > 0 ? skipOdometerLogs : [""])
+        .where(dateSql, "is not", null)
+        .groupBy("t3.short")
+    }
 
-        const unitResult = await this.db
-        .selectFrom(`${ CAR_TABLE } as t1`)
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t2`, "t1.odometer_unit_id", "t2.id")
-        .select("t2.short as unit")
-        .where("t1.id", "=", carId)
-        .executeTakeFirst();
-
-        const minQuery = baseQuery
-        .select([
-            sql`MAX(ROUND(t1.value / t3.conversion_factor))`.as("odometer_value"),
-            sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`.as("date")
-        ])
-        .where(
-            sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`,
-            "<",
-            formatDateToDatabaseFormat(date)
-        );
-
-        const maxQuery = baseQuery
-        .select([
-            sql`MIN(ROUND(t1.value / t3.conversion_factor))`.as("odometer_value"),
-            sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`.as("date")
-        ])
-        .where(
-            sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`,
-            ">",
-            formatDateToDatabaseFormat(date)
-        );
-
-        const minResult = await minQuery.executeTakeFirst();
-        const maxResult = await maxQuery.executeTakeFirst();
-
-        const formatResult = (result: any) => {
-            if(result && typeof result.odometer_value === "number" && result.date) {
-                return {
-                    value: result.odometer_value,
-                    date: String(result.date)
-                };
-            }
-            return null;
-        };
-
+    odometerLogWatchedQueryItem(
+        id: string | null | undefined,
+        options?: WatchQueryOptions
+    ): UseWatchedQueryItemProps<OdometerLog> {
         return {
-            min: formatResult(minResult),
-            max: formatResult(maxResult),
-            unitText: unitResult?.unit ?? ""
+            query: this.selectQuery(id),
+            mapper: this.mapper.toDto.bind(this.mapper),
+            options: { enabled: !!id, ...options }
         };
+    }
+
+    odometerLimitWatchedQueryItem(
+        carId: string | null | undefined,
+        date: string | null | undefined,
+        skipOdometerLogs: Array<string> = []
+    ): UseWatchedQueryItemProps<OdometerLimit> {
+        return {
+            query: this.odometerLimitQuery(carId!, date!, skipOdometerLogs),
+            mapper: this.mapper.toOdometerLimitDto.bind(this.mapper),
+            options: { enabled: !!carId && !!date }
+        };
+    }
+
+    async getOdometerLimitByDate(
+        carId: string,
+        date: string,
+        skipOdometerLogs: Array<string> = []
+    ): Promise<OdometerLimit> {
+        let result = await this.odometerLimitQuery(carId, date, skipOdometerLogs).executeTakeFirstOrThrow();
+
+        return this.mapper.toOdometerLimitDto(result);
     }
 
     async createOdometerChangeLog(formResult: OdometerChangeLogFormFields): Promise<OdometerLog> {

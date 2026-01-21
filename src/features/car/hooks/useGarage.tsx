@@ -4,7 +4,7 @@ import { Car } from "../schemas/carSchema.ts";
 import { CarouselItemType } from "../../../components/Carousel/Carousel.tsx";
 
 const useGarage = () => {
-    const { cars, loading } = useCars();
+    const { cars, isLoading } = useCars();
 
     const toCarouselItem = (car: Car): CarouselItemType => ({
         id: car.id,
@@ -18,7 +18,7 @@ const useGarage = () => {
 
     const openCarProfile = (id: string) => router.push({ pathname: "(edit)/car", params: { id } });
 
-    return { cars: cars.map(toCarouselItem), loading, openNewCarForm, openCarProfile };
+    return { cars: cars.map(toCarouselItem), isLoading, openNewCarForm, openCarProfile };
 };
 
 export default useGarage;

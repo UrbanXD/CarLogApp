@@ -1,18 +1,16 @@
 import React, { useState } from "react";
 import { View } from "react-native";
-import { SIMPLE_HEADER_HEIGHT } from "../../../constants/index.ts";
+import { SIMPLE_HEADER_HEIGHT } from "../../../constants";
 import Avatar from "../../Avatar/Avatar.ts";
 import { router } from "expo-router";
 import { getLabelByName } from "../../../utils/getLabelByName.ts";
-import { useAppSelector } from "../../../hooks/index.ts";
 import HeaderView from "./HeaderView.tsx";
-import { getUser, isUserLoading } from "../../../features/user/model/selectors/index.ts";
 import { CarPicker } from "../../../features/car/components/carPicker/CarPicker.tsx";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { useUser } from "../../../features/user/hooks/useUser.ts";
 
 const PrimaryHeader: React.FC = () => {
-    const user = useAppSelector(getUser);
-    const userLoading = useAppSelector(isUserLoading);
+    const { user, isLoading } = useUser();
     const name = `${ user?.lastname } ${ user?.firstname }`;
 
     const [isCarListVisible, setIsCarListVisible] = useState(false);
@@ -30,7 +28,7 @@ const PrimaryHeader: React.FC = () => {
                 !isCarListVisible && (
                     <Animated.View entering={ FadeIn } exiting={ FadeOut }>
                         {
-                            userLoading || !user
+                            isLoading || !user
                             ? <Avatar.Skeleton
                                 avatarSize={ SIMPLE_HEADER_HEIGHT * 0.85 }
                             />

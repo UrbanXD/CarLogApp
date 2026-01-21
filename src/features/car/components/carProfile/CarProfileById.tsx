@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
-import useCarProfile from "../../hooks/useCarProfile.tsx";
+import { useCarProfile } from "../../hooks/useCarProfile.tsx";
 import CarProfileView from "./CarProfileView.tsx";
 import { router } from "expo-router";
+import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 
 type CarProfileByIdProps = {
     carId: string
@@ -9,10 +10,10 @@ type CarProfileByIdProps = {
 }
 
 const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId, fuelSliderDisabled = false }) => {
-    const { car, handleDeleteCar, openEditCarStep } = useCarProfile(carId);
+    const { car, isLoading, handleDeleteCar, openEditCarStep } = useCarProfile(carId);
 
     useEffect(() => {
-        if(car) return;
+        if(car || isLoading) return;
 
         if(router.canGoBack()) return router.back();
         return router.replace("(main)/index");
@@ -20,7 +21,7 @@ const CarProfileById: React.FC<CarProfileByIdProps> = ({ carId, fuelSliderDisabl
 
     const openOdometerLog = () => router.push({ pathname: "/odometer/log", params: { id: carId } });
 
-    if(!car) return null;
+    if(!car || isLoading) return <MoreDataLoading/>;
 
     return (
         <CarProfileView

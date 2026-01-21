@@ -2,24 +2,19 @@ import { useTimelinePaginator } from "../../hooks/useTimelinePaginator.ts";
 import { PlaceTableRow } from "../../database/connector/powersync/AppSchema.ts";
 import { useDatabase } from "../../contexts/database/DatabaseContext.ts";
 import { useCallback, useMemo } from "react";
-import { useAppSelector } from "../../hooks/index.ts";
-import { getUser } from "../../features/user/model/selectors/index.ts";
 import { InfoTimeline, InfoTimelineItem } from "../../components/info/InfoTimeline.tsx";
 import { ScreenView } from "../../components/screenView/ScreenView.tsx";
 import { router } from "expo-router";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { useTranslation } from "react-i18next";
-import { DeleteModal } from "../../ui/alert/presets/modal/index.ts";
-import { DeleteToast, NotFoundToast } from "../../ui/alert/presets/toast/index.ts";
+import { DeleteModal } from "../../ui/alert/presets/modal";
+import { DeleteToast, NotFoundToast } from "../../ui/alert/presets/toast";
 import { Place } from "../../features/ride/_features/place/schemas/placeSchema.ts";
 
 export function PlaceScreen() {
     const { t } = useTranslation();
     const { placeDao } = useDatabase();
     const { openModal, openToast } = useAlert();
-    const user = useAppSelector(getUser);
-
-    if(!user) return <></>;
 
     const paginator = useMemo(() => placeDao.paginator(), []);
 

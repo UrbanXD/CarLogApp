@@ -43,6 +43,20 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
         const isPricePerUnit = Boolean(entity.is_price_per_unit!);
         const quantity = numberToFractionDigit(entity.quantity! / (entity.fuel_unit_conversion_factor ?? 1));
 
+        const car = {
+            id: entity.car_id,
+            name: entity.car_name,
+            model: {
+                id: entity.car_model_id,
+                name: entity.car_model_name,
+                year: entity.car_model_year,
+                make: {
+                    id: entity.car_make_id,
+                    name: entity.car_make_name
+                }
+            }
+        };
+
         const odometer =
             entity.odometer_log_id
             ? this.odometerLogDao.mapper.toOdometerDto({
@@ -59,6 +73,12 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
         const expense = this.expenseDao.mapper.toDto({
             id: entity.expense_id!,
             car_id: entity.car_id,
+            car_name: entity.car_name,
+            car_model_id: entity.car_model_id,
+            car_model_name: entity.car_model_name,
+            car_model_year: entity.car_model_year,
+            car_make_id: entity.car_make_id,
+            car_make_name: entity.car_make_name,
             related_id: entity.id,
             type_id: entity.expense_type_id,
             type_owner_id: entity.expense_type_owner_id,
@@ -78,19 +98,7 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
 
         return fuelLogSchema.parse({
             id: entity.id,
-            car: {
-                id: entity.car_id,
-                name: entity.car_name,
-                model: {
-                    id: entity.car_model_id,
-                    name: entity.car_model_name,
-                    year: entity.car_model_year,
-                    make: {
-                        id: entity.car_make_id,
-                        name: entity.car_make_name
-                    }
-                }
-            },
+            car: car,
             expense: expense,
             fuelUnit: {
                 id: entity.fuel_unit_id,

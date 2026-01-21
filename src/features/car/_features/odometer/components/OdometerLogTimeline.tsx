@@ -15,16 +15,18 @@ import { useTranslation } from "react-i18next";
 import { CAR_TABLE } from "../../../../../database/connector/powersync/tables/car.ts";
 import { SelectOdometerLogTableRow } from "../model/dao/OdometerLogDao.ts";
 import { OdometerLog } from "../schemas/odometerLogSchema.ts";
-import { Car } from "../../../schemas/carSchema.ts";
+import { useCar } from "../../../hooks/useCar.ts";
 
 type OdometerLogTimelineProps = {
-    car: Car
+    carId: string
 };
 
-export function OdometerLogTimeline({ car }: OdometerLogTimelineProps) {
+export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
     const { t } = useTranslation();
     const { odometerLogDao } = useDatabase();
     const { mapper } = useOdometerTimelineItem();
+
+    const { car, isLoading } = useCar({ carId: carId });
 
     const paginator = useMemo(
         () =>
@@ -37,10 +39,10 @@ export function OdometerLogTimeline({ car }: OdometerLogTimelineProps) {
                 },
                 {
                     group: CAR_TABLE,
-                    filters: [{ field: "car_id", operator: "=", value: car.id }]
+                    filters: [{ field: "car_id", operator: "=", value: carId }]
                 }
             ),
-        [car.id]
+        [carId]
     );
 
     const {
@@ -58,21 +60,26 @@ export function OdometerLogTimeline({ car }: OdometerLogTimelineProps) {
         mapper,
         cursorOrderButtons: [{ field: "value", title: t("odometer.value") }]
     });
-    const { filterButtons } = useOdometerLogTimelineFilter({ timelineFilterManagement, car });
+    const { filterButtons } = useOdometerLogTimelineFilter({ timelineFilterManagement, carId });
 
     const openCreateOdometerLog = useCallback(() => router.push({
         pathname: "/odometer/log/create",
-        params: { carId: car.id }
-    }), [car]);
+        params: { carId: carId }
+    }), [carId]);
 
     return (
         <View style={ styles.container }>
             <View style={ styles.titleContainer }>
-                <Title
-                    title={ car.name }
-                    subtitle={ `${ car.model.make.name } ${ car.model.name }` }
-                />
-                <Odometer value={ car.odometer.value } unit={ car.odometer.unit.short }/>
+                {
+                    car && !isLoading &&
+                   <>
+                      <Title
+                         title={ car.name }
+                         subtitle={ `${ car.model.make.name } ${ car.model.name }` }
+                      />
+                      <Odometer value={ car.odometer.value } unit={ car.odometer.unit.short }/>
+                   </>
+                }
             </View>
             <TimelineView
                 ref={ ref }

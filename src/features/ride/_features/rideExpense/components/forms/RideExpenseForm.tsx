@@ -10,14 +10,14 @@ import { StyleSheet, Text, View } from "react-native";
 import { ExpenseTypeInput } from "../../../../../expense/components/forms/inputFields/ExpenseTypeInput.tsx";
 import React from "react";
 import { SaveButton } from "../../../../../../components/Button/presets/SaveButton.tsx";
-import { COLORS, FONT_SIZES } from "../../../../../../constants/index.ts";
+import { COLORS, FONT_SIZES } from "../../../../../../constants";
 import { AmountInput } from "../../../../../_shared/currency/components/AmountInput.tsx";
 import { Car } from "../../../../../car/schemas/carSchema.ts";
 import Input from "../../../../../../components/Input/Input.ts";
 import InputDatePicker from "../../../../../../components/Input/datePicker/InputDatePicker.tsx";
 import { NoteInput } from "../../../../../../components/Input/_presets/NoteInput.tsx";
 import { useTranslation } from "react-i18next";
-import { ArrayInputToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
+import { ArrayInputToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast";
 import { formTheme } from "../../../../../../ui/form/constants/theme.ts";
 import Form from "../../../../../../components/Form/Form.tsx";
 
@@ -31,7 +31,7 @@ type RideExpenseFormProps = {
 export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate }: RideExpenseFormProps) {
     const { t } = useTranslation();
     const { openToast } = useAlert();
-    const { rideExpenseDao } = useDatabase();
+    const { rideLogDao } = useDatabase();
 
     const form = useForm<RideExpenseFormFields, any, RideExpenseFormFields>(useRideExpenseFormProps({
         rideExpense: defaultRideExpense,
@@ -43,7 +43,7 @@ export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate
     const submitHandler = handleSubmit(
         async (formResult) => {
             try {
-                const result = await rideExpenseDao.mapper.formResultMapper(formResult, car.id);
+                const result = await rideLogDao.rideExpenseMapper.toFormTransformedFields(formResult, car);
 
                 onSubmit(result);
             } catch(e) {

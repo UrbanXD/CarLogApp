@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { ExpenseType } from "../schemas/expenseTypeSchema.ts";
 import { ExpenseTypeEnum } from "../model/enums/ExpenseTypeEnum.ts";
-import { Car } from "../../car/schemas/carSchema.ts";
 import { SelectExpenseTableRow } from "../model/mapper/expenseMapper.ts";
 import { TimelineFilterManagement } from "../../../hooks/useTimelinePaginator.ts";
 import { useTranslation } from "react-i18next";
@@ -14,7 +13,7 @@ const TYPES_FILTER_FIELD_NAME = "type_id" as keyof SelectExpenseTableRow;
 
 type UseExpenseTimelineFilterProps = {
     timelineFilterManagement: TimelineFilterManagement<SelectExpenseTableRow>,
-    car: Car
+    carId: string
 }
 
 export function useExpenseTimelineFilter({
@@ -25,7 +24,7 @@ export function useExpenseTimelineFilter({
         removeFilter,
         clearFilters
     },
-    car
+    carId
 }: UseExpenseTimelineFilterProps) {
     const { t, i18n } = useTranslation();
     const { expenseTypeDao } = useDatabase();
@@ -69,8 +68,8 @@ export function useExpenseTimelineFilter({
     }, [filters]);
 
     useEffect(() => {
-        if(car) replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: car.id } });
-    }, [car]);
+        if(carId) replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: carId } });
+    }, [carId]);
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {
         const active = selectedTypesId.includes(type.id);

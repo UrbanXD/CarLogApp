@@ -17,7 +17,7 @@ import { DefaultValues, UseFormProps } from "react-hook-form";
 const rideLogForm = (odometerLogDao: OdometerLogDao) => rideLogSchema
 .pick({ id: true, note: true })
 .extend({
-    carId: zPickerRequiredString().pipe(rideLogSchema.shape.carId),
+    carId: zPickerRequiredString().pipe(rideLogSchema.shape.car.shape.id),
     startTime: zDate().pipe(rideLogSchema.shape.startTime),
     endTime: zDate().pipe(rideLogSchema.shape.endTime),
     startOdometerLogId: odometerSchema.shape.id, // hidden
@@ -109,7 +109,7 @@ export function useEditRideLogFormProps(rideLog: RideLog): UseFormProps<RideLogF
 
     const defaultValues: DefaultValues<RideLogFormFields> = {
         id: rideLog.id,
-        carId: rideLog.carId,
+        carId: rideLog.car.id,
         startOdometerLogId: rideLog.startOdometer.id,
         startOdometerValue: rideLog.startOdometer.value,
         endOdometerLogId: rideLog.endOdometer.id,
