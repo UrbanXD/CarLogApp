@@ -19,6 +19,7 @@ import { WatchQueryOptions } from "../../../../database/watcher/watcher.ts";
 import { UseWatchedQueryItemProps } from "../../../../database/hooks/useWatchedQueryItem.ts";
 import { MODEL_TABLE } from "../../../../database/connector/powersync/tables/model.ts";
 import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";
+import { UseWatchedQueryCollectionProps } from "../../../../database/hooks/useWatchedQueryCollection.ts";
 
 export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, SelectExpenseTableRow> {
     constructor(
@@ -80,16 +81,20 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         };
     }
 
-    async getLatestExpenses(carId: string, count: number = 3): Promise<Array<Expense>> {
-        const result = await (
-            this.selectQuery()
-            .whereRef("expense.car_id", "=", carId)
-            .orderBy("expense.date", "desc")
-            .limit(count)
-            .execute()
-        );
+    latestExpenseWatchedQueryCollection(
+        carId: string | null | undefined,
+        options?: WatchQueryOptions
+    ): UseWatchedQueryCollectionProps<Expense, SelectExpenseTableRow> {
+        const query = this.selectQuery()
+        .whereRef("expense.car_id", "=", carId as any)
+        .orderBy("expense.date", "desc")
+        .limit(3);
 
-        return this.mapper.toDtoArray(result);
+        return {
+            query: query,
+            mapper: this.mapper.toDtoArray.bind(this.mapper),
+            options: { enabled: !!carId, ...options }
+        };
     }
 
     async createFromFormResult(formResult: ExpenseFormFields) {

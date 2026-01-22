@@ -9,7 +9,7 @@ import { RideLogMapper } from "../mapper/rideLogMapper.ts";
 import { Kysely, sql } from "@powersync/kysely-driver";
 import { OdometerLogDao, SelectOdometerTableRow } from "../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
 import { OdometerUnitDao } from "../../../car/_features/odometer/model/dao/OdometerUnitDao.ts";
-import { CarDao } from "../../../car/model/dao/CarDao.ts";
+import { CarDao, SelectCarModelTableRow } from "../../../car/model/dao/CarDao.ts";
 import { RIDE_LOG_TABLE } from "../../../../database/connector/powersync/tables/rideLog.ts";
 import { RideLogFormFields } from "../../schemas/form/rideLogForm.ts";
 import { ODOMETER_LOG_TABLE } from "../../../../database/connector/powersync/tables/odometerLog.ts";
@@ -41,6 +41,9 @@ import { WatchQueryOptions } from "../../../../database/watcher/watcher.ts";
 import { UseWatchedQueryItemProps } from "../../../../database/hooks/useWatchedQueryItem.ts";
 import { MODEL_TABLE } from "../../../../database/connector/powersync/tables/model.ts";
 import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";
+import { UseWatchedQueryCollectionProps } from "../../../../database/hooks/useWatchedQueryCollection.ts";
+import { formatDateToDatabaseFormat } from "../../../statistics/utils/formatDateToDatabaseFormat.ts";
+import { DateType } from "react-native-ui-datepicker";
 
 export type PaginatorSelectRideLogTableRow = RideLogTableRow & {
     distance: number,
@@ -49,6 +52,7 @@ export type PaginatorSelectRideLogTableRow = RideLogTableRow & {
 }
 
 export type SelectBaseRideLogTableRow = RideLogTableRow
+    & WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">
     & WithPrefix<Omit<SelectOdometerTableRow, "log_car_id" | keyof WithPrefix<OdometerUnitTableRow, "unit">>, "start_odometer">
     & WithPrefix<Omit<SelectOdometerTableRow, "log_car_id" | keyof WithPrefix<OdometerUnitTableRow, "unit">>, "end_odometer">
     & WithPrefix<OdometerUnitTableRow, "odometer_unit">
@@ -106,6 +110,8 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
         return this.db
         .selectFrom(`${ RIDE_LOG_TABLE } as rl` as const)
         .innerJoin(`${ CAR_TABLE } as c` as const, "c.id", "rl.car_id")
+        .innerJoin(`${ MODEL_TABLE } as mo` as const, "mo.id", "c.model_id")
+        .innerJoin(`${ MAKE_TABLE } as ma` as const, "ma.id", "mo.make_id")
         .innerJoin(`${ ODOMETER_UNIT_TABLE } as ou` as const, "ou.id", "c.odometer_unit_id")
         .innerJoin(`${ ODOMETER_LOG_TABLE } as sol` as const, "sol.id", "rl.start_odometer_log_id")
         .innerJoin(`${ ODOMETER_LOG_TABLE } as eol` as const, "eol.id", "rl.end_odometer_log_id")
@@ -116,6 +122,12 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
             "rl.end_time",
             "rl.note",
             "c.id as car_id",
+            "c.name as car_name",
+            "mo.id as car_model_id",
+            "mo.name as car_model_name",
+            "c.model_year as car_model_year",
+            "ma.id as car_make_id",
+            "ma.name as car_make_name",
             "sol.id as start_odometer_log_id",
             "sol.value as start_odometer_log_value",
             "eol.id as end_odometer_log_id",
@@ -226,7 +238,25 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
         return {
             query: this.selectQuery(id),
             mapper: this.mapper.toDto.bind(this.mapper),
-            options: { enabled: !!id, ...options }
+            options: { enabled: !!id, ...options, jsonArrayFields: ["expenses", "passengers", "places"] }
+        };
+    }
+
+    upcomingRideWatchedQueryCollection(
+        carId: string | null | undefined,
+        startTime: DateType,
+        options?: WatchQueryOptions
+    ): UseWatchedQueryCollectionProps<RideLog, SelectRideLogTableRow> {
+        const query = this.selectQuery()
+        .whereRef("rl.car_id", "=", carId as any)
+        .where("rl.start_time", ">=", formatDateToDatabaseFormat(startTime) as any)
+        .orderBy("rl.start_time", "asc")
+        .limit(3);
+
+        return {
+            query: query,
+            mapper: this.mapper.toDtoArray.bind(this.mapper),
+            options: { enabled: !!carId, ...options, jsonArrayFields: ["expenses", "passengers", "places"] }
         };
     }
 

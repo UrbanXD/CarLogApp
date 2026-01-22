@@ -47,6 +47,19 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
     }
 
     toDto(entity: SelectRideLogTableRow): RideLog {
+        const car = {
+            id: entity.car_id,
+            name: entity.car_name,
+            model: {
+                id: entity.car_model_id,
+                name: entity.car_model_name,
+                year: entity.car_model_year,
+                make: {
+                    id: entity.car_make_id,
+                    name: entity.car_make_name
+                }
+            }
+        };
         const rideExpenses = this.rideExpenseMapper.toDtoArray(entity.expenses);
         const ridePlaces = this.ridePlaceMapper.toDtoArray(entity.places);
         const ridePassengers = this.ridePassengerMapper.toDtoArray(entity.passengers);
@@ -71,7 +84,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
 
         return rideLogSchema.parse({
             id: entity.id,
-            carId: entity.car_id,
+            car: car,
             rideExpenses: rideExpenses,
             ridePassengers: ridePassengers,
             ridePlaces: ridePlaces,

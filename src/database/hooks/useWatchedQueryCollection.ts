@@ -34,9 +34,10 @@ export function useWatchedQueryCollection<Dto, WatchEntity = any>({
             (result) => {
                 try {
                     setData(mapper(result));
-                    setIsLoading(false);
                 } catch(e) {
                     console.log("useWatchedQueryCollection error: ", e);
+                } finally {
+                    setIsLoading(false);
                 }
             },
             options

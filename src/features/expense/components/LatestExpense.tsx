@@ -1,14 +1,15 @@
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Expense } from "../schemas/expenseSchema.ts";
 import { Text, View } from "react-native";
-import { COLORS, GLOBAL_STYLE, ICON_NAMES } from "../../../constants/index.ts";
+import { COLORS, GLOBAL_STYLE, ICON_NAMES } from "../../../constants";
 import Link from "../../../components/Link.tsx";
 import { useExpenseTimelineItem } from "../hooks/useExepenseTimelineItem.tsx";
 import { TimelineItem } from "../../../components/timelineView/item/TimelineItem.tsx";
 import { MoreDataLoading } from "../../../components/loading/MoreDataLoading.tsx";
 import { useTranslation } from "react-i18next";
+import { useWatchedQueryCollection } from "../../../database/hooks/useWatchedQueryCollection.ts";
 
 type LatestExpenseProps = {
     carId: string
@@ -19,18 +20,11 @@ export function LatestExpenses({ carId }: LatestExpenseProps) {
     const { expenseDao } = useDatabase();
     const { mapper } = useExpenseTimelineItem();
 
-    const [expenses, setExpenses] = useState<Array<Expense>>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const expensesQuery = useMemo(() => {
+        return expenseDao.latestExpenseWatchedQueryCollection(carId);
+    }, [expenseDao, carId]);
 
-    useFocusEffect(
-        useCallback(() => {
-            setIsLoading(true);
-            expenseDao.getLatestExpenses(carId).then(result => {
-                setIsLoading(false);
-                setExpenses(result);
-            });
-        }, [carId])
-    );
+    const { data: expenses, isLoading } = useWatchedQueryCollection(expensesQuery);
 
     const renderExpense = (expense: Expense, index: number) => {
         return (
