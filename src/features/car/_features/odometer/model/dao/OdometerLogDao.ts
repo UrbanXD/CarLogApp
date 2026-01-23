@@ -9,8 +9,6 @@ import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
 import { OdometerLogMapper } from "../mapper/odometerLogMapper.ts";
 import { Kysely } from "@powersync/kysely-driver";
 import { ODOMETER_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/odometerLog.ts";
-import { CursorOptions, CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
-import { PaginatorOptions } from "../../../../../../database/paginator/AbstractPaginator.ts";
 import { OdometerChangeLogFormFields } from "../../schemas/form/odometerChangeLogForm.ts";
 import { OdometerLogTypeDao } from "./OdometerLogTypeDao.ts";
 import { FUEL_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/fuelLog.ts";
@@ -31,6 +29,7 @@ import { WatchQueryOptions } from "../../../../../../database/watcher/watcher.ts
 import { MODEL_TABLE } from "../../../../../../database/connector/powersync/tables/model.ts";
 import { MAKE_TABLE } from "../../../../../../database/connector/powersync/tables/make.ts";
 import { SelectCarModelTableRow } from "../../../../model/dao/CarDao.ts";
+import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
 
 export type SelectOdometerLogTableRow =
     OdometerLogTableRow
@@ -71,7 +70,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         super(db, powersync, ODOMETER_LOG_TABLE, new OdometerLogMapper(odometerLogTypeDao));
     }
 
-    selectQuery(id?: any | null): SelectQueryBuilder<DatabaseType, any, SelectOdometerLogTableRow> {
+    selectQuery(id?: any | null) {
         let query = this.db
         .selectFrom(`${ ODOMETER_LOG_TABLE } as ol` as const)
         .innerJoin(`${ ODOMETER_LOG_TYPE_TABLE } as ot` as const, "ot.id", "ol.type_id")
@@ -182,6 +181,27 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         };
     }
 
+    timelineInfiniteQuery(carId: string): UseInfiniteQueryOptions<ReturnType<OdometerLogDao["selectQuery"]>, OdometerLog> {
+        return {
+            baseQuery: this.selectQuery(),
+            defaultCursorOptions: {
+                cursor: [
+                    { field: "ol.value", order: "desc" },
+                    { field: "ol.id", order: "desc" }
+                ],
+                defaultOrder: "desc"
+            },
+            defaultFilters: [
+                {
+                    key: CAR_TABLE,
+                    filters: [{ field: "c.id", operator: "=", value: carId }],
+                    logic: "AND"
+                }
+            ],
+            mapper: this.mapper.toDto.bind(this.mapper)
+        };
+    }
+
     async getOdometerLimitByDate(
         carId: string,
         date: string,
@@ -258,23 +278,5 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
 
             return result.id;
         });
-    }
-
-    paginator(
-        cursorOptions: CursorOptions<keyof SelectOdometerLogTableRow>,
-        filterBy?: PaginatorOptions<SelectOdometerLogTableRow>["filterBy"],
-        perPage: number = 25
-    ): CursorPaginator<SelectOdometerLogTableRow, OdometerLog> {
-        return new CursorPaginator<SelectOdometerLogTableRow, OdometerLog>(
-            this.db,
-            this.table,
-            cursorOptions,
-            {
-                baseQuery: this.selectQuery(),
-                perPage,
-                filterBy: filterBy,
-                mapper: async (entity) => await this.mapper.toDto(entity)
-            }
-        );
     }
 }
