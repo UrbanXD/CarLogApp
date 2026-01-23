@@ -286,6 +286,8 @@ export const useInfiniteQuery = <
             const prevCursor = results[results.length - 1];
             if(prevCursor) setPrevCursor(prevCursor);
             if(!nextCursorValues && results.length > 0) setNextCursor(results[results.length - 1]);
+        } catch(error) {
+            console.log("Fetch prev infinite query error: ", error);
         } finally {
             setIsPrevFetching(false);
         }
@@ -305,6 +307,43 @@ export const useInfiniteQuery = <
         getUniqueNewItems,
         jsonArrayFields
     ]);
+
+    const diffQuery = useMemo(() => {
+        if(isDefaultCursorFetching) return null;
+
+        let watchBuilder = getBaseBuilder();
+
+        //reverse direction because watch query want between
+        watchBuilder = addCursor<QueryBuilder, TableItem, Columns>(
+            watchBuilder, cursorOptions, nextCursorValues, "prev", false, true
+        );
+        watchBuilder = addCursor<QueryBuilder, TableItem, Columns>(
+            watchBuilder, cursorOptions, prevCursorValues, "next", false, true
+        );
+
+        if(!nextCursorValues && !prevCursorValues) {
+            watchBuilder = watchBuilder.limit(perPage + 1) as QueryBuilder;
+        }
+        const cursors =
+            Array.isArray(cursorOptions.cursor)
+            ? cursorOptions.cursor
+            : [cursorOptions.cursor];
+
+        cursors.forEach((cursor) => {
+            watchBuilder = addOrder<QueryBuilder, Columns>(watchBuilder, {
+                field: cursor.field,
+                direction: cursor.order ?? cursorOptions.defaultOrder ?? "asc",
+                reverse: false,
+                toLowerCase: cursor?.toLowerCase ?? false
+            });
+        });
+
+        const compiled = watchBuilder.compile();
+        return powersync.query<TableItem>({
+            sql: compiled.sql,
+            parameters: compiled.parameters as readonly QueryParam[]
+        }).differentialWatch();
+    }, [getBaseBuilder, cursorOptions, nextCursorValues, prevCursorValues, perPage, isDefaultCursorFetching]);
 
     useEffect(() => {
         const setupInitialCursors = async () => {
@@ -378,54 +417,7 @@ export const useInfiniteQuery = <
 
     useEffect(
         () => {
-            if(isDefaultCursorFetching) return;
-
-            let watchBuilder = getBaseBuilder();
-
-            watchBuilder = addCursor<QueryBuilder, TableItem, Columns>(
-                watchBuilder,
-                cursorOptions,
-                nextCursorValues,
-                "prev", //reverse because watch query want between
-                false,
-                true
-            );
-
-            watchBuilder = addCursor<QueryBuilder, TableItem, Columns>(
-                watchBuilder,
-                cursorOptions,
-                prevCursorValues,
-                "next", //reverse because watch query want between
-                false,
-                true
-            );
-
-            if(!nextCursorValues && !prevCursorValues) {
-                watchBuilder = watchBuilder.limit(perPage + 1) as QueryBuilder;
-            }
-
-            const cursors: Array<Cursor<QueryBuilder, Columns>> =
-                Array.isArray(cursorOptions.cursor)
-                ? cursorOptions.cursor
-                : [cursorOptions.cursor];
-
-            cursors.map((cursor) => {
-                watchBuilder = addOrder<QueryBuilder, Columns>(
-                    watchBuilder,
-                    {
-                        field: cursor.field,
-                        direction: cursor.order ?? cursorOptions.defaultOrder ?? "asc",
-                        reverse: false,
-                        toLowerCase: cursor?.toLowerCase ?? false
-                    }
-                );
-            });
-
-            const compiled = watchBuilder.compile();
-            const diffQuery = powersync.query<TableItem>({
-                sql: compiled.sql,
-                parameters: compiled.parameters as readonly QueryParam[]
-            }).differentialWatch();
+            if(!diffQuery) return;
 
             const dispose = diffQuery.registerListener({
                 onData: async (rows) => {
@@ -456,7 +448,15 @@ export const useInfiniteQuery = <
                         setIsLoading(false);
                     }
                 },
-                onError: (error) => console.log("UseInfiniteQuery diff query error: ", error)
+                onStateChange: (state) => {
+                    if(!state.error && !state.isFetching && !state.isFetching && state.data.length === 0) {
+                        setIsLoading(false);
+                    }
+                },
+                onError: (error) => {
+                    console.log("UseInfiniteQuery diff query error: ", error);
+                    setIsLoading(false);
+                }
             });
 
             return () => {
@@ -464,17 +464,7 @@ export const useInfiniteQuery = <
                 diffQuery.close();
             };
         },
-        [
-            powersync,
-            getBaseBuilder,
-            nextCursorValues,
-            prevCursorValues,
-            perPage,
-            cursorOptions,
-            stableMapper,
-            isDefaultCursorFetching,
-            jsonArrayFields
-        ]
+        [diffQuery, stableMapper, jsonArrayFields]
     );
 
     return {
