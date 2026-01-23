@@ -1,5 +1,3 @@
-import { useTimelinePaginator } from "../../hooks/useTimelinePaginator.ts";
-import { PassengerTableRow } from "../../database/connector/powersync/AppSchema.ts";
 import { useDatabase } from "../../contexts/database/DatabaseContext.ts";
 import { useCallback, useMemo } from "react";
 import { InfoTimeline, InfoTimelineItem } from "../../components/info/InfoTimeline.tsx";
@@ -9,88 +7,81 @@ import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { useTranslation } from "react-i18next";
 import { DeleteToast, NotFoundToast } from "../../ui/alert/presets/toast";
 import { DeleteModal } from "../../ui/alert/presets/modal";
-import { Passenger } from "../../features/ride/_features/passenger/schemas/passengerSchema.ts";
+import { useTimeline } from "../../hooks/useTimeline.ts";
+import { useAuth } from "../../contexts/auth/AuthContext.ts";
 
 export function PassengerScreen() {
     const { t } = useTranslation();
     const { passengerDao } = useDatabase();
     const { openModal, openToast } = useAlert();
+    const { sessionUserId } = useAuth();
 
-    const paginator = useMemo(() => passengerDao.paginator(), []);
-
-    const mapper = useCallback((item: Passenger, callback?: () => void): InfoTimelineItem => {
-        return {
-            id: item.id,
-            text: item.name,
-            callback: callback
-        };
-    }, []);
+    const memoizedOptions = useMemo(
+        () => passengerDao.timelineInfiniteQuery(sessionUserId),
+        [passengerDao, sessionUserId]
+    );
 
     const {
-        ref,
         data,
-        initialFetchHappened,
-        isInitialFetching,
-        refresh,
         fetchNext,
+        fetchPrev,
         isNextFetching,
-        fetchPrevious,
-        isPreviousFetching
-    } = useTimelinePaginator<PassengerTableRow, Passenger, InfoTimelineItem>({
-        paginator,
-        mapper
-    });
+        isPrevFetching,
+        hasNext,
+        hasPrev,
+        isLoading
+    } = useTimeline({ infiniteQueryOptions: memoizedOptions });
 
     const openCreateForm = () => router.push("/ride/passenger/create");
 
-    const onEdit = useCallback((id: string | number, callback?: () => void) => {
+    const onEdit = useCallback((id: string | number) => {
         if(!id) return openToast(NotFoundToast.warning(t("passengers.title_singular")));
 
-        callback?.();
         router.push({
             pathname: "/ride/passenger/edit/[id]",
             params: { id }
         });
     }, [openToast, t]);
 
-    const handleDelete = useCallback(async (id: string | number, callback?: () => void) => {
+    const handleDelete = useCallback(async (id: string | number) => {
         if(!id) return openToast(NotFoundToast.warning(t("passengers.title_singular")));
 
         try {
             await passengerDao.delete(id);
 
             openToast(DeleteToast.success(t("passengers.title_singular")));
-            callback?.();
-            await refresh();
-            requestAnimationFrame(() => {
-                ref.current?.clearLayoutCacheOnUpdate();
-            });
         } catch(e) {
             console.log(e);
             openToast(DeleteToast.error(t("passengers.title_singular")));
         }
     }, [passengerDao, openToast, t]);
 
-    const onDelete = useCallback((id: string | number, callback?: () => void) => {
+    const onDelete = useCallback((id: string | number) => {
         openModal(DeleteModal({
             name: t("passengers.title_singular"),
-            acceptAction: () => handleDelete(id, callback)
+            acceptAction: () => handleDelete(id)
         }));
     }, [openModal, t]);
+
+    const memoizedData = useMemo(() => data.map((row) => ({
+        id: row.id,
+        text: row.name
+    }) as InfoTimelineItem), [data]);
 
     return (
         <ScreenView>
             <InfoTimeline
-                ref={ ref }
-                data={ data }
+                data={ memoizedData }
                 openCreateForm={ openCreateForm }
                 onEdit={ onEdit }
                 onDelete={ onDelete }
-                isInitialFetching={ isInitialFetching }
-                fetchNext={ (initialFetchHappened && paginator.hasNext()) ? fetchNext : undefined }
-                fetchPrevious={ (initialFetchHappened && paginator.hasPrevious()) ? fetchPrevious : undefined }
+                isLoading={ isLoading }
+                fetchNext={ fetchNext }
+                fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
-                isPreviousFetching={ isPreviousFetching }
+                isPrevFetching={ isPrevFetching }
+                hasNext={ hasNext }
+                hasPrev={ hasPrev }
             />
         </ScreenView>
     );

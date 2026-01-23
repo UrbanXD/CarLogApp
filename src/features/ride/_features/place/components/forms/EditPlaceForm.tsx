@@ -49,7 +49,7 @@ export function EditPlaceForm({ place, onFormStateChange }: EditPlaceFormProps) 
             form={ form }
             formFields={
                 <Input.Field control={ form.control } fieldName={ "name" } fieldNameText={ t("places.title_singular") }>
-                    <Input.Text placeholder={ t("places.singular") }/>
+                    <Input.Text placeholder={ t("places.title_singular") }/>
                 </Input.Field>
             }
             submitHandler={ submitHandler }

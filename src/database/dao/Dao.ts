@@ -32,7 +32,7 @@ export class Dao<
         .selectFrom(this.table)
         .selectAll();
 
-        if(id) query.where(`${ this.table }.id`, "=", id as any);
+        if(id) query = query.where(`${ this.table }.id`, "=", id as any);
 
         return query as any;
     }
@@ -47,6 +47,7 @@ export class Dao<
 
         const entity = await this.selectQuery(id)
         .executeTakeFirstOrThrow() as unknown as SelectEntity;
+
 
         return this.mapper.toDto(entity);
     }

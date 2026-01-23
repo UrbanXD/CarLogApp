@@ -8,10 +8,33 @@ import { Place } from "../../schemas/placeSchema.ts";
 import { PlaceMapper } from "../mapper/placeMapper.ts";
 import { PlaceFormFields } from "../../schemas/form/placeForm.ts";
 import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
+import { USER_TABLE } from "../../../../../../database/connector/powersync/tables/user.ts";
 
 export class PlaceDao extends Dao<PlaceTableRow, Place, PlaceMapper> {
     constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
         super(db, powersync, PLACE_TABLE, new PlaceMapper());
+    }
+
+    timelineInfiniteQuery(ownerId: string | null): UseInfiniteQueryOptions<ReturnType<PlaceDao["selectQuery"]>, Place> {
+        return {
+            baseQuery: this.selectQuery(),
+            defaultCursorOptions: {
+                cursor: [
+                    { field: "name", order: "asc", toLowerCase: true },
+                    { field: "id", order: "asc" }
+                ],
+                defaultOrder: "asc"
+            },
+            defaultFilters: [
+                {
+                    key: USER_TABLE,
+                    filters: [{ field: "owner_id", operator: "=", value: ownerId }],
+                    logic: "AND"
+                }
+            ],
+            mapper: this.mapper.toDto.bind(this.mapper)
+        };
     }
 
     async isNameAlreadyExists(id: string, ownerId: string, name: string): Promise<boolean> {
@@ -34,18 +57,6 @@ export class PlaceDao extends Dao<PlaceTableRow, Place, PlaceMapper> {
     async updateFromFormResult(formResult: PlaceFormFields) {
         const entity = this.mapper.formResultToEntity(formResult);
         return super.update(entity);
-    }
-
-    paginator(perPage: number = 30): CursorPaginator<PlaceTableRow, Place> {
-        return new CursorPaginator<PlaceTableRow, Place>(
-            this.db,
-            PLACE_TABLE,
-            { cursor: [{ field: "name", order: "asc", toLowerCase: true }, { field: "id" }], defaultOrder: "asc" },
-            {
-                perPage,
-                mapper: this.mapper.toDto.bind(this.mapper)
-            }
-        );
     }
 
     pickerPaginator(perPage: number = 30): CursorPaginator<PlaceTableRow, PickerItemType> {
