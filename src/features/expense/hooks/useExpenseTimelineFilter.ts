@@ -3,29 +3,36 @@ import { useEffect, useState } from "react";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { ExpenseType } from "../schemas/expenseTypeSchema.ts";
 import { ExpenseTypeEnum } from "../model/enums/ExpenseTypeEnum.ts";
-import { SelectExpenseTableRow } from "../model/mapper/expenseMapper.ts";
-import { TimelineFilterManagement } from "../../../hooks/useTimelinePaginator.ts";
 import { useTranslation } from "react-i18next";
-import { FilterCondition } from "../../../database/paginator/AbstractPaginator.ts";
+import { FilterManager } from "../../../database/hooks/useFilters.ts";
+import { ExtractColumnsFromQuery, FilterCondition } from "../../../database/hooks/useInfiniteQuery.ts";
+import { SelectQueryBuilder } from "kysely";
 
 const TYPES_FILTER_KEY = "type_filter";
-const TYPES_FILTER_FIELD_NAME = "type_id" as keyof SelectExpenseTableRow;
 
-type UseExpenseTimelineFilterProps = {
-    timelineFilterManagement: TimelineFilterManagement<SelectExpenseTableRow>,
-    carId: string
+type UseExpenseTimelineFilterProps<
+    QueryBuilder extends SelectQueryBuilder<any, any, any>,
+    Columns = ExtractColumnsFromQuery<QueryBuilder>
+> = {
+    filterManager: FilterManager<QueryBuilder, Columns>,
+    carId: string,
+    typesFilterFieldName: Columns
 }
 
-export function useExpenseTimelineFilter({
-    timelineFilterManagement: {
+export function useExpenseTimelineFilter<
+    QueryBuilder extends SelectQueryBuilder<any, any, any>,
+    Columns = ExtractColumnsFromQuery<QueryBuilder>
+>({
+    filterManager: {
         filters,
         addFilter,
         replaceFilter,
         removeFilter,
         clearFilters
     },
-    carId
-}: UseExpenseTimelineFilterProps) {
+    carId,
+    typesFilterFieldName
+}: UseExpenseTimelineFilterProps<QueryBuilder, Columns>) {
     const { t, i18n } = useTranslation();
     const { expenseTypeDao } = useDatabase();
 
@@ -58,7 +65,7 @@ export function useExpenseTimelineFilter({
                     const ids: Array<string> = [];
 
                     item.filters.forEach(filter => {
-                        if(filter.field === TYPES_FILTER_FIELD_NAME) ids.push(filter.value);
+                        if(filter.field === typesFilterFieldName) ids.push(filter.value);
                     });
 
                     setSelectedTypesId(ids);
@@ -67,14 +74,17 @@ export function useExpenseTimelineFilter({
         }));
     }, [filters]);
 
-    useEffect(() => {
-        if(carId) replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: carId } });
-    }, [carId]);
+    // useEffect(() => {
+    //     if(carId) replaceFilter({
+    //         groupKey: "car",
+    //         filter: { field: "id", operator: "=", value: carId }
+    //     });
+    // }, [carId]);
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {
         const active = selectedTypesId.includes(type.id);
-        const filter: FilterCondition<SelectExpenseTableRow> = {
-            field: TYPES_FILTER_FIELD_NAME,
+        const filter: FilterCondition<QueryBuilder, Columns> = {
+            field: typesFilterFieldName,
             operator: "=",
             value: type.id
         };

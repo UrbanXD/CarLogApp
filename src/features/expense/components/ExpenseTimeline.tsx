@@ -1,17 +1,13 @@
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useExpenseTimelineItem } from "../hooks/useExepenseTimelineItem.tsx";
-import React, { useMemo } from "react";
+import React from "react";
 import { TimelineView } from "../../../components/timelineView/TimelineView.tsx";
 import { Title } from "../../../components/Title.tsx";
 import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants";
-import { useTimelinePaginator } from "../../../hooks/useTimelinePaginator.ts";
-import { Expense } from "../schemas/expenseSchema.ts";
 import { useExpenseTimelineFilter } from "../hooks/useExpenseTimelineFilter.ts";
-import { SelectExpenseTableRow } from "../model/mapper/expenseMapper.ts";
-import { TimelineItemType } from "../../../components/timelineView/item/TimelineItem.tsx";
 import { useTranslation } from "react-i18next";
-import { CAR_TABLE } from "../../../database/connector/powersync/tables/car.ts";
+import { useTimeline } from "../../../hooks/useTimeline.ts";
 
 type ExpenseTimelineProps = {
     carId: string
@@ -21,41 +17,29 @@ export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
     const { t } = useTranslation();
     const { expenseDao } = useDatabase();
     const { mapper } = useExpenseTimelineItem();
-    const paginator = useMemo(
-        () =>
-            expenseDao.paginator(
-                {
-                    cursor: [
-                        { field: "date", order: "desc" },
-                        { field: "amount", order: "desc" },
-                        { field: "id" }
-                    ]
-                },
-                {
-                    group: CAR_TABLE,
-                    filters: [{ field: "car_id", operator: "=", value: carId }]
-                }
-            ),
-        []
-    );
 
     const {
-        ref,
         data,
-        initialFetchHappened,
-        isInitialFetching,
         fetchNext,
+        fetchPrev,
         isNextFetching,
-        fetchPrevious,
-        isPreviousFetching,
-        timelineFilterManagement,
+        isPrevFetching,
+        isLoading,
+        filterManager,
         orderButtons
-    } = useTimelinePaginator<SelectExpenseTableRow, Expense, TimelineItemType>({
-        paginator,
-        mapper,
-        cursorOrderButtons: [{ field: "date", title: t("date.text") }, { field: "amount", title: t("currency.price") }]
+    } = useTimeline({
+        infiniteQueryOptions: expenseDao.expenseTimelineInfiniteQuery(carId),
+        cursorOrderButtons: [
+            { field: "expense.date", title: t("date.text") },
+            { field: "expense.amount", title: t("currency.price") }
+        ]
     });
-    const { filterButtons } = useExpenseTimelineFilter({ timelineFilterManagement, carId });
+
+    const { filterButtons } = useExpenseTimelineFilter({
+        filterManager,
+        carId,
+        typesFilterFieldName: "exp_curr.id"
+    });
 
     return (
         <View style={ styles.container }>
@@ -64,15 +48,14 @@ export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
                 subtitle={ t("expenses.description") }
             />
             <TimelineView
-                ref={ ref }
-                data={ data }
+                data={ data.map((row) => mapper(row)) }
                 orderButtons={ orderButtons }
                 filterButtons={ filterButtons }
-                isInitialFetching={ isInitialFetching }
-                fetchNext={ initialFetchHappened && paginator.hasNext() ? fetchNext : undefined }
-                fetchPrevious={ initialFetchHappened && paginator.hasPrevious() ? fetchPrevious : undefined }
+                isLoading={ isLoading }
+                fetchNext={ fetchNext }
+                fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
-                isPreviousFetching={ isPreviousFetching }
+                isPrevFetching={ isPrevFetching }
                 style={ { paddingBottom: SIMPLE_TABBAR_HEIGHT } }
             />
         </View>
