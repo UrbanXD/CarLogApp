@@ -1,5 +1,6 @@
 import { CursorOptions, CursorValue, ExtractColumnsFromQuery, ExtractRowFromQuery } from "../hooks/useInfiniteQuery.ts";
 import { SelectQueryBuilder } from "kysely";
+import { getFieldName } from "./getFieldName.ts";
 
 export function getCursorValues<
     QueryBuilder extends SelectQueryBuilder<any, any, any>,
@@ -9,11 +10,9 @@ export function getCursorValues<
     item: TableItem,
     cursorOptions: CursorOptions<QueryBuilder, Columns>
 ): CursorValue<TableItem> | Array<CursorValue<TableItem>> {
-    const getKey = (field: string) => (field.includes(".") ? field.split(".").pop() : field) as keyof TableItem;
-
     if(Array.isArray(cursorOptions.cursor)) {
-        return cursorOptions.cursor.map((cursor) => item[getKey(String(cursor.field))]);
+        return cursorOptions.cursor.map((cursor) => item[getFieldName<keyof TableItem>(String(cursor.field))]);
     } else {
-        return item[getKey(String(cursorOptions.cursor.field))];
+        return item[getFieldName<keyof TableItem>(String(cursorOptions.cursor.field))];
     }
 }

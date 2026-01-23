@@ -15,6 +15,7 @@ import { addCursor } from "../utils/addCursor.ts";
 import { useCursor } from "./useCursor.ts";
 import { useFilters } from "./useFilters.ts";
 import { addOrder } from "../utils/addOrder.ts";
+import { jsonArrayParse } from "../utils/jsonArrayParse.ts";
 
 export type CursorDirection = "initial" | "next" | "prev";
 
@@ -89,6 +90,7 @@ export type UseInfiniteQueryOptions<
     perPage?: number
     mapper?: (item: TableItem, index: number) => MappedItem | Promise<MappedItem>
     mappedItemId?: keyof MappedItem
+    jsonArrayFields?: Array<keyof TableItem>
 }
 
 export const useInfiniteQuery = <
@@ -103,9 +105,10 @@ export const useInfiniteQuery = <
     defaultItem,
     perPage = 15,
     mapper,
-    mappedItemId = "id"
+    mappedItemId = "id",
+    jsonArrayFields
 }: UseInfiniteQueryOptions<QueryBuilder, MappedItem, TableItem, Columns>) => {
-    const { db, powersync } = useDatabase();
+    const { powersync } = useDatabase();
 
     const stringifiedCursors = JSON.stringify(defaultCursorOptions);
     const stringifiedMapper = JSON.stringify(mapper);
@@ -174,7 +177,7 @@ export const useInfiniteQuery = <
         });
 
         return query;
-    }, [db, cursorOptions, filters]);
+    }, [cursorOptions, filters]);
 
     const setNextCursor = useCallback((lastItem: TableItem) => {
         setNextCursorValues(getCursorValues(lastItem, cursorOptions));
@@ -207,7 +210,8 @@ export const useInfiniteQuery = <
                 nextBuilder = addCursor(nextBuilder, cursorOptions, nextCursorValues, "next");
 
                 const compiled = nextBuilder.compile();
-                const results = await powersync.getAll<TableItem>(compiled.sql, compiled.parameters as any[]);
+                const rawResults = await powersync.getAll<TableItem>(compiled.sql, compiled.parameters as any[]);
+                const results = rawResults.map(row => jsonArrayParse(row, jsonArrayFields));
 
                 const hasMore = results.length > perPage;
                 if(hasMore) results.pop();
@@ -250,7 +254,8 @@ export const useInfiniteQuery = <
             powersync,
             setPrevCursor,
             setNextCursor,
-            getUniqueNewItems
+            getUniqueNewItems,
+            jsonArrayFields
         ]
     );
 
@@ -264,7 +269,8 @@ export const useInfiniteQuery = <
 
             const compiled = prevBuilder.compile();
             const rawResults = (await powersync.getAll<TableItem>(compiled.sql, compiled.parameters as any[]));
-            const results = [...rawResults].reverse();
+            const parsedRawResults = rawResults.map(row => jsonArrayParse(row, jsonArrayFields));
+            const results = [...parsedRawResults].reverse();
 
             const hasMore = results.length > perPage;
             if(hasMore) results.unshift();
@@ -303,7 +309,8 @@ export const useInfiniteQuery = <
         powersync,
         setPrevCursor,
         setNextCursor,
-        getUniqueNewItems
+        getUniqueNewItems,
+        jsonArrayFields
     ]);
 
     useEffect(() => {
@@ -325,7 +332,8 @@ export const useInfiniteQuery = <
                 const defaultItem = (result as TableItem) ?? null;
 
                 if(defaultItem) {
-                    const defaultCursorValues = getCursorValues(defaultItem, cursorOptions);
+                    const parsedDefaultItem = jsonArrayParse(defaultItem, jsonArrayFields);
+                    const defaultCursorValues = getCursorValues(parsedDefaultItem, cursorOptions);
 
                     const [nextRes, prevRes] = await Promise.all([
                         addCursor(
@@ -344,17 +352,21 @@ export const useInfiniteQuery = <
                         .execute()
                     ]);
 
-                    const farNextItem = nextRes.length > 0 ? nextRes[nextRes.length - 1] : defaultItem;
+                    const farNextItem = nextRes.length > 0 ? nextRes[nextRes.length - 1] : null;
                     const farPrevItem = prevRes.length > 0 ? prevRes[prevRes.length - 1] : null;
 
+                    const parsedFarNextItem = farNextItem ? jsonArrayParse(farNextItem, jsonArrayFields) : null;
+                    const parsedFarPrevItem = farPrevItem ? jsonArrayParse(farPrevItem, jsonArrayFields) : null;
+
                     setNextCursorValues(getCursorValues<QueryBuilder, TableItem, Columns>(
-                        farNextItem ?? defaultItem,
+                        parsedFarNextItem ?? parsedDefaultItem,
                         cursorOptions
                     ));
-                    setPrevCursorValues(farPrevItem ? getCursorValues<QueryBuilder, TableItem, Columns>(
-                        farPrevItem,
+                    setPrevCursorValues(parsedFarPrevItem ? getCursorValues<QueryBuilder, TableItem, Columns>(
+                        parsedFarPrevItem,
                         cursorOptions
                     ) : null);
+
                     setHasNext(nextRes.length === perPage);
                     setHasPrev(prevRes.length === perPage);
                 }
@@ -369,7 +381,7 @@ export const useInfiniteQuery = <
         };
 
         setupInitialCursors();
-    }, [defaultItem, getBaseBuilder]);
+    }, [defaultItem, getBaseBuilder, jsonArrayFields]);
 
     useEffect(
         () => {
@@ -424,26 +436,32 @@ export const useInfiniteQuery = <
 
             const dispose = diffQuery.registerListener({
                 onData: async (rows) => {
-                    const tableRows = rows as unknown as Array<TableItem>;
-                    const mappedRows = stableMapper
-                                       ? await Promise.all(tableRows.map(stableMapper))
-                                       : tableRows as unknown as Array<MappedItem>;
+                    try {
+                        const tableRows = rows as unknown as Array<TableItem>;
+                        const parsedTableRow = tableRows.map(row => jsonArrayParse(row, jsonArrayFields));
 
-                    setData(mappedRows);
-                    if(defaultItem) setInitialStartIndex(tableRows.findIndex(row => row?.[defaultItem.idField] === defaultItem.idValue));
+                        const mappedRows = stableMapper
+                                           ? await Promise.all(parsedTableRow.map(stableMapper))
+                                           : parsedTableRow as unknown as Array<MappedItem>;
 
-                    if(tableRows.length > 0 && !nextCursorValues && !prevCursorValues) {
-                        const firstItem = tableRows[0];
-                        const lastItem = tableRows[tableRows.length - 1];
+                        setData(mappedRows);
+                        if(defaultItem) setInitialStartIndex(parsedTableRow.findIndex(row => row?.[defaultItem.idField] === defaultItem.idValue));
 
-                        setNextCursor(lastItem);
-                        setPrevCursor(firstItem);
+                        if(parsedTableRow.length > 0 && !nextCursorValues && !prevCursorValues) {
+                            const firstItem = parsedTableRow[0];
+                            const lastItem = parsedTableRow[parsedTableRow.length - 1];
 
-                        setHasNext(tableRows.length >= perPage);
-                        setHasPrev(!!defaultItem && tableRows.length >= perPage);
+                            setNextCursor(lastItem);
+                            setPrevCursor(firstItem);
+
+                            setHasNext(parsedTableRow.length >= perPage);
+                            setHasPrev(!!defaultItem && parsedTableRow.length >= perPage);
+                        }
+                    } catch(error) {
+                        console.log("Use infinite query diff onData error: ", error);
+                    } finally {
+                        setIsLoading(false);
                     }
-
-                    setIsLoading(false);
                 },
                 onError: (error) => console.log("UseInfiniteQuery diff query error: ", error)
             });
@@ -461,7 +479,8 @@ export const useInfiniteQuery = <
             perPage,
             cursorOptions,
             stableMapper,
-            isDefaultCursorFetching
+            isDefaultCursorFetching,
+            jsonArrayFields
         ]
     );
 

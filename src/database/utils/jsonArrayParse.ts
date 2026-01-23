@@ -1,22 +1,25 @@
-export function jsonArrayParse(row: any, jsonArrayFields: string[] = []): any {
+import { getFieldName } from "./getFieldName.ts";
+
+export function jsonArrayParse<Row>(row: Row, jsonArrayFields: Array<string> = []): Row {
     if(!row || typeof row !== "object") return row;
 
-    const parsedRow = { ...row };
+    const parsedRow = { ...row } as Row;
 
     for(const field of jsonArrayFields) {
-        const value = parsedRow[field];
+        const fieldName = getFieldName<keyof Row>(field);
+        const value = parsedRow[fieldName];
 
         if(typeof value === "string") {
             try {
-                const parsed = JSON.parse(value);
-                parsedRow[field] = Array.isArray(parsed) ? parsed : [];
+                const parsed = JSON.parse(value) as Row[keyof Row];
+                parsedRow[fieldName] = Array.isArray(parsed) ? parsed : [] as any;
             } catch(error) {
-                parsedRow[field] = [];
+                parsedRow[fieldName] = [] as any;
             }
         } else if(value === null || value === undefined) {
-            parsedRow[field] = [];
+            parsedRow[fieldName] = [] as any;
         } else if(Array.isArray(value)) {
-            parsedRow[field] = value;
+            parsedRow[fieldName] = value;
         }
     }
 
