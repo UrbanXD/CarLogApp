@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { TimelineItemType } from "../../../components/timelineView/item/TimelineItem.tsx";
 import { router } from "expo-router";
 import { RideLog } from "../schemas/rideLogSchema.ts";
-import { COLORS, ICON_NAMES } from "../../../constants/index.ts";
+import { COLORS, ICON_NAMES } from "../../../constants";
 import dayjs from "dayjs";
 import { RideTime } from "../components/RideTime.tsx";
 import { useTranslation } from "react-i18next";

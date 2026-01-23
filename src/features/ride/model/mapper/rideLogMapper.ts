@@ -15,7 +15,7 @@ import { RideLogFormFields } from "../../schemas/form/rideLogForm.ts";
 import { OdometerLogTypeEnum } from "../../../car/_features/odometer/model/enums/odometerLogTypeEnum.ts";
 import { convertOdometerValueToKilometer } from "../../../car/_features/odometer/utils/convertOdometerUnit.ts";
 import { OdometerUnit } from "../../../car/_features/odometer/schemas/odometerUnitSchema.ts";
-import { SelectRideLogTableRow } from "../dao/rideLogDao.ts";
+import { SelectRideLogTableRow, SelectTimelineRideLogTableRow } from "../dao/rideLogDao.ts";
 import { RideExpenseMapper } from "../../_features/rideExpense/model/mapper/rideExpenseMapper.ts";
 import { RidePlaceMapper } from "../../_features/place/model/mapper/ridePlaceMapper.ts";
 import { RidePassengerMapper } from "../../_features/passenger/model/mapper/ridePassengerMapper.ts";
@@ -94,6 +94,10 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
             endTime: entity.end_time,
             note: entity.note
         });
+    }
+
+    timelineEntityToDto(entity: SelectTimelineRideLogTableRow): RideLog {
+        return this.toDto({ ...entity, places: [], expenses: [], passengers: [] });
     }
 
     toEntity(dto: RideLog): RideLogTableRow {
