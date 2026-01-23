@@ -4,8 +4,6 @@ import { Expense } from "../../schemas/expenseSchema.ts";
 import { EXPENSE_TABLE } from "../../../../database/connector/powersync/tables/expense.ts";
 import { ExpenseTypeDao } from "./ExpenseTypeDao.ts";
 import { ExpenseMapper, SelectExpenseTableRow } from "../mapper/expenseMapper.ts";
-import { CursorOptions, CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
-import { PaginatorOptions } from "../../../../database/paginator/AbstractPaginator.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { ExpenseFormFields } from "../../schemas/form/expenseForm.ts";
 import { FUEL_LOG_TABLE } from "../../../../database/connector/powersync/tables/fuelLog.ts";
@@ -19,9 +17,7 @@ import { UseWatchedQueryItemProps } from "../../../../database/hooks/useWatchedQ
 import { MODEL_TABLE } from "../../../../database/connector/powersync/tables/model.ts";
 import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";
 import { UseWatchedQueryCollectionProps } from "../../../../database/hooks/useWatchedQueryCollection.ts";
-import { FilterGroup, UseInfiniteQueryOptions } from "../../../../database/hooks/useInfiniteQuery.ts";
-
-type SelectQueryBuilderExpenseTimeline = ReturnType<ExpenseDao["selectQuery"]>;
+import { UseInfiniteQueryOptions } from "../../../../database/hooks/useInfiniteQuery.ts";
 
 export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, SelectExpenseTableRow> {
     constructor(
@@ -106,13 +102,7 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         };
     }
 
-    expenseTimelineInfiniteQuery(carId: string): UseInfiniteQueryOptions<SelectQueryBuilderExpenseTimeline, Expense> {
-        const defaultFilters = new Map<string, FilterGroup<SelectQueryBuilderExpenseTimeline>>();
-        defaultFilters.set(
-            CAR_TABLE,
-            { filters: [{ field: "car.id", operator: "=", value: carId }], logic: "AND" }
-        );
-
+    expenseTimelineInfiniteQuery(carId: string): UseInfiniteQueryOptions<ReturnType<ExpenseDao["selectQuery"]>, Expense> {
         return {
             baseQuery: this.selectQuery(),
             defaultCursorOptions: {
@@ -123,7 +113,13 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
                 ],
                 defaultOrder: "desc"
             },
-            defaultFilters,
+            defaultFilters: [
+                {
+                    key: CAR_TABLE,
+                    filters: [{ field: "car.id", operator: "=", value: carId }],
+                    logic: "AND"
+                }
+            ],
             mapper: this.mapper.toDto.bind(this.mapper)
         };
     }
@@ -136,23 +132,5 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
     async updateFromFormResult(formResult: ExpenseFormFields) {
         const expenseEntity = this.mapper.formResultToEntity(formResult);
         return await super.update(expenseEntity);
-    }
-
-    paginator(
-        cursorOptions: CursorOptions<keyof SelectExpenseTableRow>,
-        filterBy?: PaginatorOptions<SelectExpenseTableRow>["filterBy"],
-        perPage: number = 25
-    ): CursorPaginator<SelectExpenseTableRow, Expense> {
-        return new CursorPaginator<SelectExpenseTableRow, Expense>(
-            this.db,
-            EXPENSE_TABLE,
-            cursorOptions,
-            {
-                baseQuery: this.selectQuery(),
-                perPage,
-                filterBy: filterBy,
-                mapper: this.mapper.toDto.bind(this.mapper)
-            }
-        );
     }
 }

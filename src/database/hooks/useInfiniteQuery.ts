@@ -44,7 +44,7 @@ export type FilterCondition<
     field: Columns
     operator: ComparisonOperatorExpression
     value: any
-    customSql?: (fieldRef: Columns | RawBuilder<Columns>) => RawBuilder<Columns>
+    customSql?: (fieldRef: Columns | RawBuilder<Columns>) => RawBuilder<any>
 }
 
 export type FilterGroup<
@@ -81,7 +81,7 @@ export type UseInfiniteQueryOptions<
 > = {
     baseQuery: QueryBuilder,
     defaultCursorOptions: CursorOptions<QueryBuilder, Columns>
-    defaultFilters?: Map<string, FilterGroup<QueryBuilder, Columns>>,
+    defaultFilters?: Array<FilterGroup<QueryBuilder, Columns> & { key: string }>,
     defaultItem?: {
         idField: keyof TableItem
         idValue: any,

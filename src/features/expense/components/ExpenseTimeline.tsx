@@ -1,6 +1,6 @@
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useExpenseTimelineItem } from "../hooks/useExepenseTimelineItem.tsx";
-import React from "react";
+import React, { useMemo } from "react";
 import { TimelineView } from "../../../components/timelineView/TimelineView.tsx";
 import { Title } from "../../../components/Title.tsx";
 import { StyleSheet, View } from "react-native";
@@ -38,8 +38,11 @@ export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
     const { filterButtons } = useExpenseTimelineFilter({
         filterManager,
         carId,
-        typesFilterFieldName: "exp_curr.id"
+        carFilterFieldName: "car.id",
+        typesFilterFieldName: "type.id"
     });
+
+    const memoizedData = useMemo(() => data.map((row) => mapper(row)), [data, mapper]);
 
     return (
         <View style={ styles.container }>
@@ -48,7 +51,7 @@ export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
                 subtitle={ t("expenses.description") }
             />
             <TimelineView
-                data={ data.map((row) => mapper(row)) }
+                data={ memoizedData }
                 orderButtons={ orderButtons }
                 filterButtons={ filterButtons }
                 isLoading={ isLoading }

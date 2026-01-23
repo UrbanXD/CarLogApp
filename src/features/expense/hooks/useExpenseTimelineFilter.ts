@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { FilterManager } from "../../../database/hooks/useFilters.ts";
 import { ExtractColumnsFromQuery, FilterCondition } from "../../../database/hooks/useInfiniteQuery.ts";
 import { SelectQueryBuilder } from "kysely";
+import { CAR_TABLE } from "../../../database/connector/powersync/tables/car.ts";
 
 const TYPES_FILTER_KEY = "type_filter";
 
@@ -16,7 +17,8 @@ type UseExpenseTimelineFilterProps<
 > = {
     filterManager: FilterManager<QueryBuilder, Columns>,
     carId: string,
-    typesFilterFieldName: Columns
+    carFilterFieldName: Columns,
+    typesFilterFieldName: Columns,
 }
 
 export function useExpenseTimelineFilter<
@@ -31,6 +33,7 @@ export function useExpenseTimelineFilter<
         clearFilters
     },
     carId,
+    carFilterFieldName,
     typesFilterFieldName
 }: UseExpenseTimelineFilterProps<QueryBuilder, Columns>) {
     const { t, i18n } = useTranslation();
@@ -72,14 +75,14 @@ export function useExpenseTimelineFilter<
                     break;
             }
         }));
-    }, [filters]);
+    }, [filters, typesFilterFieldName]);
 
-    // useEffect(() => {
-    //     if(carId) replaceFilter({
-    //         groupKey: "car",
-    //         filter: { field: "id", operator: "=", value: carId }
-    //     });
-    // }, [carId]);
+    useEffect(() => {
+        if(carId) replaceFilter({
+            groupKey: CAR_TABLE,
+            filter: { field: carFilterFieldName, operator: "=", value: carId }
+        });
+    }, [carId, carFilterFieldName]);
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {
         const active = selectedTypesId.includes(type.id);

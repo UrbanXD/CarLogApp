@@ -37,8 +37,10 @@ export type FilterManager<
 export function useFilters<
     QueryBuilder extends SelectQueryBuilder<any, any, any>,
     Columns = ExtractColumnsFromQuery<QueryBuilder>
->(defaultFilters: Map<string, FilterGroup<QueryBuilder, Columns>> = new Map<string, FilterGroup<QueryBuilder, Columns>>()) {
-    const [filters, setFilters] = useState<Map<string, FilterGroup<QueryBuilder, Columns>>>(defaultFilters);
+>(defaultFilters: Array<FilterGroup<QueryBuilder, Columns> & { key: string }>) {
+    const [filters, setFilters] = useState<Map<string, FilterGroup<QueryBuilder, Columns>>>(() => {
+        return new Map(defaultFilters.map(({ key, ...filter }) => [key, filter]));
+    });
 
     const addFilter = useCallback(({
         groupKey,
