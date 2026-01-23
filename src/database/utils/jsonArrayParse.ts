@@ -1,12 +1,12 @@
 import { getFieldName } from "./getFieldName.ts";
 
-export function jsonArrayParse<Row>(row: Row, jsonArrayFields: Array<string> = []): Row {
-    if(!row || typeof row !== "object") return row;
+export function jsonArrayParse<Row>(row: Row, jsonArrayFields: Array<keyof Row> | undefined): Row {
+    if(!row || typeof row !== "object" || !jsonArrayFields || jsonArrayFields.length === 0) return row;
 
     const parsedRow = { ...row } as Row;
 
     for(const field of jsonArrayFields) {
-        const fieldName = getFieldName<keyof Row>(field);
+        const fieldName = getFieldName<keyof Row>(field as string);
         const value = parsedRow[fieldName];
 
         if(typeof value === "string") {

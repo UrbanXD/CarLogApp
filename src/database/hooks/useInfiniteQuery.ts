@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { sql } from "@powersync/kysely-driver";
 import {
     ComparisonOperatorExpression,
     Expression,
@@ -16,6 +15,7 @@ import { useCursor } from "./useCursor.ts";
 import { useFilters } from "./useFilters.ts";
 import { addOrder } from "../utils/addOrder.ts";
 import { jsonArrayParse } from "../utils/jsonArrayParse.ts";
+import { sql } from "@powersync/kysely-driver";
 
 export type CursorDirection = "initial" | "next" | "prev";
 
@@ -72,6 +72,7 @@ export type ExtractColumnsFromQuery<QueryBuilder> = QueryBuilder extends SelectQ
                                                                                           }[keyof Schema[Table]]
                                                                                           : never;
                                                     }[Tables & keyof Schema]
+                                                        | keyof ExtractRowFromQuery<QueryBuilder>
                                                     : never;
 
 export type UseInfiniteQueryOptions<
@@ -105,7 +106,7 @@ export const useInfiniteQuery = <
     defaultItem,
     perPage = 15,
     mapper,
-    mappedItemId = "id",
+    mappedItemId,
     jsonArrayFields
 }: UseInfiniteQueryOptions<QueryBuilder, MappedItem, TableItem, Columns>) => {
     const { powersync } = useDatabase();
@@ -129,7 +130,7 @@ export const useInfiniteQuery = <
         replaceFilter,
         removeFilter,
         clearFilters
-    } = useFilters(defaultFilters);
+    } = useFilters(defaultFilters ?? []);
 
     const [data, setData] = useState<Array<MappedItem>>([]);
     const [initialStartIndex, setInitialStartIndex] = useState<number>(0);
@@ -168,14 +169,6 @@ export const useInfiniteQuery = <
             }) as QueryBuilder;
         });
 
-        const cursors: Array<Cursor<QueryBuilder, Columns>> = Array.isArray(cursorOptions.cursor)
-                                                              ? cursorOptions.cursor
-                                                              : [cursorOptions.cursor];
-
-        cursors.forEach((cursor) => {
-            query = query.select(sql.ref(cursor.field)) as QueryBuilder;
-        });
-
         return query;
     }, [cursorOptions, filters]);
 
@@ -189,14 +182,14 @@ export const useInfiniteQuery = <
 
     const getUniqueNewItems = useCallback((oldItems: Array<MappedItem>, newItems: Array<MappedItem>) => (
         newItems.filter(newItem => {
-            const newId = newItem?.[mappedItemId];
+            const newId = newItem?.[mappedItemId ?? "id" as keyof MappedItem];
 
             if(newId === undefined || newId === null) {
                 console.warn(`Missing ID in new item using key: ${ String(mappedItemId) }`, newItem);
                 return false;
             }
 
-            return !oldItems.some(oldItem => oldItem?.[mappedItemId] === newId);
+            return !oldItems.some(oldItem => oldItem?.[mappedItemId ?? "id" as keyof MappedItem] === newId);
         })
     ), [mappedItemId]);
 
@@ -326,13 +319,13 @@ export const useInfiniteQuery = <
                 setIsDefaultCursorFetching(true);
 
                 const result = await getBaseBuilder()
-                .where(defaultItem.idField, "=", defaultItem.idField)
+                .where(sql.ref(String(defaultItem.idField)), "=", defaultItem.idField)
                 .executeTakeFirst();
 
-                const defaultItem = (result as TableItem) ?? null;
+                const tableDefaultItem = (result as TableItem) ?? null;
 
-                if(defaultItem) {
-                    const parsedDefaultItem = jsonArrayParse(defaultItem, jsonArrayFields);
+                if(tableDefaultItem) {
+                    const parsedDefaultItem = jsonArrayParse(tableDefaultItem, jsonArrayFields);
                     const defaultCursorValues = getCursorValues(parsedDefaultItem, cursorOptions);
 
                     const [nextRes, prevRes] = await Promise.all([
