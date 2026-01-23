@@ -24,6 +24,8 @@ export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
         fetchPrev,
         isNextFetching,
         isPrevFetching,
+        hasNext,
+        hasPrev,
         isLoading,
         filterManager,
         orderButtons
@@ -59,6 +61,8 @@ export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
                 fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
                 isPrevFetching={ isPrevFetching }
+                hasNext={ hasNext }
+                hasPrev={ hasPrev }
                 style={ { paddingBottom: SIMPLE_TABBAR_HEIGHT } }
             />
         </View>

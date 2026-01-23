@@ -31,6 +31,8 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
         fetchPrev,
         isNextFetching,
         isPrevFetching,
+        hasNext,
+        hasPrev,
         isLoading,
         filterManager,
         orderButtons
@@ -80,6 +82,8 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
                 fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
                 isPrevFetching={ isPrevFetching }
+                hasNext={ hasNext }
+                hasPrev={ hasPrev }
             />
             <FloatingActionMenu action={ openCreateOdometerLog }/>
         </View>

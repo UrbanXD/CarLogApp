@@ -29,6 +29,8 @@ export function ServiceLogTimeline({ carId }: ServiceLogTimelineProps) {
         fetchPrev,
         isNextFetching,
         isPrevFetching,
+        hasNext,
+        hasPrev,
         isLoading,
         filterManager,
         orderButtons
@@ -84,6 +86,8 @@ export function ServiceLogTimeline({ carId }: ServiceLogTimelineProps) {
                 fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
                 isPrevFetching={ isPrevFetching }
+                hasNext={ hasNext }
+                hasPrev={ hasPrev }
                 style={ { paddingBottom: SIMPLE_TABBAR_HEIGHT } }
             />
         </View>
