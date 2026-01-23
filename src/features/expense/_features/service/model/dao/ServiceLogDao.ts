@@ -22,9 +22,6 @@ import { OdometerUnitDao } from "../../../../../car/_features/odometer/model/dao
 import { ExpenseTypeDao } from "../../../../model/dao/ExpenseTypeDao.ts";
 import { SelectServiceItemTableRow, ServiceItemDao } from "./ServiceItemDao.ts";
 import { CarDao, SelectCarModelTableRow } from "../../../../../car/model/dao/CarDao.ts";
-import { CursorOptions, CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
-import { PaginatorOptions } from "../../../../../../database/paginator/AbstractPaginator.ts";
-import { SelectQueryBuilder } from "kysely";
 import { SelectExpenseTableRow } from "../../../../model/mapper/expenseMapper.ts";
 import { CAR_TABLE } from "../../../../../../database/connector/powersync/tables/car.ts";
 import { ODOMETER_UNIT_TABLE } from "../../../../../../database/connector/powersync/tables/odometerUnit.ts";
@@ -40,6 +37,7 @@ import { MODEL_TABLE } from "../../../../../../database/connector/powersync/tabl
 import { MAKE_TABLE } from "../../../../../../database/connector/powersync/tables/make.ts";
 import { WatchQueryOptions } from "../../../../../../database/watcher/watcher.ts";
 import { UseWatchedQueryItemProps } from "../../../../../../database/hooks/useWatchedQueryItem.ts";
+import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
 
 export type SelectServiceLogTableRow =
     Omit<ServiceLogTableRow, "odometer_log_id">
@@ -81,7 +79,7 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
         );
     }
 
-    selectQuery(id?: any | null): SelectQueryBuilder<DatabaseType, any, SelectServiceLogTableRow> {
+    selectQuery(id?: any | null) {
         let query = this.db
         .selectFrom(`${ SERVICE_LOG_TABLE } as sl` as const)
         .innerJoin(`${ SERVICE_TYPE_TABLE } as st` as const, "st.id", "sl.service_type_id")
@@ -187,6 +185,29 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
             query: this.selectQuery(id),
             mapper: this.mapper.toDto.bind(this.mapper),
             options: { enabled: !!id, ...options, jsonArrayFields: ["items", "totalAmount"] }
+        };
+    }
+
+    timelineInfiniteQuery(carId: string): UseInfiniteQueryOptions<ReturnType<ServiceLogDao["selectQuery"]>, ServiceLog> {
+        return {
+            baseQuery: this.selectQuery(),
+            defaultCursorOptions: {
+                cursor: [
+                    { field: "e.date", order: "desc" },
+                    { field: "e.amount", order: "desc" },
+                    { field: "e.id", order: "desc" }
+                ],
+                defaultOrder: "desc"
+            },
+            defaultFilters: [
+                {
+                    key: CAR_TABLE,
+                    filters: [{ field: "c.id", operator: "=", value: carId }],
+                    logic: "AND"
+                }
+            ],
+            mapper: this.mapper.toDto.bind(this.mapper),
+            jsonArrayFields: ["items", "totalAmount"]
         };
     }
 
@@ -347,28 +368,5 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
 
             return result.id;
         });
-    }
-
-    paginator(
-        cursorOptions: CursorOptions<keyof SelectServiceLogTableRow>,
-        filterBy?: PaginatorOptions<SelectServiceLogTableRow>["filterBy"],
-        perPage: number = 25
-    ): CursorPaginator<SelectServiceLogTableRow, ServiceLog> {
-        const query = this.db
-        .selectFrom(SERVICE_LOG_TABLE)
-        .innerJoin(EXPENSE_TABLE, `${ EXPENSE_TABLE }.id`, `${ SERVICE_LOG_TABLE }.expense_id`)
-        .selectAll(SERVICE_LOG_TABLE);
-
-        return new CursorPaginator<SelectServiceLogTableRow, ServiceLog>(
-            this.db,
-            SERVICE_LOG_TABLE,
-            cursorOptions,
-            {
-                baseQuery: query as SelectQueryBuilder<DatabaseType, any, SelectServiceLogTableRow>,
-                perPage,
-                filterBy,
-                mapper: this.mapper.toDto.bind(this.mapper)
-            }
-        );
     }
 }
