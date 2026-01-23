@@ -1,18 +1,27 @@
-import { OrderByDirectionExpression, SelectQueryBuilder, SqlBool } from "kysely";
+import { SelectQueryBuilder, SqlBool } from "kysely";
 import { addOrder } from "./addOrder.ts";
 import { getCursorOperator } from "./getCursorOperation.ts";
 import { sql } from "@powersync/kysely-driver";
-import { CursorDirection, CursorOptions, CursorValue } from "../hooks/useInfiniteQuery.ts";
-import { DatabaseType } from "../connector/powersync/AppSchema.ts";
+import {
+    CursorDirection,
+    CursorOptions,
+    CursorValue,
+    ExtractColumnsFromQuery,
+    ExtractRowFromQuery
+} from "../hooks/useInfiniteQuery.ts";
 
-export function addCursor<TableItem>(
-    table: keyof DatabaseType | string | undefined,
-    query: SelectQueryBuilder<DatabaseType, any, TableItem>,
-    cursorOptions: CursorOptions<keyof TableItem>,
+export function addCursor<
+    QueryBuilder extends SelectQueryBuilder<any, any, any>,
+    TableItem = ExtractRowFromQuery<QueryBuilder>,
+    Columns = ExtractColumnsFromQuery<QueryBuilder>
+>(
+    query: QueryBuilder,
+    cursorOptions: CursorOptions<QueryBuilder, Columns>,
     value: CursorValue<TableItem> | Array<CursorValue<TableItem>> | null,
     direction: CursorDirection,
-    shouldOrder: boolean = true
-): SelectQueryBuilder<DatabaseType, any, TableItem> {
+    shouldOrder: boolean = true,
+    inclusive: boolean = false
+): QueryBuilder {
     const cursors = Array.isArray(cursorOptions.cursor) ? cursorOptions.cursor : [cursorOptions.cursor];
     const cursorValues: Array<CursorValue<TableItem>> | null = value ? Array.isArray(value) ? value : [value] : null;
 
@@ -20,16 +29,11 @@ export function addCursor<TableItem>(
 
     if(shouldOrder) {
         cursors.map((cursor) => {
-            const orderDirection: OrderByDirectionExpression = cursor.order ?? cursorOptions.defaultOrder ?? "asc";
-            // if table name is null that means no table name need (if undefined then set default table)
-            const tableName = cursor?.table === null ? null : cursor?.table ?? table;
-            const fieldName = tableName ? `${ String(tableName) }.${ String(cursor.field) }` : String(cursor.field);
-
-            subQuery = addOrder<TableItem>(
+            subQuery = addOrder<QueryBuilder, Columns>(
                 subQuery,
                 {
-                    field: fieldName,
-                    direction: orderDirection,
+                    field: cursor.field,
+                    direction: cursor.order ?? cursorOptions.defaultOrder ?? "asc",
                     reverse: direction === "prev",
                     toLowerCase: cursor?.toLowerCase ?? false
                 }
@@ -49,23 +53,28 @@ export function addCursor<TableItem>(
     const cursorOrders = Array.isArray(cursorOptions.cursor)
                          ? cursorOptions.cursor.map(cursor => cursor.order ?? cursorOptions.defaultOrder ?? "asc")
                          : cursorOptions.cursor.order ?? cursorOptions.defaultOrder ?? "asc";
-    const cursorOperator = getCursorOperator(cursorOrders, direction);
+
+    const cursorOperator = getCursorOperator(cursorOrders, direction, inclusive);
 
     const tupleFields = sql.raw(cursors.map(cursor => {
-        const tableName = cursor?.table === null ? null : cursor?.table ?? table;
-        const fieldName = tableName ? [tableName, cursor.field].join(".") : String(cursor.field);
+        if(cursor.toLowerCase) return `lower(${ cursor.field })`;
 
-        if(cursor.toLowerCase) return `lower(${ fieldName })`;
-        return fieldName;
+        return cursor.field;
     })
     .join(", "));
 
     const tupleValues = sql.join(cursorValues.map((v, index) => {
         const toLowerCase = cursors[index]?.toLowerCase ?? false;
-        return toLowerCase ? sql`${ String(v).toLowerCase() }` : sql`${ String(v) }`;
+
+        let finalValue: string | CursorValue<TableItem> = v;
+        if(toLowerCase && typeof finalValue === "string") {
+            finalValue = String(finalValue).toLowerCase();
+        }
+
+        return sql`${ finalValue }`;
     }));
 
     // @formatter:off
-    return subQuery.where(sql<SqlBool>`( ${ tupleFields } ) ${ sql.raw(cursorOperator) } ( ${ tupleValues } )`);
+    return subQuery.where(sql<SqlBool>`( ${ tupleFields } ) ${ sql.raw(cursorOperator) } ( ${ tupleValues } )`) as QueryBuilder;
     // @formatter:on
 }
