@@ -3,10 +3,10 @@ import { SelectQueryBuilder } from "kysely";
 import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 import { jsonArrayParse } from "../utils/jsonArrayParse.ts";
 
-export type WatchQueryOptions = {
+export type WatchQueryOptions<WatchEntity = any> = {
     queryOnce?: boolean
     enabled?: boolean
-    jsonArrayFields?: Array<string>
+    jsonArrayFields?: Array<keyof WatchEntity>
 }
 
 type WatcherEntry = {
@@ -24,7 +24,7 @@ export function watchQuery<WatchEntity>(
     powersync: AbstractPowerSyncDatabase,
     query: SelectQueryBuilder<DatabaseType, any, any>,
     onData: (data: Array<WatchEntity>) => void,
-    options?: WatchQueryOptions
+    options?: WatchQueryOptions<WatchEntity>
 ): (() => void) {
     const {
         queryOnce = false,
@@ -43,7 +43,7 @@ export function watchQuery<WatchEntity>(
 
     if(!entry) {
         const watchedQuery = powersync
-        .query({ sql, parameters: params })
+        .query<WatchEntity>({ sql, parameters: params })
         .watch();
 
         entry = {
@@ -54,7 +54,7 @@ export function watchQuery<WatchEntity>(
         };
 
         const unregister = watchedQuery.registerListener({
-            onData: (results: readonly Readonly<unknown>[]) => {
+            onData: (results) => {
                 const parsedResults = results.map(row => jsonArrayParse(row, jsonArrayFields));
 
                 entry!.lastData = parsedResults;

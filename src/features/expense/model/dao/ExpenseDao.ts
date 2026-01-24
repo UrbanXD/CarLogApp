@@ -77,7 +77,7 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
 
     expenseWatchedQueryItem(
         id: string | null | undefined,
-        options?: WatchQueryOptions
+        options?: WatchQueryOptions<SelectExpenseTableRow>
     ): UseWatchedQueryItemProps<Expense, SelectExpenseTableRow> {
         return {
             query: this.selectQuery(id),
@@ -88,7 +88,7 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
 
     latestExpenseWatchedQueryCollection(
         carId: string | null | undefined,
-        options?: WatchQueryOptions
+        options?: WatchQueryOptions<SelectExpenseTableRow>
     ): UseWatchedQueryCollectionProps<Expense, SelectExpenseTableRow> {
         const query = this.selectQuery()
         .whereRef("expense.car_id", "=", carId as any)

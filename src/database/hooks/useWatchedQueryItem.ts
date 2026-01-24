@@ -7,7 +7,7 @@ import { watchQuery, WatchQueryOptions } from "../watcher/watcher.ts";
 export type UseWatchedQueryItemProps<Dto, WatchEntity = any> = {
     query: SelectQueryBuilder<DatabaseType, any, WatchEntity>,
     mapper: (watchEntity: WatchEntity) => Dto,
-    options?: WatchQueryOptions
+    options?: WatchQueryOptions<WatchEntity>
 }
 
 type UseWatchedItemResult<Dto> = {

@@ -7,7 +7,7 @@ import { useDatabase } from "../../contexts/database/DatabaseContext.ts";
 export type UseWatchedQueryCollectionProps<Dto, WatchEntity = any> = {
     query: SelectQueryBuilder<DatabaseType, any, WatchEntity>,
     mapper: (watchEntity: Array<WatchEntity>) => Array<Dto>,
-    options?: WatchQueryOptions
+    options?: WatchQueryOptions<WatchEntity>
 }
 
 type UseWatchedCollectionResult<Dto> = {
