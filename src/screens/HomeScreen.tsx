@@ -20,7 +20,7 @@ export function HomeScreen() {
                    <>
                       <UpcomingRides carId={ selectedCarId }/>
                       <LatestExpenses carId={ selectedCarId }/>
-                      <ServiceForecastView carId={ selectedCarId }/>
+                      <ServiceForecastView carId={ selectedCarId } expandable={ true }/>
                    </>
                 }
             </View>

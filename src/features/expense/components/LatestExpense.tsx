@@ -2,14 +2,15 @@ import { router } from "expo-router";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import React, { useCallback, useMemo } from "react";
 import { Expense } from "../schemas/expenseSchema.ts";
-import { Text, View } from "react-native";
-import { COLORS, GLOBAL_STYLE, ICON_NAMES } from "../../../constants";
+import { View } from "react-native";
+import { COLORS, ICON_NAMES } from "../../../constants";
 import Link from "../../../components/Link.tsx";
 import { useExpenseTimelineItem } from "../hooks/useExepenseTimelineItem.tsx";
 import { TimelineItem } from "../../../components/timelineView/item/TimelineItem.tsx";
 import { MoreDataLoading } from "../../../components/loading/MoreDataLoading.tsx";
 import { useTranslation } from "react-i18next";
 import { useWatchedQueryCollection } from "../../../database/hooks/useWatchedQueryCollection.ts";
+import { Section } from "../../../components/Section.tsx";
 
 type LatestExpenseProps = {
     carId: string
@@ -55,10 +56,7 @@ export function LatestExpenses({ carId }: LatestExpenseProps) {
     const openCreateExpenseBottomSheet = () => router.push("/expense/create/");
 
     return (
-        <View style={ GLOBAL_STYLE.contentContainer }>
-            <Text style={ GLOBAL_STYLE.containerTitleText }>
-                { t("expenses.latest") }
-            </Text>
+        <Section title={ t("expenses.latest") }>
             {
                 isLoading
                 ?
@@ -73,6 +71,6 @@ export function LatestExpenses({ carId }: LatestExpenseProps) {
                 icon={ ICON_NAMES.rightArrowHead }
                 onPress={ goToExpensesTab }
             />
-        </View>
+        </Section>
     );
 }

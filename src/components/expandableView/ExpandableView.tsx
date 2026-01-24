@@ -1,9 +1,9 @@
 import React, { ReactNode, useCallback, useEffect } from "react";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { LayoutChangeEvent, StyleSheet, View } from "react-native";
-import { ViewStyle } from "../../types/index.ts";
+import { ViewStyle } from "../../types";
 
-type DropdownViewProps = {
+type ExpandableViewProps = {
     children?: ReactNode
     expanded: boolean
     minHeight?: number
@@ -17,7 +17,7 @@ const SPRING_CONFIG = {
     dampingRatio: 0.8
 };
 
-export function DropdownView({ children, minHeight = 0, maxHeight, expanded, style }: DropdownViewProps) {
+export function ExpandableView({ children, minHeight = 0, maxHeight, expanded, style }: ExpandableViewProps) {
     const display = useSharedValue(expanded ? 1 : 0);
     const contentHeight = useSharedValue(0);
 
@@ -32,7 +32,7 @@ export function DropdownView({ children, minHeight = 0, maxHeight, expanded, sty
         );
     }, []);
 
-    const dropdownViewStyle = useAnimatedStyle(() => {
+    const expandableViewStyle = useAnimatedStyle(() => {
         const height = withSpring(expanded ? contentHeight.value : 0, SPRING_CONFIG);
         const opacity = withTiming(expanded ? 1 : 0.5, { duration: SPRING_CONFIG.duration / 1.5 });
 
@@ -44,7 +44,7 @@ export function DropdownView({ children, minHeight = 0, maxHeight, expanded, sty
     });
 
     return (
-        <Animated.View style={ dropdownViewStyle }>
+        <Animated.View style={ expandableViewStyle }>
             <View style={ [styles.container, style] } onLayout={ onContentLayout }>
                 { children }
             </View>

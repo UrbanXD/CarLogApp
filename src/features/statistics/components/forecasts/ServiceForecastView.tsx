@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { ServiceForecast } from "../../model/dao/statisticsDao.ts";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
-import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { useTranslation } from "react-i18next";
 import { ServiceTypeEnum } from "../../../expense/_features/service/model/enums/ServiceTypeEnum.ts";
 import { ServiceForecastCard } from "../ServiceForecastCard.tsx";
+import { Section } from "../../../../components/Section.tsx";
 
 type ServiceForecastProps = {
     carId: string
+    expandable?: boolean
 }
 
-export function ServiceForecastView({ carId }: ServiceForecastProps) {
+export function ServiceForecastView({ carId, expandable = false }: ServiceForecastProps) {
     const { t } = useTranslation();
     const { statisticsDao } = useDatabase();
 
@@ -24,10 +24,10 @@ export function ServiceForecastView({ carId }: ServiceForecastProps) {
     }, [carId]);
 
     return (
-        <View style={ styles.container }>
-            <Text style={ styles.title }>
-                { t("statistics.service.forecast") }
-            </Text>
+        <Section
+            title={ t("statistics.service.forecast") }
+            expandable={ expandable }
+        >
             <ServiceForecastCard
                 forecast={ forecast?.major }
                 type={ ServiceTypeEnum.MAJOR_SERVICE }
@@ -40,66 +40,6 @@ export function ServiceForecastView({ carId }: ServiceForecastProps) {
                 odometer={ forecast?.odometer }
                 isLoading={ !forecast }
             />
-        </View>
+        </Section>
     );
 }
-
-const styles = StyleSheet.create({
-    container: GLOBAL_STYLE.contentContainer,
-    header: {
-        gap: SEPARATOR_SIZES.lightSmall / 2
-    },
-    title: GLOBAL_STYLE.containerTitleText,
-    subtitleContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-end",
-        gap: SEPARATOR_SIZES.lightSmall
-    },
-    subtitle: {
-        fontSize: FONT_SIZES.p2,
-        color: COLORS.gray1
-    },
-    subtitleDate: {
-        fontSize: FONT_SIZES.p3,
-        // lineHeight: FONT_SIZES.p3 * 1.2,
-        // letterSpacing: FONT_SIZES.p3 * 0.05,
-        color: COLORS.gray1
-    },
-    card: {
-        flex: 1,
-        justifyContent: "space-between",
-        padding: SEPARATOR_SIZES.small,
-        borderRadius: 12,
-        backgroundColor: COLORS.gray5,
-        shadowColor: COLORS.black,
-        shadowOffset: {
-            width: 0,
-            height: 12
-        },
-        shadowOpacity: 0.58,
-        shadowRadius: 16,
-        elevation: 24
-    },
-    cardTitleContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-end",
-        gap: SEPARATOR_SIZES.lightSmall
-    },
-    cardTitle: {
-        fontFamily: "Gilroy-Heavy",
-        fontSize: FONT_SIZES.p2,
-        color: COLORS.white
-    },
-    cardDate: {
-        fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.p3,
-        color: COLORS.gray1
-    },
-    cardForecast: {
-        fontFamily: "Gilroy-Heavy",
-        fontSize: FONT_SIZES.h3,
-        color: COLORS.white
-    }
-});
