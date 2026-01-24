@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
 import Input from "../../../../../components/Input/Input.ts";
-import { StepProps } from "../../../../../types/index.ts";
-import { ICON_NAMES } from "../../../../../constants/index.ts";
+import { StepProps } from "../../../../../types";
+import { ICON_NAMES } from "../../../../../constants";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
-import { MakeTableRow, ModelTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
 import { CarFormFields } from "../../../schemas/form/carForm.ts";
 import { YearPicker } from "../../../../../components/Input/_presets/YearPicker.tsx";
 import { useTranslation } from "react-i18next";
@@ -27,8 +26,8 @@ function CarModelStep({
     const [defaultLoadMakeId, setDefaultLoadMakeId] = useState(true);
     const [defaultLoadModelId, setDefaultLoadModelId] = useState(true);
 
-    const makePaginator = useMemo(() => makeDao.paginator(50), []);
-    const modelPaginator = useMemo(() => modelDao.paginatorByMakeId(selectedMakeId ?? null, 25), [selectedMakeId]);
+    const makeQueryOptions = useMemo(() => makeDao.pickerInfiniteQuery(), []);
+    const modelQueryOptions = useMemo(() => modelDao.pickerInfiniteQuery(selectedMakeId ?? null), [selectedMakeId]);
 
     useEffect(() => {
         if(defaultLoadModelId) setDefaultLoadModelId(false);
@@ -60,10 +59,6 @@ function CarModelStep({
         setValue("model.year", "");
     }, [selectedModelId]);
 
-    useEffect(() => {
-        console.log(modelYears);
-    }, [modelYears]);
-
     return (
         <Input.Group>
             <Input.Field
@@ -71,9 +66,9 @@ function CarModelStep({
                 fieldName="model.makeId"
                 fieldNameText={ t("car.steps.model.make_field.title") }
             >
-                <Input.Picker.Dropdown<MakeTableRow>
+                <Input.Picker.Dropdown<typeof makeQueryOptions["baseQuery"]>
                     title={ t("car.steps.model.make_field.title") }
-                    paginator={ makePaginator }
+                    queryOptions={ makeQueryOptions }
                     searchBy="name"
                     icon={ ICON_NAMES.car }
                 />
@@ -83,9 +78,9 @@ function CarModelStep({
                 fieldName="model.id"
                 fieldNameText={ t("car.steps.model.model_field.title") }
             >
-                <Input.Picker.Dropdown<ModelTableRow>
+                <Input.Picker.Dropdown<typeof modelQueryOptions["baseQuery"]>
                     title={ t("car.steps.model.model_field.title") }
-                    paginator={ modelPaginator }
+                    queryOptions={ modelQueryOptions }
                     searchBy="name"
                     icon={ ICON_NAMES.car }
                     disabled={ !selectedMakeId }

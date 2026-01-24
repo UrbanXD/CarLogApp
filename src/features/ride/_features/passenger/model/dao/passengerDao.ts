@@ -1,7 +1,6 @@
 import { Dao } from "../../../../../../database/dao/Dao.ts";
 import { DatabaseType, PassengerTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { Kysely } from "@powersync/kysely-driver";
-import { CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
 import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
 import { Passenger } from "../../schemas/passengerSchema.ts";
 import { PassengerMapper } from "../mapper/passengerMapper.ts";
@@ -37,6 +36,29 @@ export class PassengerDao extends Dao<PassengerTableRow, Passenger, PassengerMap
         };
     }
 
+    pickerInfiniteQuery(ownerId: string | null): UseInfiniteQueryOptions<ReturnType<PassengerDao["selectQuery"]>, PickerItemType> {
+        return {
+            baseQuery: this.selectQuery(),
+            defaultCursorOptions: {
+                cursor: [
+                    { field: "name", order: "asc", toLowerCase: true },
+                    { field: "id", order: "asc" }
+                ],
+                defaultOrder: "asc"
+            },
+            defaultFilters: [
+                {
+                    key: USER_TABLE,
+                    filters: [{ field: "owner_id", operator: "=", value: ownerId }],
+                    logic: "AND"
+                }
+            ],
+            idField: "id",
+            mapper: this.mapper.toPickerItem.bind(this.mapper),
+            mappedItemId: "value"
+        };
+    }
+
     async isNameAlreadyExists(id: string, ownerId: string, name: string): Promise<boolean> {
         const result = await this.db
         .selectFrom(PASSENGER_TABLE)
@@ -57,17 +79,5 @@ export class PassengerDao extends Dao<PassengerTableRow, Passenger, PassengerMap
     async updateFromFormResult(formResult: PassengerFormFields) {
         const entity = this.mapper.formResultToEntity(formResult);
         return super.update(entity);
-    }
-
-    pickerPaginator(perPage: number = 30): CursorPaginator<PassengerTableRow, PickerItemType> {
-        return new CursorPaginator<PassengerTableRow, PickerItemType>(
-            this.db,
-            PASSENGER_TABLE,
-            { cursor: [{ field: "name", order: "asc", toLowerCase: true }, { field: "id" }], defaultOrder: "asc" },
-            {
-                perPage,
-                mapper: this.mapper.entityToPickerItem.bind(this.mapper)
-            }
-        );
     }
 }

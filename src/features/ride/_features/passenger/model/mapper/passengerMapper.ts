@@ -21,7 +21,7 @@ export class PassengerMapper extends AbstractMapper<PassengerTableRow, Passenger
         };
     }
 
-    entityToPickerItem(entity: PassengerTableRow): PickerItemType {
+    toPickerItem(entity: PassengerTableRow): PickerItemType {
         return {
             value: entity.id,
             title: entity.name

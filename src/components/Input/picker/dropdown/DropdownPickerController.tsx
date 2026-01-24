@@ -2,18 +2,21 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { PickerItemType } from "../PickerItem.tsx";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
-import { PickerDisabledToast } from "../../../../ui/alert/presets/toast/index.ts";
-import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { PickerDisabledToast } from "../../../../ui/alert/presets/toast";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants";
 import { formTheme } from "../../../../ui/form/constants/theme.ts";
 import Icon from "../../../Icon.tsx";
 import { IntelligentMarquee } from "../../../marquee/IntelligentMarquee.tsx";
 import { useTranslation } from "react-i18next";
-import { TextStyle, ViewStyle } from "../../../../types/index.ts";
+import { TextStyle, ViewStyle } from "../../../../types";
+import { MoreDataLoading } from "../../../loading/MoreDataLoading.tsx";
 
 export type DropdownPickerControllerProps = {
     selectedItem: PickerItemType | null
     /** Callback when dropdown toggled */
     toggleDropdown: () => void
+    /** When true a loading indicator appear at controller and replace  the placeholder */
+    isSelectedItemLoading?: boolean
     /** The main icon shown in the controller input field */
     icon?: string
     /** Placeholder text displayed in the controller when no item is selected */
@@ -34,6 +37,7 @@ export type DropdownPickerControllerProps = {
 
 const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
     selectedItem,
+    isSelectedItemLoading,
     toggleDropdown,
     icon,
     inputPlaceholder,
@@ -106,8 +110,14 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
                            </IntelligentMarquee>
                         }
                     </>
-                    : <Text style={ [styles.titleText, styles.placeholderText] }>{ inputPlaceholder ?? t(
-                        "form.picker.choose") }</Text>
+                    : !isSelectedItemLoading
+                      ? <Text style={ [styles.titleText, styles.placeholderText] }>
+                          { inputPlaceholder ?? t("form.picker.choose") }
+                      </Text>
+                      : <MoreDataLoading
+                          withText={ false }
+                          containerStyle={ { alignSelf: "flex-start", alignItems: "flex-start" } }
+                      />
                 }
             </View>
             <View style={ styles.formFieldIconContainer }>

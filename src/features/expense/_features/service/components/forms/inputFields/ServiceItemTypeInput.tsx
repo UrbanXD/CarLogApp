@@ -21,9 +21,9 @@ export function ServiceItemTypeInput({
     const { t } = useTranslation();
     const { serviceItemTypeDao } = useDatabase();
 
-    const paginator = useMemo(() => serviceItemTypeDao.paginator({
-        getTitle: (entity) => t(`service.items.types.${ entity.key }`)
-    }), [t]);
+    const queryOptions = useMemo(() => {
+        return serviceItemTypeDao.pickerInfiniteQuery((entity) => t(`service.items.types.${ entity.key }`));
+    }, [t]);
 
     return (
         <Input.Field
@@ -32,9 +32,9 @@ export function ServiceItemTypeInput({
             fieldNameText={ title ?? t("service.items.types.title") }
             fieldInfoText={ subtitle }
         >
-            <Input.Picker.Dropdown
+            <Input.Picker.Dropdown<typeof queryOptions["baseQuery"]>
                 title={ title ?? t("service.items.types.title") }
-                paginator={ paginator }
+                queryOptions={ queryOptions }
                 searchBy="key"
                 icon={ ICON_NAMES.serviceOutline }
             />

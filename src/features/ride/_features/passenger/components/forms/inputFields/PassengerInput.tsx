@@ -24,7 +24,7 @@ export function PassengerInput({
 
     if(!sessionUserId) return null;
 
-    const paginator = useMemo(() => passengerDao.pickerPaginator(), []);
+    const queryOptions = useMemo(() => passengerDao.pickerInfiniteQuery(sessionUserId), []);
 
     const { form, submitHandler } = useCreatePassenger({ userId: sessionUserId, dismissSheet: false });
 
@@ -33,9 +33,9 @@ export function PassengerInput({
             control={ control }
             fieldName={ fieldName }
         >
-            <Input.Picker.Dropdown
+            <Input.Picker.Dropdown<typeof queryOptions["baseQuery"]>
                 title={ title ?? t("passengers.title_singular") }
-                paginator={ paginator }
+                queryOptions={ queryOptions }
                 renderCreateItemForm={
                     (callback) => {
                         const handler = submitHandler(callback);

@@ -4,13 +4,29 @@ import { ServiceType } from "../../schemas/serviceTypeSchema.ts";
 import { ServiceTypeMapper } from "../mapper/serviceTypeMapper.ts";
 import { Kysely } from "@powersync/kysely-driver";
 import { SERVICE_TYPE_TABLE } from "../../../../../../database/connector/powersync/tables/serviceType.ts";
-import { CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
 import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
 import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
 
 export class ServiceTypeDao extends Dao<ServiceTypeTableRow, ServiceType, ServiceTypeMapper> {
     constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
         super(db, powersync, SERVICE_TYPE_TABLE, new ServiceTypeMapper());
+    }
+
+    pickerInfiniteQuery(getTitle?: (entity: ServiceTypeTableRow) => string): UseInfiniteQueryOptions<ReturnType<ServiceTypeDao["selectQuery"]>, PickerItemType> {
+        return {
+            baseQuery: this.selectQuery(),
+            defaultCursorOptions: {
+                cursor: [
+                    { field: "key", order: "asc", toLowerCase: true },
+                    { field: "id", order: "asc" }
+                ],
+                defaultOrder: "asc"
+            },
+            idField: "id",
+            mappedItemId: "value",
+            mapper: (entity) => this.mapper.toPickerItem(entity, getTitle)
+        };
     }
 
     async getIdByKey(key: string): Promise<string> {
@@ -34,20 +50,5 @@ export class ServiceTypeDao extends Dao<ServiceTypeTableRow, ServiceType, Servic
         .executeTakeFirstOrThrow();
 
         return result.id;
-    }
-
-    paginator({ perPage = 20, getTitle }: {
-        perPage?: number,
-        getTitle?: (entity: ServiceTypeTableRow) => string
-    }): CursorPaginator<ServiceTypeTableRow, PickerItemType> {
-        return new CursorPaginator<ServiceTypeTableRow, PickerItemType>(
-            this.db,
-            SERVICE_TYPE_TABLE,
-            { cursor: [{ field: "key", order: "asc", toLowerCase: true }, { field: "id" }], defaultOrder: "asc" },
-            {
-                perPage,
-                mapper: (entity) => this.mapper.entityToPickerItem(entity, getTitle)
-            }
-        );
     }
 }

@@ -40,7 +40,7 @@ export class ServiceTypeMapper extends AbstractMapper<ServiceTypeTableRow, Servi
         };
     }
 
-    entityToPickerItem(
+    toPickerItem(
         entity: ServiceTypeTableRow,
         getTitle?: (entity: ServiceTypeTableRow) => string
     ): PickerItemType {

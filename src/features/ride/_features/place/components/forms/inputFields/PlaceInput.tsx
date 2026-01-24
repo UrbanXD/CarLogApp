@@ -24,7 +24,7 @@ export function PlaceInput({
 
     if(!sessionUserId) return null;
 
-    const paginator = useMemo(() => placeDao.pickerPaginator(), []);
+    const queryOptions = useMemo(() => placeDao.pickerInfiniteQuery(sessionUserId), [sessionUserId]);
 
     const { form, submitHandler } = useCreatePlace({ userId: sessionUserId, dismissSheet: false });
     return (
@@ -32,9 +32,9 @@ export function PlaceInput({
             control={ control }
             fieldName={ fieldName }
         >
-            <Input.Picker.Dropdown
+            <Input.Picker.Dropdown<typeof queryOptions["baseQuery"]>
                 title={ title ?? t("places.title_singular") }
-                paginator={ paginator }
+                queryOptions={ queryOptions }
                 renderCreateItemForm={
                     (callback) => {
                         const handler = submitHandler(callback);
