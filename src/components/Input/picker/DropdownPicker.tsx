@@ -128,21 +128,20 @@ export default function DropdownPicker<
 
     const isSelectedValueMissing = useMemo(() => {
         if(!inputFieldValue) return false;
-        if(foundItem) return false;
-        return true;
+        return !foundItem;
     }, [inputFieldValue, foundItem]);
 
     const isLoadingInitialItem = isSelectedValueMissing && isInitialLoading;
 
     useEffect(() => {
-        if(foundItem && selectedItem?.value !== foundItem.value) setSelectedItem(foundItem);
+        if(selectedItem?.value !== foundItem?.value) setSelectedItem(foundItem ?? null);
     }, [foundItem]);
 
     useAnimatedReaction(() => isOpened.value, (opened) => {
         if(opened) scheduleOnRN(setTmpSelectedItem, selectedItem); //reset tmp selected item after reopen
     });
 
-    const handleSearch = useCallback(() => {
+    const handleSearch = useCallback((searchTerm: string) => {
         if(!queryOptions || !searchBy) return;
 
         query.replaceFilter({
@@ -153,12 +152,12 @@ export default function DropdownPicker<
                 value: `%${ searchTerm.toLowerCase() }%`
             }
         });
-    }, [searchTerm, !!queryOptions, searchBy, query.replaceFilter]);
+    }, [searchTerm, !!queryOptions, query.replaceFilter]);
 
-    const debouncedSearch = useMemo(() => debounce(handleSearch, 200), [handleSearch]);
+    const debouncedSearch = useMemo(() => debounce(handleSearch, 450), [handleSearch]);
 
     useEffect(() => {
-        if(queryOptions) debouncedSearch();
+        if(queryOptions) debouncedSearch(searchTerm);
         return () => debouncedSearch.cancel();
     }, [searchTerm, !!queryOptions, debouncedSearch]);
 
