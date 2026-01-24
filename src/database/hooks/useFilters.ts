@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ExtractColumnsFromQuery, FilterCondition, FilterGroup } from "./useInfiniteQuery.ts";
 import { SelectQueryBuilder } from "kysely";
 
@@ -41,6 +41,10 @@ export function useFilters<
     const [filters, setFilters] = useState<Map<string, FilterGroup<QueryBuilder, Columns>>>(() => {
         return new Map(defaultFilters.map(({ key, ...filter }) => [key, filter]));
     });
+
+    useEffect(() => {
+        setFilters(new Map(defaultFilters.map(({ key, ...filter }) => [key, filter])));
+    }, [defaultFilters]);
 
     const addFilter = useCallback(({
         groupKey,

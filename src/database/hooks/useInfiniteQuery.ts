@@ -83,15 +83,14 @@ export type UseInfiniteQueryOptions<
 > = {
     baseQuery: QueryBuilder,
     defaultCursorOptions: CursorOptions<QueryBuilder, Columns>
-    defaultFilters?: Array<FilterGroup<QueryBuilder, Columns> & { key: string }>,
-    defaultItem?: {
-        idField: keyof TableItem
-        idValue: any,
-    },
+    defaultFilters?: Array<FilterGroup<QueryBuilder, Columns> & { key: string }>
+    defaultItem?: { idField: keyof TableItem, idValue: any } | null
+    idField?: Columns
     perPage?: number
     mapper?: (item: TableItem, index: number) => MappedItem | Promise<MappedItem>
     mappedItemId?: keyof MappedItem
     jsonArrayFields?: Array<keyof TableItem>
+    enabled?: boolean
 }
 
 export const useInfiniteQuery = <
@@ -99,22 +98,24 @@ export const useInfiniteQuery = <
     MappedItem = ExtractRowFromQuery<QueryBuilder>,
     TableItem = ExtractRowFromQuery<QueryBuilder>,
     Columns = ExtractColumnsFromQuery<QueryBuilder>
->({
-    defaultCursorOptions,
-    baseQuery,
-    defaultFilters,
-    defaultItem,
-    perPage = 15,
-    mapper,
-    mappedItemId,
-    jsonArrayFields
-}: UseInfiniteQueryOptions<QueryBuilder, MappedItem, TableItem, Columns>) => {
+>(props: UseInfiniteQueryOptions<QueryBuilder, MappedItem, TableItem, Columns> | null) => {
+    const {
+        defaultCursorOptions,
+        baseQuery,
+        defaultFilters,
+        defaultItem,
+        perPage = 15,
+        mapper,
+        mappedItemId,
+        jsonArrayFields,
+        enabled = true
+    } = props ?? {};
+
     const { powersync } = useDatabase();
 
-    const stringifiedCursors = JSON.stringify(defaultCursorOptions);
     const stringifiedMapper = JSON.stringify(mapper);
-    const stableDefaultCursorOptions = useMemo(() => defaultCursorOptions, [stringifiedCursors]);
     const stableMapper = useMemo(() => mapper, [stringifiedMapper]);
+    const memoizedDefaultFilters = useMemo(() => defaultFilters ?? [], [defaultFilters]);
 
     const {
         cursorOptions,
@@ -122,7 +123,7 @@ export const useInfiniteQuery = <
         makeFieldMainCursor,
         toggleFieldOrder,
         getOrderIconForField
-    } = useCursor<QueryBuilder, Columns>(stableDefaultCursorOptions);
+    } = useCursor<QueryBuilder, Columns>(defaultCursorOptions);
 
     const {
         filters,
@@ -130,7 +131,7 @@ export const useInfiniteQuery = <
         replaceFilter,
         removeFilter,
         clearFilters
-    } = useFilters(defaultFilters ?? []);
+    } = useFilters(memoizedDefaultFilters);
 
     const [data, setData] = useState<Array<MappedItem>>([]);
     const [initialStartIndex, setInitialStartIndex] = useState<number>(0);
@@ -149,6 +150,8 @@ export const useInfiniteQuery = <
         null);
 
     const getBaseBuilder = useCallback(() => {
+        if(!baseQuery || !enabled) return null;
+
         let query = baseQuery;
 
         filters.forEach((group) => {
@@ -170,13 +173,17 @@ export const useInfiniteQuery = <
         });
 
         return query;
-    }, [cursorOptions, filters]);
+    }, [cursorOptions, filters, enabled]);
 
     const setNextCursor = useCallback((lastItem: TableItem) => {
+        if(!cursorOptions) return;
+
         setNextCursorValues(getCursorValues(lastItem, cursorOptions));
     }, [cursorOptions]);
 
     const setPrevCursor = useCallback((firstItem: TableItem) => {
+        if(!cursorOptions) return;
+
         setPrevCursorValues(getCursorValues(firstItem, cursorOptions));
     }, [cursorOptions]);
 
@@ -195,11 +202,15 @@ export const useInfiniteQuery = <
 
     const fetchNext = useCallback(
         async () => {
-            if(isNextFetching || (data.length > 0 && !hasNext) || isLoading) return;
+            if(!cursorOptions || !enabled || isNextFetching || (data.length > 0 && !hasNext) || isLoading) return;
+
+            const base = getBaseBuilder();
+            if(!base) return;
+
             setIsNextFetching(true);
 
             try {
-                let nextBuilder = getBaseBuilder().limit(perPage + 1);
+                let nextBuilder = base.limit(perPage + 1);
                 nextBuilder = addCursor(nextBuilder, cursorOptions, nextCursorValues, "next");
 
                 const compiled = nextBuilder.compile();
@@ -234,6 +245,7 @@ export const useInfiniteQuery = <
             }
         },
         [
+            enabled,
             isLoading,
             isNextFetching,
             hasNext,
@@ -253,17 +265,22 @@ export const useInfiniteQuery = <
     );
 
     const fetchPrev = useCallback(async () => {
-        if(isPrevFetching || !hasPrev || isLoading) return;
+        if(!cursorOptions || !enabled || isPrevFetching || !hasPrev || isLoading) return;
+
+        const base = getBaseBuilder();
+        if(!base) return;
+
         setIsPrevFetching(true);
 
         try {
-            let prevBuilder = getBaseBuilder().limit(perPage + 1);
+            let prevBuilder = base.limit(perPage + 1);
             prevBuilder = addCursor(prevBuilder, cursorOptions, prevCursorValues, "prev");
 
             const compiled = prevBuilder.compile();
+
             const rawResults = (await powersync.getAll<TableItem>(compiled.sql, compiled.parameters as any[]));
-            const parsedRawResults = rawResults.map(row => jsonArrayParse(row, jsonArrayFields));
-            const results = [...parsedRawResults].reverse();
+            console.log(compiled.sql, compiled.parameters, "prev", rawResults.length);
+            const results = rawResults.map(row => jsonArrayParse(row, jsonArrayFields));
 
             const hasMore = results.length > perPage;
             if(hasMore) results.unshift();
@@ -292,6 +309,7 @@ export const useInfiniteQuery = <
             setIsPrevFetching(false);
         }
     }, [
+        enabled,
         isLoading,
         isPrevFetching,
         hasPrev,
@@ -309,9 +327,13 @@ export const useInfiniteQuery = <
     ]);
 
     const diffQuery = useMemo(() => {
-        if(isDefaultCursorFetching) return null;
+        if(!cursorOptions || isDefaultCursorFetching) return null;
 
-        let watchBuilder = getBaseBuilder();
+        const base = getBaseBuilder();
+
+        if(!base) return null;
+
+        let watchBuilder = base;
 
         //reverse direction because watch query want between
         watchBuilder = addCursor<QueryBuilder, TableItem, Columns>(
@@ -324,6 +346,7 @@ export const useInfiniteQuery = <
         if(!nextCursorValues && !prevCursorValues) {
             watchBuilder = watchBuilder.limit(perPage + 1) as QueryBuilder;
         }
+
         const cursors =
             Array.isArray(cursorOptions.cursor)
             ? cursorOptions.cursor
@@ -347,7 +370,7 @@ export const useInfiniteQuery = <
 
     useEffect(() => {
         const setupInitialCursors = async () => {
-            if(isDefaultCursorFetching) return;
+            if(!cursorOptions || !enabled || isDefaultCursorFetching) return;
 
             setIsLoading(true);
             setData([]);
@@ -355,11 +378,16 @@ export const useInfiniteQuery = <
             setPrevCursorValues(null);
 
             if(defaultItem) {
+                const base = getBaseBuilder();
+                if(!base) return;
+
                 setIsDefaultCursorFetching(true);
 
-                const result = await getBaseBuilder()
-                .where(sql.ref(String(defaultItem.idField)), "=", defaultItem.idField)
-                .executeTakeFirst();
+                const result = await (base.where(
+                    sql.ref(String(defaultItem.idField)),
+                    "=",
+                    defaultItem.idValue
+                )).executeTakeFirst();
 
                 const tableDefaultItem = (result as TableItem) ?? null;
 
@@ -369,14 +397,14 @@ export const useInfiniteQuery = <
 
                     const [nextRes, prevRes] = await Promise.all([
                         addCursor(
-                            getBaseBuilder().limit(perPage),
+                            base.limit(perPage),
                             cursorOptions,
                             defaultCursorValues,
                             "next"
                         )
                         .execute(),
                         addCursor(
-                            getBaseBuilder().limit(perPage),
+                            base.limit(perPage),
                             cursorOptions,
                             defaultCursorValues,
                             "prev"
@@ -389,6 +417,7 @@ export const useInfiniteQuery = <
 
                     const parsedFarNextItem = farNextItem ? jsonArrayParse(farNextItem, jsonArrayFields) : null;
                     const parsedFarPrevItem = farPrevItem ? jsonArrayParse(farPrevItem, jsonArrayFields) : null;
+
 
                     setNextCursorValues(getCursorValues<QueryBuilder, TableItem, Columns>(
                         parsedFarNextItem ?? parsedDefaultItem,
@@ -417,7 +446,7 @@ export const useInfiniteQuery = <
 
     useEffect(
         () => {
-            if(!diffQuery) return;
+            if(!diffQuery || !enabled) return;
 
             const dispose = diffQuery.registerListener({
                 onData: async (rows) => {
@@ -464,7 +493,7 @@ export const useInfiniteQuery = <
                 diffQuery.close();
             };
         },
-        [diffQuery, stableMapper, jsonArrayFields]
+        [enabled, diffQuery, stableMapper, jsonArrayFields]
     );
 
     return {
