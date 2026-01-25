@@ -84,6 +84,8 @@ export function useCreateFuelLogFormProps(car: Car | null): UseFormProps<FuelLog
 export function useEditFuelLogFormProps(fuelLog: FuelLog): UseFormProps<FuelLogFormFields, any, FuelLogFormFields> {
     const { odometerLogDao } = useDatabase();
 
+    console.log(fuelLog.odometer?.value);
+
     const defaultValues: DefaultValues<FuelLogFormFields> = {
         id: fuelLog.id,
         expense: {

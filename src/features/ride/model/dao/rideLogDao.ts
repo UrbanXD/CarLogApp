@@ -1,5 +1,6 @@
 import { Dao } from "../../../../database/dao/Dao.ts";
 import {
+    CurrencyTableRow,
     DatabaseType,
     OdometerUnitTableRow,
     RideLogTableRow
@@ -45,6 +46,7 @@ import { UseInfiniteQueryOptions } from "../../../../database/hooks/useInfiniteQ
 
 export type SelectBaseRideLogTableRow = RideLogTableRow
     & WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">
+    & WithPrefix<CurrencyTableRow, "car_currency">
     & WithPrefix<Omit<SelectOdometerTableRow, "log_car_id" | keyof WithPrefix<OdometerUnitTableRow, "unit">>, "start_odometer">
     & WithPrefix<Omit<SelectOdometerTableRow, "log_car_id" | keyof WithPrefix<OdometerUnitTableRow, "unit">>, "end_odometer">
     & WithPrefix<OdometerUnitTableRow, "odometer_unit">
@@ -120,6 +122,9 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
             "c.model_year as car_model_year",
             "ma.id as car_make_id",
             "ma.name as car_make_name",
+            "ccur.id as car_currency_id",
+            "ccur.key as car_currency_key",
+            "ccur.symbol as car_currency_symbol",
             "sol.id as start_odometer_log_id",
             "sol.value as start_odometer_log_value",
             "eol.id as end_odometer_log_id",

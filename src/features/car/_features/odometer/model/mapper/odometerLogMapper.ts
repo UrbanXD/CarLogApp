@@ -14,6 +14,7 @@ import {
     SelectOdometerLogTableRow,
     SelectOdometerTableRow
 } from "../dao/OdometerLogDao.ts";
+import { carSimpleSchema } from "../../../../schemas/carSchema.ts";
 
 export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, OdometerLog> {
     private readonly odometerLogTypeDao: OdometerLogTypeDao;
@@ -24,7 +25,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
     }
 
     toDto(entity: SelectOdometerLogTableRow): OdometerLog {
-        const car = {
+        const car = carSimpleSchema.parse({
             id: entity.car_id,
             name: entity.car_name,
             model: {
@@ -35,8 +36,13 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
                     id: entity.car_make_id,
                     name: entity.car_make_name
                 }
+            },
+            currency: {
+                id: entity.car_currency_id,
+                key: entity.car_currency_key,
+                symbol: entity.car_currency_symbol
             }
-        };
+        });
 
         const odometerLogType = this.odometerLogTypeDao.mapper.toDto({
             id: entity.type_id as never,

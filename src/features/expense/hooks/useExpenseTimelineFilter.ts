@@ -36,7 +36,7 @@ export function useExpenseTimelineFilter<
     carFilterFieldName,
     typesFilterFieldName
 }: UseExpenseTimelineFilterProps<QueryBuilder, Columns>) {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const { expenseTypeDao } = useDatabase();
 
     const [types, setTypes] = useState<Array<ExpenseType>>([]);
@@ -49,7 +49,7 @@ export function useExpenseTimelineFilter<
             // sort based on locale
             const sorted = types.sort((a, b) => {
                 //Make other first
-                if(a.key === t(ExpenseTypeEnum.OTHER)) return -1;
+                if(a.key === ExpenseTypeEnum.OTHER) return -1;
                 if(b.key === ExpenseTypeEnum.OTHER) return 1;
 
                 return t(`expenses.types.${ a.key }`).localeCompare(t(`expenses.types.${ a.key }`));
@@ -57,7 +57,7 @@ export function useExpenseTimelineFilter<
 
             setTypes(sorted);
         })();
-    }, [i18n.language]);
+    }, [t]);
 
     useEffect(() => {
         if(!filters.has(TYPES_FILTER_KEY)) setSelectedTypesId([]);

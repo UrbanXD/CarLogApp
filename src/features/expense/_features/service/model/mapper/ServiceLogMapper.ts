@@ -20,6 +20,7 @@ import { ServiceItemDao } from "../dao/ServiceItemDao.ts";
 import { OdometerUnit } from "../../../../../car/_features/odometer/schemas/odometerUnitSchema.ts";
 import { CarDao } from "../../../../../car/model/dao/CarDao.ts";
 import { SelectServiceLogTableRow } from "../dao/ServiceLogDao.ts";
+import { carSimpleSchema } from "../../../../../car/schemas/carSchema.ts";
 
 export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, ServiceLog> {
     private readonly expenseDao: ExpenseDao;
@@ -50,7 +51,7 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
     }
 
     toDto(entity: SelectServiceLogTableRow): ServiceLog {
-        const car = {
+        const car = carSimpleSchema.parse({
             id: entity.car_id,
             name: entity.car_name,
             model: {
@@ -61,8 +62,13 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
                     id: entity.car_make_id,
                     name: entity.car_make_name
                 }
+            },
+            currency: {
+                id: entity.expense_car_currency_id,
+                key: entity.expense_car_currency_key,
+                symbol: entity.expense_car_currency_symbol
             }
-        };
+        });
 
         const expense = this.expenseDao.mapper.toDto({
             id: entity.expense_id!,

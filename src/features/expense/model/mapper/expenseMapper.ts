@@ -12,6 +12,7 @@ import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.t
 import { amountSchema } from "../../../_shared/currency/schemas/amountSchema.ts";
 import { WithPrefix } from "../../../../types";
 import { SelectCarModelTableRow } from "../../../car/model/dao/CarDao.ts";
+import { carSimpleSchema } from "../../../car/schemas/carSchema.ts";
 
 export type SelectAmountCurrencyTableRow =
     WithPrefix<CurrencyTableRow, "currency">
@@ -33,7 +34,7 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, Sele
     }
 
     toDto(entity: SelectExpenseTableRow): Expense {
-        const car = {
+        const car = carSimpleSchema.parse({
             id: entity.car_id,
             name: entity.car_name,
             model: {
@@ -44,8 +45,13 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, Sele
                     id: entity.car_make_id,
                     name: entity.car_make_name
                 }
+            },
+            currency: {
+                id: entity.car_currency_id,
+                key: entity.car_currency_key,
+                symbol: entity.car_currency_symbol
             }
-        };
+        });
 
         const type = this.expenseTypeDao.mapper.toDto({
             id: entity.type_id,

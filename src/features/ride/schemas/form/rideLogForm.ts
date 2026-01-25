@@ -37,9 +37,7 @@ const rideLogForm = (odometerLogDao: OdometerLogDao) => rideLogSchema
         }
     }),
     expenses: z.array(transformedRideExpenseForm),
-    places: z.array(ridePlaceForm).min(2, {
-        message: "error.start_and_end_place_required"
-    }),
+    places: z.array(ridePlaceForm),
     passengers: z.array(ridePassengerForm)
 })
 .superRefine(async (data, ctx) => {

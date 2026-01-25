@@ -27,7 +27,7 @@ export function EditOdometerChangeLogForm({ odometerLog, field, onFormStateChang
     const { odometerLogDao } = useDatabase();
 
     const form = useForm<OdometerChangeLogFormFields>(useEditOdometerChangeLogFormProps(odometerLog));
-    const { fields, fullForm } = useOdometerLogFormFields({ form, odometerLog });
+    const { fields, fullForm } = useOdometerLogFormFields({ form, isEdit: true });
     const editFields: FormFields = field ? fields?.[field] ?? fullForm : fullForm;
 
     const submitHandler: SubmitHandlerArgs<OdometerChangeLogFormFields> = {

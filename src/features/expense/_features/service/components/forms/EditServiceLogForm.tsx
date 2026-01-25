@@ -28,7 +28,7 @@ export function EditServiceLogForm({
     const { dismissBottomSheet } = useBottomSheet();
 
     const form = useForm<ServiceLogFormFields>(useEditServiceLogFormProps(serviceLog));
-    const { fields } = useServiceLogFormFields({ ...form, odometer: serviceLog.odometer });
+    const { fields } = useServiceLogFormFields({ form, isEdit: true });
     const editFields: FormFields = fields[field];
 
     const submitHandler: SubmitHandlerArgs<ServiceLogFormFields> = {

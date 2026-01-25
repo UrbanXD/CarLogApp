@@ -11,41 +11,21 @@ import { OdometerValueInput } from "../../odometer/components/forms/inputFields/
 import { FuelInput } from "../components/forms/inputFields/FuelInput.tsx";
 import { EditToast } from "../../../../../ui/alert/presets/toast";
 import { useTranslation } from "react-i18next";
-import { Odometer } from "../../odometer/schemas/odometerSchema.ts";
-import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
-import { useCar } from "../../../hooks/useCar.ts";
-import { useWatchedQueryItem } from "../../../../../database/hooks/useWatchedQueryItem.ts";
 
 type UseFuelLogFormFieldsProps = {
     form: UseFormReturn<FuelLogFormFields, any, FuelLogFormFields>
-    odometer?: Odometer | null
+    isEdit?: boolean
 }
 
-export function useFuelLogFormFields({ form, odometer }: UseFuelLogFormFieldsProps) {
+export function useFuelLogFormFields({ form, isEdit }: UseFuelLogFormFieldsProps) {
     const { t } = useTranslation();
-    const { control, setValue, clearErrors } = form;
-    const { odometerLogDao } = useDatabase();
+    const { control, setValue, getFieldState, clearErrors } = form;
 
-    const formLogId = useWatch({ control, name: "odometerLogId" });
     const formCarId = useWatch({ control, name: "carId" });
-    const formDate = useWatch({ control, name: "date" });
-
-    const memoizedQuery = useMemo(() => odometerLogDao.odometerLimitWatchedQueryItem(
-        formCarId,
-        formDate,
-        formLogId ? [formLogId] : []
-    ), [odometerLogDao, formCarId, formDate, formLogId]);
-
-    const { data: odometerLimit } = useWatchedQueryItem(memoizedQuery);
-
-    const { car } = useCar({ carId: formCarId, options: { queryOnce: true } });
 
     useEffect(() => {
-        if(car && car.id === formCarId) {
-            setValue("fuelUnitId", car.fuelTank.unit.id);
-            clearErrors();
-        }
-    }, [car, formCarId, setValue]);
+        clearErrors();
+    }, [formCarId]);
 
     const fields: Record<FuelLogFormFieldsEnum, FormFields> = useMemo(() => ({
         [FuelLogFormFieldsEnum.Car]: {
@@ -56,13 +36,12 @@ export function useFuelLogFormFields({ form, odometer }: UseFuelLogFormFieldsPro
             editToastMessages: EditToast
         },
         [FuelLogFormFieldsEnum.Quantity]: {
-            render: () => <FuelInput<FuelLogFormFields>
+            render: () => <FuelInput
                 control={ control }
                 setValue={ setValue }
                 fieldName="quantity"
-                capacity={ car?.fuelTank.capacity ?? 0 }
-                fuelTypeText={ t(`fuel.types.${ car?.fuelTank.type.key }`) }
-                unitText={ car?.fuelTank.unit.short }
+                fuelUnitIdFieldName="fuelUnitId"
+                carIdFieldName="carId"
             />,
             editToastMessages: EditToast
         },
@@ -71,9 +50,9 @@ export function useFuelLogFormFields({ form, odometer }: UseFuelLogFormFieldsPro
                 control={ control }
                 setValue={ setValue }
                 fieldName="expense"
+                carIdFieldName="carId"
                 outsideQuantityFieldName="quantity"
                 showsQuantityInput={ false }
-                defaultCurrency={ car?.currency.id }
             />,
             editToastMessages: EditToast
         },
@@ -81,17 +60,14 @@ export function useFuelLogFormFields({ form, odometer }: UseFuelLogFormFieldsPro
             render: () => <>
                 <OdometerValueInput
                     control={ control }
+                    setValue={ setValue }
+                    getFieldState={ getFieldState }
+                    idFieldName="odometerLogId"
+                    carIdFieldName="carId"
                     odometerValueFieldName="odometerValue"
                     dateFieldName="date"
-                    currentOdometerValueTranslationKey={
-                        odometer
-                        ? "odometer.original_value"
-                        : "odometer.current_value"
-                    }
-                    currentOdometerValue={ odometer?.value ?? car?.odometer.value }
-                    odometerLimit={ odometerLimit }
-                    unitText={ car?.odometer.unit.short }
                     odometerValueOptional
+                    changeCarOdometerValueWhenInputNotTouched={ !isEdit }
                 />
             </>,
             editToastMessages: EditToast
@@ -104,7 +80,7 @@ export function useFuelLogFormFields({ form, odometer }: UseFuelLogFormFieldsPro
             />,
             editToastMessages: EditToast
         }
-    }), [control, setValue, car, t, odometer, odometerLimit]);
+    }), [control, setValue, getFieldState, t, isEdit]);
 
     const multiStepFormSteps: Steps = [
         {

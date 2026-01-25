@@ -11,25 +11,26 @@ import { ServiceItemTypeInput } from "./inputFields/ServiceItemTypeInput.tsx";
 import { AmountInput } from "../../../../../_shared/currency/components/AmountInput.tsx";
 import React from "react";
 import { SaveButton } from "../../../../../../components/Button/presets/SaveButton.tsx";
-import { COLORS, FONT_SIZES } from "../../../../../../constants/index.ts";
+import { COLORS, FONT_SIZES } from "../../../../../../constants";
 import Form from "../../../../../../components/Form/Form.tsx";
 import { useTranslation } from "react-i18next";
-import { ArrayInputToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
+import { ArrayInputToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast";
 import { formTheme } from "../../../../../../ui/form/constants/theme.ts";
+import { Currency } from "../../../../../_shared/currency/schemas/currencySchema.ts";
 
 type ServiceItemFormProps = {
-    carCurrencyId: number
+    carCurrency: Currency
     onSubmit: (result: ServiceItemFormTransformedFields) => void
     defaultServiceItem?: ServiceItemFormTransformedFields | null
 }
 
-export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }: ServiceItemFormProps) {
+export function ServiceItemForm({ carCurrency, onSubmit, defaultServiceItem }: ServiceItemFormProps) {
     const { t } = useTranslation();
     const { openToast } = useAlert();
     const { serviceItemDao } = useDatabase();
 
     const form = useForm<ServiceItemFormFields, any, ServiceItemFormFields>(useServiceItemFormProps({
-        carCurrencyId,
+        carCurrencyId: carCurrency.id,
         serviceItem: defaultServiceItem
     }));
 
@@ -38,7 +39,10 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
     const submitHandler = handleSubmit(
         async (formResult) => {
             try {
-                const result = await serviceItemDao.mapper.toFormTransformedFields(formResult, carCurrencyId);
+                const result = await serviceItemDao.mapper.toFormTransformedFields(
+                    formResult,
+                    carCurrency.id
+                );
 
                 onSubmit(result);
             } catch(e) {
@@ -69,9 +73,9 @@ export function ServiceItemForm({ carCurrencyId, onSubmit, defaultServiceItem }:
                             fieldName="expense"
                             title={ t("currency.price_per_unit") }
                             amountPlaceholder={ t("currency.price_per_unit") }
-                            defaultCurrency={ carCurrencyId }
                             isPricePerUnitFallback={ true }
                             showsQuantityInput={ true }
+                            defaultCurrency={ carCurrency }
                         />
                     ]
                 }

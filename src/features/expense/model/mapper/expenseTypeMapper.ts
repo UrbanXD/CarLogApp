@@ -68,6 +68,17 @@ export class ExpenseTypeMapper extends AbstractMapper<ExpenseTypeTableRow, Expen
         };
     }
 
+    toPickerItem(
+        entity: ExpenseTypeTableRow,
+        getTitle?: (entity: ExpenseTypeTableRow) => string
+    ): PickerItemType {
+        return {
+            value: entity.id.toString(),
+            title: getTitle?.(entity) ?? entity.key
+        };
+    }
+
+
     dtoToPicker({ dtos, getTitle }: {
         dtos: Array<ExpenseType>,
         getTitle?: (dto: ExpenseType) => string

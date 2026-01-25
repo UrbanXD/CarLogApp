@@ -52,7 +52,7 @@ export function useOdometerLogTimelineFilter<
                 if(a.id === OdometerLogTypeEnum.SIMPLE) return -1;
                 if(b.id === OdometerLogTypeEnum.SIMPLE) return 1;
 
-                return t(`fuel.types.${ a.key }`).localeCompare(t(`fuel.types.${ a.key }`));
+                return t(`odometer.types.${ a.key }`).localeCompare(t(`odometer.types.${ a.key }`));
             });
 
             setTypes(sorted);

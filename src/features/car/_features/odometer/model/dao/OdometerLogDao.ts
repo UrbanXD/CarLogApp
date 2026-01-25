@@ -1,5 +1,6 @@
 import { Dao } from "../../../../../../database/dao/Dao.ts";
 import {
+    CurrencyTableRow,
     DatabaseType,
     OdometerLogTableRow,
     OdometerLogTypeTableRow,
@@ -30,11 +31,13 @@ import { MODEL_TABLE } from "../../../../../../database/connector/powersync/tabl
 import { MAKE_TABLE } from "../../../../../../database/connector/powersync/tables/make.ts";
 import { SelectCarModelTableRow } from "../../../../model/dao/CarDao.ts";
 import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
+import { CURRENCY_TABLE } from "../../../../../../database/connector/powersync/tables/currency.ts";
 
 export type SelectOdometerLogTableRow =
     OdometerLogTableRow
     & WithPrefix<OdometerUnitTableRow, "unit">
     & WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">
+    & WithPrefix<CurrencyTableRow, "car_currency">
     &
     {
         related_id: string | null
@@ -77,6 +80,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         .innerJoin(`${ CAR_TABLE } as c` as const, "c.id", "ol.car_id")
         .innerJoin(`${ MODEL_TABLE } as mo` as const, "mo.id", "c.model_id")
         .innerJoin(`${ MAKE_TABLE } as ma` as const, "ma.id", "mo.make_id")
+        .innerJoin(`${ CURRENCY_TABLE } as ccurr` as const, "c.currency_id", "ccurr.id")
         .innerJoin(`${ ODOMETER_UNIT_TABLE } as u` as const, "u.id", "c.odometer_unit_id")
         .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as ocl` as const, "ocl.odometer_log_id", "ol.id")
         .leftJoin(`${ FUEL_LOG_TABLE } as fl` as const, "fl.odometer_log_id", "ol.id")
@@ -91,6 +95,9 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
             "mo.id as car_model_id",
             "mo.name as car_model_name",
             "c.model_year as car_model_year",
+            "ccurr.id as car_currency_id",
+            "ccurr.key as car_currency_key",
+            "ccurr.symbol as car_currency_symbol",
             "ma.id as car_make_id",
             "ma.name as car_make_name",
             "ot.key as type_key",
@@ -133,9 +140,12 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         const dateSql = sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`;
 
         return this.db
-        .selectFrom(`${ ODOMETER_LOG_TABLE } as t1` as const)
-        .innerJoin(`${ CAR_TABLE } as t2` as const, "t1.car_id", "t2.id")
+        .selectFrom(`${ CAR_TABLE } as t2` as const)
         .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3` as const, "t2.odometer_unit_id", "t3.id")
+        .leftJoin(`${ ODOMETER_LOG_TABLE } as t1` as const, (join) =>
+            join.onRef("t1.car_id", "=", "t2.id")
+            .on("t1.id", "not in", skipOdometerLogs.length > 0 ? skipOdometerLogs : [""])
+        )
         .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t4` as const, "t1.id", "t4.odometer_log_id")
         .leftJoin(`${ FUEL_LOG_TABLE } as t5` as const, "t1.id", "t5.odometer_log_id")
         .leftJoin(`${ SERVICE_LOG_TABLE } as t6` as const, "t1.id", "t6.odometer_log_id")
@@ -146,16 +156,34 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         .select([
             //@formatter:off
             "t3.short as unit",
-            sql<number | null>`MAX(CASE WHEN ${dateSql} < ${dbDate} THEN ROUND(t1.value / t3.conversion_factor) END)`.as("min_value"),
-            sql<string | null>`MAX(CASE WHEN ${dateSql} < ${dbDate} THEN ${dateSql} END)`.as("min_date"),
-            sql<number | null>`MIN(CASE WHEN ${dateSql} > ${dbDate} THEN ROUND(t1.value / t3.conversion_factor) END)`.as("max_value"),
-            sql<string | null>`MIN(CASE WHEN ${dateSql} > ${dbDate} THEN ${dateSql} END)`.as("max_date")
+            sql<number | null>`
+              MAX(CASE 
+              WHEN ${dateSql} < ${dbDate} 
+                THEN ROUND(t1.value / t3.conversion_factor) 
+              END)
+            `.as("min_value"),
+            sql<string | null>`
+              MAX(CASE 
+                WHEN ${dateSql} < ${dbDate} 
+                THEN ${dateSql} 
+              END)
+            `.as("min_date"),
+            sql<number | null>`
+              MIN(CASE 
+                WHEN ${dateSql} > ${dbDate} 
+                THEN ROUND(t1.value / t3.conversion_factor) 
+              END)
+            `.as("max_value"),
+            sql<string | null>`
+              MIN(CASE 
+                WHEN ${dateSql} > ${dbDate} 
+                THEN ${dateSql} 
+              END)
+            `.as("max_date")
             //@formatter:on
         ])
-        .where("t1.car_id", "=", carId)
-        .where("t1.id", "not in", skipOdometerLogs.length > 0 ? skipOdometerLogs : [""])
-        .where(dateSql, "is not", null)
-        .groupBy("t3.short")
+        .where("t2.id", "=", carId)
+        .groupBy(["t3.short", "t2.id"]);
     }
 
     odometerLogWatchedQueryItem(
@@ -172,12 +200,13 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
     odometerLimitWatchedQueryItem(
         carId: string | null | undefined,
         date: string | null | undefined,
-        skipOdometerLogs: Array<string> = []
+        skipOdometerLogs: Array<string> = [],
+        enabled: boolean = true
     ): UseWatchedQueryItemProps<OdometerLimit> {
         return {
             query: this.odometerLimitQuery(carId!, date!, skipOdometerLogs),
             mapper: this.mapper.toOdometerLimitDto.bind(this.mapper),
-            options: { enabled: !!carId && !!date }
+            options: { enabled: enabled && !!carId && !!date }
         };
     }
 

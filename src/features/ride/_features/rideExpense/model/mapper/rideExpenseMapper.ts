@@ -84,7 +84,6 @@ export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideE
 
         const expenseType = await this.expenseTypeDao.getById(expenseEntity.type_id);
         const currency = await this.currencyDao.getById(expenseEntity.currency_id);
-        const carCurrency = await this.currencyDao.getById(car.currency.id);
 
         return {
             id: formResult.id,
@@ -100,9 +99,9 @@ export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideE
                 type_owner_id: expenseType.ownerId,
                 type_key: expenseType.key,
                 related_id: null,
-                car_currency_id: carCurrency.id as never,
-                car_currency_key: carCurrency.key,
-                car_currency_symbol: carCurrency.symbol,
+                car_currency_id: car.currency.id as never,
+                car_currency_key: car.currency.key,
+                car_currency_symbol: car.currency.symbol,
                 currency_id: currency.id as never,
                 currency_key: currency.key,
                 currency_symbol: currency.symbol

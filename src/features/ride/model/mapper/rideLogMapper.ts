@@ -19,6 +19,7 @@ import { SelectRideLogTableRow, SelectTimelineRideLogTableRow } from "../dao/rid
 import { RideExpenseMapper } from "../../_features/rideExpense/model/mapper/rideExpenseMapper.ts";
 import { RidePlaceMapper } from "../../_features/place/model/mapper/ridePlaceMapper.ts";
 import { RidePassengerMapper } from "../../_features/passenger/model/mapper/ridePassengerMapper.ts";
+import { carSimpleSchema } from "../../../car/schemas/carSchema.ts";
 
 export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
     private readonly rideExpenseMapper: RideExpenseMapper;
@@ -47,7 +48,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
     }
 
     toDto(entity: SelectRideLogTableRow): RideLog {
-        const car = {
+        const car = carSimpleSchema.parse({
             id: entity.car_id,
             name: entity.car_name,
             model: {
@@ -58,8 +59,14 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
                     id: entity.car_make_id,
                     name: entity.car_make_name
                 }
+            },
+            currency: {
+                id: entity.car_currency_id,
+                key: entity.car_currency_key,
+                symbol: entity.car_currency_symbol
             }
-        };
+        });
+
         const rideExpenses = this.rideExpenseMapper.toDtoArray(entity.expenses);
         const ridePlaces = this.ridePlaceMapper.toDtoArray(entity.places);
         const ridePassengers = this.ridePassengerMapper.toDtoArray(entity.passengers);

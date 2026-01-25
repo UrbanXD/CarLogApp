@@ -38,6 +38,7 @@ export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate
         defaultCurrencyId: car.currency.id,
         defaultDate: defaultDate
     }));
+
     const { control, setValue, handleSubmit } = form;
 
     const submitHandler = handleSubmit(
@@ -72,7 +73,7 @@ export function RideExpenseForm({ car, onSubmit, defaultRideExpense, defaultDate
                             control={ control }
                             setValue={ setValue }
                             fieldName="expense"
-                            defaultCurrency={ car.currency.id }
+                            defaultCurrency={ car.currency }
                         />,
                         <Input.Field
                             control={ control }

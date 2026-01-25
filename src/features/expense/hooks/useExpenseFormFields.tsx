@@ -11,7 +11,6 @@ import { NoteInput } from "../../../components/Input/_presets/NoteInput.tsx";
 import { EditToast } from "../../../ui/alert/presets/toast";
 import { useTranslation } from "react-i18next";
 import { ExpenseFormFields } from "../schemas/form/expenseForm.ts";
-import { useCar } from "../../car/hooks/useCar.ts";
 
 type UseExpenseFormFieldsProps = UseFormReturn<ExpenseFormFields, any, ExpenseFormFields>
 
@@ -20,7 +19,6 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
     const { t } = useTranslation();
 
     const formCarId = useWatch({ control, name: "carId" });
-    const { car } = useCar({ carId: formCarId });
 
     useEffect(() => {
         clearErrors();
@@ -40,7 +38,7 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
                 control={ control }
                 setValue={ setValue }
                 fieldName="expense"
-                defaultCurrency={ car?.currency.id }
+                carIdFieldName="carId"
             />,
             editToastMessages: EditToast
         },
@@ -64,7 +62,7 @@ export function useExpenseFormFields(props: UseExpenseFormFieldsProps) {
             />,
             editToastMessages: EditToast
         }
-    }), [control, setValue, car]);
+    }), [control, setValue]);
 
     const fullForm: FormFields = {
         render: () => ([

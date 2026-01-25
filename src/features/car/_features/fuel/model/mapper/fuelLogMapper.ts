@@ -16,6 +16,7 @@ import { OdometerUnitDao } from "../../../odometer/model/dao/OdometerUnitDao.ts"
 import { ExpenseDao } from "../../../../../expense/model/dao/ExpenseDao.ts";
 import { numberToFractionDigit } from "../../../../../../utils/numberToFractionDigit.ts";
 import { SelectFuelLogTableRow } from "../dao/FuelLogDao.ts";
+import { carSimpleSchema } from "../../../../schemas/carSchema.ts";
 
 export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
     private readonly fuelUnitDao: FuelUnitDao;
@@ -41,9 +42,8 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
 
     toDto(entity: SelectFuelLogTableRow): FuelLog {
         const isPricePerUnit = Boolean(entity.is_price_per_unit!);
-        const quantity = numberToFractionDigit(entity.quantity! / (entity.fuel_unit_conversion_factor ?? 1));
 
-        const car = {
+        const car = carSimpleSchema.parse({
             id: entity.car_id,
             name: entity.car_name,
             model: {
@@ -54,8 +54,15 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
                     id: entity.car_make_id,
                     name: entity.car_make_name
                 }
+            },
+            currency: {
+                id: entity.expense_car_currency_id,
+                key: entity.expense_car_currency_key,
+                symbol: entity.expense_car_currency_symbol
             }
-        };
+        });
+
+        const quantity = numberToFractionDigit(entity.quantity! / (entity.fuel_unit_conversion_factor ?? 1));
 
         const odometer =
             entity.odometer_log_id

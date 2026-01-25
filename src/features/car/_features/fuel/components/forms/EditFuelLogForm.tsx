@@ -28,7 +28,7 @@ export function EditFuelLogForm({
     const { dismissBottomSheet } = useBottomSheet();
 
     const form = useForm<FuelLogFormFields, any, FuelLogFormFields>(useEditFuelLogFormProps(fuelLog));
-    const { fields } = useFuelLogFormFields({ form, odometer: fuelLog.odometer });
+    const { fields } = useFuelLogFormFields({ form, isEdit: true });
     const editFields: FormFields = fields[field];
 
     const submitHandler: SubmitHandlerArgs<FuelLogFormFields> = {

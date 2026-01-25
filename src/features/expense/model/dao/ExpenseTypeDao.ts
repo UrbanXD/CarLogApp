@@ -6,21 +6,30 @@ import { ExpenseType } from "../../schemas/expenseTypeSchema.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { ExpenseTypeEnum } from "../enums/ExpenseTypeEnum.ts";
 import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { UseInfiniteQueryOptions } from "../../../../database/hooks/useInfiniteQuery.ts";
+import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 
 export class ExpenseTypeDao extends Dao<ExpenseTypeTableRow, ExpenseType, ExpenseTypeMapper> {
     constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
         super(db, powersync, EXPENSE_TYPE_TABLE, new ExpenseTypeMapper());
     }
 
-    async getAllOtherExpenseType(): Promise<Array<ExpenseType>> {
-        const entities = await this.db
-        .selectFrom(EXPENSE_TYPE_TABLE)
-        .selectAll()
-        .where("key", "is not", ExpenseTypeEnum.FUEL)
-        .where("key", "is not", ExpenseTypeEnum.SERVICE)
-        .execute();
-
-        return this.mapper.toDtoArray(entities);
+    pickerInfiniteQuery(getTitle?: (entity: ExpenseTypeTableRow) => string): UseInfiniteQueryOptions<ReturnType<ExpenseTypeDao["selectQuery"]>, PickerItemType> {
+        return {
+            baseQuery: this.selectQuery()
+            .where("key", "is not", ExpenseTypeEnum.FUEL)
+            .where("key", "is not", ExpenseTypeEnum.SERVICE),
+            defaultCursorOptions: {
+                cursor: [
+                    { field: "key", order: "asc", toLowerCase: true },
+                    { field: "id", order: "asc" }
+                ],
+                defaultOrder: "asc"
+            },
+            idField: "id",
+            mappedItemId: "value",
+            mapper: (entity) => this.mapper.toPickerItem(entity, getTitle)
+        };
     }
 
     async getIdByKey(key: string): Promise<string> {

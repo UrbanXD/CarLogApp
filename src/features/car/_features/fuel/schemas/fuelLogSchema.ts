@@ -2,12 +2,12 @@ import { z } from "zod";
 import { fuelUnitSchema } from "./fuelUnitSchema.ts";
 import { odometerSchema } from "../../odometer/schemas/odometerSchema.ts";
 import { expenseSchema } from "../../../../expense/schemas/expenseSchema.ts";
-import { carNameAndModelSchema } from "../../../schemas/carSchema.ts";
+import { carSimpleSchema } from "../../../schemas/carSchema.ts";
 
 export const fuelLogSchema = z
 .object({
     id: z.string().uuid(),
-    car: carNameAndModelSchema,
+    car: carSimpleSchema,
     expense: expenseSchema,
     fuelUnit: fuelUnitSchema,
     odometer: odometerSchema.nullable(),
