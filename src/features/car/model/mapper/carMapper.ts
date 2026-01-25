@@ -14,7 +14,7 @@ import {
 } from "../../_features/odometer/utils/convertOdometerUnit.ts";
 import { OdometerLogTypeEnum } from "../../_features/odometer/model/enums/odometerLogTypeEnum.ts";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
-import { SelectCarTableRow } from "../dao/CarDao.ts";
+import { SelectCarModelTableRow, SelectCarTableRow } from "../dao/CarDao.ts";
 import { carModelSchema } from "../../schemas/carModelSchema.ts";
 import { makeSchema } from "../../schemas/makeSchema.ts";
 import { odometerSchema } from "../../_features/odometer/schemas/odometerSchema.ts";
@@ -99,6 +99,14 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car, SelectCarTableRo
             model_year: dto.model.year,
             created_at: dto.createdAt,
             image_url: dto.imagePath ?? null
+        };
+    }
+
+    toPickerItem(entity: SelectCarModelTableRow): PickerItemType {
+        return {
+            value: entity.id.toString(),
+            title: entity.name,
+            subtitle: `${ entity.make_name } ${ entity.model_name }`
         };
     }
 

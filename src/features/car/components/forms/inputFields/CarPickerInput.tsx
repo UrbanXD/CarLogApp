@@ -1,10 +1,7 @@
 import Input from "../../../../../components/Input/Input.ts";
 import { ICON_NAMES } from "../../../../../constants";
-import { MoreDataLoading } from "../../../../../components/loading/MoreDataLoading.tsx";
-import React from "react";
+import React, { useMemo } from "react";
 import { Control, FieldPathByValue, FieldValues } from "react-hook-form";
-import { PickerItemType } from "../../../../../components/Input/picker/PickerItem.tsx";
-import useCars from "../../../hooks/useCars.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { useTranslation } from "react-i18next";
 
@@ -23,7 +20,10 @@ export function CarPickerInput<FormFieldValues extends FieldValues>({
 }: CarPickerInputProps<FormFieldValues>) {
     const { t } = useTranslation();
     const { carDao } = useDatabase();
-    const { cars, isLoading } = useCars<PickerItemType>({ extraMapper: carDao.mapper.dtoToPicker });
+
+    const queryOptions = useMemo(() => {
+        return carDao.pickerInfiniteQuery();
+    }, [carDao]);
 
     return (
         <Input.Field
@@ -32,17 +32,12 @@ export function CarPickerInput<FormFieldValues extends FieldValues>({
             fieldNameText={ title ?? t("car.picker.title") }
             fieldInfoText={ subtitle }
         >
-            {
-                cars && !isLoading
-                ?
-                <Input.Picker.Dropdown
-                    title={ title ?? t("car.picker.title") }
-                    data={ cars }
-                    icon={ ICON_NAMES.car }
-                />
-                :
-                <MoreDataLoading/>
-            }
+            <Input.Picker.Dropdown<typeof queryOptions["baseQuery"]>
+                title={ title ?? t("service.types.title") }
+                queryOptions={ queryOptions }
+                searchBy="car.name"
+                icon={ ICON_NAMES.car }
+            />
         </Input.Field>
     );
 }

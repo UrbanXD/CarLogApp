@@ -33,6 +33,8 @@ import { WithPrefix } from "../../../../types";
 import { UseWatchedQueryItemProps } from "../../../../database/hooks/useWatchedQueryItem.ts";
 import { WatchQueryOptions } from "../../../../database/watcher/watcher.ts";
 import { UseWatchedQueryCollectionProps } from "../../../../database/hooks/useWatchedQueryCollection.ts";
+import { UseInfiniteQueryOptions } from "../../../../database/hooks/useInfiniteQuery.ts";
+import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 
 export type SelectCarModelTableRow =
     Pick<CarTableRow, "id" | "name" | "model_year"> &
@@ -128,6 +130,24 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper, SelectCarTableRow> 
         return query;
     }
 
+    selectCarModelQuery(id?: any | null) {
+        let query = this.db
+        .selectFrom(`${ CAR_TABLE } as car` as const)
+        .innerJoin(`${ MODEL_TABLE } as model` as const, "model.id", "car.model_id")
+        .innerJoin(`${ MAKE_TABLE } as make` as const, "make.id", "model.make_id")
+        .selectAll("car")
+        .select([
+            "model.id as model_id",
+            "model.name as model_name",
+            "make.id as make_id",
+            "make.name as make_name"
+        ]);
+
+        if(id) query = query.where("car.id", "=", id);
+
+        return query;
+    }
+
     carWatchedQueryCollection(options?: WatchQueryOptions): UseWatchedQueryCollectionProps<Car> {
         return {
             query: this.selectQuery(),
@@ -141,6 +161,23 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper, SelectCarTableRow> 
             query: this.selectQuery(carId),
             mapper: this.mapper.toDto.bind(this.mapper),
             options: { queryOnce: true, enabled: !!carId, ...options }
+        };
+    }
+
+    pickerInfiniteQuery(): UseInfiniteQueryOptions<ReturnType<CarDao["selectCarModelQuery"]>, PickerItemType> {
+        return {
+            baseQuery: this.selectCarModelQuery(),
+            defaultCursorOptions: {
+                cursor: [
+                    { field: "car.created_at", order: "asc" },
+                    { field: "car.name", order: "asc", toLowerCase: true },
+                    { field: "car.id", order: "asc" }
+                ],
+                defaultOrder: "asc"
+            },
+            idField: "car.id",
+            mappedItemId: "value",
+            mapper: (entity) => this.mapper.toPickerItem(entity)
         };
     }
 
