@@ -124,14 +124,15 @@ export default function DropdownPicker<
         return items.find(i => i.value.toString() === inputFieldValue?.toString());
     }, [items, inputFieldValue]);
 
-    const isInitialLoading = queryOptions ? query.isLoading : false;
-
     const isSelectedValueMissing = useMemo(() => {
         if(!inputFieldValue) return false;
         return !foundItem;
     }, [inputFieldValue, foundItem]);
 
-    const isLoadingInitialItem = isSelectedValueMissing && isInitialLoading;
+    const isLoadingSelectedItem = useMemo(
+        () => query?.isLoading && isSelectedValueMissing,
+        [isSelectedValueMissing, query.isLoading]
+    );
 
     useEffect(() => {
         if(selectedItem?.value !== foundItem?.value) setSelectedItem(foundItem ?? null);
@@ -230,7 +231,7 @@ export default function DropdownPicker<
                 !hideController &&
                <DropdownPickerController
                   selectedItem={ selectedItem }
-                  isSelectedItemLoading={ isLoadingInitialItem }
+                  isSelectedItemLoading={ isLoadingSelectedItem }
                   toggleDropdown={ () => { isOpened.value = true; } }
                   icon={ icon }
                   inputPlaceholder={ inputPlaceholder }
