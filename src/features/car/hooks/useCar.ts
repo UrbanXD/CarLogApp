@@ -16,11 +16,12 @@ export function useCar(props?: UseCarProps) {
     const { carDao } = useDatabase();
     const selectedCarId = useAppSelector(getSelectedCarId);
 
-    const queryCarId = carId ?? selectedCarId;
+    const queryCarId = useMemo(() => carId ?? selectedCarId, [carId, selectedCarId]);
 
+    const optionsKey = JSON.stringify(options);
     const carQuery = useMemo(() => {
         return carDao.carWatchedQueryItem(queryCarId, options);
-    }, [queryCarId, options]);
+    }, [queryCarId, optionsKey, carDao]);
 
     const { data, isLoading } = useWatchedQueryItem(carQuery);
 
