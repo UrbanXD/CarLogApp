@@ -23,7 +23,7 @@ export function CreateServiceLogForm({ onFormStateChange }: CreateServiceLogForm
     const { selectedCarId } = useSelectedCarId();
 
     const form = useForm<ServiceLogFormFields, any, ServiceLogFormFields>(useCreateServiceLogFormProps(selectedCarId));
-    const { multiStepFormSteps } = useServiceLogFormFields(form);
+    const { multiStepFormSteps } = useServiceLogFormFields({ form });
 
     const submitHandler: SubmitHandlerArgs<ServiceLogFormFields> = {
         onValid: async (formResult) => {

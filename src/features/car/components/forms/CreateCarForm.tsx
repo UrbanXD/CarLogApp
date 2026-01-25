@@ -22,7 +22,7 @@ export function CreateCarForm({ user, onFormStateChange }: CreateCarFormProps) {
     const { dismissBottomSheet } = useBottomSheet();
 
     const form = useForm<CarFormFields>(useCreatCarFormProps(user.id, user.currency.id));
-    const steps = useCarSteps(form);
+    const steps = useCarSteps({ form });
 
     const submitHandler: SubmitHandlerArgs<CarFormFields> = {
         onValid: async (formResult) => {

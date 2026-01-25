@@ -160,7 +160,7 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper, SelectCarTableRow> 
         return {
             query: this.selectQuery(carId),
             mapper: this.mapper.toDto.bind(this.mapper),
-            options: { queryOnce: true, enabled: !!carId, ...options }
+            options: { enabled: !!carId, ...options }
         };
     }
 

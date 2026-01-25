@@ -10,6 +10,8 @@ import { CreateToast, InvalidFormToast } from "../../../../ui/alert/presets/toas
 import { useTranslation } from "react-i18next";
 import { SubmitHandlerArgs } from "../../../../types";
 import { useCar } from "../../../car/hooks/useCar.ts";
+import { useAppSelector } from "../../../../hooks";
+import { getSelectedCarId } from "../../../car/model/selectors/getSelectedCarId.ts";
 
 type CreateExpenseFormProps = {
     onFormStateChange?: (formState: FormState<ExpenseFormFields>) => void
@@ -20,7 +22,8 @@ export function CreateExpenseForm({ onFormStateChange }: CreateExpenseFormProps)
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
     const { expenseDao } = useDatabase();
-    const { car } = useCar({ options: { queryOnce: true } });
+    const selectedCarId = useAppSelector(getSelectedCarId);
+    const { car } = useCar({ carId: selectedCarId, options: { queryOnce: true } });
 
     const form = useForm<ExpenseFormFields, any, ExpenseFormFields>(useCreateExpenseFormProps(car));
     const { fullForm } = useExpenseFormFields(form);

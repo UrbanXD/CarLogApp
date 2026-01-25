@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { FlashList, FlashListRef, ListRenderItemInfo } from "@shopify/flash-list";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { Car } from "../../schemas/carSchema.ts";
-import { useAppDispatch } from "../../../../hooks";
+import { useAppDispatch, useAppSelector } from "../../../../hooks";
 import { selectCar } from "../../model/actions/selectCar.ts";
 import { CarPickerItem } from "./CarPickerItem.tsx";
 import Button from "../../../../components/Button/Button.ts";
@@ -25,6 +25,7 @@ import { SelectedCar } from "./SelectedCar.tsx";
 import { useTranslation } from "react-i18next";
 import { useCar } from "../../hooks/useCar.ts";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
+import { getSelectedCarId } from "../../model/selectors/getSelectedCarId.ts";
 
 const CLOSE_ICON_SIZE = FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE;
 const MAX_TRANSLATE = widthPercentageToDP(100);
@@ -36,7 +37,8 @@ type CarPickerProps = {
 export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
     const { t } = useTranslation();
     const { cars, isLoading } = useCars();
-    const { car: selectedCar } = useCar();
+    const selectedCarId = useAppSelector(getSelectedCarId);
+    const { car: selectedCar } = useCar({ carId: selectedCarId });
     const dispatch = useAppDispatch();
 
     const flashListRef = useRef<FlashListRef<Car>>(null);

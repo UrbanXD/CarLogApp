@@ -1,5 +1,5 @@
 import React from "react";
-import { ResultStep as ResultStepType, StepProps, Steps, UseStepFormResult } from "../../../types/index.ts";
+import { ResultStep as ResultStepType, Steps, UseStepFormResult } from "../../../types/index.ts";
 import { CarFormFields } from "../schemas/form/carForm.ts";
 import CarModelStep from "../components/forms/steps/CarModelStep.tsx";
 import NameStep from "../components/forms/steps/NameStep.tsx";
@@ -8,10 +8,16 @@ import FuelStep from "../components/forms/steps/FuelStep.tsx";
 import ImageStep from "../components/forms/steps/ImageStep.tsx";
 import { ResultStep } from "../components/forms/steps/ResultStep.tsx";
 import { useTranslation } from "react-i18next";
-import { EditToast } from "../../../ui/alert/presets/toast/index.ts";
+import { EditToast } from "../../../ui/alert/presets/toast";
+import { UseFormReturn } from "react-hook-form";
 
-function useCarSteps({ control, formState, setValue, getValues }: StepProps<CarFormFields>): UseStepFormResult {
+type UseCarStepsProps = {
+    form: UseFormReturn<CarFormFields>;
+}
+
+function useCarSteps({ form }: UseCarStepsProps): UseStepFormResult {
     const { t } = useTranslation();
+    const { control, formState, setValue, watch } = form;
 
     const steps: Steps = [
         {
@@ -29,7 +35,7 @@ function useCarSteps({ control, formState, setValue, getValues }: StepProps<CarF
         {
             title: t("car.steps.odometer.title"),
             fields: ["odometer.value", "odometer.unitId"],
-            render: () => <OdometerStep control={ control }/>,
+            render: () => <OdometerStep form={ form }/>,
             editToastMessages: EditToast
         },
         {
@@ -49,7 +55,7 @@ function useCarSteps({ control, formState, setValue, getValues }: StepProps<CarF
     const resultStep: ResultStepType = {
         title: t("multistep_form.result_step"),
         render: (goTo: (stepIndex: number) => void) => {
-            const values = getValues();
+            const values = watch();
 
             return <ResultStep formValues={ values } goTo={ goTo }/>;
         }
