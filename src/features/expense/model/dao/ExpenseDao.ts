@@ -102,7 +102,7 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         };
     }
 
-    expenseTimelineInfiniteQuery(carId: string): UseInfiniteQueryOptions<ReturnType<ExpenseDao["selectQuery"]>, Expense> {
+    timelineInfiniteQuery(carId: string): UseInfiniteQueryOptions<ReturnType<ExpenseDao["selectQuery"]>, Expense> {
         return {
             baseQuery: this.selectQuery(),
             defaultCursorOptions: {

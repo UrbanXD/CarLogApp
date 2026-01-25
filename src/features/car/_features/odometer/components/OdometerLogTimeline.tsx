@@ -25,6 +25,8 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
 
     const { car, isLoading: isCarLoading } = useCar({ carId: carId });
 
+    const memoizedOptions = useMemo(() => odometerLogDao.timelineInfiniteQuery(carId), [odometerLogDao]);
+
     const {
         data,
         fetchNext,
@@ -37,7 +39,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
         filterManager,
         orderButtons
     } = useTimeline({
-        infiniteQueryOptions: odometerLogDao.timelineInfiniteQuery(carId),
+        infiniteQueryOptions: memoizedOptions,
         cursorOrderButtons: [
             { field: "ol.value", title: t("odometer.value") }
         ]

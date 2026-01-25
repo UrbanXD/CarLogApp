@@ -1,13 +1,13 @@
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useExpenseTimelineItem } from "../hooks/useExepenseTimelineItem.tsx";
 import React, { useMemo } from "react";
-import { TimelineView } from "../../../components/timelineView/TimelineView.tsx";
 import { Title } from "../../../components/Title.tsx";
 import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants";
-import { useExpenseTimelineFilter } from "../hooks/useExpenseTimelineFilter.ts";
 import { useTranslation } from "react-i18next";
 import { useTimeline } from "../../../hooks/useTimeline.ts";
+import { useExpenseTimelineFilter } from "../hooks/useExpenseTimelineFilter.ts";
+import { TimelineView } from "../../../components/timelineView/TimelineView.tsx";
 
 type ExpenseTimelineProps = {
     carId: string
@@ -17,6 +17,8 @@ export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
     const { t } = useTranslation();
     const { expenseDao } = useDatabase();
     const { mapper } = useExpenseTimelineItem();
+
+    const memoizedOptions = useMemo(() => expenseDao.timelineInfiniteQuery(carId), [expenseDao]);
 
     const {
         data,
@@ -30,7 +32,7 @@ export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
         filterManager,
         orderButtons
     } = useTimeline({
-        infiniteQueryOptions: expenseDao.expenseTimelineInfiniteQuery(carId),
+        infiniteQueryOptions: memoizedOptions,
         cursorOrderButtons: [
             { field: "expense.date", title: t("date.text") },
             { field: "expense.amount", title: t("currency.price") }

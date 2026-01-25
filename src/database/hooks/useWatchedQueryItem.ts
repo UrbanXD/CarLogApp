@@ -34,9 +34,10 @@ export function useWatchedQueryItem<Dto, WatchEntity = any>({
             (result) => {
                 try {
                     setData(result.length > 0 ? mapper(result[0]) : null);
-                    setIsLoading(false);
                 } catch(e) {
                     console.log("useWatchedQueryItem error: ", e);
+                } finally {
+                    setIsLoading(false);
                 }
             },
             options
