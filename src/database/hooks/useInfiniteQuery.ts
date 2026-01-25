@@ -279,7 +279,6 @@ export const useInfiniteQuery = <
             const compiled = prevBuilder.compile();
 
             const rawResults = (await powersync.getAll<TableItem>(compiled.sql, compiled.parameters as any[]));
-            console.log(compiled.sql, compiled.parameters, "prev", rawResults.length);
             const results = rawResults.map(row => jsonArrayParse(row, jsonArrayFields));
 
             const hasMore = results.length > perPage;
@@ -337,13 +336,16 @@ export const useInfiniteQuery = <
 
         //reverse direction because watch query want between
         watchBuilder = addCursor<QueryBuilder, TableItem, Columns>(
-            watchBuilder, cursorOptions, nextCursorValues, "prev", false, true
-        );
-        watchBuilder = addCursor<QueryBuilder, TableItem, Columns>(
             watchBuilder, cursorOptions, prevCursorValues, "next", false, true
         );
 
-        if(!nextCursorValues && !prevCursorValues) {
+        if(prevCursorValues !== nextCursorValues) {
+            watchBuilder = addCursor<QueryBuilder, TableItem, Columns>(
+                watchBuilder, cursorOptions, nextCursorValues, "prev", false, true
+            );
+        }
+
+        if(!nextCursorValues && !prevCursorValues || prevCursorValues === nextCursorValues) {
             watchBuilder = watchBuilder.limit(perPage + 1) as QueryBuilder;
         }
 
@@ -418,7 +420,6 @@ export const useInfiniteQuery = <
                     const parsedFarNextItem = farNextItem ? jsonArrayParse(farNextItem, jsonArrayFields) : null;
                     const parsedFarPrevItem = farPrevItem ? jsonArrayParse(farPrevItem, jsonArrayFields) : null;
 
-
                     setNextCursorValues(getCursorValues<QueryBuilder, TableItem, Columns>(
                         parsedFarNextItem ?? parsedDefaultItem,
                         cursorOptions
@@ -461,13 +462,10 @@ export const useInfiniteQuery = <
                         setData(mappedRows);
                         if(defaultItem) setInitialStartIndex(parsedTableRow.findIndex(row => row?.[defaultItem.idField] === defaultItem.idValue));
 
-                        if(parsedTableRow.length > 0 && !nextCursorValues && !prevCursorValues) {
-                            const firstItem = parsedTableRow[0];
-                            const lastItem = parsedTableRow[parsedTableRow.length - 1];
-
-                            setNextCursor(lastItem);
-                            setPrevCursor(firstItem);
-
+                        if(parsedTableRow.length === 0 && (nextCursorValues || prevCursorValues)) {
+                            setNextCursorValues(null);
+                            setPrevCursorValues(null);
+                        } else {
                             setHasNext(parsedTableRow.length >= perPage);
                             setHasPrev(!!defaultItem && parsedTableRow.length >= perPage);
                         }
