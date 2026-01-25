@@ -24,6 +24,7 @@ import { fuelTankSchema } from "../../_features/fuel/schemas/fuelTankSchema.ts";
 import { fuelTypeSchema } from "../../_features/fuel/schemas/fuelTypeSchema.ts";
 import { fuelUnitSchema } from "../../_features/fuel/schemas/fuelUnitSchema.ts";
 import { OdometerUnitDao } from "../../_features/odometer/model/dao/OdometerUnitDao.ts";
+import { getUUID } from "../../../../database/utils/uuid.ts";
 
 export class CarMapper extends AbstractMapper<CarTableRow, Car, SelectCarTableRow> {
     constructor(
@@ -48,12 +49,12 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car, SelectCarTableRo
                 year: entity.model_year
             }),
             odometer: odometerSchema.parse({
-                id: entity.odometer_log_id,
+                id: entity.odometer_log_id ?? getUUID(),
                 carId: entity.id,
-                valueInKm: entity.odometer_log_value,
+                valueInKm: entity.odometer_log_value ?? 0,
                 value: convertOdometerValueFromKilometer(
-                    entity.odometer_log_value!,
-                    entity.odometer_unit_conversion_factor!
+                    entity.odometer_log_value ?? 0,
+                    entity.odometer_unit_conversion_factor ?? 1
                 ),
                 unit: odometerUnitSchema.parse({
                     id: entity.odometer_unit_id,
