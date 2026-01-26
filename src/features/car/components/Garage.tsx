@@ -1,5 +1,5 @@
 import React from "react";
-import Carousel, { CarouselItemType } from "../../../components/Carousel/Carousel.tsx";
+import { Carousel, CarouselItemType } from "../../../components/Carousel/Carousel.tsx";
 import { StyleSheet, Text, View } from "react-native";
 import { DEFAULT_SEPARATOR, GLOBAL_STYLE, ICON_NAMES } from "../../../constants";
 import { SharedValue } from "react-native-reanimated";
@@ -10,7 +10,7 @@ import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-nat
 import useGarage from "../hooks/useGarage.tsx";
 import { useTranslation } from "react-i18next";
 
-const Garage: React.FC = () => {
+function Garage() {
     const { t } = useTranslation();
     const { cars, isLoading, openNewCarForm, openCarProfile } = useGarage();
 
@@ -39,6 +39,8 @@ const Garage: React.FC = () => {
                 cardAction={ () => openCarProfile(item.id) }
             />;
 
+    const keyExtractor = (item: CarouselItemType) => item.id;
+
     return (
         <View style={ styles.contentContainer }>
             <View style={ { paddingHorizontal: DEFAULT_SEPARATOR } }>
@@ -55,6 +57,7 @@ const Garage: React.FC = () => {
                     loading={ isLoading }
                     renderItem={ renderCarouselItem }
                     renderDefaultItem={ renderDefaultElement }
+                    keyExtractor={ keyExtractor }
                 />
             </View>
             <Button.Text
@@ -64,7 +67,7 @@ const Garage: React.FC = () => {
             />
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     contentContainer: {
