@@ -1,50 +1,39 @@
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useLocalSearchParams } from "expo-router";
+import React, { useMemo } from "react";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
-import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
 import { EditOdometerChangeLogForm } from "../../components/forms/EditOdometerChangeLogForm.tsx";
-import { NotFoundToast } from "../../../../../../ui/alert/presets/toast/index.ts";
-import { OdometerLog } from "../../schemas/odometerLogSchema.ts";
 import { useTranslation } from "react-i18next";
 import { FormBottomSheet } from "../../../../../../ui/bottomSheet/presets/FormBottomSheet.tsx";
-import { ExpenseFormFieldsEnum } from "../../../../../expense/enums/expenseFormFieldsEnum.ts";
+import { useWatchedQueryItem } from "../../../../../../database/hooks/useWatchedQueryItem.ts";
+import { useFormBottomSheetGuard } from "../../../../../../hooks/useFormBottomSheetGuard.ts";
+import { OdometerLogFormFieldsEnum } from "../../enums/odometerLogFormFields.ts";
 
 export function EditOdometerLogBottomSheet() {
     const { t } = useTranslation();
     const { id, field } = useLocalSearchParams<{ id?: string, field?: string }>();
     const { odometerLogDao } = useDatabase();
-    const { openToast } = useAlert();
 
-    const [odometerLog, setOdometerLog] = useState<OdometerLog | null>(null);
+    const memoizedQuery = useMemo(() => odometerLogDao.odometerLogWatchedQueryItem(id), [odometerLogDao, id]);
+    const { data: odometerLog, isLoading } = useWatchedQueryItem(memoizedQuery);
 
-    useEffect(() => {
-        (async () => {
-            if(!id) {
-                if(router.canGoBack()) return router.back();
-                return router.replace("(main)/index");
-            }
+    const { fieldValue, isValidField } = useFormBottomSheetGuard({
+        data: odometerLog,
+        isLoading,
+        field,
+        isFieldNullable: true,
+        enumObject: OdometerLogFormFieldsEnum,
+        notFoundText: t("odometer.log")
+    });
 
-            try {
-                setOdometerLog(await odometerLogDao.getById(id));
-            } catch(e) {
-                openToast(NotFoundToast.warning(t("odometer.log")));
+    if(!isValidField) return null;
 
-                if(router.canGoBack()) return router.back();
-                router.replace("(main)/index");
-            }
-        })();
-    }, [id]);
-
-    const fieldIndex = field ? Number(field) : undefined;
-    const isValidField = fieldIndex === undefined || !isNaN(fieldIndex) && fieldIndex in ExpenseFormFieldsEnum;
-    if(!odometerLog || !isValidField) return null;
-
-    const CONTENT = <EditOdometerChangeLogForm odometerLog={ odometerLog } field={ fieldIndex }/>;
+    const CONTENT = odometerLog ? <EditOdometerChangeLogForm odometerLog={ odometerLog } field={ fieldValue }/> : null;
 
     return (
         <FormBottomSheet
             content={ CONTENT }
             enableDynamicSizing
+            isLoading={ isLoading }
         />
     );
 }

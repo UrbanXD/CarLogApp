@@ -8,7 +8,7 @@ import {
     OdometerChangeLogFormFields,
     useEditOdometerChangeLogFormProps
 } from "../../schemas/form/odometerChangeLogForm.ts";
-import { OdometerLogFormFields } from "../../enums/odometerLogFormFields.ts";
+import { OdometerLogFormFieldsEnum } from "../../enums/odometerLogFormFields.ts";
 import { useOdometerLogFormFields } from "../../hooks/useOdometerLogFormFields.tsx";
 import { FormFields, SubmitHandlerArgs } from "../../../../../../types";
 import Form from "../../../../../../components/Form/Form.tsx";
@@ -17,7 +17,7 @@ import { InvalidFormToast } from "../../../../../../ui/alert/presets/toast";
 type EditOdometerLogFormProps = {
     odometerLog: OdometerLog
     /** Which field will be edited, if its undefined that means full form view will appear */
-    field?: OdometerLogFormFields
+    field?: OdometerLogFormFieldsEnum
     onFormStateChange?: (formState: FormState<OdometerChangeLogFormFields>) => void
 }
 
@@ -28,7 +28,7 @@ export function EditOdometerChangeLogForm({ odometerLog, field, onFormStateChang
 
     const form = useForm<OdometerChangeLogFormFields>(useEditOdometerChangeLogFormProps(odometerLog));
     const { fields, fullForm } = useOdometerLogFormFields({ form, isEdit: true });
-    const editFields: FormFields = field ? fields?.[field] ?? fullForm : fullForm;
+    const editFields: FormFields = field !== undefined ? fields?.[field] ?? fullForm : fullForm;
 
     const submitHandler: SubmitHandlerArgs<OdometerChangeLogFormFields> = {
         onValid: async (formResult) => {

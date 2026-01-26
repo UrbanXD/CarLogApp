@@ -3,7 +3,7 @@ import React, { useEffect, useMemo } from "react";
 import { FormFields } from "../../../../../types";
 import { CarPickerInput } from "../../../components/forms/inputFields/CarPickerInput.tsx";
 import { NoteInput } from "../../../../../components/Input/_presets/NoteInput.tsx";
-import { OdometerLogFormFields } from "../enums/odometerLogFormFields.ts";
+import { OdometerLogFormFieldsEnum } from "../enums/odometerLogFormFields.ts";
 import { OdometerValueInput } from "../components/forms/inputFields/OdometerValueInput.tsx";
 import { OdometerChangeLogFormFields } from "../schemas/form/odometerChangeLogForm.ts";
 import { EditToast } from "../../../../../ui/alert/presets/toast";
@@ -24,12 +24,12 @@ export function useOdometerLogFormFields({ form, isEdit }: UseOdometerLogFormFie
         clearErrors();
     }, [formCarId]);
 
-    const fields: Record<OdometerLogFormFields, FormFields> = useMemo(() => ({
-        [OdometerLogFormFields.Car]: {
+    const fields: Record<OdometerLogFormFieldsEnum, FormFields> = useMemo(() => ({
+        [OdometerLogFormFieldsEnum.Car]: {
             render: () => <CarPickerInput control={ control } fieldName="carId"/>,
             editToastMessages: EditToast
         },
-        [OdometerLogFormFields.DateAndOdometerValue]: {
+        [OdometerLogFormFieldsEnum.DateAndOdometerValue]: {
             render: () => <OdometerValueInput
                 control={ control }
                 setValue={ setValue }
@@ -42,7 +42,7 @@ export function useOdometerLogFormFields({ form, isEdit }: UseOdometerLogFormFie
             />,
             editToastMessages: EditToast
         },
-        [OdometerLogFormFields.Note]: {
+        [OdometerLogFormFieldsEnum.Note]: {
             render: () => <NoteInput
                 control={ control }
                 setValue={ setValue }
@@ -55,13 +55,13 @@ export function useOdometerLogFormFields({ form, isEdit }: UseOdometerLogFormFie
     const fullForm: FormFields = {
         render: () => ([
             <React.Fragment key="car">
-                { fields[OdometerLogFormFields.Car].render() }
+                { fields[OdometerLogFormFieldsEnum.Car].render() }
             </React.Fragment>,
             <React.Fragment key="value">
-                { fields[OdometerLogFormFields.DateAndOdometerValue].render() }
+                { fields[OdometerLogFormFieldsEnum.DateAndOdometerValue].render() }
             </React.Fragment>,
             <React.Fragment key="note">
-                { fields[OdometerLogFormFields.Note].render() }
+                { fields[OdometerLogFormFieldsEnum.Note].render() }
             </React.Fragment>
         ]),
         editToastMessages: EditToast

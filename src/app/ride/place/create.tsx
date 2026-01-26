@@ -1,3 +1,5 @@
-import { PlaceBottomSheet } from "../../../features/ride/_features/place/presets/bottomSheet/PlaceBottomSheet.tsx";
+import {
+    CreatePlaceBottomSheet
+} from "../../../features/ride/_features/place/presets/bottomSheet/CreatePlaceBottomSheet.tsx";
 
-export default PlaceBottomSheet;
+export default CreatePlaceBottomSheet;

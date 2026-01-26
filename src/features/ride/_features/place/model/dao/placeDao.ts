@@ -9,10 +9,23 @@ import { PlaceFormFields } from "../../schemas/form/placeForm.ts";
 import { AbstractPowerSyncDatabase } from "@powersync/react-native";
 import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
 import { USER_TABLE } from "../../../../../../database/connector/powersync/tables/user.ts";
+import { WatchQueryOptions } from "../../../../../../database/watcher/watcher.ts";
+import { UseWatchedQueryItemProps } from "../../../../../../database/hooks/useWatchedQueryItem.ts";
 
 export class PlaceDao extends Dao<PlaceTableRow, Place, PlaceMapper> {
     constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
         super(db, powersync, PLACE_TABLE, new PlaceMapper());
+    }
+
+    watchedQueryItem(
+        id: string | null | undefined,
+        options?: WatchQueryOptions
+    ): UseWatchedQueryItemProps<Place> {
+        return {
+            query: this.selectQuery(id),
+            mapper: this.mapper.toDto.bind(this.mapper),
+            options: { enabled: !!id, ...options }
+        };
     }
 
     timelineInfiniteQuery(ownerId: string | null): UseInfiniteQueryOptions<ReturnType<PlaceDao["selectQuery"]>, Place> {

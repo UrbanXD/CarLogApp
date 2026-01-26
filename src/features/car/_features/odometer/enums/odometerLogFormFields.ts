@@ -1,4 +1,4 @@
-export enum OdometerLogFormFields {
+export enum OdometerLogFormFieldsEnum {
     Car,
     DateAndOdometerValue,
     Note

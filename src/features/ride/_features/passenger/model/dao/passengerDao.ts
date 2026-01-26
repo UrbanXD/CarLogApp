@@ -9,10 +9,23 @@ import { PASSENGER_TABLE } from "../../../../../../database/connector/powersync/
 import { AbstractPowerSyncDatabase } from "@powersync/react-native";
 import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
 import { USER_TABLE } from "../../../../../../database/connector/powersync/tables/user.ts";
+import { WatchQueryOptions } from "../../../../../../database/watcher/watcher.ts";
+import { UseWatchedQueryItemProps } from "../../../../../../database/hooks/useWatchedQueryItem.ts";
 
 export class PassengerDao extends Dao<PassengerTableRow, Passenger, PassengerMapper> {
     constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
         super(db, powersync, PASSENGER_TABLE, new PassengerMapper());
+    }
+
+    watchedQueryItem(
+        id: string | null | undefined,
+        options?: WatchQueryOptions
+    ): UseWatchedQueryItemProps<Passenger> {
+        return {
+            query: this.selectQuery(id),
+            mapper: this.mapper.toDto.bind(this.mapper),
+            options: { enabled: !!id, ...options }
+        };
     }
 
     timelineInfiniteQuery(ownerId: string | null): UseInfiniteQueryOptions<ReturnType<PassengerDao["selectQuery"]>, Passenger> {

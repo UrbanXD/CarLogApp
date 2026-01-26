@@ -229,6 +229,7 @@
       "delete_account": "Delete account"
     },
     "user": {
+      "title": "User",
       "firstname": "First Name",
       "firstname_placeholder": "John",
       "lastname": "Last Name",
