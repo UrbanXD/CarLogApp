@@ -465,10 +465,15 @@ export const useInfiniteQuery = <
                         if(parsedTableRow.length === 0 && (nextCursorValues || prevCursorValues)) {
                             setNextCursorValues(null);
                             setPrevCursorValues(null);
-                        } else {
-                            setHasNext(parsedTableRow.length >= perPage);
-                            setHasPrev(!!defaultItem && parsedTableRow.length >= perPage);
                         }
+
+                        if(parsedTableRow.length >= perPage && !prevCursorValues && !nextCursorValues) {
+                            setNextCursor(parsedTableRow[parsedTableRow.length - 1]);
+                            setPrevCursor(parsedTableRow[0]);
+                        }
+
+                        setHasNext(parsedTableRow.length >= perPage);
+                        setHasPrev(!!prevCursorValues || (!!defaultItem && parsedTableRow.length >= perPage));
                     } catch(error) {
                         console.log("Use infinite query diff onData error: ", error);
                     } finally {
