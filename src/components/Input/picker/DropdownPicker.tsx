@@ -92,6 +92,7 @@ export default function DropdownPicker<
     const inputFieldValue = inputFieldContext?.field?.value?.toString() ?? defaultSelectedItemValue;
     const error = inputFieldContext?.fieldState?.error;
 
+    const [internalSelectedItem, setInternalSelectedItem] = useState<PickerItemType | null>(null);
     const [tmpSelectedItem, setTmpSelectedItem] = useState<PickerItemType | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -122,7 +123,18 @@ export default function DropdownPicker<
     }, [queryOptions, inputFieldValue]);
 
     const itemsQuery = useInfiniteQuery(itemsQueryProps);
-    const { data: selectedItem, isLoading: isLoadingSelectedItem } = useWatchedQueryItem(selectedItemQueryProps);
+    const selectedItemQuery = useWatchedQueryItem(selectedItemQueryProps);
+
+    const selectedItem = useMemo(() => {
+        if(selectedItemQueryProps) return selectedItemQuery.data;
+
+        return internalSelectedItem;
+    }, [selectedItemQuery.data, internalSelectedItem, !!selectedItemQueryProps]);
+
+    const isLoadingSelectedItem = useMemo(() => {
+        if(selectedItemQueryProps) return selectedItemQuery.isLoading;
+        return false;
+    }, [selectedItemQuery.isLoading, !!selectedItemQueryProps]);
 
     const items = useMemo(() => {
         if(queryOptions) return itemsQuery.data ?? [];
@@ -132,6 +144,13 @@ export default function DropdownPicker<
         }
         return [];
     }, [itemsQuery.data, data, searchTerm, !!queryOptions]);
+
+    useEffect(() => {
+        if(selectedItemQueryProps) return;
+
+        const selectedItemInData = items.find((item) => item.value === inputFieldValue);
+        setInternalSelectedItem(selectedItemInData ?? null);
+    }, [items, inputFieldValue, !!selectedItemQueryProps]);
 
     useAnimatedReaction(
         () => isOpened.value,
@@ -169,11 +188,12 @@ export default function DropdownPicker<
     }, [searchTerm, !!queryOptions, debouncedSearch]);
 
     const submit = useCallback((item: PickerItemType | null) => {
+        if(!selectedItemQueryProps) setInternalSelectedItem(item);
         const val = item?.value ?? "";
         onChange?.(val);
         setValue?.(val);
         isOpened.value = false;
-    }, [onChange, setValue]);
+    }, [onChange, setValue, !!selectedItemQueryProps]);
 
     const onSelect = useCallback((item: PickerItemType) => {
         if(selectWithoutSubmit) return submit(item);
