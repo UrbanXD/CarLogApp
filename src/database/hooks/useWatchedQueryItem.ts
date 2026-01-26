@@ -6,7 +6,7 @@ import { watchQuery, WatchQueryOptions } from "../watcher/watcher.ts";
 
 export type UseWatchedQueryItemProps<Dto, WatchEntity = any> = {
     query: SelectQueryBuilder<DatabaseType, any, WatchEntity>,
-    mapper: (watchEntity: WatchEntity) => Dto,
+    mapper?: (watchEntity: WatchEntity) => Dto | Promise<Dto>,
     options?: WatchQueryOptions<WatchEntity>
 }
 
@@ -15,36 +15,48 @@ type UseWatchedItemResult<Dto> = {
     isLoading: boolean
 }
 
-export function useWatchedQueryItem<Dto, WatchEntity = any>({
-    query,
-    mapper,
-    options
-}: UseWatchedQueryItemProps<Dto, WatchEntity>): UseWatchedItemResult<Dto> {
+export function useWatchedQueryItem<Dto, WatchEntity = any>(props: UseWatchedQueryItemProps<Dto, WatchEntity> | null): UseWatchedItemResult<Dto> {
     const { powersync } = useDatabase();
+
+    const {
+        query,
+        mapper,
+        options
+    } = props ?? {};
+
 
     const [data, setData] = useState<Dto | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        if(!query) {
+            setData(null);
+            setIsLoading(false);
+            return;
+        }
+
         setIsLoading(true);
 
-        const unwatch = watchQuery<WatchEntity>(
+        const unwatch = watchQuery<WatchEntity>({
             powersync,
             query,
-            (result) => {
+            onData: async (result) => {
                 try {
-                    setData(result.length > 0 ? mapper(result[0]) : null);
+                    setData(result.length > 0
+                            ? (mapper ? await mapper(result[0]) : result[0] as unknown as Dto)
+                            : null);
                 } catch(e) {
                     console.log("useWatchedQueryItem error: ", e);
                 } finally {
                     setIsLoading(false);
                 }
             },
+            onError: () => setIsLoading(false),
             options
-        );
+        });
 
         return unwatch;
-    }, [query, mapper, options]);
+    }, [props]);
 
     return { data, isLoading };
 }

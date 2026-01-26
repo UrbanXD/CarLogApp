@@ -20,19 +20,31 @@ type WatcherEntry = {
 
 const activeWatchers = new Map<string, WatcherEntry>();
 
-export function watchQuery<WatchEntity>(
-    powersync: AbstractPowerSyncDatabase,
-    query: SelectQueryBuilder<DatabaseType, any, any>,
-    onData: (data: Array<WatchEntity>) => void,
+export type WatchQueryProps<WatchEntity> = {
+    powersync: AbstractPowerSyncDatabase
+    query: SelectQueryBuilder<DatabaseType, any, any>
+    onData: (data: Array<WatchEntity>) => void
+    onError?: (error?: Error) => void
     options?: WatchQueryOptions<WatchEntity>
-): (() => void) {
+}
+
+export function watchQuery<WatchEntity>({
+    powersync,
+    query,
+    onData,
+    onError,
+    options
+}: WatchQueryProps<WatchEntity>): (() => void) {
     const {
         queryOnce = false,
         enabled = true,
         jsonArrayFields = []
     } = options ?? {};
 
-    if(!enabled) return () => {};
+    if(!enabled) {
+        onError?.();
+        return () => {};
+    }
 
     const compiled = query.compile();
     const sql = compiled.sql;
@@ -66,6 +78,7 @@ export function watchQuery<WatchEntity>(
                 }
             },
             onError: (error) => {
+                onError?.(error);
                 console.log(`Watch Query Error [${ sql }, ${ params }]:`, error);
                 if(queryOnce) unregister();
             }

@@ -87,7 +87,7 @@ export type UseInfiniteQueryOptions<
     defaultItem?: { idField: keyof TableItem, idValue: any } | null
     idField?: Columns
     perPage?: number
-    mapper?: (item: TableItem, index: number) => MappedItem | Promise<MappedItem>
+    mapper?: (item: TableItem, index?: number) => MappedItem | Promise<MappedItem>
     mappedItemId?: keyof MappedItem
     jsonArrayFields?: Array<keyof TableItem>
     enabled?: boolean

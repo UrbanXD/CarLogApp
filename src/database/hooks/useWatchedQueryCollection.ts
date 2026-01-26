@@ -6,7 +6,7 @@ import { useDatabase } from "../../contexts/database/DatabaseContext.ts";
 
 export type UseWatchedQueryCollectionProps<Dto, WatchEntity = any> = {
     query: SelectQueryBuilder<DatabaseType, any, WatchEntity>,
-    mapper: (watchEntity: Array<WatchEntity>) => Array<Dto>,
+    mapper?: (watchEntity: Array<WatchEntity>) => Array<Dto> | Promise<Array<Dto>>,
     options?: WatchQueryOptions<WatchEntity>
 }
 
@@ -15,36 +15,46 @@ type UseWatchedCollectionResult<Dto> = {
     isLoading: boolean
 }
 
-export function useWatchedQueryCollection<Dto, WatchEntity = any>({
-    query,
-    mapper,
-    options
-}: UseWatchedQueryCollectionProps<Dto, WatchEntity>): UseWatchedCollectionResult<Dto> {
+export function useWatchedQueryCollection<Dto, WatchEntity = any>(props: UseWatchedQueryCollectionProps<Dto, WatchEntity> | null): UseWatchedCollectionResult<Dto> {
     const { powersync } = useDatabase();
+
+    const {
+        query,
+        mapper,
+        options
+    } = props ?? {};
+
 
     const [data, setData] = useState<Array<Dto>>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        if(!query) {
+            setData([]);
+            setIsLoading(false);
+            return;
+        }
+
         setIsLoading(true);
 
-        const unwatch = watchQuery<WatchEntity>(
+        const unwatch = watchQuery<WatchEntity>({
             powersync,
             query,
-            (result) => {
+            onData: async (result) => {
                 try {
-                    setData(mapper(result));
+                    setData(mapper ? await mapper(result) : result as unknown as Array<Dto>);
                 } catch(e) {
                     console.log("useWatchedQueryCollection error: ", e);
                 } finally {
                     setIsLoading(false);
                 }
             },
+            onError: () => setIsLoading(false),
             options
-        );
+        });
 
         return unwatch;
-    }, [query, mapper, options]);
+    }, [props]);
 
     return { data, isLoading };
 }
