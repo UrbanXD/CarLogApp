@@ -1,12 +1,13 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../../constants";
 import Icon from "../../Icon.tsx";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useMemo } from "react";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import Divider from "../../Divider.tsx";
 import { DashedLine } from "./DashedLine.tsx";
-import { Color } from "../../../types/index.ts";
+import { Color } from "../../../types";
 import getContrastingColor from "../../../utils/colors/getContrastingColor.ts";
+import { debounce } from "es-toolkit";
 
 export type TimelineItemType = Omit<TimelineItemProps, "isFirst" | "isLast" | "iconSize">
 
@@ -40,6 +41,8 @@ export function TimelineItem({
 }: TimelineItemProps) {
     const styles = useStyles(color, iconSize, isFirst, isLast);
 
+    const debouncedPress = useMemo(() => debounce(() => onPress?.(), 250), [onPress]);
+
     return (
         <View style={ styles.container }>
             <View style={ styles.timeline }>
@@ -60,7 +63,7 @@ export function TimelineItem({
                    <DashedLine/>
                 }
             </View>
-            <Pressable onPress={ onPress } disabled={ !onPress } style={ styles.card }>
+            <Pressable onPress={ debouncedPress } disabled={ !onPress } style={ styles.card }>
                 <View style={ styles.cardTitleContainer }>
                     {
                         typeof milestone === "string"
