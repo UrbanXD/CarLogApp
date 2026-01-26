@@ -16,6 +16,7 @@ import {
 } from "../../../database/hooks/useInfiniteQuery.ts";
 import { SelectQueryBuilder } from "kysely";
 import { scheduleOnRN } from "react-native-worklets";
+import { useWatchedQueryItem, UseWatchedQueryItemProps } from "../../../database/hooks/useWatchedQueryItem.ts";
 
 type ConditionalProps<
     QueryBuilder extends SelectQueryBuilder<any, any, any>,
@@ -24,7 +25,7 @@ type ConditionalProps<
 > =
     | {
     queryOptions: UseInfiniteQueryOptions<QueryBuilder, PickerItemType, TableItem, Columns>
-    searchBy: Columns
+    searchBy: Array<Columns> | Columns
     renderCreateItemForm?: (callback: () => void) => ReactElement
     data?: never
 }
@@ -91,13 +92,12 @@ export default function DropdownPicker<
     const inputFieldValue = inputFieldContext?.field?.value?.toString() ?? defaultSelectedItemValue;
     const error = inputFieldContext?.fieldState?.error;
 
-    const [selectedItem, setSelectedItem] = useState<PickerItemType | null>(null);
     const [tmpSelectedItem, setTmpSelectedItem] = useState<PickerItemType | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
 
     const isOpened = useSharedValue(false);
 
-    const queryArgs = useMemo(() => {
+    const itemsQueryProps = useMemo(() => {
         if(!queryOptions) return null;
 
         return {
@@ -109,51 +109,57 @@ export default function DropdownPicker<
         };
     }, [queryOptions, inputFieldValue]);
 
-    const query = useInfiniteQuery(queryArgs);
+    const selectedItemQueryProps = useMemo(() => {
+        if(!queryOptions) return null;
+
+        const watchedQuery: UseWatchedQueryItemProps<PickerItemType, TableItem> = {
+            query: queryOptions.baseQuery.where((queryOptions.idField ?? "id") as string, "=", inputFieldValue),
+            mapper: queryOptions.mapper,
+            options: { enabled: !!inputFieldValue }
+        };
+
+        return watchedQuery;
+    }, [queryOptions, inputFieldValue]);
+
+    const itemsQuery = useInfiniteQuery(itemsQueryProps);
+    const { data: selectedItem, isLoading: isLoadingSelectedItem } = useWatchedQueryItem(selectedItemQueryProps);
 
     const items = useMemo(() => {
-        if(queryOptions) return query.data ?? [];
+        if(queryOptions) return itemsQuery.data ?? [];
         if(data) {
             if(!searchTerm) return data;
             return data.filter(i => i.title?.toLowerCase().includes(searchTerm.toLowerCase()));
         }
         return [];
-    }, [query.data, data, searchTerm, !!queryOptions]);
+    }, [itemsQuery.data, data, searchTerm, !!queryOptions]);
 
-    const foundItem = useMemo(() => {
-        return items.find(i => i.value.toString() === inputFieldValue?.toString());
-    }, [items, inputFieldValue]);
-
-    const isSelectedValueMissing = useMemo(() => {
-        if(!inputFieldValue) return false;
-        return !foundItem;
-    }, [inputFieldValue, foundItem]);
-
-    const isLoadingSelectedItem = useMemo(
-        () => query?.isLoading && isSelectedValueMissing,
-        [isSelectedValueMissing, query.isLoading]
+    useAnimatedReaction(
+        () => isOpened.value,
+        (opened, previousOpened) => {
+            if(opened && !previousOpened) { //reset tmp selected item after reopen
+                scheduleOnRN(setTmpSelectedItem, selectedItem);
+            }
+        },
+        [selectedItem]
     );
-
-    useEffect(() => {
-        if(selectedItem?.value !== foundItem?.value) setSelectedItem(foundItem ?? null);
-    }, [foundItem]);
-
-    useAnimatedReaction(() => isOpened.value, (opened) => {
-        if(opened) scheduleOnRN(setTmpSelectedItem, selectedItem); //reset tmp selected item after reopen
-    });
 
     const handleSearch = useCallback((searchTerm: string) => {
         if(!queryOptions || !searchBy) return;
 
-        query.replaceFilter({
-            groupKey: "search",
-            filter: {
-                field: searchBy,
-                operator: "like",
-                value: `%${ searchTerm.toLowerCase() }%`
-            }
+        const searchFields = Array.isArray(searchBy) ? searchBy : [searchBy];
+
+        searchFields.forEach((searchField) => {
+            itemsQuery.replaceFilter({
+                groupKey: "search",
+                filter: {
+                    field: searchField,
+                    operator: "like",
+                    value: `%${ searchTerm.toLowerCase() }%`
+                },
+                logic: "OR"
+            });
         });
-    }, [searchTerm, !!queryOptions, query.replaceFilter]);
+    }, [searchTerm, !!queryOptions, itemsQuery.replaceFilter]);
 
     const debouncedSearch = useMemo(() => debounce(handleSearch, 450), [handleSearch]);
 
@@ -163,7 +169,6 @@ export default function DropdownPicker<
     }, [searchTerm, !!queryOptions, debouncedSearch]);
 
     const submit = useCallback((item: PickerItemType | null) => {
-        setSelectedItem(item);
         const val = item?.value ?? "";
         onChange?.(val);
         setValue?.(val);
@@ -177,7 +182,7 @@ export default function DropdownPicker<
 
     const initialStartIndex =
         queryOptions
-        ? query.initialStartIndex
+        ? itemsQuery.initialStartIndex
         : data && selectedItem
           ? data.findIndex(i => i.value === selectedItem.value)
           : 0;
@@ -188,7 +193,7 @@ export default function DropdownPicker<
                 title={ title }
                 renderCreateItemForm={
                     renderCreateItemForm
-                    ? () => renderCreateItemForm(() => query.clearFilters())
+                    ? () => renderCreateItemForm(() => itemsQuery.clearFilters())
                     : undefined
                 }
                 searchTerm={ searchTerm }
@@ -199,17 +204,17 @@ export default function DropdownPicker<
             <DropdownPickerItems
                 items={ items }
                 initialStartIndex={ initialStartIndex }
-                fetchNext={ queryOptions ? query.fetchNext : null }
-                fetchPrev={ queryOptions ? query.fetchPrev : null }
-                isLoading={ queryOptions ? query.isLoading : false }
+                fetchNext={ queryOptions ? itemsQuery.fetchNext : null }
+                fetchPrev={ queryOptions ? itemsQuery.fetchPrev : null }
+                isLoading={ queryOptions ? itemsQuery.isLoading : false }
                 isNextFetchingEnabled={
                     queryOptions
-                    ? (!query.isLoading && query.hasNext && !query.isNextFetching)
+                    ? (!itemsQuery.isLoading && itemsQuery.hasNext && !itemsQuery.isNextFetching)
                     : false
                 }
                 isPrevFetchingEnabled={
                     queryOptions
-                    ? (!query.isLoading && query.hasPrev && !query.isPrevFetching)
+                    ? (!itemsQuery.isLoading && itemsQuery.hasPrev && !itemsQuery.isPrevFetching)
                     : false
                 }
                 selectedItem={ tmpSelectedItem }
