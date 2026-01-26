@@ -27,7 +27,7 @@ export class CurrencyDao extends Dao<CurrencyTableRow, Currency, CurrencyMapper>
                 cursor: [
                     { field: "symbol", order: "asc" },
                     { field: "key", order: "asc", toLowerCase: true },
-                    { field: "car.id", order: "asc" }
+                    { field: "id", order: "asc" }
                 ],
                 defaultOrder: "asc"
             },

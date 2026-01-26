@@ -33,9 +33,9 @@ export function CarPickerInput<FormFieldValues extends FieldValues>({
             fieldInfoText={ subtitle }
         >
             <Input.Picker.Dropdown<typeof queryOptions["baseQuery"]>
-                title={ title ?? t("service.types.title") }
+                title={ title ?? t("car.picker.title") }
                 queryOptions={ queryOptions }
-                searchBy="car.name"
+                searchBy={ ["car.name", "model.name", "make.name"] }
                 icon={ ICON_NAMES.car }
             />
         </Input.Field>

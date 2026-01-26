@@ -231,6 +231,8 @@ export function AmountInput<TFieldValues extends FieldValues>({
                             getPickerControllerTitle={ (entity) => String(entity.symbol) }
                             hideError
                             hiddenBackground
+                            showsTitle={ false }
+                            placeholder={ "$" }
                         />
                     </View>
                 </Input.Row>
