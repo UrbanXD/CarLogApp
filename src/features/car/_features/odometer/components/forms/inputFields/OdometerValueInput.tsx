@@ -85,7 +85,7 @@ export function OdometerValueInput<FormFieldValues extends FieldValues>({
     const { car } = useCar({ carId: formCarId, options: { queryOnce: true } });
 
     useEffect(() => {
-        if(changeCarOdometerValueWhenInputNotTouched && car && car.id === formCarId && !getFieldState(
+        if(changeCarOdometerValueWhenInputNotTouched && !odometerValueOptional && car && car.id === formCarId && !getFieldState(
             odometerValueFieldName).isDirty) {
             setValue(odometerValueFieldName, car.odometer.value as any);
         }

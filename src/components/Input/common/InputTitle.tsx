@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants";
 import { useTranslation } from "react-i18next";
 
 type InputTitleProps = {
@@ -24,7 +24,7 @@ function InputTitle({
                     {
                         optional &&
                        <Text style={ styles.optionalText }>
-                          ({ t("form.optional") })
+                           { ` (${ t("form.optional") })` }
                        </Text>
                     }
                 </Text>

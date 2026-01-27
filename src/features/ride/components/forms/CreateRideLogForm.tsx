@@ -8,21 +8,18 @@ import MultiStepForm from "../../../../components/Form/MultiStepForm.tsx";
 import { CreateToast, InvalidFormToast } from "../../../../ui/alert/presets/toast";
 import { useTranslation } from "react-i18next";
 import { SubmitHandlerArgs } from "../../../../types";
-import { useCar } from "../../../car/hooks/useCar.ts";
-import { useAppSelector } from "../../../../hooks";
-import { getSelectedCarId } from "../../../car/model/selectors/getSelectedCarId.ts";
+import { Car } from "../../../car/schemas/carSchema.ts";
 
 type CreateRideLogFormProps = {
+    car: Car | null
     onFormStateChange?: (formState: FormState<RideLogFormFields>) => void
 }
 
-export function CreateRideLogForm({ onFormStateChange }: CreateRideLogFormProps) {
+export function CreateRideLogForm({ car, onFormStateChange }: CreateRideLogFormProps) {
     const { t } = useTranslation();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
     const { rideLogDao } = useDatabase();
-    const selectedCarId = useAppSelector(getSelectedCarId);
-    const { car } = useCar({ carId: selectedCarId, options: { queryOnce: true } });
 
     const form = useForm<RideLogFormFields>(useCreateRideLogFormProps(car));
     const { multiStepFormSteps } = useRideLogFormFields({ form });
