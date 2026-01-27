@@ -27,7 +27,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
     const { openModal, openToast } = useAlert();
 
     const memoizedQuery = useMemo(() => fuelLogDao.fuelLogWatchedQueryItem(id), [fuelLogDao, id]);
-    const { data: fuelLog } = useWatchedQueryItem(memoizedQuery);
+    const { data: fuelLog, isLoading } = useWatchedQueryItem(memoizedQuery);
 
     const handleDelete = useCallback(async (fuelLog: FuelLog) => {
         try {
@@ -138,7 +138,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
                         marginBottom: SEPARATOR_SIZES.normal
                     } }
                 />
-                <InfoContainer data={ infos }/>
+                <InfoContainer data={ infos } isLoading={ isLoading }/>
             </ScreenScrollView>
             <FloatingDeleteButton onPress={ onDelete }/>
         </>

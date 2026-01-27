@@ -23,7 +23,7 @@ export function ExpenseScreen() {
     const { openModal, openToast } = useAlert();
 
     const memoizedQuery = useMemo(() => expenseDao.expenseWatchedQueryItem(id), [expenseDao, id]);
-    const { data: expense } = useWatchedQueryItem(memoizedQuery);
+    const { data: expense, isLoading } = useWatchedQueryItem(memoizedQuery);
 
     const handleDelete = useCallback(async (id: string) => {
         try {
@@ -112,7 +112,7 @@ export function ExpenseScreen() {
                         marginBottom: SEPARATOR_SIZES.normal
                     } }
                 />
-                <InfoContainer data={ infos }/>
+                <InfoContainer data={ infos } isLoading={ isLoading }/>
             </ScreenScrollView>
             <FloatingDeleteButton onPress={ onDelete }/>
         </>

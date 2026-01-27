@@ -35,7 +35,7 @@ export function RideLogView({ id }: RideLogViewProps) {
     const { ridePassengerToExpandableList } = useRidePassengerToExpandableList();
 
     const memoizedQuery = useMemo(() => rideLogDao.rideLogWatchedQueryItem(id), [rideLogDao, id]);
-    const { data: rideLog } = useWatchedQueryItem(memoizedQuery);
+    const { data: rideLog, isLoading } = useWatchedQueryItem(memoizedQuery);
 
     const [isExpenseListExpanded, setExpenseListExpanded] = useState(false);
     const [isPlaceListExpanded, setPlaceListExpanded] = useState(false);
@@ -244,7 +244,7 @@ export function RideLogView({ id }: RideLogViewProps) {
                         marginBottom: SEPARATOR_SIZES.normal
                     } }
                 />
-                <InfoContainer data={ infos }/>
+                <InfoContainer data={ infos } isLoading={ isLoading }/>
             </ScreenScrollView>
             <FloatingDeleteButton onPress={ onDelete }/>
         </>

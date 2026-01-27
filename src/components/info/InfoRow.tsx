@@ -1,16 +1,17 @@
 import React, { ReactElement, useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants";
 import { InfoText, InfoTextProps } from "./InfoText.tsx";
 import Icon from "../Icon.tsx";
 import { debounce } from "es-toolkit";
-import { ViewStyle } from "../../types/index.ts";
+import { ViewStyle } from "../../types";
 
 export type InfoRowProps = InfoTextProps & {
     onPress?: () => void
     renderContent?: () => ReactElement
     actionIcon?: string
     row?: boolean
+    isLoading?: boolean
     containerStyle?: ViewStyle
     secondaryInfo?: InfoTextProps
 }
@@ -20,6 +21,7 @@ export function InfoRow({
     renderContent,
     actionIcon,
     row = true,
+    isLoading,
     secondaryInfo,
     containerStyle,
     ...infoTextProps
@@ -42,12 +44,18 @@ export function InfoRow({
                    />
                 }
                 <View style={ [styles.contentContainer, row && styles.rowContentContainer] }>
-                    <InfoText { ...infoTextProps } />
+                    <InfoText
+                        isLoading={ isLoading }
+                        loadingIndicatorStyle={ styles.loadingIndicator }
+                        { ...infoTextProps }
+                    />
                     {
                         secondaryInfo &&
                        <InfoText
-                          contentTextStyle={ row ? styles.rowContentText : undefined }
-                          titleStyle={ row ? styles.rowContentText : undefined }
+                          isLoading={ isLoading }
+                          titleStyle={ row && styles.rowContentText }
+                          contentTextStyle={ row && styles.rowContentText }
+                          loadingIndicatorStyle={ row ? styles.rowLoadingIndicator : styles.loadingIndicator }
                           { ...secondaryInfo }
                        />
                     }
@@ -84,9 +92,15 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         gap: SEPARATOR_SIZES.lightSmall
     },
+    loadingIndicator: {
+        alignSelf: "flex-start"
+    },
     rowContentContainer: {
         flexDirection: "row",
         alignItems: "center"
+    },
+    rowLoadingIndicator: {
+        alignSelf: "flex-end"
     },
     rowContentText: {
         textAlign: "right"

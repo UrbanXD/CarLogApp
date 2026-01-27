@@ -1,32 +1,38 @@
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../constants";
 import { IntelligentMarquee } from "../marquee/IntelligentMarquee.tsx";
 import React, { ReactElement } from "react";
-import { TextStyle, ViewStyle } from "../../types/index.ts";
+import { TextStyle, ViewStyle } from "../../types";
+import { MoreDataLoading } from "../loading/MoreDataLoading.tsx";
 
 export type InfoTextProps = {
     icon?: string
     title?: string
     content?: string | ((textStyle?: TextStyle) => ReactElement | null)
+    isLoading?: boolean
     contentFirst?: boolean
     marquee?: boolean
     textContainerStyle?: ViewStyle
     titleStyle?: TextStyle
     contentTextStyle?: TextStyle
+    loadingIndicatorStyle?: ViewStyle
 }
 
 export function InfoText({
     title,
     content,
+    isLoading,
     contentFirst,
     marquee,
     textContainerStyle,
     titleStyle,
-    contentTextStyle
+    contentTextStyle,
+    loadingIndicatorStyle
 }: InfoTextProps) {
     return (
         <View
-            style={ [styles.container, contentFirst && styles.contentFirstContainer, textContainerStyle] }>
+            style={ [styles.container, contentFirst && styles.contentFirstContainer, textContainerStyle] }
+        >
             {
                 title && (
                     marquee
@@ -49,6 +55,16 @@ export function InfoText({
             }
             {
                 content && (
+                    isLoading
+                    ?
+                    <MoreDataLoading
+                        withText={ false }
+                        activityIndicatorSize={ FONT_SIZES.p3 * 0.9 }
+                        containerStyle={ [
+                            { height: FONT_SIZES.p3 * 0.9, marginLeft: -FONT_SIZES.p3 * 0.9 / 2 },
+                            loadingIndicatorStyle
+                        ] }/>
+                    :
                     typeof content === "string"
                     ? (
                         marquee

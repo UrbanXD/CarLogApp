@@ -26,7 +26,7 @@ export function OdometerLogView({ id }: OdometerLogViewProps) {
     const { openModal, openToast } = useAlert();
 
     const memoizedQuery = useMemo(() => odometerLogDao.odometerLogWatchedQueryItem(id), [odometerLogDao, id]);
-    const { data: odometerLog } = useWatchedQueryItem(memoizedQuery);
+    const { data: odometerLog, isLoading } = useWatchedQueryItem(memoizedQuery);
 
     const handleDelete = useCallback(async (odometerLog: OdometerLog) => {
         try {
@@ -98,7 +98,7 @@ export function OdometerLogView({ id }: OdometerLogViewProps) {
                         marginBottom: SEPARATOR_SIZES.normal
                     } }
                 />
-                <InfoContainer data={ infos }/>
+                <InfoContainer data={ infos } isLoading={ isLoading }/>
             </ScreenScrollView>
             <FloatingDeleteButton onPress={ onDelete }/>
         </>

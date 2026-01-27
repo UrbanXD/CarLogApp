@@ -29,7 +29,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
     const { serviceItemToExpandableListItem } = useServiceItemToExpandableList();
 
     const memoizedQuery = useMemo(() => serviceLogDao.serviceLogWatchedQueryItem(id), [serviceLogDao, id]);
-    const { data: serviceLog } = useWatchedQueryItem(memoizedQuery);
+    const { data: serviceLog, isLoading } = useWatchedQueryItem(memoizedQuery);
 
     const [isServiceItemListExpanded, setServiceItemListExpanded] = useState(false);
 
@@ -135,7 +135,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
                         marginBottom: SEPARATOR_SIZES.normal
                     } }
                 />
-                <InfoContainer data={ infos }/>
+                <InfoContainer data={ infos } isLoading={ isLoading }/>
             </ScreenScrollView>
             <FloatingDeleteButton onPress={ onDelete }/>
         </>
