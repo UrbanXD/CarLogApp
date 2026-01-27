@@ -32,8 +32,6 @@ export function useFormBottomSheetGuard<T extends object>({
                          ? Object.values(enumObject).includes(rawValue as any) || rawValue in enumObject
                          : true;
 
-    console.log((isValidField ? rawValue : undefined));
-
     useEffect(() => {
         if(isLoading) return;
 
