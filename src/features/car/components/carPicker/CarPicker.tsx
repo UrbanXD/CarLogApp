@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { FlashList, FlashListRef, ListRenderItemInfo } from "@shopify/flash-list";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants";
 import { Car } from "../../schemas/carSchema.ts";
 import { useAppDispatch, useAppSelector } from "../../../../hooks";
 import { selectCar } from "../../model/actions/selectCar.ts";
@@ -121,6 +121,7 @@ export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
                   <SelectedCar
                      car={ selectedCar }
                      placeholder={ t("car.picker.placeholder") }
+                     isCarsLoading={ isLoading }
                      userDontHaveCars={ cars.length === 0 }
                      userDontHaveCarsPlaceholder={ t("car.picker.no_cars") }
                   />

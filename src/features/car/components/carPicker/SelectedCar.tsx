@@ -1,13 +1,15 @@
 import { Car } from "../../schemas/carSchema.ts";
 import { StyleSheet, Text, View } from "react-native";
 import Icon from "../../../../components/Icon.tsx";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants";
 import { IntelligentMarquee } from "../../../../components/marquee/IntelligentMarquee.tsx";
 import React from "react";
+import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 
 type SelectedCarProps = {
     car: Car | null
     placeholder: string
+    isCarsLoading: boolean
     userDontHaveCars: boolean
     userDontHaveCarsPlaceholder: string
 }
@@ -15,6 +17,7 @@ type SelectedCarProps = {
 export function SelectedCar({
     car,
     placeholder,
+    isCarsLoading,
     userDontHaveCars,
     userDontHaveCarsPlaceholder
 }: SelectedCarProps) {
@@ -26,7 +29,7 @@ export function SelectedCar({
                 color={ COLORS.white }
             />
             {
-                userDontHaveCars
+                !isCarsLoading && userDontHaveCars
                 ?
                 <View style={ { width: "75%" } }>
                     <Text style={ styles.model }>
@@ -48,20 +51,26 @@ export function SelectedCar({
                           </Text>
                        </IntelligentMarquee>
                     }
-                    <IntelligentMarquee
-                        speed={ 0.65 }
-                        delay={ 800 }
-                        bounceDelay={ 800 }
-                        spacing={ SEPARATOR_SIZES.lightSmall }
-                    >
-                        <Text style={ styles.model } numberOfLines={ 1 }>
-                            {
-                                car
-                                ? `${ car.model.make.name } ${ car.model.name }`
-                                : placeholder
-                            }
-                        </Text>
-                    </IntelligentMarquee>
+                    {
+                        isCarsLoading && !car
+                        ?
+                        <MoreDataLoading withText={ false } containerStyle={ { alignSelf: "flex-start" } }/>
+                        :
+                        <IntelligentMarquee
+                            speed={ 0.65 }
+                            delay={ 800 }
+                            bounceDelay={ 800 }
+                            spacing={ SEPARATOR_SIZES.lightSmall }
+                        >
+                            <Text style={ styles.model } numberOfLines={ 1 }>
+                                {
+                                    car
+                                    ? `${ car.model.make.name } ${ car.model.name }`
+                                    : placeholder
+                                }
+                            </Text>
+                        </IntelligentMarquee>
+                    }
                 </View>
             }
         </View>
