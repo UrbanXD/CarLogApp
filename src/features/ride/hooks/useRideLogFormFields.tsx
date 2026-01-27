@@ -149,6 +149,7 @@ export function useRideLogFormFields({
                     odometerValueTitle={ t("rides.end_odometer") }
                     currentOdometerValue={ formStartOdometerValue }
                     currentOdometerValueTranslationKey="rides.start_odometer_value"
+                    showCurrentOdometerValueAsSubtitle
                     showLimits={ false }
                     dateFieldName="endTime"
                     dateTitle={ t("rides.end") }
@@ -174,6 +175,7 @@ export function useRideLogFormFields({
                             dateFieldName="startTime"
                             dateTitle={ t("rides.start") }
                             showLimits={ true }
+                            skipLimitLogFieldNames={ ["endOdometerLogId"] }
                             changeCarOdometerValueWhenInputNotTouched={ false }
                         />
                         <OdometerValueInput
