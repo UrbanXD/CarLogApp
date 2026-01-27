@@ -21,20 +21,16 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
     useEffect(() => {
         let mounted = true;
 
-        const init = async () => {
+        const createInstance = async () => {
             try {
                 const databaseInstance = await Database.create();
-                if(mounted) {
-                    setDatabase(databaseInstance);
-                }
+                if(mounted) setDatabase(databaseInstance);
             } catch(e) {
-                if(mounted) {
-                    setError(e as Error);
-                }
+                if(mounted) setError(e as Error);
             }
         };
 
-        init();
+        createInstance();
         return () => { mounted = false; };
     }, []);
 
@@ -55,7 +51,6 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
         };
 
         const subscription = Network.addNetworkStateListener(state => checkAndSync(state));
-
         Network.getNetworkStateAsync().then(checkAndSync);
 
         return () => subscription.remove();

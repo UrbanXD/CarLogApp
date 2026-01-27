@@ -33,15 +33,17 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     const [notVerifiedEmail, setNotVerifiedEmail] = useState<string | null>(null);
 
     useEffect(() => {
-        database.init();
-
         const { data: authListener } = supabaseConnector.client.auth.onAuthStateChange(
             (event, supabaseSession) => {
                 if(event === "PASSWORD_RECOVERY") return;
 
                 if(!supabaseSession) {
+                    database.disconnect();
+
                     if(router.canDismiss()) router.dismissAll();
                     router.replace("/backToRootIndex");
+                } else {
+                    database.init();
                 }
 
                 setAuthenticated(!!supabaseSession);
@@ -149,7 +151,6 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             if(error) throw error;
 
             if(!disabledToast) openToast(SignOutToast.success());
-            await database.disconnect();
         } catch(error) {
             if(disabledToast || !(error instanceof AuthError)) return; // if not auth error just skip
             openToast(getToastMessage({ messages: SignOutToast, error }));
