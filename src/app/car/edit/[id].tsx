@@ -1,3 +1,3 @@
-import { CarEditBottomSheet } from "../../../features/car/presets/bottomSheet";
+import { EditCarBottomSheet } from "../../../features/car/presets/bottomSheet";
 
-export default CarEditBottomSheet;
+export default EditCarBottomSheet;

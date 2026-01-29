@@ -8,7 +8,7 @@ import { EDIT_CAR_FORM_STEPS } from "../../constants";
 import { useTranslation } from "react-i18next";
 import { useFormBottomSheetGuard } from "../../../../hooks/useFormBottomSheetGuard.ts";
 
-export function CarEditBottomSheet() {
+export function EditCarBottomSheet() {
     const { id, stepIndex } = useLocalSearchParams<{ id?: string, stepIndex?: string }>();
     const { t } = useTranslation();
     const { car, isLoading } = useCar({ carId: id });
