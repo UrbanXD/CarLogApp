@@ -45,18 +45,37 @@ function CarModelStep({
     }, [selectedMakeId]);
 
     useEffect(() => {
+        let ignore = false;
+        const fetchYears = async () => {
+            const years = await modelDao.getModelYearsById(selectedModelId);
+            if(!ignore) setModelYears(years);
+        };
+        if(selectedModelId) fetchYears();
+        return () => { ignore = true; };
+    }, [selectedModelId]);
+
+    useEffect(() => {
+        let ignore = false;
+
         const setHiddenInputsValue = async () => {
             const model = await modelDao.getById(selectedModelId);
             const make = model ? await makeDao.getById(model.makeId) : null;
+
+            if(ignore) return;
 
             setValue("model.name", model?.name ?? "");
             setValue("model.makeName", make?.name ?? "");
         };
 
+        if(ignore) return;
         if(selectedModelId) setHiddenInputsValue();
         if(defaultLoadModelId) return setDefaultLoadModelId(false);
         if(formState.defaultValues?.["model"]?.["id"] === selectedModelId && formState.defaultValues?.["model"]?.["year"] === selectedYear) return;
         setValue("model.year", "");
+
+        return () => {
+            ignore = true;
+        };
     }, [selectedModelId]);
 
     return (
@@ -79,6 +98,7 @@ function CarModelStep({
                 fieldNameText={ t("car.steps.model.model_field.title") }
             >
                 <Input.Picker.Dropdown<typeof modelQueryOptions["baseQuery"]>
+                    key={ `model-picker-${ selectedMakeId }` }
                     title={ t("car.steps.model.model_field.title") }
                     queryOptions={ modelQueryOptions }
                     searchBy="name"
@@ -93,6 +113,7 @@ function CarModelStep({
                 fieldNameText={ t("car.steps.model.model_year_field.title") }
             >
                 <YearPicker
+                    key={ `model-year-picker-${ selectedMakeId }-${ selectedModelId }` }
                     title={ t("car.steps.model.model_year_field.title") }
                     icon={ ICON_NAMES.calendar }
                     maxYear={ modelYears.end ?? new Date().getFullYear() }
