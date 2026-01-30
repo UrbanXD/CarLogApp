@@ -1,10 +1,10 @@
-import React, { ReactElement, useMemo } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import React, { ReactElement } from "react";
+import { StyleSheet, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants";
 import { InfoText, InfoTextProps } from "./InfoText.tsx";
 import Icon from "../Icon.tsx";
-import { debounce } from "es-toolkit";
 import { ViewStyle } from "../../types";
+import { DebouncedPressable } from "../DebouncedPressable.tsx";
 
 export type InfoRowProps = InfoTextProps & {
     onPress?: () => void
@@ -26,12 +26,10 @@ export function InfoRow({
     containerStyle,
     ...infoTextProps
 }: InfoRowProps) {
-    const debouncedPress = useMemo(() => debounce(() => onPress?.(), 250), [onPress]);
-
     return (
         <View style={ { flex: 1 } }>
-            <Pressable
-                onPress={ debouncedPress }
+            <DebouncedPressable
+                onPress={ onPress }
                 disabled={ !onPress }
                 style={ [styles.container, containerStyle] }
             >
@@ -68,7 +66,7 @@ export function InfoRow({
                       color={ COLORS.white }
                    />
                 }
-            </Pressable>
+            </DebouncedPressable>
             {
                 renderContent &&
                <View style={ { paddingLeft: FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE + SEPARATOR_SIZES.lightSmall } }>

@@ -1,10 +1,10 @@
-import React, { ReactNode, useCallback, useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { ReactNode, useCallback, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { ExpandableView } from "./expandableView/ExpandableView.tsx";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../constants";
-import { debounce } from "es-toolkit";
 import { TextStyle, ViewStyle } from "../types";
 import Icon from "./Icon.tsx";
+import { DebouncedPressable } from "./DebouncedPressable.tsx";
 
 type SectionProps = {
     title: string
@@ -32,12 +32,10 @@ export function Section({
         setIsExpanded(prev => !prev);
     }, [setIsExpanded, expandable]);
 
-    const debouncedPress = useMemo(() => debounce(onPress, 350), [onPress]);
-
     return (
         <View style={ [styles.container, containerStyle] }>
-            <Pressable
-                onPress={ debouncedPress }
+            <DebouncedPressable
+                onPress={ onPress }
                 disabled={ !expandable }
                 style={ styles.controllerContainer }
             >
@@ -60,7 +58,7 @@ export function Section({
                       color={ COLORS.white }
                    />
                 }
-            </Pressable>
+            </DebouncedPressable>
             <ExpandableView expanded={ isExpanded } style={ { gap: SEPARATOR_SIZES.mediumSmall } }>
                 { children }
             </ExpandableView>

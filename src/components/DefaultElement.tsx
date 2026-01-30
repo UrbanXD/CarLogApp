@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../constants/index.ts";
+import { StyleSheet, Text, View } from "react-native";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../constants";
 import Icon from "./Icon";
 import { hexToRgba } from "../utils/colors/hexToRgba";
-import { ImageSource, ViewStyle } from "../types/index.ts";
-import { debounce } from "es-toolkit";
+import { ImageSource, ViewStyle } from "../types";
 import { MoreDataLoading } from "./loading/MoreDataLoading.tsx";
+import { DebouncedPressable } from "./DebouncedPressable.tsx";
 
 type DefaultElementProps = {
     icon?: ImageSource
@@ -26,15 +26,15 @@ function DefaultElement({
     activityIndicatorSize = "large",
     style
 }: DefaultElementProps) {
-    const debouncedOnPress = useMemo(() => debounce(() => {
+    const onPressHandler = useMemo(() => () => {
         if(loading) return;
 
         onPress?.();
-    }, 250), [onPress, loading]);
+    }, [onPress, loading]);
 
     return (
-        <Pressable
-            onPress={ debouncedOnPress }
+        <DebouncedPressable
+            onPress={ onPressHandler }
             disabled={ !onPress || loading }
             style={ [styles.container, style] }
         >
@@ -60,7 +60,7 @@ function DefaultElement({
                     </>
                 }
             </View>
-        </Pressable>
+        </DebouncedPressable>
     );
 }
 

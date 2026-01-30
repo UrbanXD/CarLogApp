@@ -1,15 +1,14 @@
 import React, { useCallback } from "react";
 import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { StyleSheet, View } from "react-native";
-import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { FloatingActionButton } from "./FloatingActionButton.tsx";
-import { AnimatedPressable, AnimatedSafeAreaView } from "../../../components/AnimatedComponents/index.ts";
+import { AnimatedPressable, AnimatedSafeAreaView } from "../../../components/AnimatedComponents";
 import { Overlay } from "../../../components/overlay/Overlay.tsx";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Action } from "../hooks/useActions.ts";
-import { debounce } from "es-toolkit";
-import { ViewStyle } from "../../../types/index.ts";
+import { ViewStyle } from "../../../types";
 
 type FloatingActionMenu = {
     action: (() => void) | Array<Action>
@@ -51,7 +50,7 @@ function FloatingActionMenu({ action, containerStyle }: FloatingActionMenu) {
                 index={ index + 1 }
                 icon={ action.icon }
                 label={ action.label }
-                onPress={ debounce(handlePress, 350) }
+                onPress={ handlePress }
             />
         );
     }, [isExpanded]);

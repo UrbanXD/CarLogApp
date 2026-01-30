@@ -1,10 +1,11 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import getContrastingColor from "../../utils/colors/getContrastingColor";
 import Button from "../Button/Button.ts";
-import { COLORS, ICON_NAMES } from "../../constants/index.ts";
-import { ViewStyle } from "../../types/index.ts";
+import { COLORS, ICON_NAMES } from "../../constants";
+import { ViewStyle } from "../../types";
+import { DebouncedPressable } from "../DebouncedPressable.tsx";
 
 type AvatarTextProps = {
     label: string;
@@ -42,10 +43,11 @@ function AvatarText({
         );
 
     return (
-        <TouchableOpacity
+        <DebouncedPressable
             style={ [styles.container, style] }
             onPress={ onPress }
             disabled={ !onPress }
+            debounceMs={ 1000 }
         >
             {
                 onPressBadge &&
@@ -64,7 +66,7 @@ function AvatarText({
             >
                 { label }
             </Text>
-        </TouchableOpacity>
+        </DebouncedPressable>
     );
 }
 

@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { COLORS, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import { ViewStyle } from "../../../types/index.ts";
+import { COLORS, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../constants";
+import { ViewStyle } from "../../../types";
+import { DebouncedPressable } from "../../DebouncedPressable.tsx";
 
 export type PickerItemType = {
     value: string
@@ -23,7 +24,7 @@ const PickerItem: React.FC<PickerItemProps> = ({
     selected,
     style
 }) => (
-    <Pressable
+    <DebouncedPressable
         onPress={ onPress }
         style={ [styles.itemContainer, selected && styles.selectedItemContainer, style] }
     >
@@ -38,7 +39,7 @@ const PickerItem: React.FC<PickerItemProps> = ({
                </Text>
             }
         </View>
-    </Pressable>
+    </DebouncedPressable>
 );
 
 const styles = StyleSheet.create({
