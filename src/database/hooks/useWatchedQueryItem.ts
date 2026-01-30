@@ -29,6 +29,8 @@ export function useWatchedQueryItem<Dto, WatchEntity = any>(props: UseWatchedQue
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        let active = true;
+
         if(!query) {
             setData(null);
             setIsLoading(false);
@@ -41,21 +43,33 @@ export function useWatchedQueryItem<Dto, WatchEntity = any>(props: UseWatchedQue
             powersync,
             query,
             onData: async (result) => {
+                if(!active) return;
+
                 try {
-                    setData(result.length > 0
-                            ? (mapper ? await mapper(result[0]) : result[0] as unknown as Dto)
-                            : null);
+                    setData(
+                        result.length > 0
+                        ? (mapper ? await mapper(result[0]) : result[0] as unknown as Dto)
+                        : null
+                    );
                 } catch(e) {
                     console.log("useWatchedQueryItem error: ", e);
                 } finally {
                     setIsLoading(false);
                 }
             },
-            onError: () => setIsLoading(false),
+            onError: () => {
+                if(!active) return;
+
+                setData(null);
+                setIsLoading(false);
+            },
             options
         });
 
-        return unwatch;
+        return () => {
+            active = false;
+            if(unwatch) unwatch();
+        };
     }, [props]);
 
     return { data, isLoading };

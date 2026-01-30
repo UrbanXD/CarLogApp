@@ -29,6 +29,8 @@ export function useWatchedQueryCollection<Dto, WatchEntity = any>(props: UseWatc
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        let active = true;
+
         if(!query) {
             setData([]);
             setIsLoading(false);
@@ -41,6 +43,8 @@ export function useWatchedQueryCollection<Dto, WatchEntity = any>(props: UseWatc
             powersync,
             query,
             onData: async (result) => {
+                if(!active) return;
+
                 try {
                     setData(mapper ? await mapper(result) : result as unknown as Array<Dto>);
                 } catch(e) {
@@ -49,11 +53,19 @@ export function useWatchedQueryCollection<Dto, WatchEntity = any>(props: UseWatc
                     setIsLoading(false);
                 }
             },
-            onError: () => setIsLoading(false),
+            onError: () => {
+                if(!active) return;
+
+                setData([]);
+                setIsLoading(false);
+            },
             options
         });
 
-        return unwatch;
+        return () => {
+            active = false;
+            if(unwatch) unwatch();
+        };
     }, [props]);
 
     return { data, isLoading };

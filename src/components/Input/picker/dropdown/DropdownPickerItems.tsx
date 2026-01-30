@@ -46,6 +46,7 @@ function DropdownPickerItems({
 
     const flashListRef = useRef<FlashListRef<PickerItemType>>(null);
     const itemsFiltered = useRef(false); //this is for prevent scrolling to first element if data just fetched (not filtered)
+
     const [listReady, setListReady] = useState(false);
 
     useEffect(() => {
@@ -81,13 +82,7 @@ function DropdownPickerItems({
     }, [fetchNext, isNextFetchingEnabled]);
 
 
-    const keyExtractor = useCallback(
-        (
-            item: PickerItemType,
-            index: number
-        ) => `${ item.title ?? item?.toString() ?? index.toString() }-${ item.value }`,
-        []
-    );
+    const keyExtractor = useCallback((item: PickerItemType) => item.value, []);
 
     const renderItem: ListRenderItem<PickerItemType> = useCallback(
         ({ item, index }) => {
