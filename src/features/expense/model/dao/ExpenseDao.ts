@@ -18,6 +18,21 @@ import { MODEL_TABLE } from "../../../../database/connector/powersync/tables/mod
 import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";
 import { UseWatchedQueryCollectionProps } from "../../../../database/hooks/useWatchedQueryCollection.ts";
 import { UseInfiniteQueryOptions } from "../../../../database/hooks/useInfiniteQuery.ts";
+import { StatisticsFunctionArgs } from "../../../statistics/model/dao/statisticsDao.ts";
+import { ExpenseTypeEnum } from "../enums/ExpenseTypeEnum.ts";
+import {
+    getStatisticsAggregateQuery,
+    StatisticsAggregateQueryResult
+} from "../../../../database/dao/utils/getStatisticsAggregateQuery.ts";
+import { SummaryStatistics } from "../../../../database/dao/types/statistis.ts";
+import { formatSummaryStatistics } from "../../../../database/dao/utils/formatSummaryStatistics.ts";
+
+export type ExpenseRecordTableRow = {
+    amount: number | null
+    owner_id: string | null
+    key: string | null
+    type_id: string
+}
 
 export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, SelectExpenseTableRow> {
     constructor(
@@ -75,6 +90,58 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         return query;
     }
 
+    summaryStatisticsQuery({
+        carId,
+        from,
+        to,
+        expenseType
+    }: StatisticsFunctionArgs & { expenseType?: ExpenseTypeEnum }) {
+        const applyFilters = (qb: any, tableAlias: string, typeAlias: string) => {
+            return qb
+            .$if(!!carId, (q: any) => q.where(`${ tableAlias }.car_id`, "=", carId))
+            .$if(!!expenseType, (q: any) => q.where(`${ typeAlias }.key`, "=", expenseType));
+        };
+
+        let mainQuery = this.db
+        .selectFrom(`${ EXPENSE_TABLE } as e` as const)
+        .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "e.type_id", "et.id")
+        .innerJoin(`${ CAR_TABLE } as c` as const, "c.id", "e.car_id")
+        .innerJoin(`${ CURRENCY_TABLE } as curr` as const, "c.currency_id", "curr.id");
+
+        let subQuery = this.db
+        .selectFrom(`${ EXPENSE_TABLE } as ie` as const)
+        .innerJoin(`${ EXPENSE_TYPE_TABLE } as iet` as const, "ie.type_id", "iet.id")
+        .select([
+            "ie.amount",
+            "iet.id as type_id",
+            "iet.owner_id",
+            "iet.key"
+        ]);
+
+        mainQuery = applyFilters(mainQuery, "e", "et");
+        subQuery = applyFilters(subQuery, "ie", "iet");
+
+        const query = getStatisticsAggregateQuery<typeof mainQuery, typeof subQuery>({
+            db: this.db,
+            baseQuery: mainQuery,
+            idField: "e.id",
+            field: "e.amount",
+            unitField: "curr.symbol",
+            fromDateField: "e.date",
+            recordQueryConfig: {
+                query: subQuery,
+                idField: "ie.id",
+                field: "ie.amount",
+                fromDateField: "ie.date",
+                jsonObject: true
+            },
+            from: from,
+            to: to
+        });
+
+        return query;
+    }
+
     expenseWatchedQueryItem(
         id: string | null | undefined,
         options?: WatchQueryOptions<SelectExpenseTableRow>
@@ -99,6 +166,21 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
             query: query,
             mapper: this.mapper.toDtoArray.bind(this.mapper),
             options: { enabled: !!carId, ...options }
+        };
+    }
+
+    summaryStatisticsWatchedQueryItem(props: StatisticsFunctionArgs & {
+        expenseType?: ExpenseTypeEnum
+    }): UseWatchedQueryItemProps<SummaryStatistics, StatisticsAggregateQueryResult<ExpenseRecordTableRow>> {
+        return {
+            query: this.summaryStatisticsQuery(props),
+            mapper: (result) => formatSummaryStatistics<ExpenseRecordTableRow>(
+                result,
+                { recordMapper: this.mapper.toStat.bind(this.mapper) }
+            ),
+            options: {
+                jsonFields: ["current_max_record", "current_min_record", "previous_max_record", "previous_min_record"]
+            }
         };
     }
 

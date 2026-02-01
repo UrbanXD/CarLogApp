@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { BarChartView } from "../charts/BarChartView.tsx";
-import { ComparisonStatByDate, ComparisonStatByType, SummaryStat } from "../../model/dao/statisticsDao.ts";
+import { ComparisonStatByDate, ComparisonStatByType, StatisticsFunctionArgs } from "../../model/dao/statisticsDao.ts";
 import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../../constants";
 import { useTranslation } from "react-i18next";
@@ -11,6 +11,7 @@ import { getDateFormatTemplateByRangeUnit } from "../../utils/getDateFormatTempl
 import { formatTrend } from "../../utils/formatTrend.ts";
 import { MasonryStatView } from "../MasonryStatView.tsx";
 import { formatWithUnit } from "../../../../utils/formatWithUnit.ts";
+import { useWatchedQueryItem } from "../../../../database/hooks/useWatchedQueryItem.ts";
 
 type ExpenseStatisticsProps = {
     carId?: string | null
@@ -20,10 +21,21 @@ type ExpenseStatisticsProps = {
 
 export function ExpenseStatistics({ carId, from, to }: ExpenseStatisticsProps) {
     const { t } = useTranslation();
-    const { statisticsDao } = useDatabase();
+    const { statisticsDao, expenseDao } = useDatabase();
+
+    const memoizedStatArgs: StatisticsFunctionArgs = useMemo(() => ({
+        carId: carId,
+        from,
+        to
+    }), [carId, from, to]);
+
+    const memoizedQuery = useMemo(
+        () => expenseDao.summaryStatisticsWatchedQueryItem(memoizedStatArgs),
+        [expenseDao, memoizedStatArgs]
+    );
+    const { data: summary, isLoading } = useWatchedQueryItem(memoizedQuery);
 
     const [expensesByDateWindow, setExpensesByDateWindow] = useState<ComparisonStatByDate | null>(null);
-    const [expenseStat, setExpenseStat] = useState<SummaryStat | null>(null);
     const [expensesByType, setExpensesByType] = useState<ComparisonStatByType | null>(null);
 
     useEffect(() => {
@@ -36,83 +48,80 @@ export function ExpenseStatistics({ carId, from, to }: ExpenseStatisticsProps) {
 
             const [
                 resultExpensesByDateWindow,
-                resultExpenseStat,
                 resultExpensesByType
             ] = await Promise.all([
                 statisticsDao.getExpenseComparison(statArgs),
-                statisticsDao.getExpenseSummary(statArgs),
                 statisticsDao.getExpenseComparisonByType(statArgs)
             ]);
 
             setExpensesByDateWindow(resultExpensesByDateWindow);
-            setExpenseStat(resultExpenseStat);
             setExpensesByType(resultExpensesByType);
         })();
     }, [carId, from, to]);
 
     const getCountOfExpenses = useCallback(() => {
-        const { trend, trendSymbol } = expenseStat?.totalTrend ?? {};
+        const { trend, trendSymbol } = summary?.totalTrend ?? {};
 
         return {
             label: t("statistics.expense.count"),
-            value: expenseStat?.count != null ? `${ expenseStat.count } ${ t("common.count") }` : null,
-            isPositive: expenseStat?.countTrend?.isTrendPositive,
+            value: summary?.count != null ? `${ summary.count } ${ t("common.count") }` : null,
+            isPositive: summary?.countTrend?.isTrendPositive,
             trend: formatTrend({ trend: trend, trendSymbol: trendSymbol }),
             trendDescription: t("statistics.compared_to_previous_cycle"),
-            isLoading: !expenseStat
+            isLoading: isLoading
         };
-    }, [expenseStat, t]);
+    }, [summary, t]);
 
     const getTotalExpenseAmount = useCallback(() => {
         return {
             label: t("statistics.expense.total_amount"),
-            value: expenseStat ? formatWithUnit(expenseStat.total, expenseStat?.unitText) : null,
-            isPositive: expenseStat?.totalTrend.isTrendPositive,
-            trend: expenseStat
-                   ? `${ expenseStat.totalTrend.trendSymbol } ${ expenseStat.totalTrend.trend }`
+            value: summary ? formatWithUnit(summary.total, summary?.unitText) : null,
+            isPositive: summary?.totalTrend.isTrendPositive,
+            trend: summary
+                   ? `${ summary.totalTrend.trendSymbol } ${ summary.totalTrend.trend }`
                    : null,
-            trendDescription: expenseStat ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !expenseStat
+            trendDescription: summary ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isLoading
         };
-    }, [expenseStat, t]);
+    }, [summary, t]);
 
 
     const getAverageExpenseAmount = useCallback(() => {
         return {
             label: t("statistics.expense.avg_amount"),
-            value: expenseStat ? formatWithUnit(expenseStat.average, expenseStat?.unitText) : null,
-            isPositive: expenseStat?.averageTrend.isTrendPositive,
-            trend: expenseStat
-                   ? `${ expenseStat.averageTrend.trendSymbol } ${ expenseStat.averageTrend.trend }`
+            value: summary ? formatWithUnit(summary.average, summary?.unitText) : null,
+            isPositive: summary?.averageTrend.isTrendPositive,
+            trend: summary
+                   ? `${ summary.averageTrend.trendSymbol } ${ summary.averageTrend.trend }`
                    : null,
-            trendDescription: expenseStat ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !expenseStat
+            trendDescription: summary ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isLoading
         };
-    }, [expenseStat, t]);
+    }, [summary, t]);
 
 
     const getMedianExpenseAmount = useCallback(() => {
         return {
             label: t("statistics.expense.median_amount"),
-            value: expenseStat ? formatWithUnit(expenseStat.median, expenseStat?.unitText) : null,
-            isPositive: expenseStat?.medianTrend.isTrendPositive,
-            trend: expenseStat
-                   ? `${ expenseStat.medianTrend.trendSymbol } ${ expenseStat.medianTrend.trend }`
+            value: summary ? formatWithUnit(summary.median, summary?.unitText) : null,
+            isPositive: summary?.medianTrend.isTrendPositive,
+            trend: summary
+                   ? `${ summary.medianTrend.trendSymbol } ${ summary.medianTrend.trend }`
                    : null,
-            trendDescription: expenseStat ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !expenseStat
+            trendDescription: summary ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isLoading
         };
-    }, [expenseStat, t]);
+    }, [summary, t]);
 
     const getMaxExpense = useCallback(() => {
         return {
             label: t("statistics.expense.max_amount"),
-            value: expenseStat?.max != null ? formatWithUnit(expenseStat.max.value, expenseStat?.unitText) : null,
-            description: expenseStat?.max != null ? t(`expenses.types.${ expenseStat.max.label }`) : null,
-            descriptionStyle: expenseStat?.max != null ? { color: expenseStat.max.color } : undefined,
-            isLoading: !expenseStat
+            value: summary?.max?.value != null ? formatWithUnit(summary.max.value, summary?.unitText) : null,
+            description: summary?.max?.label != null ? t(`expenses.types.${ summary.max.label }`) : null,
+            descriptionStyle: summary?.max?.color != null ? { color: summary.max.color } : undefined,
+            isLoading: isLoading
         };
-    }, [expenseStat, t]);
+    }, [summary, t]);
 
     return (
         <View style={ styles.container }>

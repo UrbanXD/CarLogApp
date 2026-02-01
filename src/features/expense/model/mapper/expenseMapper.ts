@@ -13,6 +13,8 @@ import { amountSchema } from "../../../_shared/currency/schemas/amountSchema.ts"
 import { WithPrefix } from "../../../../types";
 import { SelectCarModelTableRow } from "../../../car/model/dao/CarDao.ts";
 import { carSimpleSchema } from "../../../car/schemas/carSchema.ts";
+import { Stat } from "../../../../database/dao/types/statistis.ts";
+import { ExpenseRecordTableRow } from "../dao/ExpenseDao.ts";
 
 export type SelectAmountCurrencyTableRow =
     WithPrefix<CurrencyTableRow, "currency">
@@ -97,6 +99,20 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, Sele
             exchange_rate: dto.amount.exchangeRate,
             note: dto.note,
             date: dto.date
+        };
+    }
+
+    toStat(entity: ExpenseRecordTableRow): Stat {
+        const type = this.expenseTypeDao.mapper.toDto({
+            id: entity.type_id,
+            owner_id: entity.owner_id,
+            key: entity.key
+        });
+
+        return {
+            value: numberToFractionDigit(entity.amount ?? 0),
+            label: type.key,
+            color: type.primaryColor
         };
     }
 
