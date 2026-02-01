@@ -29,18 +29,6 @@ export class ServiceTypeDao extends Dao<ServiceTypeTableRow, ServiceType, Servic
         };
     }
 
-    async getIdByKey(key: string): Promise<string> {
-        const result = await this.db
-        .selectFrom(SERVICE_TYPE_TABLE)
-        .select("id")
-        .where("key", "=", key)
-        .executeTakeFirst();
-
-        if(!result?.id) throw new Error(`Table item not found by ${ key } key. [${ this.table }]`);
-
-        return result.id;
-    }
-
     async delete(id: string): Promise<string> {
         const result = await this.db
         .deleteFrom(SERVICE_TYPE_TABLE)

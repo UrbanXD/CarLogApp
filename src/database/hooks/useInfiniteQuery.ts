@@ -14,7 +14,7 @@ import { addCursor } from "../utils/addCursor.ts";
 import { useCursor } from "./useCursor.ts";
 import { useFilters } from "./useFilters.ts";
 import { addOrder } from "../utils/addOrder.ts";
-import { jsonArrayParse } from "../utils/jsonArrayParse.ts";
+import { jsonFieldsParse } from "../utils/jsonFieldsParse.ts";
 import { sql } from "@powersync/kysely-driver";
 
 export type CursorDirection = "initial" | "next" | "prev";
@@ -72,7 +72,8 @@ export type ExtractColumnsFromQuery<QueryBuilder> = QueryBuilder extends SelectQ
                                                                                           }[keyof Schema[Table]]
                                                                                           : never;
                                                     }[Tables & keyof Schema]
-                                                        | keyof ExtractRowFromQuery<QueryBuilder>
+                                                        | Extract<keyof ExtractRowFromQuery<QueryBuilder>, string>
+                                                        | (string & {})
                                                     : never;
 
 export type UseInfiniteQueryOptions<
@@ -89,7 +90,7 @@ export type UseInfiniteQueryOptions<
     perPage?: number
     mapper?: (item: TableItem, index?: number) => MappedItem | Promise<MappedItem>
     mappedItemId?: keyof MappedItem
-    jsonArrayFields?: Array<keyof TableItem>
+    jsonFields?: Array<keyof TableItem>
     enabled?: boolean
 }
 
@@ -107,7 +108,7 @@ export const useInfiniteQuery = <
         perPage = 15,
         mapper,
         mappedItemId,
-        jsonArrayFields,
+        jsonFields,
         enabled = true
     } = props ?? {};
 
@@ -215,7 +216,7 @@ export const useInfiniteQuery = <
 
                 const compiled = nextBuilder.compile();
                 const rawResults = await powersync.getAll<TableItem>(compiled.sql, compiled.parameters as any[]);
-                const results = rawResults.map(row => jsonArrayParse(row, jsonArrayFields));
+                const results = rawResults.map(row => jsonFieldsParse(row, jsonFields));
 
                 const hasMore = results.length > perPage;
                 if(hasMore) results.pop();
@@ -260,7 +261,7 @@ export const useInfiniteQuery = <
             setPrevCursor,
             setNextCursor,
             getUniqueNewItems,
-            jsonArrayFields
+            jsonFields
         ]
     );
 
@@ -279,7 +280,7 @@ export const useInfiniteQuery = <
             const compiled = prevBuilder.compile();
 
             const rawResults = (await powersync.getAll<TableItem>(compiled.sql, compiled.parameters as any[]));
-            const results = rawResults.map(row => jsonArrayParse(row, jsonArrayFields));
+            const results = rawResults.map(row => jsonFieldsParse(row, jsonFields));
 
             const hasMore = results.length > perPage;
             if(hasMore) results.unshift();
@@ -322,7 +323,7 @@ export const useInfiniteQuery = <
         setPrevCursor,
         setNextCursor,
         getUniqueNewItems,
-        jsonArrayFields
+        jsonFields
     ]);
 
     const diffQuery = useMemo(() => {
@@ -394,7 +395,7 @@ export const useInfiniteQuery = <
                 const tableDefaultItem = (result as TableItem) ?? null;
 
                 if(tableDefaultItem) {
-                    const parsedDefaultItem = jsonArrayParse(tableDefaultItem, jsonArrayFields);
+                    const parsedDefaultItem = jsonFieldsParse(tableDefaultItem, jsonFields);
                     const defaultCursorValues = getCursorValues(parsedDefaultItem, cursorOptions);
 
                     const [nextRes, prevRes] = await Promise.all([
@@ -417,8 +418,8 @@ export const useInfiniteQuery = <
                     const farNextItem = nextRes.length > 0 ? nextRes[nextRes.length - 1] : null;
                     const farPrevItem = prevRes.length > 0 ? prevRes[prevRes.length - 1] : null;
 
-                    const parsedFarNextItem = farNextItem ? jsonArrayParse(farNextItem, jsonArrayFields) : null;
-                    const parsedFarPrevItem = farPrevItem ? jsonArrayParse(farPrevItem, jsonArrayFields) : null;
+                    const parsedFarNextItem = farNextItem ? jsonFieldsParse(farNextItem, jsonFields) : null;
+                    const parsedFarPrevItem = farPrevItem ? jsonFieldsParse(farPrevItem, jsonFields) : null;
 
                     setNextCursorValues(getCursorValues<QueryBuilder, TableItem, Columns>(
                         parsedFarNextItem ?? parsedDefaultItem,
@@ -443,7 +444,7 @@ export const useInfiniteQuery = <
         };
 
         setupInitialCursors();
-    }, [defaultItem, getBaseBuilder, jsonArrayFields]);
+    }, [defaultItem, getBaseBuilder, jsonFields]);
 
     useEffect(
         () => {
@@ -453,7 +454,7 @@ export const useInfiniteQuery = <
                 onData: async (rows) => {
                     try {
                         const tableRows = rows as unknown as Array<TableItem>;
-                        const parsedTableRow = tableRows.map(row => jsonArrayParse(row, jsonArrayFields));
+                        const parsedTableRow = tableRows.map(row => jsonFieldsParse(row, jsonFields));
 
                         const mappedRows = stableMapper
                                            ? await Promise.all(parsedTableRow.map(stableMapper))
@@ -496,7 +497,7 @@ export const useInfiniteQuery = <
                 diffQuery.close();
             };
         },
-        [enabled, diffQuery, stableMapper, jsonArrayFields]
+        [enabled, diffQuery, stableMapper, jsonFields]
     );
 
     return {

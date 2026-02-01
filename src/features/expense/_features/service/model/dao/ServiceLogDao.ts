@@ -184,7 +184,7 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
         return {
             query: this.selectQuery(id),
             mapper: this.mapper.toDto.bind(this.mapper),
-            options: { enabled: !!id, ...options, jsonArrayFields: ["items", "totalAmount"] }
+            options: { enabled: !!id, ...options, jsonFields: ["items", "totalAmount"] }
         };
     }
 
@@ -207,7 +207,7 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
                 }
             ],
             mapper: this.mapper.toDto.bind(this.mapper),
-            jsonArrayFields: ["items", "totalAmount"]
+            jsonFields: ["items", "totalAmount"]
         };
     }
 

@@ -1,12 +1,12 @@
 import { AbstractPowerSyncDatabase, WatchedQuery } from "@powersync/react-native";
 import { SelectQueryBuilder } from "kysely";
 import { DatabaseType } from "../connector/powersync/AppSchema.ts";
-import { jsonArrayParse } from "../utils/jsonArrayParse.ts";
+import { jsonFieldsParse } from "../utils/jsonFieldsParse.ts";
 
 export type WatchQueryOptions<WatchEntity = any> = {
     queryOnce?: boolean
     enabled?: boolean
-    jsonArrayFields?: Array<keyof WatchEntity>
+    jsonFields?: Array<keyof WatchEntity>
 }
 
 type WatcherEntry = {
@@ -38,7 +38,7 @@ export function watchQuery<WatchEntity>({
     const {
         queryOnce = false,
         enabled = true,
-        jsonArrayFields = []
+        jsonFields = []
     } = options ?? {};
 
     if(!enabled) {
@@ -67,7 +67,7 @@ export function watchQuery<WatchEntity>({
 
         const unregister = watchedQuery.registerListener({
             onData: (results) => {
-                const parsedResults = results.map(row => jsonArrayParse(row, jsonArrayFields));
+                const parsedResults = results.map(row => jsonFieldsParse(row, jsonFields));
 
                 entry!.lastData = parsedResults;
                 entry!.callbacks.forEach(cb => cb(parsedResults));

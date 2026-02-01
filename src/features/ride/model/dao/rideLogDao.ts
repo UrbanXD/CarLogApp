@@ -238,7 +238,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
         return {
             query: this.selectQuery(id),
             mapper: this.mapper.toDto.bind(this.mapper),
-            options: { enabled: !!id, ...options, jsonArrayFields: ["expenses", "passengers", "places"] }
+            options: { enabled: !!id, ...options, jsonFields: ["expenses", "passengers", "places"] }
         };
     }
 
@@ -256,7 +256,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
         return {
             query: query,
             mapper: this.mapper.toDtoArray.bind(this.mapper),
-            options: { enabled: !!carId, ...options, jsonArrayFields: ["expenses", "passengers", "places"] }
+            options: { enabled: !!carId, ...options, jsonFields: ["expenses", "passengers", "places"] }
         };
     }
 
