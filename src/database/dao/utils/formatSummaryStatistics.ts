@@ -23,7 +23,6 @@ export function formatSummaryStatistics<Record = number>(
         return { value: numberToFractionDigit(record) };
     };
 
-    const unitText = result?.unit ?? null;
     const max = recordFormat(result?.current_max_record);
     const min = recordFormat(result?.current_min_record);
     const total = numberToFractionDigit(result?.current_total ?? 0);
@@ -53,7 +52,6 @@ export function formatSummaryStatistics<Record = number>(
         totalTrend: calculateTrend(total, previousWindowTotal, trendOptions),
         averageTrend: calculateTrend(average, previousWindowAverage, trendOptions),
         medianTrend: calculateTrend(median, previousWindowMedian, trendOptions),
-        countTrend: calculateTrend(count, previousWindowCount, trendOptions),
-        unitText
+        countTrend: calculateTrend(count, previousWindowCount, trendOptions)
     };
 }

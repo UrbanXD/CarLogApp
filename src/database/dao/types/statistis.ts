@@ -1,4 +1,14 @@
-import { Trend } from "../../../features/statistics/utils/calculateTrend.ts";
+import { Trend, TrendOptions } from "../../../features/statistics/utils/calculateTrend.ts";
+import { DonutChartItem } from "../../../features/statistics/components/charts/DonutChartView.tsx";
+import { LegendType } from "../../../features/statistics/components/charts/common/Legend.tsx";
+import { BarChartItem } from "../../../features/statistics/components/charts/BarChartView.tsx";
+
+export type StatisticsFunctionArgs = {
+    carId?: string | null
+    from: string
+    to: string
+    trendOptions?: TrendOptions
+}
 
 export type Stat = {
     value: number
@@ -27,3 +37,12 @@ export type SummaryStatistics = {
     unitText?: string | null
 }
 
+export type DonutChartStatistics = {
+    chartData: Array<DonutChartItem>
+    legend?: LegendType
+}
+
+export type BarChartStatistics = {
+    chartData: Array<BarChartItem>
+    legend?: LegendType
+}

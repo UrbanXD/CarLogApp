@@ -19,7 +19,6 @@ export type StatisticsAggregateQueryResult<Record = number> = {
     previous_avg: number | null
     previous_count: number | null
     previous_median: number | null
-    unit?: string | null
 }
 
 type GetStatisticsAggregateQueryProps<
@@ -34,13 +33,12 @@ type GetStatisticsAggregateQueryProps<
     field: Columns | RawBuilder<any>
     fromDateField: Columns
     toDateField?: Columns
-    unitField?: Columns
     recordQueryConfig?: {
         query: MaxItemQuery
         idField: MaxItemColumns
         field: MaxItemColumns | RawBuilder<any>
-        fromDateField: Columns
-        toDateField?: Columns
+        fromDateField: MaxItemColumns
+        toDateField?: MaxItemColumns
         jsonObject?: boolean
     }
     from?: string | null
@@ -60,7 +58,6 @@ export function getStatisticsAggregateQuery<
     field,
     fromDateField,
     toDateField,
-    unitField,
     recordQueryConfig,
     from,
     to
@@ -106,7 +103,6 @@ export function getStatisticsAggregateQuery<
     .$if(!!dbTo, (qb) => qb.where(sql.ref(toDateField ?? fromDateField), "<=", dbTo));
 
     return query
-    .$if(!!unitField, (q) => q.select(sql.ref(unitField!).as("unit")))
     .select((eb) => [
         recordExpression(eb, false).as("current_max_record"),
         recordExpression(eb, false, false).as("current_min_record"),

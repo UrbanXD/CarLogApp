@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import dayjs from "dayjs";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { BarChartView } from "../charts/BarChartView.tsx";
-import { ComparisonStatByDate, ComparisonStatByType, StatisticsFunctionArgs } from "../../model/dao/statisticsDao.ts";
+import { StatisticsFunctionArgs } from "../../model/dao/statisticsDao.ts";
 import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../../constants";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,9 @@ import { formatTrend } from "../../utils/formatTrend.ts";
 import { MasonryStatView } from "../MasonryStatView.tsx";
 import { formatWithUnit } from "../../../../utils/formatWithUnit.ts";
 import { useWatchedQueryItem } from "../../../../database/hooks/useWatchedQueryItem.ts";
+import { useWatchedQueryCollection } from "../../../../database/hooks/useWatchedQueryCollection.ts";
+import { useCar } from "../../../car/hooks/useCar.ts";
+import { getRangeUnit } from "../../utils/getRangeUnit.ts";
 
 type ExpenseStatisticsProps = {
     carId?: string | null
@@ -21,7 +24,9 @@ type ExpenseStatisticsProps = {
 
 export function ExpenseStatistics({ carId, from, to }: ExpenseStatisticsProps) {
     const { t } = useTranslation();
-    const { statisticsDao, expenseDao } = useDatabase();
+    const { expenseDao } = useDatabase();
+
+    const { car } = useCar({ carId });
 
     const memoizedStatArgs: StatisticsFunctionArgs = useMemo(() => ({
         carId: carId,
@@ -29,35 +34,25 @@ export function ExpenseStatistics({ carId, from, to }: ExpenseStatisticsProps) {
         to
     }), [carId, from, to]);
 
-    const memoizedQuery = useMemo(
+    const memoizedSummaryQuery = useMemo(
         () => expenseDao.summaryStatisticsWatchedQueryItem(memoizedStatArgs),
         [expenseDao, memoizedStatArgs]
     );
-    const { data: summary, isLoading } = useWatchedQueryItem(memoizedQuery);
+    const { data: summary, isLoading: isSummaryLoading } = useWatchedQueryItem(memoizedSummaryQuery);
 
-    const [expensesByDateWindow, setExpensesByDateWindow] = useState<ComparisonStatByDate | null>(null);
-    const [expensesByType, setExpensesByType] = useState<ComparisonStatByType | null>(null);
+    const memoizedTypeComparisonQuery = useMemo(
+        () => expenseDao.typeComparisonStatisticsWatchedQueryCollection(memoizedStatArgs),
+        [expenseDao, memoizedStatArgs]
+    );
+    const { data: typeComparison, isLoading: isTypeComparisonLoading } = useWatchedQueryCollection(
+        memoizedTypeComparisonQuery);
 
-    useEffect(() => {
-        (async () => {
-            const statArgs = {
-                carId: carId,
-                from,
-                to
-            };
-
-            const [
-                resultExpensesByDateWindow,
-                resultExpensesByType
-            ] = await Promise.all([
-                statisticsDao.getExpenseComparison(statArgs),
-                statisticsDao.getExpenseComparisonByType(statArgs)
-            ]);
-
-            setExpensesByDateWindow(resultExpensesByDateWindow);
-            setExpensesByType(resultExpensesByType);
-        })();
-    }, [carId, from, to]);
+    const memoizedGroupedExpensesByRangeQuery = useMemo(
+        () => expenseDao.groupedExpensesByRangeStatisticsWatchedQueryCollection(memoizedStatArgs),
+        [expenseDao, memoizedStatArgs]
+    );
+    const { data: groupedExpensesByRange, isLoading: isGroupedExpensesByRangeLoading } = useWatchedQueryCollection(
+        memoizedGroupedExpensesByRangeQuery);
 
     const getCountOfExpenses = useCallback(() => {
         const { trend, trendSymbol } = summary?.totalTrend ?? {};
@@ -68,60 +63,60 @@ export function ExpenseStatistics({ carId, from, to }: ExpenseStatisticsProps) {
             isPositive: summary?.countTrend?.isTrendPositive,
             trend: formatTrend({ trend: trend, trendSymbol: trendSymbol }),
             trendDescription: t("statistics.compared_to_previous_cycle"),
-            isLoading: isLoading
+            isLoading: isSummaryLoading
         };
-    }, [summary, t]);
+    }, [summary, isSummaryLoading, t]);
 
     const getTotalExpenseAmount = useCallback(() => {
         return {
             label: t("statistics.expense.total_amount"),
-            value: summary ? formatWithUnit(summary.total, summary?.unitText) : null,
+            value: summary ? formatWithUnit(summary.total, car?.currency.symbol) : null,
             isPositive: summary?.totalTrend.isTrendPositive,
             trend: summary
                    ? `${ summary.totalTrend.trendSymbol } ${ summary.totalTrend.trend }`
                    : null,
             trendDescription: summary ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: isLoading
+            isLoading: isSummaryLoading
         };
-    }, [summary, t]);
+    }, [summary, isSummaryLoading, car?.currency, t]);
 
 
     const getAverageExpenseAmount = useCallback(() => {
         return {
             label: t("statistics.expense.avg_amount"),
-            value: summary ? formatWithUnit(summary.average, summary?.unitText) : null,
+            value: summary ? formatWithUnit(summary.average, car?.currency.symbol) : null,
             isPositive: summary?.averageTrend.isTrendPositive,
             trend: summary
                    ? `${ summary.averageTrend.trendSymbol } ${ summary.averageTrend.trend }`
                    : null,
             trendDescription: summary ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: isLoading
+            isLoading: isSummaryLoading
         };
-    }, [summary, t]);
+    }, [summary, isSummaryLoading, car?.currency, t]);
 
 
     const getMedianExpenseAmount = useCallback(() => {
         return {
             label: t("statistics.expense.median_amount"),
-            value: summary ? formatWithUnit(summary.median, summary?.unitText) : null,
+            value: summary ? formatWithUnit(summary.median, car?.currency.symbol) : null,
             isPositive: summary?.medianTrend.isTrendPositive,
             trend: summary
                    ? `${ summary.medianTrend.trendSymbol } ${ summary.medianTrend.trend }`
                    : null,
             trendDescription: summary ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: isLoading
+            isLoading: isSummaryLoading
         };
-    }, [summary, t]);
+    }, [summary, isSummaryLoading, car?.currency, t]);
 
     const getMaxExpense = useCallback(() => {
         return {
             label: t("statistics.expense.max_amount"),
-            value: summary?.max?.value != null ? formatWithUnit(summary.max.value, summary?.unitText) : null,
+            value: summary?.max?.value != null ? formatWithUnit(summary.max.value, car?.currency.symbol) : null,
             description: summary?.max?.label != null ? t(`expenses.types.${ summary.max.label }`) : null,
             descriptionStyle: summary?.max?.color != null ? { color: summary.max.color } : undefined,
-            isLoading: isLoading
+            isLoading: isSummaryLoading
         };
-    }, [summary, t]);
+    }, [summary, isSummaryLoading, car?.currency.symbol, t]);
 
     return (
         <View style={ styles.container }>
@@ -146,29 +141,29 @@ export function ExpenseStatistics({ carId, from, to }: ExpenseStatisticsProps) {
                 title={ {
                     title: t("statistics.expense.total_amount_by_date.title")
                 } }
-                chartData={ expensesByDateWindow?.barChartData }
-                legend={ expensesByDateWindow?.legend }
+                chartData={ groupedExpensesByRange?.chartData }
+                legend={ groupedExpensesByRange?.legend }
                 yAxisTitle={ t(
                     "statistics.expense.total_amount_by_date.y_axis",
-                    { unit: expensesByDateWindow?.unitText }
+                    { unit: car?.currency.symbol }
                 ) }
-                formatValue={ (value) => formatWithUnit(value, expensesByDateWindow?.unitText) }
+                formatValue={ (value) => formatWithUnit(value, car?.currency.symbol) }
                 formatLabel={ (label) => dayjs(label)
-                .format(getDateFormatTemplateByRangeUnit(expensesByDateWindow?.rangeUnit)) }
+                .format(getDateFormatTemplateByRangeUnit(getRangeUnit(from, to))) }
                 formatLegend={ (label) => t(`expenses.types.${ label }`) }
-                isLoading={ !expensesByDateWindow }
+                isLoading={ isGroupedExpensesByRangeLoading }
             />
             <DonutChartView
                 title={ {
                     title: t("statistics.expense.distribution_by_type")
                 } }
-                chartData={ expensesByType?.donutChartData }
-                legend={ expensesByType?.legend }
+                chartData={ typeComparison?.chartData }
+                legend={ typeComparison?.legend }
                 formatLabel={ (label) => t(`expenses.types.${ label }`) }
-                formatDescription={ (description) => formatWithUnit(description, expensesByType?.unitText) }
+                formatDescription={ (description) => formatWithUnit(description, car?.currency.symbol) }
                 formatLegend={ (label) => t(`expenses.types.${ label }`) }
                 legendPosition="right"
-                isLoading={ !expensesByType }
+                isLoading={ isTypeComparisonLoading }
             />
         </View>
     );

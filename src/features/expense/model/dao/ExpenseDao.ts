@@ -17,16 +17,26 @@ import { UseWatchedQueryItemProps } from "../../../../database/hooks/useWatchedQ
 import { MODEL_TABLE } from "../../../../database/connector/powersync/tables/model.ts";
 import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";
 import { UseWatchedQueryCollectionProps } from "../../../../database/hooks/useWatchedQueryCollection.ts";
-import { UseInfiniteQueryOptions } from "../../../../database/hooks/useInfiniteQuery.ts";
-import { StatisticsFunctionArgs } from "../../../statistics/model/dao/statisticsDao.ts";
+import { ExtractRowFromQuery, UseInfiniteQueryOptions } from "../../../../database/hooks/useInfiniteQuery.ts";
 import { ExpenseTypeEnum } from "../enums/ExpenseTypeEnum.ts";
 import {
     getStatisticsAggregateQuery,
     StatisticsAggregateQueryResult
 } from "../../../../database/dao/utils/getStatisticsAggregateQuery.ts";
-import { SummaryStatistics } from "../../../../database/dao/types/statistis.ts";
+import {
+    BarChartStatistics,
+    DonutChartStatistics,
+    StatisticsFunctionArgs,
+    SummaryStatistics
+} from "../../../../database/dao/types/statistis.ts";
 import { formatSummaryStatistics } from "../../../../database/dao/utils/formatSummaryStatistics.ts";
+import { sql } from "kysely";
+import { formatDateToDatabaseFormat } from "../../../statistics/utils/formatDateToDatabaseFormat.ts";
+import { getRangeUnit } from "../../../statistics/utils/getRangeUnit.ts";
+import { getRangeExpression } from "../../../../database/dao/utils/getRangeExpression.ts";
 
+export type ExpenseTypeComparisonTableRow = ExtractRowFromQuery<ReturnType<ExpenseDao["typeComparisonQuery"]>>;
+export type GroupedExpensesByRangTableRow = ExtractRowFromQuery<ReturnType<ExpenseDao["groupedExpensesByRangeQuery"]>>;
 export type ExpenseRecordTableRow = {
     amount: number | null
     owner_id: string | null
@@ -104,9 +114,7 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
 
         let mainQuery = this.db
         .selectFrom(`${ EXPENSE_TABLE } as e` as const)
-        .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "e.type_id", "et.id")
-        .innerJoin(`${ CAR_TABLE } as c` as const, "c.id", "e.car_id")
-        .innerJoin(`${ CURRENCY_TABLE } as curr` as const, "c.currency_id", "curr.id");
+        .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "e.type_id", "et.id");
 
         let subQuery = this.db
         .selectFrom(`${ EXPENSE_TABLE } as ie` as const)
@@ -126,7 +134,6 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
             baseQuery: mainQuery,
             idField: "e.id",
             field: "e.amount",
-            unitField: "curr.symbol",
             fromDateField: "e.date",
             recordQueryConfig: {
                 query: subQuery,
@@ -138,6 +145,58 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
             from: from,
             to: to
         });
+
+        return query;
+    }
+
+    typeComparisonQuery({
+        carId,
+        from,
+        to
+    }: StatisticsFunctionArgs) {
+        return this.db
+        .selectFrom(`${ EXPENSE_TABLE } as e` as const)
+        .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "e.type_id", "et.id")
+        .select([
+            //@formatter:off
+            sql<number>`SUM(e.amount)`.as("total"),
+            sql<number>`SUM(e.amount) * 100.0 / SUM(SUM(e.amount)) OVER ()`.as("percent"),
+            "et.id as type_id",
+            "et.owner_id",
+            "et.key"
+            //@formatter:on
+        ])
+        .$if(!!carId, (qb) => qb.where("e.car_id", "=", carId!))
+        .where("e.date", ">=", formatDateToDatabaseFormat(from))
+        .where("e.date", "<=", formatDateToDatabaseFormat(to))
+        .groupBy("e.type_id")
+        .orderBy("total", "desc");
+    }
+
+    groupedExpensesByRangeQuery({
+        carId,
+        from,
+        to
+    }: StatisticsFunctionArgs) {
+        const rangeUnit = getRangeUnit(from, to);
+
+        const baseQuery = this.db
+        .selectFrom(`${ EXPENSE_TABLE } as e` as const)
+        .select((eb) => [
+            eb.fn.sum("e.amount").as("total"),
+            "e.type_id"
+        ])
+        .$if(!!carId, (qb) => qb.where("e.car_id", "=", carId!))
+        .where("e.date", ">=", formatDateToDatabaseFormat(from))
+        .where("e.date", "<=", formatDateToDatabaseFormat(to))
+        .groupBy("e.type_id");
+
+        const rangeExpression = getRangeExpression<typeof baseQuery>("e.date", rangeUnit);
+
+        const query = baseQuery
+        .select(rangeExpression.as("time"))
+        .groupBy(rangeExpression)
+        .orderBy(rangeExpression);
 
         return query;
     }
@@ -156,7 +215,7 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
     latestExpenseWatchedQueryCollection(
         carId: string | null | undefined,
         options?: WatchQueryOptions<SelectExpenseTableRow>
-    ): UseWatchedQueryCollectionProps<Expense, SelectExpenseTableRow> {
+    ): UseWatchedQueryCollectionProps<Array<Expense>, SelectExpenseTableRow> {
         const query = this.selectQuery()
         .whereRef("expense.car_id", "=", carId as any)
         .orderBy("expense.date", "desc")
@@ -181,6 +240,20 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
             options: {
                 jsonFields: ["current_max_record", "current_min_record", "previous_max_record", "previous_min_record"]
             }
+        };
+    }
+
+    typeComparisonStatisticsWatchedQueryCollection(props: StatisticsFunctionArgs): UseWatchedQueryCollectionProps<DonutChartStatistics, ExpenseTypeComparisonTableRow> {
+        return {
+            query: this.typeComparisonQuery(props),
+            mapper: this.mapper.typeComparisonToDonutChartStatistics.bind(this.mapper)
+        };
+    }
+
+    groupedExpensesByRangeStatisticsWatchedQueryCollection(props: StatisticsFunctionArgs): UseWatchedQueryCollectionProps<BarChartStatistics, GroupedExpensesByRangTableRow> {
+        return {
+            query: this.groupedExpensesByRangeQuery(props),
+            mapper: this.mapper.groupedExpensesByRangeToBarChartStatistics.bind(this.mapper)
         };
     }
 

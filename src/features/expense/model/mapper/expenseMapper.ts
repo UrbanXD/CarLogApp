@@ -13,8 +13,14 @@ import { amountSchema } from "../../../_shared/currency/schemas/amountSchema.ts"
 import { WithPrefix } from "../../../../types";
 import { SelectCarModelTableRow } from "../../../car/model/dao/CarDao.ts";
 import { carSimpleSchema } from "../../../car/schemas/carSchema.ts";
-import { Stat } from "../../../../database/dao/types/statistis.ts";
-import { ExpenseRecordTableRow } from "../dao/ExpenseDao.ts";
+import { BarChartStatistics, DonutChartStatistics, Stat } from "../../../../database/dao/types/statistis.ts";
+import {
+    ExpenseRecordTableRow,
+    ExpenseTypeComparisonTableRow,
+    GroupedExpensesByRangTableRow
+} from "../dao/ExpenseDao.ts";
+import { LegendType } from "../../../statistics/components/charts/common/Legend.tsx";
+import { BarChartItem } from "../../../statistics/components/charts/BarChartView.tsx";
 
 export type SelectAmountCurrencyTableRow =
     WithPrefix<CurrencyTableRow, "currency">
@@ -113,6 +119,82 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, Sele
             value: numberToFractionDigit(entity.amount ?? 0),
             label: type.key,
             color: type.primaryColor
+        };
+    }
+
+    typeComparisonToDonutChartStatistics(entities: Array<ExpenseTypeComparisonTableRow>): DonutChartStatistics {
+        const legend: LegendType = {};
+
+        return {
+            chartData: entities.map((entity, index) => {
+                if(!legend?.[entity.type_id]) {
+                    const type = this.expenseTypeDao.mapper.toDto({
+                        id: entity.type_id,
+                        owner_id: entity.owner_id,
+                        key: entity.key
+                    });
+
+                    legend[type.id] = { label: type.key, color: type.primaryColor };
+                }
+
+                return {
+                    value: numberToFractionDigit(entity.percent ?? 0),
+                    label: legend[entity.type_id].label,
+                    description: numberToFractionDigit(entity.total ?? 0).toString(),
+                    color: legend[entity.type_id].color,
+                    focused: index === 0
+                };
+            }),
+            legend
+        };
+    }
+
+    async groupedExpensesByRangeToBarChartStatistics(entities: Array<GroupedExpensesByRangTableRow>): Promise<BarChartStatistics> {
+        const expenseTypes = await this.expenseTypeDao.getAll();
+        const typeIds = expenseTypes.map((t) => t.id);
+
+        const chartData: Array<BarChartItem> = [];
+        const groupedData: { [time: string]: { [typeId: string]: number } } = {};
+
+        entities.forEach((entity) => {
+            const time = entity.time;
+            const typeId = entity.type_id;
+            const total = Number(entity.total); // SQL sum gyakran stringként jön vissza
+
+            if(!groupedData[time]) groupedData[time] = {};
+            if(typeId) {
+                groupedData[time][typeId] = total;
+            }
+        });
+
+        for(const time in groupedData) {
+            if(Object.prototype.hasOwnProperty.call(groupedData, time)) {
+                const dailyData = groupedData[time];
+
+                const valueArray = typeIds.map(typeId => {
+                    const value = dailyData[typeId] ?? 0;
+                    return numberToFractionDigit(value);
+                });
+
+                chartData.push({
+                    label: time,
+                    value: valueArray,
+                    type: typeIds
+                });
+            }
+        }
+
+        const legend: LegendType = {};
+        expenseTypes.forEach((t) => {
+            legend[t.id] = {
+                label: t.key,
+                color: t.primaryColor
+            };
+        });
+
+        return {
+            chartData: chartData.sort((a, b) => new Date(a.label).getTime() - new Date(b.label).getTime()),
+            legend
         };
     }
 
