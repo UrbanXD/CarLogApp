@@ -246,7 +246,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
         carId: string | null | undefined,
         startTime: DateType,
         options?: WatchQueryOptions
-    ): UseWatchedQueryCollectionProps<RideLog, SelectRideLogTableRow> {
+    ): UseWatchedQueryCollectionProps<Array<RideLog>, SelectRideLogTableRow> {
         const query = this.selectQuery()
         .whereRef("rl.car_id", "=", carId as any)
         .where("rl.start_time", ">=", formatDateToDatabaseFormat(startTime) as any)

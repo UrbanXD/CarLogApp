@@ -148,7 +148,7 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper, SelectCarTableRow> 
         return query;
     }
 
-    carWatchedQueryCollection(options?: WatchQueryOptions): UseWatchedQueryCollectionProps<Car> {
+    carWatchedQueryCollection(options?: WatchQueryOptions): UseWatchedQueryCollectionProps<Array<Car>> {
         return {
             query: this.selectQuery(),
             mapper: this.mapper.toDtoArray.bind(this.mapper),

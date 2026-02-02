@@ -6,12 +6,12 @@ import { useDatabase } from "../../contexts/database/DatabaseContext.ts";
 
 export type UseWatchedQueryCollectionProps<Dto, WatchEntity = any> = {
     query: SelectQueryBuilder<DatabaseType, any, WatchEntity>,
-    mapper?: (watchEntity: Array<WatchEntity>) => Array<Dto> | Promise<Array<Dto>>,
+    mapper?: (watchEntity: Array<WatchEntity>) => Dto | Promise<Dto>,
     options?: WatchQueryOptions<WatchEntity>
 }
 
 type UseWatchedCollectionResult<Dto> = {
-    data: Array<Dto>
+    data: Dto | null
     isLoading: boolean
 }
 
@@ -25,14 +25,14 @@ export function useWatchedQueryCollection<Dto, WatchEntity = any>(props: UseWatc
     } = props ?? {};
 
 
-    const [data, setData] = useState<Array<Dto>>([]);
+    const [data, setData] = useState<Dto | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         let active = true;
 
         if(!query) {
-            setData([]);
+            setData(null);
             setIsLoading(false);
             return;
         }
@@ -46,7 +46,7 @@ export function useWatchedQueryCollection<Dto, WatchEntity = any>(props: UseWatc
                 if(!active) return;
 
                 try {
-                    setData(mapper ? await mapper(result) : result as unknown as Array<Dto>);
+                    setData(mapper ? await mapper(result) : result as unknown as Dto);
                 } catch(e) {
                     console.log("useWatchedQueryCollection error: ", e);
                 } finally {
@@ -56,7 +56,7 @@ export function useWatchedQueryCollection<Dto, WatchEntity = any>(props: UseWatc
             onError: () => {
                 if(!active) return;
 
-                setData([]);
+                setData(null);
                 setIsLoading(false);
             },
             options

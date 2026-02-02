@@ -62,7 +62,7 @@ export function LatestExpenses({ carId }: LatestExpenseProps) {
                 ?
                 <MoreDataLoading/>
                 :
-                expenses.length > 0
+                expenses && expenses.length > 0
                 ? <View>{ expenses.map(renderExpense) }</View>
                 : renderEmptyComponent()
             }

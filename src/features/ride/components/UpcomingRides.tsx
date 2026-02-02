@@ -70,7 +70,7 @@ export function UpcomingRides({ carId }: UpcomingRidesProps) {
                 ?
                 <MoreDataLoading/>
                 :
-                upcomingRides.length > 0
+                upcomingRides && upcomingRides?.length > 0
                 ? <View>{ upcomingRides.map(renderRideLog) }</View>
                 : renderEmptyComponent()
             }

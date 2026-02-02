@@ -73,7 +73,6 @@ export type ExtractColumnsFromQuery<QueryBuilder> = QueryBuilder extends SelectQ
                                                                                           : never;
                                                     }[Tables & keyof Schema]
                                                         | Extract<keyof ExtractRowFromQuery<QueryBuilder>, string>
-                                                        | (string & {})
                                                     : never;
 
 export type UseInfiniteQueryOptions<

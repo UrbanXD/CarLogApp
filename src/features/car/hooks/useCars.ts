@@ -21,9 +21,9 @@ function useCars<Mapped = Car>(options?: WatchQueryOptions & { extraMapper?: (ca
 
     const cars = useMemo(() => {
         if(mapperRef.current) {
-            return mapperRef.current(rawCars);
+            return mapperRef.current(rawCars ?? []);
         }
-        return rawCars as unknown as Array<Mapped>;
+        return (rawCars ?? []) as unknown as Array<Mapped>;
     }, [rawCars]);
 
     return { cars, isLoading };
