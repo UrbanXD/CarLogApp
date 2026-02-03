@@ -1,6 +1,6 @@
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
-import React, { useCallback, useEffect, useState } from "react";
-import { ComparisonStatByDate, SummaryStat, TrendStat } from "../../model/dao/statisticsDao.ts";
+import React, { useCallback, useMemo } from "react";
+import { StatisticsFunctionArgs } from "../../model/dao/statisticsDao.ts";
 import { LineChartView } from "../charts/LineChartView.tsx";
 import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../../constants";
@@ -12,6 +12,10 @@ import { StatCard } from "../StatCard.tsx";
 import { ChartTitle } from "../charts/common/ChartTitle.tsx";
 import { getDateFormatTemplateByRangeUnit } from "../../utils/getDateFormatTemplateByRangeUnit.ts";
 import { BarChartView } from "../charts/BarChartView.tsx";
+import { useWatchedQueryItem } from "../../../../database/hooks/useWatchedQueryItem.ts";
+import { useCar } from "../../../car/hooks/useCar.ts";
+import { useWatchedQueryCollection } from "../../../../database/hooks/useWatchedQueryCollection.ts";
+import { getRangeUnit } from "../../utils/getRangeUnit.ts";
 
 type FuelConsumptionStatisticsProps = {
     carId?: string | null
@@ -25,177 +29,208 @@ export function FuelStatistics({
     to
 }: FuelConsumptionStatisticsProps) {
     const { t } = useTranslation();
-    const { statisticsDao } = useDatabase();
+    const { fuelLogDao } = useDatabase();
 
-    const [fuelConsumption, setFuelConsumption] = useState<TrendStat | null>(null);
-    const [fuelLogSummary, setFuelLogSummary] = useState<{ quantity: SummaryStat, amount: SummaryStat } | null>(null);
-    const [fuelComparisonByDateWindow, setFuelComparisonByDateWindow] = useState<ComparisonStatByDate | null>(null);
-    const [fuelCostPerDistance, setFuelCostPerDistance] = useState<TrendStat | null>(null);
+    const { car } = useCar({ carId });
 
-    useEffect(() => {
-        (async () => {
-            const statArgs = {
-                carId: carId,
-                from,
-                to
-            };
+    const rangeUnit = useMemo(() => getRangeUnit(from, to), [from, to]);
+    const carCurrency = useMemo(() => car?.currency.symbol, [car?.currency]);
+    const carFuelUnit = useMemo(() => car?.fuelTank.unit.short, [car?.fuelTank]);
+    const carOdometerUnit = useMemo(() => car?.odometer.unit.short, [car?.odometer.unit]);
+    const fuelConsumptionUnit = useMemo(() => (
+        carFuelUnit && carOdometerUnit
+        ? `${ carFuelUnit } / 100 ${ carOdometerUnit }`
+        : null
+    ), [carFuelUnit, carOdometerUnit]);
+    const fuelCostPerDistanceUnit = useMemo(() => (
+        carCurrency && carOdometerUnit
+        ? `${ carCurrency } / 100 ${ carOdometerUnit }`
+        : null
+    ), [carCurrency, carOdometerUnit]);
 
-            const [
-                resultFuelLogSummary,
-                resultFuelConsumption,
-                resultFuelComparisonByDateWindow,
-                resultFuelCostPerDistance
-            ] = await Promise.all([
-                statisticsDao.getFuelSummary(statArgs),
-                statisticsDao.getFuelConsumption(statArgs),
-                statisticsDao.getFuelExpenseComparisonByDateWindow(statArgs),
-                statisticsDao.getFuelCostPerDistance(statArgs)
-            ]);
+    const memoizedStatArgs: StatisticsFunctionArgs = useMemo(() => ({
+        carId: carId,
+        from,
+        to
+    }), [carId, from, to]);
 
-            setFuelLogSummary(resultFuelLogSummary);
-            setFuelConsumption(resultFuelConsumption);
-            setFuelComparisonByDateWindow(resultFuelComparisonByDateWindow);
-            setFuelCostPerDistance(resultFuelCostPerDistance);
-        })();
-    }, [carId, from, to]);
+    const memoizedSummaryByAmountQuery = useMemo(
+        () => fuelLogDao.summaryStatisticsByAmountWatchedQueryItem(memoizedStatArgs),
+        [fuelLogDao, memoizedStatArgs]
+    );
+    const { data: summaryByAmount, isLoading: isSummaryByAmountLoading } = useWatchedQueryItem(
+        memoizedSummaryByAmountQuery);
+
+    const memoizedSummaryByQuantityQuery = useMemo(
+        () => fuelLogDao.summaryStatisticsByQuantityWatchedQueryItem(memoizedStatArgs),
+        [fuelLogDao, memoizedStatArgs]
+    );
+    const { data: summaryByQuantity, isLoading: isSummaryByQuantityLoading } = useWatchedQueryItem(
+        memoizedSummaryByQuantityQuery);
+
+    const memoizedExpensesByRangeQuery = useMemo(
+        () => fuelLogDao.expensesByRangeStatisticsWatchedQueryCollection(memoizedStatArgs),
+        [fuelLogDao, memoizedStatArgs]
+    );
+    const { data: expensesByRange, isLoading: isExpensesByRangeLoading } = useWatchedQueryCollection(
+        memoizedExpensesByRangeQuery);
+
+    const memoizedFuelConsumptionQuery = useMemo(
+        () => fuelLogDao.fuelConsumptionStatisticsWatchedQueryCollection(memoizedStatArgs),
+        [fuelLogDao, memoizedStatArgs]
+    );
+    const { data: fuelConsumption, isLoading: isFuelConsumptionLoading } = useWatchedQueryCollection(
+        memoizedFuelConsumptionQuery);
+
+    const memoizedFuelCostPerDistanceQuery = useMemo(
+        () => fuelLogDao.fuelCostPerDistanceStatisticsWatchedQueryCollection(memoizedStatArgs),
+        [fuelLogDao, memoizedStatArgs]
+    );
+    const { data: fuelCostPerDistance, isLoading: isFuelCostPerDistanceLoading } = useWatchedQueryCollection(
+        memoizedFuelCostPerDistanceQuery);
 
     const getFuelCount = useCallback(() => {
         return {
             label: t("statistics.fuel.log_count"),
-            value: fuelLogSummary != null ? `${ fuelLogSummary.quantity.count } ${ t("common.count") }` : null,
-            isLoading: !fuelLogSummary
+            value: summaryByQuantity != null ? `${ summaryByQuantity?.count } ${ t("common.count") }` : null,
+            isPositive: summaryByQuantity?.countTrend?.isTrendPositive,
+            trend: summaryByQuantity != null
+                   ? `${ summaryByQuantity.countTrend?.trendSymbol } ${ summaryByQuantity.countTrend?.trend }`
+                   : null,
+            trendDescription: summaryByQuantity != null ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: !summaryByQuantity
         };
-    }, [fuelLogSummary, t]);
+    }, [summaryByQuantity, t]);
 
     const getFuelTotalQuantity = useCallback(() => {
         return {
             label: t("statistics.fuel.total_quantity"),
-            value: fuelLogSummary != null
-                   ? formatWithUnit(fuelLogSummary.quantity.total, fuelLogSummary.quantity?.unitText)
+            value: summaryByQuantity != null
+                   ? formatWithUnit(summaryByQuantity.total, carFuelUnit)
                    : null,
-            isPositive: fuelLogSummary?.quantity?.totalTrend?.isTrendPositive,
-            trend: fuelLogSummary != null && fuelLogSummary?.quantity
-                   ? `${ fuelLogSummary.quantity.totalTrend.trendSymbol } ${ formatWithUnit(
-                    fuelLogSummary.quantity.totalTrend.trend,
-                    fuelLogSummary.quantity?.unitText
+            isPositive: summaryByQuantity?.totalTrend?.isTrendPositive,
+            trend: summaryByQuantity != null
+                   ? `${ summaryByQuantity.totalTrend.trendSymbol } ${ formatWithUnit(
+                    summaryByQuantity.totalTrend.trend,
+                    carFuelUnit
                 ) }`
                    : null,
-            trendDescription: fuelLogSummary != null ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !fuelLogSummary
+            trendDescription: summaryByQuantity != null ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isSummaryByQuantityLoading
         };
-    }, [fuelLogSummary, t]);
+    }, [summaryByQuantity, isSummaryByQuantityLoading, carFuelUnit, t]);
 
     const getFuelAverageQuantity = useCallback(() => {
         return {
             label: t("statistics.fuel.avg_quantity"),
-            value: fuelLogSummary != null
-                   ? formatWithUnit(fuelLogSummary.quantity.average, fuelLogSummary.quantity?.unitText)
+            value: summaryByQuantity != null
+                   ? formatWithUnit(summaryByQuantity.average, carFuelUnit)
                    : null,
-            isPositive: fuelLogSummary?.quantity?.averageTrend?.isTrendPositive,
-            trend: fuelLogSummary != null
-                   ? `${ fuelLogSummary.quantity.averageTrend.trendSymbol } ${ formatWithUnit(
-                    fuelLogSummary.quantity.averageTrend.trend,
-                    fuelLogSummary.quantity?.unitText
+            isPositive: summaryByQuantity?.averageTrend?.isTrendPositive,
+            trend: summaryByQuantity != null
+                   ? `${ summaryByQuantity.averageTrend.trendSymbol } ${ formatWithUnit(
+                    summaryByQuantity.averageTrend.trend,
+                    carFuelUnit
                 ) }`
                    : null,
-            trendDescription: fuelLogSummary != null ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !fuelLogSummary
+            trendDescription: summaryByQuantity != null ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isSummaryByQuantityLoading
         };
-    }, [fuelLogSummary, t]);
+    }, [summaryByQuantity, isSummaryByQuantityLoading, carFuelUnit, t]);
 
     const getFuelMedianQuantity = useCallback(() => {
         return {
             label: t("statistics.fuel.median_quantity"),
-            value: fuelLogSummary != null
-                   ? formatWithUnit(fuelLogSummary.quantity.median, fuelLogSummary.quantity?.unitText)
+            value: summaryByQuantity != null
+                   ? formatWithUnit(summaryByQuantity.median, carFuelUnit)
                    : null,
-            isPositive: fuelLogSummary?.quantity?.medianTrend?.isTrendPositive,
-            trend: fuelLogSummary != null
-                   ? `${ fuelLogSummary.quantity.medianTrend.trendSymbol } ${ formatWithUnit(
-                    fuelLogSummary.quantity.medianTrend.trend,
-                    fuelLogSummary.quantity?.unitText
+            isPositive: summaryByQuantity?.medianTrend?.isTrendPositive,
+            trend: summaryByQuantity != null
+                   ? `${ summaryByQuantity.medianTrend.trendSymbol } ${ formatWithUnit(
+                    summaryByQuantity.medianTrend.trend,
+                    carFuelUnit
                 ) }`
                    : null,
-            trendDescription: fuelLogSummary != null ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !fuelLogSummary
+            trendDescription: summaryByQuantity != null ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isSummaryByQuantityLoading
         };
-    }, [fuelLogSummary, t]);
+    }, [summaryByQuantity, isSummaryByQuantityLoading, carFuelUnit, t]);
 
     const getFuelMaxQuantity = useCallback(() => {
         return {
             label: t("statistics.fuel.max_quantity"),
-            value: fuelLogSummary?.quantity?.max ? formatWithUnit(
-                fuelLogSummary.quantity.max.value,
-                fuelLogSummary.quantity?.unitText
+            value: summaryByQuantity?.max ? formatWithUnit(
+                summaryByQuantity.max.value,
+                carFuelUnit
             ) : null,
-            isLoading: !fuelLogSummary
+            isLoading: isSummaryByQuantityLoading
         };
-    }, [fuelLogSummary, t]);
+    }, [summaryByQuantity, isSummaryByQuantityLoading, carFuelUnit, t]);
 
     const getFuelTotalAmount = useCallback(() => {
         return {
             label: t("statistics.fuel.total_amount"),
-            value: fuelLogSummary != null
-                   ? formatWithUnit(fuelLogSummary.amount.total, fuelLogSummary.amount?.unitText)
+            value: summaryByAmount != null
+                   ? formatWithUnit(summaryByAmount.total, carCurrency)
                    : null,
-            isPositive: fuelLogSummary?.amount?.totalTrend?.isTrendPositive,
-            trend: fuelLogSummary != null
-                   ? `${ fuelLogSummary.amount.totalTrend.trendSymbol } ${ formatWithUnit(
-                    fuelLogSummary.amount.totalTrend.trend,
-                    fuelLogSummary.amount?.unitText
+            isPositive: summaryByAmount?.totalTrend?.isTrendPositive,
+            trend: summaryByAmount != null
+                   ? `${ summaryByAmount.totalTrend.trendSymbol } ${ formatWithUnit(
+                    summaryByAmount.totalTrend.trend,
+                    carCurrency
                 ) }`
                    : null,
-            trendDescription: fuelLogSummary != null ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !fuelLogSummary
+            trendDescription: summaryByAmount != null ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isSummaryByAmountLoading
         };
-    }, [fuelLogSummary, t]);
+    }, [summaryByAmount, isSummaryByAmountLoading, carCurrency, t]);
 
     const getFuelAverageAmount = useCallback(() => {
         return {
             label: t("statistics.fuel.avg_amount"),
-            value: fuelLogSummary != null
-                   ? formatWithUnit(fuelLogSummary.amount.average, fuelLogSummary.amount?.unitText)
+            value: summaryByAmount != null
+                   ? formatWithUnit(summaryByAmount.average, carCurrency)
                    : null,
-            isPositive: fuelLogSummary?.amount?.averageTrend?.isTrendPositive,
-            trend: fuelLogSummary != null
-                   ? `${ fuelLogSummary.amount.averageTrend.trendSymbol } ${ formatWithUnit(
-                    fuelLogSummary.amount.averageTrend.trend,
-                    fuelLogSummary.amount?.unitText
+            isPositive: summaryByAmount?.averageTrend?.isTrendPositive,
+            trend: summaryByAmount != null
+                   ? `${ summaryByAmount.averageTrend.trendSymbol } ${ formatWithUnit(
+                    summaryByAmount.averageTrend.trend,
+                    carCurrency
                 ) }`
                    : null,
-            trendDescription: fuelLogSummary != null ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !fuelLogSummary
+            trendDescription: summaryByAmount != null ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isSummaryByAmountLoading
         };
-    }, [fuelLogSummary, t]);
+    }, [summaryByAmount, isSummaryByAmountLoading, carCurrency, t]);
 
     const getFuelMedianAmount = useCallback(() => {
         return {
             label: t("statistics.fuel.median_amount"),
-            value: fuelLogSummary != null
-                   ? formatWithUnit(fuelLogSummary.amount.median, fuelLogSummary.amount?.unitText)
+            value: summaryByAmount != null
+                   ? formatWithUnit(summaryByAmount.median, carCurrency)
                    : null,
-            isPositive: fuelLogSummary?.amount?.medianTrend?.isTrendPositive,
-            trend: fuelLogSummary != null
-                   ? `${ fuelLogSummary.amount.medianTrend.trendSymbol } ${ formatWithUnit(
-                    fuelLogSummary.amount.medianTrend.trend,
-                    fuelLogSummary.amount?.unitText
+            isPositive: summaryByAmount?.medianTrend?.isTrendPositive,
+            trend: summaryByAmount != null
+                   ? `${ summaryByAmount?.medianTrend.trendSymbol } ${ formatWithUnit(
+                    summaryByAmount.medianTrend.trend,
+                    carCurrency
                 ) }`
                    : null,
-            trendDescription: fuelLogSummary != null ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !fuelLogSummary
+            trendDescription: summaryByAmount != null ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isSummaryByAmountLoading
         };
-    }, [fuelLogSummary, t]);
+    }, [summaryByAmount, isSummaryByAmountLoading, carCurrency, t]);
 
     const getFuelMaxAmount = useCallback(() => {
         return {
             label: t("statistics.fuel.max_amount"),
-            value: fuelLogSummary?.amount?.max ? formatWithUnit(
-                fuelLogSummary.amount.max.value,
-                fuelLogSummary.amount?.unitText
+            value: summaryByAmount?.max ? formatWithUnit(
+                summaryByAmount.max.value,
+                carCurrency
             ) : null,
-            isLoading: !fuelLogSummary
+            isLoading: isSummaryByAmountLoading
         };
-    }, [fuelLogSummary, t]);
+    }, [summaryByAmount, isSummaryByAmountLoading, carCurrency, t]);
 
     return (
         <View style={ styles.container }>
@@ -225,49 +260,49 @@ export function FuelStatistics({
                 />
             </View>
             <BarChartView
-                chartData={ fuelComparisonByDateWindow?.barChartData }
-                legend={ fuelComparisonByDateWindow?.legend }
+                chartData={ expensesByRange?.chartData }
+                legend={ expensesByRange?.legend }
                 title={ {
                     title: t("statistics.fuel.total_amount_by_date.title")
                 } }
                 yAxisTitle={ t(
                     "statistics.fuel.total_amount_by_date.y_axis",
-                    { unit: fuelComparisonByDateWindow?.unitText }
+                    { unit: carCurrency }
                 ) }
-                formatValue={ (value) => formatWithUnit(value, fuelComparisonByDateWindow?.unitText) }
+                formatValue={ (value) => formatWithUnit(value, carCurrency) }
                 formatLabel={ (label) => dayjs(label)
-                .format(getDateFormatTemplateByRangeUnit(fuelComparisonByDateWindow?.rangeUnit)) }
+                .format(getDateFormatTemplateByRangeUnit(rangeUnit)) }
                 formatLegend={ (label) => t(`expenses.types.${ label }`) }
                 showsLegend={ false }
-                isLoading={ !fuelComparisonByDateWindow }
+                isLoading={ isExpensesByRangeLoading }
             />
             <LineChartView
                 title={ {
                     title: t("statistics.fuel.consumption.title"),
-                    description: fuelConsumption && fuelConsumption.lineChartData.length > 0
+                    description: fuelConsumption && fuelConsumption.chartData.length > 0
                                  ? t("statistics.fuel.accuracy")
                                  : undefined
                 } }
-                yAxisTitle={ t("statistics.fuel.consumption.y_axis", { unit: fuelConsumption?.unitText }) }
-                chartData={ fuelConsumption?.lineChartData }
-                formatValue={ (value) => formatWithUnit(value, fuelConsumption?.unitText) }
+                yAxisTitle={ t("statistics.fuel.consumption.y_axis", { unit: fuelConsumptionUnit }) }
+                chartData={ fuelConsumption?.chartData }
+                formatValue={ (value) => formatWithUnit(value, fuelConsumptionUnit) }
                 formatLabel={ (label) => dayjs(label).format("L") }
-                isLoading={ !fuelConsumption }
+                isLoading={ isFuelConsumptionLoading }
             />
             <LineChartView
                 title={ {
                     title: t("statistics.fuel.cost_per_distance.title"),
-                    description: fuelCostPerDistance && fuelCostPerDistance.lineChartData.length > 0
+                    description: fuelCostPerDistance && fuelCostPerDistance.chartData.length > 0
                                  ? t("statistics.fuel.accuracy")
                                  : undefined
                 } }
-                yAxisTitle={ t("statistics.fuel.cost_per_distance.y_axis", { unit: fuelCostPerDistance?.unitText }) }
-                chartData={ fuelCostPerDistance?.lineChartData }
-                formatValue={ (value) => formatWithUnit(value, fuelCostPerDistance?.unitText) }
+                yAxisTitle={ t("statistics.fuel.cost_per_distance.y_axis", { unit: fuelCostPerDistanceUnit }) }
+                chartData={ fuelCostPerDistance?.chartData }
+                formatValue={ (value) => formatWithUnit(value, fuelCostPerDistanceUnit) }
                 formatLabel={
-                    (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit(fuelCostPerDistance?.rangeUnit))
+                    (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit("day"))
                 }
-                isLoading={ !fuelCostPerDistance }
+                isLoading={ isFuelCostPerDistanceLoading }
             />
         </View>
     );

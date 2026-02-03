@@ -15,8 +15,10 @@ import { OdometerLogTypeEnum } from "../../../odometer/model/enums/odometerLogTy
 import { OdometerUnitDao } from "../../../odometer/model/dao/OdometerUnitDao.ts";
 import { ExpenseDao } from "../../../../../expense/model/dao/ExpenseDao.ts";
 import { numberToFractionDigit } from "../../../../../../utils/numberToFractionDigit.ts";
-import { SelectFuelLogTableRow } from "../dao/FuelLogDao.ts";
+import { FuelConsumptionResult, FuelCostPerDistanceResult, SelectFuelLogTableRow } from "../dao/FuelLogDao.ts";
 import { carSimpleSchema } from "../../../../schemas/carSchema.ts";
+import { LineChartStatistics } from "../../../../../../database/dao/types/statistis.ts";
+import { LineChartItem } from "../../../../../statistics/components/charts/LineChartView.tsx";
 
 export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
     private readonly fuelUnitDao: FuelUnitDao;
@@ -131,6 +133,24 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
             quantity: dto.quantity * dto.fuelUnit.conversionFactor,
             is_price_per_unit: dto.isPricePerUnit ? 1 : 0
         };
+    }
+
+    fuelConsumptionToLineChartStatistics(entities: Array<FuelConsumptionResult>): LineChartStatistics {
+        const chartData: Array<LineChartItem> = entities.map((entity) => ({
+            value: entity.value,
+            label: entity.date ?? undefined
+        }));
+
+        return { chartData };
+    }
+
+    fuelCostPerDistanceToLineChartStatistics(entities: Array<FuelCostPerDistanceResult>): LineChartStatistics {
+        const chartData: Array<LineChartItem> = entities.map((entity) => ({
+            value: entity.value,
+            label: entity.date ?? undefined
+        }));
+
+        return { chartData };
     }
 
     async formResultToEntities(formResult: FuelLogFormFields): Promise<{

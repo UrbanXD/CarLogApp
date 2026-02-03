@@ -2,6 +2,7 @@ import { Trend, TrendOptions } from "../../../features/statistics/utils/calculat
 import { DonutChartItem } from "../../../features/statistics/components/charts/DonutChartView.tsx";
 import { LegendType } from "../../../features/statistics/components/charts/common/Legend.tsx";
 import { BarChartItem } from "../../../features/statistics/components/charts/BarChartView.tsx";
+import { LineChartItem } from "../../../features/statistics/components/charts/LineChartView.tsx";
 
 export type StatisticsFunctionArgs = {
     carId?: string | null
@@ -45,4 +46,8 @@ export type DonutChartStatistics = {
 export type BarChartStatistics = {
     chartData: Array<BarChartItem>
     legend?: LegendType
+}
+
+export type LineChartStatistics = {
+    chartData: Array<LineChartItem>
 }

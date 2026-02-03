@@ -17,7 +17,7 @@ import { ODOMETER_LOG_TABLE } from "../../../../../../database/connector/powersy
 import { OdometerUnitDao } from "../../../odometer/model/dao/OdometerUnitDao.ts";
 import { ExpenseDao } from "../../../../../expense/model/dao/ExpenseDao.ts";
 import { AbstractPowerSyncDatabase } from "@powersync/react-native";
-import { SelectQueryBuilder } from "kysely";
+import { SelectQueryBuilder, sql } from "kysely";
 import { SelectExpenseTableRow } from "../../../../../expense/model/mapper/expenseMapper.ts";
 import { SelectCarModelTableRow } from "../../../../model/dao/CarDao.ts";
 import { Nullable, WithPrefix } from "../../../../../../types";
@@ -30,6 +30,22 @@ import { MAKE_TABLE } from "../../../../../../database/connector/powersync/table
 import { MODEL_TABLE } from "../../../../../../database/connector/powersync/tables/model.ts";
 import { WatchQueryOptions } from "../../../../../../database/watcher/watcher.ts";
 import { UseWatchedQueryItemProps } from "../../../../../../database/hooks/useWatchedQueryItem.ts";
+import {
+    LineChartStatistics,
+    StatisticsFunctionArgs,
+    SummaryStatistics
+} from "../../../../../../database/dao/types/statistis.ts";
+import { FUEL_TANK_TABLE } from "../../../../../../database/connector/powersync/tables/fuelTank.ts";
+import { formatDateToDatabaseFormat } from "../../../../../statistics/utils/formatDateToDatabaseFormat.ts";
+import {
+    getStatisticsAggregateQuery,
+    StatisticsAggregateQueryResult
+} from "../../../../../../database/dao/utils/getStatisticsAggregateQuery.ts";
+import { formatSummaryStatistics } from "../../../../../../database/dao/utils/formatSummaryStatistics.ts";
+import { getExtendedRange } from "../../../../../statistics/utils/getExtendedRange.ts";
+import { ExtractRowFromQuery } from "../../../../../../database/hooks/useInfiniteQuery.ts";
+import { UseWatchedQueryCollectionProps } from "../../../../../../database/hooks/useWatchedQueryCollection.ts";
+import { ExpenseTypeEnum } from "../../../../../expense/model/enums/ExpenseTypeEnum.ts";
 
 export type SelectFuelLogTableRow =
     FuelLogTableRow
@@ -38,7 +54,13 @@ export type SelectFuelLogTableRow =
     & WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">
     & Nullable<WithPrefix<Omit<SelectOdometerTableRow, "log_car_id">, "odometer">>
 
+export type FuelConsumptionResult = ExtractRowFromQuery<ReturnType<FuelLogDao["fuelConsumptionQuery"]>>;
+export type FuelCostPerDistanceResult = ExtractRowFromQuery<ReturnType<FuelLogDao["fuelCostPerDistanceQuery"]>>;
+
 export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, SelectFuelLogTableRow> {
+    private readonly expenseDao: ExpenseDao;
+    private readonly odometerLogDao: OdometerLogDao;
+
     constructor(
         db: Kysely<DatabaseType>,
         powersync: AbstractPowerSyncDatabase,
@@ -54,6 +76,9 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
             FUEL_LOG_TABLE,
             new FuelLogMapper(fuelUnitDao, expenseDao, expenseTypeDao, odometerLogDao, odometerUnitDao)
         );
+
+        this.expenseDao = expenseDao;
+        this.odometerLogDao = odometerLogDao;
     }
 
     selectQuery(id?: any | null): SelectQueryBuilder<DatabaseType, any, SelectFuelLogTableRow> {
@@ -107,6 +132,181 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
         return query;
     }
 
+    baseSummaryStatisticsQuery({
+        carId,
+        from,
+        to
+    }: StatisticsFunctionArgs) {
+        return this.db
+        .selectFrom(`${ FUEL_LOG_TABLE } as fl` as const)
+        .innerJoin(`${ EXPENSE_TABLE } as e` as const, "fl.expense_id", "e.id")
+        .innerJoin(`${ CAR_TABLE } as c` as const, "e.car_id", "c.id")
+        .innerJoin(`${ FUEL_TANK_TABLE } as ft` as const, "c.id", "ft.car_id")
+        .innerJoin(`${ FUEL_UNIT_TABLE } as fu` as const, "ft.unit_id", "fu.id")
+        .where("e.date", ">=", formatDateToDatabaseFormat(from))
+        .where("e.date", "<=", formatDateToDatabaseFormat(to))
+        .$if(!!carId, (q: any) => q.where("c.id", "=", carId));
+    }
+
+    summaryStatisticsByAmountQuery({
+        carId,
+        from,
+        to
+    }: StatisticsFunctionArgs) {
+        return getStatisticsAggregateQuery<ReturnType<FuelLogDao["baseSummaryStatisticsQuery"]>>({
+            db: this.db,
+            baseQuery: this.baseSummaryStatisticsQuery({ carId, from, to }),
+            idField: "fl.id",
+            field: "e.amount",
+            fromDateField: "e.date",
+            from,
+            to
+        });
+    }
+
+    summaryStatisticsByQuantityQuery({
+        carId,
+        from,
+        to
+    }: StatisticsFunctionArgs) {
+        const quantityExpression = sql<number>`(fl.quantity / fu.conversion_factor)`;
+
+        return getStatisticsAggregateQuery({
+            db: this.db,
+            baseQuery: this.baseSummaryStatisticsQuery({ carId, from, to }),
+            idField: "fl.id",
+            field: quantityExpression,
+            fromDateField: "e.date",
+            from,
+            to
+        });
+    }
+
+    fuelConsumptionQuery({
+        carId,
+        from,
+        to
+    }: StatisticsFunctionArgs) {
+        const { extendedFrom, extendedTo } = getExtendedRange(from, to);
+
+        const baseQuery = this.db
+        .selectFrom(`${ FUEL_LOG_TABLE } as fl` as const)
+        .innerJoin(`${ EXPENSE_TABLE } as e` as const, "fl.expense_id", "e.id")
+        .leftJoin(`${ ODOMETER_LOG_TABLE } as ol` as const, "fl.odometer_log_id", "ol.id")
+        .innerJoin(`${ CAR_TABLE } as c` as const, "e.car_id", "c.id")
+        .innerJoin(`${ FUEL_TANK_TABLE } as ft` as const, "c.id", "ft.car_id")
+        .innerJoin(`${ FUEL_UNIT_TABLE } as fu` as const, "ft.unit_id", "fu.id")
+        .leftJoin(`${ ODOMETER_UNIT_TABLE } as ou` as const, "c.odometer_unit_id", "ou.id")
+        .select((eb) => [
+            "e.date",
+            eb.fn.sum<number>(eb("fl.quantity", "/", eb.ref("fu.conversion_factor"))).as("quantity"),
+            eb("ol.value", "/", eb.fn.coalesce("ou.conversion_factor", sql.lit(1))).as("odometer_value")
+        ])
+        .where("e.date", ">=", formatDateToDatabaseFormat(extendedFrom))
+        .where("e.date", "<=", formatDateToDatabaseFormat(extendedTo))
+        .$if(!!carId, (qb) => qb.where("c.id", "=", carId!))
+        .groupBy(["e.date"])
+        .orderBy("e.date", "asc");
+
+        return this.db
+        .with("base_logs", () => baseQuery)
+        .with("steps", (db) => db
+            .selectFrom("base_logs")
+            .select((eb) => [
+                //@formatter:off
+                "date",
+                "quantity",
+                "odometer_value",
+                sql<number>`LAG(${ eb.ref("odometer_value") }) OVER (ORDER BY ${ eb.ref("date") })`
+                .as("prev_odometer_value")
+                //@formatter:on
+            ])
+        )
+        .selectFrom("steps")
+        .select((eb) => {
+            //@formatter:off
+            const distance = eb("steps.odometer_value", "-", eb.ref("steps.prev_odometer_value"));
+
+            const totalDistance = sql<number>`SUM(CASE WHEN ${ distance } > 0 THEN ${ distance } ELSE 0 END) OVER (ORDER BY ${ eb.ref("steps.date") })`;
+            const totalQuantity = sql<number>`SUM(${ eb.ref("quantity") }) OVER (ORDER BY ${ eb.ref("steps.date") })`;
+
+            return [
+                "steps.date",
+                sql<number>`ROUND((${totalQuantity} / NULLIF(${totalDistance}, 0)) * 100, 2)`.as("value")
+            ];
+            //@formatter:on
+        })
+        .where("steps.prev_odometer_value", "is not", null)
+        .where((eb) => eb("steps.odometer_value", "-", eb.ref("steps.prev_odometer_value")), ">", 0)
+        .where("steps.date", ">=", formatDateToDatabaseFormat(extendedFrom))
+        .where("steps.date", "<=", formatDateToDatabaseFormat(extendedTo))
+        .orderBy("steps.date", "asc");
+    }
+
+    fuelCostPerDistanceQuery({
+        carId,
+        from,
+        to
+    }: StatisticsFunctionArgs) {
+        const { extendedFrom, extendedTo } = getExtendedRange(from, to);
+
+        const odometerStepsQuery = this.odometerLogDao.odometerQuery({ carId, from: extendedFrom, to: extendedTo })
+        .select((eb) => {
+            const odometerValueExpression = eb.fn("round", [eb("ol.value", "/", eb.ref("ou.conversion_factor"))]);
+            const dateExpression = this.odometerLogDao.dateExpression(eb);
+            return [
+                //@formatter:off
+                odometerValueExpression.as("odometer_value"),
+                dateExpression.as("date"),
+                sql<number>`LAG(${ odometerValueExpression }) OVER (ORDER BY ${ dateExpression })`.as("prev_odometer_value"),
+                sql<string>`LAG(${ dateExpression }) OVER (ORDER BY ${ dateExpression })`.as("prev_date")
+                //@formatter:on
+            ];
+        });
+
+        return this.db
+        .with("steps", () => odometerStepsQuery)
+        .with("periods", (db) => db
+            .selectFrom("steps")
+            .select((eb) => [
+                "steps.date as date",
+                sql<number>`CAST(steps.odometer_value AS NUMERIC) - CAST(steps.prev_odometer_value AS NUMERIC)`.as(
+                    "period_distance"), eb.selectFrom(`${ FUEL_LOG_TABLE } as ifl` as const)
+                .innerJoin(`${ EXPENSE_TABLE } as ie` as const, "ifl.expense_id", "ie.id")
+                .select((eb) => eb.fn.coalesce(eb.fn.sum("ie.amount"), eb.val(0)).as("period_cost"))
+                .whereRef("ie.date", ">=", "steps.prev_date")
+                .whereRef("ie.date", "<", "steps.date")
+                .$if(!!carId, (qb) => qb.where("ie.car_id", "=", carId!))
+                .as("period_cost")
+            ])
+            .where("steps.prev_date", "is not", null) // skip first or when date is null
+        )
+        .selectFrom((eb) => eb
+            .selectFrom("periods")
+            .select((_eb) => {
+                return [
+                    //@formatter:off
+                    "date",
+                    // "period_cost",
+                    // "period_distance",
+                    sql<number>`ROUND((period_cost / NULLIF(period_distance, 0)) * 100, 2)`.as("value")
+                    //@formatter:on
+                ]
+            })
+            .as("aggregated")
+        )
+        .select([
+            "date",
+            "value"
+            // "period_cost",
+            // "period_distance"
+        ])
+        .where("value", ">", 0)
+        .where("date", ">=", formatDateToDatabaseFormat(from))
+        .where("date", "<=", formatDateToDatabaseFormat(to))
+        .orderBy("date", "asc");
+    }
+
     fuelLogWatchedQueryItem(
         id: string | null | undefined,
         options?: WatchQueryOptions
@@ -115,6 +315,41 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
             query: this.selectQuery(id),
             mapper: this.mapper.toDto.bind(this.mapper),
             options: { enabled: !!id, ...options }
+        };
+    }
+
+    summaryStatisticsByAmountWatchedQueryItem(props: StatisticsFunctionArgs): UseWatchedQueryItemProps<SummaryStatistics, StatisticsAggregateQueryResult> {
+        return {
+            query: this.summaryStatisticsByAmountQuery(props),
+            mapper: formatSummaryStatistics
+        };
+    }
+
+    summaryStatisticsByQuantityWatchedQueryItem(props: StatisticsFunctionArgs): UseWatchedQueryItemProps<SummaryStatistics, StatisticsAggregateQueryResult> {
+        return {
+            query: this.summaryStatisticsByQuantityQuery(props),
+            mapper: formatSummaryStatistics
+        };
+    }
+
+    expensesByRangeStatisticsWatchedQueryCollection(props: StatisticsFunctionArgs) {
+        return this.expenseDao.groupedExpensesByRangeStatisticsWatchedQueryCollection({
+            ...props,
+            expenseType: ExpenseTypeEnum.FUEL
+        });
+    }
+
+    fuelConsumptionStatisticsWatchedQueryCollection(props: StatisticsFunctionArgs): UseWatchedQueryCollectionProps<LineChartStatistics, FuelConsumptionResult> {
+        return {
+            query: this.fuelConsumptionQuery(props),
+            mapper: this.mapper.fuelConsumptionToLineChartStatistics.bind(this.mapper)
+        };
+    }
+
+    fuelCostPerDistanceStatisticsWatchedQueryCollection(props: StatisticsFunctionArgs): UseWatchedQueryCollectionProps<LineChartStatistics, FuelCostPerDistanceResult> {
+        return {
+            query: this.fuelCostPerDistanceQuery(props),
+            mapper: this.mapper.fuelCostPerDistanceToLineChartStatistics.bind(this.mapper)
         };
     }
 
