@@ -15,7 +15,7 @@ import { OdometerLogTypeDao } from "./OdometerLogTypeDao.ts";
 import { FUEL_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/fuelLog.ts";
 import { ODOMETER_CHANGE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/odometerChangeLog.ts";
 import { EXPENSE_TABLE } from "../../../../../../database/connector/powersync/tables/expense.ts";
-import { SelectQueryBuilder, sql } from "kysely";
+import { ExpressionBuilder, SelectQueryBuilder, sql } from "kysely";
 import { OdometerLogTypeEnum } from "../enums/odometerLogTypeEnum.ts";
 import { SERVICE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/serviceLog.ts";
 import { RIDE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/rideLog.ts";
@@ -32,6 +32,7 @@ import { MAKE_TABLE } from "../../../../../../database/connector/powersync/table
 import { SelectCarModelTableRow } from "../../../../model/dao/CarDao.ts";
 import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
 import { CURRENCY_TABLE } from "../../../../../../database/connector/powersync/tables/currency.ts";
+import { StatisticsFunctionArgs } from "../../../../../statistics/model/dao/statisticsDao.ts";
 
 export type SelectOdometerLogTableRow =
     OdometerLogTableRow
@@ -73,22 +74,39 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         super(db, powersync, ODOMETER_LOG_TABLE, new OdometerLogMapper(odometerLogTypeDao));
     }
 
-    selectQuery(id?: any | null) {
-        let query = this.db
+    dateExpression(eb: ReturnType<OdometerLogDao["baseQuery"]> extends SelectQueryBuilder<infer DB, infer TB, any>
+                       ? ExpressionBuilder<DB, TB>
+                       : never) {
+        return eb.fn.coalesce(
+            "fl_e.date",
+            "sl_e.date",
+            "ocl.date",
+            "s_rl.start_time",
+            eb.fn.coalesce("e_rl.end_time", eb.val("1970-01-01"))
+        ).$castTo<string>();
+    }
+
+    baseQuery() {
+        return this.db
         .selectFrom(`${ ODOMETER_LOG_TABLE } as ol` as const)
+        .innerJoin(`${ CAR_TABLE } as c` as const, "ol.car_id", "c.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as ou` as const, "c.odometer_unit_id", "ou.id")
+        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as ocl` as const, "ol.id", "ocl.odometer_log_id")
+        .leftJoin(`${ FUEL_LOG_TABLE } as fl` as const, "ol.id", "fl.odometer_log_id")
+        .leftJoin(`${ SERVICE_LOG_TABLE } as sl` as const, "ol.id", "sl.odometer_log_id")
+        .leftJoin(`${ EXPENSE_TABLE } as fl_e` as const, "fl.expense_id", "fl_e.id")
+        .leftJoin(`${ EXPENSE_TABLE } as sl_e` as const, "sl.expense_id", "sl_e.id")
+        .leftJoin(`${ RIDE_LOG_TABLE } as s_rl` as const, "ol.id", "s_rl.start_odometer_log_id")
+        .leftJoin(`${ RIDE_LOG_TABLE } as e_rl` as const, "ol.id", "e_rl.end_odometer_log_id");
+    }
+
+    selectQuery(id?: any | null) {
+        let query = this.baseQuery()
         .innerJoin(`${ ODOMETER_LOG_TYPE_TABLE } as ot` as const, "ot.id", "ol.type_id")
-        .innerJoin(`${ CAR_TABLE } as c` as const, "c.id", "ol.car_id")
         .innerJoin(`${ MODEL_TABLE } as mo` as const, "mo.id", "c.model_id")
         .innerJoin(`${ MAKE_TABLE } as ma` as const, "ma.id", "mo.make_id")
         .innerJoin(`${ CURRENCY_TABLE } as ccurr` as const, "c.currency_id", "ccurr.id")
         .innerJoin(`${ ODOMETER_UNIT_TABLE } as u` as const, "u.id", "c.odometer_unit_id")
-        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as ocl` as const, "ocl.odometer_log_id", "ol.id")
-        .leftJoin(`${ FUEL_LOG_TABLE } as fl` as const, "fl.odometer_log_id", "ol.id")
-        .leftJoin(`${ SERVICE_LOG_TABLE } as sl` as const, "sl.odometer_log_id", "ol.id")
-        .leftJoin(`${ RIDE_LOG_TABLE } as rl1` as const, "rl1.start_odometer_log_id", "ol.id")
-        .leftJoin(`${ RIDE_LOG_TABLE } as rl2` as const, "rl2.end_odometer_log_id", "ol.id")
-        .leftJoin(`${ EXPENSE_TABLE } as e1` as const, "e1.id", "fl.expense_id")
-        .leftJoin(`${ EXPENSE_TABLE } as e2` as const, "e2.id", "sl.expense_id")
         .selectAll("ol")
         .select((eb) => [
             "c.name as car_name",
@@ -105,30 +123,45 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
             "u.key as unit_key",
             "u.short as unit_short",
             "u.conversion_factor as unit_conversion_factor",
+            this.dateExpression(eb).as("date"),
             eb.fn.coalesce(
-                "e1.date",
-                "e2.date",
-                "ocl.date",
-                "rl1.start_time",
-                eb.fn.coalesce("rl2.end_time", eb.val("1970-01-01"))
-            ).$castTo<string>().as("date"),
-            eb.fn.coalesce(
-                "e1.note",
-                "e2.note",
+                "fl_e.note",
+                "sl_e.note",
                 "ocl.note"
             ).$castTo<string | null>().as("note"),
             eb.fn.coalesce(
                 "fl.id",
                 "ocl.id",
                 "sl.id",
-                "rl1.id",
-                "rl2.id"
+                "s_rl.id",
+                "e_rl.id"
             ).$castTo<string | null>().as("related_id")
         ]);
 
         if(id) query = query.where("ol.id", "=", id);
 
         return query;
+    }
+
+    odometerQuery({
+        carId,
+        from,
+        to
+    }: Omit<StatisticsFunctionArgs, "trendOptions">) {
+        return this.baseQuery()
+        .$if(!!carId, (qb) => qb.where("c.id", "=", carId!))
+        .where((eb) => {
+            const dateExpression = this.dateExpression(eb);
+
+            return eb.and([
+                eb(dateExpression, "is not", null),
+                eb(dateExpression, ">=", formatDateToDatabaseFormat(from)),
+                eb(dateExpression, "<=", formatDateToDatabaseFormat(to))
+            ]);
+        })
+        .orderBy((eb) => this.dateExpression(eb), "asc")
+        .orderBy("ol.value", "asc")
+        .orderBy("ol.id", "asc");
     }
 
     odometerLimitQuery(
