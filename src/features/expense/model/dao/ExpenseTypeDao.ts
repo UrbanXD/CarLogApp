@@ -42,6 +42,16 @@ export class ExpenseTypeDao extends Dao<ExpenseTypeTableRow, ExpenseType, Expens
         return result.id;
     }
 
+    async getByKey(key: string): Promise<ExpenseType> {
+        const result = await this.db
+        .selectFrom(EXPENSE_TYPE_TABLE)
+        .selectAll()
+        .where("key", "=", key)
+        .executeTakeFirstOrThrow();
+
+        return this.mapper.toDto(result);
+    }
+
     async delete(id: string): Promise<string> {
         const result = await this.db
         .deleteFrom(EXPENSE_TYPE_TABLE)

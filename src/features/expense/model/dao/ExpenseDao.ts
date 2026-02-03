@@ -36,7 +36,7 @@ import { getRangeUnit } from "../../../statistics/utils/getRangeUnit.ts";
 import { getRangeExpression } from "../../../../database/dao/utils/getRangeExpression.ts";
 
 export type ExpenseTypeComparisonTableRow = ExtractRowFromQuery<ReturnType<ExpenseDao["typeComparisonQuery"]>>;
-export type GroupedExpensesByRangTableRow = ExtractRowFromQuery<ReturnType<ExpenseDao["groupedExpensesByRangeQuery"]>>;
+export type GroupedExpensesByRangeTableRow = ExtractRowFromQuery<ReturnType<ExpenseDao["groupedExpensesByRangeQuery"]>>;
 export type ExpenseRecordTableRow = {
     amount: number | null
     owner_id: string | null
@@ -176,17 +176,20 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
     groupedExpensesByRangeQuery({
         carId,
         from,
-        to
-    }: StatisticsFunctionArgs) {
+        to,
+        expenseType
+    }: StatisticsFunctionArgs & { expenseType?: ExpenseTypeEnum }) {
         const rangeUnit = getRangeUnit(from, to);
 
         const baseQuery = this.db
         .selectFrom(`${ EXPENSE_TABLE } as e` as const)
+        .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "e.type_id", "et.id")
         .select((eb) => [
             eb.fn.sum("e.amount").as("total"),
             "e.type_id"
         ])
         .$if(!!carId, (qb) => qb.where("e.car_id", "=", carId!))
+        .$if(!!expenseType, (q: any) => q.where("et.key", "=", expenseType))
         .where("e.date", ">=", formatDateToDatabaseFormat(from))
         .where("e.date", "<=", formatDateToDatabaseFormat(to))
         .groupBy("e.type_id");
@@ -250,10 +253,12 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         };
     }
 
-    groupedExpensesByRangeStatisticsWatchedQueryCollection(props: StatisticsFunctionArgs): UseWatchedQueryCollectionProps<BarChartStatistics, GroupedExpensesByRangTableRow> {
+    groupedExpensesByRangeStatisticsWatchedQueryCollection(props: StatisticsFunctionArgs & {
+        expenseType?: ExpenseTypeEnum
+    }): UseWatchedQueryCollectionProps<BarChartStatistics, GroupedExpensesByRangeTableRow> {
         return {
             query: this.groupedExpensesByRangeQuery(props),
-            mapper: this.mapper.groupedExpensesByRangeToBarChartStatistics.bind(this.mapper)
+            mapper: (entities) => this.mapper.groupedExpensesByRangeToBarChartStatistics(entities, props.expenseType)
         };
     }
 

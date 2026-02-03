@@ -17,7 +17,7 @@ import { BarChartStatistics, DonutChartStatistics, Stat } from "../../../../data
 import {
     ExpenseRecordTableRow,
     ExpenseTypeComparisonTableRow,
-    GroupedExpensesByRangTableRow
+    GroupedExpensesByRangeTableRow
 } from "../dao/ExpenseDao.ts";
 import { LegendType } from "../../../statistics/components/charts/common/Legend.tsx";
 import { BarChartItem } from "../../../statistics/components/charts/BarChartView.tsx";
@@ -149,38 +149,47 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, Sele
         };
     }
 
-    async groupedExpensesByRangeToBarChartStatistics(entities: Array<GroupedExpensesByRangTableRow>): Promise<BarChartStatistics> {
-        const expenseTypes = await this.expenseTypeDao.getAll();
+    async groupedExpensesByRangeToBarChartStatistics(
+        entities: Array<GroupedExpensesByRangeTableRow>,
+        type?: string
+    ): Promise<BarChartStatistics> {
+        const expenseTypes = !type ? await this.expenseTypeDao.getAll() : [await this.expenseTypeDao.getByKey(type)];
         const typeIds = expenseTypes.map((t) => t.id);
 
         const chartData: Array<BarChartItem> = [];
-        const groupedData: { [time: string]: { [typeId: string]: number } } = {};
 
-        entities.forEach((entity) => {
-            const time = entity.time;
-            const typeId = entity.type_id;
-            const total = Number(entity.total); // SQL sum gyakran stringként jön vissza
-
-            if(!groupedData[time]) groupedData[time] = {};
-            if(typeId) {
-                groupedData[time][typeId] = total;
-            }
-        });
-
-        for(const time in groupedData) {
-            if(Object.prototype.hasOwnProperty.call(groupedData, time)) {
-                const dailyData = groupedData[time];
-
-                const valueArray = typeIds.map(typeId => {
-                    const value = dailyData[typeId] ?? 0;
-                    return numberToFractionDigit(value);
-                });
-
+        if(expenseTypes.length === 1) {
+            const singleType = expenseTypes[0];
+            entities.forEach((entity) => {
                 chartData.push({
-                    label: time,
-                    value: valueArray,
-                    type: typeIds
+                    label: entity.time,
+                    type: singleType.id,
+                    value: numberToFractionDigit(Number(entity.total) ?? 0)
                 });
+            });
+        } else {
+            const groupedData: { [time: string]: { [typeId: string]: number } } = {};
+
+            entities.forEach((entity) => {
+                const { time, type_id, total } = entity;
+                if(!groupedData[time]) groupedData[time] = {};
+                if(type_id) {
+                    groupedData[time][type_id] = Number(total);
+                }
+            });
+
+            for(const time in groupedData) {
+                if(Object.prototype.hasOwnProperty.call(groupedData, time)) {
+                    const valueArray = typeIds.map(typeId =>
+                        numberToFractionDigit(groupedData[time][typeId] ?? 0)
+                    );
+
+                    chartData.push({
+                        label: time,
+                        value: valueArray,
+                        type: typeIds
+                    });
+                }
             }
         }
 
