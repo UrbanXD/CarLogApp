@@ -30,7 +30,7 @@ import {
     SummaryStatistics
 } from "../../../../database/dao/types/statistis.ts";
 import { formatSummaryStatistics } from "../../../../database/dao/utils/formatSummaryStatistics.ts";
-import { sql } from "kysely";
+import { SelectQueryBuilder, sql } from "kysely";
 import { formatDateToDatabaseFormat } from "../../../statistics/utils/formatDateToDatabaseFormat.ts";
 import { getRangeUnit } from "../../../statistics/utils/getRangeUnit.ts";
 import { getRangeExpression } from "../../../../database/dao/utils/getRangeExpression.ts";
@@ -102,12 +102,13 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         .$if(!!id, (qb) => qb.where("e.id", "=", id!));
     }
 
-    summaryStatisticsQuery({
+    summaryStatisticsQuery<Record = ExpenseRecordTableRow>({
         carId,
         from,
         to,
-        expenseType
-    }: StatisticsFunctionArgs & { expenseType?: ExpenseTypeEnum }) {
+        expenseType,
+        onlyRecordValue = false
+    }: StatisticsFunctionArgs & { expenseType?: ExpenseTypeEnum, onlyRecordValue?: boolean }) {
         const applyFilters = (qb: any, tableAlias: string, typeAlias: string) => {
             return qb
             .$if(!!carId, (q: any) => q.where(`${ tableAlias }.car_id`, "=", carId))
@@ -134,7 +135,6 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
 
         mainQuery = applyFilters(mainQuery, "e", "et");
         subQuery = applyFilters(subQuery, "ie", "iet");
-
         const query = getStatisticsAggregateQuery<typeof mainQuery, typeof subQuery>({
             db: this.db,
             baseQuery: mainQuery,
@@ -145,7 +145,7 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
                 "e.exchange_rate"
             ),
             fromDateField: "e.date",
-            recordQueryConfig: {
+            recordQueryConfig: (!onlyRecordValue ? {
                 query: subQuery,
                 idField: "ie.id",
                 field: (eb) => exchangedAmountExpression(
@@ -155,12 +155,12 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
                 ),
                 fromDateField: "ie.date",
                 jsonObject: true
-            },
+            } : null),
             from: from,
             to: to
         });
 
-        return query;
+        return query as unknown as SelectQueryBuilder<any, any, StatisticsAggregateQueryResult<Record>>;
     }
 
     typeComparisonQuery({

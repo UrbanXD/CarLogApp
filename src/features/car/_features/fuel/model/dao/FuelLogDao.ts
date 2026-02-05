@@ -157,23 +157,11 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
         .$if(!!carId, (q: any) => q.where("c.id", "=", carId));
     }
 
-    summaryStatisticsByAmountQuery({
-        carId,
-        from,
-        to
-    }: StatisticsFunctionArgs) {
-        return getStatisticsAggregateQuery<ReturnType<FuelLogDao["baseSummaryStatisticsQuery"]>>({
-            db: this.db,
-            baseQuery: this.baseSummaryStatisticsQuery({ carId, from, to }),
-            idField: "fl.id",
-            field: (eb) => exchangedAmountExpression(
-                eb,
-                "e.amount",
-                "e.exchange_rate"
-            ),
-            fromDateField: "e.date",
-            from,
-            to
+    summaryStatisticsByAmountQuery(props: StatisticsFunctionArgs) {
+        return this.expenseDao.summaryStatisticsQuery<number | null>({
+            ...props,
+            expenseType: ExpenseTypeEnum.FUEL,
+            onlyRecordValue: true
         });
     }
 
@@ -343,7 +331,7 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
         };
     }
 
-    summaryStatisticsByAmountWatchedQueryItem(props: StatisticsFunctionArgs): UseWatchedQueryItemProps<SummaryStatistics, StatisticsAggregateQueryResult> {
+    summaryStatisticsByAmountWatchedQueryItem(props: StatisticsFunctionArgs): UseWatchedQueryItemProps<SummaryStatistics, StatisticsAggregateQueryResult<number | null>> {
         return {
             query: this.summaryStatisticsByAmountQuery(props),
             mapper: formatSummaryStatistics
