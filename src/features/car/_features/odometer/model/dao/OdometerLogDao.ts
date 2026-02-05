@@ -15,7 +15,7 @@ import { OdometerLogTypeDao } from "./OdometerLogTypeDao.ts";
 import { FUEL_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/fuelLog.ts";
 import { ODOMETER_CHANGE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/odometerChangeLog.ts";
 import { EXPENSE_TABLE } from "../../../../../../database/connector/powersync/tables/expense.ts";
-import { ExpressionBuilder, SelectQueryBuilder, sql } from "kysely";
+import { ExpressionBuilder, SelectQueryBuilder } from "kysely";
 import { OdometerLogTypeEnum } from "../enums/odometerLogTypeEnum.ts";
 import { SERVICE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/serviceLog.ts";
 import { RIDE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/rideLog.ts";
@@ -33,6 +33,7 @@ import { SelectCarModelTableRow } from "../../../../model/dao/CarDao.ts";
 import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
 import { CURRENCY_TABLE } from "../../../../../../database/connector/powersync/tables/currency.ts";
 import { StatisticsFunctionArgs } from "../../../../../statistics/model/dao/statisticsDao.ts";
+import { odometerValueExpression } from "../../../../../../database/dao/expressions";
 
 export type SelectOdometerLogTableRow =
     OdometerLogTableRow
@@ -101,14 +102,15 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
     }
 
     selectQuery(id?: any | null) {
-        let query = this.baseQuery()
+        return this.baseQuery()
         .innerJoin(`${ ODOMETER_LOG_TYPE_TABLE } as ot` as const, "ot.id", "ol.type_id")
         .innerJoin(`${ MODEL_TABLE } as mo` as const, "mo.id", "c.model_id")
         .innerJoin(`${ MAKE_TABLE } as ma` as const, "ma.id", "mo.make_id")
         .innerJoin(`${ CURRENCY_TABLE } as ccurr` as const, "c.currency_id", "ccurr.id")
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as u` as const, "u.id", "c.odometer_unit_id")
-        .selectAll("ol")
         .select((eb) => [
+            "ol.id",
+            odometerValueExpression(eb, "ol.value", "ou.conversion_factor").as("value"),
+            "c.id as car_id",
             "c.name as car_name",
             "mo.id as car_model_id",
             "mo.name as car_model_name",
@@ -118,11 +120,12 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
             "ccurr.symbol as car_currency_symbol",
             "ma.id as car_make_id",
             "ma.name as car_make_name",
+            "ot.id as type_id",
             "ot.key as type_key",
-            "u.id as unit_id",
-            "u.key as unit_key",
-            "u.short as unit_short",
-            "u.conversion_factor as unit_conversion_factor",
+            "ou.id as unit_id",
+            "ou.key as unit_key",
+            "ou.short as unit_short",
+            "ou.conversion_factor as unit_conversion_factor",
             this.dateExpression(eb).as("date"),
             eb.fn.coalesce(
                 "fl_e.note",
@@ -136,11 +139,8 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
                 "s_rl.id",
                 "e_rl.id"
             ).$castTo<string | null>().as("related_id")
-        ]);
-
-        if(id) query = query.where("ol.id", "=", id);
-
-        return query;
+        ])
+        .$if(!!id, (qb) => qb.where("ol.id", "=", id!));
     }
 
     odometerQuery({
@@ -160,7 +160,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
             ]);
         })
         .orderBy((eb) => this.dateExpression(eb), "asc")
-        .orderBy("ol.value", "asc")
+        .orderBy((eb) => odometerValueExpression(eb, "ol.value", "ou.conversion_factor"), "asc")
         .orderBy("ol.id", "asc");
     }
 
@@ -170,53 +170,61 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         skipOdometerLogs: Array<OdometerLogTableRow["id"]> = []
     ): SelectQueryBuilder<DatabaseType, any, SelectOdometerLimitTableRow> {
         const dbDate = formatDateToDatabaseFormat(date);
-        const dateSql = sql`COALESCE(t10.end_time, t9.start_time, t8.date, t7.date, t4.date)`;
 
         return this.db
-        .selectFrom(`${ CAR_TABLE } as t2` as const)
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as t3` as const, "t2.odometer_unit_id", "t3.id")
-        .leftJoin(`${ ODOMETER_LOG_TABLE } as t1` as const, (join) =>
-            join.onRef("t1.car_id", "=", "t2.id")
-            .on("t1.id", "not in", skipOdometerLogs.length > 0 ? skipOdometerLogs : [""])
+        .selectFrom(`${ CAR_TABLE } as c` as const)
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as ou` as const, "c.odometer_unit_id", "ou.id")
+        .leftJoin(`${ ODOMETER_LOG_TABLE } as ol` as const, (join) =>
+            join.onRef("ol.car_id", "=", "c.id")
+            .on("ol.id", "not in", skipOdometerLogs.length > 0 ? skipOdometerLogs : [""])
         )
-        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as t4` as const, "t1.id", "t4.odometer_log_id")
-        .leftJoin(`${ FUEL_LOG_TABLE } as t5` as const, "t1.id", "t5.odometer_log_id")
-        .leftJoin(`${ SERVICE_LOG_TABLE } as t6` as const, "t1.id", "t6.odometer_log_id")
-        .leftJoin(`${ EXPENSE_TABLE } as t7` as const, "t5.expense_id", "t7.id")
-        .leftJoin(`${ EXPENSE_TABLE } as t8` as const, "t6.expense_id", "t8.id")
-        .leftJoin(`${ RIDE_LOG_TABLE } as t9` as const, "t1.id", "t9.start_odometer_log_id")
-        .leftJoin(`${ RIDE_LOG_TABLE } as t10` as const, "t1.id", "t10.end_odometer_log_id")
-        .select([
-            //@formatter:off
-            "t3.short as unit",
-            sql<number | null>`
-              MAX(CASE 
-              WHEN ${dateSql} < ${dbDate} 
-                THEN ROUND(t1.value / t3.conversion_factor) 
-              END)
-            `.as("min_value"),
-            sql<string | null>`
-              MAX(CASE 
-                WHEN ${dateSql} < ${dbDate} 
-                THEN ${dateSql} 
-              END)
-            `.as("min_date"),
-            sql<number | null>`
-              MIN(CASE 
-                WHEN ${dateSql} > ${dbDate} 
-                THEN ROUND(t1.value / t3.conversion_factor) 
-              END)
-            `.as("max_value"),
-            sql<string | null>`
-              MIN(CASE 
-                WHEN ${dateSql} > ${dbDate} 
-                THEN ${dateSql} 
-              END)
-            `.as("max_date")
-            //@formatter:on
-        ])
-        .where("t2.id", "=", carId)
-        .groupBy(["t3.short", "t2.id"]);
+        .leftJoin(`${ ODOMETER_CHANGE_LOG_TABLE } as ocl` as const, "ol.id", "ocl.odometer_log_id")
+        .leftJoin(`${ FUEL_LOG_TABLE } as fl` as const, "ol.id", "fl.odometer_log_id")
+        .leftJoin(`${ SERVICE_LOG_TABLE } as sl` as const, "ol.id", "sl.odometer_log_id")
+        .leftJoin(`${ EXPENSE_TABLE } as fl_e` as const, "fl.expense_id", "fl_e.id")
+        .leftJoin(`${ EXPENSE_TABLE } as sl_e` as const, "sl.expense_id", "sl_e.id")
+        .leftJoin(`${ RIDE_LOG_TABLE } as s_rl` as const, "ol.id", "s_rl.start_odometer_log_id")
+        .leftJoin(`${ RIDE_LOG_TABLE } as e_rl` as const, "ol.id", "e_rl.end_odometer_log_id")
+        .select((eb) => {
+            const dateExpression = eb.fn.coalesce(
+                "e_rl.end_time",
+                "s_rl.start_time",
+                "fl_e.date",
+                "sl_e.date",
+                "ocl.date"
+            );
+
+            const odometerExpression = odometerValueExpression(eb, "ol.value", "ou.conversion_factor");
+
+            return [
+                "ou.short as unit",
+                eb.fn.max(
+                    eb.case()
+                    .when(dateExpression, "<", dbDate)
+                    .then(odometerExpression)
+                    .end()
+                ).as("min_value"),
+                eb.fn.max(
+                    eb.case()
+                    .when(dateExpression, "<", dbDate)
+                    .then(dateExpression)
+                    .end()
+                ).as("min_date"),
+                eb.fn.min(
+                    eb.case()
+                    .when(dateExpression, ">", dbDate)
+                    .then(odometerExpression)
+                    .end()
+                ).as("max_value"),
+                eb.fn.min(
+                    eb.case()
+                    .when(dateExpression, ">", dbDate)
+                    .then(dateExpression)
+                    .end()
+                ).as("max_date")
+            ];
+        })
+        .where("c.id", "=", carId);
     }
 
     odometerLogWatchedQueryItem(

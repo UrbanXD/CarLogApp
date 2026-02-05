@@ -17,11 +17,13 @@ import { WithPrefix } from "../../../../../../types";
 import { SelectAmountCurrencyTableRow } from "../../../../model/mapper/expenseMapper.ts";
 import { CURRENCY_TABLE } from "../../../../../../database/connector/powersync/tables/currency.ts";
 import { SERVICE_ITEM_TYPE_TABLE } from "../../../../../../database/connector/powersync/tables/serviceItemType.ts";
+import { exchangedAmountExpression } from "../../../../../../database/dao/expressions";
 
 export type SelectServiceItemTableRow =
     ServiceItemTableRow &
     WithPrefix<Omit<ServiceItemTypeTableRow, "id">, "type"> &
-    Omit<SelectAmountCurrencyTableRow, "currency_id">
+    SelectAmountCurrencyTableRow &
+    { exchanged_price_per_unit: number | null }
 
 export class ServiceItemDao extends Dao<ServiceItemTableRow, ServiceItem, ServiceItemMapper> {
     constructor(
@@ -34,26 +36,31 @@ export class ServiceItemDao extends Dao<ServiceItemTableRow, ServiceItem, Servic
     }
 
     selectQuery(id?: any | null): SelectQueryBuilder<DatabaseType, any, SelectServiceItemTableRow> {
-        let query = this.db
+        return this.db
         .selectFrom(`${ SERVICE_ITEM_TABLE } as si` as const)
         .innerJoin(`${ SERVICE_ITEM_TYPE_TABLE } as sit` as const, "sit.id", "si.service_item_type_id")
         .innerJoin(`${ CAR_TABLE } as c` as const, "c.id", "si.car_id")
         .innerJoin(`${ CURRENCY_TABLE } as curr` as const, "curr.id", "si.currency_id")
         .innerJoin(`${ CURRENCY_TABLE } as c_curr` as const, "c_curr.id", "c.currency_id")
-        .selectAll("si")
-        .select([
+        .select((eb) => [
+            "si.id",
+            "si.service_log_id",
+            "si.quantity",
+            "si.price_per_unit",
+            exchangedAmountExpression(eb, "si.price_per_unit", "si.exchange_rate")
+            .as("exchanged_price_per_unit"),
+            "si.exchange_rate",
+            "sit.id as service_item_type_id",
             "sit.owner_id as type_owner_id",
             "sit.key as type_key",
-            "c.currency_id as car_currency_id",
+            "c.id as car_id",
+            "c_curr.id as car_currency_id",
             "c_curr.key as car_currency_key",
             "c_curr.symbol as car_currency_symbol",
+            "curr.id as currency_id",
             "curr.key as currency_key",
             "curr.symbol as currency_symbol"
         ])
-        .$castTo<SelectServiceItemTableRow>();
-
-        if(id) query = query.where("si.id", "=", id);
-
-        return query;
+        .$if(!!id, (qb) => qb.where("si.id", "=", id));
     }
 }

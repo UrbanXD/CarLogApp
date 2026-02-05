@@ -12,7 +12,7 @@ export const fuelLogSchema = z
     fuelUnit: fuelUnitSchema,
     odometer: odometerSchema.nullable(),
     quantity: z.number().min(0),
-    originalPricePerUnit: z.number().min(0),
+    exchangedPricePerUnit: z.number().min(0),
     pricePerUnit: z.number().min(0),
     isPricePerUnit: z.boolean().default(false)
 });

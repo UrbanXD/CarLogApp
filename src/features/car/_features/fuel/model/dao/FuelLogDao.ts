@@ -6,7 +6,7 @@ import {
 } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { FuelLog } from "../../schemas/fuelLogSchema.ts";
 import { FuelLogMapper } from "../mapper/fuelLogMapper.ts";
-import { Kysely } from "@powersync/kysely-driver";
+import { Kysely, SelectQueryBuilder, sql } from "kysely";
 import { ExpenseTypeDao } from "../../../../../expense/model/dao/ExpenseTypeDao.ts";
 import { FuelUnitDao } from "./FuelUnitDao.ts";
 import { FUEL_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/fuelLog.ts";
@@ -17,7 +17,6 @@ import { ODOMETER_LOG_TABLE } from "../../../../../../database/connector/powersy
 import { OdometerUnitDao } from "../../../odometer/model/dao/OdometerUnitDao.ts";
 import { ExpenseDao } from "../../../../../expense/model/dao/ExpenseDao.ts";
 import { AbstractPowerSyncDatabase } from "@powersync/react-native";
-import { SelectQueryBuilder, sql } from "kysely";
 import { SelectExpenseTableRow } from "../../../../../expense/model/mapper/expenseMapper.ts";
 import { SelectCarModelTableRow } from "../../../../model/dao/CarDao.ts";
 import { Nullable, WithPrefix } from "../../../../../../types";
@@ -46,6 +45,11 @@ import { getExtendedRange } from "../../../../../statistics/utils/getExtendedRan
 import { ExtractRowFromQuery } from "../../../../../../database/hooks/useInfiniteQuery.ts";
 import { UseWatchedQueryCollectionProps } from "../../../../../../database/hooks/useWatchedQueryCollection.ts";
 import { ExpenseTypeEnum } from "../../../../../expense/model/enums/ExpenseTypeEnum.ts";
+import {
+    exchangedAmountExpression,
+    odometerValueExpression,
+    simpleConversionExpression
+} from "../../../../../../database/dao/expressions";
 
 export type SelectFuelLogTableRow =
     FuelLogTableRow
@@ -82,7 +86,7 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
     }
 
     selectQuery(id?: any | null): SelectQueryBuilder<DatabaseType, any, SelectFuelLogTableRow> {
-        let query = this.db
+        return this.db
         .selectFrom(`${ FUEL_LOG_TABLE } as fl` as const)
         .innerJoin(`${ EXPENSE_TABLE } as e` as const, "e.id", "fl.expense_id")
         .innerJoin(`${ FUEL_UNIT_TABLE } as fu` as const, "fu.id", "fl.fuel_unit_id")
@@ -90,14 +94,18 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
         .innerJoin(`${ MODEL_TABLE } as mo` as const, "mo.id", "c.model_id")
         .innerJoin(`${ MAKE_TABLE } as ma` as const, "ma.id", "mo.make_id")
         .leftJoin(`${ ODOMETER_LOG_TABLE } as ol` as const, "ol.id", "fl.odometer_log_id")
-        .leftJoin(`${ ODOMETER_UNIT_TABLE } as u` as const, "u.id", "c.odometer_unit_id")
+        .leftJoin(`${ ODOMETER_UNIT_TABLE } as ou` as const, "ou.id", "c.odometer_unit_id")
         .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "et.id", "e.type_id")
         .innerJoin(`${ CURRENCY_TABLE } as cur` as const, "cur.id", "e.currency_id")
         .innerJoin(`${ CURRENCY_TABLE } as ccur` as const, "ccur.id", "c.currency_id")
         .selectAll("fl")
-        .select([
+        .select((eb) => [
             "e.amount as expense_amount",
-            "e.original_amount as expense_original_amount",
+            exchangedAmountExpression(
+                eb,
+                "e.amount",
+                "e.exchange_rate"
+            ).as("expense_exchanged_amount"),
             "e.exchange_rate as expense_exchange_rate",
             "e.date as expense_date",
             "e.note as expense_note",
@@ -119,18 +127,19 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
             "c.model_year as car_model_year",
             "ma.id as car_make_id",
             "ma.name as car_make_name",
-            "ol.value as odometer_log_value",
+            odometerValueExpression(
+                eb,
+                "ol.value",
+                "ou.conversion_factor"
+            ).as("odometer_log_value"),
             "ol.type_id as odometer_log_type_id",
-            "u.id as odometer_unit_id",
-            "u.key as odometer_unit_key",
-            "u.short as odometer_unit_short",
-            "u.conversion_factor as odometer_unit_conversion_factor"
-        ]);
-
-        if(id) query = query.where("fl.id", "=", id);
-
-        return query;
-    }
+            "ou.id as odometer_unit_id",
+            "ou.key as odometer_unit_key",
+            "ou.short as odometer_unit_short",
+            "ou.conversion_factor as odometer_unit_conversion_factor"
+        ])
+        .$if(!!id, (qb) => qb.where("fl.id", "=", id!));
+    };
 
     baseSummaryStatisticsQuery({
         carId,
@@ -157,7 +166,11 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
             db: this.db,
             baseQuery: this.baseSummaryStatisticsQuery({ carId, from, to }),
             idField: "fl.id",
-            field: "e.amount",
+            field: (eb) => exchangedAmountExpression(
+                eb,
+                "e.amount",
+                "e.exchange_rate"
+            ),
             fromDateField: "e.date",
             from,
             to
@@ -169,13 +182,11 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
         from,
         to
     }: StatisticsFunctionArgs) {
-        const quantityExpression = sql<number>`(fl.quantity / fu.conversion_factor)`;
-
         return getStatisticsAggregateQuery({
             db: this.db,
             baseQuery: this.baseSummaryStatisticsQuery({ carId, from, to }),
             idField: "fl.id",
-            field: quantityExpression,
+            field: (eb) => simpleConversionExpression(eb, "fl.quantity", "fu.conversion_factor"),
             fromDateField: "e.date",
             from,
             to
@@ -199,8 +210,8 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
         .leftJoin(`${ ODOMETER_UNIT_TABLE } as ou` as const, "c.odometer_unit_id", "ou.id")
         .select((eb) => [
             "e.date",
-            eb.fn.sum<number>(eb("fl.quantity", "/", eb.ref("fu.conversion_factor"))).as("quantity"),
-            eb("ol.value", "/", eb.fn.coalesce("ou.conversion_factor", sql.lit(1))).as("odometer_value")
+            eb.fn.sum<number>(simpleConversionExpression(eb, "fl.quantity", "fu.conversion_factor")).as("quantity"),
+            odometerValueExpression(eb, "ol.value", "ou.conversion_factor").as("odometer_value")
         ])
         .where("e.date", ">=", formatDateToDatabaseFormat(extendedFrom))
         .where("e.date", "<=", formatDateToDatabaseFormat(extendedTo))
@@ -252,13 +263,14 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
 
         const odometerStepsQuery = this.odometerLogDao.odometerQuery({ carId, from: extendedFrom, to: extendedTo })
         .select((eb) => {
-            const odometerValueExpression = eb.fn("round", [eb("ol.value", "/", eb.ref("ou.conversion_factor"))]);
+            const odometerExpression = odometerValueExpression(eb, "ol.value", "ou.conversion_factor");
             const dateExpression = this.odometerLogDao.dateExpression(eb);
+
             return [
                 //@formatter:off
-                odometerValueExpression.as("odometer_value"),
+                odometerExpression.as("odometer_value"),
                 dateExpression.as("date"),
-                sql<number>`LAG(${ odometerValueExpression }) OVER (ORDER BY ${ dateExpression })`.as("prev_odometer_value"),
+                sql<number>`LAG(${ odometerExpression }) OVER (ORDER BY ${ dateExpression })`.as("prev_odometer_value"),
                 sql<string>`LAG(${ dateExpression }) OVER (ORDER BY ${ dateExpression })`.as("prev_date")
                 //@formatter:on
             ];
@@ -269,11 +281,28 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
         .with("periods", (db) => db
             .selectFrom("steps")
             .select((eb) => [
+                //@formatter:off
                 "steps.date as date",
-                sql<number>`CAST(steps.odometer_value AS NUMERIC) - CAST(steps.prev_odometer_value AS NUMERIC)`.as(
-                    "period_distance"), eb.selectFrom(`${ FUEL_LOG_TABLE } as ifl` as const)
+                sql<number>`
+                    CAST(${ eb.ref("steps.odometer_value") } AS NUMERIC)
+                    -
+                    CAST(${ eb.ref("steps.prev_odometer_value") } AS NUMERIC)
+                `.as("period_distance"),
+                eb.selectFrom(`${ FUEL_LOG_TABLE } as ifl` as const)
                 .innerJoin(`${ EXPENSE_TABLE } as ie` as const, "ifl.expense_id", "ie.id")
-                .select((eb) => eb.fn.coalesce(eb.fn.sum("ie.amount"), eb.val(0)).as("period_cost"))
+                .innerJoin(`${ CAR_TABLE } as ic` as const, "ie.car_id", "ic.id")
+                .select((eb) =>
+                    eb.fn.coalesce(
+                        eb.fn.sum(
+                            exchangedAmountExpression(
+                                eb,
+                                "ie.amount",
+                                "ie.exchange_rate"
+                            )
+                        ),
+                        eb.val(0)
+                    ).as("period_cost")
+                )
                 .whereRef("ie.date", ">=", "steps.prev_date")
                 .whereRef("ie.date", "<", "steps.date")
                 .$if(!!carId, (qb) => qb.where("ie.car_id", "=", carId!))
@@ -283,13 +312,11 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
         )
         .selectFrom((eb) => eb
             .selectFrom("periods")
-            .select((_eb) => {
+            .select((eb) => {
                 return [
                     //@formatter:off
                     "date",
-                    // "period_cost",
-                    // "period_distance",
-                    sql<number>`ROUND((period_cost / NULLIF(period_distance, 0)) * 100, 2)`.as("value")
+                    sql<number>`ROUND((${ eb.ref("period_cost") } / NULLIF(${ eb.ref("period_distance") }, 0)) * 100, 2)`.as("value")
                     //@formatter:on
                 ]
             })
@@ -298,8 +325,6 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
         .select([
             "date",
             "value"
-            // "period_cost",
-            // "period_distance"
         ])
         .where("value", ">", 0)
         .where("date", ">=", formatDateToDatabaseFormat(from))

@@ -13,7 +13,7 @@ import {
 } from "../../../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
 import { ServiceTypeDao } from "./ServiceTypeDao.ts";
 import { SERVICE_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/serviceLog.ts";
-import { Kysely, sql } from "@powersync/kysely-driver";
+import { Kysely } from "@powersync/kysely-driver";
 import { ServiceLogFormFields } from "../../schemas/form/serviceLogForm.ts";
 import { EXPENSE_TABLE } from "../../../../../../database/connector/powersync/tables/expense.ts";
 import { ODOMETER_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/odometerLog.ts";
@@ -38,6 +38,13 @@ import { MAKE_TABLE } from "../../../../../../database/connector/powersync/table
 import { WatchQueryOptions } from "../../../../../../database/watcher/watcher.ts";
 import { UseWatchedQueryItemProps } from "../../../../../../database/hooks/useWatchedQueryItem.ts";
 import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
+import { StatisticsFunctionArgs } from "../../../../../../database/dao/types/statistis.ts";
+import { ExpenseTypeEnum } from "../../../../model/enums/ExpenseTypeEnum.ts";
+import {
+    exchangedAmountExpression,
+    odometerValueExpression,
+    pricePerUnitToAmountExpression
+} from "../../../../../../database/dao/expressions";
 
 export type SelectServiceLogTableRow =
     Omit<ServiceLogTableRow, "odometer_log_id">
@@ -52,6 +59,8 @@ export type SelectServiceLogTableRow =
     };
 
 export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLogMapper, SelectServiceLogTableRow> {
+    private readonly expenseDao: ExpenseDao;
+
     constructor(
         db: Kysely<DatabaseType>,
         powersync: AbstractPowerSyncDatabase,
@@ -77,10 +86,12 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
                 carDao
             )
         );
+
+        this.expenseDao = expenseDao;
     }
 
     selectQuery(id?: any | null) {
-        let query = this.db
+        return this.db
         .selectFrom(`${ SERVICE_LOG_TABLE } as sl` as const)
         .innerJoin(`${ SERVICE_TYPE_TABLE } as st` as const, "st.id", "sl.service_type_id")
         .innerJoin(`${ EXPENSE_TABLE } as e` as const, "e.id", "sl.expense_id")
@@ -89,7 +100,7 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
         .innerJoin(`${ MODEL_TABLE } as mo` as const, "mo.id", "c.model_id")
         .innerJoin(`${ MAKE_TABLE } as ma` as const, "ma.id", "mo.make_id")
         .innerJoin(`${ ODOMETER_LOG_TABLE } as ol` as const, "ol.id", "sl.odometer_log_id")
-        .innerJoin(`${ ODOMETER_UNIT_TABLE } as u` as const, "u.id", "c.odometer_unit_id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as ou` as const, "ou.id", "c.odometer_unit_id")
         .innerJoin(`${ CURRENCY_TABLE } as cur` as const, "cur.id", "e.currency_id")
         .innerJoin(`${ CURRENCY_TABLE } as ccur` as const, "ccur.id", "c.currency_id")
         .selectAll("sl")
@@ -97,7 +108,7 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
             "st.key as service_type_key",
             "st.owner_id as service_type_owner_id",
             "e.amount as expense_amount",
-            "e.original_amount as expense_original_amount",
+            exchangedAmountExpression(eb, "e.amount", "e.exchange_rate").as("expense_exchanged_amount"),
             "e.exchange_rate as expense_exchange_rate",
             "e.date as expense_date",
             "e.note as expense_note",
@@ -117,12 +128,12 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
             "ccur.symbol as expense_car_currency_symbol",
             "ccur.key as expense_car_currency_key",
             "ol.id as odometer_log_id",
-            "ol.value as odometer_log_value",
+            odometerValueExpression(eb, "ol.value", "ou.conversion_factor").as("odometer_log_value"),
             "ol.type_id as odometer_log_type_id",
-            "u.id as odometer_unit_id",
-            "u.key as odometer_unit_key",
-            "u.short as odometer_unit_short",
-            "u.conversion_factor as odometer_unit_conversion_factor",
+            "ou.id as odometer_unit_id",
+            "ou.key as odometer_unit_key",
+            "ou.short as odometer_unit_short",
+            "ou.conversion_factor as odometer_unit_conversion_factor",
             jsonArrayFrom(
                 eb
                 .selectFrom(`${ SERVICE_ITEM_TABLE } as si` as const)
@@ -130,7 +141,7 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
                 .innerJoin(`${ CAR_TABLE } as si_c` as const, "si_c.id", "si.car_id")
                 .innerJoin(`${ CURRENCY_TABLE } as si_curr` as const, "si_curr.id", "si.currency_id")
                 .innerJoin(`${ CURRENCY_TABLE } as si_ccurr` as const, "si_ccurr.id", "si_c.currency_id")
-                .select([
+                .select((eb) => [
                     "si.id",
                     "si.car_id",
                     "si.service_log_id",
@@ -138,6 +149,11 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
                     "si.exchange_rate",
                     "si.quantity",
                     "si.price_per_unit",
+                    exchangedAmountExpression(
+                        eb,
+                        "si.price_per_unit",
+                        "si.exchange_rate"
+                    ).as("exchanged_price_per_unit"),
                     "si_sit.owner_id as type_owner_id",
                     "si_sit.key as type_key",
                     "si_ccurr.id as car_currency_id",
@@ -148,17 +164,26 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
                     "si_curr.symbol as currency_symbol"
                 ])
                 .whereRef("si.service_log_id", "=", "sl.id")
-                .$castTo<SelectServiceItemTableRow>()
             ).as("items"),
             jsonArrayFrom(
                 eb.selectFrom(`${ SERVICE_ITEM_TABLE } as si` as const)
                 .innerJoin(`${ CURRENCY_TABLE } as si_curr` as const, "si_curr.id", "si.currency_id")
                 .innerJoin(`${ CURRENCY_TABLE } as si_ccurr` as const, "si_ccurr.id", "c.currency_id")
-                .select([
-                    // @formatter:off
-                    sql<number>`CAST(SUM(si.price_per_unit * si.quantity) AS FLOAT)`.as("original_amount"),
-                    sql<number>`CAST(SUM(si.price_per_unit * si.quantity * si.exchange_rate) AS FLOAT)`.as("amount"),
-                    // @formatter:on
+                .select((eb) => [
+                    pricePerUnitToAmountExpression(
+                        eb,
+                        "si.price_per_unit",
+                        "si.quantity"
+                    ).as("amount"),
+                    exchangedAmountExpression(
+                        eb,
+                        pricePerUnitToAmountExpression(
+                            eb,
+                            "si.price_per_unit",
+                            "si.quantity"
+                        ),
+                        "si.exchange_rate"
+                    ).as("exchanged_amount"),
                     "si.exchange_rate as exchange_rate",
                     "si_curr.id as currency_id",
                     "si_curr.key as currency_key",
@@ -170,11 +195,8 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
                 .whereRef("si.service_log_id", "=", "sl.id")
                 .groupBy(["si.currency_id", "si.exchange_rate", "si_curr.id", "si_ccurr.id"])
             ).as("totalAmount")
-        ]);
-
-        if(id) query = query.where("sl.id", "=", id);
-
-        return query;
+        ])
+        .$if(!!id, (qb) => qb.where("sl.id", "=", id!));
     }
 
     serviceLogWatchedQueryItem(

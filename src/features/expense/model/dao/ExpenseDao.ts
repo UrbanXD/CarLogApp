@@ -34,6 +34,7 @@ import { sql } from "kysely";
 import { formatDateToDatabaseFormat } from "../../../statistics/utils/formatDateToDatabaseFormat.ts";
 import { getRangeUnit } from "../../../statistics/utils/getRangeUnit.ts";
 import { getRangeExpression } from "../../../../database/dao/utils/getRangeExpression.ts";
+import { exchangedAmountExpression } from "../../../../database/dao/expressions";
 
 export type ExpenseTypeComparisonTableRow = ExtractRowFromQuery<ReturnType<ExpenseDao["typeComparisonQuery"]>>;
 export type GroupedExpensesByRangeTableRow = ExtractRowFromQuery<ReturnType<ExpenseDao["groupedExpensesByRangeQuery"]>>;
@@ -59,45 +60,46 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
     }
 
     selectQuery(id?: any | null) {
-        let query = this.db
-        .selectFrom(`${ EXPENSE_TABLE } as expense` as const)
-        .innerJoin(`${ CAR_TABLE } as car` as const, `car.id`, `expense.car_id`)
-        .innerJoin(`${ MODEL_TABLE } as model` as const, "model.id", "car.model_id")
-        .innerJoin(`${ MAKE_TABLE } as make` as const, "make.id", "model.make_id")
-        .leftJoin(`${ FUEL_LOG_TABLE } as fuel` as const, `fuel.expense_id`, `expense.id`)
-        .leftJoin(`${ SERVICE_LOG_TABLE } as service` as const, `service.expense_id`, `expense.id`)
-        .innerJoin(`${ EXPENSE_TYPE_TABLE } as type` as const, `type.id`, `expense.type_id`)
-        .innerJoin(`${ CURRENCY_TABLE } as car_curr` as const, `car_curr.id`, `car.currency_id`)
-        .innerJoin(`${ CURRENCY_TABLE } as exp_curr` as const, `exp_curr.id`, `expense.currency_id`)
+        return this.db
+        .selectFrom(`${ EXPENSE_TABLE } as e` as const)
+        .innerJoin(`${ CAR_TABLE } as c` as const, "c.id", "e.car_id")
+        .innerJoin(`${ MODEL_TABLE } as mo` as const, "mo.id", "c.model_id")
+        .innerJoin(`${ MAKE_TABLE } as m` as const, "m.id", "mo.make_id")
+        .leftJoin(`${ FUEL_LOG_TABLE } as fl` as const, "fl.expense_id", "e.id")
+        .leftJoin(`${ SERVICE_LOG_TABLE } as sl` as const, "sl.expense_id", "e.id")
+        .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "et.id", "e.type_id")
+        .innerJoin(`${ CURRENCY_TABLE } as c_curr` as const, "c_curr.id", "c.currency_id")
+        .innerJoin(`${ CURRENCY_TABLE } as e_curr` as const, "e_curr.id", "e.currency_id")
         .select((eb) => [
-            "expense.id as id",
-            "expense.original_amount",
-            "expense.exchange_rate",
-            "expense.amount",
-            "expense.note",
-            "expense.date",
-            eb.fn.coalesce("fuel.id", "service.id").as("related_id"),
-            "car.id as car_id",
-            "car.name as car_name",
-            "model.id as car_model_id",
-            "model.name as car_model_name",
-            "car.model_year as car_model_year",
-            "make.id as car_make_id",
-            "make.name as car_make_name",
-            "car.currency_id as car_currency_id",
-            "car_curr.key as car_currency_key",
-            "car_curr.symbol as car_currency_symbol",
-            "exp_curr.id as currency_id",
-            "exp_curr.key as currency_key",
-            "exp_curr.symbol as currency_symbol",
-            "type.id as type_id",
-            "type.owner_id as type_owner_id",
-            "type.key as type_key"
-        ]).$castTo<SelectExpenseTableRow>();
-
-        if(id) query = query.where("expense.id", "=", id);
-
-        return query;
+            "e.id as id",
+            "e.exchange_rate",
+            "e.amount",
+            exchangedAmountExpression(
+                eb,
+                "e.amount",
+                "e.exchange_rate"
+            ).as("exchanged_amount"),
+            "e.note",
+            "e.date",
+            eb.fn.coalesce("fl.id", "sl.id").as("related_id"),
+            "c.id as car_id",
+            "c.name as car_name",
+            "mo.id as car_model_id",
+            "mo.name as car_model_name",
+            "c.model_year as car_model_year",
+            "m.id as car_make_id",
+            "m.name as car_make_name",
+            "c_curr.id as car_currency_id",
+            "c_curr.key as car_currency_key",
+            "c_curr.symbol as car_currency_symbol",
+            "e_curr.id as currency_id",
+            "e_curr.key as currency_key",
+            "e_curr.symbol as currency_symbol",
+            "et.id as type_id",
+            "et.owner_id as type_owner_id",
+            "et.key as type_key"
+        ])
+        .$if(!!id, (qb) => qb.where("e.id", "=", id!));
     }
 
     summaryStatisticsQuery({
@@ -119,8 +121,12 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         let subQuery = this.db
         .selectFrom(`${ EXPENSE_TABLE } as ie` as const)
         .innerJoin(`${ EXPENSE_TYPE_TABLE } as iet` as const, "ie.type_id", "iet.id")
-        .select([
-            "ie.amount",
+        .select((eb) => [
+            exchangedAmountExpression(
+                eb,
+                "ie.amount",
+                "ie.exchange_rate"
+            ).as("amount"),
             "iet.id as type_id",
             "iet.owner_id",
             "iet.key"
@@ -133,12 +139,20 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
             db: this.db,
             baseQuery: mainQuery,
             idField: "e.id",
-            field: "e.amount",
+            field: (eb) => exchangedAmountExpression(
+                eb,
+                "e.amount",
+                "e.exchange_rate"
+            ),
             fromDateField: "e.date",
             recordQueryConfig: {
                 query: subQuery,
                 idField: "ie.id",
-                field: "ie.amount",
+                field: (eb) => exchangedAmountExpression(
+                    eb,
+                    "ie.amount",
+                    "ie.exchange_rate"
+                ),
                 fromDateField: "ie.date",
                 jsonObject: true
             },
@@ -220,8 +234,8 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         options?: WatchQueryOptions<SelectExpenseTableRow>
     ): UseWatchedQueryCollectionProps<Array<Expense>, SelectExpenseTableRow> {
         const query = this.selectQuery()
-        .whereRef("expense.car_id", "=", carId as any)
-        .orderBy("expense.date", "desc")
+        .whereRef("e.car_id", "=", carId as any)
+        .orderBy("e.date", "desc")
         .limit(3);
 
         return {
@@ -267,16 +281,16 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
             baseQuery: this.selectQuery(),
             defaultCursorOptions: {
                 cursor: [
-                    { field: "expense.date", order: "desc" },
-                    { field: "expense.amount", order: "desc" },
-                    { field: "expense.id", order: "desc" }
+                    { field: "e.date", order: "desc" },
+                    { field: "e.amount", order: "desc" },
+                    { field: "e.id", order: "desc" }
                 ],
                 defaultOrder: "desc"
             },
             defaultFilters: [
                 {
                     key: CAR_TABLE,
-                    filters: [{ field: "car.id", operator: "=", value: carId }],
+                    filters: [{ field: "c.id", operator: "=", value: carId }],
                     logic: "AND"
                 }
             ],

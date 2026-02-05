@@ -8,10 +8,6 @@ import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/P
 import { Car, carSchema } from "../../schemas/carSchema.ts";
 import { CarFormFields } from "../../schemas/form/carForm.ts";
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
-import {
-    convertOdometerValueFromKilometer,
-    convertOdometerValueToKilometer
-} from "../../_features/odometer/utils/convertOdometerUnit.ts";
 import { OdometerLogTypeEnum } from "../../_features/odometer/model/enums/odometerLogTypeEnum.ts";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 import { SelectCarModelTableRow, SelectCarTableRow } from "../dao/CarDao.ts";
@@ -25,11 +21,13 @@ import { fuelTypeSchema } from "../../_features/fuel/schemas/fuelTypeSchema.ts";
 import { fuelUnitSchema } from "../../_features/fuel/schemas/fuelUnitSchema.ts";
 import { OdometerUnitDao } from "../../_features/odometer/model/dao/OdometerUnitDao.ts";
 import { getUUID } from "../../../../database/utils/uuid.ts";
+import { FuelUnitDao } from "../../_features/fuel/model/dao/FuelUnitDao.ts";
 
 export class CarMapper extends AbstractMapper<CarTableRow, Car, SelectCarTableRow> {
     constructor(
         private readonly attachmentQueue: PhotoAttachmentQueue | undefined,
-        private readonly odometerUnitDao: OdometerUnitDao
+        private readonly odometerUnitDao: OdometerUnitDao,
+        private readonly fuelUnitDao: FuelUnitDao
     ) {
         super();
     }
@@ -51,11 +49,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car, SelectCarTableRo
             odometer: odometerSchema.parse({
                 id: entity.odometer_log_id ?? getUUID(),
                 carId: entity.id,
-                valueInKm: entity.odometer_log_value ?? 0,
-                value: convertOdometerValueFromKilometer(
-                    entity.odometer_log_value ?? 0,
-                    entity.odometer_unit_conversion_factor ?? 1
-                ),
+                value: entity.odometer_log_value ?? 0,
                 unit: odometerUnitSchema.parse({
                     id: entity.odometer_unit_id,
                     key: entity.odometer_unit_key,
@@ -121,7 +115,10 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car, SelectCarTableRo
         odometerChangeLog: OdometerChangeLogTableRow | null,
         fuelTank: FuelTankTableRow
     }> {
-        const odometerUnit = (await this.odometerUnitDao.getById(request.odometer.unitId))!;
+        const [odometerUnit, fuelUnit] = await Promise.all([
+            this.odometerUnitDao.getById(request.odometer.unitId),
+            this.fuelUnitDao.getById(request.fuelTank.unitId)
+        ]);
 
         let path = request?.image?.fileName ?? null;
 
@@ -149,7 +146,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car, SelectCarTableRo
             id: request.odometer.id,
             car_id: request.id,
             type_id: OdometerLogTypeEnum.SIMPLE,
-            value: convertOdometerValueToKilometer(request.odometer.value, odometerUnit?.conversionFactor)
+            value: request.odometer.value * odometerUnit.conversionFactor
         };
 
         let odometerChangeLog: OdometerChangeLogTableRow | null = null;
@@ -168,17 +165,9 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car, SelectCarTableRo
             car_id: request.id,
             type_id: request.fuelTank.typeId,
             unit_id: request.fuelTank.unitId,
-            capacity: request.fuelTank.capacity
+            capacity: request.fuelTank.capacity * fuelUnit.conversionFactor
         };
 
         return { car, odometerLog, odometerChangeLog: odometerChangeLog, fuelTank };
-    }
-
-    dtoToPicker(dtos: Array<Car>): Array<PickerItemType> {
-        return dtos.map(dto => ({
-            value: dto.id,
-            title: dto.name,
-            subtitle: `${ dto.model.make.name } ${ dto.model.name }`
-        }));
     }
 }

@@ -21,6 +21,7 @@ import {
 } from "../dao/ExpenseDao.ts";
 import { LegendType } from "../../../statistics/components/charts/common/Legend.tsx";
 import { BarChartItem } from "../../../statistics/components/charts/BarChartView.tsx";
+import { MAX_EXCHANGE_RATE_DECIMAL } from "../../../../constants";
 
 export type SelectAmountCurrencyTableRow =
     WithPrefix<CurrencyTableRow, "currency">
@@ -31,7 +32,7 @@ export type SelectExpenseTableRow =
     & Omit<SelectAmountCurrencyTableRow, "currency_id">
     & WithPrefix<ExpenseTypeTableRow, "type">
     & WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">
-    & { related_id: string | null }
+    & { related_id: string | null, exchanged_amount: number | null }
 
 export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, SelectExpenseTableRow> {
     private readonly expenseTypeDao: ExpenseTypeDao;
@@ -68,9 +69,9 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, Sele
         });
 
         const amount = amountSchema.parse({
-            amount: numberToFractionDigit(entity.original_amount ?? 0),
-            exchangedAmount: numberToFractionDigit((entity.original_amount ?? 0) * (entity.exchange_rate ?? 0)),
-            exchangeRate: numberToFractionDigit(entity.exchange_rate ?? 0),
+            amount: numberToFractionDigit(entity.amount ?? 0),
+            exchangedAmount: numberToFractionDigit(entity.exchanged_amount ?? 0),
+            exchangeRate: numberToFractionDigit(entity.exchange_rate ?? 1, MAX_EXCHANGE_RATE_DECIMAL),
             currency: currencySchema.parse({
                 id: entity.currency_id,
                 key: entity.currency_key,
@@ -100,9 +101,8 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, Sele
             car_id: dto.car.id,
             type_id: dto.type.id,
             currency_id: dto.amount.exchangeCurrency.id,
-            amount: dto.amount.exchangedAmount,
-            original_amount: dto.amount.amount,
-            exchange_rate: dto.amount.exchangeRate,
+            amount: numberToFractionDigit(dto.amount.amount),
+            exchange_rate: numberToFractionDigit(dto.amount.exchangeRate, MAX_EXCHANGE_RATE_DECIMAL),
             note: dto.note,
             date: dto.date
         };
@@ -213,9 +213,8 @@ export class ExpenseMapper extends AbstractMapper<ExpenseTableRow, Expense, Sele
             car_id: formResult.carId,
             type_id: formResult.typeId,
             currency_id: formResult.expense.currencyId,
-            amount: numberToFractionDigit(formResult.expense.amount * formResult.expense.exchangeRate),
-            original_amount: formResult.expense.amount,
-            exchange_rate: formResult.expense.exchangeRate,
+            amount: numberToFractionDigit(formResult.expense.amount),
+            exchange_rate: numberToFractionDigit(formResult.expense.exchangeRate, MAX_EXCHANGE_RATE_DECIMAL),
             note: formResult.note,
             date: formResult.date
         };

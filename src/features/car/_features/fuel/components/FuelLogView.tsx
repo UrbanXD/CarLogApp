@@ -91,14 +91,14 @@ export function FuelLogView({ id }: FuelLogViewProps) {
                />,
             onPress: () => onEdit(FuelLogFormFieldsEnum.Amount),
             secondaryInfo:
-                fuelLog?.originalPricePerUnit !== 0
+                fuelLog?.pricePerUnit !== 0
                 ? {
                         title: t("currency.price_per_unit"),
                         content: (textStyle) => fuelLog &&
                            <AmountText
-                              amount={ fuelLog.originalPricePerUnit }
+                              amount={ fuelLog.pricePerUnit }
                               currencyText={ `${ fuelLog.expense.amount.currency.symbol }/${ fuelLog.fuelUnit.short }` }
-                              exchangedAmount={ fuelLog.pricePerUnit }
+                              exchangedAmount={ fuelLog.exchangedPricePerUnit }
                               exchangeCurrencyText={ `${ fuelLog.expense.amount.exchangeCurrency.symbol }/${ fuelLog.fuelUnit.short }` }
                               amountTextStyle={ textStyle }
                            />

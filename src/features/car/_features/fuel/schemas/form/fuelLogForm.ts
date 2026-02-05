@@ -89,7 +89,7 @@ export function useEditFuelLogFormProps(fuelLog: FuelLog): UseFormProps<FuelLogF
         expense: {
             id: fuelLog.expense.id,
             currencyId: fuelLog.expense.amount.currency.id,
-            amount: fuelLog.isPricePerUnit ? fuelLog.originalPricePerUnit : fuelLog.expense.amount.amount,
+            amount: fuelLog.isPricePerUnit ? fuelLog.pricePerUnit : fuelLog.expense.amount.amount,
             isPricePerUnit: fuelLog.isPricePerUnit,
             exchangeRate: fuelLog.expense.amount.exchangeRate
         },

@@ -13,13 +13,13 @@ import { CarDao } from "../../../car/model/dao/CarDao.ts";
 import { RideLog, rideLogSchema } from "../../schemas/rideLogSchema.ts";
 import { RideLogFormFields } from "../../schemas/form/rideLogForm.ts";
 import { OdometerLogTypeEnum } from "../../../car/_features/odometer/model/enums/odometerLogTypeEnum.ts";
-import { convertOdometerValueToKilometer } from "../../../car/_features/odometer/utils/convertOdometerUnit.ts";
-import { OdometerUnit } from "../../../car/_features/odometer/schemas/odometerUnitSchema.ts";
 import { SelectRideLogTableRow, SelectTimelineRideLogTableRow } from "../dao/rideLogDao.ts";
 import { RideExpenseMapper } from "../../_features/rideExpense/model/mapper/rideExpenseMapper.ts";
 import { RidePlaceMapper } from "../../_features/place/model/mapper/ridePlaceMapper.ts";
 import { RidePassengerMapper } from "../../_features/passenger/model/mapper/ridePassengerMapper.ts";
 import { carSimpleSchema } from "../../../car/schemas/carSchema.ts";
+import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
+import { MAX_EXCHANGE_RATE_DECIMAL } from "../../../../constants";
 
 export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
     private readonly rideExpenseMapper: RideExpenseMapper;
@@ -73,7 +73,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         const startOdometer = this.odometerLogDao.mapper.toOdometerDto({
             log_id: entity.start_odometer_log_id,
             log_car_id: entity.car_id,
-            log_value: entity.start_odometer_log_value,
+            log_value: Math.round(entity.start_odometer_log_value ?? 0),
             unit_id: entity.odometer_unit_id,
             unit_key: entity.odometer_unit_key,
             unit_short: entity.odometer_unit_short,
@@ -82,7 +82,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         const endOdometer = this.odometerLogDao.mapper.toOdometerDto({
             log_id: entity.end_odometer_log_id,
             log_car_id: entity.car_id,
-            log_value: entity.end_odometer_log_value,
+            log_value: Math.round(entity.end_odometer_log_value ?? 0),
             unit_id: entity.odometer_unit_id,
             unit_key: entity.odometer_unit_key,
             unit_short: entity.odometer_unit_short,
@@ -128,7 +128,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         startOdometerLog: OdometerLogTableRow,
         endOdometerLog: OdometerLogTableRow
     }> {
-        const [ownerId, odometerUnit]: [string, OdometerUnit] = await Promise.all([
+        const [ownerId, odometerUnit] = await Promise.all([
             (async () => this.carDao.getCarOwnerById(formResult.carId))(),
             (async () => this.odometerUnitDao.getUnitByCarId(formResult.carId))()
         ]);
@@ -137,14 +137,14 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
             id: formResult.startOdometerLogId,
             car_id: formResult.carId,
             type_id: OdometerLogTypeEnum.RIDE,
-            value: convertOdometerValueToKilometer(formResult.startOdometerValue!, odometerUnit.conversionFactor)
+            value: Math.round(formResult.startOdometerValue * odometerUnit.conversionFactor)
         };
 
         const endOdometerLog: OdometerLogTableRow = {
             id: formResult.endOdometerLogId,
             car_id: formResult.carId,
             type_id: OdometerLogTypeEnum.RIDE,
-            value: convertOdometerValueToKilometer(formResult.endOdometerValue!, odometerUnit.conversionFactor)
+            value: Math.round(formResult.endOdometerValue * odometerUnit.conversionFactor)
         };
 
         const rideLog: RideLogTableRow = {
@@ -173,9 +173,8 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
                 car_id: formResult.carId,
                 type_id: item.expense.type.id,
                 currency_id: item.expense.amount.currency.id,
-                original_amount: item.expense.amount.amount,
-                amount: item.expense.amount.exchangedAmount,
-                exchange_rate: item.expense.amount.exchangeRate,
+                amount: numberToFractionDigit(item.expense.amount.amount),
+                exchange_rate: numberToFractionDigit(item.expense.amount.exchangeRate, MAX_EXCHANGE_RATE_DECIMAL),
                 note: item.expense.note,
                 date: item.expense.date
             });

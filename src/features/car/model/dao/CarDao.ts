@@ -35,6 +35,8 @@ import { WatchQueryOptions } from "../../../../database/watcher/watcher.ts";
 import { UseWatchedQueryCollectionProps } from "../../../../database/hooks/useWatchedQueryCollection.ts";
 import { UseInfiniteQueryOptions } from "../../../../database/hooks/useInfiniteQuery.ts";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
+import { FuelUnitDao } from "../../_features/fuel/model/dao/FuelUnitDao.ts";
+import { odometerValueExpression, simpleConversionExpression } from "../../../../database/dao/expressions";
 
 export type SelectCarModelTableRow =
     Pick<CarTableRow, "id" | "name" | "model_year"> &
@@ -59,13 +61,14 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper, SelectCarTableRow> 
         db: Kysely<DatabaseType>,
         powersync: AbstractPowerSyncDatabase,
         attachmentQueue: PhotoAttachmentQueue | undefined,
-        odometerUnitDao: OdometerUnitDao
+        odometerUnitDao: OdometerUnitDao,
+        fuelUnitDao: FuelUnitDao
     ) {
         super(
             db,
             powersync,
             CAR_TABLE,
-            new CarMapper(attachmentQueue, odometerUnitDao)
+            new CarMapper(attachmentQueue, odometerUnitDao, fuelUnitDao)
         );
         this.attachmentQueue = attachmentQueue;
     }
@@ -73,7 +76,7 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper, SelectCarTableRow> 
     selectQuery(id?: any | null): SelectQueryBuilder<DatabaseType, any, SelectCarTableRow> {
         const localCurrencyId = getUserLocalCurrency();
 
-        let query = this.db
+        return this.db
         .selectFrom(`${ CAR_TABLE } as car` as const)
         .innerJoin(`${ MODEL_TABLE } as model` as const, "model.id", "car.model_id")
         .innerJoin(`${ MAKE_TABLE } as make` as const, "make.id", "model.make_id")
@@ -91,6 +94,20 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper, SelectCarTableRow> 
         .innerJoin(`${ FUEL_TYPE_TABLE } as f_type` as const, "f_type.id", "tank.type_id")
         .innerJoin(`${ FUEL_UNIT_TABLE } as f_unit` as const, "f_unit.id", "tank.unit_id")
         .innerJoin(`${ ODOMETER_UNIT_TABLE } as o_unit` as const, "o_unit.id", "car.odometer_unit_id")
+        .leftJoin(
+            (eb) => eb
+            .selectFrom(`${ ODOMETER_LOG_TABLE } as o_log` as const)
+            .select(["o_log.id", "o_log.value", "o_log.car_id"])
+            .where("o_log.id", "=", (sub) =>
+                sub.selectFrom(`${ ODOMETER_LOG_TABLE } as inner_log` as const)
+                .select("inner_log.id")
+                .whereRef("inner_log.car_id", "=", "o_log.car_id")
+                .orderBy("inner_log.value", "desc")
+                .limit(1)
+            )
+            .as("latest_log"),
+            (join) => join.onRef("latest_log.car_id", "=", "car.id")
+        )
         .selectAll("car")
         .select((eb) => [
             "model.name as model_name",
@@ -99,7 +116,7 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper, SelectCarTableRow> 
             "curr.key as currency_key",
             "curr.symbol as currency_symbol",
             "tank.id as fuel_tank_id",
-            "tank.capacity as fuel_tank_capacity",
+            simpleConversionExpression(eb, "tank.capacity", "f_unit.conversion_factor", true).as("fuel_tank_capacity"),
             "f_type.id as fuel_type_id",
             "f_type.key as fuel_type_key",
             "f_unit.id as fuel_unit_id",
@@ -109,25 +126,13 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper, SelectCarTableRow> 
             "o_unit.key as odometer_unit_key",
             "o_unit.short as odometer_unit_short",
             "o_unit.conversion_factor as odometer_unit_conversion_factor",
-            eb.selectFrom(`${ ODOMETER_LOG_TABLE } as o_log`)
-            .select("o_log.id")
-            .whereRef("o_log.car_id", "=", "car.id")
-            .orderBy("o_log.value", "desc")
-            .limit(1)
-            .as("odometer_log_id"),
-            eb.selectFrom(`${ ODOMETER_LOG_TABLE } as o_log`)
-            .select("o_log.value")
-            .whereRef("o_log.car_id", "=", "car.id")
-            .orderBy("o_log.value", "desc")
-            .limit(1)
-            .as("odometer_log_value")
+            "latest_log.id as odometer_log_id",
+            odometerValueExpression(eb, "latest_log.value", "o_unit.conversion_factor").as("odometer_log_value")
         ])
         .orderBy("car.created_at", "asc")
-        .orderBy("car.name", "asc");
-
-        if(id) query = query.where("car.id", "=", id);
-
-        return query;
+        .orderBy("car.name", "asc")
+        .groupBy("car.id")
+        .$if(!!id, (qb) => qb.where("car.id", "=", id!));
     }
 
     selectCarModelQuery(id?: any | null) {

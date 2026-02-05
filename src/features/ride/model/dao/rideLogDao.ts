@@ -7,7 +7,7 @@ import {
 } from "../../../../database/connector/powersync/AppSchema.ts";
 import { RideLog } from "../../schemas/rideLogSchema.ts";
 import { RideLogMapper } from "../mapper/rideLogMapper.ts";
-import { Kysely, sql } from "@powersync/kysely-driver";
+import { Kysely } from "@powersync/kysely-driver";
 import { OdometerLogDao, SelectOdometerTableRow } from "../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
 import { OdometerUnitDao } from "../../../car/_features/odometer/model/dao/OdometerUnitDao.ts";
 import { CarDao, SelectCarModelTableRow } from "../../../car/model/dao/CarDao.ts";
@@ -43,6 +43,7 @@ import { UseWatchedQueryCollectionProps } from "../../../../database/hooks/useWa
 import { formatDateToDatabaseFormat } from "../../../statistics/utils/formatDateToDatabaseFormat.ts";
 import { DateType } from "react-native-ui-datepicker";
 import { UseInfiniteQueryOptions } from "../../../../database/hooks/useInfiniteQuery.ts";
+import { exchangedAmountExpression, odometerValueExpression } from "../../../../database/dao/expressions";
 
 export type SelectBaseRideLogTableRow = RideLogTableRow
     & WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">
@@ -110,7 +111,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
         .innerJoin(`${ ODOMETER_LOG_TABLE } as sol` as const, "sol.id", "rl.start_odometer_log_id")
         .innerJoin(`${ ODOMETER_LOG_TABLE } as eol` as const, "eol.id", "rl.end_odometer_log_id")
         .innerJoin(`${ CURRENCY_TABLE } as ccur` as const, "ccur.id", "c.currency_id")
-        .select([
+        .select((eb) => [
             "rl.id",
             "rl.start_time",
             "rl.end_time",
@@ -126,9 +127,9 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
             "ccur.key as car_currency_key",
             "ccur.symbol as car_currency_symbol",
             "sol.id as start_odometer_log_id",
-            "sol.value as start_odometer_log_value",
+            odometerValueExpression(eb, "sol.value", "ou.conversion_factor").as("start_odometer_log_value"),
             "eol.id as end_odometer_log_id",
-            "eol.value as end_odometer_log_value",
+            odometerValueExpression(eb, "eol.value", "ou.conversion_factor").as("end_odometer_log_value"),
             "ou.id as odometer_unit_id",
             "ou.key as odometer_unit_key",
             "ou.short as odometer_unit_short",
@@ -149,7 +150,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
                 .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "et.id", "e.type_id")
                 .innerJoin(`${ CURRENCY_TABLE } as cur` as const, "cur.id", "e.currency_id")
                 .innerJoin(`${ CURRENCY_TABLE } as ccur` as const, "ccur.id", "c.currency_id")
-                .select([
+                .select((eb) => [
                     "re.id",
                     "re.owner_id",
                     "re.ride_log_id",
@@ -162,7 +163,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
                     "ma.id as expense_car_make_id",
                     "ma.name as expense_car_make_name",
                     "e.amount as expense_amount",
-                    "e.original_amount as expense_original_amount",
+                    exchangedAmountExpression(eb, "e.amount", "e.exchange_rate").as("expense_exchanged_amount"),
                     "e.exchange_rate as expense_exchange_rate",
                     "e.date as expense_date",
                     "e.note as expense_note",
@@ -177,7 +178,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
                     "ccur.key as expense_car_currency_key"
                 ])
                 .whereRef("re.ride_log_id", "=", "rl.id")
-            ).$castTo<Array<SelectRideExpenseTableRow>>().as("expenses"),
+            ).as("expenses"),
             jsonArrayFrom(
                 eb
                 .selectFrom(`${ RIDE_PASSENGER_TABLE } as rp` as const)
@@ -222,11 +223,29 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
             .selectFrom(`${ RIDE_EXPENSE_TABLE } as re` as const)
             .innerJoin(`${ EXPENSE_TABLE } as e` as const, "e.id", "re.expense_id")
             .whereRef("re.ride_log_id", "=", "rl.id")
-            .select(sql<number>`COALESCE(SUM(e.amount), 0)`.as("total_expense"))
-            .as("total_expense"),
-            sql<number>`COALESCE(eol.value - sol.value, 0)`.as("distance"),
-            sql<number>`(julianday(rl.end_time) - julianday(rl.start_time))
-                        * 86400`.as("duration")
+            .select(
+                (eb) => eb.fn.coalesce(
+                    eb.fn.sum(exchangedAmountExpression(eb, "e.amount", "e.exchange_rate")),
+                    eb.val(0)
+                ).as("total")
+            ).as("total_expense"),
+            eb.fn.coalesce(
+                eb(
+                    odometerValueExpression(eb, "sol.value", "ou.conversion_factor"),
+                    "-",
+                    odometerValueExpression(eb, "eol.value", "ou.conversion_factor")
+                ),
+                eb.val(0)
+            ).as("distance"),
+            eb(
+                eb(
+                    eb.fn("JULIANDAY", [eb.ref("rl.end_time")]),
+                    "-",
+                    eb.fn("JULIANDAY", [eb.ref("rl.start_time")])
+                ),
+                "*",
+                eb.val(86400)
+            ).as("duration")
         ])
         .$castTo<SelectTimelineRideLogTableRow>();
     }

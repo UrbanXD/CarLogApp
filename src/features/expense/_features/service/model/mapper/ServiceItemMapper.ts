@@ -16,6 +16,7 @@ import { SelectServiceItemTableRow } from "../dao/ServiceItemDao.ts";
 import { SelectExpenseTableRow } from "../../../../model/mapper/expenseMapper.ts";
 import { WithPrefix } from "../../../../../../types";
 import { SelectCarModelTableRow } from "../../../../../car/model/dao/CarDao.ts";
+import { MAX_EXCHANGE_RATE_DECIMAL } from "../../../../../../constants";
 
 export type ServiceItemTotalAmountTableRow =
     Omit<SelectExpenseTableRow, "related_id" | "car_id" | "id" | "date" | "note" | "type_id" | "type_key" | "type_owner_id" | keyof WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">>
@@ -42,9 +43,9 @@ export class ServiceItemMapper extends AbstractMapper<ServiceItemTableRow, Servi
             }),
             quantity: entity.quantity,
             pricePerUnit: amountSchema.parse({
-                amount: numberToFractionDigit(entity.price_per_unit!),
-                exchangedAmount: numberToFractionDigit(entity.exchange_rate! * entity.price_per_unit!),
-                exchangeRate: numberToFractionDigit(entity.exchange_rate!),
+                amount: numberToFractionDigit(entity.price_per_unit ?? 0),
+                exchangedAmount: numberToFractionDigit(entity.exchanged_price_per_unit ?? 0),
+                exchangeRate: numberToFractionDigit(entity.exchange_rate ?? 1, MAX_EXCHANGE_RATE_DECIMAL),
                 currency: {
                     id: entity.currency_id,
                     key: entity.currency_key,
@@ -66,9 +67,9 @@ export class ServiceItemMapper extends AbstractMapper<ServiceItemTableRow, Servi
             service_log_id: dto.serviceLogId,
             service_item_type_id: dto.type.id,
             currency_id: dto.pricePerUnit.currency.id,
-            exchange_rate: dto.pricePerUnit.exchangeRate,
-            quantity: dto.quantity,
-            price_per_unit: dto.pricePerUnit.amount
+            exchange_rate: numberToFractionDigit(dto.pricePerUnit.exchangeRate, MAX_EXCHANGE_RATE_DECIMAL),
+            quantity: numberToFractionDigit(dto.quantity),
+            price_per_unit: numberToFractionDigit(dto.pricePerUnit.amount)
         };
     }
 
@@ -80,9 +81,9 @@ export class ServiceItemMapper extends AbstractMapper<ServiceItemTableRow, Servi
         for(const entity of entities) {
             result.push(
                 amountSchema.parse({
-                    amount: numberToFractionDigit(entity.original_amount!),
-                    exchangedAmount: numberToFractionDigit(entity.amount!),
-                    exchangeRate: numberToFractionDigit(entity.exchange_rate!),
+                    amount: numberToFractionDigit(entity.amount ?? 0),
+                    exchangedAmount: numberToFractionDigit(entity.exchanged_amount ?? 0),
+                    exchangeRate: numberToFractionDigit(entity.exchange_rate ?? 1, MAX_EXCHANGE_RATE_DECIMAL),
                     currency: {
                         id: entity.currency_id,
                         key: entity.currency_key,
@@ -115,11 +116,11 @@ export class ServiceItemMapper extends AbstractMapper<ServiceItemTableRow, Servi
         return transformedServiceItemForm.parse({
             id: formResult.id,
             type: type,
-            quantity: formResult.expense.quantity,
+            quantity: numberToFractionDigit(formResult.expense.quantity),
             pricePerUnit: {
                 amount: numberToFractionDigit(formResult.expense.amount),
                 exchangedAmount: numberToFractionDigit(formResult.expense.exchangeRate * formResult.expense.amount),
-                exchangeRate: numberToFractionDigit(formResult.expense.exchangeRate),
+                exchangeRate: numberToFractionDigit(formResult.expense.exchangeRate, MAX_EXCHANGE_RATE_DECIMAL),
                 currency: currency,
                 exchangeCurrency: carCurrency
             }

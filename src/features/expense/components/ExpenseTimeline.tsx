@@ -34,16 +34,16 @@ export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
     } = useTimeline({
         infiniteQueryOptions: memoizedOptions,
         cursorOrderButtons: [
-            { field: "expense.date", title: t("date.text") },
-            { field: "expense.amount", title: t("currency.price") }
+            { field: "e.date", title: t("date.text") },
+            { field: "e.amount", title: t("currency.price") }
         ]
     });
 
     const { filterButtons } = useExpenseTimelineFilter({
         filterManager,
         carId,
-        carFilterFieldName: "car.id",
-        typesFilterFieldName: "type.id"
+        carFilterFieldName: "c.id",
+        typesFilterFieldName: "et.id"
     });
 
     const memoizedData = useMemo(() => data.map((row) => mapper(row)), [data, mapper]);

@@ -1,6 +1,5 @@
 import { OdometerLog, odometerLogSchema } from "../../schemas/odometerLogSchema.ts";
 import { OdometerChangeLogFormFields } from "../../schemas/form/odometerChangeLogForm.ts";
-import { convertOdometerValueFromKilometer, convertOdometerValueToKilometer } from "../../utils/convertOdometerUnit.ts";
 import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
 import {
     OdometerChangeLogTableRow,
@@ -54,8 +53,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
             car: car,
             relatedId: entity.related_id,
             type: odometerLogType,
-            valueInKm: entity.value!,
-            value: convertOdometerValueFromKilometer(entity.value!, entity.unit_conversion_factor ?? 1),
+            value: entity.value ?? 0,
             unit: {
                 id: entity.unit_id,
                 key: entity.unit_key,
@@ -71,8 +69,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
         return odometerSchema.parse({
             id: entity.log_id,
             carId: entity.log_car_id,
-            valueInKm: entity.log_value,
-            value: convertOdometerValueFromKilometer(entity.log_value!, entity.unit_conversion_factor ?? 1),
+            value: entity.log_value ?? 0,
             unit: {
                 id: entity.unit_id,
                 key: entity.unit_key,
@@ -95,7 +92,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
             id: dto.id,
             car_id: dto.car.id,
             type_id: dto.type.id,
-            value: dto.valueInKm
+            value: Math.round(dto.value * dto.unit.conversionFactor)
         };
     }
 
@@ -107,7 +104,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
             odometerLog: {
                 id: formResult.id,
                 car_id: formResult.carId,
-                value: convertOdometerValueToKilometer(formResult.value, formResult.conversionFactor)
+                value: Math.round(formResult.value * formResult.conversionFactor)
             },
 
             odometerChangeLog: {

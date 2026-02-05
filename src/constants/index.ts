@@ -14,3 +14,4 @@ export const SIMPLE_TABBAR_HEIGHT = hp(7.5);
 export const ICON_FONT_SIZE_SCALE = 1.5;
 export const MIN_DATE = "1950-01-01";
 export const MAX_DATE = "2050-12-31";
+export const MAX_EXCHANGE_RATE_DECIMAL = 6;

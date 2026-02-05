@@ -15,12 +15,12 @@ import { ExpenseTypeEnum } from "../../../../model/enums/ExpenseTypeEnum.ts";
 import { ExpenseTypeDao } from "../../../../model/dao/ExpenseTypeDao.ts";
 import { numberToFractionDigit } from "../../../../../../utils/numberToFractionDigit.ts";
 import { OdometerLogTypeEnum } from "../../../../../car/_features/odometer/model/enums/odometerLogTypeEnum.ts";
-import { convertOdometerValueToKilometer } from "../../../../../car/_features/odometer/utils/convertOdometerUnit.ts";
 import { ServiceItemDao } from "../dao/ServiceItemDao.ts";
 import { OdometerUnit } from "../../../../../car/_features/odometer/schemas/odometerUnitSchema.ts";
 import { CarDao } from "../../../../../car/model/dao/CarDao.ts";
 import { SelectServiceLogTableRow } from "../dao/ServiceLogDao.ts";
 import { carSimpleSchema } from "../../../../../car/schemas/carSchema.ts";
+import { MAX_EXCHANGE_RATE_DECIMAL } from "../../../../../../constants";
 
 export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, ServiceLog> {
     private readonly expenseDao: ExpenseDao;
@@ -83,9 +83,9 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
             type_id: entity.expense_type_id,
             type_owner_id: entity.expense_type_owner_id,
             type_key: entity.expense_type_key,
-            exchange_rate: entity.expense_exchange_rate,
-            amount: entity.expense_amount,
-            original_amount: entity.expense_original_amount,
+            exchange_rate: numberToFractionDigit(entity.expense_exchange_rate ?? 1, MAX_EXCHANGE_RATE_DECIMAL),
+            amount: numberToFractionDigit(entity.expense_amount ?? 0),
+            exchanged_amount: numberToFractionDigit(entity.expense_exchanged_amount ?? 0),
             currency_id: entity.expense_currency_id,
             currency_key: entity.expense_currency_key,
             currency_symbol: entity.expense_currency_symbol,
@@ -156,7 +156,7 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
                 id: formResult.odometerLogId,
                 car_id: formResult.carId,
                 type_id: OdometerLogTypeEnum.SERVICE,
-                value: convertOdometerValueToKilometer(formResult.odometerValue, odometerUnit.conversionFactor)
+                value: Math.round(formResult.odometerValue * odometerUnit.conversionFactor)
             };
         }
 
@@ -178,7 +178,7 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
                 service_log_id: serviceLog.id,
                 service_item_type_id: item.type.id,
                 currency_id: item.pricePerUnit.currency.id,
-                exchange_rate: numberToFractionDigit(item.pricePerUnit.exchangeRate),
+                exchange_rate: numberToFractionDigit(item.pricePerUnit.exchangeRate, MAX_EXCHANGE_RATE_DECIMAL),
                 quantity: item.quantity,
                 price_per_unit: numberToFractionDigit(item.pricePerUnit.amount)
             });
@@ -189,7 +189,6 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
             car_id: formResult.carId,
             type_id: expenseTypeId,
             currency_id: carCurrencyId,
-            original_amount: numberToFractionDigit(totalAmount),
             exchange_rate: 1,
             amount: numberToFractionDigit(totalAmount),
             note: formResult.note,

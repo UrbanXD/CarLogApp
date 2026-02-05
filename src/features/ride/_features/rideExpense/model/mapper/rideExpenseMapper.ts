@@ -8,6 +8,8 @@ import { ExpenseTypeDao } from "../../../../../expense/model/dao/ExpenseTypeDao.
 import { WithPrefix } from "../../../../../../types";
 import { SelectExpenseTableRow } from "../../../../../expense/model/mapper/expenseMapper.ts";
 import { Car } from "../../../../../car/schemas/carSchema.ts";
+import { numberToFractionDigit } from "../../../../../../utils/numberToFractionDigit.ts";
+import { MAX_EXCHANGE_RATE_DECIMAL } from "../../../../../../constants";
 
 export type SelectRideExpenseTableRow =
     RideExpenseTableRow
@@ -39,9 +41,9 @@ export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideE
             type_id: entity.expense_type_id,
             type_owner_id: entity.expense_type_owner_id,
             type_key: entity.expense_type_key,
-            exchange_rate: entity.expense_exchange_rate,
-            amount: entity.expense_amount,
-            original_amount: entity.expense_original_amount,
+            exchange_rate: numberToFractionDigit(entity.expense_exchange_rate ?? 1, MAX_EXCHANGE_RATE_DECIMAL),
+            amount: numberToFractionDigit(entity.expense_amount ?? 0),
+            exchanged_amount: numberToFractionDigit(entity.expense_exchanged_amount ?? 0),
             currency_id: entity.expense_currency_id,
             currency_key: entity.expense_currency_key,
             currency_symbol: entity.expense_currency_symbol,
@@ -82,13 +84,16 @@ export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideE
             note: formResult.note
         });
 
-        const expenseType = await this.expenseTypeDao.getById(expenseEntity.type_id);
-        const currency = await this.currencyDao.getById(expenseEntity.currency_id);
+        const [expenseType, currency] = await Promise.all([
+            this.expenseTypeDao.getById(expenseEntity.type_id),
+            this.currencyDao.getById(expenseEntity.currency_id)
+        ]);
 
         return {
             id: formResult.id,
             expense: this.expenseDao.mapper.toDto({
                 ...expenseEntity,
+                exchanged_amount: (expenseEntity.amount ?? 0) * (expenseEntity.exchange_rate ?? 1),
                 car_name: car.name,
                 car_model_id: car.model.id,
                 car_model_name: car.model.name,

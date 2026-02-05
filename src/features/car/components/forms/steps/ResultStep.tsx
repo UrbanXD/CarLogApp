@@ -8,6 +8,7 @@ import { FuelUnit } from "../../../_features/fuel/schemas/fuelUnitSchema.ts";
 import { FuelType } from "../../../_features/fuel/schemas/fuelTypeSchema.ts";
 import { OdometerUnit } from "../../../_features/odometer/schemas/odometerUnitSchema.ts";
 import { Currency } from "../../../../_shared/currency/schemas/currencySchema.ts";
+import { numberToFractionDigit } from "../../../../../utils/numberToFractionDigit.ts";
 
 type ResultStepProps = {
     formValues: CarFormFields
@@ -72,8 +73,7 @@ export function ResultStep({
         odometer: {
             id: formValues.odometer.id,
             carId: formValues.id,
-            value: Number(formValues.odometer.value),
-            valueInKm: Number(formValues.odometer.value),
+            value: Math.round(formValues.odometer.value),
             unit: odometerUnit
         },
         currency,
@@ -81,7 +81,7 @@ export function ResultStep({
             id: formValues.fuelTank.id,
             type: fuelType,
             unit: fuelUnit,
-            capacity: Number(formValues.fuelTank.capacity)
+            capacity: numberToFractionDigit(formValues.fuelTank.capacity)
         },
         imagePath: formValues.image?.uri
     });
