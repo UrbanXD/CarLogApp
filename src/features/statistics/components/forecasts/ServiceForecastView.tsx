@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { useTranslation } from "react-i18next";
 import { ServiceTypeEnum } from "../../../expense/_features/service/model/enums/ServiceTypeEnum.ts";
@@ -22,9 +22,7 @@ export function ServiceForecastView({ carId, expandable = false }: ServiceForeca
         [serviceLogDao, carId]
     );
     const { data: forecast, isLoading: isForecastLoading } = useWatchedQueryCollection(memoizedForecastQuery);
-    useEffect(() => {
-        console.log(forecast?.[ServiceTypeEnum.SMALL_SERVICE]);
-    }, [forecast]);
+
     return (
         <Section
             title={ t("statistics.service.forecast") }
