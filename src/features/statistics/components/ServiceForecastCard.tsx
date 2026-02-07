@@ -4,20 +4,18 @@ import { OdometerText } from "../../car/_features/odometer/components/OdometerTe
 import { ALERT_ICONS, COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import dayjs from "dayjs";
 import React, { useCallback, useEffect, useState } from "react";
-import { Forecast } from "../model/dao/statisticsDao.ts";
 import { useTranslation } from "react-i18next";
 import Icon from "../../../components/Icon.tsx";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { Forecast } from "../../../database/dao/types/statistis.ts";
+import { Odometer } from "../../car/_features/odometer/schemas/odometerSchema.ts";
 
 const BAR_ANIMATiON_DURATION = 300;
 
 type ForecastCardProps = {
     forecast?: Forecast | null
     type: ServiceTypeEnum
-    odometer?: {
-        value: number
-        unitText?: string | null
-    }
+    odometer?: Odometer
     isLoading?: boolean
 }
 
@@ -42,7 +40,7 @@ export function ServiceForecastCard({
         }
 
         let percent = !isLoading && forecast && odometer
-                      ? ((odometer.value - forecast.oldValue) / (forecast.value - forecast.oldValue)) * 100
+                      ? ((odometer.value - forecast.lastValue) / (forecast.value - forecast.lastValue)) * 100
                       : 0;
 
         percentToNextService.value = withTiming(
@@ -103,8 +101,8 @@ export function ServiceForecastCard({
                             />
                             :
                             <OdometerText
-                                text={ forecast?.oldValue.toString() ?? "0" }
-                                unit={ odometer?.unitText }
+                                text={ forecast?.lastValue.toString() ?? "0" }
+                                unit={ odometer?.unit.short }
                                 textStyle={ styles.label }
                                 unitTextStyle={ { color: styles.label.color } }
                             />
@@ -128,7 +126,7 @@ export function ServiceForecastCard({
                             :
                             <OdometerText
                                 text={ forecast?.value.toString() ?? "0" }
-                                unit={ odometer?.unitText }
+                                unit={ odometer?.unit.short }
                                 textStyle={ styles.label }
                                 unitTextStyle={ { color: styles.label.color } }
                                 containerStyle={ !isOdometerViewWrapped ? { alignSelf: "flex-end" } : undefined }

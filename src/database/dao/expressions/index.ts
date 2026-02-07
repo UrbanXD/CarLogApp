@@ -1,4 +1,4 @@
-import { Expression, ExpressionBuilder, StringReference } from "kysely";
+import { Expression, ExpressionBuilder, sql, StringReference } from "kysely";
 
 type Reference<DB, TB extends keyof DB> = StringReference<DB, TB> | Expression<any>
 
@@ -52,4 +52,13 @@ export function odometerValueExpression<DB, TB extends keyof DB>(
     conversionFactorField: Reference<DB, TB>
 ) {
     return simpleConversionExpression(eb, valueField, conversionFactorField, true);
+}
+
+export function percentExpression<DB, TB extends keyof DB>(
+    eb: ExpressionBuilder<DB, TB>,
+    valueField: Reference<DB, TB>
+) {
+    //@formatter:off
+    return sql<number>`SUM(${ fieldRef(eb, valueField) }) * 100.0 / SUM(SUM(${ fieldRef(eb, valueField) })) OVER ()`
+    //@formatter:on
 }

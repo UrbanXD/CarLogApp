@@ -368,6 +368,7 @@ export class Database {
                 this.odometerUnitDao,
                 this.expenseTypeDao,
                 this.serviceItemDao,
+                this.serviceItemTypeDao,
                 this.carDao
             );
         }
@@ -453,10 +454,7 @@ export class Database {
 
     get statisticsDao(): StatisticsDao {
         if(!this._statisticsDao) this._statisticsDao = new StatisticsDao(
-            this.db,
-            this.expenseTypeDao,
-            this.serviceTypeDao,
-            this.serviceItemTypeDao
+            this.db
         );
 
         return this._statisticsDao;

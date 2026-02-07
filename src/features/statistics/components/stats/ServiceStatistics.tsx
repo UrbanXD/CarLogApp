@@ -1,10 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
-import React, { useCallback, useEffect, useState } from "react";
-import { ComparisonStatByDate, ComparisonStatByType, Stat, SummaryStat } from "../../model/dao/statisticsDao.ts";
+import React, { useCallback, useMemo } from "react";
+import { StatisticsFunctionArgs } from "../../model/dao/statisticsDao.ts";
 import { BarChartView } from "../charts/BarChartView.tsx";
 import dayjs from "dayjs";
-import { ExpenseTypeEnum } from "../../../expense/model/enums/ExpenseTypeEnum.ts";
 import { DonutChartView } from "../charts/DonutChartView.tsx";
 import { getDateFormatTemplateByRangeUnit } from "../../utils/getDateFormatTemplateByRangeUnit.ts";
 import { MasonryStatView } from "../MasonryStatView.tsx";
@@ -14,6 +13,10 @@ import { StatCard } from "../StatCard.tsx";
 import { ServiceForecastView } from "../forecasts/ServiceForecastView.tsx";
 import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../../constants";
+import { useWatchedQueryCollection } from "../../../../database/hooks/useWatchedQueryCollection.ts";
+import { useCar } from "../../../car/hooks/useCar.ts";
+import { getRangeUnit } from "../../utils/getRangeUnit.ts";
+import { useWatchedQueryItem } from "../../../../database/hooks/useWatchedQueryItem.ts";
 
 const SERVICE_FREQUENCY_INTERVAL = 25000;
 
@@ -25,143 +28,153 @@ type ServiceStatisticsProps = {
 
 export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
     const { t } = useTranslation();
-    const { statisticsDao } = useDatabase();
+    const { serviceLogDao } = useDatabase();
 
-    const [serviceLogsByDateWindow, setServiceLogsByDateWindow] = useState<ComparisonStatByDate | null>(null);
-    const [serviceLogStat, setServiceLogStat] = useState<SummaryStat | null>(null);
-    const [serviceLogByType, setServiceLogByType] = useState<ComparisonStatByType | null>(null);
-    const [serviceItemByType, setServiceItemByType] = useState<ComparisonStatByType | null>(null);
-    const [averageDistanceBetweenServices, setAverageDistanceBetweenServices] = useState<{
-        averageDistance: Omit<Stat, "label" | "color">,
-        averageTime: Omit<Stat, "label" | "color">
-    } | null>(null);
-    const [serviceFrequencyByOdometer, setServiceFrequencyByOdometer] = useState<ComparisonStatByDate | null>(null);
+    const { car } = useCar({ carId });
 
-    useEffect(() => {
-        (async () => {
-            const statArgs = {
-                carId: carId,
-                from,
-                to
-            };
+    const rangeUnit = useMemo(() => getRangeUnit(from, to), [from, to]);
+    const carCurrency = useMemo(() => car?.currency.symbol, [car?.currency]);
+    const carOdometerUnit = useMemo(() => car?.odometer.unit.short, [car?.odometer.unit]);
 
-            const [
-                resultServiceLogsByDateWindow,
-                resultServiceLogStat,
-                resultServiceLogByType,
-                resultServiceItemByType,
-                resultAverageDistanceBetweenServices,
-                resultServiceFrequencyByOdometer
-            ] = await Promise.all([
-                statisticsDao.getServiceExpenseComparison(statArgs),
-                statisticsDao.getExpenseSummary({ ...statArgs, expenseType: ExpenseTypeEnum.SERVICE }),
-                statisticsDao.getServiceComparisonByType(statArgs),
-                statisticsDao.getServiceItemComparisonByType(statArgs),
-                statisticsDao.getStatBetweenServices(statArgs),
-                statisticsDao.getServiceFrequencyByOdometer({ ...statArgs, intervalSize: SERVICE_FREQUENCY_INTERVAL })
-            ]);
+    const memoizedStatArgs: StatisticsFunctionArgs = useMemo(() => ({
+        carId: carId,
+        from,
+        to
+    }), [carId, from, to]);
 
-            setServiceLogsByDateWindow(resultServiceLogsByDateWindow);
-            setServiceLogStat(resultServiceLogStat);
-            setServiceLogByType(resultServiceLogByType);
-            setServiceItemByType(resultServiceItemByType);
-            setAverageDistanceBetweenServices(resultAverageDistanceBetweenServices);
-            setServiceFrequencyByOdometer(resultServiceFrequencyByOdometer);
-        })();
-    }, [carId, from, to]);
+    const memoizedSummaryByAmountQuery = useMemo(
+        () => serviceLogDao.summaryStatisticsByAmountWatchedQueryItem(memoizedStatArgs),
+        [serviceLogDao, memoizedStatArgs]
+    );
+    const { data: summaryByAmount, isLoading: isSummaryByAmountLoading } = useWatchedQueryItem(
+        memoizedSummaryByAmountQuery);
+
+    const memoizedStatisticsBetweenServicesQuery = useMemo(
+        () => serviceLogDao.statisticsBetweenServicesWatchedQueryItem(memoizedStatArgs),
+        [serviceLogDao, memoizedStatArgs]
+    );
+    const { data: statisticsBetweenServices, isLoading: isStatisticsBetweenServicesLoading } = useWatchedQueryItem(
+        memoizedStatisticsBetweenServicesQuery);
+
+    const memoizedExpensesByRangeQuery = useMemo(
+        () => serviceLogDao.expensesByRangeStatisticsWatchedQueryCollection(memoizedStatArgs),
+        [serviceLogDao, memoizedStatArgs]
+    );
+    const { data: expensesByRange, isLoading: isExpensesByRangeLoading } = useWatchedQueryCollection(
+        memoizedExpensesByRangeQuery);
+
+    const memoizedFrequencyByOdometerQuery = useMemo(
+        () => serviceLogDao.frequencyByOdometerStatisticsWatchedQueryCollection({
+            ...memoizedStatArgs,
+            intervalSize: SERVICE_FREQUENCY_INTERVAL
+        }),
+        [serviceLogDao, SERVICE_FREQUENCY_INTERVAL, memoizedStatArgs]
+    );
+    const { data: frequencyByOdometer, isLoading: isFrequencyByOdometerLoading } = useWatchedQueryCollection(
+        memoizedFrequencyByOdometerQuery);
+
+    const memoizedTypeComparisonQuery = useMemo(
+        () => serviceLogDao.typeComparisonStatisticsWatchedQueryCollection(memoizedStatArgs),
+        [serviceLogDao, memoizedStatArgs]
+    );
+    const { data: typeComparison, isLoading: isTypeComparisonLoading } = useWatchedQueryCollection(
+        memoizedTypeComparisonQuery);
+
+    const memoizedItemTypeComparisonQuery = useMemo(
+        () => serviceLogDao.itemTypeComparisonStatisticsWatchedQueryCollection(memoizedStatArgs),
+        [serviceLogDao, memoizedStatArgs]
+    );
+    const { data: itemTypeComparison, isLoading: isItemTypeComparisonLoading } = useWatchedQueryCollection(
+        memoizedItemTypeComparisonQuery);
 
     const getCountOfServices = useCallback(() => {
-        const { trend, trendSymbol } = serviceLogStat?.totalTrend ?? {};
+        const { trend, trendSymbol } = summaryByAmount?.totalTrend ?? {};
 
         return {
             label: t("statistics.service.log_count"),
-            value: serviceLogStat?.count != null ? `${ serviceLogStat.count } ${ t("common.count") }` : null,
-            isPositive: serviceLogStat?.countTrend?.isTrendPositive,
+            value: summaryByAmount?.count != null ? `${ summaryByAmount.count } ${ t("common.count") }` : null,
+            isPositive: summaryByAmount?.countTrend?.isTrendPositive,
             trend: formatTrend({ trend: trend, trendSymbol: trendSymbol }),
             trendDescription: t("statistics.compared_to_previous_cycle"),
-            isLoading: !serviceLogStat
+            isLoading: isSummaryByAmountLoading
         };
-    }, [serviceLogStat, t]);
+    }, [summaryByAmount, isSummaryByAmountLoading, t]);
 
     const getTotalServiceAmount = useCallback(() => {
-        const { trend, trendSymbol } = serviceLogStat?.totalTrend ?? {};
+        const { trend, trendSymbol } = summaryByAmount?.totalTrend ?? {};
 
         return {
             label: t("statistics.service.total_amount"),
-            value: serviceLogStat?.total != null
-                   ? formatWithUnit(serviceLogStat.total, serviceLogStat?.unitText)
+            value: summaryByAmount?.total != null
+                   ? formatWithUnit(summaryByAmount.total, carCurrency)
                    : null,
-            isPositive: serviceLogStat?.totalTrend?.isTrendPositive,
+            isPositive: summaryByAmount?.totalTrend?.isTrendPositive,
             trend: formatTrend({ trend: trend, trendSymbol: trendSymbol }),
             trendDescription: t("statistics.compared_to_previous_cycle"),
-            isLoading: !serviceLogStat
+            isLoading: isSummaryByAmountLoading
         };
-    }, [serviceLogStat, t]);
+    }, [summaryByAmount, isSummaryByAmountLoading, carCurrency, t]);
 
 
     const getAverageServiceAmount = useCallback(() => {
-        const { trend, trendSymbol } = serviceLogStat?.averageTrend ?? {};
+        const { trend, trendSymbol } = summaryByAmount?.averageTrend ?? {};
 
         return {
             label: t("statistics.service.avg_amount"),
-            value: serviceLogStat?.average != null
-                   ? formatWithUnit(serviceLogStat.average, serviceLogStat?.unitText)
+            value: summaryByAmount?.average != null
+                   ? formatWithUnit(summaryByAmount.average, carCurrency)
                    : null,
-            isPositive: serviceLogStat?.averageTrend?.isTrendPositive,
+            isPositive: summaryByAmount?.averageTrend?.isTrendPositive,
             trend: formatTrend({ trend: trend, trendSymbol: trendSymbol }),
             trendDescription: t("statistics.compared_to_previous_cycle"),
-            isLoading: !serviceLogStat
+            isLoading: isSummaryByAmountLoading
         };
-    }, [serviceLogStat, t]);
+    }, [summaryByAmount, isSummaryByAmountLoading, carCurrency, t]);
 
     const getMedianServiceAmount = useCallback(() => {
         return {
             label: t("statistics.service.median_amount"),
-            value: serviceLogStat != null ? formatWithUnit(serviceLogStat.median, serviceLogStat?.unitText) : null,
-            isPositive: serviceLogStat?.medianTrend?.isTrendPositive,
-            trend: serviceLogStat != null
-                   ? `${ serviceLogStat.medianTrend.trendSymbol } ${ serviceLogStat.medianTrend.trend }`
+            value: summaryByAmount != null ? formatWithUnit(summaryByAmount.median, carCurrency) : null,
+            isPositive: summaryByAmount?.medianTrend?.isTrendPositive,
+            trend: summaryByAmount != null
+                   ? `${ summaryByAmount.medianTrend.trendSymbol } ${ summaryByAmount.medianTrend.trend }`
                    : null,
-            trendDescription: serviceLogStat ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !serviceLogStat
+            trendDescription: summaryByAmount ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isSummaryByAmountLoading
         };
-    }, [serviceLogStat, t]);
+    }, [summaryByAmount, isSummaryByAmountLoading, carCurrency, t]);
 
     const getMaxServiceByAmount = useCallback(() => {
         return {
             label: t("statistics.service.max_amount"),
-            value: serviceLogStat?.max != null
-                   ? formatWithUnit(serviceLogStat.max.value, serviceLogStat?.unitText)
+            value: summaryByAmount?.max != null
+                   ? formatWithUnit(summaryByAmount.max.value, carCurrency)
                    : null,
-            isLoading: !serviceLogStat
+            isLoading: isSummaryByAmountLoading
         };
-    }, [serviceLogStat, t]);
+    }, [summaryByAmount, isSummaryByAmountLoading, carCurrency, t]);
 
     const getAverageDistanceBetweenServices = useCallback(() => {
         return {
             label: t("statistics.service.average_distance_between_services"),
-            value: averageDistanceBetweenServices != null
-                   ? formatWithUnit(
-                    averageDistanceBetweenServices.averageDistance.value,
-                    averageDistanceBetweenServices.averageDistance?.unitText
-                )
+            value: statisticsBetweenServices != null
+                   ? formatWithUnit(statisticsBetweenServices.averageDistance, carOdometerUnit)
                    : null,
-            isLoading: !averageDistanceBetweenServices
+            isLoading: isStatisticsBetweenServicesLoading
         };
-    }, [averageDistanceBetweenServices, t]);
+    }, [statisticsBetweenServices, isStatisticsBetweenServicesLoading, carOdometerUnit, t]);
 
     const getAverageTimeBetweenServices = useCallback(() => {
         return {
             label: t("statistics.service.average_time_between_services"),
-            value: averageDistanceBetweenServices != null
-                   ? averageDistanceBetweenServices.averageTime.value > 0 ? dayjs.duration(
-                    averageDistanceBetweenServices.averageTime.value,
-                    "days"
-                ).humanize() : "-"
+            value: statisticsBetweenServices != null
+                   ? statisticsBetweenServices.averageTime > 0
+                     ? dayjs.duration(statisticsBetweenServices.averageTime, "days").humanize()
+                     : "-"
                    : null,
-            isLoading: !averageDistanceBetweenServices
+            isLoading: isStatisticsBetweenServicesLoading
         };
-    }, [averageDistanceBetweenServices, t]);
+    }, [statisticsBetweenServices, isStatisticsBetweenServicesLoading, t]);
 
     return (
         <View style={ styles.container }>
@@ -185,63 +198,63 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
             <StatCard { ...getAverageDistanceBetweenServices() }/>
             <StatCard { ...getAverageTimeBetweenServices() } />
             <BarChartView
-                chartData={ serviceFrequencyByOdometer?.barChartData }
-                legend={ serviceFrequencyByOdometer?.legend }
+                chartData={ frequencyByOdometer?.chartData }
+                legend={ frequencyByOdometer?.legend }
                 title={ {
                     title: t("statistics.service.frequency_distribution_by_odometer.title"),
                     description: t(
                         "statistics.service.frequency_distribution_by_odometer.description",
-                        { value: formatWithUnit(SERVICE_FREQUENCY_INTERVAL, serviceFrequencyByOdometer?.unitText) }
+                        { value: formatWithUnit(SERVICE_FREQUENCY_INTERVAL, carOdometerUnit) }
                     )
                 } }
                 yAxisTitle={ t("statistics.service.frequency_distribution_by_odometer.y_axis") }
                 formatValue={ (value) => `${ value } ${ t("common.count") }` }
                 formatYAxisLabelAsValue={ false }
-                formatLabel={ (label) => formatWithUnit(label, serviceFrequencyByOdometer?.unitText) }
+                formatLabel={ (label) => formatWithUnit(label, carOdometerUnit) }
                 showsLegend={ false }
-                isLoading={ !serviceFrequencyByOdometer }
+                isLoading={ isFrequencyByOdometerLoading }
             />
             <BarChartView
-                chartData={ serviceLogsByDateWindow?.barChartData }
-                legend={ serviceLogsByDateWindow?.legend }
+                chartData={ expensesByRange?.chartData }
+                legend={ expensesByRange?.legend }
                 title={ {
                     title: t("statistics.service.total_amount_by_date.title")
                 } }
                 yAxisTitle={ t(
                     "statistics.service.total_amount_by_date.y_axis",
-                    { unit: serviceLogsByDateWindow?.unitText }
+                    { unit: carCurrency }
                 ) }
-                formatValue={ (value) => formatWithUnit(value, serviceLogsByDateWindow?.unitText) }
+                formatValue={ (value) => formatWithUnit(value, carCurrency) }
                 formatLabel={
-                    (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit(serviceLogsByDateWindow?.rangeUnit))
+                    (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit(rangeUnit))
                 }
                 formatLegend={ (label) => t(`expenses.types.${ label }`) }
                 showsLegend={ false }
-                isLoading={ !serviceLogsByDateWindow }
+                isLoading={ isExpensesByRangeLoading }
             />
             <DonutChartView
                 title={ {
                     title: t("statistics.service.expense_distribution_by_type")
                 } }
-                chartData={ serviceLogByType?.donutChartData }
-                legend={ serviceLogByType?.legend }
+                chartData={ typeComparison?.chartData }
+                legend={ typeComparison?.legend }
                 formatLabel={ (label) => t(`service.types.${ label }`) }
-                formatDescription={ (description) => formatWithUnit(description, serviceLogByType?.unitText) }
+                formatDescription={ (description) => formatWithUnit(description, carCurrency) }
                 formatLegend={ (label) => t(`service.types.${ label }`) }
                 legendPosition="right"
-                isLoading={ !serviceLogByType }
+                isLoading={ isTypeComparisonLoading }
             />
             <DonutChartView
                 title={ {
                     title: t("statistics.service.expense_distribution_by_service_item")
                 } }
-                chartData={ serviceItemByType?.donutChartData }
-                legend={ serviceItemByType?.legend }
+                chartData={ itemTypeComparison?.chartData }
+                legend={ itemTypeComparison?.legend }
                 formatLabel={ (label) => t(`service.items.types.${ label }`) }
-                formatDescription={ (description) => formatWithUnit(description, serviceItemByType?.unitText) }
+                formatDescription={ (description) => formatWithUnit(description, carCurrency) }
                 formatLegend={ (label) => t(`service.items.types.${ label }`) }
                 legendPosition="right"
-                isLoading={ !serviceItemByType }
+                isLoading={ isItemTypeComparisonLoading }
             />
             {
                 carId &&

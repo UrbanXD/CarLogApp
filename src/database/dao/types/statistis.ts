@@ -51,3 +51,11 @@ export type BarChartStatistics = {
 export type LineChartStatistics = {
     chartData: Array<LineChartItem>
 }
+
+export type Forecast = {
+    lastValue: number
+    value: number
+    date: string | null
+    label?: string
+    color?: string
+}

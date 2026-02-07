@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { ServiceForecast } from "../../model/dao/statisticsDao.ts";
+import React, { useEffect, useMemo } from "react";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { useTranslation } from "react-i18next";
 import { ServiceTypeEnum } from "../../../expense/_features/service/model/enums/ServiceTypeEnum.ts";
 import { ServiceForecastCard } from "../ServiceForecastCard.tsx";
 import { Section } from "../../../../components/Section.tsx";
+import { useWatchedQueryCollection } from "../../../../database/hooks/useWatchedQueryCollection.ts";
+import { useCar } from "../../../car/hooks/useCar.ts";
 
 type ServiceForecastProps = {
     carId: string
@@ -13,32 +14,33 @@ type ServiceForecastProps = {
 
 export function ServiceForecastView({ carId, expandable = false }: ServiceForecastProps) {
     const { t } = useTranslation();
-    const { statisticsDao } = useDatabase();
+    const { serviceLogDao } = useDatabase();
+    const { car } = useCar({ carId });
 
-    const [forecast, setForecast] = useState<ServiceForecast | null>(null);
-
+    const memoizedForecastQuery = useMemo(
+        () => serviceLogDao.forecastWatchedQueryCollection(carId),
+        [serviceLogDao, carId]
+    );
+    const { data: forecast, isLoading: isForecastLoading } = useWatchedQueryCollection(memoizedForecastQuery);
     useEffect(() => {
-        (async () => {
-            setForecast(await statisticsDao.getForecastForService(carId));
-        })();
-    }, [carId]);
-
+        console.log(forecast?.[ServiceTypeEnum.SMALL_SERVICE]);
+    }, [forecast]);
     return (
         <Section
             title={ t("statistics.service.forecast") }
             expandable={ expandable }
         >
             <ServiceForecastCard
-                forecast={ forecast?.major }
+                forecast={ forecast?.[ServiceTypeEnum.MAJOR_SERVICE] }
                 type={ ServiceTypeEnum.MAJOR_SERVICE }
-                odometer={ forecast?.odometer }
-                isLoading={ !forecast }
+                odometer={ car?.odometer }
+                isLoading={ isForecastLoading }
             />
             <ServiceForecastCard
-                forecast={ forecast?.small }
+                forecast={ forecast?.[ServiceTypeEnum.SMALL_SERVICE] }
                 type={ ServiceTypeEnum.SMALL_SERVICE }
-                odometer={ forecast?.odometer }
-                isLoading={ !forecast }
+                odometer={ car?.odometer }
+                isLoading={ isForecastLoading }
             />
         </Section>
     );
