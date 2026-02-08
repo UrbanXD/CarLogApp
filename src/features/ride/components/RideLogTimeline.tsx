@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { Title } from "../../../components/Title.tsx";
 import { TimelineView } from "../../../components/timelineView/TimelineView.tsx";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants";
+import { COLORS, FONT_SIZES, FULL_TABBAR_HEIGHT, SEPARATOR_SIZES } from "../../../constants";
 import { YearPicker } from "../../../components/Input/_presets/YearPicker.tsx";
 import { sql } from "@powersync/kysely-driver";
 import { useTranslation } from "react-i18next";
@@ -91,7 +91,7 @@ export function RideLogTimeline({ carId }: RideLogTimelineProps) {
                 isPrevFetching={ isPrevFetching }
                 hasNext={ hasNext }
                 hasPrev={ hasPrev }
-                style={ { paddingBottom: SIMPLE_TABBAR_HEIGHT } }
+                style={ { paddingBottom: FULL_TABBAR_HEIGHT } }
             />
         </View>
     );
@@ -99,10 +99,10 @@ export function RideLogTimeline({ carId }: RideLogTimelineProps) {
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         gap: SEPARATOR_SIZES.lightSmall
     },
     headerContainer: {
-        flex: 1,
         justifyContent: "space-between",
         flexDirection: "row",
         alignItems: "flex-start"

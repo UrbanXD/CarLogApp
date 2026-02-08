@@ -1,14 +1,14 @@
 import { Edges, SafeAreaView } from "react-native-safe-area-context";
 import React, { ReactNode } from "react";
-import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../constants/index.ts";
-import { ViewStyle } from "../../types/index.ts";
+import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES, SIMPLE_HEADER_HEIGHT } from "../../constants";
+import { ViewStyle } from "../../types";
 
 export type ScreenViewProps = {
-    screenHasHeader?: boolean,
-    screenHasTabBar?: boolean,
-    safeAreaEdges?: Edges,
-    style?: ViewStyle,
-    children?: ReactNode,
+    screenHasHeader?: boolean
+    screenHasTabBar?: boolean
+    safeAreaEdges?: Edges
+    style?: ViewStyle
+    children?: ReactNode
 }
 
 export function ScreenView({

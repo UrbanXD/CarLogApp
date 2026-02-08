@@ -3,7 +3,14 @@ import { RNNativeScrollEvent } from "react-native-reanimated/lib/typescript/hook
 import { StyleSheet, Text, View } from "react-native";
 import React, { useCallback, useEffect, useRef } from "react";
 import { MoreDataLoading } from "../loading/MoreDataLoading.tsx";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../constants";
+import {
+    COLORS,
+    FLOATING_ACTION_BUTTON_SIZE,
+    FONT_SIZES,
+    ICON_FONT_SIZE_SCALE,
+    ICON_NAMES,
+    SEPARATOR_SIZES
+} from "../../constants";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import Divider from "../Divider.tsx";
 import Icon from "../Icon.tsx";
@@ -163,7 +170,8 @@ const itemStyles = StyleSheet.create({
 
 const styles = StyleSheet.create({
     listContainer: {
-        flexGrow: 1
+        flexGrow: 1,
+        paddingBottom: FLOATING_ACTION_BUTTON_SIZE + SEPARATOR_SIZES.lightSmall
     },
     notFoundText: {
         backgroundColor: COLORS.black5,

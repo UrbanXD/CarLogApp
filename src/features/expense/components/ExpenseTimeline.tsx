@@ -3,7 +3,7 @@ import { useExpenseTimelineItem } from "../hooks/useExepenseTimelineItem.tsx";
 import React, { useMemo } from "react";
 import { Title } from "../../../components/Title.tsx";
 import { StyleSheet, View } from "react-native";
-import { SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants";
+import { FULL_TABBAR_HEIGHT, SEPARATOR_SIZES } from "../../../constants";
 import { useTranslation } from "react-i18next";
 import { useTimeline } from "../../../hooks/useTimeline.ts";
 import { useExpenseTimelineFilter } from "../hooks/useExpenseTimelineFilter.ts";
@@ -65,7 +65,7 @@ export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
                 isPrevFetching={ isPrevFetching }
                 hasNext={ hasNext }
                 hasPrev={ hasPrev }
-                style={ { paddingBottom: SIMPLE_TABBAR_HEIGHT } }
+                style={ { paddingBottom: FULL_TABBAR_HEIGHT } }
             />
         </View>
     );

@@ -1,7 +1,13 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import TabBarIcon from "./TabBarIcon.tsx";
-import { COLORS, SECONDARY_COLOR, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
+import {
+    COLORS,
+    GAP_BETWEEN_TABBAR_AND_FLOATING_ACTION_BUTTON,
+    SECONDARY_COLOR,
+    SEPARATOR_SIZES,
+    SIMPLE_TABBAR_HEIGHT
+} from "../../../constants";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,7 +22,7 @@ function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
         <>
             <FloatingActionMenu
                 action={ actions }
-                containerStyle={ { bottom: SIMPLE_TABBAR_HEIGHT + SEPARATOR_SIZES.small + insets.bottom } }
+                containerStyle={ { bottom: SIMPLE_TABBAR_HEIGHT + GAP_BETWEEN_TABBAR_AND_FLOATING_ACTION_BUTTON + insets.bottom } }
             />
             <View style={ [styles.container] }>
                 <LinearGradient

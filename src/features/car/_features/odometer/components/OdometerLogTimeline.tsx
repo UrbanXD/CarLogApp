@@ -1,7 +1,7 @@
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { TimelineView } from "../../../../../components/timelineView/TimelineView.tsx";
 import React, { useCallback, useMemo } from "react";
-import { SEPARATOR_SIZES } from "../../../../../constants";
+import { FLOATING_ACTION_BUTTON_SIZE, SEPARATOR_SIZES } from "../../../../../constants";
 import { StyleSheet, View } from "react-native";
 import { Odometer } from "./Odometer.tsx";
 import FloatingActionMenu from "../../../../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { useCar } from "../../../hooks/useCar.ts";
 import { useTimeline } from "../../../../../hooks/useTimeline.ts";
 import { MoreDataLoading } from "../../../../../components/loading/MoreDataLoading.tsx";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type OdometerLogTimelineProps = {
     carId: string
@@ -20,6 +21,7 @@ type OdometerLogTimelineProps = {
 
 export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
     const { t } = useTranslation();
+    const { bottom } = useSafeAreaInsets();
     const { odometerLogDao } = useDatabase();
     const { mapper } = useOdometerTimelineItem();
 
@@ -86,6 +88,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
                 isPrevFetching={ isPrevFetching }
                 hasNext={ hasNext }
                 hasPrev={ hasPrev }
+                style={ { paddingBottom: bottom + FLOATING_ACTION_BUTTON_SIZE + SEPARATOR_SIZES.lightSmall } }
             />
             <FloatingActionMenu action={ openCreateOdometerLog }/>
         </View>
