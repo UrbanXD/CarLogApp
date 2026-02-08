@@ -258,7 +258,7 @@ export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {
             />
             {
                 carId &&
-               <ServiceForecastView carId={ carId }/>
+               <ServiceForecastView carId={ carId } containerStyle={ { borderBottomWidth: 0 } }/>
             }
         </View>
     );

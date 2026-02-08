@@ -6,13 +6,15 @@ import { ServiceForecastCard } from "../ServiceForecastCard.tsx";
 import { Section } from "../../../../components/Section.tsx";
 import { useWatchedQueryCollection } from "../../../../database/hooks/useWatchedQueryCollection.ts";
 import { useCar } from "../../../car/hooks/useCar.ts";
+import { ViewStyle } from "../../../../types";
 
 type ServiceForecastProps = {
     carId: string
     expandable?: boolean
+    containerStyle?: ViewStyle
 }
 
-export function ServiceForecastView({ carId, expandable = false }: ServiceForecastProps) {
+export function ServiceForecastView({ carId, expandable = false, containerStyle }: ServiceForecastProps) {
     const { t } = useTranslation();
     const { serviceLogDao } = useDatabase();
     const { car } = useCar({ carId });
@@ -27,6 +29,7 @@ export function ServiceForecastView({ carId, expandable = false }: ServiceForeca
         <Section
             title={ t("statistics.service.forecast") }
             expandable={ expandable }
+            containerStyle={ containerStyle }
         >
             <ServiceForecastCard
                 forecast={ forecast?.[ServiceTypeEnum.MAJOR_SERVICE] }
