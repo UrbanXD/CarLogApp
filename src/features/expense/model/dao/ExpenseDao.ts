@@ -28,13 +28,12 @@ import {
     DonutChartStatistics,
     StatisticsFunctionArgs,
     SummaryStatistics
-} from "../../../../database/dao/types/statistis.ts";
+} from "../../../../database/dao/types/statistics.ts";
 import { formatSummaryStatistics } from "../../../../database/dao/utils/formatSummaryStatistics.ts";
 import { SelectQueryBuilder, sql } from "kysely";
 import { formatDateToDatabaseFormat } from "../../../statistics/utils/formatDateToDatabaseFormat.ts";
 import { getRangeUnit } from "../../../statistics/utils/getRangeUnit.ts";
-import { getRangeExpression } from "../../../../database/dao/utils/getRangeExpression.ts";
-import { exchangedAmountExpression } from "../../../../database/dao/expressions";
+import { exchangedAmountExpression, rangeExpression } from "../../../../database/dao/expressions";
 
 export type ExpenseTypeComparisonTableRow = ExtractRowFromQuery<ReturnType<ExpenseDao["typeComparisonQuery"]>>;
 export type GroupedExpensesByRangeTableRow = ExtractRowFromQuery<ReturnType<ExpenseDao["groupedExpensesByRangeQuery"]>>;
@@ -195,27 +194,21 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
     }: StatisticsFunctionArgs & { expenseType?: ExpenseTypeEnum }) {
         const rangeUnit = getRangeUnit(from, to);
 
-        const baseQuery = this.db
+        return this.db
         .selectFrom(`${ EXPENSE_TABLE } as e` as const)
         .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "e.type_id", "et.id")
         .select((eb) => [
             eb.fn.sum("e.amount").as("total"),
-            "e.type_id"
+            "e.type_id",
+            rangeExpression(eb, "e.date", rangeUnit).as("time")
         ])
         .$if(!!carId, (qb) => qb.where("e.car_id", "=", carId!))
         .$if(!!expenseType, (q: any) => q.where("et.key", "=", expenseType))
         .where("e.date", ">=", formatDateToDatabaseFormat(from))
         .where("e.date", "<=", formatDateToDatabaseFormat(to))
-        .groupBy("e.type_id");
-
-        const rangeExpression = getRangeExpression<typeof baseQuery>("e.date", rangeUnit);
-
-        const query = baseQuery
-        .select(rangeExpression.as("time"))
-        .groupBy(rangeExpression)
-        .orderBy(rangeExpression);
-
-        return query;
+        .groupBy("e.type_id")
+        .groupBy((eb) => rangeExpression(eb, "e.date", rangeUnit))
+        .orderBy((eb) => rangeExpression(eb, "e.date", rangeUnit));
     }
 
     expenseWatchedQueryItem(

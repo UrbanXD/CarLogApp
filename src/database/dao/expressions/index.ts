@@ -1,4 +1,5 @@
 import { Expression, ExpressionBuilder, sql, StringReference } from "kysely";
+import { RangeUnit } from "../../../features/statistics/utils/getRangeUnit.ts";
 
 type Reference<DB, TB extends keyof DB> = StringReference<DB, TB> | Expression<any>
 
@@ -61,4 +62,30 @@ export function percentExpression<DB, TB extends keyof DB>(
     //@formatter:off
     return sql<number>`SUM(${ fieldRef(eb, valueField) }) * 100.0 / SUM(SUM(${ fieldRef(eb, valueField) })) OVER ()`
     //@formatter:on
+}
+
+export function rangeExpression<DB, TB extends keyof DB>(
+    eb: ExpressionBuilder<DB, TB>,
+    field: Reference<DB, TB>,
+    unit: RangeUnit
+) {
+    //@formatter:off
+    switch(unit) {
+        case "hour":
+            return sql<string>`strftime('%Y-%m-%d %H:00:00', ${ fieldRef(eb, field) })`;
+        case "day":
+            return sql<string>`strftime('%Y-%m-%d', ${ fieldRef(eb, field) })`;
+        case "month":
+            return sql<string>`strftime('%Y-%m', ${ fieldRef(eb, field) })`;
+        case "year":
+            return sql<string>`strftime('%Y', ${ fieldRef(eb, field) })`;
+    }
+    //@formatter:on
+}
+
+export function julianDayExpression<DB, TB extends keyof DB>(
+    eb: ExpressionBuilder<DB, TB>,
+    field: Reference<DB, TB>
+) {
+    return eb.fn("JULIANDAY", [fieldRef(eb, field)]);
 }

@@ -16,7 +16,7 @@ import { ExpenseDao } from "../../../../../expense/model/dao/ExpenseDao.ts";
 import { numberToFractionDigit } from "../../../../../../utils/numberToFractionDigit.ts";
 import { FuelConsumptionResult, FuelCostPerDistanceResult, SelectFuelLogTableRow } from "../dao/FuelLogDao.ts";
 import { carSimpleSchema } from "../../../../schemas/carSchema.ts";
-import { LineChartStatistics } from "../../../../../../database/dao/types/statistis.ts";
+import { LineChartStatistics } from "../../../../../../database/dao/types/statistics.ts";
 import { LineChartItem } from "../../../../../statistics/components/charts/LineChartView.tsx";
 import { MAX_EXCHANGE_RATE_DECIMAL } from "../../../../../../constants";
 

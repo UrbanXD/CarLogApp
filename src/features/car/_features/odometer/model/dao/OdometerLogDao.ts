@@ -32,8 +32,8 @@ import { MAKE_TABLE } from "../../../../../../database/connector/powersync/table
 import { SelectCarModelTableRow } from "../../../../model/dao/CarDao.ts";
 import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
 import { CURRENCY_TABLE } from "../../../../../../database/connector/powersync/tables/currency.ts";
-import { StatisticsFunctionArgs } from "../../../../../statistics/model/dao/statisticsDao.ts";
 import { odometerValueExpression } from "../../../../../../database/dao/expressions";
+import { StatisticsFunctionArgs } from "../../../../../../database/dao/types/statistics.ts";
 
 export type SelectOdometerLogTableRow =
     OdometerLogTableRow

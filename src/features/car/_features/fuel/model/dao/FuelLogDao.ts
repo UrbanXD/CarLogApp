@@ -33,7 +33,7 @@ import {
     LineChartStatistics,
     StatisticsFunctionArgs,
     SummaryStatistics
-} from "../../../../../../database/dao/types/statistis.ts";
+} from "../../../../../../database/dao/types/statistics.ts";
 import { FUEL_TANK_TABLE } from "../../../../../../database/connector/powersync/tables/fuelTank.ts";
 import { formatDateToDatabaseFormat } from "../../../../../statistics/utils/formatDateToDatabaseFormat.ts";
 import {

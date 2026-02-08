@@ -59,3 +59,10 @@ export type Forecast = {
     label?: string
     color?: string
 }
+
+export type TopListItem = {
+    name: string,
+    count: number
+}
+
+export type TopListStatistics = Array<TopListItem>;

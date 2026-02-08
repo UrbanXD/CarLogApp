@@ -13,13 +13,25 @@ import { CarDao } from "../../../car/model/dao/CarDao.ts";
 import { RideLog, rideLogSchema } from "../../schemas/rideLogSchema.ts";
 import { RideLogFormFields } from "../../schemas/form/rideLogForm.ts";
 import { OdometerLogTypeEnum } from "../../../car/_features/odometer/model/enums/odometerLogTypeEnum.ts";
-import { SelectRideLogTableRow, SelectTimelineRideLogTableRow } from "../dao/rideLogDao.ts";
+import {
+    DrivingActivityTableRow,
+    RideFrequencyTableRow,
+    RideMostVisitedPlacesTableRow,
+    SelectRideLogTableRow,
+    SelectTimelineRideLogTableRow
+} from "../dao/rideLogDao.ts";
 import { RideExpenseMapper } from "../../_features/rideExpense/model/mapper/rideExpenseMapper.ts";
 import { RidePlaceMapper } from "../../_features/place/model/mapper/ridePlaceMapper.ts";
 import { RidePassengerMapper } from "../../_features/passenger/model/mapper/ridePassengerMapper.ts";
 import { carSimpleSchema } from "../../../car/schemas/carSchema.ts";
 import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
 import { MAX_EXCHANGE_RATE_DECIMAL } from "../../../../constants";
+import {
+    BarChartStatistics,
+    LineChartStatistics,
+    TopListStatistics
+} from "../../../../database/dao/types/statistics.ts";
+import { LineChartItem } from "../../../statistics/components/charts/LineChartView.tsx";
 
 export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
     private readonly rideExpenseMapper: RideExpenseMapper;
@@ -117,6 +129,31 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
             end_time: dto.endTime,
             note: dto.note
         };
+    }
+
+    mostVisitedPlacesToTopListStatistics(entities: Array<RideMostVisitedPlacesTableRow>): TopListStatistics {
+        return entities.map(entity => ({
+            count: Number(entity?.count ?? 0),
+            name: entity.name ?? ""
+        }));
+    }
+
+    frequencyToBarChartStatistics(entities: Array<RideFrequencyTableRow>): BarChartStatistics {
+        return {
+            chartData: entities.map((entity) => ({
+                value: entity.count,
+                label: entity.time
+            }))
+        };
+    }
+
+    drivingActivityToLineChartStatistics(entities: Array<DrivingActivityTableRow>): LineChartStatistics {
+        const chartData: Array<LineChartItem> = entities.map((entity) => ({
+            value: entity.activity ?? undefined,
+            label: entity.time ?? undefined
+        }));
+
+        return { chartData };
     }
 
     async formResultToEntities(formResult: RideLogFormFields): Promise<{

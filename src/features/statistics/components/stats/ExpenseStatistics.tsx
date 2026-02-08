@@ -2,7 +2,6 @@ import React, { useCallback, useMemo } from "react";
 import dayjs from "dayjs";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import { BarChartView } from "../charts/BarChartView.tsx";
-import { StatisticsFunctionArgs } from "../../model/dao/statisticsDao.ts";
 import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../../constants";
 import { useTranslation } from "react-i18next";
@@ -15,6 +14,7 @@ import { useWatchedQueryItem } from "../../../../database/hooks/useWatchedQueryI
 import { useWatchedQueryCollection } from "../../../../database/hooks/useWatchedQueryCollection.ts";
 import { useCar } from "../../../car/hooks/useCar.ts";
 import { getRangeUnit } from "../../utils/getRangeUnit.ts";
+import { StatisticsFunctionArgs } from "../../../../database/dao/types/statistics.ts";
 
 type ExpenseStatisticsProps = {
     carId?: string | null

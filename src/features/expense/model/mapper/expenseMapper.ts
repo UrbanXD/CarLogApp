@@ -13,7 +13,7 @@ import { amountSchema } from "../../../_shared/currency/schemas/amountSchema.ts"
 import { WithPrefix } from "../../../../types";
 import { SelectCarModelTableRow } from "../../../car/model/dao/CarDao.ts";
 import { carSimpleSchema } from "../../../car/schemas/carSchema.ts";
-import { BarChartStatistics, DonutChartStatistics, Stat } from "../../../../database/dao/types/statistis.ts";
+import { BarChartStatistics, DonutChartStatistics, Stat } from "../../../../database/dao/types/statistics.ts";
 import {
     ExpenseRecordTableRow,
     ExpenseTypeComparisonTableRow,

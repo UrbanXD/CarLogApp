@@ -44,7 +44,7 @@ import {
     Forecast,
     StatisticsFunctionArgs,
     SummaryStatistics
-} from "../../../../../../database/dao/types/statistis.ts";
+} from "../../../../../../database/dao/types/statistics.ts";
 import { ExpenseTypeEnum } from "../../../../model/enums/ExpenseTypeEnum.ts";
 import {
     exchangedAmountExpression,

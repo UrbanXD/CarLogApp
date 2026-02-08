@@ -1,7 +1,7 @@
 import { StatisticsAggregateQueryResult } from "./getStatisticsAggregateQuery.ts";
 import { numberToFractionDigit } from "../../../utils/numberToFractionDigit.ts";
 import { calculateTrend, TrendOptions } from "../../../features/statistics/utils/calculateTrend.ts";
-import { Stat } from "../types/statistis.ts";
+import { Stat } from "../types/statistics.ts";
 
 type FormatSummaryStatisticsOptions<Record = number> = {
     recordMapper?: (record: Record) => Stat

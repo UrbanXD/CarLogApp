@@ -30,7 +30,7 @@ import {
 } from "../dao/ServiceLogDao.ts";
 import { carSimpleSchema } from "../../../../../car/schemas/carSchema.ts";
 import { MAX_EXCHANGE_RATE_DECIMAL } from "../../../../../../constants";
-import { BarChartStatistics, DonutChartStatistics } from "../../../../../../database/dao/types/statistis.ts";
+import { BarChartStatistics, DonutChartStatistics } from "../../../../../../database/dao/types/statistics.ts";
 import { LegendType } from "../../../../../statistics/components/charts/common/Legend.tsx";
 import { ServiceItemTypeDao } from "../dao/ServiceItemTypeDao.ts";
 import { ServiceTypeEnum } from "../enums/ServiceTypeEnum.ts";

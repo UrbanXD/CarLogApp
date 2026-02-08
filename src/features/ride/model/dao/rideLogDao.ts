@@ -42,8 +42,27 @@ import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make
 import { UseWatchedQueryCollectionProps } from "../../../../database/hooks/useWatchedQueryCollection.ts";
 import { formatDateToDatabaseFormat } from "../../../statistics/utils/formatDateToDatabaseFormat.ts";
 import { DateType } from "react-native-ui-datepicker";
-import { UseInfiniteQueryOptions } from "../../../../database/hooks/useInfiniteQuery.ts";
-import { exchangedAmountExpression, odometerValueExpression } from "../../../../database/dao/expressions";
+import { ExtractRowFromQuery, UseInfiniteQueryOptions } from "../../../../database/hooks/useInfiniteQuery.ts";
+import {
+    exchangedAmountExpression,
+    julianDayExpression,
+    odometerValueExpression,
+    rangeExpression
+} from "../../../../database/dao/expressions";
+import {
+    BarChartStatistics,
+    LineChartStatistics,
+    StatisticsFunctionArgs,
+    SummaryStatistics,
+    TopListStatistics
+} from "../../../../database/dao/types/statistics.ts";
+import {
+    getStatisticsAggregateQuery,
+    StatisticsAggregateQueryResult
+} from "../../../../database/dao/utils/getStatisticsAggregateQuery.ts";
+import { formatSummaryStatistics } from "../../../../database/dao/utils/formatSummaryStatistics.ts";
+import { PLACE_TABLE } from "../../../../database/connector/powersync/tables/place.ts";
+import { getRangeUnit } from "../../../statistics/utils/getRangeUnit.ts";
 
 export type SelectBaseRideLogTableRow = RideLogTableRow
     & WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">
@@ -67,6 +86,10 @@ export type SelectTimelineRideLogTableRow =
     total_expense: number
     duration: number
 }
+
+export type RideMostVisitedPlacesTableRow = ExtractRowFromQuery<ReturnType<RideLogDao["mostVisitedPlacesQuery"]>>;
+export type RideFrequencyTableRow = ExtractRowFromQuery<ReturnType<RideLogDao["frequencyQuery"]>>;
+export type DrivingActivityTableRow = ExtractRowFromQuery<ReturnType<RideLogDao["drivingActivityQuery"]>>;
 
 export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, SelectRideLogTableRow> {
     readonly rideExpenseMapper: RideExpenseMapper;
@@ -96,6 +119,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
                 carDao
             )
         );
+
         this.rideExpenseMapper = rideExpenseMapper;
         this.ridePlaceMapper = ridePlaceMapper;
         this.ridePassengerMapper = ridePassengerMapper;
@@ -138,7 +162,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
     }
 
     selectQuery(id?: any | null) {
-        let query = this.baseQuery()
+        return this.baseQuery()
         .select((eb) => [
             jsonArrayFrom(
                 eb
@@ -193,7 +217,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
                 ])
                 .whereRef("rp.ride_log_id", "=", "rl.id")
                 .orderBy("rp.passenger_order", "asc")
-            ).$castTo<Array<SelectRidePlaceTableRow>>().as("passengers"),
+            ).as("passengers"),
             jsonArrayFrom(
                 eb
                 .selectFrom(`${ RIDE_PLACE_TABLE } as rp` as const)
@@ -208,12 +232,130 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
                 ])
                 .whereRef("rp.ride_log_id", "=", "rl.id")
                 .orderBy("rp.place_order", "asc")
-            ).$castTo<Array<SelectRidePlaceTableRow>>().as("places")
-        ]);
+            ).as("places")
+        ])
+        .$if(!!id, (qb) => qb.where("rl.id", "=", id!));
+    }
 
-        if(id) query = query.where("rl.id", "=", id);
+    summaryStatisticsBaseQuery(carId?: string | null) {
+        return this.db
+        .selectFrom(`${ RIDE_LOG_TABLE } as rl` as const)
+        .$if(!!carId, (qb) => qb.where("rl.car_id", "=", carId!));
+    }
 
-        return query.$castTo<SelectRideLogTableRow>();
+    summaryStatisticsByDistanceQuery({
+        carId,
+        from,
+        to
+    }: StatisticsFunctionArgs) {
+        const baseQuery = this.summaryStatisticsBaseQuery(carId)
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as s_ol` as const, "rl.start_odometer_log_id", "s_ol.id")
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as e_ol` as const, "rl.end_odometer_log_id", "e_ol.id")
+        .innerJoin(`${ CAR_TABLE } as c` as const, "rl.car_id", "c.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as ou` as const, "c.odometer_unit_id", "ou.id");
+
+        return getStatisticsAggregateQuery<typeof baseQuery>({
+            db: this.db,
+            baseQuery,
+            idField: "rl.id",
+            field: (eb) => {
+                const startOdometerExpression = odometerValueExpression(eb, "s_ol.value", "ou.conversion_factor");
+                const endOdometerExpression = odometerValueExpression(eb, "e_ol.value", "ou.conversion_factor");
+
+                return eb(endOdometerExpression, "-", startOdometerExpression);
+            },
+            fromDateField: "rl.start_time",
+            toDateField: "rl.end_time",
+            from: from,
+            to: to
+        });
+    }
+
+    summaryStatisticsByDurationQuery({
+        carId,
+        from,
+        to
+    }: StatisticsFunctionArgs) {
+        return getStatisticsAggregateQuery({
+            db: this.db,
+            baseQuery: this.summaryStatisticsBaseQuery(carId),
+            idField: "rl.id",
+            field: (eb) => eb(julianDayExpression(eb, "rl.end_time"), "-", julianDayExpression(eb, "rl.start_time")),
+            fromDateField: "rl.start_time",
+            toDateField: "rl.end_time",
+            from: from,
+            to: to
+        });
+    }
+
+    mostVisitedPlacesQuery({
+        carId,
+        from,
+        to
+    }: StatisticsFunctionArgs) {
+        return this.db
+        .selectFrom(`${ RIDE_PLACE_TABLE } as rp` as const)
+        .innerJoin(`${ RIDE_LOG_TABLE } as rl` as const, "rp.ride_log_id", "rl.id")
+        .innerJoin(`${ PLACE_TABLE } as p` as const, "rp.place_id", "p.id")
+        .select((eb) => [
+            "p.name",
+            eb.fn.count("rp.id").as("count")
+        ])
+        .$if(!!carId, (qb) => qb.where("rl.car_id", "=", carId!))
+        .where("rl.start_time", ">=", formatDateToDatabaseFormat(from))
+        .where("rl.end_time", "<=", formatDateToDatabaseFormat(to))
+        .groupBy("p.id")
+        .orderBy("count", "desc")
+        .limit(3);
+    }
+
+    frequencyQuery({
+        carId,
+        from,
+        to
+    }: StatisticsFunctionArgs) {
+        const rangeUnit = getRangeUnit(from, to);
+
+        return this.db
+        .selectFrom(`${ RIDE_LOG_TABLE } as rl` as const)
+        .select((eb) => [
+            eb.fn.count<number>("rl.id").as("count"),
+            rangeExpression(eb, "rl.start_time", rangeUnit).as("time")
+        ])
+        .$if(!!carId, (qb) => qb.where("rl.car_id", "=", carId!))
+        .where("rl.start_time", ">=", formatDateToDatabaseFormat(from))
+        .where("rl.start_time", "<=", formatDateToDatabaseFormat(to))
+        .groupBy((eb) => rangeExpression(eb, "rl.start_time", rangeUnit))
+        .orderBy((eb) => rangeExpression(eb, "rl.start_time", rangeUnit));
+    }
+
+    drivingActivityQuery({
+        carId,
+        from,
+        to
+    }: StatisticsFunctionArgs) {
+        const rangeUnit = getRangeUnit(from, to);
+
+        return this.db
+        .selectFrom(`${ RIDE_LOG_TABLE } as rl` as const)
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as s_ol` as const, "rl.start_odometer_log_id", "s_ol.id")
+        .innerJoin(`${ ODOMETER_LOG_TABLE } as e_ol` as const, "rl.end_odometer_log_id", "e_ol.id")
+        .innerJoin(`${ CAR_TABLE } as c` as const, "rl.car_id", "c.id")
+        .innerJoin(`${ ODOMETER_UNIT_TABLE } as ou` as const, "c.odometer_unit_id", "ou.id")
+        .select((eb) => {
+            const startOdometerExpression = odometerValueExpression(eb, "s_ol.value", "ou.conversion_factor");
+            const endOdometerExpression = odometerValueExpression(eb, "e_ol.value", "ou.conversion_factor");
+
+            return [
+                eb.fn.sum<number | null>(eb(endOdometerExpression, "-", startOdometerExpression)).as("activity"),
+                rangeExpression(eb, "rl.start_time", rangeUnit).as("time")
+            ];
+        })
+        .$if(!!carId, (qb) => qb.where("rl.car_id", "=", carId!))
+        .where("rl.start_time", ">=", formatDateToDatabaseFormat(from))
+        .where("rl.start_time", "<=", formatDateToDatabaseFormat(to))
+        .groupBy((eb) => rangeExpression(eb, "rl.start_time", rangeUnit))
+        .orderBy((eb) => rangeExpression(eb, "rl.start_time", rangeUnit));
     }
 
     selectTimelineQuery() {
@@ -258,6 +400,41 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
             query: this.selectQuery(id),
             mapper: this.mapper.toDto.bind(this.mapper),
             options: { enabled: !!id, ...options, jsonFields: ["expenses", "passengers", "places"] }
+        };
+    }
+
+    summaryStatisticsByDistanceWatchedQueryItem(props: StatisticsFunctionArgs): UseWatchedQueryItemProps<SummaryStatistics, StatisticsAggregateQueryResult> {
+        return {
+            query: this.summaryStatisticsByDistanceQuery(props),
+            mapper: formatSummaryStatistics
+        };
+    }
+
+    summaryStatisticsByDurationWatchedQueryItem(props: StatisticsFunctionArgs): UseWatchedQueryItemProps<SummaryStatistics, StatisticsAggregateQueryResult> {
+        return {
+            query: this.summaryStatisticsByDurationQuery(props),
+            mapper: formatSummaryStatistics
+        };
+    }
+
+    mostVisitedPlacesStatisticsWatchedQueryCollection(props: StatisticsFunctionArgs): UseWatchedQueryCollectionProps<TopListStatistics, RideMostVisitedPlacesTableRow> {
+        return {
+            query: this.mostVisitedPlacesQuery(props),
+            mapper: this.mapper.mostVisitedPlacesToTopListStatistics.bind(this.mapper)
+        };
+    }
+
+    frequencyStatisticsWatchedQueryCollection(props: StatisticsFunctionArgs): UseWatchedQueryCollectionProps<BarChartStatistics, RideFrequencyTableRow> {
+        return {
+            query: this.frequencyQuery(props),
+            mapper: this.mapper.frequencyToBarChartStatistics.bind(this.mapper)
+        };
+    }
+
+    drivingActivityStatisticsWatchedQueryCollection(props: StatisticsFunctionArgs): UseWatchedQueryCollectionProps<LineChartStatistics, DrivingActivityTableRow> {
+        return {
+            query: this.drivingActivityQuery(props),
+            mapper: this.mapper.drivingActivityToLineChartStatistics.bind(this.mapper)
         };
     }
 

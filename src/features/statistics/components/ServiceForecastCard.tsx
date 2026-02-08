@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Icon from "../../../components/Icon.tsx";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { Forecast } from "../../../database/dao/types/statistis.ts";
+import { Forecast } from "../../../database/dao/types/statistics.ts";
 import { Odometer } from "../../car/_features/odometer/schemas/odometerSchema.ts";
 
 const BAR_ANIMATiON_DURATION = 300;

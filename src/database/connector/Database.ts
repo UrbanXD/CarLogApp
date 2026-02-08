@@ -27,7 +27,6 @@ import { ServiceItemTypeDao } from "../../features/expense/_features/service/mod
 import { PlaceDao } from "../../features/ride/_features/place/model/dao/placeDao.ts";
 import { PassengerDao } from "../../features/ride/_features/passenger/model/dao/passengerDao.ts";
 import { RideLogDao } from "../../features/ride/model/dao/rideLogDao.ts";
-import { StatisticsDao } from "../../features/statistics/model/dao/statisticsDao.ts";
 import { File, Paths } from "expo-file-system";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import LargeSecureStore from "./storage/LargeSecureStorage.ts";
@@ -67,7 +66,6 @@ export class Database {
     private _rideLogDao?: RideLogDao;
     private _placeDao?: PlaceDao;
     private _passengerDao?: PassengerDao;
-    private _statisticsDao?: StatisticsDao;
 
     protected constructor(
         powersync: AbstractPowerSyncDatabase,
@@ -450,13 +448,5 @@ export class Database {
         }
 
         return this._rideLogDao;
-    }
-
-    get statisticsDao(): StatisticsDao {
-        if(!this._statisticsDao) this._statisticsDao = new StatisticsDao(
-            this.db
-        );
-
-        return this._statisticsDao;
     }
 }

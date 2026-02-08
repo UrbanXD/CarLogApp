@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import React, { useCallback, useMemo } from "react";
-import { StatisticsFunctionArgs } from "../../model/dao/statisticsDao.ts";
 import { BarChartView } from "../charts/BarChartView.tsx";
 import dayjs from "dayjs";
 import { DonutChartView } from "../charts/DonutChartView.tsx";
@@ -17,6 +16,7 @@ import { useWatchedQueryCollection } from "../../../../database/hooks/useWatched
 import { useCar } from "../../../car/hooks/useCar.ts";
 import { getRangeUnit } from "../../utils/getRangeUnit.ts";
 import { useWatchedQueryItem } from "../../../../database/hooks/useWatchedQueryItem.ts";
+import { StatisticsFunctionArgs } from "../../../../database/dao/types/statistics.ts";
 
 const SERVICE_FREQUENCY_INTERVAL = 25000;
 

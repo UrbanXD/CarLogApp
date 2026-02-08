@@ -1,6 +1,5 @@
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import React, { useCallback, useMemo } from "react";
-import { StatisticsFunctionArgs } from "../../model/dao/statisticsDao.ts";
 import { LineChartView } from "../charts/LineChartView.tsx";
 import { StyleSheet, View } from "react-native";
 import { SEPARATOR_SIZES } from "../../../../constants";
@@ -16,6 +15,7 @@ import { useWatchedQueryItem } from "../../../../database/hooks/useWatchedQueryI
 import { useCar } from "../../../car/hooks/useCar.ts";
 import { useWatchedQueryCollection } from "../../../../database/hooks/useWatchedQueryCollection.ts";
 import { getRangeUnit } from "../../utils/getRangeUnit.ts";
+import { StatisticsFunctionArgs } from "../../../../database/dao/types/statistics.ts";
 
 type FuelConsumptionStatisticsProps = {
     carId?: string | null
