@@ -11,51 +11,93 @@ type OnBoardingViewProps = {
     currentStep?: number
 }
 
-function OnBoardingView({ steps, currentStep = 0 }: OnBoardingViewProps) {
+export function OnBoardingView({
+    steps,
+    currentStep = 0
+}: OnBoardingViewProps) {
     const isBottomSheet = !!useBottomSheetInternal(true);
-    const BottomSheetFlashListScrollable = isBottomSheet ? useBottomSheetScrollableCreator() : undefined;
+    const BottomSheetFlashListScrollable = isBottomSheet
+                                           ? useBottomSheetScrollableCreator()
+                                           : undefined;
 
     const flatListRef = useRef<FlatList>(null);
 
+    const { width: windowWidth } = useWindowDimensions();
+    const width = windowWidth - 2 * DEFAULT_SEPARATOR;
+
     const [stepHeights, setStepHeights] = useState<Record<number, number>>({});
-
-    const currentHeight = stepHeights[currentStep] ?? "auto";
-
-    const width = useWindowDimensions().width - 2 * DEFAULT_SEPARATOR;
+    const [visitedSteps, setVisitedSteps] = useState<Set<number>>(
+        () => new Set([currentStep])
+    );
 
     useEffect(() => {
-        flatListRef.current?.scrollToOffset({ offset: currentStep * width, animated: true });
+        setVisitedSteps(prev => {
+            if(prev.has(currentStep)) return prev;
+
+            const next = new Set(prev);
+            next.add(currentStep);
+            return next;
+        });
+    }, [currentStep]);
+
+    useEffect(() => {
+        flatListRef.current?.scrollToOffset({
+            offset: currentStep * width,
+            animated: true
+        });
     }, [currentStep, width]);
 
-    const keyExtractor = useCallback((_: any, index: number) => index.toString(), []);
+    const currentHeight = stepHeights[currentStep];
 
-    const renderStep = useCallback(({ item, index }: FlashListRenderItemInfo<RenderComponent>) => (
-        <View
-            onLayout={
-                (event) => {
-                    const { height } = event.nativeEvent.layout;
+    const containerStyle = {
+        height: currentHeight ?? undefined,
+        minHeight: currentHeight ? undefined : 1
+    };
 
-                    if(stepHeights[index] !== height) {
-                        setStepHeights(prev => ({ ...prev, [index]: height }));
-                    }
+    const keyExtractor = useCallback(
+        (_: any, index: number) => index.toString(),
+        []
+    );
+
+    const renderStep = useCallback(
+        ({ item, index }: FlashListRenderItemInfo<RenderComponent>) => {
+
+            const isVisited = visitedSteps.has(index);
+
+            return (
+                <View
+                    onLayout={ (event) => {
+                        const { height } = event.nativeEvent.layout;
+
+                        setStepHeights(prev => {
+                            if(prev[index] === height) return prev;
+                            return { ...prev, [index]: height };
+                        });
+                    } }
+                >
+                    { isVisited ? item() : <View style={ { height: 400, width } }/> }
+                </View>
+            );
+        },
+        [visitedSteps]
+    );
+
+    const renderItem = useCallback(
+        ({ item, index }: ListRenderItemInfo<RenderComponent>) => (
+            <FlashList
+                data={ [item] }
+                renderItem={ (info) =>
+                    renderStep({ ...info, index })
                 }
-            }
-        >
-            { item() }
-        </View>
-    ), []);
-
-    const renderItem = useCallback(({ item }: ListRenderItemInfo<RenderComponent>) => (
-        <FlashList
-            data={ [item] }
-            renderItem={ renderStep }
-            keyExtractor={ keyExtractor }
-            contentContainerStyle={ { width } }
-            nestedScrollEnabled
-            showsVerticalScrollIndicator={ false }
-            renderScrollComponent={ BottomSheetFlashListScrollable }
-        />
-    ), [width, renderStep]);
+                keyExtractor={ keyExtractor }
+                contentContainerStyle={ { width } }
+                nestedScrollEnabled
+                showsVerticalScrollIndicator={ false }
+                renderScrollComponent={ BottomSheetFlashListScrollable }
+            />
+        ),
+        [width, renderStep, keyExtractor, BottomSheetFlashListScrollable]
+    );
 
     return (
         <FlatList<RenderComponent>
@@ -67,7 +109,9 @@ function OnBoardingView({ steps, currentStep = 0 }: OnBoardingViewProps) {
             scrollEnabled={ false }
             nestedScrollEnabled
             showsHorizontalScrollIndicator={ false }
-            style={ { height: currentHeight } }
+            removeClippedSubviews={ false }
+            initialNumToRender={ 1 }
+            style={ containerStyle }
         />
     );
 }
