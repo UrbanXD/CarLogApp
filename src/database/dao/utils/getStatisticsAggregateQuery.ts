@@ -1,10 +1,19 @@
-import { AggregateFunctionBuilder, ExpressionBuilder, Kysely, RawBuilder, SelectQueryBuilder, sql } from "kysely";
+import {
+    AggregateFunctionBuilder,
+    Expression,
+    ExpressionBuilder as KyselyExpressionBuilder,
+    Kysely,
+    RawBuilder,
+    SelectQueryBuilder,
+    sql
+} from "kysely";
 import { ExtractColumnsFromQuery, ExtractRowFromQuery } from "../../hooks/useInfiniteQuery.ts";
 import { DatabaseType } from "../../connector/powersync/AppSchema.ts";
 import { getPreviousRangeWindow } from "../../../features/statistics/utils/getPreviousRangeWindow.ts";
 import { formatDateToDatabaseFormat } from "../../../features/statistics/utils/formatDateToDatabaseFormat.ts";
 import { jsonObjectFrom } from "kysely/helpers/sqlite";
 import { medianSubQuery } from "./medianSubQuery.ts";
+import { ExpressionBuilder } from "../types";
 
 export type StatisticsAggregateQueryResult<Record = number> = {
     current_max_record: Record | null
@@ -23,34 +32,31 @@ export type StatisticsAggregateQueryResult<Record = number> = {
 
 type GetStatisticsAggregateQueryProps<
     QueryBuilder extends SelectQueryBuilder<any, any, any>,
-    MaxItemQuery extends SelectQueryBuilder<any, any, any> = SelectQueryBuilder<any, any, any>,
-    Columns extends string = ExtractColumnsFromQuery<QueryBuilder>,
-    MaxItemColumns extends string = ExtractColumnsFromQuery<MaxItemQuery>
+    RecordQueryBuilder extends SelectQueryBuilder<any, any, Record>,
+    Record = any
 > = {
     db: Kysely<DatabaseType>
     baseQuery: QueryBuilder
-    idField: Columns
-    field: Columns | RawBuilder<any>
-    fromDateField: Columns
-    toDateField?: Columns
+    idField: ExtractColumnsFromQuery<QueryBuilder>
+    field: ExtractColumnsFromQuery<QueryBuilder> | RawBuilder<any> | ((eb: ExpressionBuilder<QueryBuilder>) => RawBuilder<any> | Expression<any>)
+    fromDateField: ExtractColumnsFromQuery<QueryBuilder>
+    toDateField?: ExtractColumnsFromQuery<QueryBuilder>
     recordQueryConfig?: {
-        query: MaxItemQuery
-        idField: MaxItemColumns
-        field: MaxItemColumns | RawBuilder<any>
-        fromDateField: MaxItemColumns
-        toDateField?: MaxItemColumns
+        query: RecordQueryBuilder
+        idField: ExtractColumnsFromQuery<RecordQueryBuilder>
+        field: ExtractColumnsFromQuery<RecordQueryBuilder> | RawBuilder<any> | ((eb: ExpressionBuilder<RecordQueryBuilder>) => RawBuilder<any> | Expression<any>)
+        fromDateField: ExtractColumnsFromQuery<RecordQueryBuilder>
+        toDateField?: ExtractColumnsFromQuery<RecordQueryBuilder>
         jsonObject?: boolean
-    }
+    } | null
     from?: string | null
     to?: string | null
 }
 
 export function getStatisticsAggregateQuery<
     QueryBuilder extends SelectQueryBuilder<any, any, any>,
-    MaxItemQuery extends SelectQueryBuilder<any, any, any> = SelectQueryBuilder<any, any, any>,
-    Record = ExtractRowFromQuery<MaxItemQuery>,
-    Columns extends string = ExtractColumnsFromQuery<QueryBuilder>,
-    MaxItemColumns extends string = ExtractColumnsFromQuery<MaxItemQuery>
+    RecordQueryBuilder extends SelectQueryBuilder<any, any, any> = SelectQueryBuilder<any, any, any>,
+    Record = ExtractRowFromQuery<RecordQueryBuilder>
 >({
     db,
     baseQuery,
@@ -61,27 +67,38 @@ export function getStatisticsAggregateQuery<
     recordQueryConfig,
     from,
     to
-}: GetStatisticsAggregateQueryProps<QueryBuilder, MaxItemQuery, Columns, MaxItemColumns>): SelectQueryBuilder<any, any, StatisticsAggregateQueryResult<Record>> {
+}: GetStatisticsAggregateQueryProps<QueryBuilder, RecordQueryBuilder, Record>): SelectQueryBuilder<any, any, StatisticsAggregateQueryResult<Record>> {
     const previousWindow = from && to ? getPreviousRangeWindow(from, to) : null;
     const dbFrom = from ? formatDateToDatabaseFormat(from) : null;
     const dbPreviousWindowFrom = previousWindow ? formatDateToDatabaseFormat(previousWindow.from) : dbFrom;
     const dbTo = to ? formatDateToDatabaseFormat(to) : null;
 
-    const fieldExpression = typeof field === "object" ? field as RawBuilder<any> : sql.ref(field);
+    function resolveExpression(
+        eb: KyselyExpressionBuilder<any, any>,
+        field: any
+    ): RawBuilder<any> | Expression<any> {
+        if(typeof field === "function") {
+            return field(eb);
+        }
+
+        if(typeof field === "object" && field !== null) {
+            return field;
+        }
+
+        return sql.ref(field);
+    }
 
     const recordExpression = (
-        eb: ExpressionBuilder<any, any>,
+        eb: KyselyExpressionBuilder<any, any>,
         isFromPreviousWindow: boolean,
         isMax: boolean = true
     ): AggregateFunctionBuilder<any, any, Record | null> | RawBuilder<Record | null> | SelectQueryBuilder<any, any, Record | null> => {
         if(recordQueryConfig) {
-            const fieldExpression = typeof recordQueryConfig.field === "object"
-                                    ? recordQueryConfig.field as RawBuilder<any>
-                                    : sql.ref(recordQueryConfig.field);
+            const recordFieldExpression = resolveExpression(eb, recordQueryConfig.field);
 
             const query = recordQueryConfig.query
             .where(eb.ref(recordQueryConfig.fromDateField as any), isFromPreviousWindow ? "<" : ">=", dbFrom)
-            .orderBy(fieldExpression, isMax ? "desc" : "asc")
+            .orderBy(recordFieldExpression, isMax ? "desc" : "asc")
             .limit(1);
 
             return !!recordQueryConfig.jsonObject ? jsonObjectFrom(query) : query;
@@ -89,8 +106,8 @@ export function getStatisticsAggregateQuery<
 
         const whenExpression = eb.case()
         .when(eb.ref(fromDateField as any), isFromPreviousWindow ? "<" : ">=", dbFrom)
-        .then(fieldExpression)
-        .else(isMax ? 0 : Number.MAX_SAFE_INTEGER)
+        .then(resolveExpression(eb, field))
+        .else(null)
         .end();
 
         const aggregateFn = (isMax ? eb.fn.max : eb.fn.min);
@@ -103,63 +120,67 @@ export function getStatisticsAggregateQuery<
     .$if(!!dbTo, (qb) => qb.where(sql.ref(toDateField ?? fromDateField), "<=", dbTo));
 
     return query
-    .select((eb) => [
-        recordExpression(eb, false).as("current_max_record"),
-        recordExpression(eb, false, false).as("current_min_record"),
-        eb.fn.sum(
-            eb.case()
-            .when(eb.ref(fromDateField as any), ">=", dbFrom)
-            .then(fieldExpression)
-            .else(0)
-            .end()
-        ).as("current_total"),
-        eb.fn.avg(
-            eb.case()
-            .when(eb.ref(fromDateField as any), ">=", dbFrom)
-            .then(fieldExpression)
-            .else(null)
-            .end()
-        ).as("current_avg"),
-        eb.fn.count(
-            eb.case()
-            .when(eb.ref(fromDateField as any), ">=", dbFrom)
-            .then(eb.ref(idField))
-            .else(null)
-            .end()
-        ).as("current_count"),
-        medianSubQuery(
-            db,
-            query.where(eb.ref(fromDateField as any), ">=", dbFrom),
-            fieldExpression
-        ).as("current_median"),
-        //Previous Window
-        recordExpression(eb, true).as("previous_max_item"),
-        recordExpression(eb, true, false).as("previous_min_item"),
-        eb.fn.sum(
-            eb.case()
-            .when(eb.ref(fromDateField as any), "<", dbFrom)
-            .then(fieldExpression)
-            .else(0)
-            .end()
-        ).as("previous_total"),
-        eb.fn.avg(
-            eb.case()
-            .when(eb.ref(fromDateField as any), "<", dbFrom)
-            .then(fieldExpression)
-            .else(null)
-            .end()
-        ).as("previous_avg"),
-        eb.fn.count(
-            eb.case()
-            .when(eb.ref(fromDateField as any), "<", dbFrom)
-            .then(eb.ref(idField))
-            .else(null)
-            .end()
-        ).as("previous_count"),
-        medianSubQuery(
-            db,
-            query.where(eb.ref(fromDateField as any), "<", dbFrom),
-            fieldExpression
-        ).as("previous_median")
-    ]);
+    .select((eb) => {
+        const fieldExpression = resolveExpression(eb, field);
+
+        return [
+            recordExpression(eb, false).as("current_max_record"),
+            recordExpression(eb, false, false).as("current_min_record"),
+            eb.fn.sum(
+                eb.case()
+                .when(eb.ref(fromDateField as any), ">=", dbFrom)
+                .then(fieldExpression)
+                .else(0)
+                .end()
+            ).as("current_total"),
+            eb.fn.avg(
+                eb.case()
+                .when(eb.ref(fromDateField as any), ">=", dbFrom)
+                .then(fieldExpression)
+                .else(null)
+                .end()
+            ).as("current_avg"),
+            eb.fn.count(
+                eb.case()
+                .when(eb.ref(fromDateField as any), ">=", dbFrom)
+                .then(eb.ref(idField))
+                .else(null)
+                .end()
+            ).as("current_count"),
+            medianSubQuery(
+                db,
+                query.where(eb.ref(fromDateField as any), ">=", dbFrom),
+                fieldExpression
+            ).as("current_median"),
+            //Previous Window
+            recordExpression(eb, true).as("previous_max_record"),
+            recordExpression(eb, true, false).as("previous_min_record"),
+            eb.fn.sum(
+                eb.case()
+                .when(eb.ref(fromDateField as any), "<", dbFrom)
+                .then(fieldExpression)
+                .else(0)
+                .end()
+            ).as("previous_total"),
+            eb.fn.avg(
+                eb.case()
+                .when(eb.ref(fromDateField as any), "<", dbFrom)
+                .then(fieldExpression)
+                .else(null)
+                .end()
+            ).as("previous_avg"),
+            eb.fn.count(
+                eb.case()
+                .when(eb.ref(fromDateField as any), "<", dbFrom)
+                .then(eb.ref(idField))
+                .else(null)
+                .end()
+            ).as("previous_count"),
+            medianSubQuery(
+                db,
+                query.where(eb.ref(fromDateField as any), "<", dbFrom),
+                fieldExpression
+            ).as("previous_median")
+        ];
+    });
 }
