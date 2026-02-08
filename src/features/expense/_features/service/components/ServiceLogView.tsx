@@ -131,7 +131,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
                 <Title
                     title={ t(`service.types.${ serviceLog?.serviceType.key }`) }
                     dividerStyle={ {
-                        backgroundColor: serviceLog?.expense.type?.primaryColor ?? COLORS.gray2,
+                        backgroundColor: serviceLog?.serviceType.primaryColor ?? COLORS.gray2,
                         marginBottom: SEPARATOR_SIZES.normal
                     } }
                 />
