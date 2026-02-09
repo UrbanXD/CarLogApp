@@ -130,6 +130,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
                 <Title
                     title={ t(`service.types.${ serviceLog?.serviceType.key }`) }
+                    onPress={ () => onEdit(ServiceLogFormFieldsEnum.Type) }
                     dividerStyle={ {
                         backgroundColor: serviceLog?.serviceType.primaryColor ?? COLORS.gray2,
                         marginBottom: SEPARATOR_SIZES.normal

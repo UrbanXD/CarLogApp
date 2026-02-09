@@ -107,6 +107,7 @@ export function ExpenseScreen() {
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
                 <Title
                     title={ t(`expenses.types.${ expense?.type.key }`) }
+                    onPress={ () => onEdit(ExpenseFormFieldsEnum.Type) }
                     dividerStyle={ {
                         backgroundColor: expense?.type?.primaryColor ?? COLORS.gray2,
                         marginBottom: SEPARATOR_SIZES.normal
