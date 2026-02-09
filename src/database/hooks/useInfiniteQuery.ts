@@ -335,11 +335,13 @@ export const useInfiniteQuery = <
         let watchBuilder = base;
 
         //reverse direction because watch query want between
-        watchBuilder = addCursor<QueryBuilder, TableItem, Columns>(
-            watchBuilder, cursorOptions, prevCursorValues, "next", false, true
-        );
+        if(prevCursorValues) {
+            watchBuilder = addCursor<QueryBuilder, TableItem, Columns>(
+                watchBuilder, cursorOptions, prevCursorValues, "next", false, true
+            );
+        }
 
-        if(prevCursorValues !== nextCursorValues) {
+        if(nextCursorValues && prevCursorValues !== nextCursorValues) {
             watchBuilder = addCursor<QueryBuilder, TableItem, Columns>(
                 watchBuilder, cursorOptions, nextCursorValues, "prev", false, true
             );
@@ -466,12 +468,7 @@ export const useInfiniteQuery = <
                             setNextCursorValues(null);
                             setPrevCursorValues(null);
                         }
-
-                        if(parsedTableRow.length >= perPage && !prevCursorValues && !nextCursorValues) {
-                            setNextCursor(parsedTableRow[parsedTableRow.length - 1]);
-                            setPrevCursor(parsedTableRow[0]);
-                        }
-
+                        
                         setHasNext(parsedTableRow.length >= perPage);
                         setHasPrev(!!prevCursorValues || (!!defaultItem && parsedTableRow.length >= perPage));
                     } catch(error) {
