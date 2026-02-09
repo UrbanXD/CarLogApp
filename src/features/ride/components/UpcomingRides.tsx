@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { View } from "react-native";
 import { COLORS, ICON_NAMES } from "../../../constants";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
@@ -24,7 +24,7 @@ export function UpcomingRides({ carId }: UpcomingRidesProps) {
     const { rideLogDao } = useDatabase();
     const { mapper } = useRideLogTimelineItem();
 
-    const [today] = useState(dayjs().hour(0).minute(0).second(0).millisecond(0));
+    const today = useMemo(() => dayjs().startOf("day").toDate(), []);
 
     const upcomingRidesQuery = useMemo(() => {
         return rideLogDao.upcomingRideWatchedQueryCollection(carId, today);
@@ -63,7 +63,7 @@ export function UpcomingRides({ carId }: UpcomingRidesProps) {
     return (
         <Section
             title={ t("rides.upcoming") }
-            subtitle={ `${ today.format("dddd") }, ${ today.format("LL") } (${ t("date.today") })` }
+            subtitle={ `${ dayjs(today).format("dddd") }, ${ dayjs(today).format("LL") } (${ t("date.today") })` }
         >
             {
                 isLoading
