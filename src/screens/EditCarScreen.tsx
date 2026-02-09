@@ -1,36 +1,25 @@
-import React from "react";
-import {SafeAreaView, ScrollView, StyleSheet } from "react-native";
-import {DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES} from "../constants/constants";
-import { Colors } from "../constants/colors";
-import { useLocalSearchParams } from "expo-router";
-import CarProfile from "../features/CarProfile/components/CarProfile";
+import React, { useEffect } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import CarProfile from "../features/car/components/carProfile/CarProfile.ts";
+import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
 
 const EditCarScreen: React.FC = () => {
-    const localSearchParams = useLocalSearchParams();
+    const { id } = useLocalSearchParams<{ id: string }>();
+
+    useEffect(() => {
+        if(!id) {
+            if(router.canGoBack()) return router.back();
+            return router.replace("(main)/index");
+        }
+    }, [id]);
+
+    if(!id) return <></>;
 
     return (
-        <SafeAreaView style={ styles.pageContainer }>
-            <ScrollView
-                showsVerticalScrollIndicator={ false }
-                nestedScrollEnabled={ true }
-                contentContainerStyle={ GLOBAL_STYLE.scrollViewContentContainer }
-            >
-            {
-                <CarProfile carID={ localSearchParams.id as string } />
-            }
-            </ScrollView>
-        </SafeAreaView>
-    )
-}
-
-const styles = StyleSheet.create({
-    pageContainer: {
-        ...GLOBAL_STYLE.pageContainer,
-        backgroundColor: Colors.black2,
-        marginBottom: 0,
-        paddingHorizontal: DEFAULT_SEPARATOR,
-        paddingBottom: SEPARATOR_SIZES.small
-    }
-})
+        <ScreenScrollView screenHasTabBar={ false }>
+            <CarProfile.ById carId={ id } fuelSliderDisabled/>
+        </ScreenScrollView>
+    );
+};
 
 export default EditCarScreen;

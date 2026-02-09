@@ -1,168 +1,213 @@
 import React from "react";
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
-import { DEFAULT_SEPARATOR, FONT_SIZES, GLOBAL_STYLE, ICON_NAMES, SEPARATOR_SIZES } from "../constants/constants.ts";
+import { StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+    BaseConfig,
+    COLORS,
+    DEFAULT_SEPARATOR,
+    FONT_SIZES,
+    GLOBAL_STYLE,
+    ICON_NAMES,
+    SEPARATOR_SIZES
+} from "../constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { Colors } from "../constants/colors";
 import Divider from "../components/Divider.tsx";
 import Button from "../components/Button/Button.ts";
-import { useBottomSheet } from "../features/BottomSheet/context/BottomSheetContext.ts";
-import { EditUserBottomSheet } from "../features/BottomSheet/presets";
-import { EDIT_USER_FORM_STEPS } from "../features/Form/layouts/auth/user/editUser/useEditUserSteps.tsx";
 import Avatar from "../components/Avatar/Avatar.ts";
 import { getLabelByName } from "../utils/getLabelByName.ts";
-import { useAuth } from "../contexts/Auth/AuthContext.ts";
-import { useUserManagement } from "../hooks/useUserManagement.ts";
-import { Redirect } from "expo-router";
+import { useAuth } from "../contexts/auth/AuthContext.ts";
+import { Redirect, router } from "expo-router";
+import { EDIT_USER_FORM_TYPE } from "../features/user/presets/bottomSheet";
+import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
+import { FlagUs } from "../components/flags/FlagUs.tsx";
+import { FlagHu } from "../components/flags/FlagHu.tsx";
+import { useTranslation } from "react-i18next";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AnimatedPressable } from "../components/AnimatedComponents";
+import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { useUser } from "../features/user/hooks/useUser.ts";
+import { MoreDataLoading } from "../components/loading/MoreDataLoading.tsx";
 
 const ProfileScreen: React.FC = () => {
-    const { session, user, userAvatar } = useAuth();
-    const { signOut, deleteUserProfile } = useUserManagement();
-    const { openBottomSheet } = useBottomSheet();
+    const { t, i18n } = useTranslation();
+    const { user, isLoading } = useUser();
+    const { hasPassword, signOut, deleteAccount } = useAuth();
+    const { bottom } = useSafeAreaInsets();
 
-    if(!user) return Redirect({ href: "backToRootIndex" });
-    const name = `${ user.lastname } ${ user.firstname }`;
-    const avatarColor = user.avatarColor;
+    const selectedLanguage = useSharedValue(i18n.language);
 
-    const openEditUser =
-        (stepIndex: number, passwordReset: boolean = true) =>
-            openBottomSheet(
-                EditUserBottomSheet({
-                    user: {
-                        email: user.email ?? undefined,
-                        firstname: user.firstname ?? undefined,
-                        lastname: user.lastname ?? undefined,
-                    },
-                    passwordReset,
-                    stepIndex
-                })
-            );
+    const openEditUser = (type: EDIT_USER_FORM_TYPE) => router.push({
+        pathname: "bottomSheet/editUser",
+        params: { type }
+    });
 
-    const openChangeName =
-        () => openEditUser(EDIT_USER_FORM_STEPS.NameStep);
-    const openAddPasswordToOAuthUser =
-        () => openEditUser(EDIT_USER_FORM_STEPS.PasswordStep, false);
-    const openResetPassword =
-        () => openEditUser(EDIT_USER_FORM_STEPS.PasswordStep);
-    const openChangeEmail =
-        () => openEditUser(EDIT_USER_FORM_STEPS.EmailStep);
-    const openChangeAvatar =
-        () => openEditUser(EDIT_USER_FORM_STEPS.AvatarStep)
+    const openEditUserInformation = () => openEditUser(EDIT_USER_FORM_TYPE.EditUserInformation);
+    const openLinkPasswordToOAuth = () => openEditUser(EDIT_USER_FORM_TYPE.LinkPasswordToOAuth);
+    const openResetPassword = () => openEditUser(EDIT_USER_FORM_TYPE.ResetPassword);
+    const openChangeEmail = () => openEditUser(EDIT_USER_FORM_TYPE.ChangeEmail);
+    const openEditAvatar = () => openEditUser(EDIT_USER_FORM_TYPE.EditAvatar);
+
+    const changeLanguage = async (language: string) => {
+        try {
+            await i18n.changeLanguage(language);
+            selectedLanguage.value = language;
+            await AsyncStorage.setItem(BaseConfig.LOCAL_STORAGE_KEY_LANGUAGE, language);
+        } catch(error) {
+            console.error("Error changing language:", error);
+        }
+    };
+
+    const useFlagStyle = (language: Array<string> | string) => useAnimatedStyle(() => {
+        const languages = typeof language === "string" ? [language] : language;
+
+        return ({
+            transform: [
+                {
+                    scale: withTiming(languages.includes(selectedLanguage.value) ? 1.175 : 1, {
+                        duration: 200
+                    })
+                }
+            ]
+        });
+    });
+
+    const enFlagStyle = useFlagStyle(["en", "en-US"]);
+    const huFlagStyle = useFlagStyle(["hu", "hu-HU"]);
+    const styles = useStyles(bottom);
+
+    if(!user && !isLoading) return <Redirect href={ "backToRootIndex" }/>;
 
     return (
-        <SafeAreaView style={ styles.pageContainer }>
+        <ScreenScrollView
+            screenHasTabBar={ false }
+            safeAreaEdges={ ["top", "left", "right"] }
+            style={ { paddingBottom: 0, paddingHorizontal: 0 } }
+        >
             <View style={ styles.container }>
-                <View style={ styles.informationContainer }>
-                    {
-                        userAvatar
-                            ?   <Avatar.Image
-                                    source={ userAvatar.image }
-                                    avatarSize={ hp(20) }
-                                    borderColor={ Colors.black5 }
-                                    style={ styles.profileImage }
-                                    onPressBadge={() => ""}
-                            />
-                            :   <Avatar.Text
-                                    label={ getLabelByName(name) }
-                                    avatarSize={ hp(20) }
-                                    backgroundColor={ avatarColor ?? undefined }
-                                    borderColor={ Colors.black5 }
-                                    style={ styles.profileImage }
-                                    onPressBadge={() => ""}
-                                />
-                    }
-                    <View style={ styles.textContainer }>
-                        <Text style={ styles.nameText }>
-                            { name }
-                        </Text>
-                        <Text style={ styles.emailText }>
-                            { user?.email }
-                        </Text>
-                    </View>
-                </View>
-                <View style={ styles.actionButtonsContainer }>
-                    <Button.Text
-                        iconLeft={ ICON_NAMES.settings }
-                        iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Beállítások"
-                        textStyle={{ textAlign: "left" }}
-                        onPress={ openChangeName }
-                        backgroundColor="transparent"
-                        fontSize={ FONT_SIZES.p1 }
-                        loadingIndicator
-                    />
-                    <Divider />
-                    <Button.Text
-                        iconLeft={ ICON_NAMES.settings }
-                        iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Avatar"
-                        textStyle={{ textAlign: "left" }}
-                        onPress={ openChangeAvatar }
-                        backgroundColor="transparent"
-                        fontSize={ FONT_SIZES.p1 }
-                        loadingIndicator
-                    />
-                    <Divider />
-                    <Button.Text
-                        iconLeft={ ICON_NAMES.user }
-                        iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Identity link"
-                        textStyle={{ textAlign: "left" }}
-                        onPress={ () => {} }
-                        backgroundColor="transparent"
-                        fontSize={ FONT_SIZES.p1 }
-                        loadingIndicator
-                    />
-                    <Divider />
-                    <Button.Text
-                        iconLeft={ ICON_NAMES.email }
-                        iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Email csere"
-                        textStyle={{ textAlign: "left" }}
-                        onPress={ openChangeEmail }
-                        backgroundColor="transparent"
-                        fontSize={ FONT_SIZES.p1 }
-                        loadingIndicator
-                    />
-                    <Divider />
-                    <Button.Text
-                        iconLeft={ ICON_NAMES.password }
-                        iconRight={ ICON_NAMES.rightArrowHead }
-                        text={ session?.user.user_metadata.has_password ? "Jelszó csere" : "Jelszó hozzáadás"}
-                        textStyle={{ textAlign: "left" }}
-                        onPress={ session?.user.user_metadata.has_password ? openResetPassword : openAddPasswordToOAuthUser }
-                        backgroundColor="transparent"
-                        fontSize={ FONT_SIZES.p1 }
-                        loadingIndicator
-                    />
-                    <Divider />
-                    <Button.Text
-                        iconLeft={ ICON_NAMES.trashCan }
-                        iconRight={ ICON_NAMES.rightArrowHead }
-                        text="Fiók törlése"
-                        onPress={ deleteUserProfile }
-                        textStyle={{ textAlign: "left" }}
-                        backgroundColor="transparent"
-                        textColor={ Colors.redLight }
-                        fontSize={ FONT_SIZES.p1 }
-                        loadingIndicator
-                    />
-                </View>
-                <Button.Text
-                    iconLeft={ ICON_NAMES.signOut }
-                    text="Kijelentkezés"
-                    onPress={ signOut }
-                    backgroundColor={ Colors.googleRed }
-                    textColor={ Colors.black2 }
-                    fontSize={ FONT_SIZES.p1 }
-                />
+                {
+                    isLoading
+                    ? <MoreDataLoading text={ "Betotoes keciii" }/>
+                    : user
+                      ? <>
+                          <View style={ styles.informationContainer }>
+                              {
+                                  user?.avatarPath
+                                  ? <Avatar.Image
+                                      path={ user.avatarPath }
+                                      avatarSize={ hp(20) }
+                                      borderColor={ COLORS.black5 }
+                                      style={ styles.profileImage }
+                                      onPressBadge={ openEditAvatar }
+                                  />
+                                  : <Avatar.Text
+                                      label={ getLabelByName(`${ user.firstname } ${ user.lastname }`) }
+                                      avatarSize={ hp(20) }
+                                      backgroundColor={ user.avatarColor ?? undefined }
+                                      borderColor={ COLORS.black5 }
+                                      style={ styles.profileImage }
+                                      onPressBadge={ openEditAvatar }
+                                  />
+                              }
+                              <View style={ styles.textContainer }>
+                                  <Text style={ styles.nameText }>
+                                      { `${ user.lastname } ${ user.firstname }` }
+                                  </Text>
+                                  <Text style={ styles.emailText }>
+                                      { user?.email }
+                                  </Text>
+                                  <View style={ styles.flagContainer }>
+                                      <AnimatedPressable
+                                          style={ enFlagStyle }
+                                          onPress={ () => changeLanguage("en-US") }
+                                      >
+                                          <FlagUs width={ 36 } height={ 36 }/>
+                                      </AnimatedPressable>
+                                      <AnimatedPressable
+                                          style={ huFlagStyle }
+                                          onPress={ () => changeLanguage("hu-HU") }
+                                      >
+                                          <FlagHu width={ 36 } height={ 36 }/>
+                                      </AnimatedPressable>
+                                  </View>
+                              </View>
+                          </View>
+                          <View style={ styles.actionButtonsContainer }>
+                              <Button.Text
+                                  iconLeft={ ICON_NAMES.settings }
+                                  iconRight={ ICON_NAMES.rightArrowHead }
+                                  text={ t("profile.personal_information") }
+                                  textStyle={ { textAlign: "left" } }
+                                  onPress={ openEditUserInformation }
+                                  backgroundColor="transparent"
+                                  fontSize={ FONT_SIZES.p1 }
+                                  loadingIndicator
+                              />
+                              {/*<Divider/>*/ }
+                              {/*<Button.Text*/ }
+                              {/*    iconLeft={ ICON_NAMES.user }*/ }
+                              {/*    iconRight={ ICON_NAMES.rightArrowHead }*/ }
+                              {/*    text="Identity link"*/ }
+                              {/*    textStyle={ { textAlign: "left" } }*/ }
+                              {/*    onPress={ () => {*/ }
+                              {/*    } }*/ }
+                              {/*    backgroundColor="transparent"*/ }
+                              {/*    fontSize={ FONT_SIZES.p1 }*/ }
+                              {/*    loadingIndicator*/ }
+                              {/*/>*/ }
+                              <Divider/>
+                              <Button.Text
+                                  iconLeft={ ICON_NAMES.email }
+                                  iconRight={ ICON_NAMES.rightArrowHead }
+                                  text={ t("profile.change_email") }
+                                  textStyle={ { textAlign: "left" } }
+                                  onPress={ openChangeEmail }
+                                  backgroundColor="transparent"
+                                  fontSize={ FONT_SIZES.p1 }
+                                  loadingIndicator
+                              />
+                              <Divider/>
+                              <Button.Text
+                                  iconLeft={ ICON_NAMES.password }
+                                  iconRight={ ICON_NAMES.rightArrowHead }
+                                  text={ hasPassword ? t("profile.change_password") : t("profile.add_password") }
+                                  textStyle={ { textAlign: "left" } }
+                                  onPress={ hasPassword ? openResetPassword : openLinkPasswordToOAuth }
+                                  backgroundColor="transparent"
+                                  fontSize={ FONT_SIZES.p1 }
+                                  loadingIndicator
+                              />
+                              <Divider/>
+                              <Button.Text
+                                  iconLeft={ ICON_NAMES.trashCan }
+                                  iconRight={ ICON_NAMES.rightArrowHead }
+                                  text={ t("profile.delete_account") }
+                                  onPress={ deleteAccount }
+                                  textStyle={ { textAlign: "left" } }
+                                  backgroundColor="transparent"
+                                  textColor={ COLORS.redLight }
+                                  fontSize={ FONT_SIZES.p1 }
+                                  loadingIndicator
+                              />
+                          </View>
+                          <Button.Text
+                              iconLeft={ ICON_NAMES.signOut }
+                              text={ t("profile.sign_out") }
+                              onPress={ signOut }
+                              backgroundColor={ COLORS.googleRed }
+                              textColor={ COLORS.black2 }
+                              fontSize={ FONT_SIZES.p1 }
+                          />
+                      </>
+                      : <></>
+                }
             </View>
-        </SafeAreaView>
-    )
-}
+        </ScreenScrollView>
+    );
+};
 
-const styles = StyleSheet.create({
+const useStyles = (bottom: number) => StyleSheet.create({
     pageContainer: {
-        ...GLOBAL_STYLE.pageContainer,
+        flex: 1
     },
     container: {
         position: "absolute",
@@ -171,16 +216,16 @@ const styles = StyleSheet.create({
         height: "90%",
         justifyContent: "space-between",
         gap: DEFAULT_SEPARATOR,
-        backgroundColor: Colors.black5,
+        backgroundColor: COLORS.black5,
         paddingHorizontal: DEFAULT_SEPARATOR,
-        paddingBottom: DEFAULT_SEPARATOR,
+        paddingBottom: DEFAULT_SEPARATOR + bottom,
         borderTopStartRadius: 40,
         borderTopEndRadius: 40,
-        shadowColor: Colors.black5,
+        shadowColor: COLORS.black5,
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.60,
         shadowRadius: 24,
-        elevation: 12,
+        elevation: 12
     },
     informationContainer: {
         flexDirection: "column",
@@ -191,7 +236,7 @@ const styles = StyleSheet.create({
     profileImage: {
         position: "relative",
         top: -hp(9),
-        alignSelf: "center",
+        alignSelf: "center"
     },
     textContainer: {
         top: -hp(9),
@@ -207,8 +252,13 @@ const styles = StyleSheet.create({
         lineHeight: GLOBAL_STYLE.containerText.fontSize,
         textAlign: "center"
     },
+    flagContainer: {
+        flexDirection: "row",
+        gap: SEPARATOR_SIZES.mediumSmall,
+        alignSelf: "center"
+    },
     actionButtonsContainer: {
-        top: -hp(4.5)
+        top: -hp(10) //4.5
     }
 });
 

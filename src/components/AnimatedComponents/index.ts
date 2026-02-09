@@ -1,0 +1,17 @@
+import Animated from "react-native-reanimated";
+import Svg, { Circle, Path } from "react-native-svg";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { FlashList, FlashListProps } from "@shopify/flash-list";
+import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons";
+import React from "react";
+import { DebouncedPressable } from "../DebouncedPressable.tsx";
+
+export const AnimatedSvg = Animated.createAnimatedComponent(Svg);
+export const AnimatedPath = Animated.createAnimatedComponent(Path);
+export const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+export const AnimatedPressable = Animated.createAnimatedComponent(DebouncedPressable);
+export const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView);
+export const AnimatedMaterialIcon = Animated.createAnimatedComponent(MaterialIcon);
+export const AnimatedFlashList = Animated.createAnimatedComponent(FlashList) as unknown as new <T>(
+    props: FlashListProps<T>
+) => React.Component<FlashListProps<T>>;

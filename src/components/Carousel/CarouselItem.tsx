@@ -1,24 +1,25 @@
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { ReactElement } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
-import { Colors } from "../../constants/colors";
-import { FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/constants";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../constants";
 import { CarouselItemType } from "./Carousel";
-import { hexToRgba } from "../../utils/colors/hexToRgba";
 import Image from "../Image";
+import { AnimatedPressable } from "../AnimatedComponents";
+import { ViewStyle } from "../../types";
 
-interface CarouselItemProps {
+type CarouselItemProps = {
     index: number
     size: number
     x: SharedValue<number>
     overlay?: boolean
     item: CarouselItemType
     cardAction?: () => void
-    renderBottomActionButton?: () => React.ReactElement
-    renderTopActionButton?: () => React.ReactElement
+    renderBottomActionButton?: () => ReactElement
+    renderTopActionButton?: () => ReactElement
+    containerStyle?: ViewStyle
 }
 
-const CarouselItem: React.FC<CarouselItemProps> = ({
+function CarouselItem({
     index,
     size,
     x,
@@ -26,33 +27,34 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
     item,
     cardAction,
     renderBottomActionButton,
-    renderTopActionButton
-}) => {
+    renderTopActionButton,
+    containerStyle
+}: CarouselItemProps) {
     const animatedStyle = useAnimatedStyle(() => {
-        const scaleY = interpolate(
+        const scale = interpolate(
             x.value,
-            [size * (index - 1), size * index , size * (index + 1)],
-            [0.85, 1, 0.85],
+            [size * (index - 1), size * index, size * (index + 1)],
+            [0.9, 1, 0.9]
         );
 
         return {
-            transform: [{ scaleY }]
+            transform: [{ scale }]
         };
     });
 
     return (
-        <TouchableOpacity
+        <AnimatedPressable
             key={ item.id }
-            activeOpacity={ 1 }
-            style={{ width: size, paddingHorizontal: 10 }}
+            style={ [{ width: size }, containerStyle] }
             onPress={ cardAction }
             disabled={ !cardAction }
         >
-            <Animated.View style={ [styles.itemContainer, animatedStyle ] }>
+            <Animated.View style={ [styles.itemContainer, animatedStyle, containerStyle] }>
                 <Image
-                    source={ item.image || "" }
+                    path={ item?.image?.uri }
+                    attachment={ item?.image?.attachment ?? false }
                     alt={ ICON_NAMES.car }
-                    // imageStyle={}
+                    imageStyle={ containerStyle }
                 >
                     <View style={ styles.topContainer }>
                         <Text style={ styles.topContainerTitleText }>
@@ -60,9 +62,9 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                         </Text>
                         {
                             renderTopActionButton &&
-                            <View style={ styles.actionContainer }>
-                                { renderTopActionButton() }
-                            </View>
+                           <View style={ styles.actionContainer }>
+                               { renderTopActionButton() }
+                           </View>
                         }
                     </View>
                     <View style={ styles.bottomContainer }>
@@ -76,86 +78,63 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                         </View>
                         {
                             renderBottomActionButton &&
-                            <View style={ styles.actionContainer }>
-                                { renderBottomActionButton() }
-                            </View>
+                           <View style={ styles.actionContainer }>
+                               { renderBottomActionButton() }
+                           </View>
                         }
                     </View>
                 </Image>
             </Animated.View>
-        </TouchableOpacity>
-    )
+        </AnimatedPressable>
+    );
 }
 
 const styles = StyleSheet.create({
     itemContainer: {
         flex: 1,
-        backgroundColor: Colors.black,
-        borderRadius: 35,
-    },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: hexToRgba(Colors.white, 0.035),
-        borderRadius: 35,
-        zIndex: 1
-    },
-    itemContentContainer: {
-        flex: 1,
-        borderWidth: 1.5,
-        borderRadius: 35,
-        borderColor: Colors.gray4
-    },
-    itemImage: {
-        position: "absolute",
-        width: "100%",
-        height: "100%",
-        resizeMode: "cover",
-        borderRadius: 35,
-    },
-    imageOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        borderRadius: 33,
+        backgroundColor: COLORS.black,
+        borderRadius: 35
     },
     topContainer: {
         flexDirection: "row",
-        padding: SEPARATOR_SIZES.lightSmall,
-        paddingLeft: SEPARATOR_SIZES.normal,
+        padding: SEPARATOR_SIZES.mediumSmall,
+        paddingLeft: SEPARATOR_SIZES.normal
     },
     bottomContainer: {
         position: "absolute",
         bottom: 0,
         width: "100%",
         flexDirection: "row",
-        padding: SEPARATOR_SIZES.lightSmall,
-        paddingLeft: SEPARATOR_SIZES.normal,
+        padding: SEPARATOR_SIZES.mediumSmall,
+        paddingLeft: SEPARATOR_SIZES.normal
     },
     topContainerTitleText: {
         flex: 1,
-        color: Colors.white,
+        color: COLORS.white,
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.p1,
-        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowColor: "rgba(0, 0, 0, 0.75)",
         textShadowOffset: { width: -1, height: 1 },
         textShadowRadius: 10,
-        letterSpacing: FONT_SIZES.p1 * 0.05,
+        letterSpacing: FONT_SIZES.p1 * 0.05
     },
     infoContainer: {
-        flex: 1,
+        flex: 1
     },
     infoTitleText: {
-        color: Colors.white,
+        color: COLORS.white,
         fontSize: FONT_SIZES.p2,
         fontFamily: "Gilroy-Heavy",
-        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowColor: "rgba(0, 0, 0, 0.75)",
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 10,
         letterSpacing: FONT_SIZES.p2 * 0.05
     },
     infoSubtitleText: {
-        color: Colors.white,
+        color: COLORS.white,
         fontSize: FONT_SIZES.p4,
         fontFamily: "Gilroy-Medium",
-        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowColor: "rgba(0, 0, 0, 0.75)",
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 10,
         letterSpacing: FONT_SIZES.p4 * 0.05
@@ -165,6 +144,6 @@ const styles = StyleSheet.create({
         justifyContent: "flex-end",
         alignItems: "flex-end"
     }
-})
+});
 
 export default CarouselItem;

@@ -1,0 +1,134 @@
+import { Kysely, sql } from "@powersync/kysely-driver";
+import { CurrencyTableRow, DatabaseType, UserTableRow } from "../../../../database/connector/powersync/AppSchema.ts";
+import { USER_TABLE } from "../../../../database/connector/powersync/tables/user.ts";
+import { UserMapper } from "../mapper/userMapper.ts";
+import { UserAccount } from "../../schemas/userSchema.ts";
+import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
+import { Dao } from "../../../../database/dao/Dao.ts";
+import { EditUserAvatarRequest } from "../../schemas/form/editUserAvatarRequest.ts";
+import { AVATAR_COLOR } from "../../../../constants";
+import { EditUserInformationRequest } from "../../schemas/form/editUserInformation.ts";
+import { SelectQueryBuilder } from "kysely";
+import { getUserLocalCurrency } from "../../../_shared/currency/utils/getUserLocalCurrency.ts";
+import { CURRENCY_TABLE } from "../../../../database/connector/powersync/tables/currency.ts";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { WithPrefix } from "../../../../types";
+import { UseWatchedQueryItemProps } from "../../../../database/hooks/useWatchedQueryItem.ts";
+
+export type SelectUserTableRow = UserTableRow & WithPrefix<Omit<CurrencyTableRow, "id">, "currency">;
+
+export class UserDao extends Dao<UserTableRow, UserAccount, UserMapper, SelectUserTableRow> {
+    private readonly attachmentQueue?: PhotoAttachmentQueue;
+
+    constructor(
+        db: Kysely<DatabaseType>,
+        powersync: AbstractPowerSyncDatabase,
+        attachmentQueue?: PhotoAttachmentQueue
+    ) {
+        super(db, powersync, USER_TABLE, new UserMapper());
+        this.attachmentQueue = attachmentQueue;
+    }
+
+    selectQuery(id?: any | null): SelectQueryBuilder<DatabaseType, any, SelectUserTableRow> {
+        let query = this.db
+        .selectFrom(`${ USER_TABLE } as u` as const)
+        .innerJoin(`${ CURRENCY_TABLE } as curr` as const, (join) =>
+            join.on(
+                (eb) => eb.fn("coalesce", [
+                    eb.ref(`u.currency_id`),
+                    eb.val(getUserLocalCurrency())
+                ]),
+                "=",
+                sql.ref(`curr.id`)
+            ))
+        .selectAll("u")
+        .select([
+            "curr.key as currency_key",
+            "curr.symbol as currency_symbol"
+        ]);
+
+        if(id) query = query.where("u.id", "=", id);
+
+        return query;
+    }
+
+    userWatchedQueryItem(userId: string | null | undefined): UseWatchedQueryItemProps<UserAccount> {
+        return {
+            query: this.selectQuery(userId),
+            mapper: this.mapper.toDto.bind(this.mapper),
+            options: { enabled: !!userId }
+        };
+    }
+
+    async getPreviousAvatarImagePath(id: string): Promise<string | null> {
+        const result = await this.db
+        .selectFrom(USER_TABLE)
+        .select("avatar_url")
+        .where("id", "=", id)
+        .executeTakeFirst();
+
+        return result?.avatar_url ?? null;
+    }
+
+    async updateUserInformation(userId: string, request: EditUserInformationRequest): Promise<void> {
+        const user: Partial<UserTableRow> = {
+            firstname: request.firstname,
+            lastname: request.lastname,
+            currency_id: request.currencyId
+        };
+
+        await this.db
+        .updateTable(USER_TABLE)
+        .set(user)
+        .where("id", "=", userId)
+        .returning("id")
+        .executeTakeFirst();
+    }
+
+    async updateAvatar(userId: string, request: EditUserAvatarRequest): Promise<void> {
+        const previousAvatarPath = await this.getPreviousAvatarImagePath(userId);
+        const user: Partial<UserTableRow> = {};
+
+        let path = previousAvatarPath;
+        if(this.attachmentQueue && request.isImageAvatar) {
+            path = await this.attachmentQueue.changeEntityAttachment(
+                request.avatar ?? null,
+                previousAvatarPath,
+                userId
+            );
+        }
+
+        if(!request.isImageAvatar) {
+            user.avatar_url = null;
+            user.avatar_color = request.avatarColor ?? AVATAR_COLOR[0];
+
+            if(this.attachmentQueue && previousAvatarPath) await this.attachmentQueue.deleteFile(previousAvatarPath);
+        } else {
+            user.avatar_url = path;
+        }
+
+        if(Object.keys(user).length === 0) throw "Nothing changed";
+
+        await this.db
+        .updateTable(USER_TABLE)
+        .set(user)
+        .where("id", "=", userId)
+        .returning("id")
+        .executeTakeFirst();
+    }
+
+
+    async delete(id: string | number | null): Promise<UserTableRow["id"]> {
+        try {
+            const user = await this.getById(id);
+
+            if(user?.avatarPath && this.attachmentQueue) {
+                await this.attachmentQueue.deleteFile(user.avatarPath);
+            }
+        } catch(e) {
+            console.log("User image cannot be deleted: ", e);
+        }
+
+        return super.delete(id);
+    }
+}

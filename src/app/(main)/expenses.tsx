@@ -1,12 +1,3 @@
-import React from "react";
-import {Text, View} from "react-native";
+import { ExpenseTimelineScreen } from "../../screens/expense/ExpenseTimelineScreen.tsx";
 
-const Page: React.FC = () => {
-    return (
-        <View>
-            <Text>Kiadasok</Text>
-        </View>
-    )
-}
-
-export default Page;
+export default ExpenseTimelineScreen;

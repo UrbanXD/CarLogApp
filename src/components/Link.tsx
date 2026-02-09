@@ -1,49 +1,55 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import { FONT_SIZES } from "../constants/constants";
-import { Colors } from "../constants/colors/Colors.ts";
+import { Pressable, StyleSheet, Text } from "react-native";
+import { COLORS, FONT_SIZES } from "../constants/index.ts";
 import Icon from "./Icon";
+import { TextStyle, ViewStyle } from "../types/index.ts";
 
-interface LinkProps {
-    text?: string,
+type LinkProps = {
+    text?: string
     icon?: string
+    onPress?: () => void
+    disabled?: boolean
+    style?: ViewStyle
+    textStyle?: TextStyle
 }
 
-const Link: React.FC<LinkProps> = ({
-    text,
-    icon
-}) => {
+function Link({ text, icon, onPress, disabled, style, textStyle }: LinkProps) {
     return (
-        <TouchableOpacity style={ styles.linkContainer }>
+        <Pressable
+            style={ [styles.linkContainer, style] }
+            onPress={ onPress }
+            disabled={ !onPress || disabled }
+        >
             {
                 text &&
-                <Text style={ styles.linkText }>
-                    { text }
-                </Text>
+               <Text style={ [styles.linkText, textStyle] }>
+                   { text }
+               </Text>
             }
             {
                 icon &&
-                <Icon
-                    icon={ icon }
-                    size={ styles.linkText.fontSize * 1.35 }
-                    color={ styles.linkText.color }
-                />
+               <Icon
+                  icon={ icon }
+                  size={ styles.linkText.fontSize * 1.35 }
+                  color={ styles.linkText.color }
+               />
             }
-        </TouchableOpacity>
-    )
+        </Pressable>
+    );
 }
 
 const styles = StyleSheet.create({
     linkContainer: {
         flexDirection: "row",
-        justifyContent: "center"
+        justifyContent: "center",
+        alignSelf: "center"
     },
     linkText: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
         textAlign: "center",
-        color: Colors.fuelYellow,
-    },
-})
+        color: COLORS.fuelYellow
+    }
+});
 
 export default Link;

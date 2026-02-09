@@ -1,6 +1,6 @@
 import React from "npm:react@18.3.1";
 import { render } from "npm:@react-email/components@0.0.22";
-import { resend, EmailOTP, AuthEmailBody, Email } from "../_shared/index.ts";
+import { AuthEmailBody, Email, EmailOTP, resend } from "../_shared/index.ts";
 
 const handler = async (req: Request) => {
     if(req.method !== "POST") return new Response("Not Allowed", { status: 400 });
@@ -22,7 +22,7 @@ const handler = async (req: Request) => {
 
         let emails: Array<Email> = [];
 
-        switch (email_action_type) {
+        switch(email_action_type) {
             case "signup":
                 emails.push({
                     to: [email],
@@ -97,36 +97,37 @@ const handler = async (req: Request) => {
                             footer: "Amennyiben nem Ön kezdeményezte a műveletet, nyugodtan figyelmen kivül hagyhatja ezt az üzenetet."
                         })
                     )
-                })
+                });
         }
 
-        for (let { to, subject, html } of emails) {
+        for(let { to, subject, html } of emails) {
             const { error } = await resend.emails.send({
-                from: "Carlog App <noreply@rankedarena.net>",
+                from: "Carlog App <noreply@utictactoe.com>",
                 to,
                 subject,
                 html
             });
 
-            if (error) return console.error({ error });
+            if(error) return console.error({ error });
         }
-    } catch (error) {
+    } catch(error) {
         return new Response(JSON.stringify(error), {
             status: 500,
             headers: {
-                "Content-Type": "application/json",
-            },
-         });
+                "Content-Type": "application/json"
+            }
+        });
     }
 
     return new Response(
         JSON.stringify({}),
-        {   status: 200,
+        {
+            status: 200,
             headers: {
                 "Content-Type": "application/json"
-            },
+            }
         }
     );
-}
+};
 
 Deno.serve(handler);

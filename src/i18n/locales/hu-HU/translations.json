@@ -1,0 +1,766 @@
+{
+  "common": {
+    "main_screen": "Főoldal",
+    "not_assigned": "Nincs hozzárendelve",
+    "no_notes": "Nincs megjegyzés",
+    "note": "Megjegyzés",
+    "unknown": "Ismeretlen",
+    "data_loading": "Adatok betöltése",
+    "no_data_found": "Nem található adat",
+    "loading": "Betöltés",
+    "or": "vagy",
+    "log_title": "Napló bejegyzés",
+    "count": "db",
+    "filters": {
+      "all": "Mind"
+    },
+    "unit": "Mértékegység",
+    "type": "Típus",
+    "image": "Kép",
+    "element": "Elem"
+  },
+  "permission": {
+    "title": "erőforrás",
+    "camera": "kamera",
+    "media_library": "galéria"
+  },
+  "first_select_car": {
+    "title": "Először válasszon autót!",
+    "description": "Ahhoz, hogy hozzáférjen a kért adatokhoz, kérjük, válassza ki elsődleges autóját. Ezt a képernyő tetején található menüben teheti\n                    meg. Amennyiben Önnek még nem parkol autója a virtuális garázsában akkor hozzonlétre egyet."
+  },
+  "form_button": {
+    "edit": "Módosítás",
+    "save": "Mentés",
+    "delete": "Törlés",
+    "record": "Rögzítés",
+    "continue": "Folytatás",
+    "cancel": "Mégse",
+    "google_auth": "Folytatás Google fiókkal",
+    "otp_next": "Tovább"
+  },
+  "multistep_form": {
+    "go_to_next_step": "Következő",
+    "submit_multistep_form": "Befejezés",
+    "next_step": "Következik: {{step}}",
+    "result_step": "Összegzés"
+  },
+  "form": {
+    "optional": "opcionális",
+    "searchbar": {
+      "placeholder": "Keresés..."
+    },
+    "picker": {
+      "choose": "Válasszon a listából",
+      "new_item": "Új elem",
+      "no_item_found": "Nem található elem"
+    },
+    "image_picker": {
+      "selectable_images": "Kiválasztható képek"
+    },
+    "date_picker": {
+      "title": "$t(date.text)",
+      "year": "$t(date.year)",
+      "date_placeholder": "$t(date.text)",
+      "time_placeholder": "$t(date.time)"
+    }
+  },
+  "toast": {
+    "types": {
+      "success": "Sikeres művelet",
+      "info": "Információ",
+      "warning": "Figyelmeztetés",
+      "error": "Hiba"
+    },
+    "default_error": "Váratlan hiba lépett fel!",
+    "picker_disabled": {
+      "default_body": "Nem lehetséges művelet! Valami kimaradt."
+    },
+    "denied_permission": {
+      "body": "A(z) {{permission}} elérése megtagadva. Kérjük, engedélyezze a beállításokban."
+    },
+    "not_found": {
+      "body": "{{name}} nem található"
+    },
+    "invalid_form": {
+      "title": "Érvénytelen adatok",
+      "body": "Kérjük, ellenőrizze a megadott adatokat!"
+    },
+    "create": {
+      "success": {
+        "body": "{{name}} létrehozva"
+      },
+      "error": {
+        "body": "{{name}} létrehozása sikertelen"
+      }
+    },
+    "edit": {
+      "success": {
+        "body": "Változtatások mentve"
+      },
+      "error": {
+        "body": "Nem sikerült elmenteni a változtatásokat"
+      }
+    },
+    "delete": {
+      "success": {
+        "body": "{{name}} törölve"
+      },
+      "error": {
+        "body": "{{name}} törlése sikertelen"
+      }
+    },
+    "array_input": {
+      "limit": {
+        "body": "Felső határ elérve, nem adható több elem hozzá"
+      },
+      "already_added": {
+        "body": "Már hozzáadásra került, nem lehet többször"
+      },
+      "error": {
+        "body": "Váratlan hiba lépett fel"
+      }
+    },
+    "user_does_not_have_car": {
+      "body": "Először hozzalétre első autóját"
+    }
+  },
+  "modal": {
+    "accept": "Folytatás",
+    "dismiss": "Mégse",
+    "bottom_sheet_leaving": {
+      "title": "Az adatok elveszhetnek!",
+      "body": "Ha most bezárja az űrlapot, akkor a rajta elvégzett változtatások elvesznek. Biztosan beszeretné zárni az űrlapot?",
+      "accept": "Űrlap bezárása"
+    },
+    "delete": {
+      "title": "{{name}} törlése",
+      "body": "A törlés egy visszafordithatatlan folyamat, gondolja meg jól, hogy folytatja-e a műveletet",
+      "accept": "$t(form_button.delete)"
+    },
+    "log_delete_title": "{{name}} napló bejegyzés törlése",
+    "not_found": "{{name}} nem található!",
+    "log_not_found": "Napló bejegyzés nem található!"
+  },
+  "error": {
+    "email_format": "Nem megfelelő email cím formátum",
+    "password_min_length": "Legalább {{0}} karakter hosszúnak kell lennie a jelszónak",
+    "password_format": "A jelszónak legalább tartalmaznia kell egy kis- és nagybetűt, egy számot és egy speciális karaktert",
+    "passwords_not_equals": "A két jelszó nem egyezik",
+    "number_required": "Kérem adjon meg egy számot",
+    "number_min_limit": "A számnak nagyobbnak vagy egyenlőnek kell lennie mint {{0}}",
+    "number_max_limit": "A számnak kisebbnek kell lennie mint {{0}}",
+    "date_required": "Kérem válasszon ki egy dátumot",
+    "picker_required": "Kérem válasszon ki egy elemet",
+    "car_picker_required": "Kérem válasszon ki egy autót",
+    "type_picker_required": "Kérem válasszon ki egy típust",
+    "unit_picker_required": "Kérem válasszon ki egy mértékegységet",
+    "currency_picker_required": "Kérem válasszon ki egy valutát",
+    "price_per_unit_required": "Kérem adja meg az egységárat",
+    "price_per_unit_non_negative": "Az egységár nem lehet negatív szám",
+    "price_per_unit_min_limit": "Az egységárnak minimum {{0}} értékűnek kell lennie",
+    "expense_amount_required": "Kérem adja meg a kiadás összegét",
+    "expense_amount_non_negative": "A kiadás összege nem lehet negatív szám",
+    "expense_amount_min_limit": "A kiadás összegének minimum {{0}} értékűnek kell lennie",
+    "exchange_rate_required": "Kérem adja meg az átváltási árfolyamot",
+    "exchange_rate_non_negative": "Az átváltási árfolyam nem lehet negatív szám",
+    "exchange_rate_min_limit": "Az átváltási árfolyam minimum {{0}} legyen",
+    "quantity_required": "Kérem adja meg a darabszámot",
+    "quantity_non_negative": "A darabszám nem lehet negatív szám",
+    "car_name_required": "Kérem adjon meg egy azonosítót az autója számára",
+    "car_name_max_limit": "Az autó azonosítója maximum {{0}} karakter lehet",
+    "car_make_picker_required": "Kérem válasszon ki egy gyártót",
+    "car_model_picker_required": "Kérem válasszon ki egy modellt",
+    "car_model_year_picker_required": "Kérem válasszon ki egy gyártási évet",
+    "fuel_type_picker_required": "Kérem válasszon ki egy üzemanyag típust",
+    "fuel_quantity_required": "Kérem adja meg mennyit tankolt",
+    "fuel_quantity_non_negative": "A tankolt mennyiség nem lehet negatív",
+    "fuel_quantity_min_limit": "A tankolt mennyiség minimum {{0}} lehet",
+    "odometer_value_required": "Kérem jegyezze fel aktuális kilóméteróra-állását",
+    "odometer_value_non_negative": "A kilométeróra-állás nem lehet negatív",
+    "odometer_value_min_limit": "Visszafelé nem pöröghet a kilométeróra. A dátum alapján a legutóbbi állás: {{0}} {{1}} (rögzítve: {{2}}).",
+    "odometer_value_min_limit_without_date": "Visszafelé nem pöröghet a kilométeróra. A dátum alapján a legutóbbi állás: {{0}} {{1}}.",
+    "odometer_value_max_limit": "A bevitt állás ellentmond a kilométeróra-állásoknak. A dátum alapján a következő állás: {{0}} {{1}} (rögzítve: {{2}}).",
+    "odometer_value_max_limit_without_date": "A bevitt állás ellentmond a kilométeróra-állásoknak. A dátum alapján a következő állás: {{0}} {{1}}.",
+    "service_type_required": "Kérem válasszon ki egy típust",
+    "service_item_quantity_required": "Kérem adja meg tétel darabszámát",
+    "service_item_quantity_non_negative": "A tétel darabszáma nem lehet negatív szám.",
+    "service_item_quantity_min_limit": "A tétel darabszámának minimum {{0}} értékűnek kell lehet",
+    "start_and_end_place_required": "Legalább meg kell adnia az indulási és érkezési helyet",
+    "ride_end_time_must_be_later_than_start_time": "Az érkezési időnek későbbinek kell lennie, mint az indulási idő",
+    "ride_odometer_end_must_be_bigger_than_start_odometer": "A kilométeróra-állás nem csökkenhet az induláshoz képest",
+    "passenger_name_required": "Az utas nevének megadása kötelező",
+    "passenger_name_already_exists": "Már létezik ilyen nevű utas",
+    "place_name_required": "A hely megnevezésének megadása kötelező",
+    "place_name_already_exists": "Már létezik ilyen nevű hely"
+  },
+  "action_menu": {
+    "create_car": "Autó létrehozás",
+    "create_service": "Szervizelés",
+    "create_fuel_log": "Tankolás",
+    "create_expense": "Egyéb kiadások",
+    "create_ride": "Út tervezés",
+    "create_odometer_log": "Kilóméteróra-állás frissítés",
+    "places": "Helyek",
+    "passengers": "Utasok"
+  },
+  "auth": {
+    "description": "Kezelje nálunk autóit",
+    "forgot_your_password": "Elfelejtette jelszavát?",
+    "already_have_account": "Már rendelkezel felhasználóval?",
+    "sign_in_now": "Jelentkezz be",
+    "resume_verification": "Hitelesítés\nfolytatása",
+    "password_recovery": "Jelszó helyreállítása",
+    "sign_in": "Bejelentkezés",
+    "sign_up": {
+      "title": "Regisztráció",
+      "steps": {
+        "personal_information": "Személyes adatok",
+        "password": "$t(auth.user.password)"
+      }
+    },
+    "otp_verification": {
+      "use_otp_code_for_verification": "Ehhez használja azt a kódot amely a(z) <email>{{email}}</email> címre került kiküldésre.",
+      "expired_or_didnt_received": "Nem érkezett meg a kód az adott email címére, esetleg a kód már lejárt?",
+      "resend": "Újra küldés",
+      "email": "Email cím hitelesítés",
+      "new_email": "Új email cím hitelesítése",
+      "email_change": "Email módosítási kérelem hitelesítés",
+      "password_reset": "Jelszó módosítása",
+      "delete_account": "Fiók törlése"
+    },
+    "user": {
+      "title": "Felhasználó",
+      "firstname": "Keresztnév",
+      "firstname_placeholder": "János",
+      "lastname": "Vezetéknév",
+      "lastname_placeholder": "Kovács",
+      "profile_picture": "Profilkép",
+      "email": "Email cím",
+      "email_placeholder": "carlog@gmail.com",
+      "password": "Jelszó",
+      "password_placeholder": "Jelszó",
+      "repeat_password": "Jelszó újra",
+      "repeat_password_placeholder": "Jelszó újra",
+      "avatar": {
+        "title": "Avatár",
+        "type_of_avatar": "Avatár típusa",
+        "image": "Kép",
+        "monogram": "Monogram"
+      }
+    },
+    "toast": {
+      "otp": {
+        "expired": {
+          "body": "Az Ön által megadott kód érvénytelen, esetleg lejárt."
+        },
+        "over_email_send_rate_limit": {
+          "title": "Várjon egy kicsit!",
+          "body": "Túl sok email kérelem rövid időn belül, kérjük várjon {{seconds}} másodpercet."
+        }
+      },
+      "google": {
+        "auth_flow_cancelled": {
+          "body": "Megszakadt a Google autentikáció folyamata!"
+        },
+        "already_in_progress": {
+          "body": "Már folyamatban van egy Google autentikáció, várjon egy kicsit!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépetett fel a Google autentikáció során!"
+        }
+      },
+      "sign_in": {
+        "success": {
+          "title": "Sikeres bejelentkezés!"
+        },
+        "invalid_credentials": {
+          "body": "Helytelen email cím és/vagy jelszó!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel a bejelentkezés során!"
+        }
+      },
+      "sign_up": {
+        "success": {
+          "title": "Sikeres regisztráció!"
+        },
+        "email_exists": {
+          "body": "Az Ön által megadott email címmel már regisztráltak korábban!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel a regisztráció során!"
+        },
+        "otp_error": {
+          "body": "Váratlan hiba lépett fel a fiók hitelesítése során!"
+        }
+      },
+      "sign_out": {
+        "success": {
+          "title": "Sikeres kijelentkezés!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel a kijelentkezés során!"
+        }
+      },
+      "reset_password": {
+        "success": {
+          "title": "Jelszó módosítva!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel a jelszó módosítása közben!"
+        }
+      },
+      "add_password": {
+        "success": {
+          "title": "Sikeres jelszó hozzárendelés!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel a jelszó hozzárendelés során!"
+        }
+      },
+      "change_email": {
+        "success": {
+          "title": "Email cím módosítva!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel az email cím módosítása közben!"
+        }
+      },
+      "change_personal_information": {
+        "success": {
+          "title": "Személyes adatok módosítva"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel a személyes adatok módosítása során!"
+        }
+      },
+      "delete_user": {
+        "success": {
+          "title": "Felhasználói fiók törölve!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel a felhasználói fiók törlése közben!"
+        }
+      }
+    }
+  },
+  "log": {
+    "title": "Naplóbejegyzés",
+    "item_not_found": "Nem található bejegyzés",
+    "item_not_found_description": "Rögzítse első adatát itt...",
+    "loading": "Napló adatok olvasása",
+    "previous_data_loading": "Korábbi napló adatok olvasása",
+    "next_data_loading": "Régebbi napló adatok olvasása",
+    "delete": "{{name}} bejegyzés törlése"
+  },
+  "profile": {
+    "title": "Profil",
+    "personal_information": "Személyes adatok",
+    "change_email": "Email csere",
+    "change_password": "Jelszó csere",
+    "add_password": "Jelszó hozzáadás",
+    "delete_account": "Fiók törlése",
+    "sign_out": "Kijelentkezés"
+  },
+  "currency": {
+    "primary": "Elsődleges Valuta",
+    "text": "Valuta",
+    "price": "Ár",
+    "price_per_unit": "Egységár",
+    "cost": "Összeg",
+    "total_cost": "Összköltéség",
+    "free": "ingyenes",
+    "cost_in_car_currency": "Az autó alapvalutájában számolt összeg <amount>{{amount}}</amount>",
+    "price_per_unit_in_car_currency": "Az autó alapvalutájában számolt egységár <amount>{{amount}}</amount>",
+    "price_per_unit_based_on_total_cost": "Az egyésgár szerinti összköltség <amount>{{amount}}</amount>, az autó alapvalutájában számítva <amount>{{carAmount}}</amount>",
+    "price_per_unit_based_on_total_cost_in_car_currency": "Az egyésgár szerinti összköltség <amount>{{amount}}</amount>",
+    "names": {
+      "HUF": "Magyar forint",
+      "RSD": "Szerb dínár",
+      "EUR": "Euró",
+      "USD": "Amerikai dollár",
+      "GBP": "Angol font"
+    }
+  },
+  "date": {
+    "text": "Dátum",
+    "time": "Idő",
+    "year": "Év",
+    "today": "ma",
+    "days": "{{value}} nap",
+    "hours": "{{value}} óra",
+    "minutes": "{{value}} perc",
+    "seconds": "{{value}} másodperc",
+    "few_seconds": "néhány másodperc",
+    "now": "most"
+  },
+  "car": {
+    "title": "Autó adatlap",
+    "text": "Autó",
+    "make": "Gyártó",
+    "model": "Model",
+    "model_year": "Évjárat",
+    "basic_information": "Alap információk",
+    "picker": {
+      "title": "Autó",
+      "placeholder": "Válasszon autót",
+      "no_cars": "Kattintson ide és adja hozzá első autóját"
+    },
+    "steps": {
+      "name": {
+        "title": "Elnevezés",
+        "name_field": {
+          "title": "Autó azonosító",
+          "info": "Az autó elnevezése, azonosítója mely az Ön számára lehet fontos autója azonosításakor.",
+          "placeholder": "Új autóm"
+        }
+      },
+      "model": {
+        "title": "$t(car.model)",
+        "make_field": {
+          "title": "$t(car.make)"
+        },
+        "model_field": {
+          "title": "$t(car.model)",
+          "disabled_text": "Először válassza ki az autó gyártóját!"
+        },
+        "model_year_field": {
+          "title": "$t(car.model_year)",
+          "disabled_text": "Először válassza ki az autó modelljét!"
+        }
+      },
+      "odometer": {
+        "title": "$t(odometer.text)",
+        "unit_field": {
+          "title": "$t(common.unit)"
+        }
+      },
+      "fuel": {
+        "title": "$t(fuel.text)",
+        "type_field": {
+          "title": "$t(common.type)"
+        },
+        "unit_field": {
+          "title": "$t(common.unit)"
+        }
+      },
+      "image": {
+        "title": "$t(common.image)",
+        "image_field": {
+          "title": "Autó profilkép"
+        }
+      }
+    },
+    "create": "Autó létrehozás",
+    "car_name": "{{name}} nevű autó",
+    "toast": {
+      "create": {
+        "success": {
+          "body": "Az autó már be is parkolt az Ön virtuális garázsába!"
+        },
+        "error": {
+          "body": "Váratlan hiba lépett fel az új autó létrehozása során, próbálja újra!"
+        }
+      }
+    }
+  },
+  "fuel": {
+    "title": "Tankolási napló",
+    "log": "Tankolás-naplóbejegyzés",
+    "text": "Üzemanyag",
+    "fueling": "Tankolás",
+    "create": "Tankolás rögzítése",
+    "types": {
+      "title": "Üzemanyag Típus",
+      "undefined": "$t(common.unknown)",
+      "GASOLINE": "Benzin",
+      "DIESEL": "Dízel",
+      "ELECTRIC": "Elektromos",
+      "HYBRID": "Hibrid"
+    },
+    "tank": "Üzemanyagóra",
+    "tank_capacity": "Tartálytérfogat",
+    "full_tank": "Tele tank",
+    "unit_types": {
+      "title": "Üzemanyag mértékegység",
+      "undefined": "$t(common.unknown)",
+      "LITER": "Liter",
+      "GALLON": "Gallon",
+      "CUBIC_METER": "Köbméter",
+      "KWH": "kWh"
+    },
+    "steps": {
+      "basic_information": "Alap információk",
+      "fueling_information": "$t(fuel.fueling)"
+    }
+  },
+  "odometer": {
+    "title": "Kilométeróra-állás napló",
+    "log": "Kilométeróra-állás naplóbejegyzés",
+    "text": "Kilométeróra",
+    "value": "Kilométeróra-állás",
+    "create": "Kilométeróra-állás rögzítése",
+    "open_log": "Kilométeróra-állás napló",
+    "current_value": "A jelenlegi kilométeróra-állás: {{value}}",
+    "original_value": "A bejegyzés eredeti kilométeróra-állása {{value}}",
+    "min_limit": "Legutóbbi: {{value}} ({{date}})",
+    "min_limit_without_date": "Legutóbbi: {{value}}",
+    "max_limit": "Következő: {{value}} ({{date}})",
+    "max_limit_without_date": "Következő: {{value}}",
+    "unit_types": {
+      "title": "Kilométeróra mértékegység",
+      "undefined": "$t(common.unknown)",
+      "KILOMETER": "Kilométer",
+      "MILE": "Mérföld"
+    },
+    "types": {
+      "undefined": "$t(common.unknown)",
+      "SIMPLE": "Kilométeróra-frissítés",
+      "FUEL": "Tankolás",
+      "SERVICE": "Szervíz",
+      "RIDE": "Út"
+    }
+  },
+  "expenses": {
+    "title": "Kiadások",
+    "title_singular": "Kiadás",
+    "description": "Az alábbi pénzügyi naplóban különböző kiadásai szerepelnek mely a kiválasztott autójához tartoznak.",
+    "not_found": "Nem található kiadás",
+    "not_found_action_call": "Hozzalétre első kiadását ide kattintva",
+    "create": "Kiadás rögzítése",
+    "latest": "Legutóbbi kiadások",
+    "more": "További kiadások",
+    "types": {
+      "title": "Kiadás típusa",
+      "undefined": "Ismeretlen",
+      "OTHER": "Egyéb",
+      "FUEL": "Tankolás",
+      "SERVICE": "Szervíz",
+      "VEHICLE_INSPECTION": "Műszaki vizsgálat",
+      "WASH": "Autómosás",
+      "TOLL": "Útdíj",
+      "PARKING": "Parkolás",
+      "INSURANCE": "Biztosítás",
+      "REGISTRATION": "Regisztráció"
+    }
+  },
+  "service": {
+    "title": "Szervízkönyv",
+    "log": "Szervíz-naplóbejegyzés",
+    "create": "Szerviz rögzítése",
+    "items": {
+      "title": "Szervizelési tételek",
+      "title_singular": "Szervizelési tétel",
+      "types": {
+        "title": "Tétel típus",
+        "undefined": "$t(common.unknown)",
+        "TRANSMISSION_FLUID": "Váltóolaj",
+        "FUEL_FILTER": "Üzemanyagszűrő",
+        "BRAKE_FLUID": "Fékolaj",
+        "LIGHT_BULB": "Izzó",
+        "WIPER_BLADES": "Ablaktörlő lapátok",
+        "DIAGNOSTICS": "Diagnosztika",
+        "OIL": "Olaj",
+        "COOLANT": "Hűtőfolyadék",
+        "CABIN_FILTER": "Pollenszűrő",
+        "OIL_FILTER": "Olajszűrő",
+        "BRAKE_DISCS": "Féktárcsák",
+        "BATTERY": "Akkumulátor",
+        "SPARK_PLUGS": "Gyújtógyertyák",
+        "SOFTWARE_UPDATE": "Szoftverfrissítés",
+        "BRAKE_PADS": "Fékbetétek",
+        "TIRES": "Gumik",
+        "AIR_FILTER": "Légszűrő"
+      }
+    },
+    "types": {
+      "title": "Szerviz tipus",
+      "undefined": "$t(common.unknown)",
+      "TIRE_CHANGE": "Gumicsere",
+      "SMALL_SERVICE": "Kis szerviz",
+      "REPAIR": "Javítás",
+      "MAJOR_SERVICE": "Nagy szerviz",
+      "DIAGNOSTICS": "Diagnosztika",
+      "HOME_MAINTENANCE": "Otthoni karbantartás",
+      "INSPECTION": "Átvizsgálás"
+    },
+    "steps": {
+      "basic_information": "Alap információk",
+      "items": "$t(service.items.title)"
+    },
+    "modal": {
+      "delete": {
+        "title": "$t(service.log) törlése",
+        "body": "$t(modal.delete_message)"
+      }
+    }
+  },
+  "places": {
+    "title": "Helyek",
+    "title_singular": "Hely",
+    "new": "Új hely",
+    "create": "Hely létrehozása",
+    "start": "Indulás",
+    "stop": "Megálló {{index}}",
+    "end": "Érkezés",
+    "modal": {
+      "delete": {
+        "title": "$t(places.title_singular) törlése"
+      }
+    }
+  },
+  "passengers": {
+    "title": "Utasok",
+    "title_singular": "Utas",
+    "new": "Új utas",
+    "create": "Utas létrehozása",
+    "modal": {
+      "delete": "$t(passengers.title_singular) törlése"
+    }
+  },
+  "rides": {
+    "title": "Menetkönyv",
+    "item": "Út",
+    "ride_planning": "Út tervezése",
+    "log": "Menet-naplóbejegyzés",
+    "upcoming": "Közelgő utak",
+    "more": "További utak",
+    "not_found": "Nem található út",
+    "not_found_upcoming_rides_action_call": "Hozzalétre a következő útját",
+    "start": "Indulás",
+    "end": "Érkezés",
+    "start_time": "Indulási idő",
+    "start_time_value": "Az indulás ideje: {{value}}",
+    "end_time": "Érkezési idő",
+    "duration": "Idő hossz",
+    "distance": "Megtett út",
+    "start_odometer": "Indulási kilométeróra-állás",
+    "start_odometer_value": "Az indulási kilométeróra-állás: {{value}}",
+    "end_odometer": "Érkezési kilométeróra-állás",
+    "expenses": "Kiadások",
+    "other_expenses": "Egyéb kiadások",
+    "other_expense": "Egyéb kiadás",
+    "route": "Útvonal",
+    "passengers": "Utas lista",
+    "steps": {
+      "car_and_start": "Autó és indulás",
+      "end": "Érkezés",
+      "note": "Megjegyzés"
+    }
+  },
+  "garage": {
+    "garage": "Garázs",
+    "use_garage": "Rendelkezzen a virutális garázsában parkoló autókról!",
+    "add_new_car": "Autó hozzáadás",
+    "empty_car_list": "Még egy autó se parkol a virtuális garázsában",
+    "loading": "Virtuális garázs betöltése"
+  },
+  "statistics": {
+    "title": "Statisztika",
+    "types": {
+      "fuel": "Tankolás",
+      "ride": "Út",
+      "expense": "Kiadás",
+      "service": "Szervíz"
+    },
+    "compared_to_previous_cycle": "előző ciklushoz képest",
+    "chart": {
+      "not_enough_data": "Nincs elegendő adat a grafikon megjelenítéséhez"
+    },
+    "range_unit": {
+      "year": "Éves bontás",
+      "month": "Havi bontás",
+      "day": "Napi bontás",
+      "hour": "Óránkénti bontás",
+      "undefined": "Időszakos bontás"
+    },
+    "distance": {
+      "ride_distance": "Futásteljesítmény",
+      "duration": "Idő",
+      "count": "Utak",
+      "total_distance_by_odometer": "Összes távolság",
+      "total_ride_distance": "Összes utazási távolság",
+      "max_ride_distance": "Legnagyobb utazási távolság",
+      "avg_ride_distance": "Átlagos utazási távolság",
+      "median_ride_distance": "Medián utazási távolság",
+      "most_visited_places": "Felkapott helyek",
+      "total_ride_duration": "Összes utazási idő",
+      "max_ride_duration": "Legnagyobb utazási idő",
+      "avg_ride_duration": "Átlagos utazási idő",
+      "median_ride_duration": "Medián utazási idő",
+      "ride_frequency": {
+        "title": "Utak gyakorisága",
+        "y_axis": "Gyakoriság"
+      },
+      "driving_activity": {
+        "title": "Vezetési aktivitás",
+        "y_axis": "Megtett táv ({{unit}})"
+      }
+    },
+    "expense": {
+      "count": "Kiadások",
+      "total_amount": "Kiadások összege",
+      "max_amount": "Legdrágább kiadás",
+      "avg_amount": "Kiadások átlaga",
+      "median_amount": "Kiadások mediánja",
+      "total_amount_by_date": {
+        "title": "Költség eloszlás",
+        "y_axis": "Költség ({{unit}})"
+      },
+      "distribution_by_type": "Költség eloszlás típus szerint"
+    },
+    "fuel": {
+      "log_count": "Tankolások",
+      "total_amount": "Tankolások összege",
+      "max_amount": "Legdrágább tankolás",
+      "avg_amount": "Tankolások átlaga",
+      "median_amount": "Tankolasok medianja",
+      "total_quantity": "Tankolt mennyiség",
+      "max_quantity": "Legnagyobb tankolt mennyiség",
+      "avg_quantity": "Tankolt mennyiség átlaga",
+      "median_quantity": "Tankolt mennyiség mediánja",
+      "amount": "Kiadások",
+      "quantity": "Mennyiség",
+      "total_amount_by_date": {
+        "title": "Tankolási költségek",
+        "y_axis": "Költség ({{unit}})"
+      },
+      "consumption": {
+        "title": "Fogyasztás",
+        "y_axis": "Átlagfogyasztás ({{unit}})"
+      },
+      "cost_per_distance": {
+        "title": "Fogyasztási költségelemzés",
+        "y_axis": "Átlag költség ({{unit}})"
+      },
+      "accuracy": "A mutató pontosságát befolyásolja, hogy megadja-e a kilométeróra állását tankolásai alkalmával"
+    },
+    "service": {
+      "log_count": "Szervízelések",
+      "total_amount": "Szervízelések összege",
+      "max_amount": "Legdrágább szervízelés",
+      "avg_amount": "Szervízek átlaga",
+      "median_amount": "Szervízek mediánja",
+      "total_amount_by_date": {
+        "title": "Szervíz költségek",
+        "y_axis": "Költség ({{unit}})"
+      },
+      "average_distance_between_services": "Átlagos megtett távolság szervízek között",
+      "average_time_between_services": "Átlagos eltelt idő szervízek között",
+      "expense_distribution_by_service_item": "Költség eloszlás szerviz tételek szerint",
+      "expense_distribution_by_type": "Költség eloszlás szerviz típus szerint",
+      "frequency_distribution_by_odometer": {
+        "title": "Gyakorisági eloszlás kilométeróra-állás intervallum szerint",
+        "description": "Az intervallum terjedelme {{value}}",
+        "y_axis": "Gyakoriság"
+      },
+      "forecast": "Szervíz előrejelzés",
+      "last_odometer_value": "Legutóbbi",
+      "forecast_odometer_value": "Következő",
+      "forecast_not_possible": "Pontos becslés nem lehetséges",
+      "forecast_not_possible_try_to_add_new_service": "Pontos becslés nem lehetséges, először hozzonlétre ilyen típusú szervízt.",
+      "is_on_time": "Esedékes",
+      "forecast_date": "Becsült időpont"
+    }
+  }
+}

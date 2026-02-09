@@ -7,5 +7,11 @@
   "typeRoots": [
     "./types"
   ],
-  "include": ["src/**/*", "types/env.d.ts"]
+  "include": [
+    "src/**/*",
+    "types/env.d.ts"
+  ],
+  "exclude": [
+    "src/**/*.test.tsx"
+  ]
 }

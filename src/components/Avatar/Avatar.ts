@@ -6,6 +6,6 @@ const Avatar = {
     Text,
     Image,
     Skeleton
-}
+};
 
 export default Avatar;

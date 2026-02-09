@@ -1,15 +1,14 @@
 import React from "react";
-import { store } from "../../features/Database/redux/store";
 import { Provider } from "react-redux";
-import ServiceLogScreen from "../../screens/ServiceLogScreen";
 import EditCarScreen from "../../screens/EditCarScreen";
+import { store } from "../../database/redux/store.ts";
 
 const Page: React.FC = () => {
     return (
         <Provider store={ store }>
-            <EditCarScreen />
+            <EditCarScreen/>
         </Provider>
-    )
-}
+    );
+};
 
 export default Page;

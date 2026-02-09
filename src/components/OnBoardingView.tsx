@@ -1,56 +1,119 @@
-import React, { ReactNode, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ListRenderItemInfo, useWindowDimensions, View } from "react-native";
+import { DEFAULT_SEPARATOR } from "../constants";
+import { RenderComponent } from "../types";
+import { useBottomSheetInternal, useBottomSheetScrollableCreator } from "@gorhom/bottom-sheet";
 import { FlatList } from "react-native-gesture-handler";
-import { useWindowDimensions, View } from "react-native";
-import { DEFAULT_SEPARATOR } from "../constants/constants";
+import { FlashList, ListRenderItemInfo as FlashListRenderItemInfo } from "@shopify/flash-list";
 
-interface OnBoardingViewProps {
-    steps: Array<() => ReactNode>
+type OnBoardingViewProps = {
+    steps: Array<RenderComponent>
     currentStep?: number
 }
 
-const OnBoardingView: React.FC<OnBoardingViewProps> = ({
+export function OnBoardingView({
     steps,
     currentStep = 0
-}) => {
-    const scrollViewRef = useRef<FlatList>(null);
+}: OnBoardingViewProps) {
+    const isBottomSheet = !!useBottomSheetInternal(true);
+    const BottomSheetFlashListScrollable = isBottomSheet
+                                           ? useBottomSheetScrollableCreator()
+                                           : undefined;
 
-    const width =  useWindowDimensions().width;
+    const flatListRef = useRef<FlatList>(null);
+
+    const { width: windowWidth } = useWindowDimensions();
+    const width = windowWidth - 2 * DEFAULT_SEPARATOR;
+
+    const [stepHeights, setStepHeights] = useState<Record<number, number>>({});
+    const [visitedSteps, setVisitedSteps] = useState<Set<number>>(
+        () => new Set([currentStep])
+    );
+
     useEffect(() => {
-        scrollViewRef.current?.scrollToOffset({ offset: currentStep * width, animated: true });
-    }, [scrollViewRef, currentStep, width]);
+        setVisitedSteps(prev => {
+            if(prev.has(currentStep)) return prev;
 
+            const next = new Set(prev);
+            next.add(currentStep);
+            return next;
+        });
+    }, [currentStep]);
+
+    useEffect(() => {
+        flatListRef.current?.scrollToOffset({
+            offset: currentStep * width,
+            animated: true
+        });
+    }, [currentStep, width]);
+
+    const currentHeight = stepHeights[currentStep];
+
+    const containerStyle = {
+        height: currentHeight ?? undefined,
+        minHeight: currentHeight ? undefined : 1
+    };
+
+    const keyExtractor = useCallback(
+        (_: any, index: number) => index.toString(),
+        []
+    );
+
+    const renderStep = useCallback(
+        ({ item, index }: FlashListRenderItemInfo<RenderComponent>) => {
+
+            const isVisited = visitedSteps.has(index);
+
+            return (
+                <View
+                    onLayout={ (event) => {
+                        const { height } = event.nativeEvent.layout;
+
+                        setStepHeights(prev => {
+                            if(prev[index] === height) return prev;
+                            return { ...prev, [index]: height };
+                        });
+                    } }
+                >
+                    { isVisited ? item() : <View style={ { height: 400, width } }/> }
+                </View>
+            );
+        },
+        [visitedSteps]
+    );
+
+    const renderItem = useCallback(
+        ({ item, index }: ListRenderItemInfo<RenderComponent>) => (
+            <FlashList
+                data={ [item] }
+                renderItem={ (info) =>
+                    renderStep({ ...info, index })
+                }
+                keyExtractor={ keyExtractor }
+                contentContainerStyle={ { width } }
+                nestedScrollEnabled
+                showsVerticalScrollIndicator={ false }
+                renderScrollComponent={ BottomSheetFlashListScrollable }
+            />
+        ),
+        [width, renderStep, keyExtractor, BottomSheetFlashListScrollable]
+    );
 
     return (
-        <FlatList
-            data={ [] }
-            renderItem={ () => <></> }
-            ListEmptyComponent={
-                <View style={{ flexDirection: "row", gap: 2 * DEFAULT_SEPARATOR }}>
-                    {
-                        steps.map(
-                            (step, index) =>
-                                <View
-                                    key={ index }
-                                    style={{ width: width - 2 * DEFAULT_SEPARATOR }}
-                                >
-                                    { step() }
-                                </View>
-                        )
-                    }
-                </View>
-            }
-            ref={ scrollViewRef }
-            scrollEnabled={ false }
+        <FlatList<RenderComponent>
+            ref={ flatListRef }
+            data={ steps }
+            renderItem={ renderItem }
+            keyExtractor={ keyExtractor }
             horizontal
-            snapToInterval={ width }
+            scrollEnabled={ false }
+            nestedScrollEnabled
             showsHorizontalScrollIndicator={ false }
-            showsVerticalScrollIndicator={ false }
-            decelerationRate="fast"
-            bounces={ false }
-            bouncesZoom={ false }
-            renderToHardwareTextureAndroid
+            removeClippedSubviews={ false }
+            initialNumToRender={ 1 }
+            style={ containerStyle }
         />
-    )
+    );
 }
 
 export default OnBoardingView;

@@ -1,45 +1,52 @@
-import React from "react";
-import { ColorValue, ImageSourcePropType, StyleProp, StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { Colors } from "../../constants/colors/Colors.ts";
+import React, { useMemo } from "react";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import Icon from "../Icon";
-import { FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/constants";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
+import { Color, ImageSource, ViewStyle } from "../../types/index.ts";
+import { debounce } from "es-toolkit";
 
-interface IconButtonProps {
-    icon: ImageSourcePropType | string
+type IconButtonProps = {
+    icon: ImageSource
     iconSize?: number
-    iconColor?: ColorValue
-    backgroundColor?: ColorValue
+    iconColor?: Color | null
+    backgroundColor?: Color | null
     width?: number
     height?: number
-    style?: StyleProp<ViewStyle>
+    style?: ViewStyle
     inverse?: boolean
     disabled?: boolean
+    debounceMs?: number
     onPress: () => void
 }
 
-export const IconButton: React.FC<IconButtonProps> = ({
+export function IconButton({
     icon,
-    iconSize = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE,
-    iconColor = Colors.black,
-    backgroundColor = Colors.fuelYellow,
-    width = iconSize * 1.5,
-    height = iconSize * 1.5,
+    iconSize = FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE,
+    iconColor,
+    backgroundColor,
+    width = FONT_SIZES.h3 * ICON_FONT_SIZE_SCALE + SEPARATOR_SIZES.lightSmall,
+    height = FONT_SIZES.h3 * ICON_FONT_SIZE_SCALE + SEPARATOR_SIZES.lightSmall,
     style,
     inverse = false,
     disabled = false,
+    debounceMs = 350,
     onPress
-}) => {
+}: IconButtonProps) {
+    const primaryColor = backgroundColor ?? COLORS.fuelYellow;
+    const secondaryColor = iconColor ?? COLORS.black;
+
     const styles = useButtonStyles(
-        !inverse ? backgroundColor : iconColor,
-        !inverse ? iconColor : backgroundColor,
+        !inverse ? primaryColor : secondaryColor,
+        !inverse ? secondaryColor : primaryColor,
         width,
         height
     );
 
+    const debouncedPress = useMemo(() => debounce(onPress, debounceMs), [onPress, debounceMs]);
+
     return (
         <TouchableOpacity
-            onPress={ onPress }
+            onPress={ debouncedPress }
             disabled={ disabled }
             style={ [styles.buttonContainer, style] }
         >
@@ -49,14 +56,14 @@ export const IconButton: React.FC<IconButtonProps> = ({
                 color={ styles.buttonContainer.color }
             />
         </TouchableOpacity>
-    )
+    );
 }
 
 export const useButtonStyles = (
-    primaryColor: ColorValue,
-    secondaryColor: ColorValue,
+    primaryColor: Color,
+    secondaryColor: Color,
     width: number,
-    height: number,
+    height: number
 ) =>
     StyleSheet.create({
         buttonContainer: {
@@ -67,8 +74,8 @@ export const useButtonStyles = (
             height: height,
             backgroundColor: primaryColor,
             color: secondaryColor,
-            borderRadius: height / 2,
+            borderRadius: height / 2
         }
-    })
+    });
 
 export default IconButton;

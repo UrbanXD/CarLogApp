@@ -1,28 +1,30 @@
 import React from "react";
-import { TouchableOpacity, StyleSheet, ViewStyle, StyleProp, ColorValue, ImageSourcePropType } from "react-native";
+import { StyleSheet } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { ICON_NAMES } from "../../constants/constants.ts";
+import { ICON_NAMES } from "../../constants";
 import Button from "../Button/Button.ts";
 import Image from "../Image.tsx";
+import { Color, ImageSource, ViewStyle } from "../../types";
+import { DebouncedPressable } from "../DebouncedPressable.tsx";
 
-interface AvatarImageProps {
-    source: ImageSourcePropType | string
+type AvatarImageProps = {
+    path: string
     avatarSize?: number
-    borderColor?: ColorValue | string
-    style?: StyleProp<ViewStyle>
+    borderColor?: Color
+    style?: ViewStyle
     onPress?: () => void
-    badgeIcon?: string | ImageSourcePropType
+    badgeIcon?: ImageSource
     onPressBadge?: () => void
 }
 
-const AvatarImage: React.FC<AvatarImageProps> = ({
-    source,
+export default function AvatarImage({
+    path,
     avatarSize = hp(5),
     borderColor,
     style,
     onPress,
     onPressBadge
-}) => {
+}: AvatarImageProps) {
     const BORDER_WIDTH = hp(1);
     const styles =
         useStyles(
@@ -32,54 +34,51 @@ const AvatarImage: React.FC<AvatarImageProps> = ({
         );
 
     return (
-        <TouchableOpacity
+        <DebouncedPressable
             style={ [styles.container, style] }
             onPress={ onPress }
             disabled={ !onPress }
+            debounceMs={ 1000 }
         >
             {
                 onPressBadge &&
-                <Button.Icon
-                    icon={ ICON_NAMES.swap }
-                    iconSize={ avatarSize / 6 }
-                    style={ styles.badge }
-                    onPress={ onPressBadge }
-                />
+               <Button.Icon
+                  icon={ ICON_NAMES.swap }
+                  iconSize={ avatarSize / 6 }
+                  style={ styles.badge }
+                  onPress={ onPressBadge }
+               />
             }
             <Image
-                source={ source }
+                path={ path }
                 alt={ ICON_NAMES.user }
                 imageStyle={ styles.image }
             />
-        </TouchableOpacity>
-    )
+        </DebouncedPressable>
+    );
 }
 
-const useStyles = (
-    avatarSize: number,
-    borderColor?: ColorValue | string,
-    borderWidth?: number
-) => {
+function useStyles(avatarSize: number, borderColor?: Color, borderWidth?: number) {
     return StyleSheet.create({
         container: {
             width: avatarSize,
-            height: avatarSize,
+            height: avatarSize
         },
         image: {
             width: avatarSize,
             height: avatarSize,
-            resizeMode: "cover",
+            resizeMode: "stretch",
             borderRadius: avatarSize / 2,
             borderWidth,
-            borderColor,
+            borderColor
         },
         badge: {
             position: "absolute",
+            width: avatarSize / 5,
+            height: avatarSize / 5,
             right: avatarSize / 12,
             bottom: avatarSize / 20,
-            zIndex: 1,
+            zIndex: 1
         }
-    })
+    });
 }
-
-export default AvatarImage;

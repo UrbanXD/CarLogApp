@@ -1,0 +1,15 @@
+import { COLORS } from "../../../constants/colors.ts";
+
+export const ALERT_ICONS = {
+    success: "check-circle-outline",
+    info: "information-outline",
+    warning: "alert-outline",
+    error: "alert-circle-outline"
+};
+
+export const ALERT_COLORS = {
+    success: COLORS.greenLight,
+    info: COLORS.blueLight,
+    warning: COLORS.fuelYellow,
+    error: COLORS.redDark
+};

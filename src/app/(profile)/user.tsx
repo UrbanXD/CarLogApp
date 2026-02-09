@@ -3,8 +3,8 @@ import ProfileScreen from "../../screens/ProfileScreen.tsx";
 
 const Page: React.FC = () => {
     return (
-        <ProfileScreen />
-    )
-}
+        <ProfileScreen/>
+    );
+};
 
 export default Page;

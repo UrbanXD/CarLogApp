@@ -1,80 +1,79 @@
 import React from "react";
-import { SharedValue } from "react-native-reanimated";
-import { Colors } from "../constants/colors/Colors.ts";
-import { View, Text as TextRN, StyleSheet } from "react-native";
-import { Canvas, Skia, Path, Text, SkFont } from "@shopify/react-native-skia";
-import { FONT_SIZES, SEPARATOR_SIZES } from "../constants/constants";
+import { SharedValue, useAnimatedProps } from "react-native-reanimated";
+import { StyleSheet, Text, View } from "react-native";
+import Svg, { Circle } from "react-native-svg";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
+import { AnimatedCircle } from "./AnimatedComponents/index.ts";
 
-interface ProgressInfoProps {
+type ProgressInfoProps = {
     radius: number
     strokeWidth: number
     end: SharedValue<number>
-    font: SkFont
     statusText: string
     stepTitle: string
     stepSubtitle?: string
 }
 
-const ProgressInfo: React.FC<ProgressInfoProps> = ({ radius, strokeWidth, end, font, statusText, stepTitle, stepSubtitle }) => {
+export function ProgressInfo({
+    radius,
+    strokeWidth,
+    end,
+    statusText,
+    stepTitle,
+    stepSubtitle
+}: ProgressInfoProps) {
+    const center = radius;
     const innerRadius = radius - strokeWidth / 2;
-    const m = Skia.Matrix();
-    m.translate(radius, radius);
-    m.rotate(-Math.PI / 2);
-    m.translate(-radius, -radius);
+    const circumference = 2 * Math.PI * innerRadius;
 
-    const path = Skia.Path.Make();
-    path.addCircle(radius, radius, innerRadius).transform(m);
-
-    const fontSize = font.measureText(statusText);
+    const animatedProps = useAnimatedProps(() => (
+        { strokeDashoffset: circumference * (1 - end.value) }
+    ));
 
     const styles = useStyles(radius);
 
     return (
         <View style={ styles.container }>
             <View style={ styles.circularProgressBarContainer }>
-                <Canvas style={{ flex: 1 }}>
-                    <Path
-                        path={ path }
+                <Svg width={ radius * 2 } height={ radius * 2 }>
+                    <Circle
+                        cx={ center }
+                        cy={ center }
+                        r={ innerRadius }
+                        stroke={ COLORS.gray4 }
                         strokeWidth={ strokeWidth }
-                        strokeJoin="round"
-                        strokeCap="round"
-                        style="stroke"
-                        color={ Colors.gray4 }
-                        start={ 0 }
-                        end={ 1 }
+                        fill="transparent"
+                        strokeLinecap="round"
                     />
-                    <Path
-                        path={ path }
+
+                    <AnimatedCircle
+                        cx={ center }
+                        cy={ center }
+                        r={ innerRadius }
+                        stroke={ COLORS.greenLight }
                         strokeWidth={ strokeWidth }
-                        strokeJoin="round"
-                        strokeCap="round"
-                        style="stroke"
-                        color={ Colors.greenLight }
-                        start={ 0 }
-                        end={ end }
+                        fill="transparent"
+                        strokeLinecap="round"
+                        transform={ `rotate(-90, ${ center }, ${ center })` }
+                        strokeDasharray={ circumference }
+                        animatedProps={ animatedProps }
                     />
-                    <Text
-                        x={ radius - fontSize.width / 2 }
-                        y={ radius + fontSize.height / 2 }
-                        text={ statusText }
-                        font={ font }
-                        color="white"
-                    />
-                </Canvas>
+                </Svg>
+                <View style={ styles.statusTextContainer }>
+                    <Text style={ styles.statusText } numberOfLines={ 1 } adjustsFontSizeToFit>
+                        { statusText }
+                    </Text>
+                </View>
             </View>
             <View style={ styles.titleContainer }>
-                <TextRN style={ styles.title }>
-                    { stepTitle }
-                </TextRN>
+                <Text style={ styles.title }>{ stepTitle }</Text>
                 {
                     stepSubtitle &&
-                        <TextRN style={ styles.subtitle }>
-                            { stepSubtitle }
-                        </TextRN>
+                   <Text style={ styles.subtitle }>{ stepSubtitle }</Text>
                 }
             </View>
         </View>
-    )
+    );
 }
 
 const useStyles = (radius: number) =>
@@ -82,28 +81,35 @@ const useStyles = (radius: number) =>
         container: {
             flexDirection: "row",
             alignItems: "center",
-            gap: SEPARATOR_SIZES.lightSmall,
+            gap: SEPARATOR_SIZES.lightSmall
         },
         circularProgressBarContainer: {
             width: radius * 2,
-            height: radius * 2,
+            height: radius * 2
+        },
+        statusTextContainer: {
+            ...StyleSheet.absoluteFillObject,
+            justifyContent: "center",
+            alignItems: "center"
+        },
+        statusText: {
+            fontSize: FONT_SIZES.h3,
+            fontFamily: "Gilroy-Heavy",
+            color: "white"
         },
         titleContainer: {
             flex: 1,
             justifyContent: "center",
-            alignSelf: "flex-start"
+            alignSelf: "center"
         },
         title: {
             fontSize: FONT_SIZES.h3,
             fontFamily: "Gilroy-Heavy",
-            color: Colors.white,
-            paddingTop: SEPARATOR_SIZES.small
+            color: COLORS.white
         },
         subtitle: {
             fontSize: FONT_SIZES.p2,
             fontFamily: "Gilroy-Medium",
-            color: Colors.gray1
+            color: COLORS.gray1
         }
-    })
-
-export default ProgressInfo;
+    });

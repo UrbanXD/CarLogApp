@@ -1,0 +1,11 @@
+export enum ExpenseTypeEnum {
+    OTHER = "OTHER",
+    FUEL = "FUEL",
+    SERVICE = "SERVICE",
+    VEHICLE_INSPECTION = "VEHICLE_INSPECTION",
+    WASH = "WASH",
+    TOLL = "TOLL",
+    PARKING = "PARKING",
+    INSURANCE = "INSURANCE",
+    REGISTRATION = "REGISTRATION"
+}

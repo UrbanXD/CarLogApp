@@ -5,22 +5,24 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "carlog",
-    "icon": "./src/assets/icon.png",
+    "icon": "./src/assets/adaptive-icon.png",
     "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
     "androidStatusBar": {
       "translucent": true
     },
-    "splash": {
-      "image": "./src/assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "icon": {
+        "dark": "./src/assets/ios-dark.png",
+        "light": "./src/assets/ios-light.png",
+        "tinted": "./src/assets/ios-tinted.png"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
+        "monochromeImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "softwareKeyboardLayoutMode": "pan",
@@ -32,19 +34,40 @@
     },
     "plugins": [
       "expo-router",
+      "expo-secure-store",
       [
-        "expo-font",
+        "expo-splash-screen",
         {
-          "fonts": [
-            "./src/assets/fonts/Nosifer.otf",
-            "./src/assets/fonts/Gilroy-Heavy.otf",
-            "./src/assets/fonts/Gilroy-Regular.ttf",
-            "./src/assets/fonts/Gilroy-Medium.ttf",
-            "./src/assets/fonts/DoubleFeature20.ttf"
-          ]
+          "image": "./src/assets/C.png",
+          "resizeMode": "contain",
+          "imageWidth": 74,
+          "backgroundColor": "#242424"
         }
       ],
-      "expo-secure-store"
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0",
+            "kotlinVersion": "2.0.21"
+          },
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
+        }
+      ],
+      [
+        "react-native-edge-to-edge",
+        {
+          "android": {
+            "parentTheme": "Default",
+            "enforceNavigationBarContrast": false
+          }
+        }
+      ],
+      "expo-localization"
     ],
     "extra": {
       "router": {

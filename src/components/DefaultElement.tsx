@@ -1,59 +1,67 @@
-import {
-    ImageSourcePropType,
-    StyleProp,
-    StyleSheet,
-    View,
-    ViewStyle,
-    Text, ActivityIndicator
-} from "react-native";
-import { Colors } from "../constants/colors/Colors.ts";
-import {FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES} from "../constants/constants";
+import React, { useMemo } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../constants";
 import Icon from "./Icon";
 import { hexToRgba } from "../utils/colors/hexToRgba";
-import React from "react";
+import { ImageSource, ViewStyle } from "../types";
+import { MoreDataLoading } from "./loading/MoreDataLoading.tsx";
+import { DebouncedPressable } from "./DebouncedPressable.tsx";
 
-interface DefaultImageProps {
-    isLoading?: boolean;
-    icon?: string | ImageSourcePropType
+type DefaultElementProps = {
+    icon?: ImageSource
     text?: string
+    onPress?: () => void
+    loading?: boolean
     loadingText?: string
-    style?: StyleProp<ViewStyle>
+    activityIndicatorSize?: "large" | "small" | number
+    style?: ViewStyle
 }
 
-const DefaultElement: React.FC<DefaultImageProps> = ({
-    isLoading = false,
+function DefaultElement({
     icon = ICON_NAMES.image,
     text,
-    loadingText = "Adatok betöltése...",
+    onPress,
+    loading,
+    loadingText,
+    activityIndicatorSize = "large",
     style
-}) => {
+}: DefaultElementProps) {
+    const onPressHandler = useMemo(() => () => {
+        if(loading) return;
+
+        onPress?.();
+    }, [onPress, loading]);
+
     return (
-        <View style={ [styles.container, style] }>
-            {
-                isLoading
-                    ?   <ActivityIndicator
-                            size={ FONT_SIZES.title }
-                            color={ Colors.gray3 }
-                        />
-                    :   <Icon
+        <DebouncedPressable
+            onPress={ onPressHandler }
+            disabled={ !onPress || loading }
+            style={ [styles.container, style] }
+        >
+            <View style={ { alignItems: "center" } }>
+                {
+                    loading
+                    ?
+                    <MoreDataLoading
+                        text={ loadingText }
+                        activityIndicatorSize={ activityIndicatorSize }
+                    />
+                    :
+                    <>
+                        <Icon
                             icon={ icon }
                             size={ FONT_SIZES.title }
-                            color={ Colors.gray3 }
+                            color={ COLORS.gray3 }
                         />
-            }
-            {
-                isLoading
-                    ? loadingText &&
-                        <Text style={ styles.text }>
-                            { loadingText }
-                        </Text>
-                    : text &&
-                        <Text style={ styles.text }>
-                            { text }
-                        </Text>
-            }
-        </View>
-    )
+                        {
+                            text &&
+                           <Text style={ styles.text }>{ text }</Text>
+                        }
+                    </>
+                }
+            </View>
+        </DebouncedPressable>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -64,20 +72,21 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: hexToRgba(Colors.gray5, 0.65),
+        backgroundColor: hexToRgba(COLORS.gray5, 0.65),
         borderWidth: 0.5,
         borderRadius: 38,
-        borderColor: Colors.gray5,
-        paddingHorizontal: SEPARATOR_SIZES.small
+        borderColor: COLORS.gray5,
+        paddingHorizontal: SEPARATOR_SIZES.small,
+        overflow: "hidden"
     },
     text: {
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.025,
         lineHeight: FONT_SIZES.p2 * 1.25,
-        color: Colors.gray2,
+        color: COLORS.gray2,
         textAlign: "center"
     }
-})
+});
 
 export default DefaultElement;

@@ -1,32 +1,32 @@
-import React, { useState } from "react";
-import { ICON_NAMES } from "../constants/constants";
-import TextInput from "../features/Form/components/Input/text/TextInput";
+import React from "react";
+import { ICON_NAMES } from "../constants/index.ts";
+import TextInput, { TextInputProps } from "./Input/text/TextInput.tsx";
+import { useTranslation } from "react-i18next";
 
-interface SearchBarProps {
-    onTextChange: (value: any) => void
-    term?: string
-    onClose?: () => void
+type SearchBarProps = {
+    setTerm: (value: string) => void
+    term: string
+    textInputProps?: TextInputProps
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
-    onTextChange,
-    term= "",
-    onClose
+    setTerm,
+    term,
+    textInputProps
 }) => {
-    const [value, setValue] = useState(term)
+    const { t } = useTranslation();
+    const placeholder = textInputProps?.placeholder ?? t("form.searchbar.placeholder");
 
     return (
         <TextInput
-            value={ value }
-            setValue={(text: string) => {
-                setValue(text)
-                onTextChange(text)
-            }}
-            actionIcon={ ICON_NAMES.close }
-            onAction={ onClose }
+            value={ term }
+            setValue={ setTerm }
+            { ...textInputProps }
             icon={ ICON_NAMES.search }
+            placeholder={ placeholder }
+            allowInputFieldContext={ false }
         />
-    )
-}
+    );
+};
 
 export default SearchBar;
