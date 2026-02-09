@@ -1,8 +1,6 @@
 import { UseFormReturn, useWatch } from "react-hook-form";
-import useCars from "../../../../car/hooks/useCars.ts";
-import React, { useEffect, useMemo, useState } from "react";
-import { Car } from "../../../../car/schemas/carSchema.ts";
-import { FormFields, Steps } from "../../../../../types/index.ts";
+import React, { useEffect, useMemo } from "react";
+import { FormFields, Steps } from "../../../../../types";
 import { CarPickerInput } from "../../../../car/components/forms/inputFields/CarPickerInput.tsx";
 import Input from "../../../../../components/Input/Input.ts";
 import {
@@ -13,44 +11,29 @@ import { ServiceLogFormFields } from "../schemas/form/serviceLogForm.ts";
 import { ServiceLogFormFieldsEnum } from "../enums/ServiceLogFormFieldsEnum.ts";
 import { ServiceTypeInput } from "../components/forms/inputFields/ServiceTypeInput.tsx";
 import { useTranslation } from "react-i18next";
-import { EditToast } from "../../../../../ui/alert/presets/toast/index.ts";
-import { OdometerLimit } from "../../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
-import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
-import { Odometer } from "../../../../car/_features/odometer/schemas/odometerSchema.ts";
+import { EditToast } from "../../../../../ui/alert/presets/toast";
 import { ArrayInput } from "../../../../../components/Input/array/ArrayInput.tsx";
 import { useServiceItemToExpandableList } from "./useServiceItemToExpandableList.ts";
-import { CurrencyEnum } from "../../../../_shared/currency/enums/currencyEnum.ts";
 import { ServiceItemForm } from "../components/forms/ServiceItemForm.tsx";
+import { useCar } from "../../../../car/hooks/useCar.ts";
 
-type UseServiceLogFormFieldsProps = UseFormReturn<ServiceLogFormFields> & { odometer?: Odometer | null }
+type UseServiceLogFormFieldsProps = {
+    form: UseFormReturn<ServiceLogFormFields>
+    isEdit?: boolean
+}
 
-export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
-    const { control, setValue, clearErrors, odometer } = props;
+export function useServiceLogFormFields({ form, isEdit }: UseServiceLogFormFieldsProps) {
+    const { control, setValue, getFieldState, clearErrors } = form;
     const { t } = useTranslation();
-    const { odometerLogDao } = useDatabase();
-    const { getCar } = useCars();
     const { serviceItemToExpandableListItem } = useServiceItemToExpandableList();
 
-    const [car, setCar] = useState<Car | null>(null);
-    const [odometerLimit, setOdometerLimit] = useState<OdometerLimit | null>(null);
-
-    const formOdometerLogId = useWatch({ control, name: "odometerLogId" });
     const formCarId = useWatch({ control, name: "carId" });
-    const formDate = useWatch({ control, name: "date" });
+
+    const { car } = useCar({ carId: formCarId, options: { queryOnce: true } });
 
     useEffect(() => {
-        const car = getCar(formCarId);
-        setCar(car ?? null);
         clearErrors();
     }, [formCarId]);
-
-    useEffect(() => {
-        (async () => {
-            if(!formCarId || !formDate) return;
-
-            setOdometerLimit(await odometerLogDao.getOdometerLimitByDate(formCarId, formDate, [formOdometerLogId]));
-        })();
-    }, [formCarId, formDate, formOdometerLogId]);
 
     const fields: Record<ServiceLogFormFieldsEnum, FormFields> = useMemo(() => ({
         [ServiceLogFormFieldsEnum.Car]: {
@@ -65,15 +48,21 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
             render: () => (
                 <ArrayInput<ServiceLogFormFields, "items">
                     control={ control }
-                    fieldName={ "items" }
+                    fieldName="items"
                     mapperToExpandableList={ serviceItemToExpandableListItem }
-                    renderForm={ (onSubmit, item) => (
-                        <ServiceItemForm
-                            defaultServiceItem={ item }
-                            carCurrencyId={ car?.currency.id ?? CurrencyEnum.EUR }
-                            onSubmit={ onSubmit }
-                        />
-                    ) }
+                    renderForm={
+                        (onSubmit, item) => {
+                            if(!car) return null;
+
+                            return (
+                                <ServiceItemForm
+                                    defaultServiceItem={ item }
+                                    carCurrency={ car.currency }
+                                    onSubmit={ onSubmit }
+                                />
+                            );
+                        }
+                    }
                     showTotalAmounts
                     calculateItemAmount={ (item) => ({
                         amount: item.quantity * item.pricePerUnit.amount,
@@ -88,16 +77,13 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
         [ServiceLogFormFieldsEnum.DateAndOdometerValue]: {
             render: () => <OdometerValueInput
                 control={ control }
+                setValue={ setValue }
+                getFieldState={ getFieldState }
+                idFieldName="odometerLogId"
                 odometerValueFieldName="odometerValue"
+                carIdFieldName="carId"
                 dateFieldName="date"
-                currentOdometerValueTranslationKey={
-                    odometer
-                    ? "odometer.original_value"
-                    : "odometer.current_value"
-                }
-                currentOdometerValue={ odometer?.value ?? car?.odometer.value }
-                odometerLimit={ odometerLimit }
-                unitText={ car?.odometer.unit.short }
+                changeCarOdometerValueWhenInputNotTouched={ !isEdit }
             />,
             editToastMessages: EditToast
         },
@@ -109,7 +95,7 @@ export function useServiceLogFormFields(props: UseServiceLogFormFieldsProps) {
             />,
             editToastMessages: EditToast
         }
-    }), [control, setValue, car, t, odometer, odometerLimit]);
+    }), [control, setValue, getFieldState, car, t, isEdit]);
 
     const multiStepFormSteps: Steps = [
         {

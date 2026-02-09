@@ -2,14 +2,14 @@ import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts
 import { OdometerLogTypeTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { OdometerLogType, odometerLogTypeSchema } from "../../schemas/odometerLogTypeSchema.ts";
 import { OdometerLogTypeEnum } from "../enums/odometerLogTypeEnum.ts";
-import { COLORS, ICON_NAMES } from "../../../../../../constants/index.ts";
+import { COLORS, ICON_NAMES } from "../../../../../../constants";
 
 export class OdometerLogTypeMapper extends AbstractMapper<OdometerLogTypeTableRow, OdometerLogType> {
     constructor() {
         super();
     }
 
-    async toDto(entity: OdometerLogTypeTableRow): Promise<OdometerLogType> {
+    toDto(entity: OdometerLogTypeTableRow): OdometerLogType {
         let icon = null;
         let primaryColor = COLORS.gray2;
         let secondaryColor = null;
@@ -38,7 +38,7 @@ export class OdometerLogTypeMapper extends AbstractMapper<OdometerLogTypeTableRo
         });
     }
 
-    async toEntity(dto: OdometerLogType): Promise<OdometerLogTypeTableRow> {
+    toEntity(dto: OdometerLogType): OdometerLogTypeTableRow {
         return {
             id: dto.id as never,
             key: dto.key

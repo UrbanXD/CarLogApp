@@ -1,19 +1,17 @@
-import useCars from "./useCars.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useAlert } from "../../../ui/alert/hooks/useAlert.ts";
 import { router } from "expo-router";
-import { EDIT_CAR_FORM_STEPS } from "../constants/index.ts";
+import { EDIT_CAR_FORM_STEPS } from "../constants";
 import { useTranslation } from "react-i18next";
-import { NotFoundToast } from "../../../ui/alert/presets/toast/index.ts";
-import { DeleteModal } from "../../../ui/alert/presets/modal/index.ts";
+import { NotFoundToast } from "../../../ui/alert/presets/toast";
+import { DeleteModal } from "../../../ui/alert/presets/modal";
+import { useCar } from "./useCar.ts";
 
-const useCarProfile = (carId: string) => {
+export function useCarProfile(carId: string) {
     const { carDao } = useDatabase();
     const { t } = useTranslation();
     const { openModal, openToast } = useAlert();
-    const { getCar } = useCars();
-
-    const car = getCar(carId);
+    const { car, isLoading } = useCar({ carId });
 
     const handleDeleteCar = () => {
         if(!car) return openToast(NotFoundToast.warning(t("car.text")));
@@ -30,7 +28,5 @@ const useCarProfile = (carId: string) => {
         router.push({ pathname: "car/edit/[id]", params: { id: car.id, stepIndex } });
     };
 
-    return { car, handleDeleteCar, openEditCarStep };
-};
-
-export default useCarProfile;
+    return { car, isLoading, handleDeleteCar, openEditCarStep };
+}

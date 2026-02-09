@@ -1,210 +1,214 @@
 import { useTranslation } from "react-i18next";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
-import React, { useCallback, useEffect, useState } from "react";
-import { ComparisonStatByDate, RideSummaryStat, TrendStat } from "../../model/dao/statisticsDao.ts";
+import React, { useCallback, useMemo } from "react";
 import { formatTrend } from "../../utils/formatTrend.ts";
 import { formatWithUnit } from "../../../../utils/formatWithUnit.ts";
 import { MasonryStatView } from "../MasonryStatView.tsx";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants";
 import { StatCard } from "../StatCard.tsx";
 import dayjs from "dayjs";
 import { ChartTitle } from "../charts/common/ChartTitle.tsx";
 import { BarChartView } from "../charts/BarChartView.tsx";
 import { getDateFormatTemplateByRangeUnit } from "../../utils/getDateFormatTemplateByRangeUnit.ts";
 import { LineChartView } from "../charts/LineChartView.tsx";
+import { getRangeUnit } from "../../utils/getRangeUnit.ts";
+import { useCar } from "../../../car/hooks/useCar.ts";
+import { useWatchedQueryCollection } from "../../../../database/hooks/useWatchedQueryCollection.ts";
+import { useWatchedQueryItem } from "../../../../database/hooks/useWatchedQueryItem.ts";
+import { StatisticsFunctionArgs } from "../../../../database/dao/types/statistics.ts";
 
 type RideStatisticsProps = {
-    carId?: string
+    carId?: string | null
     from: string
     to: string
 }
 
 export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
     const { t } = useTranslation();
-    const { statisticsDao } = useDatabase();
+    const { rideLogDao } = useDatabase();
+    const { car } = useCar({ carId });
 
-    const [rideSummaryStat, setRideSummaryStat] = useState<RideSummaryStat | null>(null);
-    const [rideFrequency, setRideFrequency] = useState<ComparisonStatByDate | null>(null);
-    const [drivingActivity, setDrivingActivity] = useState<TrendStat | null>(null);
+    const rangeUnit = useMemo(() => getRangeUnit(from, to), [from, to]);
+    const carOdometerUnit = useMemo(() => car?.odometer.unit.short, [car?.odometer.unit]);
 
-    useEffect(() => {
-        (async () => {
-            const statArgs = {
-                carId: carId,
-                from,
-                to
-            };
+    const memoizedStatArgs: StatisticsFunctionArgs = useMemo(() => ({
+        carId: carId,
+        from,
+        to
+    }), [carId, from, to]);
 
-            const [
-                resultRideSummary,
-                resultRideFrequency,
-                resultDrivingActivity
-            ] = await Promise.all([
-                statisticsDao.getRideSummary(statArgs),
-                statisticsDao.getRideFrequency(statArgs),
-                statisticsDao.getDrivingActivity(statArgs)
-            ]);
+    const memoizedMostVisitedPlacesQuery = useMemo(
+        () => rideLogDao.mostVisitedPlacesStatisticsWatchedQueryCollection(memoizedStatArgs),
+        [rideLogDao, memoizedStatArgs]
+    );
+    const { data: mostVisitedPlaces, isLoading: isMostVisitedPlacesLoading } = useWatchedQueryCollection(
+        memoizedMostVisitedPlacesQuery);
 
-            setRideSummaryStat(resultRideSummary);
-            setRideFrequency(resultRideFrequency);
-            setDrivingActivity(resultDrivingActivity);
-        })();
-    }, [carId, from, to]);
+    const memoizedSummaryByDistanceQuery = useMemo(
+        () => rideLogDao.summaryStatisticsByDistanceWatchedQueryItem(memoizedStatArgs),
+        [rideLogDao, memoizedStatArgs]
+    );
+    const { data: summaryByDistance, isLoading: isSummaryByDistanceLoading } = useWatchedQueryItem(
+        memoizedSummaryByDistanceQuery);
+
+    const memoizedSummaryByDurationQuery = useMemo(
+        () => rideLogDao.summaryStatisticsByDurationWatchedQueryItem(memoizedStatArgs),
+        [rideLogDao, memoizedStatArgs]
+    );
+    const { data: summaryByDuration, isLoading: isSummaryByDurationLoading } = useWatchedQueryItem(
+        memoizedSummaryByDurationQuery);
+
+    const memoizedRideFrequencyQuery = useMemo(
+        () => rideLogDao.frequencyStatisticsWatchedQueryCollection(memoizedStatArgs),
+        [rideLogDao, memoizedStatArgs]
+    );
+    const { data: rideFrequency, isLoading: isRideFrequencyLoading } = useWatchedQueryCollection(
+        memoizedRideFrequencyQuery);
+
+    const memoizedDrivingActivityQuery = useMemo(
+        () => rideLogDao.drivingActivityStatisticsWatchedQueryCollection(memoizedStatArgs),
+        [rideLogDao, memoizedStatArgs]
+    );
+    const { data: drivingActivity, isLoading: isDrivingActivityLoading } = useWatchedQueryCollection(
+        memoizedDrivingActivityQuery);
 
     const getCountOfRides = useCallback(() => {
-        const { trend, trendSymbol } = rideSummaryStat?.distance.totalTrend ?? {};
+        const { trend, trendSymbol } = summaryByDistance?.countTrend ?? {};
 
         return {
             label: t("statistics.distance.count"),
-            value: rideSummaryStat?.distance.count != null
-                   ? `${ rideSummaryStat.distance.count } ${ t("common.count") }`
+            value: summaryByDistance?.count != null
+                   ? `${ summaryByDistance.count } ${ t("common.count") }`
                    : null,
-            isPositive: rideSummaryStat?.distance?.countTrend?.isTrendPositive,
+            isPositive: summaryByDistance?.countTrend?.isTrendPositive,
             trend: formatTrend({ trend: trend, trendSymbol: trendSymbol }),
             trendDescription: t("statistics.compared_to_previous_cycle"),
-            isLoading: !rideSummaryStat
+            isLoading: isSummaryByDistanceLoading
         };
-    }, [rideSummaryStat, t]);
+    }, [summaryByDistance, isSummaryByDistanceLoading, t]);
 
     const getTotalRideDuration = useCallback(() => {
         return {
             label: t("statistics.distance.total_ride_duration"),
-            value: rideSummaryStat != null
-                   ? rideSummaryStat.duration.total > 0 ? dayjs.duration(rideSummaryStat.duration.total, "days")
+            value: summaryByDuration != null
+                   ? summaryByDuration.total > 0 ? dayjs.duration(summaryByDuration.total, "days")
                 .humanize() : "-"
                    : null,
-            isPositive: rideSummaryStat?.duration?.totalTrend?.isTrendPositive,
-            trend: rideSummaryStat != null
-                   ? `${ rideSummaryStat.duration.totalTrend.trendSymbol } ${ rideSummaryStat.duration.totalTrend.trend }`
+            isPositive: summaryByDuration?.totalTrend?.isTrendPositive,
+            trend: summaryByDuration != null
+                   ? `${ summaryByDuration.totalTrend.trendSymbol } ${ summaryByDuration.totalTrend.trend }`
                    : null,
-            trendDescription: rideSummaryStat != null ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !rideSummaryStat
+            trendDescription: summaryByDuration != null ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isSummaryByDurationLoading
         };
-    }, [rideSummaryStat, t]);
+    }, [summaryByDuration, isSummaryByDurationLoading, t]);
 
 
     const getAverageRideDuration = useCallback(() => {
         return {
             label: t("statistics.distance.avg_ride_duration"),
-            value: rideSummaryStat != null
-                   ? rideSummaryStat.duration.average > 0 ? dayjs.duration(rideSummaryStat.duration.average, "days")
+            value: summaryByDuration != null
+                   ? summaryByDuration.average > 0 ? dayjs.duration(summaryByDuration.average, "days")
                 .humanize() : "-" : null,
-            isPositive: rideSummaryStat?.duration?.averageTrend?.isTrendPositive,
-            trend: rideSummaryStat != null
-                   ? `${ rideSummaryStat.duration.averageTrend.trendSymbol } ${ rideSummaryStat.duration.averageTrend.trend }`
+            isPositive: summaryByDuration?.averageTrend?.isTrendPositive,
+            trend: summaryByDuration != null
+                   ? `${ summaryByDuration.averageTrend.trendSymbol } ${ summaryByDuration.averageTrend.trend }`
                    : null,
-            trendDescription: rideSummaryStat != null ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !rideSummaryStat
+            trendDescription: summaryByDuration != null ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isSummaryByDurationLoading
         };
-    }, [rideSummaryStat, t]);
+    }, [summaryByDuration, isSummaryByDurationLoading, t]);
 
 
     const getMedianRideDuration = useCallback(() => {
         return {
             label: t("statistics.distance.median_ride_duration"),
-            value: rideSummaryStat != null
-                   ? rideSummaryStat.duration.median > 0 ? dayjs.duration(rideSummaryStat.duration.median, "days")
+            value: summaryByDuration != null
+                   ? summaryByDuration.median > 0 ? dayjs.duration(summaryByDuration.median, "days")
                 .humanize() : "-" : null,
-            isPositive: rideSummaryStat?.duration?.medianTrend?.isTrendPositive,
-            trend: rideSummaryStat != null
-                   ? `${ rideSummaryStat.duration.medianTrend.trendSymbol } ${ rideSummaryStat.duration.medianTrend.trend }`
+            isPositive: summaryByDuration?.medianTrend?.isTrendPositive,
+            trend: summaryByDuration != null
+                   ? `${ summaryByDuration.medianTrend.trendSymbol } ${ summaryByDuration.medianTrend.trend }`
                    : null,
-            trendDescription: rideSummaryStat != null ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !rideSummaryStat
+            trendDescription: summaryByDuration != null ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isSummaryByDurationLoading
         };
-    }, [rideSummaryStat, t]);
+    }, [summaryByDuration, isSummaryByDurationLoading, t]);
 
     const getMaxRideDuration = useCallback(() => {
         return {
             label: t("statistics.distance.max_ride_duration"),
-            value: rideSummaryStat?.duration?.max != null
-                   ? rideSummaryStat.duration.max.value > 0 ? dayjs.duration(rideSummaryStat.duration.max.value, "days")
+            value: summaryByDuration?.max != null
+                   ? summaryByDuration.max.value > 0 ? dayjs.duration(summaryByDuration.max.value, "days")
                 .humanize() : "-" : null,
-            isLoading: !rideSummaryStat
+            isLoading: isSummaryByDurationLoading
         };
-    }, [rideSummaryStat, t]);
-
-    const getTotalDistanceByOdometer = useCallback(() => {
-        return {
-            label: t("statistics.distance.total_distance_by_odometer"),
-            value: rideSummaryStat != null
-                   ? formatWithUnit(
-                    rideSummaryStat.distance.totalDistanceByOdometer,
-                    rideSummaryStat.distance?.unitText
-                )
-                   : null,
-            isPositive: null,
-            isLoading: !rideSummaryStat
-        };
-    }, [rideSummaryStat, t]);
+    }, [summaryByDuration, isSummaryByDurationLoading, t]);
 
     const getTotalRideDistance = useCallback(() => {
         return {
             label: t("statistics.distance.total_ride_distance"),
-            value: rideSummaryStat != null
-                   ? formatWithUnit(rideSummaryStat.distance.total, rideSummaryStat.distance?.unitText)
+            value: summaryByDistance != null
+                   ? formatWithUnit(summaryByDistance.total, carOdometerUnit)
                    : null,
-            isPositive: rideSummaryStat?.distance?.totalTrend?.isTrendPositive,
-            trend: rideSummaryStat != null
-                   ? `${ rideSummaryStat.distance.totalTrend.trendSymbol } ${ rideSummaryStat.distance.totalTrend.trend }`
+            isPositive: summaryByDistance?.totalTrend?.isTrendPositive,
+            trend: summaryByDistance != null
+                   ? `${ summaryByDistance.totalTrend.trendSymbol } ${ summaryByDistance.totalTrend.trend }`
                    : null,
-            trendDescription: rideSummaryStat != null ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !rideSummaryStat
+            trendDescription: summaryByDistance != null ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isSummaryByDistanceLoading
         };
-    }, [rideSummaryStat, t]);
+    }, [summaryByDistance, isSummaryByDistanceLoading, carOdometerUnit, t]);
 
 
     const getAverageRideDistance = useCallback(() => {
         return {
             label: t("statistics.distance.avg_ride_distance"),
-            value: rideSummaryStat != null ? formatWithUnit(
-                rideSummaryStat.distance.average,
-                rideSummaryStat.distance?.unitText
-            ) : null,
-            isPositive: rideSummaryStat?.distance?.averageTrend?.isTrendPositive,
-            trend: rideSummaryStat != null
-                   ? `${ rideSummaryStat.distance.averageTrend.trendSymbol } ${ rideSummaryStat.distance.averageTrend.trend }`
+            value: summaryByDistance != null ? formatWithUnit(summaryByDistance.average, carOdometerUnit) : null,
+            isPositive: summaryByDuration?.averageTrend?.isTrendPositive,
+            trend: summaryByDistance != null
+                   ? `${ summaryByDistance.averageTrend.trendSymbol } ${ summaryByDistance.averageTrend.trend }`
                    : null,
-            trendDescription: rideSummaryStat != null ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !rideSummaryStat
+            trendDescription: summaryByDistance != null ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isSummaryByDistanceLoading
         };
-    }, [rideSummaryStat, t]);
+    }, [summaryByDistance, isSummaryByDistanceLoading, carOdometerUnit, t]);
 
 
     const getMedianRideDistance = useCallback(() => {
         return {
             label: t("statistics.distance.median_ride_distance"),
-            value: rideSummaryStat != null
-                   ? formatWithUnit(rideSummaryStat.distance.median, rideSummaryStat.distance?.unitText)
+            value: summaryByDistance != null
+                   ? formatWithUnit(summaryByDistance.median, carOdometerUnit)
                    : null,
-            isPositive: rideSummaryStat?.distance?.medianTrend?.isTrendPositive,
-            trend: rideSummaryStat != null
-                   ? `${ rideSummaryStat.distance.medianTrend.trendSymbol } ${ rideSummaryStat.distance.medianTrend.trend }`
+            isPositive: summaryByDistance?.medianTrend?.isTrendPositive,
+            trend: summaryByDistance != null
+                   ? `${ summaryByDistance.medianTrend.trendSymbol } ${ summaryByDistance.medianTrend.trend }`
                    : null,
-            trendDescription: rideSummaryStat != null ? t("statistics.compared_to_previous_cycle") : null,
-            isLoading: !rideSummaryStat
+            trendDescription: summaryByDistance != null ? t("statistics.compared_to_previous_cycle") : null,
+            isLoading: isSummaryByDistanceLoading
         };
-    }, [rideSummaryStat, t]);
+    }, [summaryByDistance, isSummaryByDistanceLoading, carOdometerUnit, t]);
 
     const getMaxRideDistance = useCallback(() => {
         return {
             label: t("statistics.distance.max_ride_distance"),
-            value: rideSummaryStat?.distance?.max != null
-                   ? formatWithUnit(rideSummaryStat.distance.max.value, rideSummaryStat.distance?.unitText)
+            value: summaryByDistance?.max != null
+                   ? formatWithUnit(summaryByDistance.max.value, carOdometerUnit)
                    : null,
-            isLoading: !rideSummaryStat
+            isLoading: isSummaryByDistanceLoading
         };
-    }, [rideSummaryStat, t]);
+    }, [summaryByDistance, isSummaryByDistanceLoading, carOdometerUnit, t]);
 
     const getMostVisitedPlaces = useCallback(() => {
         let value: React.ReactNode = "-";
 
-        if(rideSummaryStat && rideSummaryStat.distance.mostVisitedPlaces.length > 0) {
+        if(mostVisitedPlaces && mostVisitedPlaces.length > 0) {
             value = (
                 <>
                     {
-                        rideSummaryStat.distance.mostVisitedPlaces.map((place, index) => (
+                        mostVisitedPlaces.map((place, index) => (
                             <React.Fragment key={ place.name + index }>
                                 { place.name }{ " " }
                                 <Text
@@ -216,7 +220,7 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
                                 >
                                     (x{ place.count })
                                 </Text>
-                                { rideSummaryStat.distance.mostVisitedPlaces.length - 1 !== index && "\n" }
+                                { mostVisitedPlaces.length - 1 !== index && "\n" }
                             </React.Fragment>
                         ))
                     }
@@ -227,9 +231,9 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
         return {
             label: t("statistics.distance.most_visited_places"),
             value,
-            isLoading: !rideSummaryStat
+            isLoading: isMostVisitedPlacesLoading
         };
-    }, [rideSummaryStat, t]);
+    }, [mostVisitedPlaces, isMostVisitedPlacesLoading, t]);
 
     return (
         <View style={ styles.container }>
@@ -258,7 +262,7 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
                 ] }
             />
             <BarChartView
-                chartData={ rideFrequency?.barChartData }
+                chartData={ rideFrequency?.chartData }
                 legend={ rideFrequency?.legend }
                 title={ {
                     title: t("statistics.distance.ride_frequency.title")
@@ -266,22 +270,22 @@ export function RideStatistics({ carId, from, to }: RideStatisticsProps) {
                 yAxisTitle={ t("statistics.distance.ride_frequency.y_axis") }
                 formatValue={ (value) => `${ value } ${ t("common.count") }` }
                 formatLabel={
-                    (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit(rideFrequency?.rangeUnit))
+                    (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit(rangeUnit))
                 }
                 showsLegend={ false }
-                isLoading={ !rideFrequency }
+                isLoading={ isRideFrequencyLoading }
             />
             <LineChartView
-                chartData={ drivingActivity?.lineChartData }
+                chartData={ drivingActivity?.chartData }
                 title={ {
                     title: t("statistics.distance.driving_activity.title")
                 } }
-                yAxisTitle={ t("statistics.distance.driving_activity.y_axis", { unit: drivingActivity?.unitText }) }
-                formatValue={ (value) => formatWithUnit(value, drivingActivity?.unitText) }
+                yAxisTitle={ t("statistics.distance.driving_activity.y_axis", { unit: carOdometerUnit }) }
+                formatValue={ (value) => formatWithUnit(value, carOdometerUnit) }
                 formatLabel={
-                    (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit(drivingActivity?.rangeUnit))
+                    (label) => dayjs(label).format(getDateFormatTemplateByRangeUnit(rangeUnit))
                 }
-                isLoading={ !drivingActivity }
+                isLoading={ isDrivingActivityLoading }
             />
         </View>
     );

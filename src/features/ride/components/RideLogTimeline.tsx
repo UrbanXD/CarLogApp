@@ -1,88 +1,70 @@
-import { Car } from "../../car/schemas/carSchema.ts";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useRideLogTimelineItem } from "../hooks/useRideLogTimelineItem.tsx";
 import React, { useCallback, useEffect, useMemo } from "react";
-import { useTimelinePaginator } from "../../../hooks/useTimelinePaginator.ts";
-import { TimelineItemType } from "../../../components/timelineView/item/TimelineItem.tsx";
-import { RideLog } from "../schemas/rideLogSchema.ts";
 import { StyleSheet, View } from "react-native";
 import { Title } from "../../../components/Title.tsx";
 import { TimelineView } from "../../../components/timelineView/TimelineView.tsx";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
+import { COLORS, FONT_SIZES, FULL_TABBAR_HEIGHT, SEPARATOR_SIZES } from "../../../constants";
 import { YearPicker } from "../../../components/Input/_presets/YearPicker.tsx";
 import { sql } from "@powersync/kysely-driver";
 import { useTranslation } from "react-i18next";
 import { CAR_TABLE } from "../../../database/connector/powersync/tables/car.ts";
-import { PaginatorSelectRideLogTableRow } from "../model/dao/rideLogDao.ts";
 import { RawBuilder } from "kysely";
+import { useTimeline } from "../../../hooks/useTimeline.ts";
 
 type RideLogTimelineProps = {
-    car: Car
+    carId: string
 };
 
-export function RideLogTimeline({ car }: RideLogTimelineProps) {
+export function RideLogTimeline({ carId }: RideLogTimelineProps) {
     const { t } = useTranslation();
     const { rideLogDao } = useDatabase();
     const { mapper } = useRideLogTimelineItem();
-    const paginator = useMemo(() =>
-        rideLogDao.paginator(
-            {
-                cursor: [
-                    { field: "start_time", order: "desc" },
-                    { field: "end_time", order: "desc" },
-                    { table: null, field: "distance", order: "desc" },
-                    { table: null, field: "duration", order: "desc" },
-                    { table: null, field: "total_expense", order: "desc" },
-                    { field: "id" }
-                ]
-            },
-            {
-                group: CAR_TABLE,
-                filters: [{ field: "car_id", operator: "=", value: car.id }]
-            }
-        ), []);
+
+    const memoizedOptions = useMemo(() => rideLogDao.timelineInfiniteQuery(carId), [rideLogDao]);
 
     const {
-        ref,
         data,
-        initialFetchHappened,
-        isInitialFetching,
         fetchNext,
+        fetchPrev,
         isNextFetching,
-        fetchPrevious,
-        isPreviousFetching,
-        timelineFilterManagement,
+        isPrevFetching,
+        hasNext,
+        hasPrev,
+        isLoading,
+        filterManager,
         orderButtons
-    } = useTimelinePaginator<PaginatorSelectRideLogTableRow, RideLog, TimelineItemType>({
-        paginator,
-        mapper,
+    } = useTimeline({
+        infiniteQueryOptions: memoizedOptions,
         cursorOrderButtons: [
-            { field: "start_time", title: t("rides.start_time") },
-            { field: "end_time", title: t("rides.end_time") },
-            { table: null, field: "distance", title: t("rides.distance") },
-            { table: null, field: "duration", title: t("rides.duration") },
-            { table: null, field: "total_expense", title: t("currency.price") }
+            { field: "rl.start_time", title: t("rides.start_time") },
+            { field: "rl.end_time", title: t("rides.end_time") },
+            { field: "distance", title: t("rides.distance") },
+            { field: "duration", title: t("rides.duration") },
+            { field: "total_expense", title: t("currency.price") }
         ]
     });
 
     useEffect(() => {
-        if(!car) return;
+        if(!carId) return;
 
-        timelineFilterManagement.replaceFilter({
-            groupKey: "car",
-            filter: { field: "car_id", operator: "=", value: car.id }
+        filterManager.replaceFilter({
+            groupKey: CAR_TABLE,
+            filter: { field: "c.id", operator: "=", value: carId }
         });
-    }, [car]);
+    }, [carId]);
 
     const setYearFilter = useCallback((year: string) => {
         // @formatter:off
         const customSql = (fieldRef: string | RawBuilder<any>) => sql<number>`strftime('%Y', ${ fieldRef })`;
         // @formatter:on
-        timelineFilterManagement.replaceFilter({
+        filterManager.replaceFilter({
             groupKey: "year",
             filter: { field: "start_time", operator: "=", value: year, customSql }
         });
-    }, [timelineFilterManagement]);
+    }, [filterManager]);
+
+    const memoizedData = useMemo(() => data.map((row) => mapper(row)), [data, mapper]);
 
     return (
         <View style={ styles.container }>
@@ -100,15 +82,16 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
                 />
             </View>
             <TimelineView
-                ref={ ref }
-                data={ data }
+                data={ memoizedData }
                 orderButtons={ orderButtons }
-                isInitialFetching={ isInitialFetching }
-                fetchNext={ (initialFetchHappened && paginator.hasNext()) ? fetchNext : undefined }
-                fetchPrevious={ (initialFetchHappened && paginator.hasPrevious()) ? fetchPrevious : undefined }
+                isLoading={ isLoading }
+                fetchNext={ fetchNext }
+                fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
-                isPreviousFetching={ isPreviousFetching }
-                style={ { paddingBottom: SIMPLE_TABBAR_HEIGHT } }
+                isPrevFetching={ isPrevFetching }
+                hasNext={ hasNext }
+                hasPrev={ hasPrev }
+                style={ { paddingBottom: FULL_TABBAR_HEIGHT } }
             />
         </View>
     );
@@ -116,10 +99,10 @@ export function RideLogTimeline({ car }: RideLogTimelineProps) {
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         gap: SEPARATOR_SIZES.lightSmall
     },
     headerContainer: {
-        flex: 1,
         justifyContent: "space-between",
         flexDirection: "row",
         alignItems: "flex-start"

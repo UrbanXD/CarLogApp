@@ -1,12 +1,9 @@
-import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/index.ts";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useMemo } from "react";
+import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../../constants";
 import { ScreenScrollView } from "../../components/screenView/ScreenScrollView.tsx";
 import { Title } from "../../components/Title.tsx";
 import { useDatabase } from "../../contexts/database/DatabaseContext.ts";
-import { Expense } from "../../features/expense/schemas/expenseSchema.ts";
-import { Car } from "../../features/car/schemas/carSchema.ts";
-import useCars from "../../features/car/hooks/useCars.ts";
 import dayjs from "dayjs";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { InfoContainer } from "../../components/info/InfoContainer.tsx";
@@ -15,32 +12,18 @@ import { InfoRowProps } from "../../components/info/InfoRow.tsx";
 import { FloatingDeleteButton } from "../../components/Button/presets/FloatingDeleteButton.tsx";
 import { AmountText } from "../../components/AmountText.tsx";
 import { useTranslation } from "react-i18next";
-import { DeleteToast, NotFoundToast } from "../../ui/alert/presets/toast/index.ts";
-import { DeleteModal } from "../../ui/alert/presets/modal/index.ts";
+import { DeleteToast, NotFoundToast } from "../../ui/alert/presets/toast";
+import { DeleteModal } from "../../ui/alert/presets/modal";
+import { useWatchedQueryItem } from "../../database/hooks/useWatchedQueryItem.ts";
 
 export function ExpenseScreen() {
     const { t } = useTranslation();
     const { id } = useLocalSearchParams<{ id: string }>();
     const { expenseDao } = useDatabase();
-    const { getCar } = useCars();
     const { openModal, openToast } = useAlert();
 
-    const [car, setCar] = useState<Car | null>(null);
-    const [expense, setExpense] = useState<Expense | null>(null);
-
-    useFocusEffect(
-        useCallback(() => {
-            const getExpense = async () => setExpense(await expenseDao.getById(id));
-
-            getExpense();
-        }, [id, expenseDao])
-    );
-
-    useEffect(() => {
-        if(car?.id === expense?.carId || !expense?.carId) return;
-
-        setCar(getCar(expense.carId));
-    }, [expense]);
+    const memoizedQuery = useMemo(() => expenseDao.expenseWatchedQueryItem(id), [expenseDao, id]);
+    const { data: expense, isLoading } = useWatchedQueryItem(memoizedQuery);
 
     const handleDelete = useCallback(async (id: string) => {
         try {
@@ -82,8 +65,8 @@ export function ExpenseScreen() {
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
             icon: ICON_NAMES.car,
-            title: car?.name,
-            content: `${ car?.model.make.name } ${ car?.model.name }`,
+            title: expense?.car.name,
+            content: `${ expense?.car.model.make.name } ${ expense?.car.model.name }`,
             onPress: () => onEdit(ExpenseFormFieldsEnum.Car)
         },
         {
@@ -117,19 +100,20 @@ export function ExpenseScreen() {
             contentTextStyle: !expense?.note ? { color: COLORS.gray2 } : undefined,
             onPress: () => onEdit(ExpenseFormFieldsEnum.Note)
         }
-    ]), [car, expense, getAmountSubtitle, t]);
+    ]), [expense, getAmountSubtitle, t]);
 
     return (
         <>
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
                 <Title
                     title={ t(`expenses.types.${ expense?.type.key }`) }
+                    onPress={ () => onEdit(ExpenseFormFieldsEnum.Type) }
                     dividerStyle={ {
                         backgroundColor: expense?.type?.primaryColor ?? COLORS.gray2,
                         marginBottom: SEPARATOR_SIZES.normal
                     } }
                 />
-                <InfoContainer data={ infos }/>
+                <InfoContainer data={ infos } isLoading={ isLoading }/>
             </ScreenScrollView>
             <FloatingDeleteButton onPress={ onDelete }/>
         </>

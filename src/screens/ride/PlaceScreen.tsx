@@ -1,98 +1,85 @@
-import { useTimelinePaginator } from "../../hooks/useTimelinePaginator.ts";
-import { PlaceTableRow } from "../../database/connector/powersync/AppSchema.ts";
 import { useDatabase } from "../../contexts/database/DatabaseContext.ts";
 import { useCallback, useMemo } from "react";
-import { useAppSelector } from "../../hooks/index.ts";
-import { getUser } from "../../features/user/model/selectors/index.ts";
 import { InfoTimeline, InfoTimelineItem } from "../../components/info/InfoTimeline.tsx";
 import { ScreenView } from "../../components/screenView/ScreenView.tsx";
 import { router } from "expo-router";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { useTranslation } from "react-i18next";
-import { DeleteModal } from "../../ui/alert/presets/modal/index.ts";
-import { DeleteToast, NotFoundToast } from "../../ui/alert/presets/toast/index.ts";
-import { Place } from "../../features/ride/_features/place/schemas/placeSchema.ts";
+import { DeleteModal } from "../../ui/alert/presets/modal";
+import { DeleteToast, NotFoundToast } from "../../ui/alert/presets/toast";
+import { useAuth } from "../../contexts/auth/AuthContext.ts";
+import { useTimeline } from "../../hooks/useTimeline.ts";
 
 export function PlaceScreen() {
     const { t } = useTranslation();
     const { placeDao } = useDatabase();
     const { openModal, openToast } = useAlert();
-    const user = useAppSelector(getUser);
+    const { sessionUserId } = useAuth();
 
-    if(!user) return <></>;
 
-    const paginator = useMemo(() => placeDao.paginator(), []);
-
-    const mapper = useCallback((item: Place, callback?: () => void): InfoTimelineItem => {
-        return {
-            id: item.id,
-            text: item.name,
-            callback: callback
-        };
-    }, []);
+    const memoizedOptions = useMemo(
+        () => placeDao.timelineInfiniteQuery(sessionUserId),
+        [placeDao, sessionUserId]
+    );
 
     const {
-        ref,
         data,
-        initialFetchHappened,
-        isInitialFetching,
-        refresh,
         fetchNext,
+        fetchPrev,
         isNextFetching,
-        fetchPrevious,
-        isPreviousFetching
-    } = useTimelinePaginator<PlaceTableRow, Place, InfoTimelineItem>({
-        paginator,
-        mapper
-    });
+        isPrevFetching,
+        hasNext,
+        hasPrev,
+        isLoading
+    } = useTimeline({ infiniteQueryOptions: memoizedOptions });
 
     const openCreateForm = () => router.push("/ride/place/create");
 
-    const onEdit = useCallback((id: string | number, callback?: () => void) => {
+    const onEdit = useCallback((id: string | number) => {
         if(!id) return openToast(NotFoundToast.warning(t("places.title_singular")));
 
-        callback?.();
         router.push({
             pathname: "/ride/place/edit/[id]",
             params: { id }
         });
-    }, []);
+    }, [openToast, t]);
 
-    const handleDelete = useCallback(async (id: string | number, callback?: () => void) => {
+    const handleDelete = useCallback(async (id: string | number) => {
         if(!id) return openToast(NotFoundToast.warning(t("places.title_singular")));
 
         try {
             await placeDao.delete(id);
 
             openToast(DeleteToast.success(t("places.title_singular")));
-            callback?.();
-            await refresh();
-            requestAnimationFrame(() => {
-                ref.current?.clearLayoutCacheOnUpdate();
-            });
         } catch(e) {
             console.log(e);
             openToast(DeleteToast.error(t("places.title_singular")));
         }
     }, [placeDao, openToast, t]);
 
-    const onDelete = useCallback((id: string | number, callback?: () => void) => {
-        openModal(DeleteModal({ name: t("places.title_singular"), acceptAction: () => handleDelete(id, callback) }));
+    const onDelete = useCallback((id: string | number) => {
+        openModal(DeleteModal({ name: t("places.title_singular"), acceptAction: () => handleDelete(id) }));
     }, [openModal, t]);
+
+    const memoizedData = useMemo(() => data.map((row) => ({
+        id: row.id,
+        text: row.name
+    }) as InfoTimelineItem), [data]);
 
     return (
         <ScreenView>
             <InfoTimeline
-                ref={ ref }
-                data={ data }
+                data={ memoizedData }
                 openCreateForm={ openCreateForm }
                 onEdit={ onEdit }
                 onDelete={ onDelete }
-                isInitialFetching={ isInitialFetching }
-                fetchNext={ (initialFetchHappened && paginator.hasNext()) ? fetchNext : undefined }
-                fetchPrevious={ (initialFetchHappened && paginator.hasPrevious()) ? fetchPrevious : undefined }
+                isLoading={ isLoading }
+                fetchNext={ fetchNext }
+                fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
-                isPreviousFetching={ isPreviousFetching }
+                isPrevFetching={ isPrevFetching }
+                hasNext={ hasNext }
+                hasPrev={ hasPrev }
             />
         </ScreenView>
     );

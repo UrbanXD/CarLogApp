@@ -1,21 +1,27 @@
 import React from "react";
 import Input from "../../../../../components/Input/Input.ts";
-import { StepProps } from "../../../../../types/index.ts";
 import { CarFormFields } from "../../../schemas/form/carForm.ts";
 import { OdometerUnitInput } from "../../../_features/odometer/components/forms/inputFields/OdometerUnitInput.tsx";
 import { OdometerValueInput } from "../../../_features/odometer/components/forms/inputFields/OdometerValueInput.tsx";
 import { useTranslation } from "react-i18next";
+import { UseFormReturn } from "react-hook-form";
 
-type OdometerStepProps = Pick<StepProps<CarFormFields>, "control">;
+type OdometerStepProps = {
+    form: UseFormReturn<CarFormFields, any, CarFormFields>
+}
 
-function OdometerStep({ control }: OdometerStepProps) {
+function OdometerStep({ form }: OdometerStepProps) {
     const { t } = useTranslation();
+    const { control, setValue, getFieldState } = form;
 
     return (
         <Input.Group>
             <OdometerValueInput
                 control={ control }
+                setValue={ setValue }
+                getFieldState={ getFieldState }
                 odometerValueFieldName="odometer.value"
+                showLimits={ false }
             />
             <OdometerUnitInput
                 control={ control }

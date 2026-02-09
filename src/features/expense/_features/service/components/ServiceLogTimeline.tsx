@@ -1,79 +1,66 @@
-import { Car } from "../../../../car/schemas/carSchema.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import React, { useCallback, useMemo } from "react";
-import { useTimelinePaginator } from "../../../../../hooks/useTimelinePaginator.ts";
 import { StyleSheet, View } from "react-native";
 import { TimelineView } from "../../../../../components/timelineView/TimelineView.tsx";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../../../constants/index.ts";
-import { EXPENSE_TABLE } from "../../../../../database/connector/powersync/tables/expense.ts";
+import { COLORS, FONT_SIZES, FULL_TABBAR_HEIGHT, SEPARATOR_SIZES } from "../../../../../constants";
 import { useServiceLogTimelineFilter } from "../hooks/useServiceLogTimelineFilter.ts";
-import { ExpenseTableRow, ServiceLogTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
-import { ServiceLog } from "../schemas/serviceLogSchema.ts";
 import { useServiceLogTimelineItem } from "../hooks/useServiceLogTimelineItem.tsx";
 import { YearPicker } from "../../../../../components/Input/_presets/YearPicker.tsx";
 import { sql } from "@powersync/kysely-driver";
 import { Title } from "../../../../../components/Title.tsx";
-import { TimelineItemType } from "../../../../../components/timelineView/item/TimelineItem.tsx";
 import { useTranslation } from "react-i18next";
-import { CAR_TABLE } from "../../../../../database/connector/powersync/tables/car.ts";
 import { RawBuilder } from "kysely";
+import { useTimeline } from "../../../../../hooks/useTimeline.ts";
 
 type ServiceLogTimelineProps = {
-    car: Car
+    carId: string
 };
 
-export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
+export function ServiceLogTimeline({ carId }: ServiceLogTimelineProps) {
     const { t } = useTranslation();
     const { serviceLogDao } = useDatabase();
     const { mapper } = useServiceLogTimelineItem();
-    const paginator = useMemo(
-        () =>
-            serviceLogDao.paginator(
-                {
-                    cursor: [
-                        { table: EXPENSE_TABLE, field: "date", order: "desc" },
-                        { table: EXPENSE_TABLE, field: "amount", order: "desc" },
-                        { field: "id" }
-                    ]
-                },
-                {
-                    group: CAR_TABLE,
-                    filters: [{ field: "car_id", operator: "=", value: car.id }]
-                }
-            ),
-        []
-    );
+
+    const memoizedOptions = useMemo(() => serviceLogDao.timelineInfiniteQuery(carId), [serviceLogDao]);
 
     const {
-        ref,
         data,
-        initialFetchHappened,
-        isInitialFetching,
         fetchNext,
+        fetchPrev,
         isNextFetching,
-        fetchPrevious,
-        isPreviousFetching,
-        timelineFilterManagement,
+        isPrevFetching,
+        hasNext,
+        hasPrev,
+        isLoading,
+        filterManager,
         orderButtons
-    } = useTimelinePaginator<ServiceLogTableRow & ExpenseTableRow, ServiceLog, TimelineItemType>({
-        paginator,
-        mapper,
+    } = useTimeline({
+        infiniteQueryOptions: memoizedOptions,
         cursorOrderButtons: [
-            { table: EXPENSE_TABLE, field: "date", title: t("date.text") },
-            { table: EXPENSE_TABLE, field: "amount", title: t("currency.price") }
+            { field: "e.date", title: t("date.text") },
+            { field: "e.amount", title: t("currency.price") }
         ]
     });
-    const { filterButtons } = useServiceLogTimelineFilter({ timelineFilterManagement, car });
+
+    const { filterButtons } = useServiceLogTimelineFilter({
+        filterManager,
+        carId,
+        carFilterFieldName: "c.id",
+        typesFilterFieldName: "st.id"
+    });
 
     const setYearFilter = useCallback((year: string) => {
         // @formatter:off
         const customSql = (fieldRef: string | RawBuilder<any>) => sql<number>`strftime('%Y', ${ fieldRef })`;
         // @formatter:on
-        timelineFilterManagement.replaceFilter({
+
+        filterManager.replaceFilter({
             groupKey: "year",
-            filter: { table: EXPENSE_TABLE, field: "date", operator: "=", value: year, customSql }
+            filter: { field: "e.date", operator: "=", value: year, customSql }
         });
-    }, [timelineFilterManagement])
+    }, [filterManager]);
+
+    const memoizedData = useMemo(() => data.map((row) => mapper(row)), [data, mapper]);
 
     return (
         <View style={ styles.container }>
@@ -91,16 +78,17 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
                 />
             </View>
             <TimelineView
-                ref={ ref }
-                data={ data }
+                data={ memoizedData }
                 orderButtons={ orderButtons }
                 filterButtons={ filterButtons }
-                isInitialFetching={ isInitialFetching }
-                fetchNext={ initialFetchHappened && paginator.hasNext() ? fetchNext : undefined }
-                fetchPrevious={ initialFetchHappened && paginator.hasPrevious() ? fetchPrevious : undefined }
+                isLoading={ isLoading }
+                fetchNext={ fetchNext }
+                fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
-                isPreviousFetching={ isPreviousFetching }
-                style={ { paddingBottom: SIMPLE_TABBAR_HEIGHT } }
+                isPrevFetching={ isPrevFetching }
+                hasNext={ hasNext }
+                hasPrev={ hasPrev }
+                style={ { paddingBottom: FULL_TABBAR_HEIGHT } }
             />
         </View>
     );
@@ -108,10 +96,10 @@ export function ServiceLogTimeline({ car }: ServiceLogTimelineProps) {
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         gap: SEPARATOR_SIZES.lightSmall
     },
     headerContainer: {
-        flex: 1,
         justifyContent: "space-between",
         flexDirection: "row",
         alignItems: "flex-start"

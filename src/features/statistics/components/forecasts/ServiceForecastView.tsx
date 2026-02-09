@@ -1,105 +1,48 @@
-import React, { useEffect, useState } from "react";
-import { ServiceForecast } from "../../model/dao/statisticsDao.ts";
+import React, { useMemo } from "react";
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
-import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, GLOBAL_STYLE, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import { useTranslation } from "react-i18next";
 import { ServiceTypeEnum } from "../../../expense/_features/service/model/enums/ServiceTypeEnum.ts";
 import { ServiceForecastCard } from "../ServiceForecastCard.tsx";
+import { Section } from "../../../../components/Section.tsx";
+import { useWatchedQueryCollection } from "../../../../database/hooks/useWatchedQueryCollection.ts";
+import { useCar } from "../../../car/hooks/useCar.ts";
+import { ViewStyle } from "../../../../types";
 
 type ServiceForecastProps = {
     carId: string
+    expandable?: boolean
+    containerStyle?: ViewStyle
 }
 
-export function ServiceForecastView({ carId }: ServiceForecastProps) {
+export function ServiceForecastView({ carId, expandable = false, containerStyle }: ServiceForecastProps) {
     const { t } = useTranslation();
-    const { statisticsDao } = useDatabase();
+    const { serviceLogDao } = useDatabase();
+    const { car } = useCar({ carId });
 
-    const [forecast, setForecast] = useState<ServiceForecast | null>(null);
-
-    useEffect(() => {
-        (async () => {
-            setForecast(await statisticsDao.getForecastForService(carId));
-        })();
-    }, [carId]);
+    const memoizedForecastQuery = useMemo(
+        () => serviceLogDao.forecastWatchedQueryCollection(carId),
+        [serviceLogDao, carId]
+    );
+    const { data: forecast, isLoading: isForecastLoading } = useWatchedQueryCollection(memoizedForecastQuery);
 
     return (
-        <View style={ styles.container }>
-            <Text style={ styles.title }>
-                { t("statistics.service.forecast") }
-            </Text>
+        <Section
+            title={ t("statistics.service.forecast") }
+            expandable={ expandable }
+            containerStyle={ containerStyle }
+        >
             <ServiceForecastCard
-                forecast={ forecast?.major }
+                forecast={ forecast?.[ServiceTypeEnum.MAJOR_SERVICE] }
                 type={ ServiceTypeEnum.MAJOR_SERVICE }
-                odometer={ forecast?.odometer }
-                isLoading={ !forecast }
+                odometer={ car?.odometer }
+                isLoading={ isForecastLoading }
             />
             <ServiceForecastCard
-                forecast={ forecast?.small }
+                forecast={ forecast?.[ServiceTypeEnum.SMALL_SERVICE] }
                 type={ ServiceTypeEnum.SMALL_SERVICE }
-                odometer={ forecast?.odometer }
-                isLoading={ !forecast }
+                odometer={ car?.odometer }
+                isLoading={ isForecastLoading }
             />
-        </View>
+        </Section>
     );
 }
-
-const styles = StyleSheet.create({
-    container: GLOBAL_STYLE.contentContainer,
-    header: {
-        gap: SEPARATOR_SIZES.lightSmall / 2
-    },
-    title: GLOBAL_STYLE.containerTitleText,
-    subtitleContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-end",
-        gap: SEPARATOR_SIZES.lightSmall
-    },
-    subtitle: {
-        fontSize: FONT_SIZES.p2,
-        color: COLORS.gray1
-    },
-    subtitleDate: {
-        fontSize: FONT_SIZES.p3,
-        // lineHeight: FONT_SIZES.p3 * 1.2,
-        // letterSpacing: FONT_SIZES.p3 * 0.05,
-        color: COLORS.gray1
-    },
-    card: {
-        flex: 1,
-        justifyContent: "space-between",
-        padding: SEPARATOR_SIZES.small,
-        borderRadius: 12,
-        backgroundColor: COLORS.gray5,
-        shadowColor: COLORS.black,
-        shadowOffset: {
-            width: 0,
-            height: 12
-        },
-        shadowOpacity: 0.58,
-        shadowRadius: 16,
-        elevation: 24
-    },
-    cardTitleContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-end",
-        gap: SEPARATOR_SIZES.lightSmall
-    },
-    cardTitle: {
-        fontFamily: "Gilroy-Heavy",
-        fontSize: FONT_SIZES.p2,
-        color: COLORS.white
-    },
-    cardDate: {
-        fontFamily: "Gilroy-Medium",
-        fontSize: FONT_SIZES.p3,
-        color: COLORS.gray1
-    },
-    cardForecast: {
-        fontFamily: "Gilroy-Heavy",
-        fontSize: FONT_SIZES.h3,
-        color: COLORS.white
-    }
-});

@@ -5,7 +5,7 @@ import { Passenger, passengerSchema } from "../../schemas/passengerSchema.ts";
 import { PassengerFormFields } from "../../schemas/form/passengerForm.ts";
 
 export class PassengerMapper extends AbstractMapper<PassengerTableRow, Passenger> {
-    async toDto(entity: PassengerTableRow): Promise<Passenger> {
+    toDto(entity: PassengerTableRow): Passenger {
         return passengerSchema.parse({
             id: entity.id,
             ownerId: entity.owner_id,
@@ -13,7 +13,7 @@ export class PassengerMapper extends AbstractMapper<PassengerTableRow, Passenger
         });
     }
 
-    async toEntity(dto: Passenger): Promise<PassengerTableRow> {
+    toEntity(dto: Passenger): PassengerTableRow {
         return {
             id: dto.id,
             owner_id: dto.ownerId,
@@ -21,7 +21,7 @@ export class PassengerMapper extends AbstractMapper<PassengerTableRow, Passenger
         };
     }
 
-    async entityToPickerItem(entity: PassengerTableRow): Promise<PickerItemType> {
+    toPickerItem(entity: PassengerTableRow): PickerItemType {
         return {
             value: entity.id,
             title: entity.name

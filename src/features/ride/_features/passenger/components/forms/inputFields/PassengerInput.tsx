@@ -3,10 +3,9 @@ import { useDatabase } from "../../../../../../../contexts/database/DatabaseCont
 import React, { useMemo } from "react";
 import Input from "../../../../../../../components/Input/Input.ts";
 import { useCreatePassenger } from "../../../hooks/useCreatePassenger.ts";
-import { useAppSelector } from "../../../../../../../hooks/index.ts";
-import { getUser } from "../../../../../../user/model/selectors/index.ts";
 import { AddItemToDropdownInput } from "../../../../../../../components/Input/_presets/AddItemToDropdownInput.tsx";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../../../../../../contexts/auth/AuthContext.ts";
 
 type PlaceInputProps = {
     control: Control<any>
@@ -21,21 +20,22 @@ export function PassengerInput({
 }: PlaceInputProps) {
     const { t } = useTranslation();
     const { passengerDao } = useDatabase();
-    const user = useAppSelector(getUser);
-    if(!user) return <></>;
+    const { sessionUserId } = useAuth();
 
-    const paginator = useMemo(() => passengerDao.pickerPaginator(), []);
+    if(!sessionUserId) return null;
 
-    const { form, submitHandler } = useCreatePassenger({ userId: user.id, dismissSheet: false });
+    const queryOptions = useMemo(() => passengerDao.pickerInfiniteQuery(sessionUserId), []);
+
+    const { form, submitHandler } = useCreatePassenger({ userId: sessionUserId, dismissSheet: false });
 
     return (
         <Input.Field
             control={ control }
             fieldName={ fieldName }
         >
-            <Input.Picker.Dropdown
+            <Input.Picker.Dropdown<typeof queryOptions["baseQuery"]>
                 title={ title ?? t("passengers.title_singular") }
-                paginator={ paginator }
+                queryOptions={ queryOptions }
                 renderCreateItemForm={
                     (callback) => {
                         const handler = submitHandler(callback);

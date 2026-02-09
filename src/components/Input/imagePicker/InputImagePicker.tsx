@@ -2,10 +2,10 @@ import Button from "../../Button/Button.ts";
 import { pickImage } from "../../../utils/pickImage.ts";
 import { ImageStyle, StyleSheet, View } from "react-native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import Carousel, { CarouselItemType } from "../../Carousel/Carousel.tsx";
+import { Carousel, CarouselItemType } from "../../Carousel/Carousel.tsx";
 import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../../Carousel/CarouselItem.tsx";
-import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants";
 import InputTitle from "../common/InputTitle.tsx";
 import DefaultElement from "../../DefaultElement.tsx";
 import { hexToRgba } from "../../../utils/colors/hexToRgba.ts";
@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { Paths } from "expo-file-system";
 import { usePermission } from "../../../hooks/usePermission.ts";
-import { ViewStyle } from "../../../types/index.ts";
+import { ViewStyle } from "../../../types";
 
 export const INPUT_IMAGE_TEMP_DIR = `${ Paths.document.uri }/temp`;
 
@@ -191,6 +191,8 @@ function InputImagePicker({
         );
     }, [removeImageFromHistory, selectImage]);
 
+    const keyExtractor = useCallback((item: ImageType) => item.uri, []);
+
     const getWidth = () => {
         const width = StyleSheet.flatten(historyImageStyle)?.width ?? imageStyle?.width ?? carouselLayout.width;
         return typeof width === "number" ? width : carouselLayout.width;
@@ -261,6 +263,7 @@ function InputImagePicker({
                                 onPress={ () => selectImage(null) }
                             />
                         ) }
+                        keyExtractor={ keyExtractor }
                     />
                 </View>
             </View>

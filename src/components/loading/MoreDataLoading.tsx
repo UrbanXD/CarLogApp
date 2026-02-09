@@ -12,6 +12,7 @@ type MoreDataLoadingProps = {
     containerStyle?: ViewStyle
     textStyle?: TextStyle
     withBounceDot?: boolean
+    withText?: boolean
 }
 
 export function MoreDataLoading({
@@ -20,7 +21,8 @@ export function MoreDataLoading({
     activityIndicatorColor = COLORS.gray2,
     containerStyle,
     textStyle,
-    withBounceDot = true
+    withBounceDot = true,
+    withText = true
 }: MoreDataLoadingProps) {
     const { t } = useTranslation();
 
@@ -28,9 +30,12 @@ export function MoreDataLoading({
         <View style={ [styles.container, containerStyle] }>
             <ActivityIndicator size={ activityIndicatorSize } color={ activityIndicatorColor }/>
             <View style={ styles.textContainer }>
-                <Text style={ [styles.text, textStyle] }>{ text ?? t("common.data_loading") }</Text>
                 {
-                    withBounceDot &&
+                    withText &&
+                   <Text style={ [styles.text, textStyle] }>{ text ?? t("common.data_loading") }</Text>
+                }
+                {
+                    withText && withBounceDot &&
                    <>
                       <BounceDot delay={ 0 } style={ styles.text }/>
                       <BounceDot delay={ 200 } style={ styles.text }/>

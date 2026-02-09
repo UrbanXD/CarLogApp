@@ -1,11 +1,9 @@
 import React, { useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
 import { FilterRow } from "../components/filter/FilterRow.tsx";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
+import { COLORS, FONT_SIZES, FULL_TABBAR_HEIGHT, SEPARATOR_SIZES } from "../constants";
 import dayjs from "dayjs";
 import InputDatePicker, { InputDatePickerRef } from "../components/Input/datePicker/InputDatePicker.tsx";
-import useCars from "../features/car/hooks/useCars.ts";
 import { FuelStatistics } from "../features/statistics/components/stats/FuelStatistics.tsx";
 import { ExpenseStatistics } from "../features/statistics/components/stats/ExpenseStatistics.tsx";
 import { ServiceStatistics } from "../features/statistics/components/stats/ServiceStatistics.tsx";
@@ -13,11 +11,14 @@ import { RideStatistics } from "../features/statistics/components/stats/RideStat
 import { useTranslation } from "react-i18next";
 import OnBoardingView from "../components/OnBoardingView.tsx";
 import { FirstSelectCar } from "../components/firstSelectCar/FirstSelectCar.tsx";
+import { useSelectedCarId } from "../features/car/hooks/useSelectedCarId.ts";
+import { ScreenView } from "../components/screenView/ScreenView.tsx";
+import { ScrollView } from "react-native-gesture-handler";
 
 const STAT_TYPES = ["fuel", "ride", "expense", "service"];
 
 export function StatisticsScreen() {
-    const { selectedCar } = useCars();
+    const { selectedCarId } = useSelectedCarId();
     const { t } = useTranslation();
 
     const datePickerRef = useRef<InputDatePickerRef>(null);
@@ -32,38 +33,38 @@ export function StatisticsScreen() {
     const boards = useMemo(() => ([
         () => (
             <FuelStatistics
-                carId={ selectedCar?.id }
+                carId={ selectedCarId }
                 from={ from }
                 to={ to }
             />
         ),
         () => (
             <RideStatistics
-                carId={ selectedCar?.id }
+                carId={ selectedCarId }
                 from={ from }
                 to={ to }
             />
         ),
         () => (
             <ExpenseStatistics
-                carId={ selectedCar?.id }
+                carId={ selectedCarId }
                 from={ from }
                 to={ to }
             />
         ),
         () => (
             <ServiceStatistics
-                carId={ selectedCar?.id }
+                carId={ selectedCarId }
                 from={ from }
                 to={ to }
             />
         )
-    ]), [selectedCar, from, to]);
+    ]), [selectedCarId, from, to]);
 
-    if(!selectedCar) return <FirstSelectCar/>;
+    if(!selectedCarId) return <FirstSelectCar/>;
 
     return (
-        <ScreenScrollView>
+        <ScreenView>
             <InputDatePicker
                 ref={ datePickerRef }
                 mode="range"
@@ -79,53 +80,58 @@ export function StatisticsScreen() {
                     }
                 }
             />
-            <View style={ styles.container }>
-                <View style={ styles.header }>
-                    <FilterRow style={ styles.statTypeFilterContainer }>
-                        {
-                            STAT_TYPES.map((stat, index) => (
-                                <Pressable
-                                    key={ index }
-                                    style={ [
-                                        styles.statTypeFilterButton,
-                                        currentBoardIndex === index && styles.statTypeFilterActive
-                                    ] }
-                                    onPress={ () => setCurrentBoardIndex(index) }
-                                >
-                                    <Text style={ styles.statTypeFilterText }>
-                                        { t(`statistics.types.${ stat }`) }
-                                    </Text>
-                                </Pressable>
-                            ))
-                        }
-                    </FilterRow>
-                    <Pressable onPress={ openDateRangePicker }>
-                        <View style={ styles.rangeContainer }>
-                            <Text style={ styles.rangeText }>
-                                { dayjs(from).format("LL") }
-                            </Text>
-                            <Text style={ styles.arrow }>→</Text>
-                            <Text style={ styles.rangeText }>
-                                { dayjs(to).format("LL") }
-                            </Text>
-                        </View>
-                        <Text style={ styles.agoText }>
-                            { dayjs(from).from(dayjs(to)) }
+            <View style={ styles.header }>
+                <FilterRow style={ styles.statTypeFilterContainer }>
+                    {
+                        STAT_TYPES.map((stat, index) => (
+                            <Pressable
+                                key={ index }
+                                style={ [
+                                    styles.statTypeFilterButton,
+                                    currentBoardIndex === index && styles.statTypeFilterActive
+                                ] }
+                                onPress={ () => setCurrentBoardIndex(index) }
+                            >
+                                <Text style={ styles.statTypeFilterText }>
+                                    { t(`statistics.types.${ stat }`) }
+                                </Text>
+                            </Pressable>
+                        ))
+                    }
+                </FilterRow>
+                <Pressable onPress={ openDateRangePicker }>
+                    <View style={ styles.rangeContainer }>
+                        <Text style={ styles.rangeText }>
+                            { dayjs(from).format("LL") }
                         </Text>
-                    </Pressable>
-                </View>
-                <OnBoardingView steps={ boards } currentStep={ currentBoardIndex }/>
+                        <Text style={ styles.arrow }>→</Text>
+                        <Text style={ styles.rangeText }>
+                            { dayjs(to).format("LL") }
+                        </Text>
+                    </View>
+                    <Text style={ styles.agoText }>
+                        { dayjs(from).from(dayjs(to)) }
+                    </Text>
+                </Pressable>
             </View>
-        </ScreenScrollView>
+            <ScrollView
+                style={ { gap: SEPARATOR_SIZES.lightSmall } }
+                contentContainerStyle={ { paddingBottom: FULL_TABBAR_HEIGHT } }
+                showsVerticalScrollIndicator={ false }
+            >
+                <OnBoardingView steps={ boards } currentStep={ currentBoardIndex }/>
+            </ScrollView>
+        </ScreenView>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
         gap: SEPARATOR_SIZES.lightSmall
     },
     header: {
-        gap: SEPARATOR_SIZES.lightSmall / 2
+        gap: SEPARATOR_SIZES.lightSmall / 2,
+        paddingBottom: SEPARATOR_SIZES.lightSmall
     },
     statTypeFilterContainer: {
         backgroundColor: COLORS.gray5,

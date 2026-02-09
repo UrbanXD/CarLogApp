@@ -1,14 +1,16 @@
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../constants";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 
-export type LegendData = {
-    label: string
-    color: string
+export type LegendType = {
+    [key: string]: {
+        label: string
+        color: string
+    }
 }
 
 type LegendProps = {
-    legend: { [key: string]: LegendData }
+    legend: LegendType
     formatLegend?: (label: string) => string
 }
 

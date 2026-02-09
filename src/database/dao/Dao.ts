@@ -2,54 +2,57 @@ import { Kysely } from "@powersync/kysely-driver";
 import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 import { AbstractMapper } from "./AbstractMapper.ts";
 import { SelectQueryBuilder } from "kysely";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
 
 export class Dao<
-    Entity extends { id: any },
+    Entity extends { id: string | number },
     Dto,
     Mapper extends AbstractMapper<Entity, Dto, SelectEntity>,
-    SelectEntity extends { id: any } = Entity
+    SelectEntity extends { id: string | number } = Entity
 > {
     protected readonly db: Kysely<DatabaseType>;
+    protected readonly powersync: AbstractPowerSyncDatabase;
     protected readonly table: keyof DatabaseType & string;
     readonly mapper: Mapper;
 
     constructor(
         db: Kysely<DatabaseType>,
+        powersync: AbstractPowerSyncDatabase,
         table: keyof DatabaseType & string,
         mapper: Mapper
     ) {
         this.db = db;
+        this.powersync = powersync;
         this.table = table;
         this.mapper = mapper;
     }
 
-    selectQuery(): SelectQueryBuilder<DatabaseType, any, SelectEntity> {
-        return this.db
+    selectQuery(id?: any | null): SelectQueryBuilder<DatabaseType, any, SelectEntity> {
+        let query = this.db
         .selectFrom(this.table)
-        .selectAll() as any;
+        .selectAll();
+
+        if(id) query = query.where(`${ this.table }.id`, "=", id as any);
+
+        return query as any;
     }
 
     async getAll(): Promise<Array<Dto>> {
         const entities = await this.selectQuery().execute();
-        return await this.mapper.toDtoArray(entities);
+        return this.mapper.toDtoArray(entities);
     }
 
-    async getById(id: string | number | null, safe: boolean = true): Promise<Dto | null> {
-        if(!id) {
-            if(safe) throw new Error(`ID is required for ${ this.table }`);
-            return null;
-        }
+    async getById(id: string | number | null): Promise<Dto> {
+        if(!id) throw new Error(`ID is required for ${ this.table }`);
 
-        const entity = await this.selectQuery()
-        .where(`${ this.table }.id` as any, "=", id as any)
-        .executeTakeFirst() as unknown as SelectEntity;
+        const entity = await this.selectQuery(id)
+        .executeTakeFirstOrThrow() as unknown as SelectEntity;
 
-        if(safe && !entity) throw new Error(`Table item not found by ${ id } id. [${ this.table }]`);
 
-        return entity ? await this.mapper.toDto(entity) : null;
+        return this.mapper.toDto(entity);
     }
 
-    async create(entity: Partial<Entity>, safe: boolean = true): Promise<Dto | null> {
+    async create(entity: Entity): Promise<Entity["id"]> {
         const result = await this.db
         .insertInto(this.table as any)
         .values(entity as any)
@@ -57,44 +60,39 @@ export class Dao<
         .executeTakeFirst();
 
         const insertedId = (result as any)?.id;
+        if(!insertedId) throw new Error(`Failed to create item in [${ this.table }]`);
 
-        if(safe && !insertedId) throw new Error(`Failed to create item in [${ this.table }]`);
-        if(!insertedId) return null;
-
-        return await this.getById(insertedId, safe);
+        return insertedId;
     }
 
-    async update(entity: Partial<Entity> & { id: string | number }, safe: boolean = true): Promise<Dto | null> {
+    async update(entity: Partial<Entity> & Pick<Entity, "id">): Promise<Entity["id"]> {
         const { id, ...updateData } = entity;
 
         const result = await this.db
-        .updateTable(this.table as any)
-        .set(updateData as any)
-        .where("id" as any, "=", id as any)
-        .returning("id" as any)
+        .updateTable(this.table)
+        .set(updateData)
+        .where("id", "=", id as any)
+        .returning("id")
         .executeTakeFirst();
 
-        const updatedId = (result as any)?.id;
+        const updatedId = result?.id;
+        if(!updatedId) throw new Error(`Table item not found by ${ id } id. [${ this.table }]`);
 
-        if(safe && !updatedId) throw new Error(`Table item not found by ${ id } id. [${ this.table }]`);
-        if(!updatedId) return null;
-
-        return await this.getById(updatedId, safe);
+        return updatedId;
     }
 
-    async delete(id: string | number | null, safe: boolean = true): Promise<string | number | null> {
-        if(!id) return null;
+    async delete(id: string | number | null): Promise<Entity["id"]> {
+        if(!id) throw new Error(`Table item not found by ${ id }. [${ this.table }]`);
 
         const result = await this.db
-        .deleteFrom(this.table as any)
-        .where("id" as any, "=", id as any)
-        .returning("id" as any)
+        .deleteFrom(this.table)
+        .where("id", "=", id as any)
+        .returning("id")
         .executeTakeFirst();
 
-        const deletedId = (result as any)?.id;
+        const deletedId = result?.id;
+        if(!deletedId) throw new Error(`Table item not found by ${ id }. [${ this.table }]`);
 
-        if(safe && !deletedId) throw new Error(`Table item not found by ${ id }. [${ this.table }]`);
-
-        return deletedId ?? null;
+        return deletedId;
     }
 }

@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useAppDispatch } from "../../../../../../hooks";
+import React, { useEffect } from "react";
 import { useAlert } from "../../../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { useDatabase } from "../../../../../../contexts/database/DatabaseContext.ts";
@@ -7,61 +6,55 @@ import {
     OdometerChangeLogFormFields,
     useCreateOdometerChangeLogFormProps
 } from "../../schemas/form/odometerChangeLogForm.ts";
-import { updateCarOdometer } from "../../../../model/slice";
 import { FormState, useForm, useWatch } from "react-hook-form";
-import useCars from "../../../../hooks/useCars.ts";
 import { Car } from "../../../../schemas/carSchema.ts";
 import { useOdometerLogFormFields } from "../../hooks/useOdometerLogFormFields.tsx";
 import Form from "../../../../../../components/Form/Form.tsx";
 import { CreateToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast";
 import { useTranslation } from "react-i18next";
 import { SubmitHandlerArgs } from "../../../../../../types";
+import { useCar } from "../../../../hooks/useCar.ts";
 
 type CreateOdometerLogFormProps = {
-    defaultCarId?: string
+    defaultCar: Car | null
     onFormStateChange?: (formState: FormState<OdometerChangeLogFormFields>) => void
 }
 
-export function CreateOdometerChangeLogForm({ defaultCarId, onFormStateChange }: CreateOdometerLogFormProps) {
-    const dispatch = useAppDispatch();
+export function CreateOdometerChangeLogForm({ defaultCar, onFormStateChange }: CreateOdometerLogFormProps) {
     const { t } = useTranslation();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
     const { odometerLogDao } = useDatabase();
-    const { selectedCar, getCar } = useCars();
-
-    const [car, setCar] = useState<Car | null>(defaultCarId ? getCar(defaultCarId) ?? selectedCar : selectedCar);
 
     const form = useForm<OdometerChangeLogFormFields, any, OdometerChangeLogFormFields>(
-        useCreateOdometerChangeLogFormProps(car));
+        useCreateOdometerChangeLogFormProps(defaultCar));
     const { control, setValue, clearErrors, getFieldState } = form;
-    const { fullForm } = useOdometerLogFormFields({ ...form, defaultCarId });
+    const { fullForm } = useOdometerLogFormFields({ form });
 
     const formCarId = useWatch({ control, name: "carId" });
+    const { car } = useCar({ carId: formCarId, options: { queryOnce: true } });
 
     useEffect(() => {
-        const car = getCar(formCarId);
-        setCar(car ?? null);
+        if(formCarId !== car?.id) return;
+
         setValue("conversionFactor", car?.odometer.unit.conversionFactor ?? 1);
         clearErrors();
-    }, [formCarId]);
+    }, [formCarId, car]);
 
     useEffect(() => {
+        if(formCarId !== car?.id) return;
+
         if(car && !getFieldState("value").isDirty) {
             setValue("value", car.odometer.value ?? 0);
         }
-    }, [car?.odometer.value]);
+    }, [formCarId, car?.odometer.value]);
 
     const submitHandler: SubmitHandlerArgs<OdometerChangeLogFormFields> = {
         onValid: async (formResult) => {
             try {
-                const result = await odometerLogDao.createOdometerChangeLog(formResult);
-                const odometer = await odometerLogDao.getOdometerByCarId(result.carId);
-
-                dispatch(updateCarOdometer({ odometer }));
+                await odometerLogDao.createOdometerChangeLog(formResult);
 
                 openToast(CreateToast.success(t("odometer.log")));
-
                 if(dismissBottomSheet) dismissBottomSheet(true);
             } catch(e) {
                 openToast(CreateToast.error(t("odometer.log")));

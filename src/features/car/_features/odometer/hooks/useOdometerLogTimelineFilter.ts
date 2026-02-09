@@ -3,30 +3,39 @@ import { useEffect, useState } from "react";
 import { OdometerLogTypeEnum } from "../model/enums/odometerLogTypeEnum.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { OdometerLogType } from "../schemas/odometerLogTypeSchema.ts";
-import { Car } from "../../../schemas/carSchema.ts";
-import { SelectOdometerLogTableRow } from "../model/dao/OdometerLogDao.ts";
-import { TimelineFilterManagement } from "../../../../../hooks/useTimelinePaginator.ts";
 import { useTranslation } from "react-i18next";
-import { FilterCondition } from "../../../../../database/paginator/AbstractPaginator.ts";
+import { SelectQueryBuilder } from "kysely";
+import { ExtractColumnsFromQuery, FilterCondition } from "../../../../../database/hooks/useInfiniteQuery.ts";
+import { FilterManager } from "../../../../../database/hooks/useFilters.ts";
+import { CAR_TABLE } from "../../../../../database/connector/powersync/tables/car.ts";
 
 const TYPES_FILTER_KEY = "type_filter";
-const TYPES_FILTER_FIELD_NAME = "type_id" as keyof SelectOdometerLogTableRow;
 
-type UseOdometerLogTimelineFilterProps = {
-    timelineFilterManagement: TimelineFilterManagement<SelectOdometerLogTableRow>
-    car: Car
+type UseOdometerLogTimelineFilterProps<
+    QueryBuilder extends SelectQueryBuilder<any, any, any>,
+    Columns = ExtractColumnsFromQuery<QueryBuilder>
+> = {
+    filterManager: FilterManager<QueryBuilder, Columns>,
+    carId: string,
+    carFilterFieldName: Columns,
+    typesFilterFieldName: Columns,
 }
 
-export function useOdometerLogTimelineFilter({
-    timelineFilterManagement: {
+export function useOdometerLogTimelineFilter<
+    QueryBuilder extends SelectQueryBuilder<any, any, any>,
+    Columns = ExtractColumnsFromQuery<QueryBuilder>
+>({
+    filterManager: {
         filters,
         addFilter,
         replaceFilter,
         removeFilter,
         clearFilters
     },
-    car
-}: UseOdometerLogTimelineFilterProps) {
+    carId,
+    carFilterFieldName,
+    typesFilterFieldName
+}: UseOdometerLogTimelineFilterProps<QueryBuilder, Columns>) {
     const { t } = useTranslation();
     const { odometerLogTypeDao } = useDatabase();
 
@@ -43,7 +52,7 @@ export function useOdometerLogTimelineFilter({
                 if(a.id === OdometerLogTypeEnum.SIMPLE) return -1;
                 if(b.id === OdometerLogTypeEnum.SIMPLE) return 1;
 
-                return t(`fuel.types.${ a.key }`).localeCompare(t(`fuel.types.${ a.key }`));
+                return t(`odometer.types.${ a.key }`).localeCompare(t(`odometer.types.${ a.key }`));
             });
 
             setTypes(sorted);
@@ -59,23 +68,26 @@ export function useOdometerLogTimelineFilter({
                     const ids: Array<OdometerLogType["id"]> = [];
 
                     item.filters.forEach(filter => {
-                        if(filter.field === TYPES_FILTER_FIELD_NAME) ids.push(filter.value);
+                        if(filter.field === typesFilterFieldName) ids.push(filter.value);
                     });
 
                     setSelectedTypesId(ids);
                     break;
             }
         }));
-    }, [filters]);
+    }, [filters, typesFilterFieldName]);
 
     useEffect(() => {
-        replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: car.id } });
-    }, [car]);
+        if(carId) replaceFilter({
+            groupKey: CAR_TABLE,
+            filter: { field: carFilterFieldName, operator: "=", value: carId }
+        });
+    }, [carId, carFilterFieldName]);
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {
         const active = selectedTypesId.includes(type.id);
-        const filter: FilterCondition<SelectOdometerLogTableRow> = {
-            field: TYPES_FILTER_FIELD_NAME,
+        const filter: FilterCondition<QueryBuilder, Columns> = {
+            field: typesFilterFieldName,
             operator: "=",
             value: type.id
         };

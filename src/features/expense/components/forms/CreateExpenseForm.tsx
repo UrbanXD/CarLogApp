@@ -1,4 +1,3 @@
-import useCars from "../../../car/hooks/useCars.ts";
 import React from "react";
 import { FormState, useForm } from "react-hook-form";
 import { ExpenseFormFields, useCreateExpenseFormProps } from "../../schemas/form/expenseForm.ts";
@@ -10,28 +9,27 @@ import Form from "../../../../components/Form/Form.tsx";
 import { CreateToast, InvalidFormToast } from "../../../../ui/alert/presets/toast";
 import { useTranslation } from "react-i18next";
 import { SubmitHandlerArgs } from "../../../../types";
+import { Car } from "../../../car/schemas/carSchema.ts";
 
 type CreateExpenseFormProps = {
+    car: Car | null
     onFormStateChange?: (formState: FormState<ExpenseFormFields>) => void
 }
 
-export function CreateExpenseForm({ onFormStateChange }: CreateExpenseFormProps) {
+export function CreateExpenseForm({ car, onFormStateChange }: CreateExpenseFormProps) {
     const { t } = useTranslation();
     const { openToast } = useAlert();
     const { dismissBottomSheet } = useBottomSheet();
     const { expenseDao } = useDatabase();
-    const { selectedCar } = useCars();
-
-    const form = useForm<ExpenseFormFields, any, ExpenseFormFields>(useCreateExpenseFormProps(selectedCar));
+    const form = useForm<ExpenseFormFields, any, ExpenseFormFields>(useCreateExpenseFormProps(car));
     const { fullForm } = useExpenseFormFields(form);
 
     const submitHandler: SubmitHandlerArgs<ExpenseFormFields> = {
         onValid: async (formResult) => {
             try {
-                await expenseDao.create(formResult, true);
+                await expenseDao.createFromFormResult(formResult);
 
                 openToast(CreateToast.success(t("expenses.title_singular")));
-
                 if(dismissBottomSheet) dismissBottomSheet(true);
             } catch(e) {
                 openToast(CreateToast.error(t("fuel.title_singular")));

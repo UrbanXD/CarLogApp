@@ -1,29 +1,30 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { ICON_NAMES } from "../../constants/index.ts";
+import { ICON_NAMES } from "../../constants";
 import Button from "../Button/Button.ts";
 import Image from "../Image.tsx";
-import { Color, ImageSource, ViewStyle } from "../../types/index.ts";
+import { Color, ImageSource, ViewStyle } from "../../types";
+import { DebouncedPressable } from "../DebouncedPressable.tsx";
 
-interface AvatarImageProps {
-    path: string;
-    avatarSize?: number;
-    borderColor?: Color;
-    style?: ViewStyle;
-    onPress?: () => void;
-    badgeIcon?: ImageSource;
-    onPressBadge?: () => void;
+type AvatarImageProps = {
+    path: string
+    avatarSize?: number
+    borderColor?: Color
+    style?: ViewStyle
+    onPress?: () => void
+    badgeIcon?: ImageSource
+    onPressBadge?: () => void
 }
 
-const AvatarImage: React.FC<AvatarImageProps> = ({
+export default function AvatarImage({
     path,
     avatarSize = hp(5),
     borderColor,
     style,
     onPress,
     onPressBadge
-}) => {
+}: AvatarImageProps) {
     const BORDER_WIDTH = hp(1);
     const styles =
         useStyles(
@@ -33,10 +34,11 @@ const AvatarImage: React.FC<AvatarImageProps> = ({
         );
 
     return (
-        <TouchableOpacity
+        <DebouncedPressable
             style={ [styles.container, style] }
             onPress={ onPress }
             disabled={ !onPress }
+            debounceMs={ 1000 }
         >
             {
                 onPressBadge &&
@@ -52,15 +54,11 @@ const AvatarImage: React.FC<AvatarImageProps> = ({
                 alt={ ICON_NAMES.user }
                 imageStyle={ styles.image }
             />
-        </TouchableOpacity>
+        </DebouncedPressable>
     );
-};
+}
 
-const useStyles = (
-    avatarSize: number,
-    borderColor?: Color,
-    borderWidth?: number
-) => {
+function useStyles(avatarSize: number, borderColor?: Color, borderWidth?: number) {
     return StyleSheet.create({
         container: {
             width: avatarSize,
@@ -83,6 +81,4 @@ const useStyles = (
             zIndex: 1
         }
     });
-};
-
-export default AvatarImage;
+}

@@ -1,15 +1,19 @@
 import React, { useCallback } from "react";
 import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { StyleSheet, View } from "react-native";
-import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
-import { heightPercentageToDP } from "react-native-responsive-screen";
+import {
+    COLORS,
+    DEFAULT_SEPARATOR,
+    FLOATING_ACTION_BUTTON_SIZE,
+    FONT_SIZES,
+    SEPARATOR_SIZES
+} from "../../../constants";
 import { FloatingActionButton } from "./FloatingActionButton.tsx";
-import { AnimatedPressable, AnimatedSafeAreaView } from "../../../components/AnimatedComponents/index.ts";
+import { AnimatedPressable, AnimatedSafeAreaView } from "../../../components/AnimatedComponents";
 import { Overlay } from "../../../components/overlay/Overlay.tsx";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Action } from "../hooks/useActions.ts";
-import { debounce } from "es-toolkit";
-import { ViewStyle } from "../../../types/index.ts";
+import { ViewStyle } from "../../../types";
 
 type FloatingActionMenu = {
     action: (() => void) | Array<Action>
@@ -51,7 +55,7 @@ function FloatingActionMenu({ action, containerStyle }: FloatingActionMenu) {
                 index={ index + 1 }
                 icon={ action.icon }
                 label={ action.label }
-                onPress={ debounce(handlePress, 350) }
+                onPress={ handlePress }
             />
         );
     }, [isExpanded]);
@@ -85,7 +89,7 @@ const useStyles = (bottom: number) => StyleSheet.create({
     container: {
         position: "absolute",
         top: 0,
-        bottom: bottom + SEPARATOR_SIZES.small,
+        bottom: bottom,
         left: 0,
         right: DEFAULT_SEPARATOR,
         justifyContent: "flex-end",
@@ -101,8 +105,8 @@ const useStyles = (bottom: number) => StyleSheet.create({
     },
     actionButton: {
         zIndex: 1,
-        height: heightPercentageToDP(6),
-        width: heightPercentageToDP(6),
+        height: FLOATING_ACTION_BUTTON_SIZE,
+        width: FLOATING_ACTION_BUTTON_SIZE,
         borderRadius: 100,
         backgroundColor: COLORS.fuelYellow,
         borderColor: COLORS.black2,

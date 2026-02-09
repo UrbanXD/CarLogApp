@@ -2,7 +2,7 @@ const Database = require("better-sqlite3");
 const { createClient } = require("@supabase/supabase-js");
 const fs = require("fs");
 
-async function fetchInBatches(tableName) {
+async function fetchInBatches(tableName: string) {
     let allData = [];
     let from = 0;
     const step = 1000;
@@ -78,7 +78,7 @@ async function generateSeed() {
     const makes = await fetchInBatches("make");
     if(makes.length > 0) {
         const insert = db.prepare("INSERT OR REPLACE INTO make (id, name) VALUES (@id, @name)");
-        const insertMany = db.transaction((rows) => {
+        const insertMany = db.transaction((rows: any[]) => {
             for(const row of rows) insert.run(row);
         });
         insertMany(makes);
@@ -91,7 +91,7 @@ async function generateSeed() {
         const insert = db.prepare(
             "INSERT OR REPLACE INTO model (id, make_id, name, start_year, end_year) VALUES (@id, @make_id, @name, @start_year, @end_year)"
         );
-        const insertMany = db.transaction((rows) => {
+        const insertMany = db.transaction((rows: any[]) => {
             for(const row of rows) insert.run(row);
         });
         insertMany(models);

@@ -1,35 +1,44 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../../../../constants";
 import Input from "../../../../../../../components/Input/Input.ts";
 import { Control, FieldPathByValue, FieldValues, UseFormSetValue, useWatch } from "react-hook-form";
 import { formTheme } from "../../../../../../../ui/form/constants/theme.ts";
 import { useTranslation } from "react-i18next";
+import { useCar } from "../../../../../hooks/useCar.ts";
 
 type FuelInputProps<FormFieldValues extends FieldValues> = {
     control: Control<FormFieldValues>
     setValue: UseFormSetValue<FormFieldValues>
     fieldName: FieldPathByValue<FormFieldValues, number>
+    fuelUnitIdFieldName: FieldPathByValue<FormFieldValues, number>
+    carIdFieldName: FieldPathByValue<FormFieldValues, string>
     title?: string
     subtitle?: string
-    capacity: number
-    fuelTypeText?: string
-    unitText?: string
 }
 
 export function FuelInput<FormFieldValues extends FieldValues>({
     control,
     setValue,
     fieldName,
+    fuelUnitIdFieldName,
+    carIdFieldName,
     title,
-    subtitle,
-    capacity,
-    fuelTypeText,
-    unitText
+    subtitle
 }: FuelInputProps<FormFieldValues>) {
     const { t } = useTranslation();
 
+    const formCarId = useWatch({ control, name: carIdFieldName });
     const fuelValue = useWatch({ control, name: fieldName });
+
+    const { car } = useCar({ carId: formCarId, options: { queryOnce: true } });
+    const capacity = useMemo(() => car?.fuelTank.capacity ?? 0, [car?.fuelTank.capacity]);
+
+    useEffect(() => {
+        if(car && car.id === formCarId) {
+            setValue(fuelUnitIdFieldName, car.fuelTank.unit.id as any);
+        }
+    }, [car, formCarId, setValue]);
 
     const fuelingToFull = useCallback(() => {
         if(fuelValue === capacity) return;
@@ -47,18 +56,16 @@ export function FuelInput<FormFieldValues extends FieldValues>({
 
     const getFieldNameText = useCallback(() => {
         let fieldNameText = title ?? t("fuel.tank");
+        const fuelTypeText = car ? t(`fuel.types.${ car.fuelTank.type.key }`) : null;
+
         if(!fieldNameText && fuelTypeText) fieldNameText = fuelTypeText;
         if(fieldNameText && fuelTypeText) fieldNameText += ` (${ fuelTypeText })`;
 
-
         return fieldNameText;
-    }, [t, title, fuelTypeText]);
-
-    useEffect(() => {
-        console.log(fuelValue);
-    }, [fuelValue]);
+    }, [t, title, car]);
 
     const stepperButtons = [-10, -1, +1, +10];
+
     return (
         <Input.Field
             control={ control }
@@ -81,9 +88,9 @@ export function FuelInput<FormFieldValues extends FieldValues>({
                                     </Text>
                                 </Pressable>
                                 {
-                                    Math.floor(stepperButtons.length / 2) === index + 1 &&
+                                    Math.floor(stepperButtons.length / 2) === index + 1 && car &&
                                    <Text style={ styles.buttonText }>
-                                       { unitText }
+                                       { car.fuelTank.unit.short }
                                    </Text>
                                 }
                             </React.Fragment>
@@ -102,7 +109,7 @@ export function FuelInput<FormFieldValues extends FieldValues>({
             <Input.Slider
                 minValue={ 0 }
                 maxValue={ capacity }
-                unit={ unitText }
+                unit={ car?.fuelTank.unit.short }
                 tooltipAsInputField={ true }
                 style={ {
                     showsHandle: false,

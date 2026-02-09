@@ -1,11 +1,9 @@
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
-import useCars from "../../../../car/hooks/useCars.ts";
 import { useAlert } from "../../../../../ui/alert/hooks/useAlert.ts";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Car } from "../../../../car/schemas/carSchema.ts";
+import React, { useCallback, useMemo, useState } from "react";
 import { InfoRowProps } from "../../../../../components/info/InfoRow.tsx";
-import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
+import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants";
 import dayjs from "dayjs";
 import { ScreenScrollView } from "../../../../../components/screenView/ScreenScrollView.tsx";
 import { Title } from "../../../../../components/Title.tsx";
@@ -13,56 +11,33 @@ import { InfoContainer } from "../../../../../components/info/InfoContainer.tsx"
 import { FloatingDeleteButton } from "../../../../../components/Button/presets/FloatingDeleteButton.tsx";
 import { ServiceLog } from "../schemas/serviceLogSchema.ts";
 import { ServiceLogFormFieldsEnum } from "../enums/ServiceLogFormFieldsEnum.ts";
-import { Odometer } from "../../../../car/_features/odometer/schemas/odometerSchema.ts";
-import { updateCarOdometer } from "../../../../car/model/slice/index.ts";
 import { ExpandableList } from "../../../../../components/expandableList/ExpandableList.tsx";
 import { useServiceItemToExpandableList } from "../hooks/useServiceItemToExpandableList.ts";
-import { useAppDispatch } from "../../../../../hooks/index.ts";
 import { useTranslation } from "react-i18next";
-import { DeleteToast, NotFoundToast } from "../../../../../ui/alert/presets/toast/index.ts";
-import { DeleteModal } from "../../../../../ui/alert/presets/modal/index.ts";
+import { DeleteToast, NotFoundToast } from "../../../../../ui/alert/presets/toast";
+import { DeleteModal } from "../../../../../ui/alert/presets/modal";
+import { useWatchedQueryItem } from "../../../../../database/hooks/useWatchedQueryItem.ts";
 
 export type ServiceLogViewProps = {
     id: string
 }
 
 export function ServiceLogView({ id }: ServiceLogViewProps) {
-    const dispatch = useAppDispatch();
     const { t } = useTranslation();
-    const { serviceLogDao, odometerLogDao } = useDatabase();
-    const { getCar } = useCars();
+    const { serviceLogDao } = useDatabase();
     const { openModal, openToast } = useAlert();
     const { serviceItemToExpandableListItem } = useServiceItemToExpandableList();
 
-    const [car, setCar] = useState<Car | null>(null);
-    const [serviceLog, setServiceLog] = useState<ServiceLog | null>(null);
+    const memoizedQuery = useMemo(() => serviceLogDao.serviceLogWatchedQueryItem(id), [serviceLogDao, id]);
+    const { data: serviceLog, isLoading } = useWatchedQueryItem(memoizedQuery);
+
     const [isServiceItemListExpanded, setServiceItemListExpanded] = useState(false);
-
-    useFocusEffect(
-        useCallback(() => {
-            (async () => {
-                setServiceLog(await serviceLogDao.getById(id));
-            })();
-        }, [id, serviceLogDao])
-    );
-
-    useEffect(() => {
-        if(car?.id === serviceLog?.expense.carId || !serviceLog?.expense.carId) return;
-
-        setCar(getCar(serviceLog.expense.carId));
-    }, [serviceLog]);
 
     const handleDelete = useCallback(async (serviceLog: ServiceLog) => {
         try {
-            const resultId = await serviceLogDao.deleteLog(serviceLog);
-
-            let odometer: Odometer | null = null;
-            if(resultId && serviceLog.odometer?.carId) odometer = await odometerLogDao.getOdometerByCarId(serviceLog.odometer.carId);
-
-            if(odometer) dispatch(updateCarOdometer({ odometer }));
+            await serviceLogDao.deleteLog(serviceLog);
 
             openToast(DeleteToast.success(t("service.log")));
-
             if(router.canGoBack()) return router.back();
             router.replace("/(main)/expense");
         } catch(e) {
@@ -115,8 +90,8 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
             icon: ICON_NAMES.car,
-            title: car?.name,
-            content: `${ car?.model.make.name } ${ car?.model.name }`,
+            title: serviceLog?.car?.name,
+            content: `${ serviceLog?.car?.model.make.name } ${ serviceLog?.car?.model.name }`,
             onPress: () => onEdit(ServiceLogFormFieldsEnum.Car)
         },
         {
@@ -148,19 +123,20 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
             contentTextStyle: !serviceLog?.expense?.note ? { color: COLORS.gray2 } : undefined,
             onPress: () => onEdit(ServiceLogFormFieldsEnum.Note)
         }
-    ]), [car, serviceLog, isServiceItemListExpanded, getAmountSubtitle, t]);
+    ]), [serviceLog, isServiceItemListExpanded, getAmountSubtitle, t]);
 
     return (
         <>
             <ScreenScrollView screenHasTabBar={ false } style={ { paddingBottom: SEPARATOR_SIZES.small } }>
                 <Title
                     title={ t(`service.types.${ serviceLog?.serviceType.key }`) }
+                    onPress={ () => onEdit(ServiceLogFormFieldsEnum.Type) }
                     dividerStyle={ {
-                        backgroundColor: serviceLog?.expense.type?.primaryColor ?? COLORS.gray2,
+                        backgroundColor: serviceLog?.serviceType.primaryColor ?? COLORS.gray2,
                         marginBottom: SEPARATOR_SIZES.normal
                     } }
                 />
-                <InfoContainer data={ infos }/>
+                <InfoContainer data={ infos } isLoading={ isLoading }/>
             </ScreenScrollView>
             <FloatingDeleteButton onPress={ onDelete }/>
         </>

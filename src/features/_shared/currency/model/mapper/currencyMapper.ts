@@ -8,7 +8,7 @@ export class CurrencyMapper extends AbstractMapper<CurrencyTableRow, Currency> {
         super();
     }
 
-    async toDto(entity: CurrencyTableRow): Promise<Currency> {
+    toDto(entity: CurrencyTableRow): Currency {
         return currencySchema.parse({
             id: entity.id,
             key: entity.key,
@@ -16,7 +16,7 @@ export class CurrencyMapper extends AbstractMapper<CurrencyTableRow, Currency> {
         });
     }
 
-    async toEntity(dto: Currency): Promise<CurrencyTableRow> {
+    toEntity(dto: Currency): CurrencyTableRow {
         return {
             id: dto.id as never,
             key: dto.key,
@@ -24,17 +24,15 @@ export class CurrencyMapper extends AbstractMapper<CurrencyTableRow, Currency> {
         };
     }
 
-    dtoToPicker({ dtos, getControllerTitle, getTitle }: {
-        dtos: Array<Currency>,
-        getControllerTitle?: (dto: Currency) => string,
-        getTitle?: (dto: Currency) => string
-    }): Array<PickerItemType> {
-        return dtos.map(dto => {
-            return ({
-                value: dto.id.toString(),
-                controllerTitle: getControllerTitle?.(dto) ?? dto.symbol,
-                title: getTitle?.(dto) ?? getControllerTitle?.(dto) ?? dto.symbol
-            });
-        });
+    toPickerItem({ entity, getControllerTitle, getTitle }: {
+        entity: CurrencyTableRow,
+        getControllerTitle?: (entity: CurrencyTableRow) => string,
+        getTitle?: (entity: CurrencyTableRow) => string
+    }): PickerItemType {
+        return {
+            value: String(entity.id),
+            controllerTitle: getControllerTitle?.(entity) ?? entity.symbol,
+            title: getTitle?.(entity) ?? getControllerTitle?.(entity) ?? entity.symbol
+        };
     }
 }

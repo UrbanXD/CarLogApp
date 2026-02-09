@@ -1,5 +1,5 @@
-import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
-import React, { Ref, useCallback, useState } from "react";
+import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import { TimelineItem, TimelineItemType } from "./item/TimelineItem.tsx";
 import { FlashList, FlashListRef, ListRenderItemInfo } from "@shopify/flash-list";
@@ -9,18 +9,20 @@ import { LayoutChangeEvent, StyleSheet, View } from "react-native";
 import { FilterButton, FilterButtonProps } from "../filter/FilterButton.tsx";
 import { FilterRow } from "../filter/FilterRow.tsx";
 import { useTranslation } from "react-i18next";
-import { ViewStyle } from "../../types/index.ts";
+import { ViewStyle } from "../../types";
+import { useDelayedBoolean } from "../../hooks/useDelayedBoolean.ts";
 
 type TimelineViewProps = {
-    ref: Ref<FlashListRef<TimelineItemType>>
     data: Array<TimelineItemType>
     orderButtons?: Array<FilterButtonProps>
     filterButtons?: Array<FilterButtonProps>
-    isInitialFetching?: boolean
+    isLoading?: boolean
     fetchNext?: () => Promise<void>
-    fetchPrevious?: () => Promise<void>
+    fetchPrev?: () => Promise<void>
     isNextFetching?: boolean
-    isPreviousFetching?: boolean
+    isPrevFetching?: boolean
+    hasNext?: boolean
+    hasPrev?: boolean
     scrollHandler?: (event: RNNativeScrollEvent, context?: Record<string, unknown>) => void
     style?: ViewStyle
     filtersContainerStyle?: ViewStyle
@@ -29,22 +31,31 @@ type TimelineViewProps = {
 const DOT_ICON_SIZE = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE;
 
 function ITimelineView({
-    ref,
     data,
     orderButtons,
     filterButtons,
-    isInitialFetching,
+    isLoading,
     fetchNext,
-    fetchPrevious,
+    fetchPrev,
     isNextFetching,
-    isPreviousFetching,
+    isPrevFetching,
+    hasNext,
+    hasPrev,
     scrollHandler,
     style,
     filtersContainerStyle
 }: TimelineViewProps) {
     const { t } = useTranslation();
+    const showPrevLoading = useDelayedBoolean(!!isPrevFetching && !isLoading, 100);
+    const showNextLoading = useDelayedBoolean(!!isNextFetching && !isLoading, 100);
+
+    const ref = useRef<FlashListRef<TimelineItemType>>(null);
 
     const [filterRowsHeight, setFilterRowsHeight] = useState(0);
+
+    useEffect(() => {
+        if(!isLoading) ref.current?.scrollToTop();
+    }, [isLoading]);
 
     const renderItem = useCallback(({ item, index }: ListRenderItemInfo<TimelineItemType>) => (
         <TimelineItem
@@ -56,7 +67,7 @@ function ITimelineView({
     ), [data]);
 
     const renderListEmptyComponent = useCallback(() => {
-        if(isInitialFetching) return <MoreDataLoading text={ t("log.loading") }/>;
+        if(isLoading) return <MoreDataLoading text={ t("log.loading") }/>;
 
         return (
             <TimelineItem
@@ -68,19 +79,19 @@ function ITimelineView({
                 isLast
             />
         );
-    }, [isInitialFetching, t]);
+    }, [isLoading, t]);
 
     const renderHeader = useCallback(() => {
-        if(!isPreviousFetching) return <></>;
+        if(!showPrevLoading) return null;
 
         return <MoreDataLoading text={ t("log.previous_data_loading") }/>;
-    }, [isPreviousFetching, t]);
+    }, [showPrevLoading, t]);
 
     const renderFooter = useCallback(() => {
-        if(!isNextFetching) return <></>;
+        if(!showNextLoading) return null;
 
         return <MoreDataLoading text={ t("log.next_data_loading") }/>;
-    }, [isNextFetching, t]);
+    }, [showNextLoading, t]);
 
     const keyExtractor = useCallback((item: TimelineItemType) => item.id, []);
 
@@ -116,9 +127,9 @@ function ITimelineView({
                 ListEmptyComponent={ renderListEmptyComponent }
                 ListHeaderComponent={ renderHeader }
                 ListFooterComponent={ renderFooter }
-                onEndReached={ fetchNext }
+                onEndReached={ !isLoading && hasPrev ? fetchNext : undefined }
                 onEndReachedThreshold={ 0.5 }
-                onStartReached={ fetchPrevious }
+                onStartReached={ !isLoading && hasNext ? fetchPrev : undefined }
                 onStartReachedThreshold={ 0.5 }
                 keyboardDismissMode="on-drag"
                 contentContainerStyle={ [

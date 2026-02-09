@@ -1,22 +1,36 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import Divider from "./Divider.tsx";
 import { widthPercentageToDP } from "react-native-responsive-screen";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../constants";
 import React from "react";
-import { TextStyle, ViewStyle } from "../types/index.ts";
+import { TextStyle, ViewStyle } from "../types";
+import { DebouncedPressable } from "./DebouncedPressable.tsx";
 
 type TitleProps = {
     title: string
     subtitle?: string
+    onPress?: () => void
     containerStyle?: ViewStyle
     titleStyle?: TextStyle
     subtitleStyle?: TextStyle
     dividerStyle?: ViewStyle
 }
 
-export function Title({ title, subtitle, containerStyle, titleStyle, subtitleStyle, dividerStyle }: TitleProps) {
+export function Title({
+    title,
+    subtitle,
+    onPress,
+    containerStyle,
+    titleStyle,
+    subtitleStyle,
+    dividerStyle
+}: TitleProps) {
     return (
-        <View style={ [styles.container, containerStyle] }>
+        <DebouncedPressable
+            disabled={ !onPress }
+            onPress={ onPress }
+            style={ [styles.container, containerStyle] }
+        >
             <Text style={ [styles.title, titleStyle] }>{ title }</Text>
             {
                 subtitle &&
@@ -29,7 +43,7 @@ export function Title({ title, subtitle, containerStyle, titleStyle, subtitleSty
                 margin={ SEPARATOR_SIZES.lightSmall / 2 }
                 style={ [styles.divider, dividerStyle] }
             />
-        </View>
+        </DebouncedPressable>
     );
 }
 

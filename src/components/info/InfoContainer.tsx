@@ -3,11 +3,12 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import Divider from "../Divider.tsx";
 import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen";
-import { COLORS, SEPARATOR_SIZES } from "../../constants/index.ts";
-import { Color } from "../../types/index.ts";
+import { COLORS, SEPARATOR_SIZES } from "../../constants";
+import { Color } from "../../types";
 
 type InfoContainerProps = {
     data: Array<InfoRowProps>
+    isLoading?: boolean
     maxItemInRow?: number
     flexDirection?: "row" | "column"
     dividerColor?: Color
@@ -16,6 +17,7 @@ type InfoContainerProps = {
 
 export function InfoContainer({
     data,
+    isLoading,
     maxItemInRow = 1,
     flexDirection = "row",
     dividerColor = COLORS.gray3,
@@ -42,6 +44,7 @@ export function InfoContainer({
                                     <React.Fragment key={ index }>
                                         <InfoRow
                                             { ...item }
+                                            isLoading={ isLoading }
                                             containerStyle={ [containerStyle, item.containerStyle] }
                                             titleStyle={ [titleStyle, item.titleStyle] }
                                             contentTextStyle={ [contentTextStyle, item.contentTextStyle] }

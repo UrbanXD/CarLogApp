@@ -8,24 +8,29 @@ import {
 import { ServiceItemTypeMapper } from "../mapper/ServiceItemTypeMapper.ts";
 import { SERVICE_ITEM_TYPE_TABLE } from "../../../../../../database/connector/powersync/tables/serviceItemType.ts";
 import { Kysely } from "@powersync/kysely-driver";
-import { CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
 import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
 
 export class ServiceItemTypeDao extends Dao<ServiceItemTypeTableRow, ServiceItemType, ServiceItemTypeMapper> {
-    constructor(db: Kysely<DatabaseType>) {
-        super(db, SERVICE_ITEM_TYPE_TABLE, new ServiceItemTypeMapper());
+    constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
+        super(db, powersync, SERVICE_ITEM_TYPE_TABLE, new ServiceItemTypeMapper());
     }
 
-    async getIdByKey(key: string, safe: boolean = true): Promise<string | null> {
-        const result = await this.db
-        .selectFrom(SERVICE_ITEM_TYPE_TABLE)
-        .select("id")
-        .where("key", "=", key)
-        .executeTakeFirst();
-
-        if(safe && !result?.id) throw new Error(`Table item not found by ${ key } key. [${ SERVICE_ITEM_TYPE_TABLE }]`);
-
-        return result?.id ? result.id : null;
+    pickerInfiniteQuery(getTitle?: (entity: ServiceTypeTableRow) => string): UseInfiniteQueryOptions<ReturnType<ServiceItemTypeDao["selectQuery"]>, PickerItemType> {
+        return {
+            baseQuery: this.selectQuery(),
+            defaultCursorOptions: {
+                cursor: [
+                    { field: "key", order: "asc", toLowerCase: true },
+                    { field: "id", order: "asc" }
+                ],
+                defaultOrder: "asc"
+            },
+            idField: "id",
+            mappedItemId: "value",
+            mapper: (entity) => this.mapper.toPickerItem(entity, getTitle)
+        };
     }
 
     async delete(id: string): Promise<string> {
@@ -37,20 +42,5 @@ export class ServiceItemTypeDao extends Dao<ServiceItemTypeTableRow, ServiceItem
         .executeTakeFirstOrThrow();
 
         return result.id;
-    }
-
-    paginator({ perPage = 20, getTitle }: {
-        perPage?: number,
-        getTitle?: (entity: ServiceTypeTableRow) => string
-    }): CursorPaginator<ServiceItemTypeTableRow, PickerItemType> {
-        return new CursorPaginator<ServiceItemTypeTableRow, PickerItemType>(
-            this.db,
-            SERVICE_ITEM_TYPE_TABLE,
-            { cursor: [{ field: "key" }, { field: "id" }], defaultOrder: "asc" },
-            {
-                perPage,
-                mapper: (entity) => this.mapper.entityToPickerItem(entity, getTitle)
-            }
-        );
     }
 }

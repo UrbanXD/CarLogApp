@@ -1,35 +1,29 @@
 import Input from "../../../../../components/Input/Input.ts";
-import { ICON_NAMES } from "../../../../../constants/index.ts";
-import { MoreDataLoading } from "../../../../../components/loading/MoreDataLoading.tsx";
-import React, { useEffect, useState } from "react";
-import { Control } from "react-hook-form";
-import { PickerItemType } from "../../../../../components/Input/picker/PickerItem.tsx";
-import useCars from "../../../hooks/useCars.ts";
+import { ICON_NAMES } from "../../../../../constants";
+import React, { useMemo } from "react";
+import { Control, FieldPathByValue, FieldValues } from "react-hook-form";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { useTranslation } from "react-i18next";
 
-type CarPickerInputProps = {
-    control: Control<any>
-    fieldName: string
+type CarPickerInputProps<FormFieldValues extends FieldValues> = {
+    control: Control<FormFieldValues>
+    fieldName: FieldPathByValue<FormFieldValues, string>
     title?: string
     subtitle?: string
 }
 
-export function CarPickerInput({
+export function CarPickerInput<FormFieldValues extends FieldValues>({
     control,
     fieldName,
     title,
     subtitle
-}: CarPickerInputProps) {
+}: CarPickerInputProps<FormFieldValues>) {
     const { t } = useTranslation();
-    const { cars } = useCars();
     const { carDao } = useDatabase();
 
-    const [carsData, setCarsData] = useState<Array<PickerItemType> | null>(null);
-
-    useEffect(() => {
-        setCarsData(carDao.mapper.dtoToPicker(cars));
-    }, [cars]);
+    const queryOptions = useMemo(() => {
+        return carDao.pickerInfiniteQuery();
+    }, [carDao]);
 
     return (
         <Input.Field
@@ -38,17 +32,12 @@ export function CarPickerInput({
             fieldNameText={ title ?? t("car.picker.title") }
             fieldInfoText={ subtitle }
         >
-            {
-                carsData
-                ?
-                <Input.Picker.Dropdown
-                    title={ title ?? t("car.picker.title") }
-                    data={ carsData }
-                    icon={ ICON_NAMES.car }
-                />
-                :
-                <MoreDataLoading/>
-            }
+            <Input.Picker.Dropdown<typeof queryOptions["baseQuery"]>
+                title={ title ?? t("car.picker.title") }
+                queryOptions={ queryOptions }
+                searchBy={ ["car.name", "model.name", "make.name"] }
+                icon={ ICON_NAMES.car }
+            />
         </Input.Field>
     );
 }

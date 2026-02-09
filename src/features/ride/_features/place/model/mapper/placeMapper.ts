@@ -5,7 +5,7 @@ import { Place, placeSchema } from "../../schemas/placeSchema.ts";
 import { PlaceFormFields } from "../../schemas/form/placeForm.ts";
 
 export class PlaceMapper extends AbstractMapper<PlaceTableRow, Place> {
-    async toDto(entity: PlaceTableRow): Promise<Place> {
+    toDto(entity: PlaceTableRow): Place {
         return placeSchema.parse({
             id: entity.id,
             ownerId: entity.owner_id,
@@ -13,7 +13,7 @@ export class PlaceMapper extends AbstractMapper<PlaceTableRow, Place> {
         });
     }
 
-    async toEntity(dto: Place): Promise<PlaceTableRow> {
+    toEntity(dto: Place): PlaceTableRow {
         return {
             id: dto.id,
             owner_id: dto.ownerId,
@@ -21,7 +21,7 @@ export class PlaceMapper extends AbstractMapper<PlaceTableRow, Place> {
         };
     }
 
-    async entityToPickerItem(entity: PlaceTableRow): Promise<PickerItemType> {
+    toPickerItem(entity: PlaceTableRow): PickerItemType {
         return {
             value: entity.id,
             title: entity.name

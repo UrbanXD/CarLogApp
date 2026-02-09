@@ -11,18 +11,13 @@ import { getToastMessage } from "../../ui/alert/utils/getToastMessage.ts";
 import { useAlert } from "../../ui/alert/hooks/useAlert.ts";
 import { SignInRequest } from "../../features/user/schemas/form/signInRequest.ts";
 import { SignUpRequest } from "../../features/user/schemas/form/signUpRequest.ts";
-import { deleteCars, resetCars, updateCars } from "../../features/car/model/slice";
-import { updateUser } from "../../features/user/model/slice";
+import { resetSelectedCar } from "../../features/car/model/slice";
 import { getUserLocalCurrency } from "../../features/_shared/currency/utils/getUserLocalCurrency.ts";
 import { useTranslation } from "react-i18next";
 import { OtpVerificationHandlerType } from "../../features/user/hooks/useOtpVerificationHandler.ts";
-import { CAR_TABLE } from "../../database/connector/powersync/tables/car.ts";
-import { DiffTriggerOperation, sanitizeSQL, sanitizeUUID, TriggerRemoveCallback } from "@powersync/react-native";
-import { USER_TABLE } from "../../database/connector/powersync/tables/user.ts";
-import { selectCar } from "../../features/car/model/actions/selectCar.ts";
 import { Directory } from "expo-file-system";
 import { INPUT_IMAGE_TEMP_DIR } from "../../components/Input/imagePicker/InputImagePicker.tsx";
-import { CarTableRow, UserTableRow } from "../../database/connector/powersync/AppSchema.ts";
+import { loadSelectedCar } from "../../features/car/model/actions/loadSelectedCar.ts";
 
 export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     children
@@ -31,22 +26,24 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     const dispatch = useAppDispatch();
     const { openToast } = useAlert();
     const database = useDatabase();
-    const { supabaseConnector, powersync, attachmentQueue, userDao, carDao } = database;
+    const { supabaseConnector, attachmentQueue } = database;
 
     const [session, setSession] = useState<Session | null>(null);
     const [authenticated, setAuthenticated] = useState<boolean | null>(null);
     const [notVerifiedEmail, setNotVerifiedEmail] = useState<string | null>(null);
 
     useEffect(() => {
-        database.init();
-
         const { data: authListener } = supabaseConnector.client.auth.onAuthStateChange(
             (event, supabaseSession) => {
                 if(event === "PASSWORD_RECOVERY") return;
 
                 if(!supabaseSession) {
+                    database.disconnect();
+
                     if(router.canDismiss()) router.dismissAll();
                     router.replace("/backToRootIndex");
+                } else {
+                    database.init();
                 }
 
                 setAuthenticated(!!supabaseSession);
@@ -61,114 +58,18 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         if(session && notVerifiedEmail && session.user.email === notVerifiedEmail) updateNotVerifiedEmail(null);
         if(!session) {
             fetchNotVerifiedEmail();
-            dispatch(resetCars());
+            dispatch(resetSelectedCar());
         }
 
         if(!session?.user.id) return;
+
+        dispatch(loadSelectedCar());
+
         const userId = session.user.id;
 
-        let unsubscribeUserTrigger: TriggerRemoveCallback | null = null;
-        let unsubscribeCarsTrigger: TriggerRemoveCallback | null = null;
-
-        const initTriggers = async () => {
-            await database.waitForInit();
-            await powersync.waitForReady();
-            await powersync.waitForFirstSync();
-
-            unsubscribeUserTrigger = await powersync.triggers.trackTableDiff({
-                source: USER_TABLE,
-                when: {
-                    [DiffTriggerOperation.INSERT]: sanitizeSQL`NEW.id = ${ sanitizeUUID(userId) }`,
-                    [DiffTriggerOperation.UPDATE]: sanitizeSQL`NEW.id = ${ sanitizeUUID(userId) }`,
-                    [DiffTriggerOperation.DELETE]: sanitizeSQL`OLD.id = ${ sanitizeUUID(userId) }`
-                },
-                onChange: async (context) => {
-                    const newUser = (await context.withDiff(`
-                        SELECT ${ USER_TABLE }.*
-                        FROM DIFF
-                                 JOIN ${ USER_TABLE } ON DIFF.id = ${ USER_TABLE }.id
-                        WHERE DIFF.id = '${ userId }'
-                    `))?.[0] ?? null;
-
-                    dispatch(updateUser({ user: newUser ? await userDao.mapper.toDto(newUser) : null }));
-                },
-                hooks: {
-                    beforeCreate: async (lockContext) => {
-                        const res = await lockContext.getOptional<UserTableRow>(`
-                            SELECT *
-                            FROM ${ USER_TABLE }
-                            WHERE id = '${ userId }'
-                        `);
-
-                        if(res) dispatch(updateUser({ user: await database.userDao.mapper.toDto(res) }));
-                    }
-                }
-            });
-
-            unsubscribeCarsTrigger = await powersync.triggers.trackTableDiff({
-                source: CAR_TABLE,
-                when: {
-                    [DiffTriggerOperation.INSERT]: sanitizeSQL`json_extract(NEW.data, '$.owner_id') = ${ sanitizeUUID(
-                        userId) }`,
-                    [DiffTriggerOperation.UPDATE]: sanitizeSQL`json_extract(NEW.data, '$.owner_id') = ${ sanitizeUUID(
-                        userId) }`,
-                    [DiffTriggerOperation.DELETE]: sanitizeSQL`json_extract(OLD.data, '$.owner_id') = ${ sanitizeUUID(
-                        userId) }`
-                },
-                onChange: async (context) => {
-                    const updatedDiffResult = await context.withDiff(`
-                        SELECT ${ CAR_TABLE }.*
-                        FROM DIFF
-                                 JOIN ${ CAR_TABLE } ON DIFF.id = ${ CAR_TABLE }.id
-                        WHERE ${ CAR_TABLE }.owner_id = '${ userId }'
-                          AND operation != '${ DiffTriggerOperation.DELETE }'
-                    `);
-
-                    const deletedDiffResult = await context.withDiff(`
-                        SELECT DIFF.id
-                        FROM DIFF
-                        WHERE operation = '${ DiffTriggerOperation.DELETE }'
-                    `);
-
-                    const updatedIds = new Set(updatedDiffResult.map(result => result.id));
-                    const realDeletes = deletedDiffResult.filter(result => !updatedIds.has(result.id));
-
-                    if(realDeletes.length > 0) {
-                        dispatch(deleteCars({ carIds: realDeletes.map(result => result.id) }));
-                    }
-
-                    if(updatedDiffResult.length > 0) {
-                        dispatch(updateCars({ cars: await carDao.mapper.toDtoArray(updatedDiffResult) }));
-                    }
-
-                    dispatch(selectCar());
-                },
-                hooks: {
-                    beforeCreate: async (lockContext) => {
-                        const result = await lockContext.getAll<CarTableRow>(`
-                            SELECT *
-                            FROM ${ CAR_TABLE } AS t1
-                            WHERE t1.owner_id = '${ userId }'
-                            ORDER BY t1.created_at
-                        `);
-
-                        const cars = await database.carDao.mapper.toDtoArray(result);
-                        dispatch(updateCars({ cars, shouldReplace: true }));
-                        dispatch(selectCar());
-                    }
-                }
-            });
-        };
-
-        initTriggers();
         if(attachmentQueue) attachmentQueue.cleanUpLocalFiles(userId);
         const inputImageTempDirectory = new Directory(INPUT_IMAGE_TEMP_DIR);
         if(inputImageTempDirectory.exists) inputImageTempDirectory.delete();
-
-        return () => {
-            if(unsubscribeUserTrigger) unsubscribeUserTrigger();
-            if(unsubscribeCarsTrigger) unsubscribeCarsTrigger();
-        };
     }, [session?.user.id]);
 
     const openAccountVerification = (email: string, automaticResend: boolean = false) => {
@@ -250,7 +151,6 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             if(error) throw error;
 
             if(!disabledToast) openToast(SignOutToast.success());
-            await database.disconnect();
         } catch(error) {
             if(disabledToast || !(error instanceof AuthError)) return; // if not auth error just skip
             openToast(getToastMessage({ messages: SignOutToast, error }));
@@ -320,6 +220,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
                 (session?.user.user_metadata?.provider ? [session.user.user_metadata.provider] : []);
 
             return {
+                sessionUserId: session?.user.id ?? null,
                 authenticated: authenticated,
                 hasPassword,
                 providers,
@@ -334,7 +235,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             };
         },
         [
-            session,
+            session?.user,
             authenticated,
             openAccountVerification,
             signUp,

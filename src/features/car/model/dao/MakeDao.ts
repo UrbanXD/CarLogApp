@@ -3,21 +3,30 @@ import { DatabaseType, MakeTableRow } from "../../../../database/connector/power
 import { MakeMapper } from "../mapper/makeMapper.ts";
 import { Make } from "../../schemas/makeSchema.ts";
 import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";
-import { CursorPaginator } from "../../../../database/paginator/CursorPaginator.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { UseInfiniteQueryOptions } from "../../../../database/hooks/useInfiniteQuery.ts";
 
 export class MakeDao extends Dao<MakeTableRow, Make, MakeMapper> {
-    constructor(db: Kysely<DatabaseType>) {
-        super(db, MAKE_TABLE, new MakeMapper());
+    constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
+        super(db, powersync, MAKE_TABLE, new MakeMapper());
     }
 
-    paginator(perPage: number = 50): CursorPaginator<MakeTableRow, PickerItemType> {
-        return new CursorPaginator<MakeTableRow, PickerItemType>(
-            this.db,
-            MAKE_TABLE,
-            { cursor: [{ field: "name", order: "asc", toLowerCase: true }, { field: "id" }], defaultOrder: "asc" },
-            { perPage, mapper: this.mapper.toPickerItem }
-        );
+    pickerInfiniteQuery(): UseInfiniteQueryOptions<ReturnType<MakeDao["selectQuery"]>, PickerItemType> {
+        return {
+            baseQuery: this.selectQuery(),
+            defaultCursorOptions: {
+                cursor: [
+                    { field: "name", order: "asc", toLowerCase: true },
+                    { field: "id", order: "asc" }
+                ],
+                defaultOrder: "asc"
+            },
+            idField: "id",
+            mapper: this.mapper.toPickerItem.bind(this.mapper),
+            mappedItemId: "value",
+            perPage: 50
+        };
     }
 }

@@ -1,36 +1,56 @@
-import React, { useCallback } from "react";
-import { Control } from "react-hook-form";
+import React, { useCallback, useEffect, useMemo } from "react";
+import {
+    Control,
+    FieldPath,
+    FieldPathByValue,
+    FieldValues,
+    UseFormGetFieldState,
+    UseFormSetValue,
+    useWatch
+} from "react-hook-form";
 import Input from "../../../../../../../components/Input/Input.ts";
-import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../../../../constants/index.ts";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../../../../../../constants";
 import { View } from "react-native";
 import { UnitText } from "../../../../../../../components/UnitText.tsx";
 import { useTranslation } from "react-i18next";
 import { formTheme } from "../../../../../../../ui/form/constants/theme.ts";
 import InputDatePicker from "../../../../../../../components/Input/datePicker/InputDatePicker.tsx";
 import { formatWithUnit } from "../../../../../../../utils/formatWithUnit.ts";
-import { OdometerLimit } from "../../../model/dao/OdometerLogDao.ts";
 import dayjs from "dayjs";
+import { useDatabase } from "../../../../../../../contexts/database/DatabaseContext.ts";
+import { useWatchedQueryItem } from "../../../../../../../database/hooks/useWatchedQueryItem.ts";
+import { useCar } from "../../../../../hooks/useCar.ts";
 
-type OdometerValueInputProps = {
-    control: Control<any>
-    odometerValueFieldName: string
+type OdometerValueInputProps<FormFieldValues extends FieldValues> = {
+    control: Control<FormFieldValues>
+    setValue: UseFormSetValue<FormFieldValues>
+    getFieldState: UseFormGetFieldState<FormFieldValues>
+    odometerValueFieldName: FieldPath<FormFieldValues>
+    idFieldName?: FieldPath<FormFieldValues>
+    carIdFieldName?: FieldPathByValue<FormFieldValues, string>
     odometerValueTitle?: string
     odometerValueSubtitle?: string
     odometerValueOptional?: boolean
     odometerValuePlaceholder?: string
-    dateFieldName?: string
+    dateFieldName?: FieldPath<FormFieldValues>
     dateTitle?: string
     dateSubtitle?: string
-    currentOdometerValueTranslationKey?: string
     currentOdometerValue?: number
-    odometerLimit?: OdometerLimit | null
-    unitText?: string
+    currentOdometerValueTranslationKey?: string
     showCurrentOdometerValueAsSubtitle?: boolean
+    showLimits?: boolean
+    skipLimitLogFieldNames?: Array<FieldPath<FormFieldValues>>
+    changeCarOdometerValueWhenInputNotTouched?: boolean
+    onValueChange?: (value: number) => void
 }
 
-export function OdometerValueInput({
+export function OdometerValueInput<FormFieldValues extends FieldValues>({
     control,
+    setValue,
+    getFieldState,
+    idFieldName,
     odometerValueFieldName,
+    carIdFieldName,
     odometerValueTitle,
     odometerValueSubtitle,
     odometerValueOptional,
@@ -38,19 +58,48 @@ export function OdometerValueInput({
     dateFieldName,
     dateTitle,
     dateSubtitle,
-    currentOdometerValueTranslationKey,
     currentOdometerValue,
-    odometerLimit,
-    unitText,
-    showCurrentOdometerValueAsSubtitle = false
-}: OdometerValueInputProps) {
+    currentOdometerValueTranslationKey,
+    showCurrentOdometerValueAsSubtitle = false,
+    showLimits = true,
+    skipLimitLogFieldNames,
+    changeCarOdometerValueWhenInputNotTouched = true,
+    onValueChange
+}: OdometerValueInputProps<FormFieldValues>) {
     const { t } = useTranslation();
+    const { odometerLogDao } = useDatabase();
+
+    const formId = useWatch({ control, name: idFieldName ?? "" as FieldPath<FormFieldValues> });
+    const formCarId = useWatch({ control, name: carIdFieldName ?? "" as FieldPath<FormFieldValues> });
+    const formOdometerValue = useWatch({ control, name: odometerValueFieldName });
+    const formDate = useWatch({ control, name: dateFieldName ?? "" as FieldPath<FormFieldValues> });
+    const formSkipLimitLogs = useWatch({ control, name: skipLimitLogFieldNames ?? [] });
+
+    const memoizedLimitQuery = useMemo(() => odometerLogDao.odometerLimitWatchedQueryItem(
+        formCarId,
+        formDate,
+        formSkipLimitLogs && formSkipLimitLogs.length > 0 ? [formId, ...formSkipLimitLogs] : [formId],
+        showLimits && formCarId
+    ), [odometerLogDao, formId, formCarId, formDate, formSkipLimitLogs, showLimits]);
+    const { data: odometerLimit } = useWatchedQueryItem(memoizedLimitQuery);
+    const { car } = useCar({ carId: formCarId, options: { queryOnce: true } });
+
+    useEffect(() => {
+        if(changeCarOdometerValueWhenInputNotTouched && !odometerValueOptional && car && car.id === formCarId && !getFieldState(
+            odometerValueFieldName).isDirty) {
+            setValue(odometerValueFieldName, car.odometer.value as any);
+        }
+    }, [formCarId, car?.id, car?.odometer?.value, changeCarOdometerValueWhenInputNotTouched]);
+
+    useEffect(() => {
+        if(onValueChange && formOdometerValue) onValueChange(formOdometerValue);
+    }, [onValueChange, formOdometerValue]);
 
     const getSubtitle = useCallback(
         () => {
             if(odometerValueSubtitle) return odometerValueSubtitle;
 
-            if(odometerLimit) {
+            if(showLimits && odometerLimit) {
                 let subtitle;
 
                 if(odometerLimit.min) {
@@ -98,10 +147,15 @@ export function OdometerValueInput({
                 return subtitle;
             }
 
-            if(showCurrentOdometerValueAsSubtitle && currentOdometerValue) {
+            if(showCurrentOdometerValueAsSubtitle && (car || currentOdometerValue)) {
                 return t(
                     currentOdometerValueTranslationKey ?? "odometer.current_value",
-                    { value: formatWithUnit(currentOdometerValue, unitText) }
+                    {
+                        value: formatWithUnit(
+                            currentOdometerValue ?? car?.odometer.value ?? 0,
+                            car?.odometer.unit.short
+                        )
+                    }
                 );
             }
 
@@ -111,9 +165,10 @@ export function OdometerValueInput({
             t,
             odometerValueSubtitle,
             odometerLimit,
-            showCurrentOdometerValueAsSubtitle,
+            showLimits,
+            car,
             currentOdometerValue,
-            unitText,
+            showCurrentOdometerValueAsSubtitle,
             currentOdometerValueTranslationKey
         ]
     );
@@ -148,9 +203,9 @@ export function OdometerValueInput({
                         />
                     </View>
                     {
-                        unitText &&
+                        car &&
                        <UnitText
-                          text={ unitText }
+                          text={ car.odometer.unit.short }
                           style={ { padding: SEPARATOR_SIZES.lightSmall } }
                        />
                     }

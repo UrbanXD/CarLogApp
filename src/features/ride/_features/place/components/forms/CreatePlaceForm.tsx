@@ -1,5 +1,3 @@
-import { useAppSelector } from "../../../../../../hooks/index.ts";
-import { getUser } from "../../../../../user/model/selectors/index.ts";
 import Form from "../../../../../../components/Form/Form.tsx";
 import React from "react";
 import Input from "../../../../../../components/Input/Input.ts";
@@ -7,6 +5,7 @@ import { useCreatePlace } from "../../hooks/useCreatePlace.ts";
 import { useTranslation } from "react-i18next";
 import { FormState } from "react-hook-form";
 import { PassengerFormFields } from "../../../passenger/schemas/form/passengerForm.ts";
+import { useAuth } from "../../../../../../contexts/auth/AuthContext.ts";
 
 type CreatePlaceFormProps = {
     onFormStateChange?: (formState: FormState<PassengerFormFields>) => void
@@ -14,10 +13,10 @@ type CreatePlaceFormProps = {
 
 export function CreatePlaceForm({ onFormStateChange }: CreatePlaceFormProps) {
     const { t } = useTranslation();
-    const user = useAppSelector(getUser);
-    if(!user) return <></>;
+    const { sessionUserId } = useAuth();
+    if(!sessionUserId) return null;
 
-    const { form, submitHandler } = useCreatePlace({ userId: user.id });
+    const { form, submitHandler } = useCreatePlace({ userId: sessionUserId });
 
     return (
         <Form

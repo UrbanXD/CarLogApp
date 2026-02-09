@@ -10,64 +10,100 @@ import {
 import { OdometerLogDao } from "../../../car/_features/odometer/model/dao/OdometerLogDao.ts";
 import { OdometerUnitDao } from "../../../car/_features/odometer/model/dao/OdometerUnitDao.ts";
 import { CarDao } from "../../../car/model/dao/CarDao.ts";
-import { Odometer } from "../../../car/_features/odometer/schemas/odometerSchema.ts";
 import { RideLog, rideLogSchema } from "../../schemas/rideLogSchema.ts";
-import { RidePassengerDao } from "../../_features/passenger/model/dao/ridePassengerDao.ts";
-import { RidePlaceDao } from "../../_features/place/model/dao/ridePlaceDao.ts";
-import { RideExpenseDao } from "../../_features/rideExpense/model/dao/rideExpenseDao.ts";
-import { RideExpense } from "../../_features/rideExpense/schemas/rideExpenseSchema.ts";
-import { RidePlace } from "../../_features/place/schemas/ridePlaceSchema.ts";
-import { RidePassenger } from "../../_features/passenger/schemas/ridePassengerSchema.ts";
 import { RideLogFormFields } from "../../schemas/form/rideLogForm.ts";
 import { OdometerLogTypeEnum } from "../../../car/_features/odometer/model/enums/odometerLogTypeEnum.ts";
-import { convertOdometerValueToKilometer } from "../../../car/_features/odometer/utils/convertOdometerUnit.ts";
-import { OdometerUnit } from "../../../car/_features/odometer/schemas/odometerUnitSchema.ts";
+import {
+    DrivingActivityTableRow,
+    RideFrequencyTableRow,
+    RideMostVisitedPlacesTableRow,
+    SelectRideLogTableRow,
+    SelectTimelineRideLogTableRow
+} from "../dao/rideLogDao.ts";
+import { RideExpenseMapper } from "../../_features/rideExpense/model/mapper/rideExpenseMapper.ts";
+import { RidePlaceMapper } from "../../_features/place/model/mapper/ridePlaceMapper.ts";
+import { RidePassengerMapper } from "../../_features/passenger/model/mapper/ridePassengerMapper.ts";
+import { carSimpleSchema } from "../../../car/schemas/carSchema.ts";
+import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
+import { MAX_EXCHANGE_RATE_DECIMAL } from "../../../../constants";
+import {
+    BarChartStatistics,
+    LineChartStatistics,
+    TopListStatistics
+} from "../../../../database/dao/types/statistics.ts";
+import { LineChartItem } from "../../../statistics/components/charts/LineChartView.tsx";
 
 export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
-    private readonly rideExpenseDao: RideExpenseDao;
-    private readonly ridePlaceDao: RidePlaceDao;
-    private readonly ridePassengerDao: RidePassengerDao;
+    private readonly rideExpenseMapper: RideExpenseMapper;
+    private readonly ridePlaceMapper: RidePlaceMapper;
+    private readonly ridePassengerMapper: RidePassengerMapper;
     private readonly odometerLogDao: OdometerLogDao;
     private readonly odometerUnitDao: OdometerUnitDao;
     private readonly carDao: CarDao;
 
     constructor(
-        rideExpenseDao: RideExpenseDao,
-        ridePlaceDao: RidePlaceDao,
-        ridePassengerDao: RidePassengerDao,
+        rideExpenseMapper: RideExpenseMapper,
+        ridePlaceMapper: RidePlaceMapper,
+        ridePassengerMapper: RidePassengerMapper,
         odometerLogDao: OdometerLogDao,
         odometerUnitDao: OdometerUnitDao,
         carDao: CarDao
     ) {
         super();
 
-        this.rideExpenseDao = rideExpenseDao;
-        this.ridePlaceDao = ridePlaceDao;
-        this.ridePassengerDao = ridePassengerDao;
+        this.rideExpenseMapper = rideExpenseMapper;
+        this.ridePlaceMapper = ridePlaceMapper;
+        this.ridePassengerMapper = ridePassengerMapper;
         this.odometerLogDao = odometerLogDao;
         this.odometerUnitDao = odometerUnitDao;
         this.carDao = carDao;
     }
 
-    async toDto(entity: RideLogTableRow): Promise<RideLog> {
-        const [rideExpenses, ridePlaces, ridePassengers, startOdometer, endOdometer]: [Array<RideExpense>, Array<RidePlace>, Array<RidePassenger>, Odometer | null, Odometer | null] = await Promise.all(
-            [
-                (async () => this.rideExpenseDao.getAllByRideLogId(entity.id))(),
-                (async () => this.ridePlaceDao.getAllByRideLogId(entity.id))(),
-                (async () => this.ridePassengerDao.getAllByRideLogId(entity.id))(),
-                (async () => {
-                    if(!entity.start_odometer_log_id || !entity.car_id) return null;
-                    return this.odometerLogDao.getOdometerByLogId(entity.start_odometer_log_id, entity.car_id);
-                })(),
-                (async () => {
-                    if(!entity.end_odometer_log_id || !entity.car_id) return null;
-                    return this.odometerLogDao.getOdometerByLogId(entity.end_odometer_log_id, entity.car_id);
-                })()
-            ]);
+    toDto(entity: SelectRideLogTableRow): RideLog {
+        const car = carSimpleSchema.parse({
+            id: entity.car_id,
+            name: entity.car_name,
+            model: {
+                id: entity.car_model_id,
+                name: entity.car_model_name,
+                year: entity.car_model_year,
+                make: {
+                    id: entity.car_make_id,
+                    name: entity.car_make_name
+                }
+            },
+            currency: {
+                id: entity.car_currency_id,
+                key: entity.car_currency_key,
+                symbol: entity.car_currency_symbol
+            }
+        });
+
+        const rideExpenses = this.rideExpenseMapper.toDtoArray(entity.expenses);
+        const ridePlaces = this.ridePlaceMapper.toDtoArray(entity.places);
+        const ridePassengers = this.ridePassengerMapper.toDtoArray(entity.passengers);
+        const startOdometer = this.odometerLogDao.mapper.toOdometerDto({
+            log_id: entity.start_odometer_log_id,
+            log_car_id: entity.car_id,
+            log_value: Math.round(entity.start_odometer_log_value ?? 0),
+            unit_id: entity.odometer_unit_id,
+            unit_key: entity.odometer_unit_key,
+            unit_short: entity.odometer_unit_short,
+            unit_conversion_factor: entity.odometer_unit_conversion_factor
+        });
+        const endOdometer = this.odometerLogDao.mapper.toOdometerDto({
+            log_id: entity.end_odometer_log_id,
+            log_car_id: entity.car_id,
+            log_value: Math.round(entity.end_odometer_log_value ?? 0),
+            unit_id: entity.odometer_unit_id,
+            unit_key: entity.odometer_unit_key,
+            unit_short: entity.odometer_unit_short,
+            unit_conversion_factor: entity.odometer_unit_conversion_factor
+        });
 
         return rideLogSchema.parse({
             id: entity.id,
-            carId: entity.car_id,
+            car: car,
             rideExpenses: rideExpenses,
             ridePassengers: ridePassengers,
             ridePlaces: ridePlaces,
@@ -79,16 +115,45 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         });
     }
 
-    async toEntity(dto: RideLog): Promise<RideLogTableRow> {
+    timelineEntityToDto(entity: SelectTimelineRideLogTableRow): RideLog {
+        return this.toDto({ ...entity, places: [], expenses: [], passengers: [] });
+    }
+
+    toEntity(dto: RideLog): RideLogTableRow {
         return {
             id: dto.id,
-            car_id: dto.carId,
+            car_id: dto.car.id,
             start_odometer_log_id: dto.startOdometer?.id ?? null,
             end_odometer_log_id: dto.endOdometer?.id ?? null,
             start_time: dto.startTime,
             end_time: dto.endTime,
             note: dto.note
         };
+    }
+
+    mostVisitedPlacesToTopListStatistics(entities: Array<RideMostVisitedPlacesTableRow>): TopListStatistics {
+        return entities.map(entity => ({
+            count: Number(entity?.count ?? 0),
+            name: entity.name ?? ""
+        }));
+    }
+
+    frequencyToBarChartStatistics(entities: Array<RideFrequencyTableRow>): BarChartStatistics {
+        return {
+            chartData: entities.map((entity) => ({
+                value: entity.count,
+                label: entity.time
+            }))
+        };
+    }
+
+    drivingActivityToLineChartStatistics(entities: Array<DrivingActivityTableRow>): LineChartStatistics {
+        const chartData: Array<LineChartItem> = entities.map((entity) => ({
+            value: entity.activity ?? undefined,
+            label: entity.time ?? undefined
+        }));
+
+        return { chartData };
     }
 
     async formResultToEntities(formResult: RideLogFormFields): Promise<{
@@ -100,7 +165,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         startOdometerLog: OdometerLogTableRow,
         endOdometerLog: OdometerLogTableRow
     }> {
-        const [ownerId, odometerUnit]: [string, OdometerUnit] = await Promise.all([
+        const [ownerId, odometerUnit] = await Promise.all([
             (async () => this.carDao.getCarOwnerById(formResult.carId))(),
             (async () => this.odometerUnitDao.getUnitByCarId(formResult.carId))()
         ]);
@@ -109,14 +174,14 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
             id: formResult.startOdometerLogId,
             car_id: formResult.carId,
             type_id: OdometerLogTypeEnum.RIDE,
-            value: convertOdometerValueToKilometer(formResult.startOdometerValue!, odometerUnit.conversionFactor)
+            value: Math.round(formResult.startOdometerValue * odometerUnit.conversionFactor)
         };
 
         const endOdometerLog: OdometerLogTableRow = {
             id: formResult.endOdometerLogId,
             car_id: formResult.carId,
             type_id: OdometerLogTypeEnum.RIDE,
-            value: convertOdometerValueToKilometer(formResult.endOdometerValue!, odometerUnit.conversionFactor)
+            value: Math.round(formResult.endOdometerValue * odometerUnit.conversionFactor)
         };
 
         const rideLog: RideLogTableRow = {
@@ -145,9 +210,8 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
                 car_id: formResult.carId,
                 type_id: item.expense.type.id,
                 currency_id: item.expense.amount.currency.id,
-                original_amount: item.expense.amount.amount,
-                amount: item.expense.amount.exchangedAmount,
-                exchange_rate: item.expense.amount.exchangeRate,
+                amount: numberToFractionDigit(item.expense.amount.amount),
+                exchange_rate: numberToFractionDigit(item.expense.amount.exchangeRate, MAX_EXCHANGE_RATE_DECIMAL),
                 note: item.expense.note,
                 date: item.expense.date
             });

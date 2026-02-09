@@ -5,10 +5,11 @@ import { Kysely } from "@powersync/kysely-driver";
 import { ODOMETER_UNIT_TABLE } from "../../../../../../database/connector/powersync/tables/odometerUnit.ts";
 import { OdometerUnit } from "../../schemas/odometerUnitSchema.ts";
 import { CAR_TABLE } from "../../../../../../database/connector/powersync/tables/car.ts";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
 
 export class OdometerUnitDao extends Dao<OdometerUnitTableRow, OdometerUnit, OdometerUnitMapper> {
-    constructor(db: Kysely<DatabaseType>) {
-        super(db, ODOMETER_UNIT_TABLE, new OdometerUnitMapper());
+    constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
+        super(db, powersync, ODOMETER_UNIT_TABLE, new OdometerUnitMapper());
     }
 
     async getUnitByCarId(carId: string): Promise<OdometerUnit> {

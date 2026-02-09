@@ -4,11 +4,12 @@ import { odometerSchema } from "../../../../car/_features/odometer/schemas/odome
 import { serviceTypeSchema } from "./serviceTypeSchema.ts";
 import { serviceItemSchema } from "./serviceItemSchema.ts";
 import { amountSchema } from "../../../../_shared/currency/schemas/amountSchema.ts";
+import { carSimpleSchema } from "../../../../car/schemas/carSchema.ts";
 
 export const serviceLogSchema = z
 .object({
     id: z.string().uuid(),
-    carId: z.string().uuid(),
+    car: carSimpleSchema,
     expense: expenseSchema,
     odometer: odometerSchema.nullable(),
     serviceType: serviceTypeSchema,

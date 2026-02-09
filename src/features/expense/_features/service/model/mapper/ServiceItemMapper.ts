@@ -12,16 +12,14 @@ import {
     ServiceItemFormTransformedFields,
     transformedServiceItemForm
 } from "../../schemas/form/serviceItemForm.ts";
-
-export type SelectServiceItemTableRow = ServiceItemTableRow & { car_currency_id: number | null }
+import { SelectServiceItemTableRow } from "../dao/ServiceItemDao.ts";
+import { SelectExpenseTableRow } from "../../../../model/mapper/expenseMapper.ts";
+import { WithPrefix } from "../../../../../../types";
+import { SelectCarModelTableRow } from "../../../../../car/model/dao/CarDao.ts";
+import { MAX_EXCHANGE_RATE_DECIMAL } from "../../../../../../constants";
 
 export type ServiceItemTotalAmountTableRow =
-    Pick<ServiceItemTableRow, "service_log_id" | "currency_id" | "exchange_rate">
-    &
-    {
-        total_amount: number,
-        exchanged_total_amount: number
-    }
+    Omit<SelectExpenseTableRow, "related_id" | "car_id" | "id" | "date" | "note" | "type_id" | "type_key" | "type_owner_id" | keyof WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">>
 
 export class ServiceItemMapper extends AbstractMapper<ServiceItemTableRow, ServiceItem, SelectServiceItemTableRow> {
     private readonly serviceItemTypeDao: ServiceItemTypeDao;
@@ -33,61 +31,69 @@ export class ServiceItemMapper extends AbstractMapper<ServiceItemTableRow, Servi
         this.currencyDao = currencyDao;
     }
 
-    async toDto(entity: SelectServiceItemTableRow): Promise<ServiceItem> {
-        const [type, carCurrency, currency]: [ServiceItemType | null, Currency | null, Currency | null] = await Promise.all(
-            [
-                this.serviceItemTypeDao.getById(entity.service_item_type_id),
-                this.currencyDao.getById(entity.car_currency_id),
-                this.currencyDao.getById(entity.currency_id)
-            ]
-        );
-
+    toDto(entity: SelectServiceItemTableRow): ServiceItem {
         return serviceItemSchema.parse({
             id: entity.id,
             carId: entity.car_id,
             serviceLogId: entity.service_log_id,
-            type: type,
+            type: this.serviceItemTypeDao.mapper.toDto({
+                id: entity.service_item_type_id!,
+                key: entity.type_key,
+                owner_id: entity.type_owner_id
+            }),
             quantity: entity.quantity,
             pricePerUnit: amountSchema.parse({
-                amount: numberToFractionDigit(entity.price_per_unit!),
-                exchangedAmount: numberToFractionDigit(entity.exchange_rate! * entity.price_per_unit!),
-                exchangeRate: numberToFractionDigit(entity.exchange_rate!),
-                currency: currency,
-                exchangeCurrency: carCurrency
+                amount: numberToFractionDigit(entity.price_per_unit ?? 0),
+                exchangedAmount: numberToFractionDigit(entity.exchanged_price_per_unit ?? 0),
+                exchangeRate: numberToFractionDigit(entity.exchange_rate ?? 1, MAX_EXCHANGE_RATE_DECIMAL),
+                currency: {
+                    id: entity.currency_id,
+                    key: entity.currency_key,
+                    symbol: entity.currency_symbol
+                },
+                exchangeCurrency: {
+                    id: entity.car_currency_id,
+                    key: entity.car_currency_key,
+                    symbol: entity.car_currency_symbol
+                }
             })
         });
     }
 
-    async toEntity(dto: ServiceItem): Promise<ServiceItemTableRow> {
+    toEntity(dto: ServiceItem): ServiceItemTableRow {
         return {
             id: dto.id,
             car_id: dto.carId,
             service_log_id: dto.serviceLogId,
             service_item_type_id: dto.type.id,
             currency_id: dto.pricePerUnit.currency.id,
-            exchange_rate: dto.pricePerUnit.exchangeRate,
-            quantity: dto.quantity,
-            price_per_unit: dto.pricePerUnit.amount
+            exchange_rate: numberToFractionDigit(dto.pricePerUnit.exchangeRate, MAX_EXCHANGE_RATE_DECIMAL),
+            quantity: numberToFractionDigit(dto.quantity),
+            price_per_unit: numberToFractionDigit(dto.pricePerUnit.amount)
         };
     }
 
-    async toTotalAmountArray(
-        carCurrencyId: number,
+    toTotalAmountArray(
         entities: Array<ServiceItemTotalAmountTableRow>
-    ): Promise<Array<Amount>> {
-        const carCurrency = await this.currencyDao.getById(carCurrencyId);
+    ): Array<Amount> {
         const result = [];
 
         for(const entity of entities) {
-            const currency = await this.currencyDao.getById(entity.currency_id);
-
             result.push(
                 amountSchema.parse({
-                    amount: numberToFractionDigit(entity.total_amount!),
-                    exchangedAmount: numberToFractionDigit(entity.exchanged_total_amount!),
-                    exchangeRate: numberToFractionDigit(entity.exchange_rate!),
-                    currency: currency,
-                    exchangeCurrency: carCurrency
+                    amount: numberToFractionDigit(entity.amount ?? 0),
+                    exchangedAmount: numberToFractionDigit(entity.exchanged_amount ?? 0),
+                    exchangeRate: numberToFractionDigit(entity.exchange_rate ?? 1, MAX_EXCHANGE_RATE_DECIMAL),
+                    currency: {
+                        id: entity.currency_id,
+                        key: entity.currency_key,
+                        symbol: entity.currency_symbol
+                    },
+                    exchangeCurrency: {
+                        id: entity.car_currency_id,
+                        key: entity.car_currency_key,
+                        symbol: entity.car_currency_symbol
+                    }
                 })
             );
         }
@@ -95,7 +101,7 @@ export class ServiceItemMapper extends AbstractMapper<ServiceItemTableRow, Servi
         return result;
     }
 
-    async formResultToDto(
+    async toFormTransformedFields(
         formResult: ServiceItemFormFields,
         carCurrencyId: number
     ): Promise<ServiceItemFormTransformedFields> {
@@ -110,14 +116,14 @@ export class ServiceItemMapper extends AbstractMapper<ServiceItemTableRow, Servi
         return transformedServiceItemForm.parse({
             id: formResult.id,
             type: type,
-            quantity: formResult.expense.quantity,
-            pricePerUnit: amountSchema.parse({
+            quantity: numberToFractionDigit(formResult.expense.quantity),
+            pricePerUnit: {
                 amount: numberToFractionDigit(formResult.expense.amount),
                 exchangedAmount: numberToFractionDigit(formResult.expense.exchangeRate * formResult.expense.amount),
-                exchangeRate: numberToFractionDigit(formResult.expense.exchangeRate),
+                exchangeRate: numberToFractionDigit(formResult.expense.exchangeRate, MAX_EXCHANGE_RATE_DECIMAL),
                 currency: currency,
                 exchangeCurrency: carCurrency
-            })
+            }
         });
     }
 }

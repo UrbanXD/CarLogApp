@@ -24,7 +24,7 @@ export function useCreatePlace({ userId, dismissSheet = true }: UseCreatePlacePr
     const submitHandler = (onDone?: () => void): SubmitHandlerArgs<PlaceFormFields> => ({
         onValid: async (formResult) => {
             try {
-                await placeDao.create(formResult);
+                await placeDao.createFromFormResult(formResult);
                 openToast(CreateToast.success(t("places.title_singular")));
 
                 onDone?.();

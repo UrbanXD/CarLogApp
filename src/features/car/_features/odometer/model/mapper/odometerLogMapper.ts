@@ -1,65 +1,98 @@
 import { OdometerLog, odometerLogSchema } from "../../schemas/odometerLogSchema.ts";
 import { OdometerChangeLogFormFields } from "../../schemas/form/odometerChangeLogForm.ts";
-import { convertOdometerValueFromKilometer, convertOdometerValueToKilometer } from "../../utils/convertOdometerUnit.ts";
 import { AbstractMapper } from "../../../../../../database/dao/AbstractMapper.ts";
 import {
     OdometerChangeLogTableRow,
     OdometerLogTableRow
 } from "../../../../../../database/connector/powersync/AppSchema.ts";
-import { OdometerUnitDao } from "../dao/OdometerUnitDao.ts";
 import { OdometerLogTypeDao } from "../dao/OdometerLogTypeDao.ts";
-import { OdometerUnit } from "../../schemas/odometerUnitSchema.ts";
-import { OdometerLogType } from "../../schemas/odometerLogTypeSchema.ts";
 import { Odometer, odometerSchema } from "../../schemas/odometerSchema.ts";
-import { SelectOdometerLogTableRow } from "../dao/OdometerLogDao.ts";
+import {
+    OdometerLimit,
+    SelectOdometerLimitTableRow,
+    SelectOdometerLogTableRow,
+    SelectOdometerTableRow
+} from "../dao/OdometerLogDao.ts";
+import { carSimpleSchema } from "../../../../schemas/carSchema.ts";
 
 export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, OdometerLog> {
-    private readonly odometerUnitDao: OdometerUnitDao;
     private readonly odometerLogTypeDao: OdometerLogTypeDao;
 
-    constructor(odometerUnitDao: OdometerUnitDao, odometerLogTypeDao: OdometerLogTypeDao) {
+    constructor(odometerLogTypeDao: OdometerLogTypeDao) {
         super();
-        this.odometerUnitDao = odometerUnitDao;
         this.odometerLogTypeDao = odometerLogTypeDao;
     }
 
-    async toDto(entity: SelectOdometerLogTableRow): Promise<OdometerLog> {
-        const [odometerUnit, odometerLogType]: [OdometerUnit, OdometerLogType | null] = await Promise.all([
-            this.odometerUnitDao.getUnitByCarId(entity.car_id!),
-            this.odometerLogTypeDao.getById(entity.type_id)
-        ]);
+    toDto(entity: SelectOdometerLogTableRow): OdometerLog {
+        const car = carSimpleSchema.parse({
+            id: entity.car_id,
+            name: entity.car_name,
+            model: {
+                id: entity.car_model_id,
+                name: entity.car_model_name,
+                year: entity.car_model_year,
+                make: {
+                    id: entity.car_make_id,
+                    name: entity.car_make_name
+                }
+            },
+            currency: {
+                id: entity.car_currency_id,
+                key: entity.car_currency_key,
+                symbol: entity.car_currency_symbol
+            }
+        });
+
+        const odometerLogType = this.odometerLogTypeDao.mapper.toDto({
+            id: entity.type_id as never,
+            key: entity.type_key
+        });
 
         return odometerLogSchema.parse({
             id: entity.id,
-            carId: entity.car_id,
+            car: car,
             relatedId: entity.related_id,
             type: odometerLogType,
-            valueInKm: entity.value!,
-            value: convertOdometerValueFromKilometer(entity.value!, odometerUnit.conversionFactor!),
-            unit: odometerUnit,
+            value: entity.value ?? 0,
+            unit: {
+                id: entity.unit_id,
+                key: entity.unit_key,
+                short: entity.unit_short,
+                conversionFactor: entity.unit_conversion_factor
+            },
             note: entity.note,
             date: entity.date
         });
     }
 
-    async toOdometerDto(entity: OdometerLogTableRow): Promise<Odometer> {
-        const odometerUnit = await this.odometerUnitDao.getUnitByCarId(entity.car_id!);
-
+    toOdometerDto(entity: SelectOdometerTableRow): Odometer {
         return odometerSchema.parse({
-            id: entity.id,
-            carId: entity.car_id,
-            valueInKm: entity.value,
-            value: convertOdometerValueFromKilometer(entity.value!, odometerUnit.conversionFactor!),
-            unit: odometerUnit
+            id: entity.log_id,
+            carId: entity.log_car_id,
+            value: entity.log_value ?? 0,
+            unit: {
+                id: entity.unit_id,
+                key: entity.unit_key,
+                short: entity.unit_short,
+                conversionFactor: entity.unit_conversion_factor
+            }
         });
     }
 
-    async toEntity(dto: OdometerLog): Promise<OdometerLogTableRow> {
+    toOdometerLimitDto(entity: SelectOdometerLimitTableRow): OdometerLimit {
+        return {
+            min: entity?.min_value ? { value: Number(entity.min_value), date: String(entity.min_date) } : null,
+            max: entity?.max_value ? { value: Number(entity.max_value), date: String(entity.max_date) } : null,
+            unitText: entity?.unit ?? ""
+        };
+    }
+
+    toEntity(dto: OdometerLog): OdometerLogTableRow {
         return {
             id: dto.id,
-            car_id: dto.carId,
+            car_id: dto.car.id,
             type_id: dto.type.id,
-            value: dto.valueInKm
+            value: Math.round(dto.value * dto.unit.conversionFactor)
         };
     }
 
@@ -71,7 +104,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
             odometerLog: {
                 id: formResult.id,
                 car_id: formResult.carId,
-                value: convertOdometerValueToKilometer(formResult.value, formResult.conversionFactor)
+                value: Math.round(formResult.value * formResult.conversionFactor)
             },
 
             odometerChangeLog: {

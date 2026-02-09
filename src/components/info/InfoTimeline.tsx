@@ -1,54 +1,72 @@
 import { FlashList, FlashListRef, ListRenderItemInfo } from "@shopify/flash-list";
 import { RNNativeScrollEvent } from "react-native-reanimated/lib/typescript/hook/commonTypes";
 import { StyleSheet, Text, View } from "react-native";
-import React, { Ref, useCallback } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { MoreDataLoading } from "../loading/MoreDataLoading.tsx";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../constants/index.ts";
+import {
+    COLORS,
+    FLOATING_ACTION_BUTTON_SIZE,
+    FONT_SIZES,
+    ICON_FONT_SIZE_SCALE,
+    ICON_NAMES,
+    SEPARATOR_SIZES
+} from "../../constants";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import Divider from "../Divider.tsx";
 import Icon from "../Icon.tsx";
 import FloatingActionMenu from "../../ui/floatingActionMenu/components/FloatingActionMenu.tsx";
 import { useTranslation } from "react-i18next";
-import { ViewStyle } from "../../types/index.ts";
+import { ViewStyle } from "../../types";
+import { useDelayedBoolean } from "../../hooks/useDelayedBoolean.ts";
 
 export type InfoTimelineItem = {
     id: string | number
     text: string
-    callback?: () => void
 }
 
 type InfoTimelineProps = {
-    ref: Ref<FlashListRef<any>>
     data: Array<InfoTimelineItem>
     openCreateForm: () => void
-    onEdit: (id: string | number, callback?: () => void) => void
-    onDelete: (id: string | number, callback?: () => void) => void
-    isInitialFetching?: boolean
+    onEdit: (id: string | number) => void
+    onDelete: (id: string | number) => void
+    isLoading?: boolean
     fetchNext?: () => Promise<void>
-    fetchPrevious?: () => Promise<void>
+    fetchPrev?: () => Promise<void>
     isNextFetching?: boolean
-    isPreviousFetching?: boolean
+    isPrevFetching?: boolean
+    hasNext?: boolean
+    hasPrev?: boolean
     scrollHandler?: (event: RNNativeScrollEvent, context?: Record<string, unknown>) => void
     notFoundText?: string
     style?: ViewStyle
 }
 
 function IInfoTimeline({
-    ref,
     data,
     openCreateForm,
     onEdit,
     onDelete,
-    isInitialFetching,
+    isLoading,
     fetchNext,
-    fetchPrevious,
+    fetchPrev,
     isNextFetching,
-    isPreviousFetching,
+    isPrevFetching,
+    hasNext,
+    hasPrev,
     scrollHandler,
     notFoundText,
     style
 }: InfoTimelineProps) {
     const { t } = useTranslation();
+
+    const showPrevLoading = useDelayedBoolean(!!isPrevFetching && !isLoading, 100);
+    const showNextLoading = useDelayedBoolean(!!isNextFetching && !isLoading, 100);
+
+    const ref = useRef<FlashListRef<InfoTimelineItem>>(null);
+
+    useEffect(() => {
+        if(!isLoading) ref.current?.scrollToTop();
+    }, [isLoading]);
 
     const renderItem = useCallback(({ item }: ListRenderItemInfo<InfoTimelineItem>) => (
         <View style={ itemStyles.container }>
@@ -58,35 +76,35 @@ function IInfoTimeline({
                     icon={ ICON_NAMES.pencil }
                     color={ COLORS.gray1 }
                     size={ FONT_SIZES.p3 * ICON_FONT_SIZE_SCALE }
-                    onPress={ () => onEdit(item?.id, item.callback) }
+                    onPress={ () => onEdit(item?.id) }
                 />
                 <Icon
                     icon={ ICON_NAMES.trashCan }
                     color={ COLORS.redLight }
                     size={ FONT_SIZES.p3 * ICON_FONT_SIZE_SCALE }
-                    onPress={ () => onDelete(item?.id, item.callback) }
+                    onPress={ () => onDelete(item?.id) }
                 />
             </View>
         </View>
     ), [onEdit, onDelete]);
 
     const renderListEmptyComponent = useCallback(() => {
-        if(isInitialFetching) return <MoreDataLoading/>;
+        if(isLoading) return <MoreDataLoading/>;
 
         return <Text style={ styles.notFoundText }>{ notFoundText ?? t("common.no_data_found") }</Text>;
-    }, [isInitialFetching, t]);
+    }, [isLoading, t]);
 
     const renderHeader = useCallback(() => {
-        if(!isPreviousFetching) return <></>;
+        if(!showPrevLoading) return <></>;
 
         return <MoreDataLoading/>;
-    }, [isPreviousFetching]);
+    }, [showNextLoading]);
 
     const renderFooter = useCallback(() => {
-        if(!isNextFetching) return <></>;
+        if(!showNextLoading) return <></>;
 
         return <MoreDataLoading/>;
-    }, [isNextFetching]);
+    }, [showNextLoading]);
 
     const renderSeparatorComponent = useCallback(() => {
         return (
@@ -112,9 +130,9 @@ function IInfoTimeline({
                 ListHeaderComponent={ renderHeader }
                 ListFooterComponent={ renderFooter }
                 ItemSeparatorComponent={ renderSeparatorComponent }
-                onEndReached={ fetchNext }
+                onEndReached={ !isLoading && hasPrev ? fetchNext : undefined }
                 onEndReachedThreshold={ 0.5 }
-                onStartReached={ fetchPrevious }
+                onStartReached={ !isLoading && hasNext ? fetchPrev : undefined }
                 onStartReachedThreshold={ 0.5 }
                 keyboardDismissMode="on-drag"
                 contentContainerStyle={ [style, styles.listContainer] }
@@ -152,7 +170,8 @@ const itemStyles = StyleSheet.create({
 
 const styles = StyleSheet.create({
     listContainer: {
-        flexGrow: 1
+        flexGrow: 1,
+        paddingBottom: FLOATING_ACTION_BUTTON_SIZE + SEPARATOR_SIZES.lightSmall
     },
     notFoundText: {
         backgroundColor: COLORS.black5,

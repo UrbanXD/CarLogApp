@@ -1,9 +1,9 @@
 import React from "react";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { COLORS } from "../../constants/index.ts";
+import { COLORS } from "../../constants";
 import getContrastingColor from "../../utils/colors/getContrastingColor.ts";
 import { StyleSheet, View } from "react-native";
-import { Color, ViewStyle } from "../../types/index.ts";
+import { Color, ViewStyle } from "../../types";
 
 interface AvatarSkeletonProps {
     avatarSize?: number;

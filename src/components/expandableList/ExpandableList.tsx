@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { useCallback } from "react";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import Button from "../Button/Button.ts";
 import { Amount } from "../../features/_shared/currency/schemas/amountSchema.ts";
@@ -8,7 +8,7 @@ import { useBottomSheetInternal, useBottomSheetScrollableCreator } from "@gorhom
 import { FlashList, ListRenderItemInfo } from "@shopify/flash-list";
 import { AmountText } from "../AmountText.tsx";
 import { ExpandableListItem, ExpandableListItemType } from "./ExpandableListItem.tsx";
-import { DropdownView } from "../dropdownView/DropdownView.tsx";
+import { ExpandableView } from "../expandableView/ExpandableView.tsx";
 import InputTitle from "../Input/common/InputTitle.tsx";
 import { useTranslation } from "react-i18next";
 
@@ -57,7 +57,7 @@ export function ExpandableList({
     const BottomSheetFlashListScrollable = bottomSheetInternal ? useBottomSheetScrollableCreator() : undefined;
 
     return (
-        <DropdownView expanded={ expanded }>
+        <ExpandableView expanded={ expanded }>
             <View style={ styles.topContainer }>
                 <View style={ { flexDirection: "row" } }>
                     {
@@ -107,7 +107,7 @@ export function ExpandableList({
                   <Text style={ [styles.label, styles.bottomContainerLabel] }>{ t("currency.total_cost") }</Text>
                </View>
             }
-        </DropdownView>
+        </ExpandableView>
     );
 }
 

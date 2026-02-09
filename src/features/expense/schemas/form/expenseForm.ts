@@ -12,7 +12,7 @@ import { DefaultValues, UseFormProps } from "react-hook-form";
 export const expenseForm = expenseSchema
 .pick({ id: true, note: true })
 .extend({
-    carId: zPickerRequiredString({ errorMessage: "error.car_picker_required" }).pipe(expenseSchema.shape.carId),
+    carId: zPickerRequiredString({ errorMessage: "error.car_picker_required" }).pipe(expenseSchema.shape.car.shape.id),
     typeId: zPickerRequiredString({ errorMessage: "error.type_picker_required" })
     .pipe(expenseSchema.shape.type.shape.id),
     expense: inputAmountSchema({
@@ -44,7 +44,7 @@ export function useCreateExpenseFormProps(car: Car | null): UseFormProps<Expense
 export function useEditExpenseFormProps(expense: Expense): UseFormProps<ExpenseFormFields, any, ExpenseFormFields> {
     const defaultValues: DefaultValues<ExpenseFormFields> = {
         id: expense.id,
-        carId: expense.carId,
+        carId: expense.car.id,
         typeId: expense.type.id,
         expense: {
             amount: expense.amount.amount,
@@ -54,6 +54,6 @@ export function useEditExpenseFormProps(expense: Expense): UseFormProps<ExpenseF
         note: expense.note,
         date: dayjs(expense.date).isValid() ? dayjs(expense.date).toISOString() : new Date().toISOString()
     };
-    
+
     return { defaultValues, resolver: zodResolver(expenseForm), mode: "onBlur" };
 }

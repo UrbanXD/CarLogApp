@@ -5,12 +5,12 @@ import { modelSchema } from "../modelSchema.ts";
 import { zImage, zNumber, zPickerRequiredNumber, zPickerRequiredString } from "../../../../types/zodTypes.ts";
 import { getUUID } from "../../../../database/utils/uuid.ts";
 import { currencySchema } from "../../../_shared/currency/schemas/currencySchema.ts";
-import { UserAccount } from "../../../user/schemas/userSchema.ts";
 import { getMediaType } from "../../../../database/utils/getFileExtension.ts";
 import { PhotoAttachmentQueue } from "../../../../database/connector/powersync/PhotoAttachmentQueue.ts";
 import { DefaultValues } from "react-hook-form";
 import { odometerLogSchema } from "../../_features/odometer/schemas/odometerLogSchema.ts";
 import { MIN_ODOMETER_VALUE } from "../../_features/odometer/utils/zodOdometerValidation.ts";
+import { useMemo } from "react";
 
 export const carFormSchema = carSchema
 .pick({ id: true, ownerId: true, name: true, createdAt: true })
@@ -51,36 +51,39 @@ export const carFormSchema = carSchema
 
 export type CarFormFields = z.infer<typeof carFormSchema>;
 
-export const useCreatCarFormProps = (user: UserAccount) => {
-    const defaultValues: DefaultValues<CarFormFields> = {
-        id: getUUID(),
-        ownerId: user.id,
-        name: "",
-        image: null,
-        model: {
-            id: "",
-            name: "",
-            makeId: "",
-            makeName: "",
-            year: ""
-        },
-        odometer: {
-            id: getUUID(),
-            odometerChangeLogId: getUUID(),
-            value: undefined,
-            unitId: undefined
-        },
-        currencyId: user.currency.id,
-        fuelTank: {
-            id: getUUID(),
-            typeId: undefined,
-            unitId: undefined,
-            capacity: undefined
-        },
-        createdAt: new Date().toISOString()
-    };
-
-    return { defaultValues, resolver: zodResolver(carFormSchema) };
+export const useCreatCarFormProps = (userId: string, currencyId: number) => {
+    return useMemo(() => {
+        return {
+            defaultValues: {
+                id: getUUID(),
+                ownerId: userId,
+                name: "",
+                image: null,
+                model: {
+                    id: "",
+                    name: "",
+                    makeId: "",
+                    makeName: "",
+                    year: ""
+                },
+                odometer: {
+                    id: getUUID(),
+                    odometerChangeLogId: getUUID(),
+                    value: undefined,
+                    unitId: undefined
+                },
+                currencyId: currencyId,
+                fuelTank: {
+                    id: getUUID(),
+                    typeId: undefined,
+                    unitId: undefined,
+                    capacity: undefined
+                },
+                createdAt: new Date().toISOString()
+            } as DefaultValues<CarFormFields>,
+            resolver: zodResolver(carFormSchema)
+        };
+    }, [userId]);
 };
 
 export const useEditCarFormProps = (car: Car, attachmentQueue?: PhotoAttachmentQueue) => {

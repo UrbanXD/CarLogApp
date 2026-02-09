@@ -1,12 +1,13 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { StyleSheet, Text, View } from "react-native";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../../constants";
 import Icon from "../../Icon.tsx";
 import React, { ReactNode } from "react";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 import Divider from "../../Divider.tsx";
 import { DashedLine } from "./DashedLine.tsx";
-import { Color } from "../../../types/index.ts";
+import { Color } from "../../../types";
 import getContrastingColor from "../../../utils/colors/getContrastingColor.ts";
+import { DebouncedPressable } from "../../DebouncedPressable.tsx";
 
 export type TimelineItemType = Omit<TimelineItemProps, "isFirst" | "isLast" | "iconSize">
 
@@ -60,7 +61,12 @@ export function TimelineItem({
                    <DashedLine/>
                 }
             </View>
-            <Pressable onPress={ onPress } disabled={ !onPress } style={ styles.card }>
+            <DebouncedPressable
+                onPress={ onPress }
+                disabled={ !onPress }
+                style={ styles.card }
+                debounceMs={ 1000 }
+            >
                 <View style={ styles.cardTitleContainer }>
                     {
                         typeof milestone === "string"
@@ -85,7 +91,7 @@ export function TimelineItem({
                         : footerText
                     )
                 }
-            </Pressable>
+            </DebouncedPressable>
         </View>
     );
 }

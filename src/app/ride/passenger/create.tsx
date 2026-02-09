@@ -1,5 +1,5 @@
 import {
-    PassengerBottomSheet
-} from "../../../features/ride/_features/passenger/presets/bottomSheet/PassengerBottomSheet.tsx";
+    CreatePassengerBottomSheet
+} from "../../../features/ride/_features/passenger/presets/bottomSheet/CreatePassengerBottomSheet.tsx";
 
-export default PassengerBottomSheet;
+export default CreatePassengerBottomSheet;

@@ -8,8 +8,8 @@ import Input from "../../../../../../components/Input/Input.ts";
 import { useBottomSheet } from "../../../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { Place } from "../../schemas/placeSchema.ts";
 import { useTranslation } from "react-i18next";
-import { EditToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast/index.ts";
-import { SubmitHandlerArgs } from "../../../../../../types/index.ts";
+import { EditToast, InvalidFormToast } from "../../../../../../ui/alert/presets/toast";
+import { SubmitHandlerArgs } from "../../../../../../types";
 
 type EditPlaceFormProps = {
     place: Place
@@ -27,7 +27,7 @@ export function EditPlaceForm({ place, onFormStateChange }: EditPlaceFormProps) 
     const submitHandler: SubmitHandlerArgs<PlaceFormFields> = {
         onValid: async (formResult: PlaceFormFields) => {
             try {
-                await placeDao.update(formResult);
+                await placeDao.updateFromFormResult(formResult);
 
                 openToast(EditToast.success());
 
@@ -49,7 +49,7 @@ export function EditPlaceForm({ place, onFormStateChange }: EditPlaceFormProps) 
             form={ form }
             formFields={
                 <Input.Field control={ form.control } fieldName={ "name" } fieldNameText={ t("places.title_singular") }>
-                    <Input.Text placeholder={ t("places.singular") }/>
+                    <Input.Text placeholder={ t("places.title_singular") }/>
                 </Input.Field>
             }
             submitHandler={ submitHandler }

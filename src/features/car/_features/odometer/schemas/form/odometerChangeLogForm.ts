@@ -14,7 +14,8 @@ import { DefaultValues, UseFormProps } from "react-hook-form";
 export const odometerChangeLogForm = (odometerLogDao: OdometerLogDao) => odometerLogSchema
 .pick({ id: true, note: true })
 .extend({
-    carId: zPickerRequiredString({ errorMessage: "error.car_picker_required" }).pipe(odometerLogSchema.shape.carId),
+    carId: zPickerRequiredString({ errorMessage: "error.car_picker_required" })
+    .pipe(odometerLogSchema.shape.car.shape.id),
     odometerChangeLogId: z.string().uuid(), //hidden
     value: zNumber({
             bounds: { min: MIN_ODOMETER_VALUE },
@@ -62,7 +63,7 @@ export const useEditOdometerChangeLogFormProps = (odometerLog: OdometerLog): Use
     const defaultValues: DefaultValues<OdometerChangeLogFormFields> = {
         id: odometerLog.id,
         odometerChangeLogId: odometerLog.relatedId ?? undefined,
-        carId: odometerLog.carId,
+        carId: odometerLog.car.id,
         value: odometerLog.value,
         note: odometerLog.note,
         date: dayjs(odometerLog.date).isValid() ? dayjs(odometerLog.date).toISOString() : new Date().toISOString(),

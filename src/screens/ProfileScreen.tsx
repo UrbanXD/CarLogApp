@@ -9,7 +9,7 @@ import {
     GLOBAL_STYLE,
     ICON_NAMES,
     SEPARATOR_SIZES
-} from "../constants/index.ts";
+} from "../constants";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Divider from "../components/Divider.tsx";
 import Button from "../components/Button/Button.ts";
@@ -17,20 +17,20 @@ import Avatar from "../components/Avatar/Avatar.ts";
 import { getLabelByName } from "../utils/getLabelByName.ts";
 import { useAuth } from "../contexts/auth/AuthContext.ts";
 import { Redirect, router } from "expo-router";
-import { useAppSelector } from "../hooks/index.ts";
-import { getUser } from "../features/user/model/selectors/index.ts";
-import { EDIT_USER_FORM_TYPE } from "../features/user/presets/bottomSheet/index.ts";
+import { EDIT_USER_FORM_TYPE } from "../features/user/presets/bottomSheet";
 import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
 import { FlagUs } from "../components/flags/FlagUs.tsx";
 import { FlagHu } from "../components/flags/FlagHu.tsx";
 import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AnimatedPressable } from "../components/AnimatedComponents/index.ts";
+import { AnimatedPressable } from "../components/AnimatedComponents";
 import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { useUser } from "../features/user/hooks/useUser.ts";
+import { MoreDataLoading } from "../components/loading/MoreDataLoading.tsx";
 
 const ProfileScreen: React.FC = () => {
     const { t, i18n } = useTranslation();
-    const user = useAppSelector(getUser);
+    const { user, isLoading } = useUser();
     const { hasPassword, signOut, deleteAccount } = useAuth();
     const { bottom } = useSafeAreaInsets();
 
@@ -75,10 +75,7 @@ const ProfileScreen: React.FC = () => {
     const huFlagStyle = useFlagStyle(["hu", "hu-HU"]);
     const styles = useStyles(bottom);
 
-    if(!user) return <Redirect href={ "backToRootIndex" }/>;
-
-    const name = `${ user.lastname } ${ user.firstname }`;
-    const avatarColor = user.avatarColor;
+    if(!user && !isLoading) return <Redirect href={ "backToRootIndex" }/>;
 
     return (
         <ScreenScrollView
@@ -87,114 +84,122 @@ const ProfileScreen: React.FC = () => {
             style={ { paddingBottom: 0, paddingHorizontal: 0 } }
         >
             <View style={ styles.container }>
-                <View style={ styles.informationContainer }>
-                    {
-                        user?.avatarPath
-                        ? <Avatar.Image
-                            path={ user.avatarPath }
-                            avatarSize={ hp(20) }
-                            borderColor={ COLORS.black5 }
-                            style={ styles.profileImage }
-                            onPressBadge={ openEditAvatar }
-                        />
-                        : <Avatar.Text
-                            label={ getLabelByName(name) }
-                            avatarSize={ hp(20) }
-                            backgroundColor={ avatarColor ?? undefined }
-                            borderColor={ COLORS.black5 }
-                            style={ styles.profileImage }
-                            onPressBadge={ openEditAvatar }
-                        />
-                    }
-                    <View style={ styles.textContainer }>
-                        <Text style={ styles.nameText }>
-                            { name }
-                        </Text>
-                        <Text style={ styles.emailText }>
-                            { user?.email }
-                        </Text>
-                        <View style={ styles.flagContainer }>
-                            <AnimatedPressable
-                                style={ enFlagStyle }
-                                onPress={ () => changeLanguage("en-US") }
-                            >
-                                <FlagUs width={ 36 } height={ 36 }/>
-                            </AnimatedPressable>
-                            <AnimatedPressable
-                                style={ huFlagStyle }
-                                onPress={ () => changeLanguage("hu-HU") }
-                            >
-                                <FlagHu width={ 36 } height={ 36 }/>
-                            </AnimatedPressable>
-                        </View>
-                    </View>
-                </View>
-                <View style={ styles.actionButtonsContainer }>
-                    <Button.Text
-                        iconLeft={ ICON_NAMES.settings }
-                        iconRight={ ICON_NAMES.rightArrowHead }
-                        text={ t("profile.personal_information") }
-                        textStyle={ { textAlign: "left" } }
-                        onPress={ openEditUserInformation }
-                        backgroundColor="transparent"
-                        fontSize={ FONT_SIZES.p1 }
-                        loadingIndicator
-                    />
-                    {/*<Divider/>*/ }
-                    {/*<Button.Text*/ }
-                    {/*    iconLeft={ ICON_NAMES.user }*/ }
-                    {/*    iconRight={ ICON_NAMES.rightArrowHead }*/ }
-                    {/*    text="Identity link"*/ }
-                    {/*    textStyle={ { textAlign: "left" } }*/ }
-                    {/*    onPress={ () => {*/ }
-                    {/*    } }*/ }
-                    {/*    backgroundColor="transparent"*/ }
-                    {/*    fontSize={ FONT_SIZES.p1 }*/ }
-                    {/*    loadingIndicator*/ }
-                    {/*/>*/ }
-                    <Divider/>
-                    <Button.Text
-                        iconLeft={ ICON_NAMES.email }
-                        iconRight={ ICON_NAMES.rightArrowHead }
-                        text={ t("profile.change_email") }
-                        textStyle={ { textAlign: "left" } }
-                        onPress={ openChangeEmail }
-                        backgroundColor="transparent"
-                        fontSize={ FONT_SIZES.p1 }
-                        loadingIndicator
-                    />
-                    <Divider/>
-                    <Button.Text
-                        iconLeft={ ICON_NAMES.password }
-                        iconRight={ ICON_NAMES.rightArrowHead }
-                        text={ hasPassword ? t("profile.change_password") : t("profile.add_password") }
-                        textStyle={ { textAlign: "left" } }
-                        onPress={ hasPassword ? openResetPassword : openLinkPasswordToOAuth }
-                        backgroundColor="transparent"
-                        fontSize={ FONT_SIZES.p1 }
-                        loadingIndicator
-                    />
-                    <Divider/>
-                    <Button.Text
-                        iconLeft={ ICON_NAMES.trashCan }
-                        iconRight={ ICON_NAMES.rightArrowHead }
-                        text={ t("profile.delete_account") }
-                        onPress={ deleteAccount }
-                        textStyle={ { textAlign: "left" } }
-                        backgroundColor="transparent"
-                        textColor={ COLORS.redLight }
-                        fontSize={ FONT_SIZES.p1 }
-                        loadingIndicator
-                    />
-                </View>
-                <Button.Text
-                    iconLeft={ ICON_NAMES.signOut }
-                    text={ t("profile.sign_out") }
-                    onPress={ signOut }
-                    backgroundColor={ COLORS.googleRed }
-                    textColor={ COLORS.black2 }
-                    fontSize={ FONT_SIZES.p1 }
-                />
+                {
+                    isLoading
+                    ? <MoreDataLoading text={ "Betotoes keciii" }/>
+                    : user
+                      ? <>
+                          <View style={ styles.informationContainer }>
+                              {
+                                  user?.avatarPath
+                                  ? <Avatar.Image
+                                      path={ user.avatarPath }
+                                      avatarSize={ hp(20) }
+                                      borderColor={ COLORS.black5 }
+                                      style={ styles.profileImage }
+                                      onPressBadge={ openEditAvatar }
+                                  />
+                                  : <Avatar.Text
+                                      label={ getLabelByName(`${ user.firstname } ${ user.lastname }`) }
+                                      avatarSize={ hp(20) }
+                                      backgroundColor={ user.avatarColor ?? undefined }
+                                      borderColor={ COLORS.black5 }
+                                      style={ styles.profileImage }
+                                      onPressBadge={ openEditAvatar }
+                                  />
+                              }
+                              <View style={ styles.textContainer }>
+                                  <Text style={ styles.nameText }>
+                                      { `${ user.lastname } ${ user.firstname }` }
+                                  </Text>
+                                  <Text style={ styles.emailText }>
+                                      { user?.email }
+                                  </Text>
+                                  <View style={ styles.flagContainer }>
+                                      <AnimatedPressable
+                                          style={ enFlagStyle }
+                                          onPress={ () => changeLanguage("en-US") }
+                                      >
+                                          <FlagUs width={ 36 } height={ 36 }/>
+                                      </AnimatedPressable>
+                                      <AnimatedPressable
+                                          style={ huFlagStyle }
+                                          onPress={ () => changeLanguage("hu-HU") }
+                                      >
+                                          <FlagHu width={ 36 } height={ 36 }/>
+                                      </AnimatedPressable>
+                                  </View>
+                              </View>
+                          </View>
+                          <View style={ styles.actionButtonsContainer }>
+                              <Button.Text
+                                  iconLeft={ ICON_NAMES.settings }
+                                  iconRight={ ICON_NAMES.rightArrowHead }
+                                  text={ t("profile.personal_information") }
+                                  textStyle={ { textAlign: "left" } }
+                                  onPress={ openEditUserInformation }
+                                  backgroundColor="transparent"
+                                  fontSize={ FONT_SIZES.p1 }
+                                  loadingIndicator
+                              />
+                              {/*<Divider/>*/ }
+                              {/*<Button.Text*/ }
+                              {/*    iconLeft={ ICON_NAMES.user }*/ }
+                              {/*    iconRight={ ICON_NAMES.rightArrowHead }*/ }
+                              {/*    text="Identity link"*/ }
+                              {/*    textStyle={ { textAlign: "left" } }*/ }
+                              {/*    onPress={ () => {*/ }
+                              {/*    } }*/ }
+                              {/*    backgroundColor="transparent"*/ }
+                              {/*    fontSize={ FONT_SIZES.p1 }*/ }
+                              {/*    loadingIndicator*/ }
+                              {/*/>*/ }
+                              <Divider/>
+                              <Button.Text
+                                  iconLeft={ ICON_NAMES.email }
+                                  iconRight={ ICON_NAMES.rightArrowHead }
+                                  text={ t("profile.change_email") }
+                                  textStyle={ { textAlign: "left" } }
+                                  onPress={ openChangeEmail }
+                                  backgroundColor="transparent"
+                                  fontSize={ FONT_SIZES.p1 }
+                                  loadingIndicator
+                              />
+                              <Divider/>
+                              <Button.Text
+                                  iconLeft={ ICON_NAMES.password }
+                                  iconRight={ ICON_NAMES.rightArrowHead }
+                                  text={ hasPassword ? t("profile.change_password") : t("profile.add_password") }
+                                  textStyle={ { textAlign: "left" } }
+                                  onPress={ hasPassword ? openResetPassword : openLinkPasswordToOAuth }
+                                  backgroundColor="transparent"
+                                  fontSize={ FONT_SIZES.p1 }
+                                  loadingIndicator
+                              />
+                              <Divider/>
+                              <Button.Text
+                                  iconLeft={ ICON_NAMES.trashCan }
+                                  iconRight={ ICON_NAMES.rightArrowHead }
+                                  text={ t("profile.delete_account") }
+                                  onPress={ deleteAccount }
+                                  textStyle={ { textAlign: "left" } }
+                                  backgroundColor="transparent"
+                                  textColor={ COLORS.redLight }
+                                  fontSize={ FONT_SIZES.p1 }
+                                  loadingIndicator
+                              />
+                          </View>
+                          <Button.Text
+                              iconLeft={ ICON_NAMES.signOut }
+                              text={ t("profile.sign_out") }
+                              onPress={ signOut }
+                              backgroundColor={ COLORS.googleRed }
+                              textColor={ COLORS.black2 }
+                              fontSize={ FONT_SIZES.p1 }
+                          />
+                      </>
+                      : <></>
+                }
             </View>
         </ScreenScrollView>
     );

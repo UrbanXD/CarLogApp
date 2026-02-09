@@ -52,7 +52,7 @@ export const useGoogleAuth = () => {
             // uj fiok kerult letrehozasra, mentsuk le a nevet a felhasznalonak
             await userDao.create({
                 id: user.id,
-                email: user.email,
+                email: user.email ?? null,
                 firstname: googleData.user.givenName || "",
                 lastname: googleData.user.familyName || "",
                 currency_id: getUserLocalCurrency(),

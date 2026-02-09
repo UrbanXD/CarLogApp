@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import DropdownPickerController, { DropdownPickerControllerProps } from "./dropdown/DropdownPickerController.tsx";
 import DropdownPickerItems from "./dropdown/DropdownPickerItems.tsx";
 import { PopupView } from "../../popupView/PopupView.tsx";
@@ -8,229 +8,214 @@ import { DropdownPickerHeader } from "./dropdown/DropdownPickerHeader.tsx";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { DropdownPickerFooter } from "./dropdown/DropdownPickerFooter.tsx";
 import { debounce } from "es-toolkit";
+import {
+    ExtractColumnsFromQuery,
+    ExtractRowFromQuery,
+    useInfiniteQuery,
+    UseInfiniteQueryOptions
+} from "../../../database/hooks/useInfiniteQuery.ts";
+import { SelectQueryBuilder } from "kysely";
 import { scheduleOnRN } from "react-native-worklets";
-import { CursorPaginator } from "../../../database/paginator/CursorPaginator.ts";
+import { useWatchedQueryItem, UseWatchedQueryItemProps } from "../../../database/hooks/useWatchedQueryItem.ts";
 
-type ConditionalDropdownPickerProps<Item extends { id: any }> = | {
-    /** Used when the dropdown fetches data with pagination */
-    paginator: CursorPaginator<Item, PickerItemType>
-    /** The key of the item property used for search filtering in the paginator. */
-    searchBy?: keyof Item
-    /** Replace search bar and user can add an item to dropdown list */
+type ConditionalProps<
+    QueryBuilder extends SelectQueryBuilder<any, any, any>,
+    TableItem = ExtractRowFromQuery<QueryBuilder>,
+    Columns = ExtractColumnsFromQuery<QueryBuilder>
+> =
+    | {
+    queryOptions: UseInfiniteQueryOptions<QueryBuilder, PickerItemType, TableItem, Columns>
+    searchBy: Array<Columns> | Columns
     renderCreateItemForm?: (callback: () => void) => ReactElement
-    /** Used when the dropdown has static data and no pagination is required */
     data?: never
-} | {
-    paginator?: never
+}
+    | {
+    queryOptions?: never
     searchBy?: never
     renderCreateItemForm?: never
     data: Array<PickerItemType>
-}
+};
 
-export type CommonDropdownPickerProps = {
-    /** The item that will be selected by default on first render */
-    defaultSelectedItemValue?: string
-    /** Callback function for set the selected value outside the dropdown picker **/
-    setValue?: (value: string) => void
-    /** When true, the search bar will be displayed above the list */
-    searchBarEnabled?: boolean
-    /** Placeholder text shown inside the search bar input */
-    searchBarPlaceholder?: string
-    /** When true, items are rendered in a masonry-style layout */
-    masonry?: boolean
-    /** Number of columns to display when using masonry layout */
-    numColumns?: number
-    /** When item selected menu automatically submit the result and close itself */
-    selectWithoutSubmit?: boolean
-    /** The title displayed at the top of the dropdown menu */
-    title?: string
-    /** Show content inside a popup view, default is true */
-    popUpView?: boolean
-    /** Hide the picker controller, if true then content is always visible */
-    hideController?: boolean
-} & Omit<DropdownPickerControllerProps, "selectedItem" | "toggleDropdown">;
+export type CommonDropdownPickerProps =
+    Omit<DropdownPickerControllerProps, "selectedItem" | "toggleDropdown">
+    &
+    {
+        defaultSelectedItemValue?: string
+        setValue?: (value: string) => void
+        searchBarEnabled?: boolean
+        searchBarPlaceholder?: string
+        masonry?: boolean
+        numColumns?: number
+        selectWithoutSubmit?: boolean
+        title?: string
+        popUpView?: boolean
+        hideController?: boolean
+    }
 
-export type DropdownPickerProps<Item extends { id: any } = { id: any }> =
-    ConditionalDropdownPickerProps<Item> & CommonDropdownPickerProps;
+export type DropdownPickerProps<
+    QueryBuilder extends SelectQueryBuilder<any, any, any>,
+    TableItem = ExtractRowFromQuery<QueryBuilder>,
+    Columns = ExtractColumnsFromQuery<QueryBuilder>
+> = ConditionalProps<QueryBuilder, TableItem, Columns> & CommonDropdownPickerProps;
 
-const DropdownPicker = <Item extends { id: any } = { id: any }, >({
-    title,
-    data,
-    paginator,
-    searchBy,
-    renderCreateItemForm,
-    searchBarEnabled = true,
-    selectWithoutSubmit = false,
-    icon,
-    searchBarPlaceholder,
-    inputPlaceholder,
-    masonry,
-    numColumns,
-    defaultSelectedItemValue,
-    setValue,
-    popUpView = true,
-    hideController,
-    disabled,
-    disabledText,
-    hiddenBackground,
-    containerStyle,
-    textInputStyle
-}: DropdownPickerProps<Item>) => {
+export default function DropdownPicker<
+    QueryBuilder extends SelectQueryBuilder<any, any, any>,
+    TableItem = ExtractRowFromQuery<QueryBuilder>,
+    Columns = ExtractColumnsFromQuery<QueryBuilder>
+>(props: DropdownPickerProps<QueryBuilder, TableItem, Columns>) {
+    const {
+        title,
+        data,
+        queryOptions,
+        searchBy,
+        renderCreateItemForm,
+        searchBarEnabled = true,
+        selectWithoutSubmit = false,
+        icon,
+        searchBarPlaceholder,
+        inputPlaceholder,
+        masonry,
+        numColumns,
+        defaultSelectedItemValue,
+        setValue,
+        popUpView = true,
+        hideController,
+        disabled,
+        disabledText,
+        hiddenBackground,
+        containerStyle,
+        textInputStyle
+    } = props;
+
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field.onChange;
     const inputFieldValue = inputFieldContext?.field?.value?.toString() ?? defaultSelectedItemValue;
     const error = inputFieldContext?.fieldState?.error;
 
-    const IS_STATIC = !!data;
-
-    const userSearching = useRef(false);
-
-    const [initialLoadCompleted, setInitialLoadCompleted] = useState(false);
-    const [items, setItems] = useState<Array<PickerItemType>>([]);
-    const [selectedItem, setSelectedItem] = useState<PickerItemType | null>(null);
+    const [internalSelectedItem, setInternalSelectedItem] = useState<PickerItemType | null>(null);
     const [tmpSelectedItem, setTmpSelectedItem] = useState<PickerItemType | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
 
     const isOpened = useSharedValue(false);
 
-    const fetchBySearching = useCallback(() => {
-        if(!searchBy) return;
+    const itemsQueryProps = useMemo(() => {
+        if(!queryOptions) return null;
 
-        paginator?.replaceFilter({
-            groupKey: "search",
-            filter: {
-                field: searchBy,
-                operator: "like",
-                value: `%${ searchTerm.toLowerCase() }%`
-            },
-            defaultItemId: userSearching.current ? undefined : selectedItem?.value
-        }).then(result => setItems(result));
+        return {
+            ...queryOptions,
+            defaultItem: inputFieldValue ? {
+                idValue: inputFieldValue,
+                idField: (queryOptions.idField || "id") as keyof TableItem
+            } : undefined
+        };
+    }, [queryOptions, inputFieldValue]);
 
-        userSearching.current = true;
-    }, [paginator, selectedItem, searchTerm]);
+    const selectedItemQueryProps = useMemo(() => {
+        if(!queryOptions) return null;
 
-    const staticSearching = useCallback(() => {
-        if(!IS_STATIC || !data) return;
+        const watchedQuery: UseWatchedQueryItemProps<PickerItemType, TableItem> = {
+            query: queryOptions.baseQuery.where((queryOptions.idField ?? "id") as string, "=", inputFieldValue),
+            mapper: queryOptions.mapper,
+            options: { enabled: !!inputFieldValue }
+        };
 
-        if(searchTerm === "" && data.length !== items.length) return setItems(data);
-        setItems(data.filter(item => item.title?.toLowerCase().includes(searchTerm.toLowerCase())));
-    }, [IS_STATIC, data, searchTerm]);
+        return watchedQuery;
+    }, [queryOptions, inputFieldValue]);
 
-    const fetchByScrolling = useCallback(async (direction: "next" | "prev" = "next") => {
-        if(!initialLoadCompleted || !paginator) return;
+    const itemsQuery = useInfiniteQuery(itemsQueryProps);
+    const selectedItemQuery = useWatchedQueryItem(selectedItemQueryProps);
 
-        let result: Array<PickerItemType> | null = [];
-        switch(direction) {
-            case "next":
-                result = await paginator.next();
-                break;
-            case "prev":
-                result = await paginator.previous();
-                break;
+    const selectedItem = useMemo(() => {
+        if(selectedItemQueryProps) return selectedItemQuery.data;
+
+        return internalSelectedItem;
+    }, [selectedItemQuery.data, internalSelectedItem, !!selectedItemQueryProps]);
+
+    const isLoadingSelectedItem = useMemo(() => {
+        if(selectedItemQueryProps) return selectedItemQuery.isLoading;
+        return false;
+    }, [selectedItemQuery.isLoading, !!selectedItemQueryProps]);
+
+    const items = useMemo(() => {
+        if(queryOptions) return itemsQuery.data ?? [];
+        if(data) {
+            if(!searchTerm) return data;
+            return data.filter(i => i.title?.toLowerCase().includes(searchTerm.toLowerCase()));
         }
+        return [];
+    }, [itemsQuery.data, data, searchTerm, !!queryOptions]);
 
-        if(!result || result.length === 0) return;
+    useEffect(() => {
+        if(selectedItemQueryProps) return;
 
-        setItems(prevState => {
-            switch(direction) {
-                case "next":
-                    return [...prevState, ...result];
-                case "prev":
-                    return [...result, ...prevState];
-                default:
-                    return prevState;
+        const selectedItemInData = items.find((item) => item.value === inputFieldValue);
+        setInternalSelectedItem(selectedItemInData ?? null);
+    }, [items, inputFieldValue, !!selectedItemQueryProps]);
+
+    useAnimatedReaction(
+        () => isOpened.value,
+        (opened, previousOpened) => {
+            if(opened && !previousOpened) { //reset tmp selected item after reopen
+                scheduleOnRN(setTmpSelectedItem, selectedItem);
             }
-        });
-    }, [initialLoadCompleted, paginator]);
-
-    const debouncedFilter = useMemo(
-        () => debounce(IS_STATIC ? staticSearching : fetchBySearching, 200),
-        [staticSearching, fetchBySearching]
+        },
+        [selectedItem]
     );
 
-    useAnimatedReaction(() => isOpened.value, (opened) => {
-        if(opened) scheduleOnRN(setTmpSelectedItem, selectedItem); //reset tmp selected item after reopen
-    });
+    const handleSearch = useCallback((searchTerm: string) => {
+        if(!queryOptions || !searchBy) return;
 
-    useEffect(() => {
-        if(!initialLoadCompleted) return;
-        if(!inputFieldValue || inputFieldValue === "") return setSelectedItem(null);
+        const searchFields = Array.isArray(searchBy) ? searchBy : [searchBy];
 
-        const item = items.find(item => item.value.toString() === inputFieldValue.toString());
-        if(item && item.value !== selectedItem?.value) setSelectedItem(item);
-    }, [items, inputFieldValue, initialLoadCompleted]);
-
-    useEffect(() => {
-        if(!data && !paginator) throw new Error("DropdownPicker did not get Data nor Paginator");
-
-        if(searchTerm !== "") {
-            userSearching.current = false;
-            setSearchTerm("");
-        }
-
-        if(IS_STATIC && data) {
-            setItems(data);
-
-            if(!initialLoadCompleted) setInitialLoadCompleted(true);
-        }
-
-        if(paginator) {
-            paginator.initial(inputFieldValue).then(result => {
-                setItems(result);
-                if(!initialLoadCompleted) setInitialLoadCompleted(true);
+        searchFields.forEach((searchField) => {
+            itemsQuery.replaceFilter({
+                groupKey: "search",
+                filter: {
+                    field: searchField,
+                    operator: "like",
+                    value: `%${ searchTerm.toLowerCase() }%`
+                },
+                logic: "OR"
             });
-        }
-    }, [data, paginator, inputFieldValue]);
+        });
+    }, [searchTerm, !!queryOptions, itemsQuery.replaceFilter]);
+
+    const debouncedSearch = useMemo(() => debounce(handleSearch, 450), [handleSearch]);
 
     useEffect(() => {
-        if(selectedItem?.value === tmpSelectedItem?.value) return;
-
-        setTmpSelectedItem(selectedItem);
-    }, [selectedItem]);
-
-    useEffect(() => {
-        if(!initialLoadCompleted) return;
-
-        debouncedFilter();
-        return () => debouncedFilter.cancel();
-    }, [searchTerm]);
-
-    const togglePopup = useCallback(() => {
-        isOpened.value = true;
-    }, []);
-
-    const renderForm = useCallback(() => {
-        if(!renderCreateItemForm) return <></>;
-
-        return renderCreateItemForm(() => paginator?.refresh().then((result) => setItems(result)));
-    }, [renderCreateItemForm, paginator]);
+        if(queryOptions) debouncedSearch(searchTerm);
+        return () => debouncedSearch.cancel();
+    }, [searchTerm, !!queryOptions, debouncedSearch]);
 
     const submit = useCallback((item: PickerItemType | null) => {
-        setSelectedItem(item);
-
-        const value = item?.value ?? "";
-        if(onChange) onChange(value);
-        if(setValue) setValue(value);
-
+        if(!selectedItemQueryProps) setInternalSelectedItem(item);
+        const val = item?.value ?? "";
+        onChange?.(val);
+        setValue?.(val);
         isOpened.value = false;
-    }, [onChange, setValue]);
+    }, [onChange, setValue, !!selectedItemQueryProps]);
 
     const onSelect = useCallback((item: PickerItemType) => {
         if(selectWithoutSubmit) return submit(item);
+        setTmpSelectedItem(prev => prev?.value === item.value ? null : item);
+    }, [selectWithoutSubmit, submit]);
 
-        if(tmpSelectedItem?.value === item.value) return setTmpSelectedItem(null);
-        if(tmpSelectedItem?.value !== item.value) setTmpSelectedItem(item);
-    }, [selectWithoutSubmit, submit, tmpSelectedItem]);
-
-    const onSubmit = useCallback(() => {
-        submit(tmpSelectedItem);
-    }, [submit, tmpSelectedItem]);
+    const initialStartIndex =
+        queryOptions
+        ? itemsQuery.initialStartIndex
+        : data && selectedItem
+          ? data.findIndex(i => i.value === selectedItem.value)
+          : 0;
 
     const renderContent = () => (
         <>
             <DropdownPickerHeader
                 title={ title }
-                renderCreateItemForm={ renderCreateItemForm ? renderForm : undefined }
+                renderCreateItemForm={
+                    renderCreateItemForm
+                    ? () => renderCreateItemForm(() => itemsQuery.clearFilters())
+                    : undefined
+                }
                 searchTerm={ searchTerm }
                 setSearchTerm={ setSearchTerm }
                 searchBarEnabled={ searchBarEnabled }
@@ -238,8 +223,20 @@ const DropdownPicker = <Item extends { id: any } = { id: any }, >({
             />
             <DropdownPickerItems
                 items={ items }
-                fetchByScrolling={ IS_STATIC ? null : fetchByScrolling }
-                fetchingEnabled={ IS_STATIC ? false : initialLoadCompleted }
+                initialStartIndex={ initialStartIndex }
+                fetchNext={ queryOptions ? itemsQuery.fetchNext : null }
+                fetchPrev={ queryOptions ? itemsQuery.fetchPrev : null }
+                isLoading={ queryOptions ? itemsQuery.isLoading : false }
+                isNextFetchingEnabled={
+                    queryOptions
+                    ? (!itemsQuery.isLoading && itemsQuery.hasNext && !itemsQuery.isNextFetching)
+                    : false
+                }
+                isPrevFetchingEnabled={
+                    queryOptions
+                    ? (!itemsQuery.isLoading && itemsQuery.hasPrev && !itemsQuery.isPrevFetching)
+                    : false
+                }
                 selectedItem={ tmpSelectedItem }
                 onSelect={ onSelect }
                 searchTerm={ searchTerm }
@@ -248,7 +245,7 @@ const DropdownPicker = <Item extends { id: any } = { id: any }, >({
             />
             {
                 !selectWithoutSubmit &&
-               <DropdownPickerFooter onSubmit={ onSubmit }/>
+               <DropdownPickerFooter onSubmit={ () => submit(tmpSelectedItem) }/>
             }
         </>
     );
@@ -259,7 +256,8 @@ const DropdownPicker = <Item extends { id: any } = { id: any }, >({
                 !hideController &&
                <DropdownPickerController
                   selectedItem={ selectedItem }
-                  toggleDropdown={ togglePopup }
+                  isSelectedItemLoading={ isLoadingSelectedItem }
+                  toggleDropdown={ () => { isOpened.value = true; } }
                   icon={ icon }
                   inputPlaceholder={ inputPlaceholder }
                   error={ !!error }
@@ -277,6 +275,4 @@ const DropdownPicker = <Item extends { id: any } = { id: any }, >({
             }
         </>
     );
-};
-
-export default DropdownPicker;
+}

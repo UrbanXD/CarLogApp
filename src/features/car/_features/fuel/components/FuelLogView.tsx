@@ -1,11 +1,9 @@
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
-import useCars from "../../../hooks/useCars.ts";
 import { useAlert } from "../../../../../ui/alert/hooks/useAlert.ts";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Car } from "../../../schemas/carSchema.ts";
+import React, { useCallback, useMemo } from "react";
 import { InfoRowProps } from "../../../../../components/info/InfoRow.tsx";
-import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants/index.ts";
+import { COLORS, ICON_NAMES, SEPARATOR_SIZES } from "../../../../../constants";
 import dayjs from "dayjs";
 import { ScreenScrollView } from "../../../../../components/screenView/ScreenScrollView.tsx";
 import { Title } from "../../../../../components/Title.tsx";
@@ -14,12 +12,10 @@ import { FuelLog } from "../schemas/fuelLogSchema.ts";
 import { FuelLogFormFieldsEnum } from "../enums/fuelLogFormFields.tsx";
 import { FloatingDeleteButton } from "../../../../../components/Button/presets/FloatingDeleteButton.tsx";
 import { AmountText } from "../../../../../components/AmountText.tsx";
-import { updateCarOdometer } from "../../../model/slice/index.ts";
-import { Odometer } from "../../odometer/schemas/odometerSchema.ts";
 import { useTranslation } from "react-i18next";
-import { DeleteToast, NotFoundToast } from "../../../../../ui/alert/presets/toast/index.ts";
-import { DeleteModal } from "../../../../../ui/alert/presets/modal/index.ts";
-import { useAppDispatch } from "../../../../../hooks/index.ts";
+import { DeleteToast, NotFoundToast } from "../../../../../ui/alert/presets/toast";
+import { DeleteModal } from "../../../../../ui/alert/presets/modal";
+import { useWatchedQueryItem } from "../../../../../database/hooks/useWatchedQueryItem.ts";
 
 export type FuelLogViewProps = {
     id: string
@@ -27,40 +23,15 @@ export type FuelLogViewProps = {
 
 export function FuelLogView({ id }: FuelLogViewProps) {
     const { t } = useTranslation();
-    const dispatch = useAppDispatch();
-    const { fuelLogDao, odometerLogDao } = useDatabase();
-    const { getCar } = useCars();
+    const { fuelLogDao } = useDatabase();
     const { openModal, openToast } = useAlert();
 
-    const [car, setCar] = useState<Car | null>(null);
-    const [fuelLog, setFuelLog] = useState<FuelLog | null>(null);
-
-    useFocusEffect(
-        useCallback(() => {
-            (async () => {
-                setFuelLog(await fuelLogDao.getById(id));
-            })();
-        }, [id, fuelLogDao])
-    );
-
-    useEffect(() => {
-        if(car?.id === fuelLog?.expense.carId || !fuelLog?.expense.carId) return;
-
-        setCar(getCar(fuelLog.expense.carId));
-    }, [fuelLog]);
+    const memoizedQuery = useMemo(() => fuelLogDao.fuelLogWatchedQueryItem(id), [fuelLogDao, id]);
+    const { data: fuelLog, isLoading } = useWatchedQueryItem(memoizedQuery);
 
     const handleDelete = useCallback(async (fuelLog: FuelLog) => {
         try {
-            if(!car) throw new Error("Car not found!");
-
-            const resultId = await fuelLogDao.deleteLog(fuelLog);
-
-            let odometer: Odometer | null = null;
-            if(resultId && fuelLog.odometer?.carId) {
-                odometer = await odometerLogDao.getOdometerByLogId(resultId.toString(), fuelLog.odometer.carId);
-            }
-
-            if(odometer) dispatch(updateCarOdometer({ odometer }));
+            await fuelLogDao.deleteLog(fuelLog);
 
             openToast(DeleteToast.success(t("fuel.log")));
 
@@ -70,7 +41,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
             console.log(e);
             openToast(DeleteToast.error(t("fuel.log")));
         }
-    }, [fuelLog, car, t]);
+    }, [fuelLog, t]);
 
     const onDelete = useCallback(() => {
         if(!fuelLog) {
@@ -97,8 +68,8 @@ export function FuelLogView({ id }: FuelLogViewProps) {
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
             icon: ICON_NAMES.car,
-            title: car?.name,
-            content: `${ car?.model.make.name } ${ car?.model.name }`,
+            title: fuelLog?.car.name,
+            content: `${ fuelLog?.car.model.make.name } ${ fuelLog?.car.model.name }`,
             onPress: () => onEdit(FuelLogFormFieldsEnum.Car)
         },
         {
@@ -120,14 +91,14 @@ export function FuelLogView({ id }: FuelLogViewProps) {
                />,
             onPress: () => onEdit(FuelLogFormFieldsEnum.Amount),
             secondaryInfo:
-                fuelLog?.originalPricePerUnit !== 0
+                fuelLog?.pricePerUnit !== 0
                 ? {
                         title: t("currency.price_per_unit"),
                         content: (textStyle) => fuelLog &&
                            <AmountText
-                              amount={ fuelLog.originalPricePerUnit }
+                              amount={ fuelLog.pricePerUnit }
                               currencyText={ `${ fuelLog.expense.amount.currency.symbol }/${ fuelLog.fuelUnit.short }` }
-                              exchangedAmount={ fuelLog.pricePerUnit }
+                              exchangedAmount={ fuelLog.exchangedPricePerUnit }
                               exchangeCurrencyText={ `${ fuelLog.expense.amount.exchangeCurrency.symbol }/${ fuelLog.fuelUnit.short }` }
                               amountTextStyle={ textStyle }
                            />
@@ -155,7 +126,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
             contentTextStyle: !fuelLog?.expense?.note && { color: COLORS.gray2 },
             onPress: () => onEdit(FuelLogFormFieldsEnum.Note)
         }
-    ]), [car, fuelLog, t]);
+    ]), [fuelLog, t]);
 
     return (
         <>
@@ -167,7 +138,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
                         marginBottom: SEPARATOR_SIZES.normal
                     } }
                 />
-                <InfoContainer data={ infos }/>
+                <InfoContainer data={ infos } isLoading={ isLoading }/>
             </ScreenScrollView>
             <FloatingDeleteButton onPress={ onDelete }/>
         </>

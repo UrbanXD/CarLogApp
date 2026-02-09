@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     BlurEvent,
     FocusEvent,
@@ -130,30 +130,46 @@ const Slider: React.FC<SliderProps> = ({
     const bounds = useSharedValue({ min: minValue, max: maxValue });
 
     const [trackLayoutReady, setTrackLayoutReady] = useState(false);
-    const [currentValue, setCurrentValue] = useState(value ?? 0);
+    const isInternalChange = useRef(false);
 
+    const [currentValue, setCurrentValue] = useState<number>(NaN);
+
+    // External -> Internal
     useEffect(() => {
-        const rawValue = inputFieldContext?.field?.value ?? value;
+        const rawValue = inputFieldContext?.field?.value;
+
+        if(isInternalChange.current) {
+            isInternalChange.current = false;
+            return;
+        }
+
         const numericValue = (rawValue === "" || rawValue == null) ? NaN : Number(rawValue);
-        const fieldValue = (isNaN(numericValue)) ? minValue : Math.min(maxValue, Math.max(minValue, numericValue));
+        if(!isNaN(numericValue)) {
+            const clampedValue = Math.min(maxValue, Math.max(minValue, numericValue));
 
-        setCurrentValue(fieldValue);
-    }, [inputFieldContext?.field?.value, value, minValue, maxValue]);
+            if(clampedValue !== currentValue) {
+                setCurrentValue(clampedValue);
+            }
+        }
+    }, [inputFieldContext?.field?.value, value, maxValue, minValue]);
 
+    // Internal -> External
     useEffect(() => {
-        if(!trackLayoutReady) return;
+        if(!trackLayoutReady || isNaN(currentValue)) return;
 
-        const fieldValueNumber = Number(inputFieldContext?.field?.value ?? 0);
-        if(setValue && currentValue !== fieldValueNumber) setValue(currentValue);
-        if(onChange && currentValue !== fieldValueNumber) onChange(currentValue);
-
-        percent.value = Math.max(
-            0,
-            Math.min(100, (currentValue - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
-        );
+        const range = bounds.value.max - bounds.value.min;
+        const safeRange = range <= 0 ? 1 : range;
+        percent.value = Math.max(0, Math.min(100, (currentValue - bounds.value.min) * 100 / safeRange));
         inputValue.value = currentValue.toString();
-
         scheduleOnUI(calculateThumbOffsetByPercent);
+
+        const externalValue = Number(inputFieldContext?.field?.value ?? 0);
+        if(currentValue !== externalValue) {
+            isInternalChange.current = true;
+
+            if(setValue) setValue(currentValue);
+            if(onChange) onChange(currentValue);
+        }
     }, [currentValue, trackLayoutReady]);
 
     useEffect(() => {

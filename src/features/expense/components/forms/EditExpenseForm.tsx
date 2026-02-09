@@ -8,8 +8,8 @@ import { ExpenseFormFields, useEditExpenseFormProps } from "../../schemas/form/e
 import { ExpenseFormFieldsEnum } from "../../enums/expenseFormFieldsEnum.ts";
 import { useExpenseFormFields } from "../../hooks/useExpenseFormFields.tsx";
 import Form from "../../../../components/Form/Form.tsx";
-import { FormFields, SubmitHandlerArgs } from "../../../../types/index.ts";
-import { InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
+import { FormFields, SubmitHandlerArgs } from "../../../../types";
+import { InvalidFormToast } from "../../../../ui/alert/presets/toast";
 
 type EditExpenseFormProps = {
     expense: Expense
@@ -35,9 +35,9 @@ export function EditExpenseForm({
     const submitHandler: SubmitHandlerArgs<ExpenseFormFields> = {
         onValid: async (formResult) => {
             try {
-                await expenseDao.update(formResult);
-                openToast(editFields.editToastMessages.success());
+                await expenseDao.updateFromFormResult(formResult);
 
+                openToast(editFields.editToastMessages.success());
                 if(dismissBottomSheet) dismissBottomSheet(true);
             } catch(e) {
                 openToast(editFields.editToastMessages.error());

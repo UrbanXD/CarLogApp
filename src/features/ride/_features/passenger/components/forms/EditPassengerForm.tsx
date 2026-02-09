@@ -27,7 +27,7 @@ export function EditPassengerForm({ passenger, onFormStateChange }: EditPassenge
     const submitHandler: SubmitHandlerArgs<PassengerFormFields> = {
         onValid: async (formResult) => {
             try {
-                await passengerDao.update(formResult);
+                await passengerDao.updateFromFormResult(formResult);
                 openToast(EditToast.success());
 
                 if(dismissBottomSheet) dismissBottomSheet(true);

@@ -1,15 +1,20 @@
-import React, { ReactElement, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import PickerItem, { PickerItemType } from "../PickerItem.tsx";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants";
 import { StyleSheet, Text, View } from "react-native";
 import { heightPercentageToDP, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { FlashList, FlashListRef, ListRenderItem } from "@shopify/flash-list";
 import { useTranslation } from "react-i18next";
+import { MoreDataLoading } from "../../../loading/MoreDataLoading.tsx";
 
 type DropdownPickerElementsProps = {
     items: Array<PickerItemType>
-    fetchByScrolling: ((direction?: ("next" | "prev")) => void) | null
-    fetchingEnabled: boolean
+    initialStartIndex: number
+    fetchNext?: (() => Promise<void>) | null
+    fetchPrev?: (() => Promise<void>) | null
+    isLoading: boolean
+    isNextFetchingEnabled: boolean
+    isPrevFetchingEnabled: boolean
     selectedItem: PickerItemType | null
     searchTerm: string
     onSelect: (item: PickerItemType) => void
@@ -25,8 +30,12 @@ type DropdownPickerElementsProps = {
  */
 function DropdownPickerItems({
     items,
-    fetchByScrolling,
-    fetchingEnabled,
+    initialStartIndex,
+    isLoading,
+    fetchNext,
+    fetchPrev,
+    isNextFetchingEnabled,
+    isPrevFetchingEnabled,
     selectedItem,
     searchTerm,
     onSelect,
@@ -37,6 +46,7 @@ function DropdownPickerItems({
 
     const flashListRef = useRef<FlashListRef<PickerItemType>>(null);
     const itemsFiltered = useRef(false); //this is for prevent scrolling to first element if data just fetched (not filtered)
+
     const [listReady, setListReady] = useState(false);
 
     useEffect(() => {
@@ -60,25 +70,19 @@ function DropdownPickerItems({
     }, [listReady, selectedItem]);
 
     const onStartReached = useCallback(() => {
-        if((flashListRef.current?.getAbsoluteLastScrollOffset() === 0 && selectedItem) || !fetchingEnabled || !fetchByScrolling) return;
+        if((flashListRef.current?.getAbsoluteLastScrollOffset() === 0 && selectedItem) || !isPrevFetchingEnabled) return;
 
-        fetchByScrolling("prev");
-    }, [fetchingEnabled, selectedItem, fetchByScrolling]);
+        fetchPrev?.();
+    }, [isPrevFetchingEnabled, selectedItem, fetchPrev]);
 
     const onEndReached = useCallback(() => {
-        if(!fetchingEnabled || !fetchByScrolling) return;
+        if(!isNextFetchingEnabled) return;
 
-        fetchByScrolling("next");
-    }, [fetchingEnabled, fetchByScrolling]);
+        fetchNext?.();
+    }, [fetchNext, isNextFetchingEnabled]);
 
 
-    const keyExtractor = useCallback(
-        (
-            item: PickerItemType,
-            index: number
-        ) => `${ item.title ?? item?.toString() ?? index.toString() }-${ item.value }`,
-        []
-    );
+    const keyExtractor = useCallback((item: PickerItemType) => item.value, []);
 
     const renderItem: ListRenderItem<PickerItemType> = useCallback(
         ({ item, index }) => {
@@ -108,8 +112,12 @@ function DropdownPickerItems({
     );
 
     const renderListEmptyComponent = useCallback(
-        () => <Text style={ styles.notFoundText }>{ t("form.picker.no_item_found") }</Text>,
-        [t]
+        () => {
+            if(isLoading) return <MoreDataLoading/>;
+
+            return <Text style={ styles.notFoundText }>{ t("form.picker.no_item_found") }</Text>;
+        },
+        [t, isLoading]
     );
 
     return (
@@ -117,6 +125,7 @@ function DropdownPickerItems({
             <FlashList
                 ref={ flashListRef }
                 data={ items }
+                initialScrollIndex={ initialStartIndex }
                 masonry={ masonry }
                 numColumns={ numColumns }
                 optimizeItemArrangement={ false }

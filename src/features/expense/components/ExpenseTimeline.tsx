@@ -1,64 +1,52 @@
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useExpenseTimelineItem } from "../hooks/useExepenseTimelineItem.tsx";
 import React, { useMemo } from "react";
-import { TimelineView } from "../../../components/timelineView/TimelineView.tsx";
 import { Title } from "../../../components/Title.tsx";
 import { StyleSheet, View } from "react-native";
-import { SEPARATOR_SIZES, SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
-import { useTimelinePaginator } from "../../../hooks/useTimelinePaginator.ts";
-import { Expense } from "../schemas/expenseSchema.ts";
-import { Car } from "../../car/schemas/carSchema.ts";
-import { useExpenseTimelineFilter } from "../hooks/useExpenseTimelineFilter.ts";
-import { SelectExpenseTableRow } from "../model/mapper/expenseMapper.ts";
-import { TimelineItemType } from "../../../components/timelineView/item/TimelineItem.tsx";
+import { FULL_TABBAR_HEIGHT, SEPARATOR_SIZES } from "../../../constants";
 import { useTranslation } from "react-i18next";
-import { CAR_TABLE } from "../../../database/connector/powersync/tables/car.ts";
+import { useTimeline } from "../../../hooks/useTimeline.ts";
+import { useExpenseTimelineFilter } from "../hooks/useExpenseTimelineFilter.ts";
+import { TimelineView } from "../../../components/timelineView/TimelineView.tsx";
 
 type ExpenseTimelineProps = {
-    car: Car
+    carId: string
 };
 
-export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
+export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
     const { t } = useTranslation();
     const { expenseDao } = useDatabase();
     const { mapper } = useExpenseTimelineItem();
-    const paginator = useMemo(
-        () =>
-            expenseDao.paginator(
-                {
-                    cursor: [
-                        { field: "date", order: "desc" },
-                        { field: "amount", order: "desc" },
-                        { field: "id" }
-                    ]
-                },
-                {
-                    group: CAR_TABLE,
-                    filters: [{ field: "car_id", operator: "=", value: car.id }]
-                }
-            ),
-        []
-    );
+
+    const memoizedOptions = useMemo(() => expenseDao.timelineInfiniteQuery(carId), [expenseDao]);
 
     const {
-        ref,
         data,
-        initialFetchHappened,
-        isInitialFetching,
         fetchNext,
+        fetchPrev,
         isNextFetching,
-        fetchPrevious,
-        isPreviousFetching,
-        timelineFilterManagement,
+        isPrevFetching,
+        hasNext,
+        hasPrev,
+        isLoading,
+        filterManager,
         orderButtons
-    } = useTimelinePaginator<SelectExpenseTableRow, Expense, TimelineItemType>({
-        paginator,
-        mapper,
-        cursorOrderButtons: [{ field: "date", title: t("date.text") }, { field: "amount", title: t("currency.price") }]
+    } = useTimeline({
+        infiniteQueryOptions: memoizedOptions,
+        cursorOrderButtons: [
+            { field: "e.date", title: t("date.text") },
+            { field: "e.amount", title: t("currency.price") }
+        ]
     });
-    const { filterButtons } = useExpenseTimelineFilter({ timelineFilterManagement, car });
 
-    if(!car) return <></>;
+    const { filterButtons } = useExpenseTimelineFilter({
+        filterManager,
+        carId,
+        carFilterFieldName: "c.id",
+        typesFilterFieldName: "et.id"
+    });
+
+    const memoizedData = useMemo(() => data.map((row) => mapper(row)), [data, mapper]);
 
     return (
         <View style={ styles.container }>
@@ -67,16 +55,17 @@ export function ExpenseTimeline({ car }: ExpenseTimelineProps) {
                 subtitle={ t("expenses.description") }
             />
             <TimelineView
-                ref={ ref }
-                data={ data }
+                data={ memoizedData }
                 orderButtons={ orderButtons }
                 filterButtons={ filterButtons }
-                isInitialFetching={ isInitialFetching }
-                fetchNext={ initialFetchHappened && paginator.hasNext() ? fetchNext : undefined }
-                fetchPrevious={ initialFetchHappened && paginator.hasPrevious() ? fetchPrevious : undefined }
+                isLoading={ isLoading }
+                fetchNext={ fetchNext }
+                fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
-                isPreviousFetching={ isPreviousFetching }
-                style={ { paddingBottom: SIMPLE_TABBAR_HEIGHT } }
+                isPrevFetching={ isPrevFetching }
+                hasNext={ hasNext }
+                hasPrev={ hasPrev }
+                style={ { paddingBottom: FULL_TABBAR_HEIGHT } }
             />
         </View>
     );

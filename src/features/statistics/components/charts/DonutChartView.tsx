@@ -1,20 +1,20 @@
 import { PieChart, pieDataItem } from "react-native-gifted-charts";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants";
 import { ChartTitle, ChartTitleProps } from "./common/ChartTitle.tsx";
-import { Legend, LegendData } from "./common/Legend.tsx";
+import { Legend, LegendType } from "./common/Legend.tsx";
 import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
 import { ChartDataNotFound } from "./common/ChartDataNotFound.tsx";
 
-export type DonutChartItem = pieDataItem & { label: string, description?: string, focused?: boolean }
+export type DonutChartItem = pieDataItem & { label: string, description?: string | number, focused?: boolean }
 
 type DonutChartViewProps = {
     chartData?: Array<DonutChartItem>
     title?: ChartTitleProps
-    legend?: { [key: string]: LegendData }
+    legend?: LegendType
     formatLabel?: (label: string) => string
-    formatDescription?: (description: string) => string
+    formatDescription?: (description: string | number) => string
     formatLegend?: (label: string) => string,
     showsLegend?: boolean
     legendPosition?: "top" | "bottom" | "left" | "right"
@@ -82,7 +82,9 @@ export function DonutChartView({
                                     return (
                                         <CenterLabel
                                             label={ focused.label && (formatLabel?.(focused.label) ?? focused.label) }
-                                            description={ focused.description && (formatDescription?.(focused.description) ?? focused.description) }
+                                            description={ !!focused.description
+                                                          ? (formatDescription?.(focused.description) ?? focused.description.toString())
+                                                          : undefined }
                                             value={ focused.value }
                                         />
                                     );

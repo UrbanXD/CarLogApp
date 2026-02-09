@@ -2,30 +2,39 @@ import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts
 import { useEffect, useState } from "react";
 import { FilterButtonProps } from "../../../../../components/filter/FilterButton.tsx";
 import { ServiceType } from "../schemas/serviceTypeSchema.ts";
-import { Car } from "../../../../car/schemas/carSchema.ts";
-import { ExpenseTableRow, ServiceLogTableRow } from "../../../../../database/connector/powersync/AppSchema.ts";
-import { TimelineFilterManagement } from "../../../../../hooks/useTimelinePaginator.ts";
 import { useTranslation } from "react-i18next";
-import { FilterCondition } from "../../../../../database/paginator/AbstractPaginator.ts";
+import { SelectQueryBuilder } from "kysely";
+import { ExtractColumnsFromQuery, FilterCondition } from "../../../../../database/hooks/useInfiniteQuery.ts";
+import { FilterManager } from "../../../../../database/hooks/useFilters.ts";
+import { CAR_TABLE } from "../../../../../database/connector/powersync/tables/car.ts";
 
 const TYPES_FILTER_KEY = "type_filter";
-const TYPES_FILTER_FIELD_NAME = "service_type_id" as keyof (ExpenseTableRow & ServiceLogTableRow);
 
-type UseServiceLogTimelineFilterProps = {
-    timelineFilterManagement: TimelineFilterManagement<ExpenseTableRow & ServiceLogTableRow>,
-    car: Car
+type UseServiceLogTimelineFilterProps<
+    QueryBuilder extends SelectQueryBuilder<any, any, any>,
+    Columns = ExtractColumnsFromQuery<QueryBuilder>
+> = {
+    filterManager: FilterManager<QueryBuilder, Columns>
+    carId: string
+    carFilterFieldName: Columns
+    typesFilterFieldName: Columns
 }
 
-export function useServiceLogTimelineFilter({
-    timelineFilterManagement: {
+export function useServiceLogTimelineFilter<
+    QueryBuilder extends SelectQueryBuilder<any, any, any>,
+    Columns = ExtractColumnsFromQuery<QueryBuilder>
+>({
+    filterManager: {
         filters,
         addFilter,
         replaceFilter,
         removeFilter,
         clearFilters
     },
-    car
-}: UseServiceLogTimelineFilterProps) {
+    carId,
+    carFilterFieldName,
+    typesFilterFieldName
+}: UseServiceLogTimelineFilterProps<QueryBuilder, Columns>) {
     const { t } = useTranslation();
     const { serviceTypeDao } = useDatabase();
 
@@ -55,23 +64,26 @@ export function useServiceLogTimelineFilter({
                     const ids: Array<string> = [];
 
                     item.filters.forEach(filter => {
-                        if(filter.field === TYPES_FILTER_FIELD_NAME) ids.push(filter.value);
+                        if(filter.field === typesFilterFieldName) ids.push(filter.value);
                     });
 
                     setSelectedTypesId(ids);
                     break;
             }
         }));
-    }, [filters]);
+    }, [filters, typesFilterFieldName]);
 
     useEffect(() => {
-        if(car) replaceFilter({ groupKey: "car", filter: { field: "car_id", operator: "=", value: car.id } });
-    }, [car]);
+        if(carId) replaceFilter({
+            groupKey: CAR_TABLE,
+            filter: { field: carFilterFieldName, operator: "=", value: carId }
+        });
+    }, [carId, carFilterFieldName]);
 
     const filterButtons: Array<FilterButtonProps> = types.map((type) => {
         const active = selectedTypesId.includes(type.id);
-        const filter: FilterCondition<ExpenseTableRow & ServiceLogTableRow> = {
-            field: TYPES_FILTER_FIELD_NAME,
+        const filter: FilterCondition<QueryBuilder, Columns> = {
+            field: typesFilterFieldName,
             operator: "=",
             value: type.id
         };

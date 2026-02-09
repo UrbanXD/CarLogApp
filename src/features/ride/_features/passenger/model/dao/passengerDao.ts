@@ -1,16 +1,75 @@
 import { Dao } from "../../../../../../database/dao/Dao.ts";
 import { DatabaseType, PassengerTableRow } from "../../../../../../database/connector/powersync/AppSchema.ts";
 import { Kysely } from "@powersync/kysely-driver";
-import { CursorPaginator } from "../../../../../../database/paginator/CursorPaginator.ts";
 import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
 import { Passenger } from "../../schemas/passengerSchema.ts";
 import { PassengerMapper } from "../mapper/passengerMapper.ts";
 import { PassengerFormFields } from "../../schemas/form/passengerForm.ts";
 import { PASSENGER_TABLE } from "../../../../../../database/connector/powersync/tables/passenger.ts";
+import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
+import { USER_TABLE } from "../../../../../../database/connector/powersync/tables/user.ts";
+import { WatchQueryOptions } from "../../../../../../database/watcher/watcher.ts";
+import { UseWatchedQueryItemProps } from "../../../../../../database/hooks/useWatchedQueryItem.ts";
 
 export class PassengerDao extends Dao<PassengerTableRow, Passenger, PassengerMapper> {
-    constructor(db: Kysely<DatabaseType>) {
-        super(db, PASSENGER_TABLE, new PassengerMapper());
+    constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {
+        super(db, powersync, PASSENGER_TABLE, new PassengerMapper());
+    }
+
+    watchedQueryItem(
+        id: string | null | undefined,
+        options?: WatchQueryOptions
+    ): UseWatchedQueryItemProps<Passenger> {
+        return {
+            query: this.selectQuery(id),
+            mapper: this.mapper.toDto.bind(this.mapper),
+            options: { enabled: !!id, ...options }
+        };
+    }
+
+    timelineInfiniteQuery(ownerId: string | null): UseInfiniteQueryOptions<ReturnType<PassengerDao["selectQuery"]>, Passenger> {
+        return {
+            baseQuery: this.selectQuery(),
+            defaultCursorOptions: {
+                cursor: [
+                    { field: "name", order: "asc", toLowerCase: true },
+                    { field: "id", order: "asc" }
+                ],
+                defaultOrder: "asc"
+            },
+            defaultFilters: [
+                {
+                    key: USER_TABLE,
+                    filters: [{ field: "owner_id", operator: "=", value: ownerId }],
+                    logic: "AND"
+                }
+            ],
+            mapper: this.mapper.toDto.bind(this.mapper)
+        };
+    }
+
+    pickerInfiniteQuery(ownerId: string | null): UseInfiniteQueryOptions<ReturnType<PassengerDao["selectQuery"]>, PickerItemType> {
+        return {
+            baseQuery: this.selectQuery(),
+            defaultCursorOptions: {
+                cursor: [
+                    { field: "name", order: "asc", toLowerCase: true },
+                    { field: "id", order: "asc" }
+                ],
+                defaultOrder: "asc"
+            },
+            defaultFilters: [
+                {
+                    key: USER_TABLE,
+                    filters: [{ field: "owner_id", operator: "=", value: ownerId }],
+                    logic: "AND"
+                }
+            ],
+            idField: "id",
+            mapper: this.mapper.toPickerItem.bind(this.mapper),
+            mappedItemId: "value"
+        };
     }
 
     async isNameAlreadyExists(id: string, ownerId: string, name: string): Promise<boolean> {
@@ -25,37 +84,13 @@ export class PassengerDao extends Dao<PassengerTableRow, Passenger, PassengerMap
         return !result;
     }
 
-    async create(formResult: PassengerFormFields, safe?: boolean): Promise<Passenger | null> {
+    async createFromFormResult(formResult: PassengerFormFields) {
         const entity = this.mapper.formResultToEntity(formResult);
-        return await super.create(entity, safe);
+        return await super.create(entity);
     }
 
-    async update(formResult: PassengerFormFields, safe?: boolean): Promise<Passenger | null> {
+    async updateFromFormResult(formResult: PassengerFormFields) {
         const entity = this.mapper.formResultToEntity(formResult);
-        return super.update(entity, safe);
-    }
-
-    paginator(perPage: number = 30): CursorPaginator<PassengerTableRow, Passenger> {
-        return new CursorPaginator<PassengerTableRow, Passenger>(
-            this.db,
-            PASSENGER_TABLE,
-            { cursor: [{ field: "name", order: "asc", toLowerCase: true }, { field: "id" }], defaultOrder: "asc" },
-            {
-                perPage,
-                mapper: this.mapper.toDto.bind(this.mapper)
-            }
-        );
-    }
-
-    pickerPaginator(perPage: number = 30): CursorPaginator<PassengerTableRow, PickerItemType> {
-        return new CursorPaginator<PassengerTableRow, PickerItemType>(
-            this.db,
-            PASSENGER_TABLE,
-            { cursor: [{ field: "name", order: "asc", toLowerCase: true }, { field: "id" }], defaultOrder: "asc" },
-            {
-                perPage,
-                mapper: this.mapper.entityToPickerItem.bind(this.mapper)
-            }
-        );
+        return super.update(entity);
     }
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { MAX_DATE, MIN_DATE } from "../../../constants/index.ts";
+import { MAX_DATE, MIN_DATE } from "../../../constants";
 import Input from "../Input.ts";
 import { PickerItemType } from "../picker/PickerItem.tsx";
 import dayjs from "dayjs";

@@ -1,10 +1,10 @@
-import React, { useCallback, useState } from "react";
-import { Text, View } from "react-native";
-import { COLORS, GLOBAL_STYLE, ICON_NAMES } from "../../../constants/index.ts";
+import React, { useCallback, useMemo } from "react";
+import { View } from "react-native";
+import { COLORS, ICON_NAMES } from "../../../constants";
 import { useDatabase } from "../../../contexts/database/DatabaseContext.ts";
 import { useRideLogTimelineItem } from "../hooks/useRideLogTimelineItem.tsx";
 import { RideLog } from "../schemas/rideLogSchema.ts";
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 import { TimelineItem } from "../../../components/timelineView/item/TimelineItem.tsx";
 import { MoreDataLoading } from "../../../components/loading/MoreDataLoading.tsx";
 import Link from "../../../components/Link.tsx";
@@ -12,6 +12,8 @@ import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import "dayjs/locale/en";
 import "dayjs/locale/hu";
+import { useWatchedQueryCollection } from "../../../database/hooks/useWatchedQueryCollection.ts";
+import { Section } from "../../../components/Section.tsx";
 
 type UpcomingRidesProps = {
     carId: string
@@ -22,19 +24,13 @@ export function UpcomingRides({ carId }: UpcomingRidesProps) {
     const { rideLogDao } = useDatabase();
     const { mapper } = useRideLogTimelineItem();
 
-    const [rides, setRides] = useState<Array<RideLog>>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [today] = useState(dayjs().hour(0).minute(0).second(0).toDate());
+    const today = useMemo(() => dayjs().startOf("day").toDate(), []);
 
-    useFocusEffect(
-        useCallback(() => {
-            setIsLoading(true);
-            rideLogDao.getUpcomingRides(carId, today.toISOString()).then(result => {
-                setIsLoading(false);
-                setRides(result);
-            });
-        }, [carId])
-    );
+    const upcomingRidesQuery = useMemo(() => {
+        return rideLogDao.upcomingRideWatchedQueryCollection(carId, today);
+    }, [rideLogDao, carId, today]);
+
+    const { data: upcomingRides, isLoading } = useWatchedQueryCollection(upcomingRidesQuery);
 
     const renderRideLog = (rideLog: RideLog, index: number) => {
         return (
@@ -65,22 +61,17 @@ export function UpcomingRides({ carId }: UpcomingRidesProps) {
     const openCreateRideLogBottomSheet = () => router.push("/ride/create/");
 
     return (
-        <View style={ GLOBAL_STYLE.contentContainer }>
-            <View>
-                <Text style={ GLOBAL_STYLE.containerTitleText }>
-                    { t("rides.upcoming") }
-                </Text>
-                <Text style={ GLOBAL_STYLE.containerText }>
-                    { dayjs(today).format("dddd") }, { dayjs(today).format("LL") } ({ t("date.today") })
-                </Text>
-            </View>
+        <Section
+            title={ t("rides.upcoming") }
+            subtitle={ `${ dayjs(today).format("dddd") }, ${ dayjs(today).format("LL") } (${ t("date.today") })` }
+        >
             {
                 isLoading
                 ?
                 <MoreDataLoading/>
                 :
-                rides.length > 0
-                ? <View>{ rides.map(renderRideLog) }</View>
+                upcomingRides && upcomingRides?.length > 0
+                ? <View>{ upcomingRides.map(renderRideLog) }</View>
                 : renderEmptyComponent()
             }
             <Link
@@ -88,6 +79,6 @@ export function UpcomingRides({ carId }: UpcomingRidesProps) {
                 icon={ ICON_NAMES.rightArrowHead }
                 onPress={ goToRideLogTab }
             />
-        </View>
+        </Section>
     );
 }

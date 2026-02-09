@@ -5,11 +5,11 @@ import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { useBottomSheet } from "../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { CarFormFields, useEditCarFormProps } from "../../schemas/form/carForm.ts";
 import { Car } from "../../schemas/carSchema.ts";
-import { EDIT_CAR_FORM_STEPS } from "../../constants/index.ts";
+import { EDIT_CAR_FORM_STEPS } from "../../constants";
 import { useEditCarSteps } from "../../hooks/useEditCarSteps.tsx";
-import { InvalidFormToast } from "../../../../ui/alert/presets/toast/index.ts";
+import { InvalidFormToast } from "../../../../ui/alert/presets/toast";
 import { Form } from "../../../../components/Form/Form.tsx";
-import { SubmitHandlerArgs } from "../../../../types/index.ts";
+import { SubmitHandlerArgs } from "../../../../types";
 
 export type EditCarFormProps = {
     car: Car
@@ -32,7 +32,7 @@ export function EditCarForm({
     const submitHandler: SubmitHandlerArgs<CarFormFields> = useMemo(() => ({
         onValid: async (formResult) => {
             try {
-                await carDao.update(formResult);
+                await carDao.updateFromFormResult(formResult);
 
                 if(dismissBottomSheet) dismissBottomSheet(true);
                 openToast(editFields.editToastMessages.success());

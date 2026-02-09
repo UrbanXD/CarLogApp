@@ -8,14 +8,14 @@ export class FuelTypeMapper extends AbstractMapper<FuelTypeTableRow, FuelType> {
         super();
     }
 
-    async toDto(entity: FuelTypeTableRow): Promise<FuelType> {
+    toDto(entity: FuelTypeTableRow): FuelType {
         return fuelTypeSchema.parse({
             id: entity.id,
             key: entity.key
         });
     }
 
-    async toEntity(dto: FuelType): Promise<FuelTypeTableRow> {
+    toEntity(dto: FuelType): FuelTypeTableRow {
         return {
             id: dto.id as never,
             key: dto.key

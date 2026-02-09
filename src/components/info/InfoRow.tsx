@@ -1,16 +1,17 @@
-import React, { ReactElement, useMemo } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
+import React, { ReactElement } from "react";
+import { StyleSheet, View } from "react-native";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants";
 import { InfoText, InfoTextProps } from "./InfoText.tsx";
 import Icon from "../Icon.tsx";
-import { debounce } from "es-toolkit";
-import { ViewStyle } from "../../types/index.ts";
+import { ViewStyle } from "../../types";
+import { DebouncedPressable } from "../DebouncedPressable.tsx";
 
 export type InfoRowProps = InfoTextProps & {
     onPress?: () => void
     renderContent?: () => ReactElement
     actionIcon?: string
     row?: boolean
+    isLoading?: boolean
     containerStyle?: ViewStyle
     secondaryInfo?: InfoTextProps
 }
@@ -20,16 +21,15 @@ export function InfoRow({
     renderContent,
     actionIcon,
     row = true,
+    isLoading,
     secondaryInfo,
     containerStyle,
     ...infoTextProps
 }: InfoRowProps) {
-    const debouncedPress = useMemo(() => debounce(() => onPress?.(), 250), [onPress]);
-
     return (
         <View style={ { flex: 1 } }>
-            <Pressable
-                onPress={ debouncedPress }
+            <DebouncedPressable
+                onPress={ onPress }
                 disabled={ !onPress }
                 style={ [styles.container, containerStyle] }
             >
@@ -42,12 +42,18 @@ export function InfoRow({
                    />
                 }
                 <View style={ [styles.contentContainer, row && styles.rowContentContainer] }>
-                    <InfoText { ...infoTextProps } />
+                    <InfoText
+                        isLoading={ isLoading }
+                        loadingIndicatorStyle={ styles.loadingIndicator }
+                        { ...infoTextProps }
+                    />
                     {
                         secondaryInfo &&
                        <InfoText
-                          contentTextStyle={ row ? styles.rowContentText : undefined }
-                          titleStyle={ row ? styles.rowContentText : undefined }
+                          isLoading={ isLoading }
+                          titleStyle={ row && styles.rowContentText }
+                          contentTextStyle={ row && styles.rowContentText }
+                          loadingIndicatorStyle={ row ? styles.rowLoadingIndicator : styles.loadingIndicator }
                           { ...secondaryInfo }
                        />
                     }
@@ -60,7 +66,7 @@ export function InfoRow({
                       color={ COLORS.white }
                    />
                 }
-            </Pressable>
+            </DebouncedPressable>
             {
                 renderContent &&
                <View style={ { paddingLeft: FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE + SEPARATOR_SIZES.lightSmall } }>
@@ -84,9 +90,15 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         gap: SEPARATOR_SIZES.lightSmall
     },
+    loadingIndicator: {
+        alignSelf: "flex-start"
+    },
     rowContentContainer: {
         flexDirection: "row",
         alignItems: "center"
+    },
+    rowLoadingIndicator: {
+        alignSelf: "flex-end"
     },
     rowContentText: {
         textAlign: "right"

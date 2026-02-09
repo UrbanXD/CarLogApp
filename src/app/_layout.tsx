@@ -7,7 +7,6 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Provider } from "react-redux";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import Compactor from "../components/Compactor";
-import { ScreenScrollViewProvider } from "../contexts/screenScrollView/ScreenScrollViewProvider.tsx";
 import { AuthProvider } from "../contexts/auth/AuthProvider.tsx";
 import { DatabaseProvider } from "../contexts/database/DatabaseProvider.tsx";
 import { store } from "../database/redux/store.ts";
@@ -15,7 +14,7 @@ import Header from "../components/Navigation/Header/Header.tsx";
 import ToastManager from "../ui/alert/components/toast/ToastManager.tsx";
 import ModalManager from "../ui/alert/components/modal/ModalManager.tsx";
 import { SystemBars } from "react-native-edge-to-edge";
-import { SECONDARY_COLOR } from "../constants/index.ts";
+import { SECONDARY_COLOR } from "../constants";
 import { PortalHost, PortalProvider } from "@gorhom/portal";
 import { useTranslation } from "react-i18next";
 import { setBackgroundColorAsync } from "expo-system-ui";
@@ -319,7 +318,6 @@ const RootLayout: React.FC = () =>
             { Component: Provider, props: { store } },
             { Component: SafeAreaProvider },
             { Component: KeyboardProvider },
-            { Component: ScreenScrollViewProvider },
             { Component: GestureHandlerRootView, props: { style: { flex: 1 } } },
             { Component: PortalProvider },
             { Component: AuthProvider },

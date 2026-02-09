@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { FlashList, FlashListRef, ListRenderItemInfo } from "@shopify/flash-list";
-import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants";
 import { Car } from "../../schemas/carSchema.ts";
-import { useAppDispatch } from "../../../../hooks";
+import { useAppDispatch, useAppSelector } from "../../../../hooks";
 import { selectCar } from "../../model/actions/selectCar.ts";
 import { CarPickerItem } from "./CarPickerItem.tsx";
 import Button from "../../../../components/Button/Button.ts";
@@ -23,6 +23,9 @@ import { router } from "expo-router";
 import useCars from "../../hooks/useCars.ts";
 import { SelectedCar } from "./SelectedCar.tsx";
 import { useTranslation } from "react-i18next";
+import { useCar } from "../../hooks/useCar.ts";
+import { MoreDataLoading } from "../../../../components/loading/MoreDataLoading.tsx";
+import { getSelectedCarId } from "../../model/selectors/getSelectedCarId.ts";
 
 const CLOSE_ICON_SIZE = FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE;
 const MAX_TRANSLATE = widthPercentageToDP(100);
@@ -33,7 +36,9 @@ type CarPickerProps = {
 
 export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
     const { t } = useTranslation();
-    const { cars, selectedCar } = useCars();
+    const { cars, isLoading } = useCars();
+    const selectedCarId = useAppSelector(getSelectedCarId);
+    const { car: selectedCar } = useCar({ carId: selectedCarId });
     const dispatch = useAppDispatch();
 
     const flashListRef = useRef<FlashListRef<Car>>(null);
@@ -116,6 +121,7 @@ export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
                   <SelectedCar
                      car={ selectedCar }
                      placeholder={ t("car.picker.placeholder") }
+                     isCarsLoading={ isLoading }
                      userDontHaveCars={ cars.length === 0 }
                      userDontHaveCarsPlaceholder={ t("car.picker.no_cars") }
                   />
@@ -132,16 +138,22 @@ export function CarPicker({ onCarListVisibleChange }: CarPickerProps) {
                 />
             </Animated.View>
             <Animated.View style={ carPickerStyle }>
-                <FlashList<Car>
-                    ref={ flashListRef }
-                    data={ cars }
-                    renderItem={ renderItem }
-                    keyExtractor={ keyExtractor }
-                    ItemSeparatorComponent={ renderSeparatorComponent }
-                    contentContainerStyle={ { flexGrow: 1 } }
-                    horizontal
-                    showsHorizontalScrollIndicator={ false }
-                />
+                {
+                    isLoading
+                    ?
+                    <MoreDataLoading/>
+                    :
+                    <FlashList<Car>
+                        ref={ flashListRef }
+                        data={ cars }
+                        renderItem={ renderItem }
+                        keyExtractor={ keyExtractor }
+                        ItemSeparatorComponent={ renderSeparatorComponent }
+                        contentContainerStyle={ { flexGrow: 1 } }
+                        horizontal
+                        showsHorizontalScrollIndicator={ false }
+                    />
+                }
             </Animated.View>
         </View>
     );

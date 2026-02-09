@@ -8,7 +8,7 @@ export class FuelUnitMapper extends AbstractMapper<FuelUnitTableRow, FuelUnit> {
         super();
     }
 
-    async toDto(entity: FuelUnitTableRow): Promise<FuelUnit> {
+    toDto(entity: FuelUnitTableRow): FuelUnit {
         return fuelUnitSchema.parse({
             id: entity.id,
             key: entity.key,
@@ -17,7 +17,7 @@ export class FuelUnitMapper extends AbstractMapper<FuelUnitTableRow, FuelUnit> {
         });
     }
 
-    async toEntity(dto: FuelUnit): Promise<FuelUnitTableRow> {
+    toEntity(dto: FuelUnit): FuelUnitTableRow {
         return {
             id: dto.id as never,
             key: dto.key,

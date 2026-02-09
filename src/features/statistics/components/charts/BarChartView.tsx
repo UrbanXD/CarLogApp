@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import { BarChart, barDataItem, yAxisSides } from "react-native-gifted-charts";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../../constants";
-import { Legend, LegendData } from "./common/Legend.tsx";
+import { Legend, LegendType } from "./common/Legend.tsx";
 import { hexToRgba } from "../../../../utils/colors/hexToRgba.ts";
 import {
     POINTER_LABEL_FONT_SIZE,
@@ -30,7 +30,7 @@ export type BarChartItem = {
 type BarChartViewProps = {
     chartData?: Array<BarChartItem>
     title?: ChartTitleProps
-    legend?: { [key: string]: LegendData }
+    legend?: LegendType
     yAxisTitle?: string
     xAxisTitle?: string
     barWidth?: number
@@ -64,7 +64,7 @@ export function BarChartView({
 
     const transformToBarData = (
         groups: Array<BarChartItem>,
-        legend?: { [key: string]: LegendData }
+        legend?: LegendType
     ): Array<barDataItem> => {
         const result: Array<barDataItem> = [];
 

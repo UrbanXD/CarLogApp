@@ -3,21 +3,56 @@ import { RideExpenseTableRow } from "../../../../../../database/connector/powers
 import { RideExpense, rideExpenseSchema } from "../../schemas/rideExpenseSchema.ts";
 import { ExpenseDao } from "../../../../../expense/model/dao/ExpenseDao.ts";
 import { RideExpenseFormFields, RideExpenseFormTransformedFields } from "../../schemas/form/rideExpenseForm.ts";
-import { CarDao } from "../../../../../car/model/dao/CarDao.ts";
+import { CurrencyDao } from "../../../../../_shared/currency/model/dao/CurrencyDao.ts";
+import { ExpenseTypeDao } from "../../../../../expense/model/dao/ExpenseTypeDao.ts";
+import { WithPrefix } from "../../../../../../types";
+import { SelectExpenseTableRow } from "../../../../../expense/model/mapper/expenseMapper.ts";
+import { Car } from "../../../../../car/schemas/carSchema.ts";
+import { numberToFractionDigit } from "../../../../../../utils/numberToFractionDigit.ts";
+import { MAX_EXCHANGE_RATE_DECIMAL } from "../../../../../../constants";
 
-export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideExpense> {
-    private readonly carDao: CarDao;
+export type SelectRideExpenseTableRow =
+    RideExpenseTableRow
+    & WithPrefix<Omit<SelectExpenseTableRow, "id" | "related_id">, "expense">;
+
+export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideExpense, SelectRideExpenseTableRow> {
     private readonly expenseDao: ExpenseDao;
+    private readonly expenseTypeDao: ExpenseTypeDao;
+    private readonly currencyDao: CurrencyDao;
 
-    constructor(carDao: CarDao, expenseDao: ExpenseDao) {
+    constructor(expenseDao: ExpenseDao, expenseTypeDao: ExpenseTypeDao, currencyDao: CurrencyDao) {
         super();
-
-        this.carDao = carDao;
         this.expenseDao = expenseDao;
+        this.expenseTypeDao = expenseTypeDao;
+        this.currencyDao = currencyDao;
     }
 
-    async toDto(entity: RideExpenseTableRow): Promise<RideExpense> {
-        const expense = await this.expenseDao.getById(entity.expense_id);
+    toDto(entity: SelectRideExpenseTableRow): RideExpense {
+        const expense = this.expenseDao.mapper.toDto({
+            id: entity.expense_id!,
+            car_id: entity.expense_car_id,
+            car_name: entity.expense_car_name,
+            car_model_id: entity.expense_car_model_id,
+            car_model_name: entity.expense_car_model_name,
+            car_model_year: entity.expense_car_model_year,
+            car_make_id: entity.expense_car_make_id,
+            car_make_name: entity.expense_car_make_name,
+            related_id: null,
+            type_id: entity.expense_type_id,
+            type_owner_id: entity.expense_type_owner_id,
+            type_key: entity.expense_type_key,
+            exchange_rate: numberToFractionDigit(entity.expense_exchange_rate ?? 1, MAX_EXCHANGE_RATE_DECIMAL),
+            amount: numberToFractionDigit(entity.expense_amount ?? 0),
+            exchanged_amount: numberToFractionDigit(entity.expense_exchanged_amount ?? 0),
+            currency_id: entity.expense_currency_id,
+            currency_key: entity.expense_currency_key,
+            currency_symbol: entity.expense_currency_symbol,
+            car_currency_id: entity.expense_car_currency_id,
+            car_currency_key: entity.expense_car_currency_key,
+            car_currency_symbol: entity.expense_car_currency_symbol,
+            date: entity.expense_date,
+            note: entity.expense_note
+        });
 
         return rideExpenseSchema.parse({
             id: entity.id,
@@ -27,7 +62,7 @@ export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideE
         });
     }
 
-    async toEntity(dto: RideExpense): Promise<RideExpenseTableRow> {
+    toEntity(dto: RideExpense): RideExpenseTableRow {
         return {
             id: dto.id,
             owner_id: dto.ownerId,
@@ -36,27 +71,45 @@ export class RideExpenseMapper extends AbstractMapper<RideExpenseTableRow, RideE
         };
     }
 
-    async formResultMapper(
+    async toFormTransformedFields(
         formResult: RideExpenseFormFields,
-        carId: string
+        car: Car
     ): Promise<RideExpenseFormTransformedFields> {
-        const carCurrencyId = await this.carDao.getCarCurrencyIdById(carId);
-
         const expenseEntity = this.expenseDao.mapper.formResultToEntity({
             id: formResult.expense.id,
-            carId: carId,
+            carId: car.id,
             typeId: formResult.typeId,
             expense: formResult.expense,
             date: formResult.date,
             note: formResult.note
         });
 
+        const [expenseType, currency] = await Promise.all([
+            this.expenseTypeDao.getById(expenseEntity.type_id),
+            this.currencyDao.getById(expenseEntity.currency_id)
+        ]);
+
         return {
             id: formResult.id,
-            expense: await this.expenseDao.mapper.toDto({
+            expense: this.expenseDao.mapper.toDto({
                 ...expenseEntity,
+                exchanged_amount: (expenseEntity.amount ?? 0) * (expenseEntity.exchange_rate ?? 1),
+                car_name: car.name,
+                car_model_id: car.model.id,
+                car_model_name: car.model.name,
+                car_model_year: car.model.year,
+                car_make_id: car.model.make.id,
+                car_make_name: car.model.make.name,
+                type_id: expenseType.id,
+                type_owner_id: expenseType.ownerId,
+                type_key: expenseType.key,
                 related_id: null,
-                car_currency_id: carCurrencyId
+                car_currency_id: car.currency.id as never,
+                car_currency_key: car.currency.key,
+                car_currency_symbol: car.currency.symbol,
+                currency_id: currency.id as never,
+                currency_key: currency.key,
+                currency_symbol: currency.symbol
             })
         };
     }

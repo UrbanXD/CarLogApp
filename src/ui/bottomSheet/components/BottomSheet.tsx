@@ -8,26 +8,32 @@ import {
     FONT_SIZES,
     GLOBAL_STYLE,
     SEPARATOR_SIZES
-} from "../../../constants/index.ts";
+} from "../../../constants";
 import { BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { BottomSheetModalProps } from "@gorhom/bottom-sheet/src/components/bottomSheetModal/types";
 import BottomSheetBackdrop from "./BottomSheetBackdrop.tsx";
 import { router, useFocusEffect, useNavigation } from "expo-router";
 import { KeyboardController } from "react-native-keyboard-controller";
-import { BottomSheetLeavingModal } from "../presets/modal/index.ts";
+import { BottomSheetLeavingModal } from "../presets/modal";
 import { useAlert } from "../../alert/hooks/useAlert.ts";
 import { BottomSheetProvider } from "../contexts/BottomSheetProvider.tsx";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { isArray } from "es-toolkit/compat";
+import { MoreDataLoading } from "../../../components/loading/MoreDataLoading.tsx";
 
 export interface BottomSheetProps extends Partial<BottomSheetModalProps> {
     title?: string;
     content: ReactNode;
     closeButton?: ReactNode;
+    isLoading?: boolean;
 }
 
 const BottomSheet: React.FC<BottomSheetProps> = ({
-    title, content, closeButton, ...restProps
+    title,
+    content,
+    closeButton,
+    isLoading,
+    ...restProps
 }) => {
     const { top, bottom } = useSafeAreaInsets();
     const { openModal } = useAlert();
@@ -179,7 +185,11 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                    </View>
                 }
                 <BottomSheetProvider contextValue={ { dismissBottomSheet } }>
-                    { content }
+                    {
+                        isLoading
+                        ? <MoreDataLoading/>
+                        : content
+                    }
                 </BottomSheetProvider>
             </BottomSheetView>
         </BottomSheetModal>
