@@ -25,13 +25,13 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-          SUPABASE_SEED_BUCKET: ${{ env.SUPABASE_SEED_BUCKET }}
-          SEED_DATABASE_NAME: ${{ env.SEED_DATABASE_NAME }}
+          SUPABASE_SEED_BUCKET: ${{ vars.SUPABASE_SEED_BUCKET }}
+          SEED_DATABASE_NAME: ${{ vars.SEED_DATABASE_NAME }}
         run: npx tsx scripts/generateSeed.ts
 
       - name: Upload Seed Artifact
         uses: actions/upload-artifact@v4
         with:
           name: carlog_seed_database
-          path: ${{ env.SEED_DATABASE_NAME }}
+          path: ${{ vars.SEED_DATABASE_NAME }}
           retention-days: 7
