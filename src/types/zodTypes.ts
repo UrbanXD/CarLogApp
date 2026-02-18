@@ -4,6 +4,7 @@ import { isNaN } from "es-toolkit/compat";
 
 export type ZodNumberErrorMessage = {
     required?: string
+    format?: string
     minBound?: (min?: number) => string
     maxBound?: (max?: number) => string
 }
@@ -18,9 +19,16 @@ type ZodNumberArgs = {
     errorMessage?: ZodNumberErrorMessage
 }
 
-const zNumberBase = ({ bounds, errorMessage }: ZodNumberArgs) => z
-.coerce
-.number({ invalid_type_error: errorMessage?.required ?? "error.number_required" })
+const zNumberBase = ({ bounds, errorMessage }: ZodNumberArgs) => z.preprocess((value) => {
+    if(typeof value === "number") return value.toString();
+    return value;
+}, z
+.string()
+.transform((value) => ((value === "" || value === null) ? null : Number(value)))
+.nullable()
+.refine((value) => !isNaN(value), {
+    message: errorMessage?.format ?? "error.number_format"
+})
 .superRefine((value, ctx) => {
     if(value === null || value === undefined) return;
 
@@ -37,7 +45,7 @@ const zNumberBase = ({ bounds, errorMessage }: ZodNumberArgs) => z
             message: errorMessage?.maxBound?.(bounds.max) ?? `error.number_max_limit;${ bounds.max }`
         });
     }
-});
+}));
 
 export const zNumberOptional = (args: ZodNumberArgs = {}) => zNumberBase(args)
 .nullable()

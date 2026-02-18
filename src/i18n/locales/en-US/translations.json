@@ -147,6 +147,7 @@
     "password_format": "The password must contain at least one lowercase and uppercase letter, one number, and one special character",
     "passwords_not_equals": "The two passwords do not match",
     "number_required": "Please enter a number",
+    "number_format": "Please use the required number format",
     "number_min_limit": "The number must be greater than or equal to {{0}}",
     "number_max_limit": "The number must be less than {{0}}",
     "date_required": "Please select a date",
