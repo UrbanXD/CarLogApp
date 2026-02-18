@@ -7,4 +7,5 @@ export enum RideLogFormFieldsEnum {
     Passengers,
     Note,
     DateAndOdometer, // for edit
+    CarWithDateAndOdometerValue, // for edit
 }

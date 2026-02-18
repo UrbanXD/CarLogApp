@@ -66,7 +66,7 @@ export function OdometerLogView({ id }: OdometerLogViewProps) {
             icon: ICON_NAMES.car,
             title: odometerLog?.car.name,
             content: `${ odometerLog?.car.model.make.name } ${ odometerLog?.car.model.name }`,
-            onPress: () => onEdit(OdometerLogFormFieldsEnum.Car)
+            onPress: () => onEdit(OdometerLogFormFieldsEnum.CarWithDateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.odometer,

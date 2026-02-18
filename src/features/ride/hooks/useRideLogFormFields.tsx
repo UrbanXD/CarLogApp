@@ -1,13 +1,12 @@
-import { UseFormReturn, useWatch } from "react-hook-form";
+import { UseFormReturn, useFormState, useWatch } from "react-hook-form";
 import { RideLogFormFields } from "../schemas/form/rideLogForm.ts";
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { RideLogFormFieldsEnum } from "../enums/RideLogFormFields.ts";
 import { FormFields, Steps } from "../../../types";
 import { CarPickerInput } from "../../car/components/forms/inputFields/CarPickerInput.tsx";
 import { OdometerValueInput } from "../../car/_features/odometer/components/forms/inputFields/OdometerValueInput.tsx";
 import Input from "../../../components/Input/Input.ts";
 import { NoteInput } from "../../../components/Input/_presets/NoteInput.tsx";
-import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { EditToast } from "../../../ui/alert/presets/toast";
 import { useRidePlaceToExpandableList } from "../_features/place/hooks/useRidePlaceToExpandableList.ts";
@@ -50,10 +49,72 @@ export function useRideLogFormFields({
         }
     }, [formStartTime, changeEndTimeWhenInputNotTouched]);
 
+    const startTimeAndOdometerInput = useCallback((isEditField: boolean = false) => (
+        <OdometerValueInput
+            control={ control }
+            setValue={ setValue }
+            getFieldState={ getFieldState }
+            idFieldName="startOdometerLogId"
+            carIdFieldName="carId"
+            odometerValueFieldName="startOdometerValue"
+            odometerValueTitle={ t("rides.start_odometer") }
+            dateFieldName="startTime"
+            dateTitle={ t("rides.start") }
+            showLimits={ isEditField }
+            skipLimitLogFieldNames={ ["endOdometerLogId"] }
+            changeCarOdometerValueWhenInputNotTouched={ !isEditField }
+        />
+    ), [control, setValue, getFieldState, t]);
+
+    const endTimeAndOdometerInput = useCallback((isEditField: boolean = false) => (
+        <OdometerValueInput
+            control={ control }
+            setValue={ setValue }
+            getFieldState={ getFieldState }
+            idFieldName="endOdometerLogId"
+            carIdFieldName="carId"
+            odometerValueFieldName="endOdometerValue"
+            odometerValueTitle={ t("rides.end_odometer") }
+            showCurrentOdometerValueAsSubtitle={ !isEditField }
+            currentOdometerValue={ formStartOdometerValue }
+            currentOdometerValueTranslationKey="rides.start_odometer_value"
+            dateFieldName="endTime"
+            dateTitle={ t("rides.end") }
+            showLimits={ false }
+            skipLimitLogFieldNames={ ["startOdometerLogId"] }
+            changeCarOdometerValueWhenInputNotTouched={ !isEditField }
+        />
+    ), [control, setValue, getFieldState, t]);
+
     const fields: Record<RideLogFormFieldsEnum, FormFields> = useMemo(
         () => ({
             [RideLogFormFieldsEnum.Car]: {
                 render: () => <CarPickerInput control={ control } fieldName="carId"/>,
+                editToastMessages: EditToast
+            },
+            [RideLogFormFieldsEnum.CarWithDateAndOdometerValue]: {
+                render: () => {
+                    const { errors, dirtyFields } = useFormState({ control });
+
+                    const showTimeAndOdometerInput = !!(
+                        errors.startTime ||
+                        errors.startOdometerValue ||
+                        errors.endTime ||
+                        errors.endOdometerValue ||
+                        dirtyFields.startTime ||
+                        dirtyFields.startOdometerValue ||
+                        dirtyFields.endTime ||
+                        dirtyFields.endOdometerValue
+                    );
+
+                    return (
+                        <Input.Group>
+                            <CarPickerInput control={ control } fieldName="carId"/>
+                            { showTimeAndOdometerInput && startTimeAndOdometerInput(true) }
+                            { showTimeAndOdometerInput && endTimeAndOdometerInput(true) }
+                        </Input.Group>
+                    );
+                },
                 editToastMessages: EditToast
             },
             [RideLogFormFieldsEnum.Expenses]: {
@@ -124,74 +185,18 @@ export function useRideLogFormFields({
                 editToastMessages: EditToast
             },
             [RideLogFormFieldsEnum.StartTimeAndOdometer]: {
-                render: () => <OdometerValueInput
-                    control={ control }
-                    setValue={ setValue }
-                    getFieldState={ getFieldState }
-                    idFieldName="startOdometerLogId"
-                    carIdFieldName="carId"
-                    odometerValueFieldName="startOdometerValue"
-                    odometerValueTitle={ t("rides.start_odometer") }
-                    dateFieldName="startTime"
-                    dateTitle={ t("rides.start") }
-                    changeCarOdometerValueWhenInputNotTouched={ true }
-                />,
+                render: () => startTimeAndOdometerInput(),
                 editToastMessages: EditToast
             },
             [RideLogFormFieldsEnum.EndTimeAndOdometer]: {
-                render: () => <OdometerValueInput
-                    control={ control }
-                    setValue={ setValue }
-                    getFieldState={ getFieldState }
-                    idFieldName="endOdometerLogId"
-                    carIdFieldName="carId"
-                    odometerValueFieldName="endOdometerValue"
-                    odometerValueTitle={ t("rides.end_odometer") }
-                    currentOdometerValue={ formStartOdometerValue }
-                    currentOdometerValueTranslationKey="rides.start_odometer_value"
-                    showCurrentOdometerValueAsSubtitle
-                    showLimits={ false }
-                    dateFieldName="endTime"
-                    dateTitle={ t("rides.end") }
-                    dateSubtitle={ t(
-                        "rides.start_time_value",
-                        { value: `${ dayjs(formStartTime).format("L LT") }` }
-                    ) }
-                    changeCarOdometerValueWhenInputNotTouched={ false }
-                />,
+                render: () => endTimeAndOdometerInput(),
                 editToastMessages: EditToast
             },
             [RideLogFormFieldsEnum.DateAndOdometer]: {
                 render: () => (
                     <Input.Group>
-                        <OdometerValueInput
-                            control={ control }
-                            setValue={ setValue }
-                            getFieldState={ getFieldState }
-                            idFieldName="startOdometerLogId"
-                            carIdFieldName="carId"
-                            odometerValueFieldName="startOdometerValue"
-                            odometerValueTitle={ t("rides.start_odometer") }
-                            dateFieldName="startTime"
-                            dateTitle={ t("rides.start") }
-                            showLimits={ true }
-                            skipLimitLogFieldNames={ ["endOdometerLogId"] }
-                            changeCarOdometerValueWhenInputNotTouched={ false }
-                        />
-                        <OdometerValueInput
-                            control={ control }
-                            setValue={ setValue }
-                            getFieldState={ getFieldState }
-                            idFieldName="endOdometerLogId"
-                            carIdFieldName="carId"
-                            odometerValueFieldName="endOdometerValue"
-                            odometerValueTitle={ t("rides.end_odometer") }
-                            dateFieldName="endTime"
-                            dateTitle={ t("rides.end") }
-                            showCurrentOdometerValueAsSubtitle={ false }
-                            showLimits={ false }
-                            changeCarOdometerValueWhenInputNotTouched={ false }
-                        />
+                        { startTimeAndOdometerInput(true) }
+                        { endTimeAndOdometerInput(true) }
                     </Input.Group>
                 ),
                 editToastMessages: EditToast
@@ -212,7 +217,9 @@ export function useRideLogFormFields({
             formStartOdometerValue,
             formStartTime,
             t,
-            car
+            car,
+            startTimeAndOdometerInput,
+            endTimeAndOdometerInput
         ]
     );
 

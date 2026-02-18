@@ -3,5 +3,6 @@ export enum ServiceLogFormFieldsEnum {
     Type,
     ServiceItems,
     DateAndOdometerValue,
-    Note
+    Note,
+    CarWithDateAndOdometerValue, // for edit
 }

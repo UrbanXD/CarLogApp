@@ -49,7 +49,7 @@ const rideLogForm = (odometerLogDao: OdometerLogDao) => rideLogSchema
         });
     }
 
-    if(data.startOdometerValue && data.endOdometerValue && data.endOdometerValue <= data.startOdometerValue) {
+    if(data.startOdometerValue && data.endOdometerValue && data.endOdometerValue < data.startOdometerValue) {
         ctx.addIssue({
             code: "custom",
             path: ["endOdometerValue"],

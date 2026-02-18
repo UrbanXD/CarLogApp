@@ -158,7 +158,7 @@ export function RideLogView({ id }: RideLogViewProps) {
                 icon: ICON_NAMES.car,
                 title: rideLog?.car.name,
                 content: `${ rideLog?.car.model.make.name } ${ rideLog?.car.model.name }`,
-                onPress: () => onEdit(RideLogFormFieldsEnum.Car)
+                onPress: () => onEdit(RideLogFormFieldsEnum.CarWithDateAndOdometerValue)
             },
             {
                 icon: ICON_NAMES.calendar,

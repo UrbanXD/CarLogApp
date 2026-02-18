@@ -1,4 +1,4 @@
-import { UseFormReturn, useWatch } from "react-hook-form";
+import { UseFormReturn, useFormState, useWatch } from "react-hook-form";
 import React, { useEffect, useMemo } from "react";
 import { FormFields } from "../../../../../types";
 import { CarPickerInput } from "../../../components/forms/inputFields/CarPickerInput.tsx";
@@ -8,6 +8,7 @@ import { OdometerValueInput } from "../components/forms/inputFields/OdometerValu
 import { OdometerChangeLogFormFields } from "../schemas/form/odometerChangeLogForm.ts";
 import { EditToast } from "../../../../../ui/alert/presets/toast";
 import { useTranslation } from "react-i18next";
+import Input from "../../../../../components/Input/Input.ts";
 
 type UseOdometerLogFormFieldsProps = {
     form: UseFormReturn<OdometerChangeLogFormFields>
@@ -24,22 +25,46 @@ export function useOdometerLogFormFields({ form, isEdit }: UseOdometerLogFormFie
         clearErrors();
     }, [formCarId]);
 
+    const odometerValueInput = useMemo(() => (
+        <OdometerValueInput
+            control={ control }
+            setValue={ setValue }
+            getFieldState={ getFieldState }
+            idFieldName="id"
+            carIdFieldName="carId"
+            odometerValueFieldName="value"
+            dateFieldName="date"
+            changeCarOdometerValueWhenInputNotTouched={ !isEdit }
+        />
+    ), [control, setValue, getFieldState, isEdit]);
+
     const fields: Record<OdometerLogFormFieldsEnum, FormFields> = useMemo(() => ({
         [OdometerLogFormFieldsEnum.Car]: {
             render: () => <CarPickerInput control={ control } fieldName="carId"/>,
             editToastMessages: EditToast
         },
+        [OdometerLogFormFieldsEnum.CarWithDateAndOdometerValue]: {
+            render: () => {
+                const { errors, dirtyFields } = useFormState({ control });
+
+                const showDateAndOdometerValueInput = !!(
+                    errors.date ||
+                    errors.value ||
+                    dirtyFields.date ||
+                    dirtyFields.value
+                );
+
+                return (
+                    <Input.Group>
+                        <CarPickerInput control={ control } fieldName="carId"/>
+                        { showDateAndOdometerValueInput && odometerValueInput }
+                    </Input.Group>
+                );
+            },
+            editToastMessages: EditToast
+        },
         [OdometerLogFormFieldsEnum.DateAndOdometerValue]: {
-            render: () => <OdometerValueInput
-                control={ control }
-                setValue={ setValue }
-                getFieldState={ getFieldState }
-                idFieldName="id"
-                carIdFieldName="carId"
-                odometerValueFieldName="value"
-                dateFieldName="date"
-                changeCarOdometerValueWhenInputNotTouched={ !isEdit }
-            />,
+            render: () => odometerValueInput,
             editToastMessages: EditToast
         },
         [OdometerLogFormFieldsEnum.Note]: {
@@ -50,7 +75,7 @@ export function useOdometerLogFormFields({ form, isEdit }: UseOdometerLogFormFie
             />,
             editToastMessages: EditToast
         }
-    }), [control, setValue, t, isEdit]);
+    }), [control, setValue, t, isEdit, odometerValueInput]);
 
     const fullForm: FormFields = {
         render: () => ([
