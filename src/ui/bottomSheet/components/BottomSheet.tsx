@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Keyboard, Platform, StyleSheet, Text, View } from "react-native";
+import { Keyboard, Platform, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import {
     BottomSheetRoutes,
@@ -35,6 +35,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     isLoading,
     ...restProps
 }) => {
+    const { height: screenHeight } = useWindowDimensions();
     const { top, bottom } = useSafeAreaInsets();
     const { openModal } = useAlert();
     const navigation = useNavigation();
@@ -43,6 +44,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     const manuallyClosed = useRef(false);
     const forceClosed = useRef(false);
 
+    const [headerHeight, setHeaderHeight] = useState(0);
     const [keyboardVisible, setKeyboardVisible] = useState(false);
 
     const { snapPoints, enableHandlePanningGesture, enableDynamicSizing, enableDismissOnClose } = restProps;
@@ -159,6 +161,42 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         bottom
     );
 
+    const availableContentHeight = useMemo(
+        () => {
+            let limit = screenHeight * 0.9;
+
+            if(restProps.enableDynamicSizing) {
+                limit = restProps.maxDynamicContentSize ?? (screenHeight * 0.9);
+            } else if(restProps.snapPoints) {
+                const points: Array<string | number> = ("value" in restProps.snapPoints
+                                                        ? restProps.snapPoints.value
+                                                        : snapPoints as Array<string | number>) ?? [];
+
+                const lastSnapPoint = points[points.length - 1];
+
+                if(typeof lastSnapPoint === "string" && lastSnapPoint.endsWith("%")) {
+                    const percentage = parseFloat(lastSnapPoint) / 100;
+                    limit = screenHeight * percentage;
+                } else if(typeof lastSnapPoint === "number") {
+                    limit = lastSnapPoint;
+                }
+            }
+
+
+            return limit - top - bottom - headerHeight - styles.container.gap - styles.container.paddingBottom;
+        },
+        [
+            restProps.enableDynamicSizing,
+            restProps.maxDynamicContentSize,
+            restProps.snapPoints,
+            screenHeight,
+            headerHeight,
+            top,
+            title,
+            styles.container
+        ]
+    );
+
     return (
         <BottomSheetModal
             ref={ bottomSheetRef }
@@ -177,14 +215,14 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
             <BottomSheetView style={ styles.container }>
                 {
                     title &&
-                   <View>
+                   <View onLayout={ (e) => setHeaderHeight(e.nativeEvent.layout.height) }>
                        { closeButton }
                       <Text style={ styles.titleText }>
                           { title }
                       </Text>
                    </View>
                 }
-                <BottomSheetProvider contextValue={ { dismissBottomSheet } }>
+                <BottomSheetProvider contextValue={ { dismissBottomSheet, availableContentHeight } }>
                     {
                         isLoading
                         ? <MoreDataLoading/>
