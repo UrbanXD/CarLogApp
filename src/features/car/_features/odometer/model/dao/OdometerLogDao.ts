@@ -256,7 +256,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
             baseQuery: this.selectQuery(),
             defaultCursorOptions: {
                 cursor: [
-                    { field: "ol.value", order: "desc" },
+                    { field: "ol.value", order: "desc", extraOrderByField: { field: "date", reverseOrder: false } },
                     { field: "ol.id", order: "desc" }
                 ],
                 defaultOrder: "desc"

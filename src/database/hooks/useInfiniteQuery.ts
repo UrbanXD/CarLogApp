@@ -21,13 +21,20 @@ export type CursorDirection = "initial" | "next" | "prev";
 
 export type CursorValue<TableItem> = TableItem[keyof TableItem];
 
+export type CursorExtraOrderByField<Columns> = {
+    field: Columns
+    reverseOrder?: boolean
+    toLowerCase?: boolean
+}
+
 export type Cursor<
     QueryBuilder extends SelectQueryBuilder<any, any, any>,
     Columns = ExtractColumnsFromQuery<QueryBuilder>
 > = {
-    field: Columns,
-    order?: OrderByDirectionExpression,
+    field: Columns
+    order?: OrderByDirectionExpression
     toLowerCase?: boolean
+    extraOrderByField?: CursorExtraOrderByField<Columns> | Array<CursorExtraOrderByField<Columns>>
 }
 
 export type CursorOptions<
@@ -363,6 +370,22 @@ export const useInfiniteQuery = <
                 reverse: false,
                 toLowerCase: cursor?.toLowerCase ?? false
             });
+
+            if(cursor.extraOrderByField) {
+                const extraOrderByFields = Array.isArray(cursor.extraOrderByField)
+                                           ? cursor.extraOrderByField
+                                           : [cursor.extraOrderByField];
+
+                extraOrderByFields.forEach((extraOrder) => watchBuilder = addOrder<QueryBuilder, Columns>(
+                    watchBuilder,
+                    {
+                        field: extraOrder.field,
+                        direction: cursor.order ?? cursorOptions.defaultOrder ?? "asc",
+                        reverse: extraOrder.reverseOrder,
+                        toLowerCase: extraOrder.toLowerCase
+                    }
+                ));
+            }
         });
 
         const compiled = watchBuilder.compile();
@@ -468,7 +491,7 @@ export const useInfiniteQuery = <
                             setNextCursorValues(null);
                             setPrevCursorValues(null);
                         }
-                        
+
                         setHasNext(parsedTableRow.length >= perPage);
                         setHasPrev(!!prevCursorValues || (!!defaultItem && parsedTableRow.length >= perPage));
                     } catch(error) {

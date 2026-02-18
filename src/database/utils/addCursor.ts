@@ -26,7 +26,6 @@ export function addCursor<
     const cursorValues: Array<CursorValue<TableItem>> | null = value ? Array.isArray(value) ? value : [value] : null;
 
     let subQuery = query;
-
     if(shouldOrder) {
         cursors.map((cursor) => {
             subQuery = addOrder<QueryBuilder, Columns>(
@@ -38,6 +37,22 @@ export function addCursor<
                     toLowerCase: cursor?.toLowerCase ?? false
                 }
             );
+
+            if(cursor.extraOrderByField) {
+                const extraOrderByFields = Array.isArray(cursor.extraOrderByField)
+                                           ? cursor.extraOrderByField
+                                           : [cursor.extraOrderByField];
+
+                extraOrderByFields.forEach((extraOrder) => subQuery = addOrder<QueryBuilder, Columns>(
+                    subQuery,
+                    {
+                        field: extraOrder.field,
+                        direction: cursor.order ?? cursorOptions.defaultOrder ?? "asc",
+                        reverse: !!extraOrder.reverseOrder && direction === "prev",
+                        toLowerCase: extraOrder.toLowerCase
+                    }
+                ));
+            }
         });
     }
 
