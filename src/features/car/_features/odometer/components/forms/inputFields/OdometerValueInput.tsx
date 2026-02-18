@@ -35,7 +35,7 @@ type OdometerValueInputProps<FormFieldValues extends FieldValues> = {
     dateFieldName?: FieldPath<FormFieldValues>
     dateTitle?: string
     dateSubtitle?: string
-    currentOdometerValue?: number
+    currentOdometerValue?: number | null
     currentOdometerValueTranslationKey?: string
     showCurrentOdometerValueAsSubtitle?: boolean
     showLimits?: boolean
