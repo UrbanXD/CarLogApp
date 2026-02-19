@@ -45,7 +45,7 @@ export type SelectOdometerLogTableRow =
         related_id: string | null
         type_key: OdometerLogTypeTableRow["key"]
         note: string | null
-        date: string | null
+        log_date: string | null
     };
 
 export type SelectOdometerTableRow =
@@ -126,7 +126,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
             "ou.key as unit_key",
             "ou.short as unit_short",
             "ou.conversion_factor as unit_conversion_factor",
-            this.dateExpression(eb).as("date"),
+            this.dateExpression(eb).as("log_date"),
             eb.fn.coalesce(
                 "fl_e.note",
                 "sl_e.note",
@@ -256,7 +256,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
             baseQuery: this.selectQuery(),
             defaultCursorOptions: {
                 cursor: [
-                    { field: "ol.value", order: "desc", extraOrderByField: { field: "date", reverseOrder: false } },
+                    { field: "ol.value", order: "desc", extraOrderByField: { field: "log_date", reverseOrder: false } },
                     { field: "ol.id", order: "desc" }
                 ],
                 defaultOrder: "desc"

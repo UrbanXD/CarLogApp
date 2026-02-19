@@ -39,12 +39,14 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
         hasPrev,
         isLoading,
         filterManager,
+        filterByRange,
         orderButtons
     } = useTimeline({
         infiniteQueryOptions: memoizedOptions,
         cursorOrderButtons: [
             { field: "ol.value", title: t("odometer.value") }
-        ]
+        ],
+        fromDateRangeFilterField: "log_date"
     });
 
     const { filterButtons } = useOdometerLogTimelineFilter({
@@ -81,6 +83,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
                 data={ memoizedData }
                 orderButtons={ orderButtons }
                 filterButtons={ filterButtons }
+                filterByRange={ filterByRange }
                 isLoading={ isLoading }
                 fetchNext={ fetchNext }
                 fetchPrev={ fetchPrev }

@@ -30,13 +30,15 @@ export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
         hasPrev,
         isLoading,
         filterManager,
+        filterByRange,
         orderButtons
     } = useTimeline({
         infiniteQueryOptions: memoizedOptions,
         cursorOrderButtons: [
             { field: "e.date", title: t("date.text") },
             { field: "e.amount", title: t("currency.price") }
-        ]
+        ],
+        fromDateRangeFilterField: "e.date"
     });
 
     const { filterButtons } = useExpenseTimelineFilter({
@@ -58,6 +60,7 @@ export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
                 data={ memoizedData }
                 orderButtons={ orderButtons }
                 filterButtons={ filterButtons }
+                filterByRange={ filterByRange }
                 isLoading={ isLoading }
                 fetchNext={ fetchNext }
                 fetchPrev={ fetchPrev }

@@ -54,11 +54,16 @@ function InputDatePicker({
             const [start, end] = safeRaw;
 
             return [
-                (start && dayjs(start).isValid()) ? dayjs(start).toDate() : (dayjs(defaultStartDate).isValid() ? dayjs(
-                    defaultStartDate).toDate() : null),
-                (end && dayjs(end).isValid()) ? dayjs(end).toDate() : (dayjs(defaultEndDate).isValid() ? dayjs(
-                    defaultEndDate)
-                .toDate() : null)
+                (start && dayjs(start).isValid())
+                ? dayjs(start).startOf("day").toDate()
+                : (dayjs(defaultStartDate).isValid()
+                   ? dayjs(defaultStartDate).startOf("day").toDate()
+                   : null),
+                (end && dayjs(end).isValid())
+                ? dayjs(end).endOf("day").toDate()
+                : (dayjs(defaultEndDate).isValid()
+                   ? dayjs(defaultEndDate).endOf("day").toDate()
+                   : null)
             ];
         }
 
@@ -109,9 +114,18 @@ function InputDatePicker({
         if(mode === "single") {
             finalDates = startDate ? [startDate] : [null];
         } else {
-            finalDates = startDate && endDate
-                         ? dayjs(startDate).isAfter(endDate) ? [endDate, startDate] : [startDate, endDate]
-                         : [startDate, endDate];
+            const formatedStartDate = (startDate && dayjs(startDate).isValid()) ? dayjs(startDate)
+            .startOf("day")
+            .toDate() : null;
+            const formatedEndDate = (endDate && dayjs(endDate).isValid())
+                                    ? (dayjs(endDate).endOf("day").toDate())
+                                    : null;
+
+            finalDates = formatedStartDate && formatedEndDate
+                         ? dayjs(formatedStartDate).isAfter(formatedEndDate)
+                           ? [formatedEndDate, formatedStartDate]
+                           : [formatedStartDate, formatedEndDate]
+                         : [formatedStartDate, formatedEndDate];
         }
 
         handleDateChange(finalDates);

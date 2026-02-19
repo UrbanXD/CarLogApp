@@ -11,9 +11,13 @@ import { FilterRow } from "../filter/FilterRow.tsx";
 import { useTranslation } from "react-i18next";
 import { ViewStyle } from "../../types";
 import { useDelayedBoolean } from "../../hooks/useDelayedBoolean.ts";
+import { DateRangePicker } from "../Input/datePicker/presets/DateRangePicker.tsx";
+
+export type FilterByRange = (from: string | null, to: string | null) => void
 
 type TimelineViewProps = {
     data: Array<TimelineItemType>
+    filterByRange?: FilterByRange
     orderButtons?: Array<FilterButtonProps>
     filterButtons?: Array<FilterButtonProps>
     isLoading?: boolean
@@ -32,6 +36,7 @@ const DOT_ICON_SIZE = FONT_SIZES.p1 * ICON_FONT_SIZE_SCALE;
 
 function ITimelineView({
     data,
+    filterByRange,
     orderButtons,
     filterButtons,
     isLoading,
@@ -52,10 +57,16 @@ function ITimelineView({
     const ref = useRef<FlashListRef<TimelineItemType>>(null);
 
     const [filterRowsHeight, setFilterRowsHeight] = useState(0);
+    const [from, setFrom] = useState<string | null>(null);
+    const [to, setTo] = useState<string | null>(null);
 
     useEffect(() => {
         if(!isLoading) ref.current?.scrollToTop();
     }, [isLoading]);
+
+    useEffect(() => {
+        if(filterByRange) filterByRange(from, to);
+    }, [filterByRange, from, to]);
 
     const renderItem = useCallback(({ item, index }: ListRenderItemInfo<TimelineItemType>) => (
         <TimelineItem
@@ -105,6 +116,16 @@ function ITimelineView({
                 style={ [styles.filtersContainer, filtersContainerStyle] }
                 onLayout={ filterRowsOnLayout }
             >
+                {
+                    filterByRange &&
+                   <DateRangePicker
+                      from={ from }
+                      to={ to }
+                      setFrom={ setFrom }
+                      setTo={ setTo }
+                      style={ styles.datePickerContainer }
+                   />
+                }
                 {
                     orderButtons &&
                    <FilterRow style={ { paddingHorizontal: DEFAULT_SEPARATOR } }>
@@ -156,6 +177,12 @@ const styles = StyleSheet.create({
         left: -DEFAULT_SEPARATOR,
         right: -DEFAULT_SEPARATOR,
         zIndex: 1
+    },
+    datePickerContainer: {
+        position: "relative",
+        marginLeft: DEFAULT_SEPARATOR,
+        marginRight: DEFAULT_SEPARATOR,
+        marginBottom: SEPARATOR_SIZES.lightSmall
     }
 });
 

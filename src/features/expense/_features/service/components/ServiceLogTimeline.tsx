@@ -1,15 +1,12 @@
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { TimelineView } from "../../../../../components/timelineView/TimelineView.tsx";
-import { COLORS, FONT_SIZES, FULL_TABBAR_HEIGHT, SEPARATOR_SIZES } from "../../../../../constants";
+import { FULL_TABBAR_HEIGHT, SEPARATOR_SIZES } from "../../../../../constants";
 import { useServiceLogTimelineFilter } from "../hooks/useServiceLogTimelineFilter.ts";
 import { useServiceLogTimelineItem } from "../hooks/useServiceLogTimelineItem.tsx";
-import { YearPicker } from "../../../../../components/Input/_presets/YearPicker.tsx";
-import { sql } from "@powersync/kysely-driver";
 import { Title } from "../../../../../components/Title.tsx";
 import { useTranslation } from "react-i18next";
-import { RawBuilder } from "kysely";
 import { useTimeline } from "../../../../../hooks/useTimeline.ts";
 
 type ServiceLogTimelineProps = {
@@ -22,7 +19,6 @@ export function ServiceLogTimeline({ carId }: ServiceLogTimelineProps) {
     const { mapper } = useServiceLogTimelineItem();
 
     const memoizedOptions = useMemo(() => serviceLogDao.timelineInfiniteQuery(carId), [serviceLogDao]);
-
     const {
         data,
         fetchNext,
@@ -33,13 +29,15 @@ export function ServiceLogTimeline({ carId }: ServiceLogTimelineProps) {
         hasPrev,
         isLoading,
         filterManager,
+        filterByRange,
         orderButtons
     } = useTimeline({
         infiniteQueryOptions: memoizedOptions,
         cursorOrderButtons: [
             { field: "e.date", title: t("date.text") },
             { field: "e.amount", title: t("currency.price") }
-        ]
+        ],
+        fromDateRangeFilterField: "e.date"
     });
 
     const { filterButtons } = useServiceLogTimelineFilter({
@@ -49,36 +47,17 @@ export function ServiceLogTimeline({ carId }: ServiceLogTimelineProps) {
         typesFilterFieldName: "st.id"
     });
 
-    const setYearFilter = useCallback((year: string) => {
-        // @formatter:off
-        const customSql = (fieldRef: string | RawBuilder<any>) => sql<number>`strftime('%Y', ${ fieldRef })`;
-        // @formatter:on
-
-        filterManager.replaceFilter({
-            groupKey: "year",
-            filter: { field: "e.date", operator: "=", value: year, customSql }
-        });
-    }, [filterManager]);
-
     const memoizedData = useMemo(() => data.map((row) => mapper(row)), [data, mapper]);
 
     return (
         <View style={ styles.container }>
-            <View style={ styles.headerContainer }>
-                <Title
-                    title={ t("service.title") }
-                    containerStyle={ styles.titleContainer }
-                />
-                <YearPicker
-                    containerStyle={ styles.yearPicker }
-                    textInputStyle={ styles.yearPickerLabel }
-                    inputPlaceholder={ t("date.year") }
-                    hiddenBackground={ true }
-                    setValue={ setYearFilter }
-                />
-            </View>
+            <Title
+                title={ t("service.title") }
+                containerStyle={ styles.titleContainer }
+            />
             <TimelineView
                 data={ memoizedData }
+                filterByRange={ filterByRange }
                 orderButtons={ orderButtons }
                 filterButtons={ filterButtons }
                 isLoading={ isLoading }
@@ -99,20 +78,7 @@ const styles = StyleSheet.create({
         flex: 1,
         gap: SEPARATOR_SIZES.lightSmall
     },
-    headerContainer: {
-        justifyContent: "space-between",
-        flexDirection: "row",
-        alignItems: "flex-start"
-    },
     titleContainer: {
         flexShrink: 1
-    },
-    yearPicker: {
-        minHeight: 0,
-        height: FONT_SIZES.p1
-    },
-    yearPickerLabel: {
-        fontFamily: "Gilroy-Heavy",
-        color: COLORS.white
     }
 });
