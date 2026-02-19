@@ -24,8 +24,8 @@ const zNumberBase = ({ bounds, errorMessage }: ZodNumberArgs) => z.preprocess((v
     return value;
 }, z
 .string()
-.transform((value) => ((value === "" || value === null) ? null : Number(value)))
 .nullable()
+.transform((value) => ((value === "" || value === null) ? null : Number(value)))
 .refine((value) => !isNaN(value), {
     message: errorMessage?.format ?? "error.number_format"
 })
@@ -45,7 +45,8 @@ const zNumberBase = ({ bounds, errorMessage }: ZodNumberArgs) => z.preprocess((v
             message: errorMessage?.maxBound?.(bounds.max) ?? `error.number_max_limit;${ bounds.max }`
         });
     }
-}));
+}))
+.pipe(z.number());
 
 export const zNumberOptional = (args: ZodNumberArgs = {}) => zNumberBase(args)
 .nullable()

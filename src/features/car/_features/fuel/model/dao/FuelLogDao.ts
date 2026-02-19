@@ -98,8 +98,11 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
         .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "et.id", "e.type_id")
         .innerJoin(`${ CURRENCY_TABLE } as cur` as const, "cur.id", "e.currency_id")
         .innerJoin(`${ CURRENCY_TABLE } as ccur` as const, "ccur.id", "c.currency_id")
-        .selectAll("fl")
         .select((eb) => [
+            "fl.id",
+            "fl.is_price_per_unit",
+            simpleConversionExpression(eb, "fl.quantity", "fu.conversion_factor").as("quantity"),
+            "e.id as expense_id",
             "e.amount as expense_amount",
             exchangedAmountExpression(
                 eb,
@@ -118,15 +121,18 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
             "ccur.id as expense_car_currency_id",
             "ccur.symbol as expense_car_currency_symbol",
             "ccur.key as expense_car_currency_key",
+            "fu.id as fuel_unit_id",
             "fu.key as fuel_unit_key",
             "fu.short as fuel_unit_short",
             "fu.conversion_factor as fuel_unit_conversion_factor",
+            "c.id as car_id",
             "c.name as car_name",
             "mo.id as car_model_id",
             "mo.name as car_model_name",
             "c.model_year as car_model_year",
             "ma.id as car_make_id",
             "ma.name as car_make_name",
+            "ol.id as odometer_log_id",
             odometerValueExpression(
                 eb,
                 "ol.value",
