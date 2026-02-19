@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants";
 import { InputRow } from "../common/InputRow.tsx";
 import React, { useCallback } from "react";
 import Divider from "../../Divider.tsx";
@@ -10,7 +10,7 @@ import Icon from "../../Icon.tsx";
 import { useTranslation } from "react-i18next";
 
 type InputDatePickerControllerProps = {
-    date: Array<Date>
+    date: Array<Date | null>
     mode: "single" | "range"
     open: (view: DatePickerViews) => void
 }
@@ -40,7 +40,7 @@ export function InputDatePickerController({ date, mode, open }: InputDatePickerC
                     style={ [styles.text, !date && styles.placeholder] }
                 >
                     {
-                        date.length > 0
+                        date && date.length > 0
                         ? mode === "single"
                           ? dayjs(date[0]).format("L")
                           : date.map(d => dayjs(d).format("L")).join(" - ")

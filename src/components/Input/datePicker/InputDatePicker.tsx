@@ -25,7 +25,7 @@ type InputDatePicker = {
     defaultEndDate?: DateType
     minDate?: DateType
     maxDate?: DateType
-    setValue?: (date: string | Array<string>) => void
+    setValue?: (date: string | Array<string | null> | null) => void
     hiddenController?: boolean
     showTimestamps?: boolean
 }
@@ -50,52 +50,50 @@ function InputDatePicker({
         const rawValue = inputFieldContext?.field?.value;
 
         if(mode === "range") {
-            if(rawValue && (Array.isArray(rawValue) && rawValue.length === 2)) {
-                const [start, end] = rawValue;
+            const safeRaw = Array.isArray(rawValue) ? rawValue : [];
+            const [start, end] = safeRaw;
 
-                return [
-                    dayjs(start).isValid() ? dayjs(start).toDate() : dayjs(defaultStartDate).toDate(),
-                    dayjs(end).isValid() ? dayjs(end).toDate() : dayjs(defaultEndDate).toDate()
-                ];
-            }
-
-            return [dayjs(defaultStartDate).toDate(), dayjs(defaultEndDate).toDate()];
+            return [
+                (start && dayjs(start).isValid()) ? dayjs(start).toDate() : (dayjs(defaultStartDate).isValid() ? dayjs(
+                    defaultStartDate).toDate() : null),
+                (end && dayjs(end).isValid()) ? dayjs(end).toDate() : (dayjs(defaultEndDate).isValid() ? dayjs(
+                    defaultEndDate)
+                .toDate() : null)
+            ];
         }
 
         if(mode === "single" && rawValue && dayjs(rawValue).isValid()) {
             return [dayjs(rawValue).toDate()];
         }
 
-        return [dayjs(defaultStartDate).toDate()];
-    }, [inputFieldContext?.field.value, defaultStartDate, defaultEndDate]);
+        return [dayjs(defaultStartDate).isValid() ? dayjs(defaultStartDate).toDate() : null];
+    }, [inputFieldContext?.field.value, defaultStartDate, defaultEndDate, mode]);
 
     const isExpanded = useSharedValue(false);
 
-    const [date, setDate] = useState<Array<Date>>(fieldValue);
+    const [date, setDate] = useState<Array<Date | null>>(fieldValue);
     const [view, setView] = useState<DatePickerViews>("calendar");
 
     useEffect(() => {
-        if(onChange) onChange(mode === "single" ? date[0].toISOString() : date.map(d => d.toISOString()));
-        if(setValue) setValue(mode === "single" ? date[0].toISOString() : date.map(d => d.toISOString()));
-    }, [date]);
+        const isSame = (d1: Date | null, d2: Date | null) => {
+            if(!d1 && !d2) return true;
+            if(!d1 || !d2) return false;
+            return d1.getTime() === d2.getTime();
+        };
 
-    useEffect(() => {
-        if(fieldValue.length !== date.length) {
-            setDate(fieldValue);
-            return;
-        }
-
-        const hasDifference = fieldValue.some((newDate, i) => {
-            const curr = date[i];
-
-            const bothValid = dayjs(curr).isValid() && dayjs(newDate).isValid();
-            if(bothValid) return !dayjs(curr).isSame(newDate);
-
-            return curr !== newDate;
-        });
-
-        if(hasDifference) setDate(fieldValue);
+        const hasChanged = fieldValue.some((d, i) => !isSame(d, date[i]));
+        if(hasChanged) setDate(fieldValue);
     }, [fieldValue]);
+
+    const handleDateChange = (newDates: Array<Date | null>) => {
+        setDate(newDates);
+
+        const output = mode === "single"
+                       ? newDates[0]?.toISOString() ?? null
+                       : newDates.map(d => d?.toISOString() ?? null);
+        if(onChange) onChange(output);
+        if(setValue) setValue(output);
+    };
 
     const open = (view: DatePickerViews) => {
         isExpanded.value = true;
@@ -107,17 +105,16 @@ function InputDatePicker({
     };
 
     const submit = (startDate: Date | null, endDate: Date | null) => {
+        let finalDates: Array<Date | null>;
         if(mode === "single") {
-            setDate(startDate ? [startDate] : []);
-        } else if(mode === "range") {
-            setDate(
-                startDate && endDate
-                ? dayjs(startDate).isAfter(endDate)
-                  ? [endDate, startDate]
-                  : [startDate, endDate]
-                : []
-            );
+            finalDates = startDate ? [startDate] : [null];
+        } else {
+            finalDates = startDate && endDate
+                         ? dayjs(startDate).isAfter(endDate) ? [endDate, startDate] : [startDate, endDate]
+                         : [startDate, endDate];
         }
+
+        handleDateChange(finalDates);
         isExpanded.value = false;
     };
 
@@ -135,8 +132,8 @@ function InputDatePicker({
             <PopupView opened={ isExpanded }>
                 <DatePickerProvider
                     mode={ mode }
-                    initialStartDate={ date?.[0] }
-                    initialEndDate={ date?.[1] }
+                    initialStartDate={ date?.[0] ?? undefined }
+                    initialEndDate={ date?.[1] ?? undefined }
                     maxDate={ maxDate }
                     minDate={ minDate }
                     initialView={ view }

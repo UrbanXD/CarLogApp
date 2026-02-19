@@ -393,7 +393,8 @@
     "minutes": "{{value}} perc",
     "seconds": "{{value}} másodperc",
     "few_seconds": "néhány másodperc",
-    "now": "most"
+    "now": "most",
+    "range_placeholder": "Szűrés időszak szerint"
   },
   "car": {
     "title": "Autó adatlap",

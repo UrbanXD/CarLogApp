@@ -393,7 +393,8 @@
     "minutes": "{{value}} minutes",
     "seconds": "{{value}} seconds",
     "few_seconds": "a few seconds",
-    "now": "now"
+    "now": "now",
+    "range_placeholder": "Filter by period"
   },
   "car": {
     "title": "Car profile",
