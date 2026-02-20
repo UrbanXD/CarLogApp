@@ -6,8 +6,8 @@ import { LineChartItem } from "../../../features/statistics/components/charts/Li
 
 export type StatisticsFunctionArgs = {
     carId?: string | null
-    from: string
-    to: string
+    from: string | null
+    to: string | null
     trendOptions?: TrendOptions
 }
 

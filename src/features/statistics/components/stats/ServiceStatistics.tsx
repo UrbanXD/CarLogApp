@@ -22,8 +22,8 @@ const SERVICE_FREQUENCY_INTERVAL = 25000;
 
 type ServiceStatisticsProps = {
     carId?: string | null
-    from: string
-    to: string
+    from: string | null
+    to: string | null
 }
 
 export function ServiceStatistics({ carId, from, to }: ServiceStatisticsProps) {

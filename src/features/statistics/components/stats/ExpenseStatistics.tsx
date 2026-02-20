@@ -18,8 +18,8 @@ import { StatisticsFunctionArgs } from "../../../../database/dao/types/statistic
 
 type ExpenseStatisticsProps = {
     carId?: string | null
-    from: string
-    to: string
+    from: string | null
+    to: string | null
 }
 
 export function ExpenseStatistics({ carId, from, to }: ExpenseStatisticsProps) {
