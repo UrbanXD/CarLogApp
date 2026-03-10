@@ -45,7 +45,7 @@ export function EditUserAvatarForm({ user, onFormStateChange }: EditUserAvatarFo
                 await userDao.updateAvatar(user.id, request);
 
                 openToast(ChangePersonalInformationToast.success());
-                router.dismissTo("(profile)/user");
+                router.dismissTo("user");
             } catch(error) {
                 console.log(error);
                 openToast(getToastMessage({ messages: ChangePersonalInformationToast, error }));

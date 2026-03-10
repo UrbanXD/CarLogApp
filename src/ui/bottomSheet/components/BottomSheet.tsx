@@ -109,8 +109,15 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         while(stackOfRoutes.length > 0) {
             const route = stackOfRoutes.pop();
             if(!route) continue;
-            if(!route.name.startsWith("bottomSheet/") && !BottomSheetRoutes.includes(route.name)) {
-                let pathname = route.name;
+
+            let cleanName = route.name.replace(/\/index$/, "");
+
+            const isBottomSheet = cleanName.startsWith("bottomSheet/") ||
+                BottomSheetRoutes.includes(cleanName) ||
+                BottomSheetRoutes.includes(`${ cleanName }/`);
+
+            if(!isBottomSheet) {
+                let pathname = cleanName.startsWith("/") ? cleanName : `/${ cleanName }`;
                 let params = { ...route.params };
 
                 if(route.state) {
@@ -119,16 +126,16 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                         const activeSubRoute = route.state.routes[activeRouteIndex];
 
                         if(activeSubRoute) {
-                            pathname = `/${ route.name }/${ activeSubRoute.name }`;
+                            const subPath = activeSubRoute.name.replace(/\/index$/, "");
+
+                            pathname = `${ pathname }/${ subPath }`.replace(/\/+/g, "/"); // prevent "//"
                             params = { ...params, ...activeSubRoute.params };
                         }
                     }
-                } else if(pathname.endsWith("index")) {
-                    pathname = pathname.slice(0, pathname.length - 5);
                 }
 
                 router.dismissTo({
-                    pathname: pathname.startsWith("/") ? pathname : `/${ pathname }`,
+                    pathname,
                     params
                 });
                 return;

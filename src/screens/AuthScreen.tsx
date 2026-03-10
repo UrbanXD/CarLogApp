@@ -19,8 +19,8 @@ const AuthScreen: React.FC = () => {
     const { top, bottom } = useSafeAreaInsets();
     const { notVerifiedEmail, openAccountVerification } = useAuth();
 
-    const openSignUp = () => router.push("bottomSheet/signUp");
-    const openSignIn = () => router.push("bottomSheet/signIn");
+    const openSignUp = () => router.push("auth/signUp");
+    const openSignIn = () => router.push("auth/signIn");
 
     const openVerification = useCallback(() => {
         if(notVerifiedEmail) openAccountVerification(notVerifiedEmail, true);

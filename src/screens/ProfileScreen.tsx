@@ -37,7 +37,7 @@ const ProfileScreen: React.FC = () => {
     const selectedLanguage = useSharedValue(i18n.language);
 
     const openEditUser = (type: EDIT_USER_FORM_TYPE) => router.push({
-        pathname: "bottomSheet/editUser",
+        pathname: "user/edit",
         params: { type }
     });
 

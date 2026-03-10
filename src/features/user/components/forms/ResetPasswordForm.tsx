@@ -36,7 +36,7 @@ export function ResetPasswordForm({ defaultEmail, withEmailFormField, onFormStat
                 if(error) throw error;
 
                 router.push({
-                    pathname: "bottomSheet/otpVerification",
+                    pathname: "auth/otpVerification",
                     params: {
                         type: "recovery",
                         title: t("auth.otp_verification.password_reset"),

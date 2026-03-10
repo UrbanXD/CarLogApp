@@ -74,7 +74,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
 
     const openAccountVerification = (email: string, automaticResend: boolean = false) => {
         router.push({
-            pathname: "bottomSheet/otpVerification",
+            pathname: "auth/otpVerification",
             params: {
                 type: "signup",
                 title: t("auth.otp_verification.email"),
@@ -174,7 +174,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
             if(error) throw error;
 
             router.push({
-                pathname: "bottomSheet/otpVerification",
+                pathname: "auth/otpVerification",
                 params: {
                     type: "magiclink", // magiclink viselkedik ugy mint ha torlest verifyolna *mivel supabasebe nincs implementalva ez meg*
                     title: t("auth.otp_verification.delete_account"),

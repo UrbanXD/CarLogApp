@@ -1,6 +1,6 @@
 import React from "react";
-import AuthScreen from "../screens/AuthScreen.tsx";
-import { useAuth } from "../contexts/auth/AuthContext.ts";
+import AuthScreen from "../../screens/AuthScreen.tsx";
+import { useAuth } from "../../contexts/auth/AuthContext.ts";
 import { Redirect } from "expo-router";
 
 const Page: React.FC = () => {

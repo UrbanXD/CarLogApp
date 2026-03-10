@@ -34,7 +34,7 @@ export function EditUserInformationForm({ user, onFormStateChange }: EditUserInf
                 await userDao.updateUserInformation(user.id, request);
 
                 openToast(ChangePersonalInformationToast.success());
-                router.dismissTo("(profile)/user");
+                router.dismissTo("user");
             } catch(error) {
                 openToast(getToastMessage({ messages: ChangePersonalInformationToast, error }));
             }

@@ -40,7 +40,7 @@ function SignInForm({ onFormStateChange }: SignInFormProps) {
     const submit = handleSubmit(submitHandler.onValid, submitHandler.onInvalid);
 
     const openResetPassword = () => {
-        router.push({ pathname: "user/resetPassword", params: { email: form.getValues("email") } });
+        router.push({ pathname: "auth/resetPassword", params: { email: form.getValues("email") } });
     };
 
     return (
