@@ -10,13 +10,13 @@ import {
     View
 } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants/index.ts";
+import { ICON_NAMES, SEPARATOR_SIZES } from "../../../constants";
 import Icon from "../../Icon.tsx";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
 import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
 import { formTheme } from "../../../ui/form/constants/theme.ts";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { TextStyle, ViewStyle } from "../../../types/index.ts";
+import { TextStyle, ViewStyle } from "../../../types";
 
 export type TextInputProps = {
     inputRef?: RefObject<TextInputRN | null>
@@ -58,7 +58,7 @@ const TextInput: React.FC<TextInputProps> = ({
     const bottomSheetInternal = useBottomSheetInternal(true);
 
     const inputFieldContext = allowInputFieldContext ? useInputFieldContext() : null;
-    const fieldValue = value || inputFieldContext?.field?.value || "";
+    const fieldValue = value ?? inputFieldContext?.field?.value ?? "";
     const onChange = inputFieldContext?.field?.onChange;
     let error = inputFieldContext?.fieldState?.error ?? null;
     if(error && error.ref?.name !== inputFieldContext?.field.name) error = null;

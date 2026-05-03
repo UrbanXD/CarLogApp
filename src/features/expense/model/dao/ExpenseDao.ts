@@ -180,8 +180,8 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
             //@formatter:on
         ])
         .$if(!!carId, (qb) => qb.where("e.car_id", "=", carId!))
-        .where("e.date", ">=", formatDateToDatabaseFormat(from))
-        .where("e.date", "<=", formatDateToDatabaseFormat(to))
+        .$if(!!from, (qb) => qb.where("e.date", ">=", formatDateToDatabaseFormat(from)))
+        .$if(!!to, (qb) => qb.where("e.date", "<=", formatDateToDatabaseFormat(to)))
         .groupBy("e.type_id")
         .orderBy("total", "desc");
     }
@@ -204,8 +204,8 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         ])
         .$if(!!carId, (qb) => qb.where("e.car_id", "=", carId!))
         .$if(!!expenseType, (q: any) => q.where("et.key", "=", expenseType))
-        .where("e.date", ">=", formatDateToDatabaseFormat(from))
-        .where("e.date", "<=", formatDateToDatabaseFormat(to))
+        .$if(!!from, (qb) => qb.where("e.date", ">=", formatDateToDatabaseFormat(from)))
+        .$if(!!to, (qb) => qb.where("e.date", "<=", formatDateToDatabaseFormat(to)))
         .groupBy("e.type_id")
         .groupBy((eb) => rangeExpression(eb, "e.date", rangeUnit))
         .orderBy((eb) => rangeExpression(eb, "e.date", rangeUnit));

@@ -302,8 +302,8 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
             eb.fn.count("rp.id").as("count")
         ])
         .$if(!!carId, (qb) => qb.where("rl.car_id", "=", carId!))
-        .where("rl.start_time", ">=", formatDateToDatabaseFormat(from))
-        .where("rl.end_time", "<=", formatDateToDatabaseFormat(to))
+        .$if(!!from, (qb) => qb.where("rl.start_time", ">=", formatDateToDatabaseFormat(from)))
+        .$if(!!to, (qb) => qb.where("rl.start_time", "<=", formatDateToDatabaseFormat(to)))
         .groupBy("p.id")
         .orderBy("count", "desc")
         .limit(3);
@@ -323,8 +323,8 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
             rangeExpression(eb, "rl.start_time", rangeUnit).as("time")
         ])
         .$if(!!carId, (qb) => qb.where("rl.car_id", "=", carId!))
-        .where("rl.start_time", ">=", formatDateToDatabaseFormat(from))
-        .where("rl.start_time", "<=", formatDateToDatabaseFormat(to))
+        .$if(!!from, (qb) => qb.where("rl.start_time", ">=", formatDateToDatabaseFormat(from!)))
+        .$if(!!to, (qb) => qb.where("rl.start_time", "<=", formatDateToDatabaseFormat(to!)))
         .groupBy((eb) => rangeExpression(eb, "rl.start_time", rangeUnit))
         .orderBy((eb) => rangeExpression(eb, "rl.start_time", rangeUnit));
     }
@@ -352,8 +352,8 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
             ];
         })
         .$if(!!carId, (qb) => qb.where("rl.car_id", "=", carId!))
-        .where("rl.start_time", ">=", formatDateToDatabaseFormat(from))
-        .where("rl.start_time", "<=", formatDateToDatabaseFormat(to))
+        .$if(!!from, (qb) => qb.where("rl.start_time", ">=", formatDateToDatabaseFormat(from)))
+        .$if(!!to, (qb) => qb.where("rl.start_time", "<=", formatDateToDatabaseFormat(to)))
         .groupBy((eb) => rangeExpression(eb, "rl.start_time", rangeUnit))
         .orderBy((eb) => rangeExpression(eb, "rl.start_time", rangeUnit));
     }

@@ -1,5 +1,6 @@
 export enum OdometerLogFormFieldsEnum {
     Car,
     DateAndOdometerValue,
-    Note
+    Note,
+    CarWithDateAndOdometerValue, // for edit
 }

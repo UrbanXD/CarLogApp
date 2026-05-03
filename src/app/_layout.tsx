@@ -44,14 +44,14 @@ const Layout: React.FC = () => {
             <Stack.Screen name="index"/>
             <Stack.Screen name="backToRootIndex"/>
             <Stack.Screen
-                name="auth"
+                name="auth/index"
                 options={ {
                     header: () => <SystemBars style={ { statusBar: "dark", navigationBar: "light" } }/>,
                     animation: "none"
                 } }
             />
             <Stack.Screen
-                name="bottomSheet/signIn"
+                name="auth/signIn"
                 options={ {
                     header: () => <></>,
                     animation: "slide_from_bottom",
@@ -60,7 +60,7 @@ const Layout: React.FC = () => {
                 } }
             />
             <Stack.Screen
-                name="bottomSheet/signUp"
+                name="auth/signUp"
                 options={ {
                     header: () => <></>,
                     animation: "slide_from_bottom",
@@ -69,7 +69,7 @@ const Layout: React.FC = () => {
                 } }
             />
             <Stack.Screen
-                name="bottomSheet/otpVerification"
+                name="auth/otpVerification"
                 options={ {
                     header: () => <></>,
                     animation: "slide_from_bottom",
@@ -78,7 +78,7 @@ const Layout: React.FC = () => {
                 } }
             />
             <Stack.Screen
-                name="bottomSheet/editUser"
+                name="user/edit"
                 options={ {
                     header: () => <></>,
                     animation: "slide_from_bottom",
@@ -94,19 +94,19 @@ const Layout: React.FC = () => {
                 } }
             />
             <Stack.Screen
-                name="(profile)/user"
+                name="user/index"
                 options={ {
                     header: () => <Header.Secondary title={ t("profile.title") }/>
                 } }
             />
             <Stack.Screen
-                name="(edit)/car"
+                name="car/[id]"
                 options={ {
                     header: () => <Header.Secondary title={ t("car.title") }/>
                 } }
             />
             <Stack.Screen
-                name="user/resetPassword"
+                name="auth/resetPassword"
                 options={ {
                     header: () => <></>,
                     animation: "slide_from_bottom",
@@ -133,7 +133,7 @@ const Layout: React.FC = () => {
                 } }
             />
             <Stack.Screen
-                name="odometer/log"
+                name="odometer/log/index"
                 options={ {
                     header: () => <Header.Secondary title={ t("odometer.title") }/>
                 } }

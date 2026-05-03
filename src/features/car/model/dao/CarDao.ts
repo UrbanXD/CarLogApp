@@ -226,11 +226,11 @@ export class CarDao extends Dao<CarTableRow, Car, CarMapper, SelectCarTableRow> 
     }
 
     async createFromFormResult(formResult: CarFormFields) {
-        const previousCarImagePath = await this.getCarImagePath(formResult.id);
-
-        const { car, odometerLog, odometerChangeLog, fuelTank } = await this.mapper.formResultToCarEntities(
+        const {
+            car, odometerLog, odometerChangeLog, fuelTank
+        } = await this.mapper.formResultToCarEntities(
             formResult,
-            previousCarImagePath,
+            null,
             (new Date()).toISOString()
         );
 

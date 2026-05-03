@@ -70,7 +70,7 @@ export function FuelLogView({ id }: FuelLogViewProps) {
             icon: ICON_NAMES.car,
             title: fuelLog?.car.name,
             content: `${ fuelLog?.car.model.make.name } ${ fuelLog?.car.model.name }`,
-            onPress: () => onEdit(FuelLogFormFieldsEnum.Car)
+            onPress: () => onEdit(FuelLogFormFieldsEnum.CarWithDateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.fuelPump,

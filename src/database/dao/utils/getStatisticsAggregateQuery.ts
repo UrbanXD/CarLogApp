@@ -77,14 +77,8 @@ export function getStatisticsAggregateQuery<
         eb: KyselyExpressionBuilder<any, any>,
         field: any
     ): RawBuilder<any> | Expression<any> {
-        if(typeof field === "function") {
-            return field(eb);
-        }
-
-        if(typeof field === "object" && field !== null) {
-            return field;
-        }
-
+        if(typeof field === "function") return field(eb);
+        if(typeof field === "object" && field !== null) return field;
         return sql.ref(field);
     }
 
@@ -97,7 +91,14 @@ export function getStatisticsAggregateQuery<
             const recordFieldExpression = resolveExpression(eb, recordQueryConfig.field);
 
             const query = recordQueryConfig.query
-            .where(eb.ref(recordQueryConfig.fromDateField as any), isFromPreviousWindow ? "<" : ">=", dbFrom)
+            .$if(
+                !!dbFrom,
+                (qb) => qb.where(
+                    eb.ref(recordQueryConfig.fromDateField as any),
+                    isFromPreviousWindow ? "<" : ">=",
+                    dbFrom
+                )
+            )
             .orderBy(recordFieldExpression, isMax ? "desc" : "asc")
             .limit(1);
 
@@ -105,7 +106,10 @@ export function getStatisticsAggregateQuery<
         }
 
         const whenExpression = eb.case()
-        .when(eb.ref(fromDateField as any), isFromPreviousWindow ? "<" : ">=", dbFrom)
+        .when((eb) => {
+            if(dbFrom === null) return eb.val(1);
+            return eb(eb.ref(fromDateField as any), isFromPreviousWindow ? "<" : ">=", dbFrom);
+        })
         .then(resolveExpression(eb, field))
         .else(null)
         .end();
@@ -128,28 +132,37 @@ export function getStatisticsAggregateQuery<
             recordExpression(eb, false, false).as("current_min_record"),
             eb.fn.sum(
                 eb.case()
-                .when(eb.ref(fromDateField as any), ">=", dbFrom)
+                .when((eb) => {
+                    if(dbFrom === null) return eb.val(1);
+                    return eb(eb.ref(fromDateField as any), ">=", dbFrom);
+                })
                 .then(fieldExpression)
                 .else(0)
                 .end()
             ).as("current_total"),
             eb.fn.avg(
                 eb.case()
-                .when(eb.ref(fromDateField as any), ">=", dbFrom)
+                .when((eb) => {
+                    if(dbFrom === null) return eb.val(1);
+                    return eb(eb.ref(fromDateField as any), ">=", dbFrom);
+                })
                 .then(fieldExpression)
                 .else(null)
                 .end()
             ).as("current_avg"),
             eb.fn.count(
                 eb.case()
-                .when(eb.ref(fromDateField as any), ">=", dbFrom)
+                .when((eb) => {
+                    if(dbFrom === null) return eb.val(1);
+                    return eb(eb.ref(fromDateField as any), ">=", dbFrom);
+                })
                 .then(eb.ref(idField))
                 .else(null)
                 .end()
             ).as("current_count"),
             medianSubQuery(
                 db,
-                query.where(eb.ref(fromDateField as any), ">=", dbFrom),
+                query.$if(!!dbFrom, (qb) => qb.where(eb.ref(fromDateField as any), ">=", dbFrom)),
                 fieldExpression
             ).as("current_median"),
             //Previous Window
@@ -157,28 +170,37 @@ export function getStatisticsAggregateQuery<
             recordExpression(eb, true, false).as("previous_min_record"),
             eb.fn.sum(
                 eb.case()
-                .when(eb.ref(fromDateField as any), "<", dbFrom)
+                .when((eb) => {
+                    if(dbFrom === null) return eb.val(1);
+                    return eb(eb.ref(fromDateField as any), "<", dbFrom);
+                })
                 .then(fieldExpression)
                 .else(0)
                 .end()
             ).as("previous_total"),
             eb.fn.avg(
                 eb.case()
-                .when(eb.ref(fromDateField as any), "<", dbFrom)
+                .when((eb) => {
+                    if(dbFrom === null) return eb.val(1);
+                    return eb(eb.ref(fromDateField as any), "<", dbFrom);
+                })
                 .then(fieldExpression)
                 .else(null)
                 .end()
             ).as("previous_avg"),
             eb.fn.count(
                 eb.case()
-                .when(eb.ref(fromDateField as any), "<", dbFrom)
+                .when((eb) => {
+                    if(dbFrom === null) return eb.val(1);
+                    return eb(eb.ref(fromDateField as any), "<", dbFrom);
+                })
                 .then(eb.ref(idField))
                 .else(null)
                 .end()
             ).as("previous_count"),
             medianSubQuery(
                 db,
-                query.where(eb.ref(fromDateField as any), "<", dbFrom),
+                query.$if(!!dbFrom, (qb) => qb.where(eb.ref(fromDateField as any), "<", dbFrom)),
                 fieldExpression
             ).as("previous_median")
         ];

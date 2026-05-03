@@ -3,5 +3,6 @@ export enum FuelLogFormFieldsEnum {
     Quantity,
     Amount,
     DateAndOdometerValue,
-    Note
+    Note,
+    CarWithDateAndOdometerValue, // for edit
 }

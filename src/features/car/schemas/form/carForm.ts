@@ -28,6 +28,7 @@ export const carFormSchema = carSchema
         id: odometerLogSchema.shape.id,
         odometerChangeLogId: z.string().uuid().nullable(),
         value: zNumber({
+                int: true,
                 bounds: { min: MIN_ODOMETER_VALUE },
                 errorMessage: {
                     required: "error.odometer_value_required",
@@ -42,7 +43,7 @@ export const carFormSchema = carSchema
     fuelTank: carSchema.shape.fuelTank.pick({ id: true }).extend({
         typeId: zPickerRequiredNumber({ errorMessage: "error.fuel_type_picker_required" })
         .pipe(carSchema.shape.fuelTank.shape.type.shape.id),
-        capacity: zNumber({ bounds: { min: 0 } }).pipe(carSchema.shape.fuelTank.shape.capacity),
+        capacity: zNumber({ int: true, bounds: { min: 0 } }).pipe(carSchema.shape.fuelTank.shape.capacity),
         unitId: zPickerRequiredNumber({ errorMessage: "error.unit_picker_required" })
         .pipe(carSchema.shape.fuelTank.shape.unit.shape.id)
     }),

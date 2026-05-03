@@ -72,13 +72,16 @@ export const inputAmountSchema = ({
 type InputAmountWithQuantitySchemaOptions = {
     minQuantity?: number
     quantityErrorMessage?: ZodNumberErrorMessage
+    int?: boolean
 }
 
 export const inputAmountWithQuantity = ({
     minQuantity,
-    quantityErrorMessage
+    quantityErrorMessage,
+    int
 }: InputAmountWithQuantitySchemaOptions) => z.object({
     quantity: zNumber({
+        int: int,
         bounds: { min: minQuantity ?? 0 },
         errorMessage: {
             required: "error.quantity_required",

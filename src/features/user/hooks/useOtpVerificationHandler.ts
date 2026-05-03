@@ -65,7 +65,7 @@ export const useOtpVerificationHandler = () => {
             }
 
             router.replace({
-                pathname: "bottomSheet/otpVerification",
+                pathname: "auth/otpVerification",
                 params: {
                     type: "email_change",
                     title: t("auth.otp_verification.new_email"),

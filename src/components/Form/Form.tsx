@@ -1,11 +1,12 @@
 import React, { ReactElement, ReactNode, useEffect, useMemo } from "react";
-import { FlatList } from "react-native-gesture-handler";
 import { View } from "react-native";
 import { FormState, UseFormReturn } from "react-hook-form";
 import { formTheme } from "../../ui/form/constants/theme.ts";
 import { FormButtons } from "../Button/presets/FormButtons.tsx";
-import { SubmitHandlerArgs, ViewStyle } from "../../types/index.ts";
-import { SEPARATOR_SIZES } from "../../constants/index.ts";
+import { SubmitHandlerArgs, ViewStyle } from "../../types";
+import { SEPARATOR_SIZES } from "../../constants";
+import { useBottomSheet } from "../../ui/bottomSheet/contexts/BottomSheetContext.ts";
+import { FlatList } from "react-native-gesture-handler";
 
 type FormProps = {
     form: UseFormReturn<any>
@@ -26,6 +27,8 @@ export function Form({
     submitText,
     containerStyle
 }: FormProps) {
+    const { availableContentHeight } = useBottomSheet();
+
     useEffect(() => {
         if(onFormStateChange) onFormStateChange(form.formState);
     }, [form.formState]);
@@ -36,7 +39,7 @@ export function Form({
     }, [form, submitHandler]);
 
     return (
-        <View style={ { flex: 1, gap: formTheme.gap } }>
+        <View style={ { flex: 1, maxHeight: availableContentHeight, gap: formTheme.gap } }>
             <FlatList
                 data={ React.Children.toArray(formFields) }
                 renderItem={ ({ item }) => item as ReactElement }

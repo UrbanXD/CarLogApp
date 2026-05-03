@@ -33,7 +33,7 @@ export function ChangeEmailForm({ user, onFormStateChange }: ChangeEmailFormProp
                 if(error) throw error;
 
                 router.push({
-                    pathname: "bottomSheet/otpVerification",
+                    pathname: "auth/otpVerification",
                     params: {
                         type: "email_change",
                         title: t("auth.otp_verification.email_change"),

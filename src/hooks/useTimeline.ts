@@ -5,8 +5,9 @@ import {
     UseInfiniteQueryOptions
 } from "../database/hooks/useInfiniteQuery.ts";
 import { FilterButtonProps } from "../components/filter/FilterButton.tsx";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { SelectQueryBuilder } from "kysely";
+import { FilterByRange } from "../components/timelineView/TimelineView.tsx";
 
 export type UseTimelineProps<
     QueryBuilder extends SelectQueryBuilder<any, any, any>,
@@ -14,13 +15,20 @@ export type UseTimelineProps<
     Columns = ExtractColumnsFromQuery<QueryBuilder>
 > = {
     infiniteQueryOptions: UseInfiniteQueryOptions<QueryBuilder, MappedItem>,
-    cursorOrderButtons?: Array<{ field: Columns, title: string }>
+    cursorOrderButtons?: Array<{ field: Columns, title: string }>,
+    fromDateRangeFilterField?: Columns
+    toDateRangeFilterField?: Columns
 }
 
 export function useTimeline<
     QueryBuilder extends SelectQueryBuilder<any, any, any>,
     MappedItem = ExtractRowFromQuery<QueryBuilder>
->({ infiniteQueryOptions, cursorOrderButtons }: UseTimelineProps<QueryBuilder, MappedItem>) {
+>({
+    infiniteQueryOptions,
+    cursorOrderButtons,
+    fromDateRangeFilterField,
+    toDateRangeFilterField
+}: UseTimelineProps<QueryBuilder, MappedItem>) {
     const {
         data,
         isLoading,
@@ -50,6 +58,38 @@ export function useTimeline<
         iconOnPress: () => toggleFieldOrder(cursor.field)
     })), [cursorOrderButtons, isMainCursor, makeFieldMainCursor, getOrderIconForField, toggleFieldOrder]);
 
+    const filterByRange: FilterByRange = useCallback((from, to) => {
+        if(!fromDateRangeFilterField) return;
+
+        if(from) {
+            replaceFilter({
+                groupKey: "rangeFromDate",
+                filter: { field: fromDateRangeFilterField, operator: ">=", value: from },
+                logic: "AND"
+            });
+        } else {
+            removeFilter({
+                groupKey: "rangeFromDate",
+                filter: { field: fromDateRangeFilterField, operator: ">=", value: from },
+                byValue: false
+            });
+        }
+
+        if(to) {
+            replaceFilter({
+                groupKey: "rangeToDate",
+                filter: { field: toDateRangeFilterField ?? fromDateRangeFilterField, operator: "<=", value: to },
+                logic: "AND"
+            });
+        } else {
+            removeFilter({
+                groupKey: "rangeToDate",
+                filter: { field: toDateRangeFilterField ?? fromDateRangeFilterField, operator: "<=", value: to },
+                byValue: false
+            });
+        }
+    }, [replaceFilter, fromDateRangeFilterField, toDateRangeFilterField]);
+
     return {
         data,
         isLoading,
@@ -61,6 +101,7 @@ export function useTimeline<
         fetchPrev,
         initialStartIndex,
         orderButtons,
+        filterByRange,
         cursorManager: {
             isMainCursor,
             makeFieldMainCursor,

@@ -1,9 +1,9 @@
 import { getRangeUnit, RangeUnit } from "./getRangeUnit.ts";
 import dayjs from "dayjs";
 
-export function getExtendedRange(from: string, to: string): {
-    extendedFrom: string,
-    extendedTo: string,
+export function getExtendedRange(from: string | null, to: string | null): {
+    extendedFrom: string | null,
+    extendedTo: string | null,
     rangeUnit: RangeUnit
 } {
     const rangeUnit = getRangeUnit(from, to);
@@ -14,13 +14,13 @@ export function getExtendedRange(from: string, to: string): {
     switch(rangeUnit) {
         case "hour":
         case "day":
-            extendedFrom = dayjs(from).subtract(1, "day").toISOString();
-            extendedTo = dayjs(to).add(1, "day").toISOString();
+            if(from) extendedFrom = dayjs(from).subtract(1, "day").toISOString();
+            if(to) extendedTo = dayjs(to).add(1, "day").toISOString();
             break;
         case "month":
         case "year":
-            extendedFrom = dayjs(from).subtract(1, "month").toISOString();
-            extendedTo = dayjs(to).add(1, "month").toISOString();
+            if(from) extendedFrom = dayjs(from).subtract(1, "month").toISOString();
+            if(to) extendedTo = dayjs(to).add(1, "month").toISOString();
     }
 
     return { extendedFrom, extendedTo, rangeUnit };

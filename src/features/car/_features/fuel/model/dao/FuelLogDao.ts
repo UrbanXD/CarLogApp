@@ -98,8 +98,11 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
         .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "et.id", "e.type_id")
         .innerJoin(`${ CURRENCY_TABLE } as cur` as const, "cur.id", "e.currency_id")
         .innerJoin(`${ CURRENCY_TABLE } as ccur` as const, "ccur.id", "c.currency_id")
-        .selectAll("fl")
         .select((eb) => [
+            "fl.id",
+            "fl.is_price_per_unit",
+            simpleConversionExpression(eb, "fl.quantity", "fu.conversion_factor").as("quantity"),
+            "e.id as expense_id",
             "e.amount as expense_amount",
             exchangedAmountExpression(
                 eb,
@@ -118,15 +121,18 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
             "ccur.id as expense_car_currency_id",
             "ccur.symbol as expense_car_currency_symbol",
             "ccur.key as expense_car_currency_key",
+            "fu.id as fuel_unit_id",
             "fu.key as fuel_unit_key",
             "fu.short as fuel_unit_short",
             "fu.conversion_factor as fuel_unit_conversion_factor",
+            "c.id as car_id",
             "c.name as car_name",
             "mo.id as car_model_id",
             "mo.name as car_model_name",
             "c.model_year as car_model_year",
             "ma.id as car_make_id",
             "ma.name as car_make_name",
+            "ol.id as odometer_log_id",
             odometerValueExpression(
                 eb,
                 "ol.value",
@@ -152,9 +158,9 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
         .innerJoin(`${ CAR_TABLE } as c` as const, "e.car_id", "c.id")
         .innerJoin(`${ FUEL_TANK_TABLE } as ft` as const, "c.id", "ft.car_id")
         .innerJoin(`${ FUEL_UNIT_TABLE } as fu` as const, "ft.unit_id", "fu.id")
-        .where("e.date", ">=", formatDateToDatabaseFormat(from))
-        .where("e.date", "<=", formatDateToDatabaseFormat(to))
-        .$if(!!carId, (q: any) => q.where("c.id", "=", carId));
+        .$if(!!carId, (q: any) => q.where("c.id", "=", carId))
+        .$if(!!from, (qb) => qb.where("e.date", ">=", formatDateToDatabaseFormat(from)))
+        .$if(!!to, (qb) => qb.where("e.date", "<=", formatDateToDatabaseFormat(to)));
     }
 
     summaryStatisticsByAmountQuery(props: StatisticsFunctionArgs) {
@@ -201,9 +207,9 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
             eb.fn.sum<number>(simpleConversionExpression(eb, "fl.quantity", "fu.conversion_factor")).as("quantity"),
             odometerValueExpression(eb, "ol.value", "ou.conversion_factor").as("odometer_value")
         ])
-        .where("e.date", ">=", formatDateToDatabaseFormat(extendedFrom))
-        .where("e.date", "<=", formatDateToDatabaseFormat(extendedTo))
         .$if(!!carId, (qb) => qb.where("c.id", "=", carId!))
+        .$if(!!extendedFrom, (qb) => qb.where("e.date", ">=", formatDateToDatabaseFormat(extendedFrom)))
+        .$if(!!extendedTo, (qb) => qb.where("e.date", "<=", formatDateToDatabaseFormat(extendedTo)))
         .groupBy(["e.date"])
         .orderBy("e.date", "asc");
 
@@ -237,8 +243,8 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
         })
         .where("steps.prev_odometer_value", "is not", null)
         .where((eb) => eb("steps.odometer_value", "-", eb.ref("steps.prev_odometer_value")), ">", 0)
-        .where("steps.date", ">=", formatDateToDatabaseFormat(extendedFrom))
-        .where("steps.date", "<=", formatDateToDatabaseFormat(extendedTo))
+        .$if(!!extendedFrom, (qb) => qb.where("steps.date", ">=", formatDateToDatabaseFormat(extendedFrom)))
+        .$if(!!extendedTo, (qb) => qb.where("steps.date", "<=", formatDateToDatabaseFormat(extendedTo)))
         .orderBy("steps.date", "asc");
     }
 
@@ -315,8 +321,8 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
             "value"
         ])
         .where("value", ">", 0)
-        .where("date", ">=", formatDateToDatabaseFormat(from))
-        .where("date", "<=", formatDateToDatabaseFormat(to))
+        .$if(!!from, (qb) => qb.where("date", ">=", formatDateToDatabaseFormat(from)))
+        .$if(!!to, (qb) => qb.where("date", "<=", formatDateToDatabaseFormat(to)))
         .orderBy("date", "asc");
     }
 

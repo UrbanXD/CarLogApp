@@ -19,8 +19,8 @@ import { StatisticsFunctionArgs } from "../../../../database/dao/types/statistic
 
 type FuelConsumptionStatisticsProps = {
     carId?: string | null
-    from: string
-    to: string
+    from: string | null
+    to: string | null
 }
 
 export function FuelStatistics({

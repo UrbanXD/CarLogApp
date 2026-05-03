@@ -3,7 +3,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import CarProfile from "../features/car/components/carProfile/CarProfile.ts";
 import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
 
-const EditCarScreen: React.FC = () => {
+const CarProfileScreen: React.FC = () => {
     const { id } = useLocalSearchParams<{ id: string }>();
 
     useEffect(() => {
@@ -22,4 +22,4 @@ const EditCarScreen: React.FC = () => {
     );
 };
 
-export default EditCarScreen;
+export default CarProfileScreen;

@@ -23,7 +23,7 @@ export async function zodOdometerValidation({
     odometerValue,
     skipOdometerLogs
 }: ZodOdometerValidationArgs) {
-    if(!odometerValue) return;
+    if(odometerValue === null || odometerValue === undefined) return;
 
     const odometerLimit = await odometerLogDao.getOdometerLimitByDate(carId, date, skipOdometerLogs);
 

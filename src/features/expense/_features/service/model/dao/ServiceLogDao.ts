@@ -395,8 +395,8 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
             ];
         })
         .$if(!!carId, (qb) => qb.where("sl.car_id", "=", carId!))
-        .where("e.date", ">=", formatDateToDatabaseFormat(from))
-        .where("e.date", "<=", formatDateToDatabaseFormat(to));
+        .$if(!!from, (qb) => qb.where("e.date", ">=", formatDateToDatabaseFormat(from)))
+        .$if(!!to, (qb) => qb.where("e.date", "<=", formatDateToDatabaseFormat(to)));
     }
 
     frequencyByOdometerQuery({
@@ -427,8 +427,8 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
             ).as("interval_start")
         ])
         .$if(!!carId, (qb) => qb.where("sl.car_id", "=", carId!))
-        .where("e.date", ">=", formatDateToDatabaseFormat(from))
-        .where("e.date", "<=", formatDateToDatabaseFormat(to))
+        .$if(!!from, (qb) => qb.where("e.date", ">=", formatDateToDatabaseFormat(from)))
+        .$if(!!to, (qb) => qb.where("e.date", "<=", formatDateToDatabaseFormat(to)))
         .groupBy("interval_start")
         .orderBy("interval_start", "asc");
     }
@@ -458,8 +458,8 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
             ];
         })
         .$if(!!carId, (qb) => qb.where("e.car_id", "=", carId!))
-        .where("e.date", ">=", formatDateToDatabaseFormat(from))
-        .where("e.date", "<=", formatDateToDatabaseFormat(to))
+        .$if(!!from, (qb) => qb.where("e.date", ">=", formatDateToDatabaseFormat(from)))
+        .$if(!!to, (qb) => qb.where("e.date", "<=", formatDateToDatabaseFormat(to)))
         .groupBy("sl.service_type_id")
         .orderBy("total", "desc");
     }
@@ -490,8 +490,8 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
             ];
         })
         .$if(!!carId, (qb) => qb.where("e.car_id", "=", carId!))
-        .where("e.date", ">=", formatDateToDatabaseFormat(from))
-        .where("e.date", "<=", formatDateToDatabaseFormat(to))
+        .$if(!!from, (qb) => qb.where("e.date", ">=", formatDateToDatabaseFormat(from)))
+        .$if(!!to, (qb) => qb.where("e.date", "<=", formatDateToDatabaseFormat(to)))
         .groupBy("si.service_item_type_id")
         .orderBy("total", "desc");
     }

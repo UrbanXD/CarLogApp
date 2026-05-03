@@ -16,7 +16,7 @@ const PrimaryHeader: React.FC = () => {
     const [isCarListVisible, setIsCarListVisible] = useState(false);
 
     const openProfile = () => {
-        router.push("/(profile)/user");
+        router.push("user");
     };
 
     return (

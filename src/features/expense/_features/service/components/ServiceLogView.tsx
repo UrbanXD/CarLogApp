@@ -92,7 +92,7 @@ export function ServiceLogView({ id }: ServiceLogViewProps) {
             icon: ICON_NAMES.car,
             title: serviceLog?.car?.name,
             content: `${ serviceLog?.car?.model.make.name } ${ serviceLog?.car?.model.name }`,
-            onPress: () => onEdit(ServiceLogFormFieldsEnum.Car)
+            onPress: () => onEdit(ServiceLogFormFieldsEnum.CarWithDateAndOdometerValue)
         },
         {
             icon: ICON_NAMES.expenseItem,

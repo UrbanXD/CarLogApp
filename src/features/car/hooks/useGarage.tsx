@@ -16,7 +16,7 @@ const useGarage = () => {
 
     const openNewCarForm = () => router.push("car/create");
 
-    const openCarProfile = (id: string) => router.push({ pathname: "(edit)/car", params: { id } });
+    const openCarProfile = (id: string) => router.push({ pathname: "car/[id]", params: { id } });
 
     return { cars: cars.map(toCarouselItem), isLoading, openNewCarForm, openCarProfile };
 };

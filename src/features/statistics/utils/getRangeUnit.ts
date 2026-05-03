@@ -2,7 +2,9 @@ import dayjs from "dayjs";
 
 export type RangeUnit = "year" | "month" | "day" | "hour";
 
-export function getRangeUnit(from: string, to: string): RangeUnit {
+export function getRangeUnit(from: string | null, to: string | null): RangeUnit {
+    if(from === null && to === null) return "month";
+
     const start = dayjs(from);
     const end = dayjs(to);
     const diffHours = end.diff(start, "hour");

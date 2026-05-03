@@ -61,7 +61,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
                 conversionFactor: entity.unit_conversion_factor
             },
             note: entity.note,
-            date: entity.date
+            date: entity.log_date
         });
     }
 
