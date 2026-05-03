@@ -32,7 +32,7 @@ export function useRideExpenseFormProps({
         expense: {
             id: rideExpense?.expense?.id ?? getUUID(),
             currencyId: rideExpense?.expense?.amount.currency?.id ?? defaultCurrencyId ?? CurrencyEnum.EUR,
-            amount: rideExpense?.expense?.amount.amount ?? NaN,
+            amount: rideExpense?.expense?.amount.amount ?? undefined,
             exchangeRate: rideExpense?.expense?.amount.exchangeRate ?? 1
         },
         typeId: rideExpense?.expense?.type?.id,
