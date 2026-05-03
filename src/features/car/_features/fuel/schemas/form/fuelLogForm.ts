@@ -36,6 +36,7 @@ const fuelLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
             }
         }).pipe(fuelLogSchema.shape.quantity),
         odometerValue: zNumberOptional({
+            int: true,
             bounds: { min: MIN_ODOMETER_VALUE },
             errorMessage: { minBound: () => "error.odometer_value_non_negative" }
         }),

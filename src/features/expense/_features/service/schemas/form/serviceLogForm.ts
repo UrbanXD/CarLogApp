@@ -26,6 +26,7 @@ const serviceLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
         serviceTypeId: zPickerRequiredString({ errorMessage: "error.service_type_required" })
         .pipe(serviceLogSchema.shape.serviceType.shape.id),
         odometerValue: zNumber({
+            int: true,
             bounds: { min: MIN_ODOMETER_VALUE },
             errorMessage: {
                 required: "error.odometer_value_required",

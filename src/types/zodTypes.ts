@@ -5,6 +5,7 @@ import { isNaN } from "es-toolkit/compat";
 export type ZodNumberErrorMessage = {
     required?: string
     format?: string
+    int?: string
     minBound?: (min?: number) => string
     maxBound?: (max?: number) => string
 }
@@ -15,11 +16,12 @@ type ZodDateArgs = {
 }
 
 type ZodNumberArgs = {
+    int?: boolean,
     bounds?: { min?: number, max?: number },
     errorMessage?: ZodNumberErrorMessage
 }
 
-const zNumberBase = ({ bounds, errorMessage }: ZodNumberArgs) => z.preprocess((value) => {
+const zNumberBase = ({ int, bounds, errorMessage }: ZodNumberArgs) => z.preprocess((value) => {
     if(typeof value === "number") return value.toString();
     return value;
 }, z
@@ -31,6 +33,13 @@ const zNumberBase = ({ bounds, errorMessage }: ZodNumberArgs) => z.preprocess((v
 })
 .superRefine((value, ctx) => {
     if(value === null || value === undefined) return;
+
+    if(int && !Number.isInteger(value)) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: errorMessage?.int ?? "error.number_int"
+        });
+    }
 
     if(bounds?.min !== undefined && value < bounds.min) {
         ctx.addIssue({

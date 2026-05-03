@@ -22,6 +22,7 @@ const rideLogForm = (odometerLogDao: OdometerLogDao) => rideLogSchema
     endTime: zDate().pipe(rideLogSchema.shape.endTime),
     startOdometerLogId: odometerSchema.shape.id, // hidden
     startOdometerValue: zNumber({
+        int: true,
         bounds: { min: 0 },
         errorMessage: {
             required: "error.odometer_value_required",
@@ -30,6 +31,7 @@ const rideLogForm = (odometerLogDao: OdometerLogDao) => rideLogSchema
     }),
     endOdometerLogId: odometerSchema.shape.id, // hidden
     endOdometerValue: zNumber({
+        int: true,
         bounds: { min: 0 },
         errorMessage: {
             required: "error.odometer_value_required",

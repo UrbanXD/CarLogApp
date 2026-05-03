@@ -29,7 +29,8 @@ export const serviceItemForm = serviceItemSchema
         })
         .extend(
             inputAmountWithQuantity({
-                minQuantity: serviceItemSchema.shape.quantity.minValue ?? 1
+                minQuantity: serviceItemSchema.shape.quantity.minValue ?? 1,
+                int: true
             }).shape
         )
 });

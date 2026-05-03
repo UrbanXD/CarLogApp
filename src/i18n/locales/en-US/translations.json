@@ -148,6 +148,7 @@
     "passwords_not_equals": "The two passwords do not match",
     "number_required": "Please enter a number",
     "number_format": "Please use the required number format",
+    "number_int": "The number must be integer",
     "number_min_limit": "The number must be greater than or equal to {{0}}",
     "number_max_limit": "The number must be less than {{0}}",
     "date_required": "Please select a date",

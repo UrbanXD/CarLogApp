@@ -18,6 +18,7 @@ export const odometerChangeLogForm = (odometerLogDao: OdometerLogDao) => odomete
     .pipe(odometerLogSchema.shape.car.shape.id),
     odometerChangeLogId: z.string().uuid(), //hidden
     value: zNumber({
+            int: true,
             bounds: { min: MIN_ODOMETER_VALUE },
             errorMessage: {
                 required: "error.odometer_value_required",
