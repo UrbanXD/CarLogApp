@@ -174,14 +174,14 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
             id: formResult.startOdometerLogId,
             car_id: formResult.carId,
             type_id: OdometerLogTypeEnum.RIDE,
-            value: Math.round(formResult.startOdometerValue * odometerUnit.conversionFactor)
+            value: Math.floor(formResult.startOdometerValue * odometerUnit.conversionFactor)
         };
 
         const endOdometerLog: OdometerLogTableRow = {
             id: formResult.endOdometerLogId,
             car_id: formResult.carId,
             type_id: OdometerLogTypeEnum.RIDE,
-            value: Math.round(formResult.endOdometerValue * odometerUnit.conversionFactor)
+            value: Math.floor(formResult.endOdometerValue * odometerUnit.conversionFactor)
         };
 
         const rideLog: RideLogTableRow = {

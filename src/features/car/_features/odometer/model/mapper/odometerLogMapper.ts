@@ -92,7 +92,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
             id: dto.id,
             car_id: dto.car.id,
             type_id: dto.type.id,
-            value: Math.round(dto.value * dto.unit.conversionFactor)
+            value: Math.floor(dto.value * dto.unit.conversionFactor)
         };
     }
 
@@ -104,7 +104,7 @@ export class OdometerLogMapper extends AbstractMapper<OdometerLogTableRow, Odome
             odometerLog: {
                 id: formResult.id,
                 car_id: formResult.carId,
-                value: Math.round(formResult.value * formResult.conversionFactor)
+                value: Math.floor(formResult.value * formResult.conversionFactor)
             },
 
             odometerChangeLog: {

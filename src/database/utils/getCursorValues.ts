@@ -11,8 +11,10 @@ export function getCursorValues<
     cursorOptions: CursorOptions<QueryBuilder, Columns>
 ): CursorValue<TableItem> | Array<CursorValue<TableItem>> {
     if(Array.isArray(cursorOptions.cursor)) {
-        return cursorOptions.cursor.map((cursor) => item[getFieldName<keyof TableItem>(String(cursor.field))]);
+        return cursorOptions.cursor.map((cursor) => {
+            return item[getFieldName<keyof TableItem>(String(cursor?.alias ?? cursor.field))];
+        });
     } else {
-        return item[getFieldName<keyof TableItem>(String(cursorOptions.cursor.field))];
+        return item[getFieldName<keyof TableItem>(String(cursorOptions.cursor?.alias ?? cursorOptions.cursor.field))];
     }
 }

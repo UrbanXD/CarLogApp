@@ -100,7 +100,7 @@ const ProfileScreen: React.FC = () => {
                                       onPressBadge={ openEditAvatar }
                                   />
                                   : <Avatar.Text
-                                      label={ getLabelByName(`${ user.firstname } ${ user.lastname }`) }
+                                      label={ getLabelByName(`${ user.lastname } ${ user.firstname }`) }
                                       avatarSize={ hp(20) }
                                       backgroundColor={ user.avatarColor ?? undefined }
                                       borderColor={ COLORS.black5 }

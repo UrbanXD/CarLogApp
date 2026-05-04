@@ -258,7 +258,7 @@ export class ServiceLogMapper extends AbstractMapper<ServiceLogTableRow, Service
                 id: formResult.odometerLogId,
                 car_id: formResult.carId,
                 type_id: OdometerLogTypeEnum.SERVICE,
-                value: Math.round(formResult.odometerValue * odometerUnit.conversionFactor)
+                value: Math.floor(formResult.odometerValue * odometerUnit.conversionFactor)
             };
         }
 

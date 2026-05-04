@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     ComparisonOperatorExpression,
     Expression,
@@ -32,6 +32,7 @@ export type Cursor<
     Columns = ExtractColumnsFromQuery<QueryBuilder>
 > = {
     field: Columns
+    alias?: string
     order?: OrderByDirectionExpression
     toLowerCase?: boolean
     extraOrderByField?: CursorExtraOrderByField<Columns> | Array<CursorExtraOrderByField<Columns>>
@@ -111,7 +112,7 @@ export const useInfiniteQuery = <
         baseQuery,
         defaultFilters,
         defaultItem,
-        perPage = 15,
+        perPage = 50,
         mapper,
         mappedItemId,
         jsonFields,
@@ -119,6 +120,9 @@ export const useInfiniteQuery = <
     } = props ?? {};
 
     const { powersync } = useDatabase();
+
+    const isAtTopRef = useRef(false);
+    const isAtBottomRef = useRef(false);
 
     const stringifiedMapper = JSON.stringify(mapper);
     const stableMapper = useMemo(() => mapper, [stringifiedMapper]);
@@ -208,43 +212,25 @@ export const useInfiniteQuery = <
     ), [mappedItemId]);
 
     const fetchNext = useCallback(
-        async () => {
-            if(!cursorOptions || !enabled || isNextFetching || (data.length > 0 && !hasNext) || isLoading) return;
-
-            const base = getBaseBuilder();
-            if(!base) return;
+        async (force?: boolean) => {
+            if(!cursorOptions || !enabled || isNextFetching || isLoading) return;
+            if(!force && !hasNext) return;
 
             setIsNextFetching(true);
 
             try {
-                let nextBuilder = base.limit(perPage + 1);
+                const base = getBaseBuilder();
+                if(!base) return;
+
+                let nextBuilder = base.limit(perPage);
                 nextBuilder = addCursor(nextBuilder, cursorOptions, nextCursorValues, "next");
 
                 const compiled = nextBuilder.compile();
-                const rawResults = await powersync.getAll<TableItem>(compiled.sql, compiled.parameters as any[]);
-                const results = rawResults.map(row => jsonFieldsParse(row, jsonFields));
-
-                const hasMore = results.length > perPage;
-                if(hasMore) results.pop();
+                const results = await powersync.getAll<TableItem>(compiled.sql, compiled.parameters as any[]);
 
                 if(results.length > 0) {
-                    const mapped = stableMapper
-                                   ? await Promise.all(results.map(stableMapper))
-                                   : results as unknown as Array<MappedItem>;
-
-                    setData(prev => {
-                        const uniqueNewItems = getUniqueNewItems(prev, mapped);
-
-                        if(uniqueNewItems.length === 0) return prev;
-                        return [...prev, ...uniqueNewItems];
-                    });
+                    setNextCursor(results[results.length - 1]);
                 }
-
-                setHasNext(hasMore);
-
-                const nextCursor = results[results.length - 1];
-                if(nextCursor) setNextCursor(nextCursor);
-                if(!prevCursorValues && results.length > 0) setPrevCursor(results[0]);
             } catch(error) {
                 console.log("Fetch next infinite query error: ", error);
             } finally {
@@ -252,63 +238,31 @@ export const useInfiniteQuery = <
             }
         },
         [
-            enabled,
-            isLoading,
-            isNextFetching,
-            hasNext,
-            data.length,
-            nextCursorValues,
-            getBaseBuilder,
-            cursorOptions,
-            perPage,
-            stableMapper,
-            prevCursorValues,
-            powersync,
-            setPrevCursor,
-            setNextCursor,
-            getUniqueNewItems,
+            enabled, isLoading, isNextFetching, hasNext, data.length, nextCursorValues, getBaseBuilder, cursorOptions,
+            perPage, stableMapper, prevCursorValues, powersync, setPrevCursor, setNextCursor, getUniqueNewItems,
             jsonFields
         ]
     );
 
-    const fetchPrev = useCallback(async () => {
-        if(!cursorOptions || !enabled || isPrevFetching || !hasPrev || isLoading) return;
-
-        const base = getBaseBuilder();
-        if(!base) return;
+    const fetchPrev = useCallback(async (force?: boolean) => {
+        if(!cursorOptions || !enabled || isPrevFetching || isLoading) return;
+        if(!force && !hasPrev) return;
 
         setIsPrevFetching(true);
 
         try {
-            let prevBuilder = base.limit(perPage + 1);
+            const base = getBaseBuilder();
+            if(!base) return;
+
+            let prevBuilder = base.limit(perPage);
             prevBuilder = addCursor(prevBuilder, cursorOptions, prevCursorValues, "prev");
 
             const compiled = prevBuilder.compile();
-
-            const rawResults = (await powersync.getAll<TableItem>(compiled.sql, compiled.parameters as any[]));
-            const results = rawResults.map(row => jsonFieldsParse(row, jsonFields));
-
-            const hasMore = results.length > perPage;
-            if(hasMore) results.unshift();
+            const results = await powersync.getAll<TableItem>(compiled.sql, compiled.parameters as any[]);
 
             if(results.length > 0) {
-                const mapped = stableMapper
-                               ? await Promise.all(results.map(stableMapper))
-                               : results as unknown as Array<MappedItem>;
-
-                setData(prev => {
-                    const uniqueNewItems = getUniqueNewItems(prev, mapped);
-
-                    if(uniqueNewItems.length === 0) return prev;
-                    return [...uniqueNewItems, ...prev];
-                });
+                setPrevCursor(results[results.length - 1]);
             }
-
-            setHasPrev(hasMore);
-
-            const prevCursor = results[results.length - 1];
-            if(prevCursor) setPrevCursor(prevCursor);
-            if(!nextCursorValues && results.length > 0) setNextCursor(results[results.length - 1]);
         } catch(error) {
             console.log("Fetch prev infinite query error: ", error);
         } finally {
@@ -331,6 +285,14 @@ export const useInfiniteQuery = <
         getUniqueNewItems,
         jsonFields
     ]);
+
+    const setIsAtTop = (value: boolean) => {
+        isAtTopRef.current = value;
+    };
+
+    const setIsAtBottom = (value: boolean) => {
+        isAtBottomRef.current = value;
+    };
 
     const diffQuery = useMemo(() => {
         if(!cursorOptions || isDefaultCursorFetching) return null;
@@ -355,7 +317,7 @@ export const useInfiniteQuery = <
         }
 
         if(!nextCursorValues && !prevCursorValues || prevCursorValues === nextCursorValues) {
-            watchBuilder = watchBuilder.limit(perPage + 1) as QueryBuilder;
+            watchBuilder = watchBuilder.limit(perPage) as QueryBuilder;
         }
 
         const cursors =
@@ -395,14 +357,47 @@ export const useInfiniteQuery = <
         }).differentialWatch();
     }, [getBaseBuilder, cursorOptions, nextCursorValues, prevCursorValues, perPage, isDefaultCursorFetching]);
 
+    const hasPrevQuery = useMemo(() => {
+        if(!cursorOptions || isLoading || isPrevFetching || !prevCursorValues) return null;
+
+        let watchBuilder = getBaseBuilder();
+
+        if(!watchBuilder) return null;
+
+        watchBuilder = addCursor<QueryBuilder, TableItem, Columns>(
+            watchBuilder, cursorOptions, prevCursorValues, "prev", false
+        );
+
+        const compiled = watchBuilder.clearLimit().limit(1).compile();
+        return powersync.query<TableItem>({
+            sql: compiled.sql,
+            parameters: compiled.parameters as readonly QueryParam[]
+        }).differentialWatch();
+    }, [getBaseBuilder, cursorOptions, prevCursorValues, isLoading, isPrevFetching]);
+
+    const hasNextQuery = useMemo(() => {
+        if(!cursorOptions || isLoading || isNextFetching || !nextCursorValues) return null;
+
+        let watchBuilder = getBaseBuilder();
+
+        if(!watchBuilder) return null;
+        watchBuilder = addCursor<QueryBuilder, TableItem, Columns>(
+            watchBuilder, cursorOptions, nextCursorValues, "next", false
+        );
+
+        const compiled = watchBuilder.clearLimit().limit(1).compile();
+        return powersync.query<TableItem>({
+            sql: compiled.sql,
+            parameters: compiled.parameters as readonly QueryParam[]
+        }).differentialWatch();
+    }, [getBaseBuilder, cursorOptions, nextCursorValues, isLoading, isNextFetching]);
+
     useEffect(() => {
         const setupInitialCursors = async () => {
             if(!cursorOptions || !enabled || isDefaultCursorFetching) return;
 
             setIsLoading(true);
             setData([]);
-            setNextCursorValues(null);
-            setPrevCursorValues(null);
 
             if(defaultItem) {
                 const base = getBaseBuilder();
@@ -410,11 +405,9 @@ export const useInfiniteQuery = <
 
                 setIsDefaultCursorFetching(true);
 
-                const result = await (base.where(
-                    sql.ref(String(defaultItem.idField)),
-                    "=",
-                    defaultItem.idValue
-                )).executeTakeFirst();
+                const result = await base
+                .where(sql.ref(String(defaultItem.idField)), "=", defaultItem.idValue)
+                .executeTakeFirst();
 
                 const tableDefaultItem = (result as TableItem) ?? null;
 
@@ -459,11 +452,6 @@ export const useInfiniteQuery = <
                 }
 
                 setIsDefaultCursorFetching(false);
-            } else {
-                setNextCursorValues(null);
-                setPrevCursorValues(null);
-                setHasNext(false);
-                setHasPrev(false);
             }
         };
 
@@ -487,13 +475,17 @@ export const useInfiniteQuery = <
                         setData(mappedRows);
                         if(defaultItem) setInitialStartIndex(parsedTableRow.findIndex(row => row?.[defaultItem.idField] === defaultItem.idValue));
 
+                        if(!defaultItem && parsedTableRow.length > 0) {
+                            if(!nextCursorValues) {
+                                const lastItem = parsedTableRow[parsedTableRow.length - 1];
+                                setNextCursor(lastItem);
+                            }
+                        }
+
                         if(parsedTableRow.length === 0 && (nextCursorValues || prevCursorValues)) {
                             setNextCursorValues(null);
                             setPrevCursorValues(null);
                         }
-
-                        setHasNext(parsedTableRow.length >= perPage);
-                        setHasPrev(!!prevCursorValues || (!!defaultItem && parsedTableRow.length >= perPage));
                     } catch(error) {
                         console.log("Use infinite query diff onData error: ", error);
                     } finally {
@@ -519,6 +511,54 @@ export const useInfiniteQuery = <
         [enabled, diffQuery, stableMapper, jsonFields]
     );
 
+    useEffect(
+        () => {
+            if(!hasPrevQuery || !enabled) return;
+
+            const dispose = hasPrevQuery.registerListener({
+                onData: async (rows) => {
+                    const has = rows && rows.length > 0;
+                    setHasPrev(has);
+
+                    if(has && isAtTopRef.current) await fetchPrev(true);
+                },
+                onError: (error) => {
+                    console.log("UseInfiniteQuery hasNext query error: ", error);
+                }
+            });
+
+            return () => {
+                dispose();
+                hasPrevQuery.close();
+            };
+        },
+        [enabled, hasPrevQuery]
+    );
+
+    useEffect(
+        () => {
+            if(!hasNextQuery || !enabled) return;
+
+            const dispose = hasNextQuery.registerListener({
+                onData: async (rows) => {
+                    const has = rows && rows.length > 0;
+                    setHasNext(has);
+
+                    if(has && isAtBottomRef.current) await fetchNext(true);
+                },
+                onError: (error) => {
+                    console.log("UseInfiniteQuery hasNext query error: ", error);
+                }
+            });
+
+            return () => {
+                dispose();
+                hasNextQuery.close();
+            };
+        },
+        [enabled, hasNextQuery]
+    );
+
     return {
         data,
         isLoading,
@@ -528,6 +568,8 @@ export const useInfiniteQuery = <
         hasPrev,
         fetchNext,
         fetchPrev,
+        setIsAtTop,
+        setIsAtBottom,
         initialStartIndex,
         isMainCursor,
         makeFieldMainCursor,

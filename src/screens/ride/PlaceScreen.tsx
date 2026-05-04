@@ -28,9 +28,9 @@ export function PlaceScreen() {
         fetchPrev,
         isNextFetching,
         isPrevFetching,
-        hasNext,
-        hasPrev,
-        isLoading
+        isLoading,
+        setIsAtTop,
+        setIsAtBottom
     } = useTimeline({ infiniteQueryOptions: memoizedOptions });
 
     const openCreateForm = () => router.push("/ride/place/create");
@@ -78,8 +78,8 @@ export function PlaceScreen() {
                 fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
                 isPrevFetching={ isPrevFetching }
-                hasNext={ hasNext }
-                hasPrev={ hasPrev }
+                setIsAtTop={ setIsAtTop }
+                setIsAtBottom={ setIsAtBottom }
             />
         </ScreenView>
     );

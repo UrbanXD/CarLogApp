@@ -564,8 +564,8 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
             baseQuery: this.selectQuery(),
             defaultCursorOptions: {
                 cursor: [
-                    { field: "e.date", order: "desc" },
-                    { field: "e.amount", order: "desc" },
+                    { field: "e.date", alias: "expense_date", order: "desc" },
+                    { field: "e.amount", alias: "expense_amount", order: "desc" },
                     { field: "e.id", order: "desc" }
                 ],
                 defaultOrder: "desc"

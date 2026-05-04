@@ -26,9 +26,9 @@ export function RideLogTimeline({ carId }: RideLogTimelineProps) {
         fetchPrev,
         isNextFetching,
         isPrevFetching,
-        hasNext,
-        hasPrev,
         isLoading,
+        setIsAtTop,
+        setIsAtBottom,
         filterManager,
         filterByRange,
         orderButtons
@@ -71,8 +71,8 @@ export function RideLogTimeline({ carId }: RideLogTimelineProps) {
                 fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
                 isPrevFetching={ isPrevFetching }
-                hasNext={ hasNext }
-                hasPrev={ hasPrev }
+                setIsAtTop={ setIsAtTop }
+                setIsAtBottom={ setIsAtBottom }
                 style={ { paddingBottom: FULL_TABBAR_HEIGHT } }
             />
         </View>

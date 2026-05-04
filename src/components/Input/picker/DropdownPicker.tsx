@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
+import React, { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import DropdownPickerController, { DropdownPickerControllerProps } from "./dropdown/DropdownPickerController.tsx";
 import DropdownPickerItems from "./dropdown/DropdownPickerItems.tsx";
 import { PopupView } from "../../popupView/PopupView.tsx";
@@ -92,23 +92,25 @@ export default function DropdownPicker<
     const inputFieldValue = inputFieldContext?.field?.value?.toString() ?? defaultSelectedItemValue;
     const error = inputFieldContext?.fieldState?.error;
 
+    const initialValueRef = useRef(inputFieldValue);
+
     const [internalSelectedItem, setInternalSelectedItem] = useState<PickerItemType | null>(null);
     const [tmpSelectedItem, setTmpSelectedItem] = useState<PickerItemType | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
 
-    const isOpened = useSharedValue(false);
+    const isOpened = useSharedValue(!!hideController);
 
     const itemsQueryProps = useMemo(() => {
         if(!queryOptions) return null;
 
         return {
             ...queryOptions,
-            defaultItem: inputFieldValue ? {
-                idValue: inputFieldValue,
+            defaultItem: initialValueRef.current ? {
+                idValue: initialValueRef.current,
                 idField: (queryOptions.idField || "id") as keyof TableItem
             } : undefined
         };
-    }, [queryOptions, inputFieldValue]);
+    }, [queryOptions]);
 
     const selectedItemQueryProps = useMemo(() => {
         if(!queryOptions) return null;
@@ -154,8 +156,8 @@ export default function DropdownPicker<
 
     useAnimatedReaction(
         () => isOpened.value,
-        (opened, previousOpened) => {
-            if(opened && !previousOpened) { //reset tmp selected item after reopen
+        (opened) => {
+            if(opened) { //reset tmp selected item after reopen
                 scheduleOnRN(setTmpSelectedItem, selectedItem);
             }
         },
@@ -189,11 +191,12 @@ export default function DropdownPicker<
 
     const submit = useCallback((item: PickerItemType | null) => {
         if(!selectedItemQueryProps) setInternalSelectedItem(item);
+
         const val = item?.value ?? "";
         onChange?.(val);
         setValue?.(val);
-        isOpened.value = false;
-    }, [onChange, setValue, !!selectedItemQueryProps]);
+        if(!hideController) isOpened.value = false;
+    }, [onChange, setValue, !!selectedItemQueryProps, hideController]);
 
     const onSelect = useCallback((item: PickerItemType) => {
         if(selectWithoutSubmit) return submit(item);

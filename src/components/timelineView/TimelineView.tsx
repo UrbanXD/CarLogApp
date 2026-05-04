@@ -25,8 +25,8 @@ type TimelineViewProps = {
     fetchPrev?: () => Promise<void>
     isNextFetching?: boolean
     isPrevFetching?: boolean
-    hasNext?: boolean
-    hasPrev?: boolean
+    setIsAtTop?: (value: boolean) => void
+    setIsAtBottom?: (value: boolean) => void
     scrollHandler?: (event: RNNativeScrollEvent, context?: Record<string, unknown>) => void
     style?: ViewStyle
     filtersContainerStyle?: ViewStyle
@@ -44,8 +44,8 @@ function ITimelineView({
     fetchPrev,
     isNextFetching,
     isPrevFetching,
-    hasNext,
-    hasPrev,
+    setIsAtTop,
+    setIsAtBottom,
     scrollHandler,
     style,
     filtersContainerStyle
@@ -67,6 +67,24 @@ function ITimelineView({
     useEffect(() => {
         if(filterByRange) filterByRange(from, to);
     }, [filterByRange, from, to]);
+
+    const handleScroll = (event: RNNativeScrollEvent, context?: Record<string, unknown>) => {
+        if(scrollHandler) scrollHandler(event, context);
+
+        const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+
+        const threshold = heightPercentageToDP(15);
+
+        if(setIsAtBottom) {
+            const isAtBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - threshold;
+            setIsAtBottom(isAtBottom);
+        }
+
+        if(setIsAtTop) {
+            const isAtTop = contentOffset.y <= threshold;
+            setIsAtTop(isAtTop);
+        }
+    };
 
     const renderItem = useCallback(({ item, index }: ListRenderItemInfo<TimelineItemType>) => (
         <TimelineItem
@@ -148,9 +166,9 @@ function ITimelineView({
                 ListEmptyComponent={ renderListEmptyComponent }
                 ListHeaderComponent={ renderHeader }
                 ListFooterComponent={ renderFooter }
-                onEndReached={ !isLoading && hasPrev ? fetchNext : undefined }
+                onEndReached={ !isLoading ? fetchNext : undefined }
                 onEndReachedThreshold={ 0.5 }
-                onStartReached={ !isLoading && hasNext ? fetchPrev : undefined }
+                onStartReached={ !isLoading ? fetchPrev : undefined }
                 onStartReachedThreshold={ 0.5 }
                 keyboardDismissMode="on-drag"
                 contentContainerStyle={ [
@@ -159,8 +177,8 @@ function ITimelineView({
                 ] }
                 showsVerticalScrollIndicator={ false }
                 showsHorizontalScrollIndicator={ false }
-                onScroll={ scrollHandler }
-                scrollEventThrottle={ 16 }
+                onScroll={ handleScroll }
+                scrollEventThrottle={ 64 }
             />
         </View>
     );

@@ -146,7 +146,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car, SelectCarTableRo
             id: request.odometer.id,
             car_id: request.id,
             type_id: OdometerLogTypeEnum.SIMPLE,
-            value: request.odometer.value * odometerUnit.conversionFactor
+            value: Math.floor(request.odometer.value * odometerUnit.conversionFactor)
         };
 
         let odometerChangeLog: OdometerChangeLogTableRow | null = null;
@@ -165,7 +165,7 @@ export class CarMapper extends AbstractMapper<CarTableRow, Car, SelectCarTableRo
             car_id: request.id,
             type_id: request.fuelTank.typeId,
             unit_id: request.fuelTank.unitId,
-            capacity: request.fuelTank.capacity * fuelUnit.conversionFactor
+            capacity: Math.floor(request.fuelTank.capacity * fuelUnit.conversionFactor)
         };
 
         return { car, odometerLog, odometerChangeLog: odometerChangeLog, fuelTank };

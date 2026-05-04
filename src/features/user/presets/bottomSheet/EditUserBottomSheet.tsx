@@ -50,7 +50,7 @@ export function EditUserBottomSheet() {
                 CONTENT = <ResetPasswordForm defaultEmail={ user.email }/>;
                 break;
             case EDIT_USER_FORM_TYPE.LinkPasswordToOAuth:
-                CONTENT = <LinkPasswordToOAuthForm/>;
+                CONTENT = <LinkPasswordToOAuthForm defaultEmail={ user.email }/>;
                 break;
         }
     }
