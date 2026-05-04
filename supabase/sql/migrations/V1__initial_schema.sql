@@ -121,7 +121,7 @@ CREATE INDEX idx_fuel_tank_car_id ON public.fuel_tank (car_id);
 DROP PUBLICATION powersync;
 CREATE PUBLICATION powersync FOR ALL TABLES;
 
-CREATE ROLE powersync_role WITH REPLICATION BYPASSRLS LOGIN PASSWORD 'JECY6oX9mnfvriGBI6HaCpdy7MF6mA';
+CREATE ROLE powersync_role WITH REPLICATION BYPASSRLS LOGIN PASSWORD 'template';
 
 -- Set up permissions for the newly created role
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO powersync_role;
