@@ -30,7 +30,8 @@ export function EditRideLogForm({
     const form = useForm<RideLogFormFields>(useEditRideLogFormProps(rideLog));
     const { fields } = useRideLogFormFields({
         form,
-        changeEndTimeWhenInputNotTouched: false
+        changeEndTimeWhenInputNotTouched: false,
+        changeEndOdometerValueWhenInputNotTouched: false
     });
     const editFields: FormFields = fields[field];
 

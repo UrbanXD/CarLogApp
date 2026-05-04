@@ -34,8 +34,8 @@ type InfoTimelineProps = {
     fetchPrev?: () => Promise<void>
     isNextFetching?: boolean
     isPrevFetching?: boolean
-    hasNext?: boolean
-    hasPrev?: boolean
+    setIsAtTop?: (value: boolean) => void
+    setIsAtBottom?: (value: boolean) => void
     scrollHandler?: (event: RNNativeScrollEvent, context?: Record<string, unknown>) => void
     notFoundText?: string
     style?: ViewStyle
@@ -51,8 +51,8 @@ function IInfoTimeline({
     fetchPrev,
     isNextFetching,
     isPrevFetching,
-    hasNext,
-    hasPrev,
+    setIsAtTop,
+    setIsAtBottom,
     scrollHandler,
     notFoundText,
     style
@@ -67,6 +67,26 @@ function IInfoTimeline({
     useEffect(() => {
         if(!isLoading) ref.current?.scrollToTop();
     }, [isLoading]);
+
+    const handleScroll = (event: RNNativeScrollEvent, context?: Record<string, unknown>) => {
+        if(scrollHandler) scrollHandler(event, context);
+        if(!setIsAtBottom) return;
+
+        const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+
+        const paddingToBottom = SEPARATOR_SIZES.small;
+        const paddingToTop = SEPARATOR_SIZES.small;
+
+        if(setIsAtBottom) {
+            const isAtBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
+            setIsAtBottom(isAtBottom);
+        }
+
+        if(setIsAtTop) {
+            const isAtTop = contentOffset.y <= paddingToTop;
+            setIsAtTop(isAtTop);
+        }
+    };
 
     const renderItem = useCallback(({ item }: ListRenderItemInfo<InfoTimelineItem>) => (
         <View style={ itemStyles.container }>
@@ -130,16 +150,16 @@ function IInfoTimeline({
                 ListHeaderComponent={ renderHeader }
                 ListFooterComponent={ renderFooter }
                 ItemSeparatorComponent={ renderSeparatorComponent }
-                onEndReached={ !isLoading && hasPrev ? fetchNext : undefined }
+                onEndReached={ !isLoading ? fetchNext : undefined }
                 onEndReachedThreshold={ 0.5 }
-                onStartReached={ !isLoading && hasNext ? fetchPrev : undefined }
+                onStartReached={ !isLoading ? fetchPrev : undefined }
                 onStartReachedThreshold={ 0.5 }
                 keyboardDismissMode="on-drag"
                 contentContainerStyle={ [style, styles.listContainer] }
                 showsVerticalScrollIndicator={ false }
                 showsHorizontalScrollIndicator={ false }
-                onScroll={ scrollHandler }
-                scrollEventThrottle={ 16 }
+                onScroll={ handleScroll }
+                scrollEventThrottle={ 64 }
             />
             <FloatingActionMenu action={ openCreateForm }/>
         </>
@@ -148,7 +168,7 @@ function IInfoTimeline({
 
 const itemStyles = StyleSheet.create({
     container: {
-        flex: 1,
+        width: "100%",
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
@@ -156,14 +176,17 @@ const itemStyles = StyleSheet.create({
         paddingVertical: SEPARATOR_SIZES.lightSmall / 2
     },
     text: {
+        flex: 1,
         fontFamily: "Gilroy-Heavy",
         fontSize: FONT_SIZES.p2,
         letterSpacing: FONT_SIZES.p2 * 0.035,
-        color: COLORS.white
+        color: COLORS.white,
+        flexWrap: "wrap"
     },
     iconContainer: {
         flexDirection: "row",
         alignItems: "center",
+        flexShrink: 0,
         gap: SEPARATOR_SIZES.lightSmall
     }
 });

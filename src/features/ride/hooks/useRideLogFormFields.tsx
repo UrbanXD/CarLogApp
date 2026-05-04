@@ -21,11 +21,13 @@ import { useCar } from "../../car/hooks/useCar.ts";
 type UseRideLogFormFieldsProps = {
     form: UseFormReturn<RideLogFormFields>
     changeEndTimeWhenInputNotTouched?: boolean
+    changeEndOdometerValueWhenInputNotTouched?: boolean
 }
 
 export function useRideLogFormFields({
     form,
-    changeEndTimeWhenInputNotTouched = true
+    changeEndTimeWhenInputNotTouched = true,
+    changeEndOdometerValueWhenInputNotTouched = true
 }: UseRideLogFormFieldsProps) {
     const { control, setValue, getFieldState, clearErrors } = form;
     const { t } = useTranslation();
@@ -48,6 +50,12 @@ export function useRideLogFormFields({
             setValue("endTime", formStartTime);
         }
     }, [formStartTime, changeEndTimeWhenInputNotTouched]);
+
+    useEffect(() => {
+        if(changeEndOdometerValueWhenInputNotTouched && formStartOdometerValue && !getFieldState("endOdometerValue").isDirty) {
+            setValue("endOdometerValue", formStartOdometerValue);
+        }
+    }, [formStartOdometerValue, changeEndOdometerValueWhenInputNotTouched]);
 
     const startTimeAndOdometerInput = useCallback((isEditField: boolean = false) => (
         <OdometerValueInput
@@ -82,7 +90,7 @@ export function useRideLogFormFields({
             dateTitle={ t("rides.end") }
             showLimits={ false }
             skipLimitLogFieldNames={ ["startOdometerLogId"] }
-            changeCarOdometerValueWhenInputNotTouched={ !isEditField }
+            changeCarOdometerValueWhenInputNotTouched={ false }
         />
     ), [control, setValue, getFieldState, t]);
 

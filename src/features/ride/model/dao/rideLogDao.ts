@@ -221,7 +221,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
             jsonArrayFrom(
                 eb
                 .selectFrom(`${ RIDE_PLACE_TABLE } as rp` as const)
-                .innerJoin(`${ PASSENGER_TABLE } as p` as const, "p.id", "rp.place_id")
+                .innerJoin(`${ PLACE_TABLE } as p` as const, "p.id", "rp.place_id")
                 .select([
                     "rp.id",
                     "rp.owner_id",
