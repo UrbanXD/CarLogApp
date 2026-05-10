@@ -4,12 +4,12 @@ import { useAlert } from "../../../../../ui/alert/hooks/useAlert.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { useBottomSheet } from "../../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { getUUID } from "../../../../../database/utils/uuid.ts";
-import { CreateToast, InvalidFormToast } from "../../../../../ui/alert/presets/toast/index.ts";
+import { CreateToast, InvalidFormToast } from "../../../../../ui/alert/presets/toast";
 import { useTranslation } from "react-i18next";
-import { SubmitHandlerArgs } from "../../../../../types/index.ts";
+import { SubmitHandlerArgs } from "../../../../../types";
 
 type UseCreatePlaceProps = {
-    userId: string,
+    userId: string | null
     dismissSheet?: boolean
 }
 
@@ -28,7 +28,7 @@ export function useCreatePlace({ userId, dismissSheet = true }: UseCreatePlacePr
                 openToast(CreateToast.success(t("places.title_singular")));
 
                 onDone?.();
-                form.reset({ id: getUUID(), name: "", ownerId: userId });
+                form.reset({ id: getUUID(), name: "", ownerId: userId ?? "" });
 
                 if(dismissBottomSheet && dismissSheet) dismissBottomSheet(true);
             } catch(e) {

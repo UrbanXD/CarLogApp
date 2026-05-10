@@ -14,9 +14,10 @@ type CreatePlaceFormProps = {
 export function CreatePlaceForm({ onFormStateChange }: CreatePlaceFormProps) {
     const { t } = useTranslation();
     const { sessionUserId } = useAuth();
-    if(!sessionUserId) return null;
 
     const { form, submitHandler } = useCreatePlace({ userId: sessionUserId });
+
+    if(!sessionUserId) return null;
 
     return (
         <Form

@@ -23,10 +23,10 @@ const getPassengerForm = (passengerDao: PassengerDao) => passengerForm
 
 export type PassengerFormFields = z.infer<typeof passengerForm>;
 
-export function useCreatePassengerFormProps(passengerDao: PassengerDao, ownerId: string) {
+export function useCreatePassengerFormProps(passengerDao: PassengerDao, ownerId: string | null) {
     const defaultValues: PassengerFormFields = {
         id: getUUID(),
-        ownerId,
+        ownerId: ownerId ?? "",
         name: ""
     };
 

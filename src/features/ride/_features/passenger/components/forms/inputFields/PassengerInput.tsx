@@ -22,11 +22,11 @@ export function PassengerInput({
     const { passengerDao } = useDatabase();
     const { sessionUserId } = useAuth();
 
-    if(!sessionUserId) return null;
-
     const queryOptions = useMemo(() => passengerDao.pickerInfiniteQuery(sessionUserId), []);
 
     const { form, submitHandler } = useCreatePassenger({ userId: sessionUserId, dismissSheet: false });
+
+    if(!sessionUserId) return null;
 
     return (
         <Input.Field
