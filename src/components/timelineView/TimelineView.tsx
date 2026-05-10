@@ -25,8 +25,6 @@ type TimelineViewProps = {
     fetchPrev?: () => Promise<void>
     isNextFetching?: boolean
     isPrevFetching?: boolean
-    setIsAtTop?: (value: boolean) => void
-    setIsAtBottom?: (value: boolean) => void
     scrollHandler?: (event: RNNativeScrollEvent, context?: Record<string, unknown>) => void
     style?: ViewStyle
     filtersContainerStyle?: ViewStyle
@@ -44,8 +42,6 @@ function ITimelineView({
     fetchPrev,
     isNextFetching,
     isPrevFetching,
-    setIsAtTop,
-    setIsAtBottom,
     scrollHandler,
     style,
     filtersContainerStyle
@@ -67,24 +63,6 @@ function ITimelineView({
     useEffect(() => {
         if(filterByRange) filterByRange(from, to);
     }, [filterByRange, from, to]);
-
-    const handleScroll = (event: RNNativeScrollEvent, context?: Record<string, unknown>) => {
-        if(scrollHandler) scrollHandler(event, context);
-
-        const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-
-        const threshold = heightPercentageToDP(15);
-
-        if(setIsAtBottom) {
-            const isAtBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - threshold;
-            setIsAtBottom(isAtBottom);
-        }
-
-        if(setIsAtTop) {
-            const isAtTop = contentOffset.y <= threshold;
-            setIsAtTop(isAtTop);
-        }
-    };
 
     const renderItem = useCallback(({ item, index }: ListRenderItemInfo<TimelineItemType>) => (
         <TimelineItem
@@ -177,7 +155,7 @@ function ITimelineView({
                 ] }
                 showsVerticalScrollIndicator={ false }
                 showsHorizontalScrollIndicator={ false }
-                onScroll={ handleScroll }
+                onScroll={ scrollHandler }
                 scrollEventThrottle={ 64 }
             />
         </View>

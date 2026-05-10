@@ -16,7 +16,6 @@ export function PlaceScreen() {
     const { openModal, openToast } = useAlert();
     const { sessionUserId } = useAuth();
 
-
     const memoizedOptions = useMemo(
         () => placeDao.timelineInfiniteQuery(sessionUserId),
         [placeDao, sessionUserId]
@@ -28,9 +27,7 @@ export function PlaceScreen() {
         fetchPrev,
         isNextFetching,
         isPrevFetching,
-        isLoading,
-        setIsAtTop,
-        setIsAtBottom
+        isLoading
     } = useTimeline({ infiniteQueryOptions: memoizedOptions });
 
     const openCreateForm = () => router.push("/ride/place/create");
@@ -78,8 +75,6 @@ export function PlaceScreen() {
                 fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
                 isPrevFetching={ isPrevFetching }
-                setIsAtTop={ setIsAtTop }
-                setIsAtBottom={ setIsAtBottom }
             />
         </ScreenView>
     );

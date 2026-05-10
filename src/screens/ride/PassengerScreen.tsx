@@ -27,9 +27,7 @@ export function PassengerScreen() {
         fetchPrev,
         isNextFetching,
         isPrevFetching,
-        isLoading,
-        setIsAtTop,
-        setIsAtBottom
+        isLoading
     } = useTimeline({ infiniteQueryOptions: memoizedOptions });
 
     const openCreateForm = () => router.push("/ride/passenger/create");
@@ -80,8 +78,6 @@ export function PassengerScreen() {
                 fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
                 isPrevFetching={ isPrevFetching }
-                setIsAtTop={ setIsAtTop }
-                setIsAtBottom={ setIsAtBottom }
             />
         </ScreenView>
     );

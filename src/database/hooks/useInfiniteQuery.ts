@@ -112,7 +112,7 @@ export const useInfiniteQuery = <
         baseQuery,
         defaultFilters,
         defaultItem,
-        perPage = 50,
+        perPage = 25,
         mapper,
         mappedItemId,
         jsonFields,
@@ -121,8 +121,8 @@ export const useInfiniteQuery = <
 
     const { powersync } = useDatabase();
 
-    const isAtTopRef = useRef(false);
-    const isAtBottomRef = useRef(false);
+    const hadNext = useRef(false);
+    const hadPrev = useRef(false);
 
     const stringifiedMapper = JSON.stringify(mapper);
     const stableMapper = useMemo(() => mapper, [stringifiedMapper]);
@@ -235,6 +235,7 @@ export const useInfiniteQuery = <
                 console.log("Fetch next infinite query error: ", error);
             } finally {
                 setIsNextFetching(false);
+                hadNext.current = false;
             }
         },
         [
@@ -267,6 +268,7 @@ export const useInfiniteQuery = <
             console.log("Fetch prev infinite query error: ", error);
         } finally {
             setIsPrevFetching(false);
+            hadPrev.current = false;
         }
     }, [
         enabled,
@@ -285,14 +287,6 @@ export const useInfiniteQuery = <
         getUniqueNewItems,
         jsonFields
     ]);
-
-    const setIsAtTop = (value: boolean) => {
-        isAtTopRef.current = value;
-    };
-
-    const setIsAtBottom = (value: boolean) => {
-        isAtBottomRef.current = value;
-    };
 
     const diffQuery = useMemo(() => {
         if(!cursorOptions || isDefaultCursorFetching) return null;
@@ -520,7 +514,8 @@ export const useInfiniteQuery = <
                     const has = rows && rows.length > 0;
                     setHasPrev(has);
 
-                    if(has && isAtTopRef.current) await fetchPrev(true);
+                    if(has && !hadPrev.current) await fetchPrev(true);
+                    hadPrev.current = has;
                 },
                 onError: (error) => {
                     console.log("UseInfiniteQuery hasNext query error: ", error);
@@ -544,7 +539,8 @@ export const useInfiniteQuery = <
                     const has = rows && rows.length > 0;
                     setHasNext(has);
 
-                    if(has && isAtBottomRef.current) await fetchNext(true);
+                    if(has && !hadNext.current) await fetchNext(true);
+                    hadNext.current = has;
                 },
                 onError: (error) => {
                     console.log("UseInfiniteQuery hasNext query error: ", error);
@@ -568,8 +564,6 @@ export const useInfiniteQuery = <
         hasPrev,
         fetchNext,
         fetchPrev,
-        setIsAtTop,
-        setIsAtBottom,
         initialStartIndex,
         isMainCursor,
         makeFieldMainCursor,

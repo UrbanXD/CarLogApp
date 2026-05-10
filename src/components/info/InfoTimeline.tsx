@@ -34,8 +34,6 @@ type InfoTimelineProps = {
     fetchPrev?: () => Promise<void>
     isNextFetching?: boolean
     isPrevFetching?: boolean
-    setIsAtTop?: (value: boolean) => void
-    setIsAtBottom?: (value: boolean) => void
     scrollHandler?: (event: RNNativeScrollEvent, context?: Record<string, unknown>) => void
     notFoundText?: string
     style?: ViewStyle
@@ -51,8 +49,6 @@ function IInfoTimeline({
     fetchPrev,
     isNextFetching,
     isPrevFetching,
-    setIsAtTop,
-    setIsAtBottom,
     scrollHandler,
     notFoundText,
     style
@@ -67,26 +63,6 @@ function IInfoTimeline({
     useEffect(() => {
         if(!isLoading) ref.current?.scrollToTop();
     }, [isLoading]);
-
-    const handleScroll = (event: RNNativeScrollEvent, context?: Record<string, unknown>) => {
-        if(scrollHandler) scrollHandler(event, context);
-        if(!setIsAtBottom) return;
-
-        const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-
-        const paddingToBottom = SEPARATOR_SIZES.small;
-        const paddingToTop = SEPARATOR_SIZES.small;
-
-        if(setIsAtBottom) {
-            const isAtBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
-            setIsAtBottom(isAtBottom);
-        }
-
-        if(setIsAtTop) {
-            const isAtTop = contentOffset.y <= paddingToTop;
-            setIsAtTop(isAtTop);
-        }
-    };
 
     const renderItem = useCallback(({ item }: ListRenderItemInfo<InfoTimelineItem>) => (
         <View style={ itemStyles.container }>
@@ -158,7 +134,7 @@ function IInfoTimeline({
                 contentContainerStyle={ [style, styles.listContainer] }
                 showsVerticalScrollIndicator={ false }
                 showsHorizontalScrollIndicator={ false }
-                onScroll={ handleScroll }
+                onScroll={ scrollHandler }
                 scrollEventThrottle={ 64 }
             />
             <FloatingActionMenu action={ openCreateForm }/>

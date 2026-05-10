@@ -26,8 +26,6 @@ export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
         fetchPrev,
         isNextFetching,
         isPrevFetching,
-        setIsAtBottom,
-        setIsAtTop,
         isLoading,
         filterManager,
         filterByRange,
@@ -66,8 +64,6 @@ export function ExpenseTimeline({ carId }: ExpenseTimelineProps) {
                 fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
                 isPrevFetching={ isPrevFetching }
-                setIsAtTop={ setIsAtTop }
-                setIsAtBottom={ setIsAtBottom }
                 style={ { paddingBottom: FULL_TABBAR_HEIGHT } }
             />
         </View>
