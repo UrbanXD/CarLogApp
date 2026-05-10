@@ -316,7 +316,7 @@ export const useInfiniteQuery = <
             );
         }
 
-        if(!nextCursorValues && !prevCursorValues || prevCursorValues === nextCursorValues) {
+        if((!nextCursorValues && !prevCursorValues) || prevCursorValues === nextCursorValues) {
             watchBuilder = watchBuilder.limit(perPage) as QueryBuilder;
         }
 

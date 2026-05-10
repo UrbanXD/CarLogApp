@@ -566,7 +566,7 @@ export class ServiceLogDao extends Dao<ServiceLogTableRow, ServiceLog, ServiceLo
                 cursor: [
                     { field: "e.date", alias: "expense_date", order: "desc" },
                     { field: "e.amount", alias: "expense_amount", order: "desc" },
-                    { field: "e.id", order: "desc" }
+                    { field: "sl.id", order: "desc" }
                 ],
                 defaultOrder: "desc"
             },
