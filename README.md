@@ -1,8 +1,7 @@
----
-
 ## Követelmények / Célok
 
-Egy olyan applikáció lefejlesztése, melyben a felhasználók virtuálisan is kezelni tudják autóikat és az azokhoz kapcsolódó fontos információkat és ezekkel kapcsolatos statisztikákhoz is hozzáférjenek.
+Egy olyan applikáció lefejlesztése, melyben a felhasználók virtuálisan is kezelni tudják autóikat és az azokhoz
+kapcsolódó fontos információkat és ezekkel kapcsolatos statisztikákhoz is hozzáférjenek.
 
 Alap Funkciók:
 
