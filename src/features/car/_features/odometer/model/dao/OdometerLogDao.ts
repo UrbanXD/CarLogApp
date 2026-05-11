@@ -110,6 +110,7 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
         .select((eb) => [
             "ol.id",
             odometerValueExpression(eb, "ol.value", "ou.conversion_factor").as("value"),
+            "ol.value as value_in_km",
             "c.id as car_id",
             "c.name as car_name",
             "mo.id as car_model_id",
@@ -256,7 +257,11 @@ export class OdometerLogDao extends Dao<OdometerLogTableRow, OdometerLog, Odomet
             baseQuery: this.selectQuery(),
             defaultCursorOptions: {
                 cursor: [
-                    { field: "ol.value", order: "desc", extraOrderByField: { field: "log_date", reverseOrder: false } },
+                    {
+                        field: "value_in_km",
+                        order: "desc",
+                        extraOrderByField: { field: "log_date", reverseOrder: false }
+                    },
                     { field: "ol.id", order: "desc" }
                 ],
                 defaultOrder: "desc"

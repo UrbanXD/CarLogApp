@@ -42,7 +42,7 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
     } = useTimeline({
         infiniteQueryOptions: memoizedOptions,
         cursorOrderButtons: [
-            { field: "ol.value", title: t("odometer.value") }
+            { field: "value_in_km", title: t("odometer.value") }
         ],
         fromDateRangeFilterField: "log_date"
     });
