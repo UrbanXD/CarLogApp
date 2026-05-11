@@ -198,19 +198,6 @@ export const useInfiniteQuery = <
         setPrevCursorValues(getCursorValues(firstItem, cursorOptions));
     }, [cursorOptions]);
 
-    const getUniqueNewItems = useCallback((oldItems: Array<MappedItem>, newItems: Array<MappedItem>) => (
-        newItems.filter(newItem => {
-            const newId = newItem?.[mappedItemId ?? "id" as keyof MappedItem];
-
-            if(newId === undefined || newId === null) {
-                console.warn(`Missing ID in new item using key: ${ String(mappedItemId) }`, newItem);
-                return false;
-            }
-
-            return !oldItems.some(oldItem => oldItem?.[mappedItemId ?? "id" as keyof MappedItem] === newId);
-        })
-    ), [mappedItemId]);
-
     const fetchNext = useCallback(
         async (force?: boolean) => {
             if(!cursorOptions || !enabled || isNextFetching || isLoading) return;
@@ -240,8 +227,7 @@ export const useInfiniteQuery = <
         },
         [
             enabled, isLoading, isNextFetching, hasNext, data.length, nextCursorValues, getBaseBuilder, cursorOptions,
-            perPage, stableMapper, prevCursorValues, powersync, setPrevCursor, setNextCursor, getUniqueNewItems,
-            jsonFields
+            perPage, stableMapper, prevCursorValues, powersync, setPrevCursor, setNextCursor, jsonFields
         ]
     );
 
@@ -284,7 +270,6 @@ export const useInfiniteQuery = <
         powersync,
         setPrevCursor,
         setNextCursor,
-        getUniqueNewItems,
         jsonFields
     ]);
 
@@ -454,7 +439,12 @@ export const useInfiniteQuery = <
 
     useEffect(
         () => {
-            if(!diffQuery || !enabled) return;
+            if(!diffQuery || !enabled) {
+                setIsLoading(false);
+                return;
+            }
+
+            if(diffQuery.state.isLoading || diffQuery.state.isFetching) setIsLoading(true);
 
             const dispose = diffQuery.registerListener({
                 onData: async (rows) => {
@@ -487,9 +477,8 @@ export const useInfiniteQuery = <
                     }
                 },
                 onStateChange: (state) => {
-                    if(!state.error && !state.isFetching && !state.isFetching && state.data.length === 0) {
-                        setIsLoading(false);
-                    }
+                    if(state.isLoading || state.isFetching) setIsLoading(true);
+                    if(!state.isFetching && !state.isLoading) setIsLoading(false);
                 },
                 onError: (error) => {
                     console.log("UseInfiniteQuery diff query error: ", error);
@@ -500,6 +489,7 @@ export const useInfiniteQuery = <
             return () => {
                 dispose();
                 diffQuery.close();
+                setIsLoading(false);
             };
         },
         [enabled, diffQuery, stableMapper, jsonFields]
