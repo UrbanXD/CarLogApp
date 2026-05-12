@@ -92,7 +92,7 @@ export function useRideLogFormFields({
             skipLimitLogFieldNames={ ["startOdometerLogId"] }
             changeCarOdometerValueWhenInputNotTouched={ false }
         />
-    ), [control, setValue, getFieldState, t]);
+    ), [control, setValue, getFieldState, t, formStartOdometerValue]);
 
     const fields: Record<RideLogFormFieldsEnum, FormFields> = useMemo(
         () => ({

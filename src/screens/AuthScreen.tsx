@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, SECONDARY_COLOR, SEPARATOR_SIZES } from "../constants/index.ts";
+import { COLORS, DEFAULT_SEPARATOR, FONT_SIZES, SECONDARY_COLOR, SEPARATOR_SIZES } from "../constants";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button/Button";
@@ -11,6 +11,7 @@ import Divider from "../components/Divider.tsx";
 import CarlogTitle from "../components/CarlogTitle.tsx";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { debounce } from "es-toolkit";
 
 const ENTERING_ANIMATION_DURATION = 300;
 
@@ -19,8 +20,8 @@ const AuthScreen: React.FC = () => {
     const { top, bottom } = useSafeAreaInsets();
     const { notVerifiedEmail, openAccountVerification } = useAuth();
 
-    const openSignUp = () => router.push("auth/signUp");
-    const openSignIn = () => router.push("auth/signIn");
+    const openSignUp = debounce(() => router.push("auth/signUp"), 350);
+    const openSignIn = debounce(() => router.push("auth/signIn"), 350);
 
     const openVerification = useCallback(() => {
         if(notVerifiedEmail) openAccountVerification(notVerifiedEmail, true);

@@ -8,7 +8,7 @@ const SignUpBottomSheet: React.FC = () => {
 
     const TITLE = t("auth.sign_up.title");
     const CONTENT = <SignUpForm/>;
-    const SNAP_POINTS = ["62.5%"];
+    const SNAP_POINTS = ["72.5%"];
 
     return (
         <FormBottomSheet

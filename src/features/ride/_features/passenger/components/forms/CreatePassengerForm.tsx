@@ -14,9 +14,10 @@ type CreatePassengerFormProps = {
 export function CreatePassengerForm({ onFormStateChange }: CreatePassengerFormProps) {
     const { t } = useTranslation();
     const { sessionUserId } = useAuth();
-    if(!sessionUserId) return null;
 
     const { form, submitHandler } = useCreatePassenger({ userId: sessionUserId });
+
+    if(!sessionUserId) return null;
 
     return (
         <Form

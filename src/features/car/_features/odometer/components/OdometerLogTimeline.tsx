@@ -36,15 +36,13 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
         isNextFetching,
         isPrevFetching,
         isLoading,
-        setIsAtTop,
-        setIsAtBottom,
         filterManager,
         filterByRange,
         orderButtons
     } = useTimeline({
         infiniteQueryOptions: memoizedOptions,
         cursorOrderButtons: [
-            { field: "ol.value", title: t("odometer.value") }
+            { field: "value_in_km", title: t("odometer.value") }
         ],
         fromDateRangeFilterField: "log_date"
     });
@@ -89,8 +87,6 @@ export function OdometerLogTimeline({ carId }: OdometerLogTimelineProps) {
                 fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
                 isPrevFetching={ isPrevFetching }
-                setIsAtTop={ setIsAtTop }
-                setIsAtBottom={ setIsAtBottom }
                 style={ { paddingBottom: bottom + FLOATING_ACTION_BUTTON_SIZE + SEPARATOR_SIZES.lightSmall } }
             />
             <FloatingActionMenu action={ openCreateOdometerLog }/>

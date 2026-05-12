@@ -2,7 +2,7 @@ import { ReactElement, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { DateType } from "react-native-ui-datepicker";
 import { DatePickerContext, DatePickerViews } from "./DatePickerContext.ts";
-import { MAX_DATE, MIN_DATE } from "../../constants/index.ts";
+import { MAX_DATE, MIN_DATE } from "../../constants";
 
 export type DatePickerProviderProps = {
     children: ReactElement | Array<ReactElement>;
@@ -26,7 +26,7 @@ export function DatePickerProvider({
     onSubmit
 }: DatePickerProviderProps) {
     const [startDate, setStartDate] = useState<Date | null>(dayjs(initialStartDate).toDate());
-    const [endDate, setEndDate] = useState<Date | null>(initialEndDate ? dayjs(initialEndDate).toDate() : null);
+    const [endDate, setEndDate] = useState<Date | null>(mode === "range" ? dayjs(initialEndDate).toDate() : null);
     const [calendarDate, setCalendarDate] = useState<Date>(dayjs(initialStartDate).toDate());
     const [view, setView] = useState<DatePickerViews>(initialView);
 

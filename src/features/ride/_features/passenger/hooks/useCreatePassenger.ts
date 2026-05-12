@@ -1,15 +1,15 @@
-import { useForm } from "react-hook-form";
 import { PassengerFormFields, useCreatePassengerFormProps } from "../schemas/form/passengerForm.ts";
 import { useAlert } from "../../../../../ui/alert/hooks/useAlert.ts";
 import { useDatabase } from "../../../../../contexts/database/DatabaseContext.ts";
 import { useBottomSheet } from "../../../../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { getUUID } from "../../../../../database/utils/uuid.ts";
-import { CreateToast, InvalidFormToast } from "../../../../../ui/alert/presets/toast/index.ts";
+import { CreateToast, InvalidFormToast } from "../../../../../ui/alert/presets/toast";
 import { useTranslation } from "react-i18next";
-import { SubmitHandlerArgs } from "../../../../../types/index.ts";
+import { SubmitHandlerArgs } from "../../../../../types";
+import { useForm } from "react-hook-form";
 
 type UseCreatePassengerProps = {
-    userId: string
+    userId: string | null
     dismissSheet?: boolean
 }
 
@@ -28,7 +28,7 @@ export function useCreatePassenger({ userId, dismissSheet = true }: UseCreatePas
                 openToast(CreateToast.success(t("passengers.title_singular")));
 
                 onDone?.();
-                form.reset({ id: getUUID(), name: "", ownerId: userId });
+                form.reset({ id: getUUID(), name: "", ownerId: userId ?? "" });
 
                 if(dismissBottomSheet && dismissSheet) dismissBottomSheet(true);
             } catch(e) {

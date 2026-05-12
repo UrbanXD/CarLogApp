@@ -1,5 +1,3 @@
----
-
 ## Követelmények / Célok
 
 Egy olyan applikáció lefejlesztése, melyben a felhasználók virtuálisan is kezelni tudják autóikat és az azokhoz

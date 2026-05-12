@@ -26,8 +26,6 @@ export function ServiceLogTimeline({ carId }: ServiceLogTimelineProps) {
         isNextFetching,
         isPrevFetching,
         isLoading,
-        setIsAtTop,
-        setIsAtBottom,
         filterManager,
         filterByRange,
         orderButtons
@@ -65,8 +63,6 @@ export function ServiceLogTimeline({ carId }: ServiceLogTimelineProps) {
                 fetchPrev={ fetchPrev }
                 isNextFetching={ isNextFetching }
                 isPrevFetching={ isPrevFetching }
-                setIsAtTop={ setIsAtTop }
-                setIsAtBottom={ setIsAtBottom }
                 style={ { paddingBottom: FULL_TABBAR_HEIGHT } }
             />
         </View>

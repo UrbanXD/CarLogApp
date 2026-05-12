@@ -22,11 +22,12 @@ export function PlaceInput({
     const { placeDao } = useDatabase();
     const { sessionUserId } = useAuth();
 
-    if(!sessionUserId) return null;
-
     const queryOptions = useMemo(() => placeDao.pickerInfiniteQuery(sessionUserId), [sessionUserId]);
 
     const { form, submitHandler } = useCreatePlace({ userId: sessionUserId, dismissSheet: false });
+
+    if(!sessionUserId) return null;
+
     return (
         <Input.Field
             control={ control }

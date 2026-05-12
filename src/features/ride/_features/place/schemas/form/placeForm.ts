@@ -23,10 +23,10 @@ const getPlaceForm = (placeDao: PlaceDao) => placeForm
 
 export type PlaceFormFields = z.infer<typeof placeForm>;
 
-export function useCreatePlaceFormProps(placeDao: PlaceDao, ownerId: string) {
+export function useCreatePlaceFormProps(placeDao: PlaceDao, ownerId: string | null) {
     const defaultValues: PlaceFormFields = {
         id: getUUID(),
-        ownerId,
+        ownerId: ownerId ?? "",
         name: ""
     };
 

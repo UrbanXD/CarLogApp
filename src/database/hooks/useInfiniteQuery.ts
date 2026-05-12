@@ -112,7 +112,7 @@ export const useInfiniteQuery = <
         baseQuery,
         defaultFilters,
         defaultItem,
-        perPage = 50,
+        perPage = 25,
         mapper,
         mappedItemId,
         jsonFields,
@@ -121,8 +121,8 @@ export const useInfiniteQuery = <
 
     const { powersync } = useDatabase();
 
-    const isAtTopRef = useRef(false);
-    const isAtBottomRef = useRef(false);
+    const hadNext = useRef(false);
+    const hadPrev = useRef(false);
 
     const stringifiedMapper = JSON.stringify(mapper);
     const stableMapper = useMemo(() => mapper, [stringifiedMapper]);
@@ -198,19 +198,6 @@ export const useInfiniteQuery = <
         setPrevCursorValues(getCursorValues(firstItem, cursorOptions));
     }, [cursorOptions]);
 
-    const getUniqueNewItems = useCallback((oldItems: Array<MappedItem>, newItems: Array<MappedItem>) => (
-        newItems.filter(newItem => {
-            const newId = newItem?.[mappedItemId ?? "id" as keyof MappedItem];
-
-            if(newId === undefined || newId === null) {
-                console.warn(`Missing ID in new item using key: ${ String(mappedItemId) }`, newItem);
-                return false;
-            }
-
-            return !oldItems.some(oldItem => oldItem?.[mappedItemId ?? "id" as keyof MappedItem] === newId);
-        })
-    ), [mappedItemId]);
-
     const fetchNext = useCallback(
         async (force?: boolean) => {
             if(!cursorOptions || !enabled || isNextFetching || isLoading) return;
@@ -235,12 +222,12 @@ export const useInfiniteQuery = <
                 console.log("Fetch next infinite query error: ", error);
             } finally {
                 setIsNextFetching(false);
+                hadNext.current = false;
             }
         },
         [
             enabled, isLoading, isNextFetching, hasNext, data.length, nextCursorValues, getBaseBuilder, cursorOptions,
-            perPage, stableMapper, prevCursorValues, powersync, setPrevCursor, setNextCursor, getUniqueNewItems,
-            jsonFields
+            perPage, stableMapper, prevCursorValues, powersync, setPrevCursor, setNextCursor, jsonFields
         ]
     );
 
@@ -267,6 +254,7 @@ export const useInfiniteQuery = <
             console.log("Fetch prev infinite query error: ", error);
         } finally {
             setIsPrevFetching(false);
+            hadPrev.current = false;
         }
     }, [
         enabled,
@@ -282,17 +270,8 @@ export const useInfiniteQuery = <
         powersync,
         setPrevCursor,
         setNextCursor,
-        getUniqueNewItems,
         jsonFields
     ]);
-
-    const setIsAtTop = (value: boolean) => {
-        isAtTopRef.current = value;
-    };
-
-    const setIsAtBottom = (value: boolean) => {
-        isAtBottomRef.current = value;
-    };
 
     const diffQuery = useMemo(() => {
         if(!cursorOptions || isDefaultCursorFetching) return null;
@@ -316,7 +295,7 @@ export const useInfiniteQuery = <
             );
         }
 
-        if(!nextCursorValues && !prevCursorValues || prevCursorValues === nextCursorValues) {
+        if((!nextCursorValues && !prevCursorValues) || prevCursorValues === nextCursorValues) {
             watchBuilder = watchBuilder.limit(perPage) as QueryBuilder;
         }
 
@@ -460,7 +439,12 @@ export const useInfiniteQuery = <
 
     useEffect(
         () => {
-            if(!diffQuery || !enabled) return;
+            if(!diffQuery || !enabled) {
+                setIsLoading(false);
+                return;
+            }
+
+            if(diffQuery.state.isLoading || diffQuery.state.isFetching) setIsLoading(true);
 
             const dispose = diffQuery.registerListener({
                 onData: async (rows) => {
@@ -493,9 +477,8 @@ export const useInfiniteQuery = <
                     }
                 },
                 onStateChange: (state) => {
-                    if(!state.error && !state.isFetching && !state.isFetching && state.data.length === 0) {
-                        setIsLoading(false);
-                    }
+                    if(state.isLoading || state.isFetching) setIsLoading(true);
+                    if(!state.isFetching && !state.isLoading) setIsLoading(false);
                 },
                 onError: (error) => {
                     console.log("UseInfiniteQuery diff query error: ", error);
@@ -506,6 +489,7 @@ export const useInfiniteQuery = <
             return () => {
                 dispose();
                 diffQuery.close();
+                setIsLoading(false);
             };
         },
         [enabled, diffQuery, stableMapper, jsonFields]
@@ -520,7 +504,8 @@ export const useInfiniteQuery = <
                     const has = rows && rows.length > 0;
                     setHasPrev(has);
 
-                    if(has && isAtTopRef.current) await fetchPrev(true);
+                    if(has && !hadPrev.current) await fetchPrev(true);
+                    hadPrev.current = has;
                 },
                 onError: (error) => {
                     console.log("UseInfiniteQuery hasNext query error: ", error);
@@ -544,7 +529,8 @@ export const useInfiniteQuery = <
                     const has = rows && rows.length > 0;
                     setHasNext(has);
 
-                    if(has && isAtBottomRef.current) await fetchNext(true);
+                    if(has && !hadNext.current) await fetchNext(true);
+                    hadNext.current = has;
                 },
                 onError: (error) => {
                     console.log("UseInfiniteQuery hasNext query error: ", error);
@@ -568,8 +554,6 @@ export const useInfiniteQuery = <
         hasPrev,
         fetchNext,
         fetchPrev,
-        setIsAtTop,
-        setIsAtBottom,
         initialStartIndex,
         isMainCursor,
         makeFieldMainCursor,

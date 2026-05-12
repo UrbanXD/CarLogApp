@@ -1,5 +1,5 @@
 import { StyleSheet, Text } from "react-native";
-import { COLORS, FONT_SIZES } from "../../../../constants/index.ts";
+import { COLORS, FONT_SIZES } from "../../../../constants";
 import { useDatePicker } from "../../../../contexts/datePicker/DatePickerContext.ts";
 import { DatePicker, PickerItem, RenderItemProps } from "@quidone/react-native-wheel-picker";
 import React, { Dispatch, ReactNode, SetStateAction, useCallback } from "react";
@@ -9,11 +9,13 @@ import { DateNodeType } from "@quidone/react-native-wheel-picker/dest/typescript
 import { heightPercentageToDP } from "react-native-responsive-screen";
 
 type WheelDatePickerProps = {
-    date: Date | null,
-    setDate: Dispatch<SetStateAction<Date | null>>;
+    date: Date | null
+    setDate: Dispatch<SetStateAction<Date | null>>
+    timeReset?: boolean
+    defaultStartOrEndTime?: "start" | "end"
 }
 
-export function WheelDatePicker({ date, setDate }: WheelDatePickerProps) {
+export function WheelDatePicker({ date, setDate, timeReset, defaultStartOrEndTime }: WheelDatePickerProps) {
     const { maxDate, minDate } = useDatePicker();
 
     const renderDate = useCallback(() => (
@@ -36,17 +38,23 @@ export function WheelDatePicker({ date, setDate }: WheelDatePickerProps) {
     const onDateChanged = useCallback((event: { date: OnlyDateFormat }) => {
         const newDate = dayjs(event.date);
 
-        setDate(prevState => dayjs(prevState)
+        setDate(prevState => {
+            let baseDate = dayjs(prevState ?? newDate)
             .set("year", newDate.year())
             .set("month", newDate.month())
-            .set("date", newDate.date())
-            .toDate()
-        );
-    }, []);
+            .set("date", newDate.date());
+
+            if(timeReset) {
+                baseDate = defaultStartOrEndTime === "start" ? baseDate.startOf("day") : baseDate.endOf("day");
+            }
+
+            return baseDate.toDate();
+        });
+    }, [setDate, timeReset, defaultStartOrEndTime]);
 
     return (
         <DatePicker
-            date={ dayjs(date).format("YYYY-MM-DD") }
+            date={ dayjs(date ?? undefined).format("YYYY-MM-DD") }
             minDate={ dayjs(minDate).format("YYYY-MM-DD") }
             maxDate={ dayjs(maxDate).format("YYYY-MM-DD") }
             locale={ dayjs.locale() }

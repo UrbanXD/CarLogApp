@@ -83,6 +83,7 @@ export function useFuelLogFormFields({ form, isEdit }: UseFuelLogFormFieldsProps
                 fieldName="expense"
                 carIdFieldName="carId"
                 outsideQuantityFieldName="quantity"
+                showsIsPricePerUnitInput
                 showsQuantityInput={ false }
             />,
             editToastMessages: EditToast
