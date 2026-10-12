@@ -14,12 +14,14 @@ import "dayjs/locale/en";
 import "dayjs/locale/hu";
 import { useWatchedQueryCollection } from "../../../database/hooks/useWatchedQueryCollection.ts";
 import { Section } from "../../../components/Section.tsx";
+import { ViewStyle } from "../../../types";
 
 type UpcomingRidesProps = {
     carId: string
+    containerStyle?: ViewStyle
 }
 
-export function UpcomingRides({ carId }: UpcomingRidesProps) {
+export function UpcomingRides({ carId, containerStyle }: UpcomingRidesProps) {
     const { t } = useTranslation();
     const { rideLogDao } = useDatabase();
     const { mapper } = useRideLogTimelineItem();
@@ -64,6 +66,7 @@ export function UpcomingRides({ carId }: UpcomingRidesProps) {
         <Section
             title={ t("rides.upcoming") }
             subtitle={ `${ dayjs(today).format("dddd") }, ${ dayjs(today).format("LL") } (${ t("date.today") })` }
+            containerStyle={ containerStyle }
         >
             {
                 isLoading

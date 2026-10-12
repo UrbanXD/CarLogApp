@@ -9,7 +9,7 @@ export function RideTimelineScreen() {
     if(!selectedCarId) return <FirstSelectCar/>;
 
     return (
-        <ScreenView>
+        <ScreenView fullWidthScrollArea>
             <RideLogTimeline carId={ selectedCarId }/>
         </ScreenView>
     );

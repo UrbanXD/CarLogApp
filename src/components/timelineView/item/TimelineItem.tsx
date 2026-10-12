@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../../constants";
 import Icon from "../../Icon.tsx";
 import React, { ReactNode } from "react";
@@ -115,7 +115,10 @@ const useStyles = (color: Color, dotSize: number, isFirstItem: boolean, isLastIt
     },
     timeline: {
         flexDirection: "column",
-        height: !isLastItem ? "100%" : dotSize + SEPARATOR_SIZES.lightSmall * (isFirstItem ? 2 : 1),
+        height: Platform.OS === "web" && !isLastItem
+                ? undefined
+                : !isLastItem ? "100%" : dotSize + SEPARATOR_SIZES.lightSmall * (isFirstItem ? 2 : 1),
+        alignSelf: "stretch",
         width: dotSize + SEPARATOR_SIZES.lightSmall,
         backgroundColor: COLORS.gray5,
         paddingTop: isFirstItem ? SEPARATOR_SIZES.lightSmall : undefined,

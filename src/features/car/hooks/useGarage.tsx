@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import useCars from "./useCars.ts";
 import { Car } from "../schemas/carSchema.ts";
-import { CarouselItemType } from "../../../components/Carousel/Carousel.tsx";
+import { CarouselItemType } from "../../../components/Carousel/Carousel";
 
 const useGarage = () => {
     const { cars, isLoading } = useCars();

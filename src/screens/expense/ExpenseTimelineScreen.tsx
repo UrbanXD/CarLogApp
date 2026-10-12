@@ -10,7 +10,7 @@ export function ExpenseTimelineScreen() {
     if(!selectedCarId) return <FirstSelectCar/>;
 
     return (
-        <ScreenView>
+        <ScreenView fullWidthScrollArea>
             <ExpenseTimeline carId={ selectedCarId }/>
         </ScreenView>
     );

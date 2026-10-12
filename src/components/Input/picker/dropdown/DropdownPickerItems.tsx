@@ -6,6 +6,8 @@ import { heightPercentageToDP, heightPercentageToDP as hp } from "react-native-r
 import { FlashList, FlashListRef, ListRenderItem } from "@shopify/flash-list";
 import { useTranslation } from "react-i18next";
 import { MoreDataLoading } from "../../../loading/MoreDataLoading.tsx";
+import { WEB_SCROLLBAR_STYLE } from "../../../screenView/webScrollbarStyle";
+import { useDesktopWeb } from "../../../../hooks/useDesktopWeb";
 
 type DropdownPickerElementsProps = {
     items: Array<PickerItemType>
@@ -42,6 +44,7 @@ function DropdownPickerItems({
     masonry,
     numColumns
 }: DropdownPickerElementsProps) {
+    const showWebScrollbar = useDesktopWeb();
     const { t } = useTranslation();
 
     const flashListRef = useRef<FlashListRef<PickerItemType>>(null);
@@ -124,6 +127,7 @@ function DropdownPickerItems({
         <View style={ styles.container }>
             <FlashList
                 ref={ flashListRef }
+                style={ showWebScrollbar ? WEB_SCROLLBAR_STYLE : undefined }
                 data={ items }
                 initialScrollIndex={ initialStartIndex }
                 masonry={ masonry }
@@ -141,7 +145,7 @@ function DropdownPickerItems({
                 onEndReached={ onEndReached }
                 onEndReachedThreshold={ 0.5 }
                 keyboardDismissMode="on-drag"
-                showsVerticalScrollIndicator={ false }
+                showsVerticalScrollIndicator={ showWebScrollbar }
                 showsHorizontalScrollIndicator={ false }
                 onLayout={ () => setListReady(true) }
             />

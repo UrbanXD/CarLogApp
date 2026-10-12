@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants/index.ts";
 import React, { useEffect } from "react";
 import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated";
@@ -38,11 +38,19 @@ export function DatePickerHeader({ title, showTimestamps }: DatePickerHeaderProp
     }));
 
     const onPressStartDateSelector = () => openView(
-        currentView === "start_date_picker"
+        Platform.OS === "web"
         ? "calendar"
-        : "start_date_picker"
+        : currentView === "start_date_picker"
+          ? "calendar"
+          : "start_date_picker"
     );
-    const onPressEndDateSelector = () => openView(currentView === "end_date_picker" ? "calendar" : "end_date_picker");
+    const onPressEndDateSelector = () => openView(
+        Platform.OS === "web"
+        ? "calendar"
+        : currentView === "end_date_picker"
+          ? "calendar"
+          : "end_date_picker"
+    );
     const onPressTimeSelector = () => openView(currentView === "time" ? "calendar" : "time");
 
     const getRangeLabel = (value: number, unit: dayjs.QUnitType) => {
@@ -77,7 +85,7 @@ export function DatePickerHeader({ title, showTimestamps }: DatePickerHeaderProp
             {
                 mode === "range" &&
                <View style={ styles.buttonContainer }>
-                  <Pressable onPress={ onPressStartDateSelector }
+                  <Pressable onPress={ onPressStartDateSelector } disabled={ Platform.OS === "web" }
                              style={ { flexDirection: "row", alignItems: "center" } }>
                      <Icon
                         icon={ ICON_NAMES.calendar }
@@ -87,15 +95,18 @@ export function DatePickerHeader({ title, showTimestamps }: DatePickerHeaderProp
                      <Text style={ styles.label }>
                          { startDate ? dayjs(startDate).format("L") : t("form.date_picker.date_placeholder") }
                      </Text>
-                     <Animated.View style={ leftDateArrowStyle }>
-                        <Icon
-                           icon={ ICON_NAMES.downArrowHead }
-                           size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
-                        />
-                     </Animated.View>
+                      { Platform.OS !== "web" && (
+                          <Animated.View style={ leftDateArrowStyle }>
+                              <Icon
+                                  icon={ ICON_NAMES.downArrowHead }
+                                  size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
+                              />
+                          </Animated.View>
+                      ) }
                   </Pressable>
                   <Pressable
                      onPress={ onPressEndDateSelector }
+                     disabled={ Platform.OS === "web" }
                      style={ { flexDirection: "row-reverse", alignItems: "center", flexShrink: 1 } }
                   >
                      <Icon
@@ -106,19 +117,21 @@ export function DatePickerHeader({ title, showTimestamps }: DatePickerHeaderProp
                      <Text numberOfLines={ 1 } adjustsFontSizeToFit style={ styles.label }>
                          { endDate ? dayjs(endDate).format("L") : t("form.date_picker.date_placeholder") }
                      </Text>
-                     <Animated.View style={ rightDateArrowStyle }>
-                        <Icon
-                           icon={ ICON_NAMES.downArrowHead }
-                           size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
-                        />
-                     </Animated.View>
+                      { Platform.OS !== "web" && (
+                          <Animated.View style={ rightDateArrowStyle }>
+                              <Icon
+                                  icon={ ICON_NAMES.downArrowHead }
+                                  size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
+                              />
+                          </Animated.View>
+                      ) }
                   </Pressable>
                </View>
             }
             {
                 mode === "single" &&
                <View style={ styles.buttonContainer }>
-                  <Pressable onPress={ onPressStartDateSelector }
+                  <Pressable onPress={ onPressStartDateSelector } disabled={ Platform.OS === "web" }
                              style={ { flexDirection: "row", alignItems: "center" } }>
                      <Icon
                         icon={ ICON_NAMES.calendar }
@@ -127,12 +140,14 @@ export function DatePickerHeader({ title, showTimestamps }: DatePickerHeaderProp
                      />
                      <Text style={ styles.label }>{ startDate ? dayjs(startDate).format("L") : t(
                          "form.date_picker.date_placeholder") }</Text>
-                     <Animated.View style={ leftDateArrowStyle }>
-                        <Icon
-                           icon={ ICON_NAMES.downArrowHead }
-                           size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
-                        />
-                     </Animated.View>
+                      { Platform.OS !== "web" && (
+                          <Animated.View style={ leftDateArrowStyle }>
+                              <Icon
+                                  icon={ ICON_NAMES.downArrowHead }
+                                  size={ FONT_SIZES.p4 * ICON_FONT_SIZE_SCALE }
+                              />
+                          </Animated.View>
+                      ) }
                   </Pressable>
                   <Pressable
                      onPress={ onPressTimeSelector }

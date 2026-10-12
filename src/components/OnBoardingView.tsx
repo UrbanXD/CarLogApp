@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ListRenderItemInfo, useWindowDimensions, View } from "react-native";
+import { ListRenderItemInfo, Platform, useWindowDimensions, View } from "react-native";
 import { DEFAULT_SEPARATOR } from "../constants";
 import { RenderComponent } from "../types";
 import { useBottomSheetInternal, useBottomSheetScrollableCreator } from "@gorhom/bottom-sheet";
@@ -23,7 +23,12 @@ export function OnBoardingView({
     const flatListRef = useRef<FlatList>(null);
 
     const { width: windowWidth } = useWindowDimensions();
-    const width = windowWidth - 2 * DEFAULT_SEPARATOR;
+    const [measuredWidth, setMeasuredWidth] = useState(0);
+    // On web this list lives inside a modal. Using the viewport width here makes
+    // every step wider than the modal and causes its fields/buttons to overflow.
+    const width = Platform.OS === "web"
+                  ? measuredWidth
+                  : windowWidth - 2 * DEFAULT_SEPARATOR;
 
     const [stepHeights, setStepHeights] = useState<Record<number, number>>({});
     const [visitedSteps, setVisitedSteps] = useState<Set<number>>(
@@ -50,8 +55,9 @@ export function OnBoardingView({
     const currentHeight = stepHeights[currentStep];
 
     const containerStyle = {
-        height: currentHeight ?? undefined,
-        minHeight: currentHeight ? undefined : 1
+        height: Platform.OS === "web" ? undefined : currentHeight ?? undefined,
+        minHeight: Platform.OS === "web" ? 0 : currentHeight ? undefined : 1,
+        flex: Platform.OS === "web" ? 1 : undefined
     };
 
     const keyExtractor = useCallback(
@@ -66,6 +72,7 @@ export function OnBoardingView({
 
             return (
                 <View
+                    style={ Platform.OS === "web" ? { width, minWidth: 0, maxWidth: "100%" } : undefined }
                     onLayout={ (event) => {
                         const { height } = event.nativeEvent.layout;
 
@@ -79,7 +86,7 @@ export function OnBoardingView({
                 </View>
             );
         },
-        [visitedSteps]
+        [visitedSteps, width]
     );
 
     const renderItem = useCallback(
@@ -91,6 +98,7 @@ export function OnBoardingView({
                 }
                 keyExtractor={ keyExtractor }
                 contentContainerStyle={ { width } }
+                style={ Platform.OS === "web" ? { width, minWidth: 0, maxWidth: "100%" } : undefined }
                 nestedScrollEnabled
                 showsVerticalScrollIndicator={ false }
                 renderScrollComponent={ BottomSheetFlashListScrollable }
@@ -99,7 +107,7 @@ export function OnBoardingView({
         [width, renderStep, keyExtractor, BottomSheetFlashListScrollable]
     );
 
-    return (
+    const list = (
         <FlatList<RenderComponent>
             ref={ flatListRef }
             data={ steps }
@@ -111,8 +119,30 @@ export function OnBoardingView({
             showsHorizontalScrollIndicator={ false }
             removeClippedSubviews={ false }
             initialNumToRender={ 1 }
-            style={ containerStyle }
+            style={ [containerStyle, Platform.OS === "web" && { width, minWidth: 0, maxWidth: "100%" }] }
         />
+    );
+
+    if(Platform.OS !== "web") return list;
+
+    return (
+        <View
+            onLayout={ ({ nativeEvent }) => {
+                const nextWidth = nativeEvent.layout.width;
+                setMeasuredWidth(previous => Math.abs(previous - nextWidth) < 1 ? previous : nextWidth);
+            } }
+            style={ {
+                width: "100%",
+                minWidth: 0,
+                maxWidth: "100%",
+                minHeight: 0,
+                flex: 1,
+                alignSelf: "stretch",
+                overflow: "hidden"
+            } }
+        >
+            { list }
+        </View>
     );
 }
 

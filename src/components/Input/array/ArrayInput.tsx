@@ -8,7 +8,7 @@ import { debounce } from "es-toolkit";
 import Input from "../Input.ts";
 import { ExpandableList } from "../../expandableList/ExpandableList.tsx";
 import { ICON_NAMES } from "../../../constants/index.ts";
-import { PopupView } from "../../popupView/PopupView.tsx";
+import { PopupView } from "../../popupView/PopupView";
 import { Amount } from "../../../features/_shared/currency/schemas/amountSchema.ts";
 
 export type ArrayInputProps<

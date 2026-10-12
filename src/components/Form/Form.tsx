@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode, useEffect, useMemo } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { FormState, UseFormReturn } from "react-hook-form";
 import { formTheme } from "../../ui/form/constants/theme.ts";
 import { FormButtons } from "../Button/presets/FormButtons.tsx";
@@ -7,6 +7,8 @@ import { SubmitHandlerArgs, ViewStyle } from "../../types";
 import { SEPARATOR_SIZES } from "../../constants";
 import { useBottomSheet } from "../../ui/bottomSheet/contexts/BottomSheetContext.ts";
 import { FlatList } from "react-native-gesture-handler";
+import { WEB_SCROLLBAR_STYLE } from "../screenView/webScrollbarStyle";
+import { useDesktopWeb } from "../../hooks/useDesktopWeb";
 
 type FormProps = {
     form: UseFormReturn<any>
@@ -27,6 +29,7 @@ export function Form({
     submitText,
     containerStyle
 }: FormProps) {
+    const showWebScrollbar = useDesktopWeb();
     const { availableContentHeight } = useBottomSheet();
 
     useEffect(() => {
@@ -39,7 +42,10 @@ export function Form({
     }, [form, submitHandler]);
 
     return (
-        <View style={ { flex: 1, maxHeight: availableContentHeight, gap: formTheme.gap } }>
+        <View style={ [
+            { flex: 1, maxHeight: availableContentHeight, gap: formTheme.gap },
+            Platform.OS === "web" && styles.webFormContainer
+        ] }>
             <FlatList
                 data={ React.Children.toArray(formFields) }
                 renderItem={ ({ item }) => item as ReactElement }
@@ -47,13 +53,19 @@ export function Form({
                 contentContainerStyle={ [
                     {
                         flexGrow: 1,
+                        width: "100%",
+                        alignSelf: "stretch",
+                        minWidth: 0,
                         justifyContent: "flex-start",
                         gap: formTheme.gap,
                         paddingBottom: SEPARATOR_SIZES.lightSmall
                     },
                     containerStyle
                 ] }
-                showsVerticalScrollIndicator={ false }
+                style={ Platform.OS === "web"
+                        ? [styles.webFormList, showWebScrollbar && WEB_SCROLLBAR_STYLE]
+                        : undefined }
+                showsVerticalScrollIndicator={ showWebScrollbar }
             />
             {
                 submitHandler && submit &&
@@ -66,5 +78,15 @@ export function Form({
         </View>
     );
 }
+
+const styles = {
+    webFormContainer: {
+        width: "100%" as const,
+        maxWidth: "100%" as const,
+        minWidth: 0,
+        boxSizing: "border-box" as const
+    },
+    webFormList: { width: "100%" as const, maxWidth: "100%" as const, minWidth: 0, boxSizing: "border-box" as const }
+};
 
 export default Form;

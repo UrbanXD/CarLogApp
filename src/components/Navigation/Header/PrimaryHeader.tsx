@@ -1,15 +1,17 @@
 import React, { useState } from "react";
-import { View } from "react-native";
+import { Platform, useWindowDimensions, View } from "react-native";
 import { SIMPLE_HEADER_HEIGHT } from "../../../constants";
 import Avatar from "../../Avatar/Avatar.ts";
 import { router } from "expo-router";
 import { getLabelByName } from "../../../utils/getLabelByName.ts";
 import HeaderView from "./HeaderView.tsx";
-import { CarPicker } from "../../../features/car/components/carPicker/CarPicker.tsx";
+import { CarPicker } from "../../../features/car/components/carPicker/CarPicker";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useUser } from "../../../features/user/hooks/useUser.ts";
 
 const PrimaryHeader: React.FC = () => {
+    const { width } = useWindowDimensions();
+    const desktop = Platform.OS === "web" && width >= 1040;
     const { user, isLoading } = useUser();
     const name = `${ user?.lastname } ${ user?.firstname }`;
 
@@ -18,6 +20,11 @@ const PrimaryHeader: React.FC = () => {
     const openProfile = () => {
         router.push("user");
     };
+
+    if(desktop) {
+        // The desktop screens already show their own page heading in the content.
+        return null;
+    }
 
     return (
         <HeaderView>

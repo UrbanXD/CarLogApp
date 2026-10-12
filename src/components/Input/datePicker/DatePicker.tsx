@@ -1,9 +1,9 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { CalendarPicker } from "./pickerView/CalendarPicker.tsx";
-import { WheelDatePicker } from "./pickerView/WheelDatePicker.tsx";
+import { WheelDatePicker } from "./pickerView/WheelDatePicker";
 import { useDatePicker } from "../../../contexts/datePicker/DatePickerContext.ts";
-import { TimePicker } from "./pickerView/TimePicker.tsx";
+import { TimePicker } from "./pickerView/TimePicker";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { CalendarHeader } from "./header/CalendarHeader.tsx";
 import { heightPercentageToDP } from "react-native-responsive-screen";

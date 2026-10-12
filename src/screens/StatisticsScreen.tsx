@@ -14,10 +14,13 @@ import { useSelectedCarId } from "../features/car/hooks/useSelectedCarId.ts";
 import { ScreenView } from "../components/screenView/ScreenView.tsx";
 import { ScrollView } from "react-native-gesture-handler";
 import { DateRangePicker } from "../components/Input/datePicker/presets/DateRangePicker.tsx";
+import { WEB_SCROLLBAR_STYLE } from "../components/screenView/webScrollbarStyle";
+import { useDesktopWeb } from "../hooks/useDesktopWeb";
 
 const STAT_TYPES = ["ride", "expense", "fuel", "service"];
 
 export function StatisticsScreen() {
+    const showWebScrollbar = useDesktopWeb();
     const { selectedCarId } = useSelectedCarId();
     const { t } = useTranslation();
 
@@ -88,9 +91,9 @@ export function StatisticsScreen() {
                 />
             </View>
             <ScrollView
-                style={ { gap: SEPARATOR_SIZES.lightSmall } }
+                style={ [showWebScrollbar && WEB_SCROLLBAR_STYLE, { gap: SEPARATOR_SIZES.lightSmall }] }
                 contentContainerStyle={ { paddingBottom: FULL_TABBAR_HEIGHT } }
-                showsVerticalScrollIndicator={ false }
+                showsVerticalScrollIndicator={ showWebScrollbar }
             >
                 <OnBoardingView steps={ boards } currentStep={ currentBoardIndex }/>
             </ScrollView>

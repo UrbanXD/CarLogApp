@@ -1,7 +1,7 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, useWindowDimensions, View } from "react-native";
 import { ScreenScrollView } from "../components/screenView/ScreenScrollView.tsx";
-import Garage from "../features/car/components/Garage.tsx";
+import Garage from "../features/car/components/Garage";
 import { LatestExpenses } from "../features/expense/components/LatestExpense.tsx";
 import { DEFAULT_SEPARATOR, GLOBAL_STYLE, SEPARATOR_SIZES } from "../constants";
 import { ServiceForecastView } from "../features/statistics/components/forecasts/ServiceForecastView.tsx";
@@ -10,17 +10,25 @@ import { UpcomingRides } from "../features/ride/components/UpcomingRides.tsx";
 
 export function HomeScreen() {
     const { selectedCarId } = useSelectedCarId();
+    const { width } = useWindowDimensions();
+    const desktop = Platform.OS === "web" && width >= 1040;
 
     return (
         <ScreenScrollView style={ { paddingHorizontal: 0 } }>
             <Garage/>
-            <View style={ styles.contentContainer }>
+            <View style={ [styles.contentContainer, desktop && styles.desktopContentContainer] }>
                 {
                     selectedCarId &&
                    <>
-                      <UpcomingRides carId={ selectedCarId }/>
-                      <LatestExpenses carId={ selectedCarId }/>
-                      <ServiceForecastView carId={ selectedCarId } expandable={ true }/>
+                      <UpcomingRides carId={ selectedCarId }
+                                     containerStyle={ desktop ? styles.desktopHalf : undefined }/>
+                      <LatestExpenses carId={ selectedCarId }
+                                      containerStyle={ desktop ? styles.desktopHalf : undefined }/>
+                      <ServiceForecastView
+                         carId={ selectedCarId }
+                         expandable={ true }
+                         containerStyle={ desktop ? styles.desktopFull : undefined }
+                      />
                    </>
                 }
             </View>
@@ -39,5 +47,30 @@ const styles = StyleSheet.create({
     contentContainer: {
         marginHorizontal: DEFAULT_SEPARATOR,
         gap: SEPARATOR_SIZES.medium
+    },
+    desktopContentContainer: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        alignItems: "stretch",
+        columnGap: SEPARATOR_SIZES.medium,
+        rowGap: SEPARATOR_SIZES.medium
+    },
+    desktopHalf: {
+        width: "48%",
+        flexGrow: 1,
+        flexShrink: 1,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: "#303133",
+        backgroundColor: "#1B1C1E",
+        padding: SEPARATOR_SIZES.small
+    },
+    desktopFull: {
+        width: "100%",
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: "#303133",
+        backgroundColor: "#1B1C1E",
+        padding: SEPARATOR_SIZES.small
     }
 });

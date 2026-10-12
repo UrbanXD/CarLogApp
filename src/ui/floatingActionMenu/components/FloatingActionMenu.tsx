@@ -1,11 +1,12 @@
 import React, { useCallback } from "react";
 import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import {
     COLORS,
     DEFAULT_SEPARATOR,
     FLOATING_ACTION_BUTTON_SIZE,
     FONT_SIZES,
+    ICON_NAMES,
     SEPARATOR_SIZES
 } from "../../../constants";
 import { FloatingActionButton } from "./FloatingActionButton.tsx";
@@ -14,6 +15,7 @@ import { Overlay } from "../../../components/overlay/Overlay.tsx";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Action } from "../hooks/useActions.ts";
 import { ViewStyle } from "../../../types";
+import Icon from "../../../components/Icon.tsx";
 
 type FloatingActionMenu = {
     action: (() => void) | Array<Action>
@@ -76,7 +78,12 @@ function FloatingActionMenu({ action, containerStyle }: FloatingActionMenu) {
                         onPress={ Array.isArray(action) ? toggle : action }
                         style={ [styles.actionButton] }
                     >
-                        <Animated.Text style={ [styles.actionButtonIcon, actionButtonIconStyle] }>+</Animated.Text>
+                        { Platform.OS === "web"
+                          ? <Animated.View style={ actionButtonIconStyle }>
+                              <Icon icon={ ICON_NAMES.add } size={ 36 } color={ COLORS.black }/>
+                          </Animated.View>
+                          : <Animated.Text
+                              style={ [styles.actionButtonIcon, actionButtonIconStyle] }>+</Animated.Text> }
                     </AnimatedPressable>
                     { Array.isArray(action) && action.map(renderAction) }
                 </View>

@@ -18,6 +18,8 @@ import { SECONDARY_COLOR } from "../constants";
 import { PortalHost, PortalProvider } from "@gorhom/portal";
 import { useTranslation } from "react-i18next";
 import { setBackgroundColorAsync } from "expo-system-ui";
+import { View } from "react-native";
+import DesktopSidebar from "../components/Navigation/DesktopSidebar";
 
 
 const Layout: React.FC = () => {
@@ -32,283 +34,286 @@ const Layout: React.FC = () => {
     }, []);
 
     return (
-        <Stack
-            screenOptions={ {
-                header: () => <SystemBars style="light" hidden={ false }/>,
-                headerTransparent: true,
-                animation: "slide_from_right",
-                statusBarAnimation: "slide",
-                contentStyle: { backgroundColor: SECONDARY_COLOR }
-            } }
-        >
-            <Stack.Screen name="index"/>
-            <Stack.Screen name="backToRootIndex"/>
-            <Stack.Screen
-                name="auth/index"
-                options={ {
-                    header: () => <SystemBars style={ { statusBar: "dark", navigationBar: "light" } }/>,
-                    animation: "none"
+        <View style={ { flex: 1, position: "relative" } }>
+            <DesktopSidebar/>
+            <Stack
+                screenOptions={ {
+                    header: () => <SystemBars style="light" hidden={ false }/>,
+                    headerTransparent: true,
+                    animation: "slide_from_right",
+                    statusBarAnimation: "slide",
+                    contentStyle: { backgroundColor: SECONDARY_COLOR }
                 } }
-            />
-            <Stack.Screen
-                name="auth/signIn"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="auth/signUp"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="auth/otpVerification"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="user/edit"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="(main)"
-                options={ {
-                    header: () => <Header.Primary/>,
-                    animation: "none"
-                } }
-            />
-            <Stack.Screen
-                name="user/index"
-                options={ {
-                    header: () => <Header.Secondary title={ t("profile.title") }/>
-                } }
-            />
-            <Stack.Screen
-                name="car/[id]"
-                options={ {
-                    header: () => <Header.Secondary title={ t("car.title") }/>
-                } }
-            />
-            <Stack.Screen
-                name="auth/resetPassword"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="car/create"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="car/edit/[id]"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="odometer/log/index"
-                options={ {
-                    header: () => <Header.Secondary title={ t("odometer.title") }/>
-                } }
-            />
-            <Stack.Screen
-                name="odometer/log/[id]"
-                options={ {
-                    header: () => <Header.Secondary title={ t("common.log_title") }/>
-                } }
-            />
-            <Stack.Screen
-                name="odometer/log/create"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="odometer/log/edit/[id]"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="expense/[id]"
-                options={ {
-                    header: () => <Header.Secondary title={ t("expenses.title_singular") }/>
-                } }
-            />
-            <Stack.Screen
-                name="expense/fuel/[id]"
-                options={ ({ route }) => ({
-                    header: () => <Header.Secondary
-                        title={ (route.params as Record<string, any>)?.title ?? t("log.title") }/>
-                }) }
-            />
-            <Stack.Screen
-                name="expense/service/[id]"
-                options={ ({ route }) => ({
-                    header: () => <Header.Secondary
-                        title={ (route.params as Record<string, any>)?.["title"] ?? t("log.title") }/>
-                }) }
-            />
-            <Stack.Screen
-                name="expense/create/index"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="expense/create/fuel"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="expense/create/service"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="expense/edit/[id]"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="expense/edit/fuel/[id]"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="expense/edit/service/[id]"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="ride/place/index"
-                options={ {
-                    header: () => <Header.Secondary title={ t("places.title") }/>
-                } }
-            />
-            <Stack.Screen
-                name="ride/place/create"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="ride/place/edit/[id]"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="ride/passenger/index"
-                options={ {
-                    header: () => <Header.Secondary title={ t("passengers.title") }/>
-                } }
-            />
-            <Stack.Screen
-                name="ride/passenger/create"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="ride/passenger/edit/[id]"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="ride/create"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="ride/edit/[id]"
-                options={ {
-                    header: () => <></>,
-                    animation: "slide_from_bottom",
-                    presentation: "transparentModal",
-                    contentStyle: { backgroundColor: "transparent" }
-                } }
-            />
-            <Stack.Screen
-                name="ride/[id]"
-                options={ {
-                    header: () => <Header.Secondary title={ t("rides.log") }/>
-                } }
-            />
-        </Stack>
+            >
+                <Stack.Screen name="index"/>
+                <Stack.Screen name="backToRootIndex"/>
+                <Stack.Screen
+                    name="auth/index"
+                    options={ {
+                        header: () => <SystemBars style={ { statusBar: "dark", navigationBar: "light" } }/>,
+                        animation: "none"
+                    } }
+                />
+                <Stack.Screen
+                    name="auth/signIn"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="auth/signUp"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="auth/otpVerification"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="user/edit"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="(main)"
+                    options={ {
+                        header: () => <Header.Primary/>,
+                        animation: "none"
+                    } }
+                />
+                <Stack.Screen
+                    name="user/index"
+                    options={ {
+                        header: () => <Header.Secondary title={ t("profile.title") }/>
+                    } }
+                />
+                <Stack.Screen
+                    name="car/[id]"
+                    options={ {
+                        header: () => <Header.CarProfile/>
+                    } }
+                />
+                <Stack.Screen
+                    name="auth/resetPassword"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="car/create"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="car/edit/[id]"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="odometer/log/index"
+                    options={ {
+                        header: () => <Header.Secondary title={ t("odometer.title") } showDesktopTitle/>
+                    } }
+                />
+                <Stack.Screen
+                    name="odometer/log/[id]"
+                    options={ {
+                        header: () => <Header.Secondary title={ t("odometer.title") } showDesktopTitle/>
+                    } }
+                />
+                <Stack.Screen
+                    name="odometer/log/create"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="odometer/log/edit/[id]"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="expense/[id]"
+                    options={ {
+                        header: () => <Header.Secondary title={ t("expenses.title_singular") }/>
+                    } }
+                />
+                <Stack.Screen
+                    name="expense/fuel/[id]"
+                    options={ ({ route }) => ({
+                        header: () => <Header.Secondary
+                            title={ (route.params as Record<string, any>)?.title ?? t("log.title") }/>
+                    }) }
+                />
+                <Stack.Screen
+                    name="expense/service/[id]"
+                    options={ ({ route }) => ({
+                        header: () => <Header.Secondary
+                            title={ (route.params as Record<string, any>)?.["title"] ?? t("log.title") }/>
+                    }) }
+                />
+                <Stack.Screen
+                    name="expense/create/index"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="expense/create/fuel"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="expense/create/service"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="expense/edit/[id]"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="expense/edit/fuel/[id]"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="expense/edit/service/[id]"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="ride/place/index"
+                    options={ {
+                        header: () => <Header.Secondary title={ t("places.title") }/>
+                    } }
+                />
+                <Stack.Screen
+                    name="ride/place/create"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="ride/place/edit/[id]"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="ride/passenger/index"
+                    options={ {
+                        header: () => <Header.Secondary title={ t("passengers.title") }/>
+                    } }
+                />
+                <Stack.Screen
+                    name="ride/passenger/create"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="ride/passenger/edit/[id]"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="ride/create"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="ride/edit/[id]"
+                    options={ {
+                        header: () => <></>,
+                        animation: "slide_from_bottom",
+                        presentation: "transparentModal",
+                        contentStyle: { backgroundColor: "transparent" }
+                    } }
+                />
+                <Stack.Screen
+                    name="ride/[id]"
+                    options={ {
+                        header: () => <Header.Secondary title={ t("rides.log") }/>
+                    } }
+                />
+            </Stack>
+        </View>
     );
 };
 

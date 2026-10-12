@@ -16,7 +16,7 @@ export function OdometerLogTimelineScreen() {
     if(!id) return null;
 
     return (
-        <ScreenView>
+        <ScreenView fullWidthScrollArea>
             <OdometerLogTimeline carId={ id }/>
         </ScreenView>
     );

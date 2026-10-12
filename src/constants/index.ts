@@ -1,4 +1,5 @@
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { Platform } from "react-native";
 import { SEPARATOR_SIZES } from "./separatorSizes.ts";
 
 export * from "./baseConfig.ts";
@@ -10,9 +11,9 @@ export * from "./separatorSizes.ts";
 export * from "./globalStyles.ts";
 export * from "./bottomSheetRoutes.ts";
 
-export const SIMPLE_HEADER_HEIGHT = hp(6.75);
-export const SIMPLE_TABBAR_HEIGHT = hp(7.5);
-export const FLOATING_ACTION_BUTTON_SIZE = hp(6);
+export const SIMPLE_HEADER_HEIGHT = Platform.OS === "web" ? 64 : hp(6.75);
+export const SIMPLE_TABBAR_HEIGHT = Platform.OS === "web" ? 68 : hp(7.5);
+export const FLOATING_ACTION_BUTTON_SIZE = Platform.OS === "web" ? 56 : hp(6);
 export const GAP_BETWEEN_TABBAR_AND_FLOATING_ACTION_BUTTON = SEPARATOR_SIZES.lightSmall;
 export const FULL_TABBAR_HEIGHT = SIMPLE_TABBAR_HEIGHT + FLOATING_ACTION_BUTTON_SIZE + GAP_BETWEEN_TABBAR_AND_FLOATING_ACTION_BUTTON;
 export const ICON_FONT_SIZE_SCALE = 1.5;

@@ -2,7 +2,7 @@ import Button from "../../Button/Button.ts";
 import { pickImage } from "../../../utils/pickImage";
 import { ImageStyle, StyleSheet, View } from "react-native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Carousel, CarouselItemType } from "../../Carousel/Carousel.tsx";
+import { Carousel, CarouselItemType } from "../../Carousel/Carousel";
 import { SharedValue } from "react-native-reanimated";
 import CarouselItem from "../../Carousel/CarouselItem.tsx";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../constants";

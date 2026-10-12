@@ -3,7 +3,7 @@ import React, { Ref, useEffect, useImperativeHandle, useMemo, useState } from "r
 import { DateType } from "react-native-ui-datepicker";
 import { DatePicker } from "./DatePicker.tsx";
 import { DatePickerProvider } from "../../../contexts/datePicker/DatePickerProvider.tsx";
-import { PopupView } from "../../popupView/PopupView.tsx";
+import { PopupView } from "../../popupView/PopupView";
 import { DatePickerHeader } from "./header/DatePickerHeader.tsx";
 import { DatePickerFooter } from "./footer/DatePickerFooter.tsx";
 import dayjs from "dayjs";

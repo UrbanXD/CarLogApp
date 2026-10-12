@@ -1,6 +1,6 @@
 import { FormState } from "react-hook-form";
 import React, { ReactElement, useState } from "react";
-import BottomSheet, { BottomSheetProps } from "../components/BottomSheet.tsx";
+import BottomSheet, { BottomSheetProps } from "../components/BottomSheet";
 import { heightPercentageToDP } from "react-native-responsive-screen";
 
 type FormBottomSheetProps = BottomSheetProps & {

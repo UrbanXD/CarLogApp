@@ -1,7 +1,7 @@
 import React, { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import DropdownPickerController, { DropdownPickerControllerProps } from "./dropdown/DropdownPickerController.tsx";
 import DropdownPickerItems from "./dropdown/DropdownPickerItems.tsx";
-import { PopupView } from "../../popupView/PopupView.tsx";
+import { PopupView } from "../../popupView/PopupView";
 import { useAnimatedReaction, useSharedValue } from "react-native-reanimated";
 import { PickerItemType } from "./PickerItem.tsx";
 import { DropdownPickerHeader } from "./dropdown/DropdownPickerHeader.tsx";

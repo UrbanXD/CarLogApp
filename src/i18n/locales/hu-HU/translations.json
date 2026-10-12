@@ -19,6 +19,10 @@
     "image": "Kép",
     "element": "Elem"
   },
+  "navigation": {
+    "menu": "Menü",
+    "vehicle": "Jármű"
+  },
   "permission": {
     "title": "erőforrás",
     "camera": "kamera",

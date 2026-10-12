@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { PickerItemType } from "../PickerItem.tsx";
 import { useAlert } from "../../../../ui/alert/hooks/useAlert.ts";
 import { PickerDisabledToast } from "../../../../ui/alert/presets/toast";
@@ -67,7 +67,8 @@ const DropdownPickerController: React.FC<DropdownPickerControllerProps> = ({
                 styles.container,
                 !hiddenBackground && styles.backgroundContainer,
                 error && styles.errorFormFieldContainer,
-                containerStyle
+                containerStyle,
+                Platform.OS === "web" && styles.webContainer
             ] }
             pointerEvents={ "box-only" }
         >
@@ -135,6 +136,7 @@ const styles = StyleSheet.create({
     container: {
         minHeight: formTheme.containerHeight,
         maxHeight: formTheme.containerHeight,
+        minWidth: 0,
         flexDirection: "row",
         alignItems: "center",
         gap: SEPARATOR_SIZES.lightSmall / 2,
@@ -154,8 +156,10 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     textContainer: {
+        minWidth: 0,
         flexGrow: 1,
         flexShrink: 1,
+        flexBasis: 0,
         minWidth: 15,
         gap: SEPARATOR_SIZES.lightSmall / 2,
         justifyContent: "center"
@@ -172,6 +176,12 @@ const styles = StyleSheet.create({
     },
     placeholderText: {
         color: formTheme.placeHolderColor
+    },
+    webContainer: {
+        flex: 1,
+        minWidth: 0,
+        maxWidth: "100%",
+        alignSelf: "stretch"
     }
 });
 

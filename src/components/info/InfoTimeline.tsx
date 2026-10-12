@@ -18,6 +18,8 @@ import FloatingActionMenu from "../../ui/floatingActionMenu/components/FloatingA
 import { useTranslation } from "react-i18next";
 import { ViewStyle } from "../../types";
 import { useDelayedBoolean } from "../../hooks/useDelayedBoolean.ts";
+import { WEB_SCROLLBAR_STYLE } from "../screenView/webScrollbarStyle";
+import { useDesktopWeb } from "../../hooks/useDesktopWeb";
 
 export type InfoTimelineItem = {
     id: string | number
@@ -53,6 +55,7 @@ function IInfoTimeline({
     notFoundText,
     style
 }: InfoTimelineProps) {
+    const showWebScrollbar = useDesktopWeb();
     const { t } = useTranslation();
 
     const showPrevLoading = useDelayedBoolean(!!isPrevFetching && !isLoading, 100);
@@ -118,6 +121,7 @@ function IInfoTimeline({
         <>
             <FlashList<InfoTimelineItem>
                 ref={ ref }
+                style={ showWebScrollbar ? WEB_SCROLLBAR_STYLE : undefined }
                 data={ data }
                 renderItem={ renderItem }
                 drawDistance={ heightPercentageToDP(100) }
@@ -132,7 +136,7 @@ function IInfoTimeline({
                 onStartReachedThreshold={ 0.5 }
                 keyboardDismissMode="on-drag"
                 contentContainerStyle={ [style, styles.listContainer] }
-                showsVerticalScrollIndicator={ false }
+                showsVerticalScrollIndicator={ showWebScrollbar }
                 showsHorizontalScrollIndicator={ false }
                 onScroll={ scrollHandler }
                 scrollEventThrottle={ 64 }

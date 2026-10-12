@@ -11,12 +11,14 @@ import { MoreDataLoading } from "../../../components/loading/MoreDataLoading.tsx
 import { useTranslation } from "react-i18next";
 import { useWatchedQueryCollection } from "../../../database/hooks/useWatchedQueryCollection.ts";
 import { Section } from "../../../components/Section.tsx";
+import { ViewStyle } from "../../../types";
 
 type LatestExpenseProps = {
     carId: string
+    containerStyle?: ViewStyle
 }
 
-export function LatestExpenses({ carId }: LatestExpenseProps) {
+export function LatestExpenses({ carId, containerStyle }: LatestExpenseProps) {
     const { t } = useTranslation();
     const { expenseDao } = useDatabase();
     const { mapper } = useExpenseTimelineItem();
@@ -56,7 +58,7 @@ export function LatestExpenses({ carId }: LatestExpenseProps) {
     const openCreateExpenseBottomSheet = () => router.push("/expense/create/");
 
     return (
-        <Section title={ t("expenses.latest") }>
+        <Section title={ t("expenses.latest") } containerStyle={ containerStyle }>
             {
                 isLoading
                 ?

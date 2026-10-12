@@ -209,7 +209,11 @@ function CarProfileView({
                        />
                     }
                 </View>
-                <Odometer value={ car.odometer.value } unit={ car.odometer.unit.short }/>
+                <Odometer
+                    value={ car.odometer.value }
+                    unit={ car.odometer.unit.short }
+                    containerStyle={ { justifyContent: "center" } }
+                />
                 {
                     openOdometerLog &&
                    <Link

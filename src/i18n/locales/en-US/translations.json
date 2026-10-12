@@ -19,6 +19,10 @@
     "image": "Image",
     "element": "Item"
   },
+  "navigation": {
+    "menu": "Menu",
+    "vehicle": "Vehicle"
+  },
   "permission": {
     "title": "requested feature",
     "camera": "camera",

@@ -11,6 +11,8 @@ import { ExpandableListItem, ExpandableListItemType } from "./ExpandableListItem
 import { ExpandableView } from "../expandableView/ExpandableView.tsx";
 import InputTitle from "../Input/common/InputTitle.tsx";
 import { useTranslation } from "react-i18next";
+import { WEB_SCROLLBAR_STYLE } from "../screenView/webScrollbarStyle";
+import { useDesktopWeb } from "../../hooks/useDesktopWeb";
 
 type ExpandableListProps = {
     expanded: boolean
@@ -35,6 +37,7 @@ export function ExpandableList({
     onItemPress,
     onRemoveItem
 }: ExpandableListProps) {
+    const showWebScrollbar = useDesktopWeb();
     const { t } = useTranslation();
     const keyExtractor = useCallback((item: ExpandableListItemType) => item.id.toString(), []);
 
@@ -90,8 +93,8 @@ export function ExpandableList({
                 renderItem={ renderItem }
                 ItemSeparatorComponent={ renderSeparatorComponent }
                 ListEmptyComponent={ renderEmptyComponent }
-                showsVerticalScrollIndicator={ false }
-                style={ styles.itemsContainer }
+                showsVerticalScrollIndicator={ showWebScrollbar }
+                style={ [styles.itemsContainer, showWebScrollbar && WEB_SCROLLBAR_STYLE] }
                 renderScrollComponent={ BottomSheetFlashListScrollable }
             />
             {

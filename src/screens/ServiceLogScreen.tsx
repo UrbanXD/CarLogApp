@@ -10,7 +10,7 @@ export function ServiceLogScreen() {
     if(!selectedCarId) return <FirstSelectCar/>;
 
     return (
-        <ScreenView>
+        <ScreenView fullWidthScrollArea>
             <ServiceLogTimeline carId={ selectedCarId }/>
         </ScreenView>
 

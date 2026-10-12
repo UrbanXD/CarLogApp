@@ -1,7 +1,7 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { ICON_NAMES } from "../../constants";
+import { COLORS, ICON_NAMES } from "../../constants";
 import Button from "../Button/Button.ts";
 import Image from "../Image.tsx";
 import { Color, ImageSource, ViewStyle } from "../../types";
@@ -67,7 +67,8 @@ function useStyles(avatarSize: number, borderColor?: Color, borderWidth?: number
         image: {
             width: avatarSize,
             height: avatarSize,
-            resizeMode: "stretch",
+            resizeMode: Platform.OS === "web" && avatarSize <= 48 ? "contain" : "stretch",
+            backgroundColor: Platform.OS === "web" && avatarSize <= 48 ? COLORS.black2 : undefined,
             borderRadius: avatarSize / 2,
             borderWidth,
             borderColor

@@ -1,5 +1,5 @@
 import React from "react";
-import { Carousel, CarouselItemType } from "../../../components/Carousel/Carousel.tsx";
+import { Carousel, CarouselItemType } from "../../../components/Carousel/Carousel";
 import { StyleSheet, Text, View } from "react-native";
 import { DEFAULT_SEPARATOR, GLOBAL_STYLE, ICON_NAMES } from "../../../constants";
 import { SharedValue } from "react-native-reanimated";

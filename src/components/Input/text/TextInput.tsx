@@ -4,6 +4,7 @@ import {
     FocusEvent,
     KeyboardType,
     NativeSyntheticEvent,
+    Platform,
     StyleSheet,
     TextInput as TextInputRN,
     TextInputContentSizeChangeEventData,
@@ -136,7 +137,8 @@ const TextInput: React.FC<TextInputProps> = ({
                 type === "primary" && styles.primaryFormFieldContainer,
                 containerStyle,
                 (focused || alwaysFocused) && styles.activeFormFieldContainer,
-                !!error && styles.errorFormFieldContainer
+                !!error && styles.errorFormFieldContainer,
+                Platform.OS === "web" && styles.webFormFieldContainer
             ] }>
             {
                 icon &&
@@ -151,7 +153,7 @@ const TextInput: React.FC<TextInputProps> = ({
             <TextInputRN
                 ref={ inputRef }
                 placeholder={ placeholder }
-                style={ [textInputStyle, styles.textInput] }
+                style={ [textInputStyle, styles.textInput, Platform.OS === "web" && styles.webTextInput] }
                 placeholderTextColor={ styles.placeholderText.color }
                 value={ fieldValue.toString() }
                 multiline={ multiline }
@@ -198,6 +200,14 @@ const styles = StyleSheet.create({
         alignItems: "center",
         overflow: "hidden"
     },
+    webFormFieldContainer: {
+        maxWidth: "100%",
+        minWidth: 0,
+        alignSelf: "stretch",
+        flexBasis: 0,
+        flexGrow: 1,
+        flexShrink: 1
+    },
     primaryFormFieldContainer: {
         backgroundColor: formTheme.containerBackgroundColor,
         paddingHorizontal: formTheme.containerPaddingHorizontal,
@@ -217,12 +227,26 @@ const styles = StyleSheet.create({
     },
     textInput: {
         flex: 1,
+        minWidth: 0,
         color: formTheme.valueTextColor,
         fontSize: formTheme.valueTextFontSize,
         // lineHeight: formTheme.valueTextFontSize,
         alignItems: "center",
         justifyContent: "center"
     },
+    webTextInput: {
+        width: 0,
+        minWidth: 0,
+        maxWidth: "100%",
+        flexBasis: 0,
+        flexGrow: 1,
+        flexShrink: 1,
+        boxSizing: "border-box",
+        outlineStyle: "none",
+        outlineWidth: 0,
+        outlineColor: "transparent",
+        boxShadow: "none"
+    } as any,
     placeholderText: {
         color: formTheme.placeHolderColor
     }

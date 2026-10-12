@@ -49,7 +49,11 @@ function MultiStepForm({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        gap: formTheme.gap
+        gap: formTheme.gap,
+        width: "100%",
+        minWidth: 0,
+        maxWidth: "100%",
+        alignSelf: "stretch"
     }
 });
 
