@@ -160,19 +160,18 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         flexShrink: 1,
         flexBasis: 0,
-        minWidth: 15,
         gap: SEPARATOR_SIZES.lightSmall / 2,
         justifyContent: "center"
     },
     titleText: {
         color: formTheme.valueTextColor,
         fontSize: formTheme.valueTextFontSize,
-        lineHeight: formTheme.valueTextFontSize
+        lineHeight: formTheme.valueTextFontSize * (Platform.OS === "web" ? 1.25 : 1)
     },
     subtitleText: {
         color: formTheme.placeHolderColor,
         fontSize: formTheme.valueTextFontSize * 0.85,
-        lineHeight: formTheme.valueTextFontSize * 0.85
+        lineHeight: formTheme.valueTextFontSize * 0.85 * (Platform.OS === "web" ? 1.05 : 1)
     },
     placeholderText: {
         color: formTheme.placeHolderColor

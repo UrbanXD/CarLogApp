@@ -1,4 +1,4 @@
-import React, { RefObject, useCallback, useState } from "react";
+import React, { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import {
     BlurEvent,
     FocusEvent,
@@ -7,6 +7,7 @@ import {
     Platform,
     StyleSheet,
     TextInput as TextInputRN,
+    TextInputChangeEventData,
     TextInputContentSizeChangeEventData,
     View
 } from "react-native";
@@ -65,6 +66,8 @@ const TextInput: React.FC<TextInputProps> = ({
     if(error && error.ref?.name !== inputFieldContext?.field.name) error = null;
 
     const height = useSharedValue(formTheme.containerHeight);
+    const [webMultilineHeight, setWebMultilineHeight] = useState(formTheme.containerHeight);
+    const internalInputRef = useRef<TextInputRN | null>(null);
 
     const [focused, setFocused] = useState(false);
     const [secure, setSecure] = useState(isSecure);
@@ -103,13 +106,59 @@ const TextInput: React.FC<TextInputProps> = ({
         if(setValue) setValue(value);
     };
 
-    const numberOfLines = multiline ? 5 : 1;
-    const maxHeight = numberOfLines * formTheme.containerHeight;
+    const numberOfLines = multiline && Platform.OS !== "web" ? 5 : 1;
+    // Let web notes grow to four field heights before the textarea starts scrolling.
+    // Keep the existing native limit and mobile behavior unchanged.
+    const maxHeight = multiline
+                      ? 3 * formTheme.containerHeight
+                      : formTheme.containerHeight;
+
+    const measureWebMultilineInput = useCallback((inputOverride?: any) => {
+        if(Platform.OS !== "web" || !multiline) return;
+
+        requestAnimationFrame(() => {
+            const input = inputOverride ?? (inputRef?.current ?? internalInputRef.current) as any;
+            if(!input?.style || typeof input.scrollHeight !== "number") return;
+
+            const borderHeight = type === "primary" ? 2 : 0;
+            const lineHeight = formTheme.valueTextFontSize * 1.25;
+
+            // Measure with natural height so a previously expanded textarea can shrink too.
+            input.style.height = "auto";
+            input.style.paddingTop = "0px";
+            const contentHeight = input.scrollHeight;
+            const nextHeight = Math.max(
+                formTheme.containerHeight,
+                Math.min(contentHeight + borderHeight, maxHeight)
+            );
+
+            // Keep the placeholder and a single entered line centered; multiline content starts at the top.
+            const isSingleLine = !input.value?.includes("\n") && contentHeight <= lineHeight * 1.5;
+            input.style.paddingTop = isSingleLine
+                                     ? `${ Math.max(0, (formTheme.containerHeight - borderHeight - lineHeight) / 2) }px`
+                                     : "0px";
+            input.style.height = "100%";
+
+            height.value = nextHeight;
+            setWebMultilineHeight(nextHeight);
+        });
+    }, [height, inputRef, maxHeight, multiline, type]);
+
+    useEffect(() => {
+        measureWebMultilineInput();
+    }, [fieldValue, measureWebMultilineInput]);
 
     const animatedStyle = useAnimatedStyle(() => ({
         height: withTiming(height.value, { duration: 250 }),
         alignItems: height.value > formTheme.containerHeight ? "flex-start" : "center"
     }));
+
+    const containerSizeStyle = Platform.OS === "web" && multiline
+                               ? {
+            height: webMultilineHeight,
+            alignItems: webMultilineHeight > formTheme.containerHeight ? "flex-start" as const : "center" as const
+        }
+                               : animatedStyle;
 
     const animatedIconStyle = useAnimatedStyle(() => ({
         paddingTop: withTiming(
@@ -126,19 +175,40 @@ const TextInput: React.FC<TextInputProps> = ({
     }));
 
     const onContentSizeChange = (event: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
-        height.value = Math.min(event.nativeEvent.contentSize.height, maxHeight);
+        const nextHeight = Math.max(
+            formTheme.containerHeight,
+            Math.min(event.nativeEvent.contentSize.height, maxHeight)
+        );
+        height.value = nextHeight;
+        if(Platform.OS === "web") setWebMultilineHeight(nextHeight);
     };
+
+    const onWebMultilineChange = (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
+        if(Platform.OS !== "web" || !multiline) return;
+
+        const webEvent = event as any;
+        measureWebMultilineInput(webEvent.currentTarget ?? webEvent.target);
+    };
+
+    const multilineAlignmentStyle = multiline && Platform.OS !== "web"
+                                    ? {
+            textAlignVertical: fieldValue.toString().length === 0
+                               ? "center" as const
+                               : "top" as const
+        }
+                                    : undefined;
 
     return (
         <Animated.View
             style={ [
                 styles.formFieldContainer,
-                animatedStyle,
+                containerSizeStyle,
                 type === "primary" && styles.primaryFormFieldContainer,
                 containerStyle,
                 (focused || alwaysFocused) && styles.activeFormFieldContainer,
                 !!error && styles.errorFormFieldContainer,
-                Platform.OS === "web" && styles.webFormFieldContainer
+                Platform.OS === "web" && styles.webFormFieldContainer,
+                Platform.OS === "web" && multiline && styles.webMultilineFormFieldContainer
             ] }>
             {
                 icon &&
@@ -151,15 +221,23 @@ const TextInput: React.FC<TextInputProps> = ({
                </Animated.View>
             }
             <TextInputRN
-                ref={ inputRef }
+                ref={ inputRef ?? internalInputRef }
                 placeholder={ placeholder }
-                style={ [textInputStyle, styles.textInput, Platform.OS === "web" && styles.webTextInput] }
+                style={ [
+                    textInputStyle,
+                    styles.textInput,
+                    multiline && styles.multilineTextInput,
+                    Platform.OS === "web" && styles.webTextInput,
+                    Platform.OS === "web" && multiline && styles.webMultilineTextInput,
+                    multilineAlignmentStyle
+                ] }
                 placeholderTextColor={ styles.placeholderText.color }
                 value={ fieldValue.toString() }
                 multiline={ multiline }
                 numberOfLines={ numberOfLines }
                 keyboardType={ keyboardType }
                 secureTextEntry={ secure }
+                onChange={ Platform.OS === "web" && multiline ? onWebMultilineChange : undefined }
                 onChangeText={ updateFieldValue }
                 onBlur={ onBlur }
                 onFocus={ onFocus }
@@ -208,6 +286,11 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         flexShrink: 1
     },
+    webMultilineFormFieldContainer: {
+        flexBasis: "auto",
+        flexGrow: 0,
+        flexShrink: 0
+    },
     primaryFormFieldContainer: {
         backgroundColor: formTheme.containerBackgroundColor,
         paddingHorizontal: formTheme.containerPaddingHorizontal,
@@ -230,9 +313,12 @@ const styles = StyleSheet.create({
         minWidth: 0,
         color: formTheme.valueTextColor,
         fontSize: formTheme.valueTextFontSize,
-        // lineHeight: formTheme.valueTextFontSize,
-        alignItems: "center",
-        justifyContent: "center"
+        alignItems: "center"
+    },
+    multilineTextInput: {
+        height: "100%",
+        lineHeight: formTheme.valueTextFontSize * 1.25,
+        textAlignVertical: "top"
     },
     webTextInput: {
         width: 0,
@@ -246,6 +332,9 @@ const styles = StyleSheet.create({
         outlineWidth: 0,
         outlineColor: "transparent",
         boxShadow: "none"
+    } as any,
+    webMultilineTextInput: {
+        overflowY: "auto"
     } as any,
     placeholderText: {
         color: formTheme.placeHolderColor

@@ -51,12 +51,14 @@ const styles = StyleSheet.create({
     desktopContentContainer: {
         flexDirection: "row",
         flexWrap: "wrap",
-        alignItems: "stretch",
+        alignItems: "flex-start",
         columnGap: SEPARATOR_SIZES.medium,
         rowGap: SEPARATOR_SIZES.medium
     },
     desktopHalf: {
         width: "48%",
+        alignSelf: "flex-start",
+        minHeight: 108,
         flexGrow: 1,
         flexShrink: 1,
         borderRadius: 16,

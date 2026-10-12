@@ -38,11 +38,16 @@ export default function DesktopSidebar() {
 
     return (
         <View style={ styles.sidebar }>
-            <View style={ styles.brand }>
+            <Pressable
+                accessibilityRole="link"
+                accessibilityLabel={ t("common.main_screen") }
+                onPress={ () => router.navigate("/" as never) }
+                style={ styles.brand }
+            >
                 <View style={ styles.brandMark }><Icon icon={ ICON_NAMES.car } size={ 23 }
                                                        color={ COLORS.black }/></View>
                 <Text style={ styles.brandText }>CARLOG</Text>
-            </View>
+            </Pressable>
             <SidebarCarPicker/>
             <Text style={ styles.sectionLabel }>{ t("navigation.menu") }</Text>
             <View style={ styles.nav }>

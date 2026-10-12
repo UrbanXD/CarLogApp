@@ -16,6 +16,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { DateRangePicker } from "../components/Input/datePicker/presets/DateRangePicker.tsx";
 import { WEB_SCROLLBAR_STYLE } from "../components/screenView/webScrollbarStyle";
 import { useDesktopWeb } from "../hooks/useDesktopWeb";
+import { Title } from "../components/Title.tsx";
 
 const STAT_TYPES = ["ride", "expense", "fuel", "service"];
 
@@ -64,6 +65,10 @@ export function StatisticsScreen() {
 
     return (
         <ScreenView>
+            <Title
+                title={ t("statistics.title") }
+                containerStyle={ styles.pageTitle }
+            />
             <View style={ styles.header }>
                 <FilterRow style={ styles.statTypeFilterContainer }>
                     {
@@ -102,6 +107,9 @@ export function StatisticsScreen() {
 }
 
 const styles = StyleSheet.create({
+    pageTitle: {
+        marginBottom: SEPARATOR_SIZES.lightSmall
+    },
     container: {
         gap: SEPARATOR_SIZES.lightSmall
     },

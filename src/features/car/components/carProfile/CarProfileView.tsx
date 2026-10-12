@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import Image from "../../../../components/Image.tsx";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants";
 import Button from "../../../../components/Button/Button.ts";
@@ -13,6 +13,7 @@ import Link from "../../../../components/Link.tsx";
 import { InfoContainer } from "../../../../components/info/InfoContainer.tsx";
 import { InfoRowProps } from "../../../../components/info/InfoRow.tsx";
 import { useTranslation } from "react-i18next";
+import { useDesktopWeb } from "../../../../hooks/useDesktopWeb";
 
 type CarProfileViewProps = {
     car: Car
@@ -36,6 +37,8 @@ function CarProfileView({
     openEditOdometerValue
 }: CarProfileViewProps) {
     const { t } = useTranslation();
+    const desktopWeb = useDesktopWeb();
+    const { height: windowHeight } = useWindowDimensions();
 
     const infos: Array<InfoRowProps> = useMemo(() => ([
         {
@@ -62,166 +65,196 @@ function CarProfileView({
     ]), [car, openEditCarStep, t]);
 
     return (
-        <View style={ styles.container }>
-            <View style={ styles.imageContainer }>
-                <Image
-                    path={ car.imagePath }
-                    attachment={ imageIsAttachment }
-                    alt={ ICON_NAMES.car }
-                    overlay
-                >
-                    <View style={ styles.editImageIconContainer }>
+        <View style={ [styles.container, desktopWeb && styles.desktopContainer] }>
+            <View style={ desktopWeb && styles.desktopHeroGrid }>
+                <View style={ [
+                    styles.imageContainer,
+                    desktopWeb && styles.desktopImageContainer,
+                    desktopWeb && { height: Math.min(560, Math.max(380, windowHeight * 0.52)) }
+                ] }>
+                    <Image
+                        path={ car.imagePath }
+                        attachment={ imageIsAttachment }
+                        alt={ ICON_NAMES.car }
+                        overlay
+                        imageStyle={ desktopWeb ? styles.desktopHeroImage : undefined }
+                    >
+                        <View style={ styles.editImageIconContainer }>
+                            <Button.Icon
+                                icon={ ICON_NAMES.pencil }
+                                iconSize={ FONT_SIZES.h2 }
+                                iconColor={ COLORS.gray1 }
+                                width={ FONT_SIZES.h2 }
+                                height={ FONT_SIZES.h2 }
+                                style={ styles.editImageIcon }
+                                backgroundColor="transparent"
+                                onPress={ () => openEditCarStep(EDIT_CAR_FORM_STEPS.Image) }
+                            />
+                        </View>
+                    </Image>
+                </View>
+                <View style={ [styles.contentRowContainer, desktopWeb && styles.desktopCarInfoPanel] }>
+                    <View style={ styles.carInfoRow }>
+                        <View style={ { flex: 1 } }>
+                            <IntelligentMarquee
+                                speed={ MARQUEE_SPEED }
+                                bounceDelay={ MARQUEE_BOUNCE_DELAY }
+                                delay={ MARQUEE_DELAY }
+                                spacing={ SEPARATOR_SIZES.medium }
+                            >
+                                <Text style={ [
+                                    styles.carNameText,
+                                    desktopWeb && styles.desktopCarNameText
+                                ] }>{ car.name }</Text>
+                            </IntelligentMarquee>
+                        </View>
                         <Button.Icon
                             icon={ ICON_NAMES.pencil }
-                            iconSize={ FONT_SIZES.h2 }
+                            iconSize={ FONT_SIZES.h3 }
                             iconColor={ COLORS.gray1 }
-                            width={ FONT_SIZES.h2 }
-                            height={ FONT_SIZES.h2 }
-                            style={ styles.editImageIcon }
+                            width={ FONT_SIZES.h3 }
+                            height={ FONT_SIZES.h3 }
                             backgroundColor="transparent"
-                            onPress={ () => openEditCarStep(EDIT_CAR_FORM_STEPS.Image) }
+                            onPress={ () => openEditCarStep(EDIT_CAR_FORM_STEPS.Name) }
                         />
                     </View>
-                </Image>
-            </View>
-            <View style={ styles.contentRowContainer }>
-                <View style={ styles.carInfoRow }>
-                    <View style={ { flex: 1 } }>
-                        <IntelligentMarquee
-                            speed={ MARQUEE_SPEED }
-                            bounceDelay={ MARQUEE_BOUNCE_DELAY }
-                            delay={ MARQUEE_DELAY }
-                            spacing={ SEPARATOR_SIZES.medium }
-                        >
-                            <Text style={ styles.carNameText }>{ car.name }</Text>
-                        </IntelligentMarquee>
-                    </View>
-                    <Button.Icon
-                        icon={ ICON_NAMES.pencil }
-                        iconSize={ FONT_SIZES.h3 }
-                        iconColor={ COLORS.gray1 }
-                        width={ FONT_SIZES.h3 }
-                        height={ FONT_SIZES.h3 }
-                        backgroundColor="transparent"
-                        onPress={ () => openEditCarStep(EDIT_CAR_FORM_STEPS.Name) }
+                    <Divider
+                        color={ COLORS.gray3 }
+                        margin={ SEPARATOR_SIZES.lightSmall / 2.5 }
                     />
-                </View>
-                <Divider
-                    color={ COLORS.gray3 }
-                    margin={ SEPARATOR_SIZES.lightSmall / 2.5 }
-                />
-                <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoRowTitle }>{ t("car.make") }</Text>
-                    <View style={ styles.carInfoRowContentContainer }>
-                        <IntelligentMarquee
-                            speed={ MARQUEE_SPEED }
-                            bounceDelay={ MARQUEE_BOUNCE_DELAY }
-                            delay={ MARQUEE_DELAY }
-                            spacing={ SEPARATOR_SIZES.medium }
-                            style={ { alignSelf: "flex-end" } }
-                        >
-                            <Text style={ styles.carInfoRowText }>{ car.model.make.name }</Text>
-                        </IntelligentMarquee>
+                    <View style={ styles.carInfoRow }>
+                        <Text style={ [
+                            styles.carInfoRowTitle,
+                            desktopWeb && styles.desktopCarInfoText
+                        ] }>{ t("car.make") }</Text>
+                        <View style={ styles.carInfoRowContentContainer }>
+                            <IntelligentMarquee
+                                speed={ MARQUEE_SPEED }
+                                bounceDelay={ MARQUEE_BOUNCE_DELAY }
+                                delay={ MARQUEE_DELAY }
+                                spacing={ SEPARATOR_SIZES.medium }
+                                style={ { alignSelf: "flex-end" } }
+                            >
+                                <Text style={ [
+                                    styles.carInfoRowText,
+                                    desktopWeb && styles.desktopCarInfoText
+                                ] }>{ car.model.make.name }</Text>
+                            </IntelligentMarquee>
+                        </View>
                     </View>
-                </View>
-                <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoRowTitle }>{ t("car.model") }</Text>
-                    <View style={ styles.carInfoRowContentContainer }>
-                        <IntelligentMarquee
-                            speed={ 0.75 }
-                            bounceDelay={ 500 }
-                            delay={ 500 }
-                            spacing={ SEPARATOR_SIZES.medium }
-                            style={ { alignSelf: "flex-end" } }
-                        >
-                            <Text style={ styles.carInfoRowText }>{ car.model.name }</Text>
-                        </IntelligentMarquee>
+                    <View style={ styles.carInfoRow }>
+                        <Text style={ [styles.carInfoRowTitle, desktopWeb && styles.desktopCarInfoText] }>{ t(
+                            "car.model") }</Text>
+                        <View style={ styles.carInfoRowContentContainer }>
+                            <IntelligentMarquee
+                                speed={ 0.75 }
+                                bounceDelay={ 500 }
+                                delay={ 500 }
+                                spacing={ SEPARATOR_SIZES.medium }
+                                style={ { alignSelf: "flex-end" } }
+                            >
+                                <Text style={ [
+                                    styles.carInfoRowText,
+                                    desktopWeb && styles.desktopCarInfoText
+                                ] }>{ car.model.name }</Text>
+                            </IntelligentMarquee>
+                        </View>
                     </View>
-                </View>
-                <View style={ styles.carInfoRow }>
-                    <Text style={ styles.carInfoRowTitle }>{ t("car.model_year") }</Text>
-                    <View style={ styles.carInfoRowContentContainer }>
-                        <IntelligentMarquee
-                            speed={ MARQUEE_SPEED }
-                            bounceDelay={ MARQUEE_BOUNCE_DELAY }
-                            delay={ MARQUEE_DELAY }
-                            spacing={ SEPARATOR_SIZES.medium }
-                            style={ { alignSelf: "flex-end" } }
-                        >
-                            <Text style={ styles.carInfoRowText }>{ car.model.year }</Text>
-                        </IntelligentMarquee>
+                    <View style={ styles.carInfoRow }>
+                        <Text style={ [styles.carInfoRowTitle, desktopWeb && styles.desktopCarInfoText] }>{ t(
+                            "car.model_year") }</Text>
+                        <View style={ styles.carInfoRowContentContainer }>
+                            <IntelligentMarquee
+                                speed={ MARQUEE_SPEED }
+                                bounceDelay={ MARQUEE_BOUNCE_DELAY }
+                                delay={ MARQUEE_DELAY }
+                                spacing={ SEPARATOR_SIZES.medium }
+                                style={ { alignSelf: "flex-end" } }
+                            >
+                                <Text style={ [
+                                    styles.carInfoRowText,
+                                    desktopWeb && styles.desktopCarInfoText
+                                ] }>{ car.model.year }</Text>
+                            </IntelligentMarquee>
+                        </View>
                     </View>
+                    <Button.Row
+                        style={ {
+                            marginTop: SEPARATOR_SIZES.mediumSmall,
+                            justifyContent: handleDeleteCar ? "space-between" : "center"
+                        } }
+                    >
+                        {
+                            handleDeleteCar &&
+                           <Button.Icon
+                              icon={ ICON_NAMES.trashCan }
+                              iconSize={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
+                              backgroundColor={ COLORS.googleRed }
+                              iconColor={ COLORS.black }
+                              height={ FONT_SIZES.p2 * 2 }
+                              onPress={ handleDeleteCar }
+                           />
+                        }
+                        <Button.Text
+                            text={ t("form_button.edit") }
+                            textColor={ COLORS.gray1 }
+                            fontSize={ FONT_SIZES.p2 }
+                            height={ FONT_SIZES.p2 * 2 }
+                            backgroundColor="transparent"
+                            style={ { flex: 0.75, borderColor: COLORS.gray1, borderWidth: 2.5 } }
+                            onPress={ () => openEditCarStep(EDIT_CAR_FORM_STEPS.CarModel) }
+                        />
+                    </Button.Row>
                 </View>
-                <Button.Row
-                    style={ {
-                        marginTop: SEPARATOR_SIZES.mediumSmall,
-                        justifyContent: handleDeleteCar ? "space-between" : "center"
-                    } }
-                >
+            </View>
+            <View style={ desktopWeb && styles.desktopDetailsGrid }>
+                <View style={ [styles.block, desktopWeb && styles.desktopDetailsPanel] }>
+                    <Text style={ styles.blockTitle }>{ t("car.basic_information") }</Text>
+                    <InfoContainer data={ infos } flexDirection={ "column" } maxItemInRow={ desktopWeb ? 2 : 3 }/>
+                </View>
+                <View style={ [styles.block, desktopWeb && styles.desktopDetailsPanel] }>
+                    <View
+                        style={ {
+                            flexDirection: "row",
+                            justifyContent: openEditOdometerValue ? "space-between" : "center"
+                        } }
+                    >
+                        {
+                            openEditOdometerValue &&
+                           <View style={ {
+                               width: FONT_SIZES.h3,
+                               height: FONT_SIZES.h3,
+                               backgroundColor: "transparent"
+                           } }/>
+                        }
+                        <Text style={ styles.blockTitle }>{ t("odometer.text") }</Text>
+                        {
+                            openEditOdometerValue &&
+                           <Button.Icon
+                              icon={ ICON_NAMES.pencil }
+                              iconSize={ FONT_SIZES.h3 }
+                              iconColor={ COLORS.gray1 }
+                              width={ FONT_SIZES.h3 }
+                              height={ FONT_SIZES.h3 }
+                              backgroundColor="transparent"
+                              onPress={ openEditOdometerValue }
+                           />
+                        }
+                    </View>
+                    <Odometer
+                        value={ car.odometer.value }
+                        unit={ car.odometer.unit.short }
+                        containerStyle={ { justifyContent: "center" } }
+                    />
                     {
-                        handleDeleteCar &&
-                       <Button.Icon
-                          icon={ ICON_NAMES.trashCan }
-                          iconSize={ FONT_SIZES.p2 * ICON_FONT_SIZE_SCALE }
-                          backgroundColor={ COLORS.googleRed }
-                          iconColor={ COLORS.black }
-                          height={ FONT_SIZES.p2 * 2 }
-                          onPress={ handleDeleteCar }
+                        openOdometerLog &&
+                       <Link
+                          text={ t("odometer.open_log") }
+                          icon={ ICON_NAMES.rightArrowHead }
+                          onPress={ openOdometerLog }
                        />
                     }
-                    <Button.Text
-                        text={ t("form_button.edit") }
-                        textColor={ COLORS.gray1 }
-                        fontSize={ FONT_SIZES.p2 }
-                        height={ FONT_SIZES.p2 * 2 }
-                        backgroundColor="transparent"
-                        style={ { flex: 0.75, borderColor: COLORS.gray1, borderWidth: 2.5 } }
-                        onPress={ () => openEditCarStep(EDIT_CAR_FORM_STEPS.CarModel) }
-                    />
-                </Button.Row>
-            </View>
-            <View style={ styles.block }>
-                <Text style={ styles.blockTitle }>{ t("car.basic_information") }</Text>
-                <InfoContainer data={ infos } flexDirection={ "column" } maxItemInRow={ 3 }/>
-            </View>
-            <View style={ styles.block }>
-                <View
-                    style={ {
-                        flexDirection: "row",
-                        justifyContent: openEditOdometerValue ? "space-between" : "center"
-                    } }
-                >
-                    {
-                        openEditOdometerValue &&
-                       <View style={ { width: FONT_SIZES.h3, height: FONT_SIZES.h3, backgroundColor: "transparent" } }/>
-                    }
-                    <Text style={ styles.blockTitle }>{ t("odometer.text") }</Text>
-                    {
-                        openEditOdometerValue &&
-                       <Button.Icon
-                          icon={ ICON_NAMES.pencil }
-                          iconSize={ FONT_SIZES.h3 }
-                          iconColor={ COLORS.gray1 }
-                          width={ FONT_SIZES.h3 }
-                          height={ FONT_SIZES.h3 }
-                          backgroundColor="transparent"
-                          onPress={ openEditOdometerValue }
-                       />
-                    }
                 </View>
-                <Odometer
-                    value={ car.odometer.value }
-                    unit={ car.odometer.unit.short }
-                    containerStyle={ { justifyContent: "center" } }
-                />
-                {
-                    openOdometerLog &&
-                   <Link
-                      text={ t("odometer.open_log") }
-                      icon={ ICON_NAMES.rightArrowHead }
-                      onPress={ openOdometerLog }
-                   />
-                }
             </View>
         </View>);
 }
@@ -231,6 +264,40 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "column",
         gap: SEPARATOR_SIZES.normal
+    },
+    desktopContainer: {
+        width: "100%",
+        maxWidth: 1280,
+        alignSelf: "center"
+    },
+    desktopHeroGrid: {
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "stretch",
+        gap: SEPARATOR_SIZES.normal
+    },
+    desktopImageContainer: {
+        flex: 1,
+        minWidth: 0
+    },
+    desktopHeroImage: {
+        resizeMode: "cover",
+        borderRadius: 28
+    },
+    desktopCarInfoPanel: {
+        flex: 1,
+        minWidth: 0,
+        justifyContent: "center",
+        gap: SEPARATOR_SIZES.medium,
+        padding: SEPARATOR_SIZES.medium,
+        borderRadius: 28
+    },
+    desktopCarNameText: {
+        fontSize: FONT_SIZES.h2,
+        letterSpacing: FONT_SIZES.h2 * 0.045
+    },
+    desktopCarInfoText: {
+        fontSize: FONT_SIZES.p1
     },
     imageContainer: {
         flexDirection: "row",
@@ -284,6 +351,20 @@ const styles = StyleSheet.create({
     },
     block: {
         gap: SEPARATOR_SIZES.lightSmall
+    },
+    desktopDetailsGrid: {
+        flexDirection: "row",
+        alignItems: "stretch",
+        gap: SEPARATOR_SIZES.medium
+    },
+    desktopDetailsPanel: {
+        flex: 1,
+        minWidth: 0,
+        justifyContent: "center",
+        minHeight: 260,
+        padding: SEPARATOR_SIZES.medium,
+        borderRadius: 18,
+        backgroundColor: COLORS.black4
     },
     blockTitle: {
         flexShrink: 1,
