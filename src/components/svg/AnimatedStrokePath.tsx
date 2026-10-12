@@ -1,5 +1,5 @@
 import React, { Component, useRef } from "react";
-import { AnimatedPath } from "../AnimatedComponents/index.ts";
+import { AnimatedPath } from "../AnimatedComponents";
 import { PathProps } from "react-native-svg";
 import { COLORS } from "../../constants/index.ts";
 import {

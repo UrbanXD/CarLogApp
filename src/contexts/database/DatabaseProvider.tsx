@@ -1,10 +1,10 @@
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { DatabaseContext } from "./DatabaseContext.ts";
-import { Database } from "../../database/connector/Database.ts";
+import { Database } from "../../database/connector/Database";
 import * as SplashScreen from "expo-splash-screen";
 import * as Network from "expo-network";
 import { NetworkState } from "expo-network";
-import { PowerSyncContext } from "@powersync/react-native";
+import { PowerSyncContext } from "@powersync/react";
 
 type DatabaseProviderProps = {
     children: ReactNode | null

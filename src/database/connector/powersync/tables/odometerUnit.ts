@@ -1,4 +1,4 @@
-import { column, Table } from "@powersync/react-native";
+import { column, Table } from "@powersync/common";
 
 export const ODOMETER_UNIT_TABLE = "odometer_unit" as const;
 

@@ -8,7 +8,7 @@ import Animated, {
 import { useEffect } from "react";
 import getContrastingColor from "../../utils/colors/getContrastingColor.ts";
 import { COLORS, FONT_SIZES, ICON_FONT_SIZE_SCALE, SEPARATOR_SIZES } from "../../constants/index.ts";
-import { AnimatedMaterialIcon, AnimatedPressable } from "../AnimatedComponents/index.ts";
+import { AnimatedMaterialIcon, AnimatedPressable } from "../AnimatedComponents";
 import { StyleSheet } from "react-native";
 import { Color } from "../../types/index.ts";
 

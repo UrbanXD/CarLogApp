@@ -6,7 +6,7 @@ import { Passenger } from "../../schemas/passengerSchema.ts";
 import { PassengerMapper } from "../mapper/passengerMapper.ts";
 import { PassengerFormFields } from "../../schemas/form/passengerForm.ts";
 import { PASSENGER_TABLE } from "../../../../../../database/connector/powersync/tables/passenger.ts";
-import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { AbstractPowerSyncDatabase } from "@powersync/common";
 import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
 import { USER_TABLE } from "../../../../../../database/connector/powersync/tables/user.ts";
 import { WatchQueryOptions } from "../../../../../../database/watcher/watcher.ts";

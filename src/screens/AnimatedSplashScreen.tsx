@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, DEFAULT_SEPARATOR, SEPARATOR_SIZES } from "../constants/index.ts";
 import { Href, router } from "expo-router";
-import CarlogTitle from "../components/CarlogTitle.tsx";
+import CarlogTitle from "../components/CarlogTitle";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 

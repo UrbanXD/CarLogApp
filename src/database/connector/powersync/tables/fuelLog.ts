@@ -1,4 +1,4 @@
-import { column, Table } from "@powersync/react-native";
+import { column, Table } from "@powersync/common";
 
 export const FUEL_LOG_TABLE = "fuel_log" as const;
 

@@ -1,4 +1,4 @@
-import ImagePicker from "./imagePicker/InputImagePicker.tsx";
+import ImagePicker from "./imagePicker/InputImagePicker";
 import Text from "./text/TextInput.tsx";
 import Title from "./common/InputTitle.tsx";
 import Group from "./common/InputGroup.tsx";

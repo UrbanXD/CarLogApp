@@ -16,7 +16,7 @@ import { FuelLogFormFields } from "../../schemas/form/fuelLogForm.ts";
 import { ODOMETER_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/odometerLog.ts";
 import { OdometerUnitDao } from "../../../odometer/model/dao/OdometerUnitDao.ts";
 import { ExpenseDao } from "../../../../../expense/model/dao/ExpenseDao.ts";
-import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { AbstractPowerSyncDatabase } from "@powersync/common";
 import { SelectExpenseTableRow } from "../../../../../expense/model/mapper/expenseMapper.ts";
 import { SelectCarModelTableRow } from "../../../../model/dao/CarDao.ts";
 import { Nullable, WithPrefix } from "../../../../../../types";

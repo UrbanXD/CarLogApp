@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
 import { useAuth } from "../contexts/auth/AuthContext.ts";
 import { useFonts } from "expo-font";
-import AnimatedSplashScreen from "../screens/AnimatedSplashScreen.tsx";
+import AnimatedSplashScreen from "../screens/AnimatedSplashScreen";
 import "../i18n/index.ts";
 
 const App: React.FC = () => {

@@ -1,4 +1,4 @@
-import { AbstractPowerSyncDatabase, WatchedQuery } from "@powersync/react-native";
+import { AbstractPowerSyncDatabase, WatchedQuery } from "@powersync/common";
 import { SelectQueryBuilder } from "kysely";
 import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 import { jsonFieldsParse } from "../utils/jsonFieldsParse.ts";

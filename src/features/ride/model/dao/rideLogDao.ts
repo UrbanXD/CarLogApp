@@ -18,7 +18,7 @@ import { RIDE_EXPENSE_TABLE } from "../../../../database/connector/powersync/tab
 import { RIDE_PLACE_TABLE } from "../../../../database/connector/powersync/tables/ridePlace.ts";
 import { RIDE_PASSENGER_TABLE } from "../../../../database/connector/powersync/tables/ridePassenger.ts";
 import { EXPENSE_TABLE } from "../../../../database/connector/powersync/tables/expense.ts";
-import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { AbstractPowerSyncDatabase } from "@powersync/common";
 import { RidePlaceMapper, SelectRidePlaceTableRow } from "../../_features/place/model/mapper/ridePlaceMapper.ts";
 import {
     RidePassengerMapper,

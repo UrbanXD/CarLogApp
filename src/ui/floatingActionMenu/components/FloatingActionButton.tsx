@@ -1,7 +1,7 @@
 import Animated, { SharedValue, useAnimatedStyle, withDelay, withSpring, withTiming } from "react-native-reanimated";
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { AnimatedPressable } from "../../../components/AnimatedComponents/index.ts";
+import { AnimatedPressable } from "../../../components/AnimatedComponents";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../../../constants/index.ts";
 import Icon from "../../../components/Icon.tsx";
 import { heightPercentageToDP } from "react-native-responsive-screen";

@@ -3,7 +3,7 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { COLORS, DEFAULT_SEPARATOR } from "../constants/index.ts";
 import AnimatedStrokePath from "./svg/AnimatedStrokePath.tsx";
-import { AnimatedSvg } from "./AnimatedComponents/index.ts";
+import { AnimatedSvg } from "./AnimatedComponents";
 
 type TitleProps = {
     animated?: boolean

@@ -1,4 +1,4 @@
-import { column, Table } from "@powersync/react-native";
+import { column, Table } from "@powersync/common";
 
 export const USER_TABLE = "user_account" as const;
 

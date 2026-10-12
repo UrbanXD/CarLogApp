@@ -1,5 +1,5 @@
 import Button from "../../Button/Button.ts";
-import { pickImage } from "../../../utils/pickImage.ts";
+import { pickImage } from "../../../utils/pickImage";
 import { ImageStyle, StyleSheet, View } from "react-native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Carousel, CarouselItemType } from "../../Carousel/Carousel.tsx";
@@ -13,11 +13,9 @@ import Image from "../../Image.tsx";
 import { Image as ImageType } from "../../../types/zodTypes.ts";
 import { useTranslation } from "react-i18next";
 import { useInputFieldContext } from "../../../contexts/inputField/InputFieldContext.ts";
-import { Paths } from "expo-file-system";
 import { usePermission } from "../../../hooks/usePermission.ts";
 import { ViewStyle } from "../../../types";
-
-export const INPUT_IMAGE_TEMP_DIR = `${ Paths.document.uri }/temp`;
+import { INPUT_IMAGE_TEMP_DIR } from "./imageTempDirectory";
 
 type InputImagePickerProps = {
     defaultImages?: Array<ImageType>

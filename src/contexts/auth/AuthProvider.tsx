@@ -1,4 +1,5 @@
-import React, { ProviderProps, useEffect, useMemo, useState } from "react";
+import React, { ProviderProps, useEffect, useMemo, useRef, useState } from "react";
+import { Platform } from "react-native";
 import { AuthContext } from "./AuthContext.ts";
 import { useAppDispatch } from "../../hooks";
 import { useDatabase } from "../database/DatabaseContext.ts";
@@ -15,8 +16,7 @@ import { resetSelectedCar } from "../../features/car/model/slice";
 import { getUserLocalCurrency } from "../../features/_shared/currency/utils/getUserLocalCurrency.ts";
 import { useTranslation } from "react-i18next";
 import { OtpVerificationHandlerType } from "../../features/user/hooks/useOtpVerificationHandler.ts";
-import { Directory } from "expo-file-system";
-import { INPUT_IMAGE_TEMP_DIR } from "../../components/Input/imagePicker/InputImagePicker.tsx";
+import { cleanupInputImageTempDirectory } from "../../components/Input/imagePicker/imageTempDirectory";
 import { loadSelectedCar } from "../../features/car/model/actions/loadSelectedCar.ts";
 
 export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
@@ -31,17 +31,23 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
     const [session, setSession] = useState<Session | null>(null);
     const [authenticated, setAuthenticated] = useState<boolean | null>(null);
     const [notVerifiedEmail, setNotVerifiedEmail] = useState<string | null>(null);
+    const hasHandledInitialAuthState = useRef(false);
 
     useEffect(() => {
         const { data: authListener } = supabaseConnector.client.auth.onAuthStateChange(
             (event, supabaseSession) => {
                 if(event === "PASSWORD_RECOVERY") return;
 
+                const isInitialAuthState = !hasHandledInitialAuthState.current;
+                hasHandledInitialAuthState.current = true;
+
                 if(!supabaseSession) {
                     database.disconnect();
 
-                    if(router.canDismiss()) router.dismissAll();
-                    router.replace("/backToRootIndex");
+                    if(Platform.OS !== "web" || !isInitialAuthState) {
+                        if(router.canDismiss()) router.dismissAll();
+                        router.replace("/backToRootIndex");
+                    }
                 } else {
                     database.init();
                 }
@@ -68,8 +74,7 @@ export const AuthProvider: React.FC<ProviderProps<unknown>> = ({
         const userId = session.user.id;
 
         if(attachmentQueue) attachmentQueue.cleanUpLocalFiles(userId);
-        const inputImageTempDirectory = new Directory(INPUT_IMAGE_TEMP_DIR);
-        if(inputImageTempDirectory.exists) inputImageTempDirectory.delete();
+        cleanupInputImageTempDirectory();
     }, [session?.user.id]);
 
     const openAccountVerification = (email: string, automaticResend: boolean = false) => {

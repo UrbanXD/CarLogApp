@@ -6,7 +6,7 @@ import { PLACE_TABLE } from "../../../../../../database/connector/powersync/tabl
 import { Place } from "../../schemas/placeSchema.ts";
 import { PlaceMapper } from "../mapper/placeMapper.ts";
 import { PlaceFormFields } from "../../schemas/form/placeForm.ts";
-import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { AbstractPowerSyncDatabase } from "@powersync/common";
 import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
 import { USER_TABLE } from "../../../../../../database/connector/powersync/tables/user.ts";
 import { WatchQueryOptions } from "../../../../../../database/watcher/watcher.ts";

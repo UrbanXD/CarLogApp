@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ATTACHMENT_TABLE, AttachmentState } from "@powersync/attachments";
-import { useQuery } from "@powersync/react-native";
+import { useQuery } from "@powersync/react";
 import { File } from "expo-file-system";
 import { useDatabase } from "../../contexts/database/DatabaseContext.ts";
 

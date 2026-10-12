@@ -14,7 +14,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
 import BounceDot from "./BounceDot.tsx";
-import { AnimatedPath, AnimatedSvg } from "../AnimatedComponents/index.ts";
+import { AnimatedPath, AnimatedSvg } from "../AnimatedComponents";
 import { useTranslation } from "react-i18next";
 
 type CarLoadingIndicatorProps = {

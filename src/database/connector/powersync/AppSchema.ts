@@ -4,7 +4,7 @@ import { fuelTankTable } from "./tables/fuelTank.ts";
 import { makeTable } from "./tables/make.ts";
 import { modelTable } from "./tables/model.ts";
 import { AttachmentTable } from "@powersync/attachments";
-import { Schema } from "@powersync/react-native";
+import { Schema } from "@powersync/common";
 import { odometerLogTable } from "./tables/odometerLog.ts";
 import { fuelLogTable } from "./tables/fuelLog.ts";
 import { expenseTable } from "./tables/expense.ts";

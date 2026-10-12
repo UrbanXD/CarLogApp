@@ -8,7 +8,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../contexts/auth/AuthContext.ts";
 import Animated, { FadeIn, SlideInRight } from "react-native-reanimated";
 import Divider from "../components/Divider.tsx";
-import CarlogTitle from "../components/CarlogTitle.tsx";
+import CarlogTitle from "../components/CarlogTitle";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { debounce } from "es-toolkit";

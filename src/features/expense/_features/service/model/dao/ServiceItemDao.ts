@@ -12,7 +12,7 @@ import { ServiceItemTypeDao } from "./ServiceItemTypeDao.ts";
 import { CurrencyDao } from "../../../../../_shared/currency/model/dao/CurrencyDao.ts";
 import { CAR_TABLE } from "../../../../../../database/connector/powersync/tables/car.ts";
 import { SelectQueryBuilder } from "kysely";
-import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { AbstractPowerSyncDatabase } from "@powersync/common";
 import { WithPrefix } from "../../../../../../types";
 import { SelectAmountCurrencyTableRow } from "../../../../model/mapper/expenseMapper.ts";
 import { CURRENCY_TABLE } from "../../../../../../database/connector/powersync/tables/currency.ts";

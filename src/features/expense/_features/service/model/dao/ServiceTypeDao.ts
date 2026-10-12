@@ -5,7 +5,7 @@ import { ServiceTypeMapper } from "../mapper/serviceTypeMapper.ts";
 import { Kysely } from "@powersync/kysely-driver";
 import { SERVICE_TYPE_TABLE } from "../../../../../../database/connector/powersync/tables/serviceType.ts";
 import { PickerItemType } from "../../../../../../components/Input/picker/PickerItem.tsx";
-import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { AbstractPowerSyncDatabase } from "@powersync/common";
 import { UseInfiniteQueryOptions } from "../../../../../../database/hooks/useInfiniteQuery.ts";
 
 export class ServiceTypeDao extends Dao<ServiceTypeTableRow, ServiceType, ServiceTypeMapper> {

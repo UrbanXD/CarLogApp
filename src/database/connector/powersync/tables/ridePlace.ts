@@ -1,4 +1,4 @@
-import { column, Table } from "@powersync/react-native";
+import { column, Table } from "@powersync/common";
 
 export const RIDE_PLACE_TABLE = "ride_place" as const;
 

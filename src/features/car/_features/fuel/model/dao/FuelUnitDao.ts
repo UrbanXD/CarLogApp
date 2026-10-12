@@ -4,7 +4,7 @@ import { Kysely } from "@powersync/kysely-driver";
 import { FuelUnitMapper } from "../mapper/fuelUnitMapper.ts";
 import { FUEL_UNIT_TABLE } from "../../../../../../database/connector/powersync/tables/fuelUnit.ts";
 import { FuelUnit } from "../../schemas/fuelUnitSchema.ts";
-import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { AbstractPowerSyncDatabase } from "@powersync/common";
 
 export class FuelUnitDao extends Dao<FuelUnitTableRow, FuelUnit, FuelUnitMapper> {
     constructor(db: Kysely<DatabaseType>, powersync: AbstractPowerSyncDatabase) {

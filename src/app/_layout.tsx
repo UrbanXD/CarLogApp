@@ -8,7 +8,7 @@ import { Provider } from "react-redux";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import Compactor from "../components/Compactor";
 import { AuthProvider } from "../contexts/auth/AuthProvider.tsx";
-import { DatabaseProvider } from "../contexts/database/DatabaseProvider.tsx";
+import { DatabaseProvider } from "../contexts/database/DatabaseProvider";
 import { store } from "../database/redux/store.ts";
 import Header from "../components/Navigation/Header/Header.tsx";
 import ToastManager from "../ui/alert/components/toast/ToastManager.tsx";

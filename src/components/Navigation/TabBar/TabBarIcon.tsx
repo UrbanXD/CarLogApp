@@ -4,7 +4,7 @@ import Icon from "../../Icon.tsx";
 import { SIMPLE_TABBAR_HEIGHT } from "../../../constants/index.ts";
 import { Color, ImageSource } from "../../../types/index.ts";
 import { Easing, useAnimatedStyle, withTiming } from "react-native-reanimated";
-import { AnimatedPressable } from "../../AnimatedComponents/index.ts";
+import { AnimatedPressable } from "../../AnimatedComponents";
 
 type TabBarIconProps = {
     title: string

@@ -4,7 +4,7 @@ import { Currency } from "../../schemas/currencySchema.ts";
 import { CurrencyMapper } from "../mapper/currencyMapper.ts";
 import { Kysely } from "@powersync/kysely-driver";
 import { CURRENCY_TABLE } from "../../../../../database/connector/powersync/tables/currency.ts";
-import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { AbstractPowerSyncDatabase } from "@powersync/common";
 import { UseInfiniteQueryOptions } from "../../../../../database/hooks/useInfiniteQuery.ts";
 import { PickerItemType } from "../../../../../components/Input/picker/PickerItem.tsx";
 import { CAR_TABLE } from "../../../../../database/connector/powersync/tables/car.ts";

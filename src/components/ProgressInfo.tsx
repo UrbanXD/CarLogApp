@@ -3,7 +3,7 @@ import { SharedValue, useAnimatedProps } from "react-native-reanimated";
 import { StyleSheet, Text, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { COLORS, FONT_SIZES, SEPARATOR_SIZES } from "../constants/index.ts";
-import { AnimatedCircle } from "./AnimatedComponents/index.ts";
+import { AnimatedCircle } from "./AnimatedComponents";
 
 type ProgressInfoProps = {
     radius: number

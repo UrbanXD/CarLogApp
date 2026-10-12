@@ -11,7 +11,7 @@ import { EditUserInformationRequest } from "../../schemas/form/editUserInformati
 import { SelectQueryBuilder } from "kysely";
 import { getUserLocalCurrency } from "../../../_shared/currency/utils/getUserLocalCurrency.ts";
 import { CURRENCY_TABLE } from "../../../../database/connector/powersync/tables/currency.ts";
-import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { AbstractPowerSyncDatabase } from "@powersync/common";
 import { WithPrefix } from "../../../../types";
 import { UseWatchedQueryItemProps } from "../../../../database/hooks/useWatchedQueryItem.ts";
 

@@ -19,7 +19,7 @@ import { Dao } from "../../../../database/dao/Dao.ts";
 import { OdometerUnitDao } from "../../_features/odometer/model/dao/OdometerUnitDao.ts";
 import { ODOMETER_CHANGE_LOG_TABLE } from "../../../../database/connector/powersync/tables/odometerChangeLog.ts";
 import { CarFormFields } from "../../schemas/form/carForm.ts";
-import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { AbstractPowerSyncDatabase } from "@powersync/common";
 import { SelectQueryBuilder } from "kysely";
 import { MODEL_TABLE } from "../../../../database/connector/powersync/tables/model.ts";
 import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";

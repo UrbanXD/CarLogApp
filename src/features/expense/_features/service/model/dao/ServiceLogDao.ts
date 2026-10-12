@@ -30,7 +30,7 @@ import { CURRENCY_TABLE } from "../../../../../../database/connector/powersync/t
 import { WithPrefix } from "../../../../../../types";
 import { jsonArrayFrom } from "kysely/helpers/sqlite";
 import { SERVICE_TYPE_TABLE } from "../../../../../../database/connector/powersync/tables/serviceType.ts";
-import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { AbstractPowerSyncDatabase } from "@powersync/common";
 import { ServiceItemTotalAmountTableRow } from "../mapper/ServiceItemMapper.ts";
 import { SERVICE_ITEM_TYPE_TABLE } from "../../../../../../database/connector/powersync/tables/serviceItemType.ts";
 import { MODEL_TABLE } from "../../../../../../database/connector/powersync/tables/model.ts";

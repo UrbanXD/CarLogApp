@@ -4,7 +4,7 @@ import DefaultElement from "./DefaultElement";
 import { COLORS, ICON_NAMES } from "../constants";
 import { hexToRgba } from "../utils/colors/hexToRgba";
 import { LinearGradient } from "expo-linear-gradient";
-import { useFile } from "../database/hooks/useFile.ts";
+import { useFile } from "../database/hooks/useFile";
 import { ViewStyle } from "../types/index.ts";
 
 type ImageProps = {

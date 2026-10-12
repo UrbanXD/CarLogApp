@@ -7,7 +7,7 @@ import {
     SelectQueryBuilder,
     SqlBool
 } from "kysely";
-import { QueryParam } from "@powersync/react-native";
+import { QueryParam } from "@powersync/common";
 import { useDatabase } from "../../contexts/database/DatabaseContext.ts";
 import { getCursorValues } from "../utils/getCursorValues.ts";
 import { addCursor } from "../utils/addCursor.ts";

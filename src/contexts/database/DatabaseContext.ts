@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { Database } from "../../database/connector/Database.ts";
+import type { Database } from "../../database/connector/Database.ts";
 
 export const DatabaseContext = createContext<Database | null>(null);
 export const useDatabase = () => {

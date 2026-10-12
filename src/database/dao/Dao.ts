@@ -2,7 +2,7 @@ import { Kysely } from "@powersync/kysely-driver";
 import { DatabaseType } from "../connector/powersync/AppSchema.ts";
 import { AbstractMapper } from "./AbstractMapper.ts";
 import { SelectQueryBuilder } from "kysely";
-import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { AbstractPowerSyncDatabase } from "@powersync/common";
 
 export class Dao<
     Entity extends { id: string | number },

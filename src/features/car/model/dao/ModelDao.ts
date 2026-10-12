@@ -6,7 +6,7 @@ import { Model } from "../../schemas/modelSchema.ts";
 import { Dao } from "../../../../database/dao/Dao.ts";
 import { PickerItemType } from "../../../../components/Input/picker/PickerItem.tsx";
 import { MAKE_TABLE } from "../../../../database/connector/powersync/tables/make.ts";
-import { AbstractPowerSyncDatabase } from "@powersync/react-native";
+import { AbstractPowerSyncDatabase } from "@powersync/common";
 import { UseInfiniteQueryOptions } from "../../../../database/hooks/useInfiniteQuery.ts";
 
 export class ModelDao extends Dao<ModelTableRow, Model, ModelMapper> {

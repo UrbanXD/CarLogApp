@@ -1,4 +1,4 @@
-import { AnimatedPressable } from "../AnimatedComponents/index.ts";
+import { AnimatedPressable } from "../AnimatedComponents";
 import { Color } from "../../types/index.ts";
 import { COLORS } from "../../constants/index.ts";
 import {
