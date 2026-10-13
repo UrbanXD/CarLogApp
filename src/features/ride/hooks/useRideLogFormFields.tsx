@@ -16,6 +16,7 @@ import { useRidePassengerToExpandableList } from "../_features/passenger/hooks/u
 import { RidePassengerForm } from "../_features/passenger/components/forms/RidePassengerForm.tsx";
 import { useRideExpenseToExpandableList } from "../_features/rideExpense/hooks/useRideExpenseToExpandableList.ts";
 import { RideExpenseForm } from "../_features/rideExpense/components/forms/RideExpenseForm.tsx";
+import { RideFuelLogForm } from "../components/forms/RideFuelLogForm.tsx";
 import { useCar } from "../../car/hooks/useCar.ts";
 
 type UseRideLogFormFieldsProps = {
@@ -38,6 +39,7 @@ export function useRideLogFormFields({
     const formCarId = useWatch({ control, name: "carId" });
     const formStartOdometerValue = useWatch({ control, name: "startOdometerValue" });
     const formStartTime = useWatch({ control, name: "startTime" });
+    const formEndTime = useWatch({ control, name: "endTime" });
 
     const { car } = useCar({ carId: formCarId, options: { queryOnce: true } });
 
@@ -95,37 +97,8 @@ export function useRideLogFormFields({
     ), [control, setValue, getFieldState, t, formStartOdometerValue]);
 
     const fields: Record<RideLogFormFieldsEnum, FormFields> = useMemo(
-        () => ({
-            [RideLogFormFieldsEnum.Car]: {
-                render: () => <CarPickerInput control={ control } fieldName="carId"/>,
-                editToastMessages: EditToast
-            },
-            [RideLogFormFieldsEnum.CarWithDateAndOdometerValue]: {
-                render: () => {
-                    const { errors, dirtyFields } = useFormState({ control });
-
-                    const showTimeAndOdometerInput = !!(
-                        errors.startTime ||
-                        errors.startOdometerValue ||
-                        errors.endTime ||
-                        errors.endOdometerValue ||
-                        dirtyFields.startTime ||
-                        dirtyFields.startOdometerValue ||
-                        dirtyFields.endTime ||
-                        dirtyFields.endOdometerValue
-                    );
-
-                    return (
-                        <Input.Group>
-                            <CarPickerInput control={ control } fieldName="carId"/>
-                            { showTimeAndOdometerInput && startTimeAndOdometerInput(true) }
-                            { showTimeAndOdometerInput && endTimeAndOdometerInput(true) }
-                        </Input.Group>
-                    );
-                },
-                editToastMessages: EditToast
-            },
-            [RideLogFormFieldsEnum.Expenses]: {
+        () => {
+            const expensesField: FormFields = {
                 render: () => (
                     <ArrayInput<RideLogFormFields, "expenses">
                         control={ control }
@@ -151,73 +124,139 @@ export function useRideLogFormFields({
                     />
                 ),
                 editToastMessages: EditToast
-            },
-            [RideLogFormFieldsEnum.Places]: {
+            };
+            const fuelLogsField: FormFields = {
                 render: () => (
-                    <ArrayInput<RideLogFormFields, "places">
+                    <ArrayInput<RideLogFormFields, "fuelLogs">
                         control={ control }
-                        fieldName="places"
-                        title={ t("places.title") }
-                        mapperToExpandableList={ ridePlaceToExpandableList }
-                        renderForm={
-                            (onSubmit, item) => (
-                                <RidePlaceForm
-                                    onSubmit={ onSubmit }
-                                    defaultRidePlace={ item }
-                                />
-                            )
-                        }
+                        fieldName="fuelLogs"
+                        title={ t("fuel.fueling") }
+                        mapperToExpandableList={ (item) => ({
+                            id: item.id,
+                            title: t("fuel.fueling"),
+                            subtitle: `${ item.quantity } ${ car?.fuelTank.unit.short ?? "" }`.trim()
+                        }) }
+                        renderForm={ (onSubmit, item) => car ? (
+                            <RideFuelLogForm
+                                car={ car }
+                                defaultFuelLog={ item ?? undefined }
+                                defaultDate={ formEndTime ?? formStartTime }
+                                onSubmit={ onSubmit }
+                            />
+                        ) : null }
                     />
                 ),
                 editToastMessages: EditToast
-            },
-            [RideLogFormFieldsEnum.Passengers]: {
-                render: () => (
-                    <ArrayInput<RideLogFormFields, "passengers">
+            };
+
+            return {
+                [RideLogFormFieldsEnum.Car]: {
+                    render: () => <CarPickerInput control={ control } fieldName="carId"/>,
+                    editToastMessages: EditToast
+                },
+                [RideLogFormFieldsEnum.CarWithDateAndOdometerValue]: {
+                    render: () => {
+                        const { errors, dirtyFields } = useFormState({ control });
+
+                        const showTimeAndOdometerInput = !!(
+                            errors.startTime ||
+                            errors.startOdometerValue ||
+                            errors.endTime ||
+                            errors.endOdometerValue ||
+                            dirtyFields.startTime ||
+                            dirtyFields.startOdometerValue ||
+                            dirtyFields.endTime ||
+                            dirtyFields.endOdometerValue
+                        );
+
+                        return (
+                            <Input.Group>
+                                <CarPickerInput control={ control } fieldName="carId"/>
+                                { showTimeAndOdometerInput && startTimeAndOdometerInput(true) }
+                                { showTimeAndOdometerInput && endTimeAndOdometerInput(true) }
+                            </Input.Group>
+                        );
+                    },
+                    editToastMessages: EditToast
+                },
+                [RideLogFormFieldsEnum.Expenses]: expensesField,
+                [RideLogFormFieldsEnum.FuelLogs]: fuelLogsField,
+                [RideLogFormFieldsEnum.ExpensesAndFuelLogs]: {
+                    render: () => (
+                        <Input.Group>
+                            { expensesField.render() }
+                            { fuelLogsField.render() }
+                        </Input.Group>
+                    ),
+                    editToastMessages: EditToast
+                },
+                [RideLogFormFieldsEnum.Places]: {
+                    render: () => (
+                        <ArrayInput<RideLogFormFields, "places">
+                            control={ control }
+                            fieldName="places"
+                            title={ t("places.title") }
+                            mapperToExpandableList={ ridePlaceToExpandableList }
+                            renderForm={
+                                (onSubmit, item) => (
+                                    <RidePlaceForm
+                                        onSubmit={ onSubmit }
+                                        defaultRidePlace={ item }
+                                    />
+                                )
+                            }
+                        />
+                    ),
+                    editToastMessages: EditToast
+                },
+                [RideLogFormFieldsEnum.Passengers]: {
+                    render: () => (
+                        <ArrayInput<RideLogFormFields, "passengers">
+                            control={ control }
+                            fieldName="passengers"
+                            title={ t("passengers.title") }
+                            mapperToExpandableList={ ridePassengerToExpandableList }
+                            renderForm={
+                                (onSubmit, item) => (
+                                    <RidePassengerForm
+                                        onSubmit={ onSubmit }
+                                        defaultRidePassenger={ item }
+                                    />
+                                )
+                            }
+                            checkItemAlreadyAdded
+                            alreadyAddedItemExpression={ (itemA, itemB) => itemA.passengerId === itemB.passengerId }
+                        />
+                    ),
+                    editToastMessages: EditToast
+                },
+                [RideLogFormFieldsEnum.StartTimeAndOdometer]: {
+                    render: () => startTimeAndOdometerInput(),
+                    editToastMessages: EditToast
+                },
+                [RideLogFormFieldsEnum.EndTimeAndOdometer]: {
+                    render: () => endTimeAndOdometerInput(),
+                    editToastMessages: EditToast
+                },
+                [RideLogFormFieldsEnum.DateAndOdometer]: {
+                    render: () => (
+                        <Input.Group>
+                            { startTimeAndOdometerInput(true) }
+                            { endTimeAndOdometerInput(true) }
+                        </Input.Group>
+                    ),
+                    editToastMessages: EditToast
+                },
+                [RideLogFormFieldsEnum.Note]: {
+                    render: () => <NoteInput
                         control={ control }
-                        fieldName="passengers"
-                        title={ t("passengers.title") }
-                        mapperToExpandableList={ ridePassengerToExpandableList }
-                        renderForm={
-                            (onSubmit, item) => (
-                                <RidePassengerForm
-                                    onSubmit={ onSubmit }
-                                    defaultRidePassenger={ item }
-                                />
-                            )
-                        }
-                        checkItemAlreadyAdded
-                        alreadyAddedItemExpression={ (itemA, itemB) => itemA.passengerId === itemB.passengerId }
-                    />
-                ),
-                editToastMessages: EditToast
-            },
-            [RideLogFormFieldsEnum.StartTimeAndOdometer]: {
-                render: () => startTimeAndOdometerInput(),
-                editToastMessages: EditToast
-            },
-            [RideLogFormFieldsEnum.EndTimeAndOdometer]: {
-                render: () => endTimeAndOdometerInput(),
-                editToastMessages: EditToast
-            },
-            [RideLogFormFieldsEnum.DateAndOdometer]: {
-                render: () => (
-                    <Input.Group>
-                        { startTimeAndOdometerInput(true) }
-                        { endTimeAndOdometerInput(true) }
-                    </Input.Group>
-                ),
-                editToastMessages: EditToast
-            },
-            [RideLogFormFieldsEnum.Note]: {
-                render: () => <NoteInput
-                    control={ control }
-                    setValue={ setValue }
-                    fieldName="note"
-                />,
-                editToastMessages: EditToast
-            }
-        }),
+                        setValue={ setValue }
+                        fieldName="note"
+                    />,
+                    editToastMessages: EditToast
+                }
+            };
+        },
         [
             control,
             setValue,
@@ -225,7 +264,11 @@ export function useRideLogFormFields({
             formStartOdometerValue,
             formStartTime,
             t,
+            rideExpenseToExpandableList,
+            ridePlaceToExpandableList,
+            ridePassengerToExpandableList,
             car,
+            formEndTime,
             startTimeAndOdometerInput,
             endTimeAndOdometerInput
         ]
@@ -271,10 +314,11 @@ export function useRideLogFormFields({
         },
         {
             title: t("rides.expenses"),
-            fields: ["expenses"],
+            fields: ["expenses", "fuelLogs"],
             render: () => (
                 <Input.Group>
                     { fields[RideLogFormFieldsEnum.Expenses].render() }
+                    { fields[RideLogFormFieldsEnum.FuelLogs].render() }
                 </Input.Group>
             )
         },

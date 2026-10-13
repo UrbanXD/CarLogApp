@@ -12,6 +12,7 @@ const MultiStepFormContent: React.FC = () => {
         <OnBoardingView
             steps={ stepsList }
             currentStep={ currentStep }
+            renderCurrentStepOnly
         />
     );
 };

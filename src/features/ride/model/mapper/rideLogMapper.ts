@@ -1,6 +1,7 @@
 import { AbstractMapper } from "../../../../database/dao/AbstractMapper.ts";
 import {
     ExpenseTableRow,
+    FuelLogTableRow,
     OdometerLogTableRow,
     RideExpenseTableRow,
     RideLogTableRow,
@@ -23,6 +24,7 @@ import {
 import { RideExpenseMapper } from "../../_features/rideExpense/model/mapper/rideExpenseMapper.ts";
 import { RidePlaceMapper } from "../../_features/place/model/mapper/ridePlaceMapper.ts";
 import { RidePassengerMapper } from "../../_features/passenger/model/mapper/ridePassengerMapper.ts";
+import { FuelLogMapper } from "../../../car/_features/fuel/model/mapper/fuelLogMapper.ts";
 import { carSimpleSchema } from "../../../car/schemas/carSchema.ts";
 import { numberToFractionDigit } from "../../../../utils/numberToFractionDigit.ts";
 import { MAX_EXCHANGE_RATE_DECIMAL } from "../../../../constants";
@@ -37,6 +39,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
     private readonly rideExpenseMapper: RideExpenseMapper;
     private readonly ridePlaceMapper: RidePlaceMapper;
     private readonly ridePassengerMapper: RidePassengerMapper;
+    private readonly fuelLogMapper: FuelLogMapper;
     private readonly odometerLogDao: OdometerLogDao;
     private readonly odometerUnitDao: OdometerUnitDao;
     private readonly carDao: CarDao;
@@ -45,6 +48,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         rideExpenseMapper: RideExpenseMapper,
         ridePlaceMapper: RidePlaceMapper,
         ridePassengerMapper: RidePassengerMapper,
+        fuelLogMapper: FuelLogMapper,
         odometerLogDao: OdometerLogDao,
         odometerUnitDao: OdometerUnitDao,
         carDao: CarDao
@@ -54,6 +58,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         this.rideExpenseMapper = rideExpenseMapper;
         this.ridePlaceMapper = ridePlaceMapper;
         this.ridePassengerMapper = ridePassengerMapper;
+        this.fuelLogMapper = fuelLogMapper;
         this.odometerLogDao = odometerLogDao;
         this.odometerUnitDao = odometerUnitDao;
         this.carDao = carDao;
@@ -80,6 +85,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         });
 
         const rideExpenses = this.rideExpenseMapper.toDtoArray(entity.expenses);
+        const fuelLogs = this.fuelLogMapper.toDtoArray(entity.fuel_logs ?? []);
         const ridePlaces = this.ridePlaceMapper.toDtoArray(entity.places);
         const ridePassengers = this.ridePassengerMapper.toDtoArray(entity.passengers);
         const startOdometer = this.odometerLogDao.mapper.toOdometerDto({
@@ -105,6 +111,7 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
             id: entity.id,
             car: car,
             rideExpenses: rideExpenses,
+            fuelLogs: fuelLogs,
             ridePassengers: ridePassengers,
             ridePlaces: ridePlaces,
             startOdometer: startOdometer,
@@ -160,6 +167,8 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
         rideLog: RideLogTableRow,
         expenses: Map<string, ExpenseTableRow>,
         rideExpenses: Map<string, RideExpenseTableRow>,
+        fuelLogs: Map<string, FuelLogTableRow>,
+        fuelOdometerLogs: Map<string, OdometerLogTableRow>,
         ridePlaces: Map<string, RidePlaceTableRow>,
         ridePassengers: Map<string, RidePassengerTableRow>,
         startOdometerLog: OdometerLogTableRow,
@@ -196,6 +205,8 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
 
         const rideExpenses = new Map<string, RideExpenseTableRow>();
         const expenses = new Map<string, ExpenseTableRow>();
+        const fuelLogs = new Map<string, FuelLogTableRow>();
+        const fuelOdometerLogs = new Map<string, OdometerLogTableRow>();
 
         for(const item of formResult.expenses) {
             rideExpenses.set(item.id, {
@@ -216,6 +227,23 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
                 date: item.expense.date
             });
         }
+
+        const fuelLogEntities = await Promise.all(formResult.fuelLogs.map((fuelLogForm) =>
+            this.fuelLogMapper.formResultToEntities({ ...fuelLogForm, carId: formResult.carId })
+        ));
+
+        fuelLogEntities.forEach(({ fuelLog, expense, odometerLog }) => {
+            fuelLogs.set(fuelLog.id, fuelLog);
+            expenses.set(expense.id, expense);
+            rideExpenses.set(fuelLog.id, {
+                id: fuelLog.id,
+                owner_id: ownerId,
+                ride_log_id: formResult.id,
+                expense_id: expense.id
+            });
+
+            if(odometerLog) fuelOdometerLogs.set(odometerLog.id, odometerLog);
+        });
 
         const ridePlaces = new Map<string, RidePlaceTableRow>();
 
@@ -249,6 +277,8 @@ export class RideLogMapper extends AbstractMapper<RideLogTableRow, RideLog> {
             rideLog,
             expenses,
             rideExpenses,
+            fuelLogs,
+            fuelOdometerLogs,
             ridePlaces,
             ridePassengers,
             startOdometerLog,

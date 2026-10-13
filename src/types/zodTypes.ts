@@ -61,7 +61,7 @@ export const zNumberOptional = (args: ZodNumberArgs = {}) => zNumberBase(args)
 .nullable()
 .optional()
 .or(z.literal(""))
-.transform(v => (v === "" || v === null ? null : Number(v)));
+.transform(v => (v === "" || v === null || v === undefined ? null : Number(v)));
 
 export const zNumber = (args: ZodNumberArgs = {}) => zNumberBase(args)
 .superRefine((value, ctx) => {

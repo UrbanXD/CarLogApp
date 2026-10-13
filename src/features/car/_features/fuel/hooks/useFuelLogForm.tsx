@@ -102,6 +102,19 @@ export function useFuelLogFormFields({ form, isEdit }: UseFuelLogFormFieldsProps
         }
     }), [control, setValue, getFieldState, t, isEdit, odometerValueInput]);
 
+    const fullForm: FormFields = {
+        render: () => (
+            <Input.Group>
+                { fields[FuelLogFormFieldsEnum.Car].render() }
+                { odometerValueInput }
+                { fields[FuelLogFormFieldsEnum.Note].render() }
+                { fields[FuelLogFormFieldsEnum.Quantity].render() }
+                { fields[FuelLogFormFieldsEnum.Amount].render() }
+            </Input.Group>
+        ),
+        editToastMessages: EditToast
+    };
+
     const multiStepFormSteps: Steps = [
         {
             title: t("fuel.steps.basic_information"),
@@ -126,5 +139,5 @@ export function useFuelLogFormFields({ form, isEdit }: UseFuelLogFormFieldsProps
         }
     ];
 
-    return { fields, multiStepFormSteps };
+    return { fields, fullForm, multiStepFormSteps };
 }

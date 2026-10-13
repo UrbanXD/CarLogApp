@@ -16,3 +16,11 @@ declare module "@env" {
     export const LOCAL_IMAGE_CLEANUP_INTERVAL_MS: string;
     export const LOCAL_IMAGE_CLEANUP_GRACE_PERIOD_MS: string;
 }
+
+declare module "react-dom" {
+    export function createPortal(
+        children: import("react").ReactNode,
+        container: Element | DocumentFragment,
+        key?: string | null
+    ): import("react").ReactPortal;
+}

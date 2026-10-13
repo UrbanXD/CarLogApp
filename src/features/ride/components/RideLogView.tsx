@@ -21,6 +21,7 @@ import { useTranslation } from "react-i18next";
 import { DeleteToast, NotFoundToast } from "../../../ui/alert/presets/toast";
 import { DeleteModal } from "../../../ui/alert/presets/modal";
 import { useWatchedQueryItem } from "../../../database/hooks/useWatchedQueryItem.ts";
+import { ExpenseTypeEnum } from "../../expense/model/enums/ExpenseTypeEnum.ts";
 
 export type RideLogViewProps = {
     id: string
@@ -105,20 +106,62 @@ export function RideLogView({ id }: RideLogViewProps) {
     const renderRideExpenses = useCallback(() => {
         if(!rideLog) return <></>;
 
+        const expenseItems = [
+            ...rideLog.rideExpenses
+            .filter((item) => item.expense.type.key !== ExpenseTypeEnum.FUEL)
+            .map((item) => ({
+                item: rideExpenseToExpandableList(item),
+                date: item.expense.date,
+                type: "expense" as const,
+                id: item.expense.id
+            })),
+            ...rideLog.fuelLogs.map((fuelLog) => ({
+                item: {
+                    id: fuelLog.id,
+                    title: t("fuel.fueling"),
+                    subtitle: `${ fuelLog.quantity } ${ fuelLog.fuelUnit.short }`,
+                    amountProps: {
+                        amount: fuelLog.expense.amount.amount,
+                        currencyText: fuelLog.expense.amount.currency.symbol,
+                        exchangedAmount: fuelLog.expense.amount.exchangedAmount,
+                        exchangeCurrencyText: fuelLog.expense.amount.exchangeCurrency.symbol
+                    }
+                },
+                date: fuelLog.expense.date,
+                type: "fuel" as const,
+                id: fuelLog.id
+            }))
+        ].sort((a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf());
+
         return (
             <ExpandableList
-                data={ rideLog.rideExpenses.map(rideExpenseToExpandableList) }
+                data={ expenseItems.map(({ item }) => item) }
                 subtitle={ t("currency.price") }
                 totalAmount={ totalAmount }
                 expanded={ isExpenseListExpanded }
                 actionIcon={ ICON_NAMES.pencil }
+                onItemPress={ (index) => {
+                    const item = expenseItems[index];
+                    if(!item) return;
+
+                    setExpenseListExpanded(false);
+                    router.push(item.type === "fuel"
+                                ? {
+                            pathname: "/expense/edit/fuel/[id]",
+                            params: { id: item.id }
+                        }
+                                : {
+                            pathname: "/expense/edit/[id]",
+                            params: { id: item.id }
+                        });
+                } }
                 onAction={ () => {
                     setExpenseListExpanded(false);
-                    onEdit(RideLogFormFieldsEnum.Expenses);
+                    onEdit(RideLogFormFieldsEnum.ExpensesAndFuelLogs);
                 } }
             />
         );
-    }, [rideLog, onEdit, rideExpenseToExpandableList, isExpenseListExpanded, t]);
+    }, [rideLog, onEdit, rideExpenseToExpandableList, isExpenseListExpanded, totalAmount, t]);
 
     const renderRidePlaces = useCallback(() => {
         if(!rideLog) return <></>;

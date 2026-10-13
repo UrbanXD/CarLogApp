@@ -12,7 +12,9 @@ import { OdometerLogDao } from "../../../car/_features/odometer/model/dao/Odomet
 import { useDatabase } from "../../../../contexts/database/DatabaseContext.ts";
 import dayjs from "dayjs";
 import { transformedRideExpenseForm } from "../../_features/rideExpense/schemas/form/rideExpenseForm.ts";
+import { fuelLogForm, fuelLogToFormFields } from "../../../car/_features/fuel/schemas/form/fuelLogForm.ts";
 import { DefaultValues, UseFormProps } from "react-hook-form";
+import { ExpenseTypeEnum } from "../../../expense/model/enums/ExpenseTypeEnum.ts";
 
 const rideLogForm = (odometerLogDao: OdometerLogDao) => rideLogSchema
 .pick({ id: true, note: true })
@@ -39,6 +41,7 @@ const rideLogForm = (odometerLogDao: OdometerLogDao) => rideLogSchema
         }
     }),
     expenses: z.array(transformedRideExpenseForm),
+    fuelLogs: z.array(fuelLogForm(odometerLogDao)),
     places: z.array(ridePlaceForm),
     passengers: z.array(ridePassengerForm)
 })
@@ -94,6 +97,7 @@ export function useCreateRideLogFormProps(car: Car | null): UseFormProps<RideLog
         endOdometerLogId: getUUID(),
         endOdometerValue: car?.odometer.value,
         expenses: [],
+        fuelLogs: [],
         places: [],
         passengers: [],
         startTime: now,
@@ -114,7 +118,8 @@ export function useEditRideLogFormProps(rideLog: RideLog): UseFormProps<RideLogF
         startOdometerValue: rideLog.startOdometer.value,
         endOdometerLogId: rideLog.endOdometer.id,
         endOdometerValue: rideLog.endOdometer.value,
-        expenses: rideLog.rideExpenses,
+        expenses: rideLog.rideExpenses.filter((item) => item.expense.type.key !== ExpenseTypeEnum.FUEL),
+        fuelLogs: rideLog.fuelLogs.map(fuelLogToFormFields),
         places: rideLog.ridePlaces,
         passengers: rideLog.ridePassengers,
         startTime: dayjs(rideLog.startTime).isValid() ? rideLog.startTime : new Date().toISOString(),

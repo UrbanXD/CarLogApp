@@ -441,6 +441,7 @@ export class Database {
                 rideExpenseMapper,
                 ridePlaceMapper,
                 ridePassengerMapper,
+                this.fuelLogDao.mapper,
                 this.odometerLogDao,
                 this.odometerUnitDao,
                 this.carDao

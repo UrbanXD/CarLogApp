@@ -14,6 +14,8 @@ import { CarDao, SelectCarModelTableRow } from "../../../car/model/dao/CarDao.ts
 import { RIDE_LOG_TABLE } from "../../../../database/connector/powersync/tables/rideLog.ts";
 import { RideLogFormFields } from "../../schemas/form/rideLogForm.ts";
 import { ODOMETER_LOG_TABLE } from "../../../../database/connector/powersync/tables/odometerLog.ts";
+import { FUEL_LOG_TABLE } from "../../../../database/connector/powersync/tables/fuelLog.ts";
+import { FUEL_UNIT_TABLE } from "../../../../database/connector/powersync/tables/fuelUnit.ts";
 import { RIDE_EXPENSE_TABLE } from "../../../../database/connector/powersync/tables/rideExpense.ts";
 import { RIDE_PLACE_TABLE } from "../../../../database/connector/powersync/tables/ridePlace.ts";
 import { RIDE_PASSENGER_TABLE } from "../../../../database/connector/powersync/tables/ridePassenger.ts";
@@ -47,7 +49,8 @@ import {
     exchangedAmountExpression,
     julianDayExpression,
     odometerValueExpression,
-    rangeExpression
+    rangeExpression,
+    simpleConversionExpression
 } from "../../../../database/dao/expressions";
 import {
     BarChartStatistics,
@@ -63,6 +66,8 @@ import {
 import { formatSummaryStatistics } from "../../../../database/dao/utils/formatSummaryStatistics.ts";
 import { PLACE_TABLE } from "../../../../database/connector/powersync/tables/place.ts";
 import { getRangeUnit } from "../../../statistics/utils/getRangeUnit.ts";
+import { FuelLogMapper } from "../../../car/_features/fuel/model/mapper/fuelLogMapper.ts";
+import { SelectFuelLogTableRow } from "../../../car/_features/fuel/model/dao/FuelLogDao.ts";
 
 export type SelectBaseRideLogTableRow = RideLogTableRow
     & WithPrefix<Omit<SelectCarModelTableRow, "id">, "car">
@@ -75,6 +80,7 @@ export type SelectRideLogTableRow =
     SelectBaseRideLogTableRow
     & {
     expenses: Array<SelectRideExpenseTableRow>
+    fuel_logs?: Array<SelectFuelLogTableRow>
     places: Array<SelectRidePlaceTableRow>
     passengers: Array<SelectRidePassengerTableRow>
 }
@@ -102,6 +108,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
         rideExpenseMapper: RideExpenseMapper,
         ridePlaceMapper: RidePlaceMapper,
         ridePassengerMapper: RidePassengerMapper,
+        fuelLogMapper: FuelLogMapper,
         odometerLogDao: OdometerLogDao,
         odometerUnitDao: OdometerUnitDao,
         carDao: CarDao
@@ -114,6 +121,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
                 rideExpenseMapper,
                 ridePlaceMapper,
                 ridePassengerMapper,
+                fuelLogMapper,
                 odometerLogDao,
                 odometerUnitDao,
                 carDao
@@ -203,6 +211,62 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
                 ])
                 .whereRef("re.ride_log_id", "=", "rl.id")
             ).as("expenses"),
+            jsonArrayFrom(
+                eb
+                .selectFrom(`${ RIDE_EXPENSE_TABLE } as re` as const)
+                .innerJoin(`${ FUEL_LOG_TABLE } as fl` as const, "fl.expense_id", "re.expense_id")
+                .innerJoin(`${ EXPENSE_TABLE } as e` as const, "e.id", "fl.expense_id")
+                .innerJoin(`${ FUEL_UNIT_TABLE } as fu` as const, "fu.id", "fl.fuel_unit_id")
+                .innerJoin(`${ CAR_TABLE } as c` as const, "c.id", "fl.car_id")
+                .innerJoin(`${ MODEL_TABLE } as mo` as const, "mo.id", "c.model_id")
+                .innerJoin(`${ MAKE_TABLE } as ma` as const, "ma.id", "mo.make_id")
+                .leftJoin(`${ ODOMETER_LOG_TABLE } as ol` as const, "ol.id", "fl.odometer_log_id")
+                .leftJoin(`${ ODOMETER_UNIT_TABLE } as ou` as const, "ou.id", "c.odometer_unit_id")
+                .innerJoin(`${ EXPENSE_TYPE_TABLE } as et` as const, "et.id", "e.type_id")
+                .innerJoin(`${ CURRENCY_TABLE } as cur` as const, "cur.id", "e.currency_id")
+                .innerJoin(`${ CURRENCY_TABLE } as ccur` as const, "ccur.id", "c.currency_id")
+                .select((eb) => [
+                    "fl.id",
+                    "fl.car_id",
+                    "fl.expense_id",
+                    "fl.odometer_log_id",
+                    "fl.fuel_unit_id",
+                    simpleConversionExpression(eb, "fl.quantity", "fu.conversion_factor").as("quantity"),
+                    "fl.is_price_per_unit",
+                    "e.amount as expense_amount",
+                    exchangedAmountExpression(eb, "e.amount", "e.exchange_rate").as("expense_exchanged_amount"),
+                    "e.exchange_rate as expense_exchange_rate",
+                    "e.date as expense_date",
+                    "e.note as expense_note",
+                    "et.id as expense_type_id",
+                    "et.owner_id as expense_type_owner_id",
+                    "et.key as expense_type_key",
+                    "cur.id as expense_currency_id",
+                    "cur.symbol as expense_currency_symbol",
+                    "cur.key as expense_currency_key",
+                    "ccur.id as expense_car_currency_id",
+                    "ccur.symbol as expense_car_currency_symbol",
+                    "ccur.key as expense_car_currency_key",
+                    "fu.key as fuel_unit_key",
+                    "fu.short as fuel_unit_short",
+                    "fu.conversion_factor as fuel_unit_conversion_factor",
+                    "c.name as car_name",
+                    "mo.id as car_model_id",
+                    "mo.name as car_model_name",
+                    "c.model_year as car_model_year",
+                    "ma.id as car_make_id",
+                    "ma.name as car_make_name",
+                    "ol.id as odometer_log_id",
+                    odometerValueExpression(eb, "ol.value", "ou.conversion_factor").as("odometer_log_value"),
+                    "ol.type_id as odometer_log_type_id",
+                    "ou.id as odometer_unit_id",
+                    "ou.key as odometer_unit_key",
+                    "ou.short as odometer_unit_short",
+                    "ou.conversion_factor as odometer_unit_conversion_factor"
+                ])
+                .whereRef("re.ride_log_id", "=", "rl.id")
+                .orderBy("e.date", "asc")
+            ).as("fuel_logs"),
             jsonArrayFrom(
                 eb
                 .selectFrom(`${ RIDE_PASSENGER_TABLE } as rp` as const)
@@ -399,7 +463,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
         return {
             query: this.selectQuery(id),
             mapper: this.mapper.toDto.bind(this.mapper),
-            options: { enabled: !!id, ...options, jsonFields: ["expenses", "passengers", "places"] }
+            options: { enabled: !!id, ...options, jsonFields: ["expenses", "fuel_logs", "passengers", "places"] }
         };
     }
 
@@ -444,7 +508,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
         options?: WatchQueryOptions
     ): UseWatchedQueryCollectionProps<Array<RideLog>, SelectRideLogTableRow> {
         const query = this.selectQuery()
-        .whereRef("rl.car_id", "=", carId as any)
+        .where("rl.car_id", "=", carId as any)
         .where("rl.start_time", ">=", formatDateToDatabaseFormat(startTime) as any)
         .orderBy("rl.start_time", "asc")
         .limit(3);
@@ -452,7 +516,7 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
         return {
             query: query,
             mapper: this.mapper.toDtoArray.bind(this.mapper),
-            options: { enabled: !!carId, ...options, jsonFields: ["expenses", "passengers", "places"] }
+            options: { enabled: !!carId, ...options, jsonFields: ["expenses", "fuel_logs", "passengers", "places"] }
         };
     }
 
@@ -486,6 +550,8 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
             rideLog,
             expenses,
             rideExpenses,
+            fuelLogs,
+            fuelOdometerLogs,
             ridePlaces,
             ridePassengers,
             startOdometerLog,
@@ -516,6 +582,24 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
                 await trx
                 .insertInto(EXPENSE_TABLE)
                 .values(expenseArray as any)
+                .returning("id")
+                .execute();
+            }
+
+            const fuelOdometerLogArray = Array.from(fuelOdometerLogs.values());
+            if(fuelOdometerLogArray.length >= 1) {
+                await trx
+                .insertInto(ODOMETER_LOG_TABLE)
+                .values(fuelOdometerLogArray as any)
+                .returning("id")
+                .execute();
+            }
+
+            const fuelLogArray = Array.from(fuelLogs.values());
+            if(fuelLogArray.length >= 1) {
+                await trx
+                .insertInto(FUEL_LOG_TABLE)
+                .values(fuelLogArray as any)
                 .returning("id")
                 .execute();
             }
@@ -558,6 +642,8 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
             rideLog,
             expenses,
             rideExpenses,
+            fuelLogs,
+            fuelOdometerLogs,
             ridePlaces,
             ridePassengers,
             startOdometerLog,
@@ -588,12 +674,82 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
 
             const originalRideExpenses = await trx
             .selectFrom(RIDE_EXPENSE_TABLE)
-            .select(["id", "expense_id"])
+            .leftJoin(`${ FUEL_LOG_TABLE } as fl` as const, "fl.expense_id", "ride_expense.expense_id")
+            .select([
+                "ride_expense.id",
+                "ride_expense.expense_id",
+                "fl.id as fuel_log_id",
+                "fl.odometer_log_id as fuel_odometer_log_id"
+            ])
             .where("ride_log_id", "=", rideLog.id)
             .execute();
 
             for(const originalRideExpense of originalRideExpenses) {
                 if(!originalRideExpense.expense_id) continue;
+
+                if(originalRideExpense.fuel_log_id) {
+                    const newFuelLog = fuelLogs.get(originalRideExpense.fuel_log_id);
+
+                    if(newFuelLog) {
+                        const oldOdometerLogId = originalRideExpense.fuel_odometer_log_id;
+                        const newOdometerLogId = newFuelLog.odometer_log_id;
+                        const updatedOdometerLog = newOdometerLogId
+                                                   ? fuelOdometerLogs.get(newOdometerLogId)
+                                                   : undefined;
+
+                        if(updatedOdometerLog && newOdometerLogId !== oldOdometerLogId) {
+                            await trx
+                            .insertInto(ODOMETER_LOG_TABLE)
+                            .values(updatedOdometerLog as any)
+                            .returning("id")
+                            .executeTakeFirstOrThrow();
+
+                            fuelOdometerLogs.delete(updatedOdometerLog.id);
+                        }
+
+                        await trx
+                        .updateTable(FUEL_LOG_TABLE)
+                        .set(newFuelLog as any)
+                        .where("id", "=", newFuelLog.id)
+                        .returning("id")
+                        .executeTakeFirstOrThrow();
+
+                        fuelLogs.delete(newFuelLog.id);
+
+                        if(oldOdometerLogId && oldOdometerLogId !== newOdometerLogId) {
+                            await trx
+                            .deleteFrom(ODOMETER_LOG_TABLE)
+                            .where("id", "=", oldOdometerLogId)
+                            .returning("id")
+                            .executeTakeFirst();
+                        }
+
+                        if(oldOdometerLogId && updatedOdometerLog && oldOdometerLogId === newOdometerLogId) {
+                            await trx
+                            .updateTable(ODOMETER_LOG_TABLE)
+                            .set(updatedOdometerLog as any)
+                            .where("id", "=", updatedOdometerLog.id)
+                            .returning("id")
+                            .executeTakeFirstOrThrow();
+
+                            fuelOdometerLogs.delete(updatedOdometerLog.id);
+                        }
+                    } else {
+                        await trx
+                        .deleteFrom(FUEL_LOG_TABLE)
+                        .where("id", "=", originalRideExpense.fuel_log_id)
+                        .returning("id")
+                        .executeTakeFirstOrThrow();
+
+                        if(originalRideExpense.fuel_odometer_log_id) {
+                            await trx
+                            .deleteFrom(ODOMETER_LOG_TABLE)
+                            .where("id", "=", originalRideExpense.fuel_odometer_log_id)
+                            .returning("id")
+                            .executeTakeFirstOrThrow();
+                        }
+                    }
+                }
 
                 const newExpense = expenses.get(originalRideExpense.expense_id);
                 if(newExpense) {
@@ -637,6 +793,24 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
                 await trx
                 .insertInto(EXPENSE_TABLE)
                 .values(expenseArray as any)
+                .returning("id")
+                .execute();
+            }
+
+            const fuelOdometerLogArray = Array.from(fuelOdometerLogs.values());
+            if(fuelOdometerLogArray.length >= 1) {
+                await trx
+                .insertInto(ODOMETER_LOG_TABLE)
+                .values(fuelOdometerLogArray as any)
+                .returning("id")
+                .execute();
+            }
+
+            const fuelLogArray = Array.from(fuelLogs.values());
+            if(fuelLogArray.length >= 1) {
+                await trx
+                .insertInto(FUEL_LOG_TABLE)
+                .values(fuelLogArray as any)
                 .returning("id")
                 .execute();
             }
@@ -729,6 +903,22 @@ export class RideLogDao extends Dao<RideLogTableRow, RideLog, RideLogMapper, Sel
 
     async deleteLog(rideLog: RideLog): Promise<string> {
         return await this.db.transaction().execute(async (trx) => {
+            for(const fuelLog of rideLog.fuelLogs) {
+                await trx
+                .deleteFrom(FUEL_LOG_TABLE)
+                .where("id", "=", fuelLog.id)
+                .returning("id")
+                .executeTakeFirstOrThrow();
+
+                if(fuelLog.odometer) {
+                    await trx
+                    .deleteFrom(ODOMETER_LOG_TABLE)
+                    .where("id", "=", fuelLog.odometer.id)
+                    .returning("id")
+                    .executeTakeFirstOrThrow();
+                }
+            }
+
             const result = await trx
             .deleteFrom(RIDE_LOG_TABLE)
             .where("id", "=", rideLog.id)

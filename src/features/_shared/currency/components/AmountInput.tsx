@@ -1,5 +1,5 @@
 import Input from "../../../../components/Input/Input.ts";
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_NAMES, SEPARATOR_SIZES } from "../../../../constants";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Control, FieldPath, FieldValues, UseFormSetValue, useWatch } from "react-hook-form";
@@ -169,7 +169,10 @@ export function AmountInput<TFieldValues extends FieldValues>({
                   fieldName={ isPricePerUnitFieldName }
                >
                   <View style={ styles.isPricePerUnitContainer }>
-                     <Input.Switch label={ { on: t("currency.price_per_unit"), off: t("currency.total_cost") } }/>
+                     <Input.Switch
+                        label={ { on: t("currency.price_per_unit"), off: t("currency.total_cost") } }
+                        trackStyle={ Platform.OS === "web" ? styles.webPricePerUnitSwitchTrack : undefined }
+                     />
                       {
                           isPricePerUnit &&
                          <View style={ styles.isPricePerUnitTextContainer }>
@@ -292,9 +295,14 @@ const styles = StyleSheet.create({
         gap: SEPARATOR_SIZES.lightSmall
     },
     isPricePerUnitContainer: {
+        width: "100%",
         flexDirection: "row",
         alignItems: "center",
+        justifyContent: "space-between",
         gap: SEPARATOR_SIZES.lightSmall
+    },
+    webPricePerUnitSwitchTrack: {
+        minWidth: 0
     },
     isPricePerUnitTextContainer: {
         flexShrink: 1,

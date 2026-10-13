@@ -227,7 +227,7 @@ export class ExpenseDao extends Dao<ExpenseTableRow, Expense, ExpenseMapper, Sel
         options?: WatchQueryOptions<SelectExpenseTableRow>
     ): UseWatchedQueryCollectionProps<Array<Expense>, SelectExpenseTableRow> {
         const query = this.selectQuery()
-        .whereRef("e.car_id", "=", carId as any)
+        .where("e.car_id", "=", carId as any)
         .orderBy("e.date", "desc")
         .limit(3);
 

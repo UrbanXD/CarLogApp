@@ -1,6 +1,6 @@
 import Button from "../../Button/Button.ts";
 import { pickImage } from "../../../utils/pickImage";
-import { ImageStyle, StyleSheet, View } from "react-native";
+import { ImageStyle, Platform, StyleSheet, View } from "react-native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Carousel, CarouselItemType } from "../../Carousel/Carousel";
 import { SharedValue } from "react-native-reanimated";
@@ -43,13 +43,46 @@ function InputImagePicker({
 
     const inputFieldContext = useInputFieldContext();
     const onChange = inputFieldContext?.field?.onChange;
-    const fieldValue = useMemo(() => inputFieldContext?.field?.value ?? (defaultImages.length === 0 || multipleSelection)
-                                     ? null
-                                     : defaultImages[0], [inputFieldContext?.field.value]);
+    const fieldValue = useMemo(() => {
+        const value = inputFieldContext?.field?.value;
+        if(value !== undefined) return Array.isArray(value) ? null : value;
+
+        return defaultImages.length === 0 || multipleSelection ? null : defaultImages[0];
+    }, [inputFieldContext?.field?.value, defaultImages, multipleSelection]);
 
     const [selectedImage, setSelectedImage] = useState<ImageType | null>(fieldValue);
     const [history, setHistory] = useState<Array<ImageType>>(defaultImages ?? []);
     const [carouselLayout, setCarouselLayout] = useState({ width: 0, height: 0 });
+    const [cameraAvailable, setCameraAvailable] = useState(Platform.OS !== "web");
+
+    useEffect(() => {
+        if(Platform.OS !== "web") return;
+
+        let active = true;
+        const mediaDevices = typeof navigator !== "undefined" ? navigator.mediaDevices : undefined;
+
+        const updateCameraAvailability = async () => {
+            if(!mediaDevices?.enumerateDevices) {
+                if(active) setCameraAvailable(false);
+                return;
+            }
+
+            try {
+                const devices = await mediaDevices.enumerateDevices();
+                if(active) setCameraAvailable(devices.some(device => device.kind === "videoinput"));
+            } catch {
+                if(active) setCameraAvailable(false);
+            }
+        };
+
+        void updateCameraAvailability();
+        mediaDevices?.addEventListener?.("devicechange", updateCameraAvailability);
+
+        return () => {
+            active = false;
+            mediaDevices?.removeEventListener?.("devicechange", updateCameraAvailability);
+        };
+    }, []);
 
     useEffect(() => {
         const newValue = inputFieldContext?.field.value;
@@ -70,10 +103,11 @@ function InputImagePicker({
     };
 
     const getImages = async (type: "CAMERA" | "GALLERY") => {
-        if(type === "CAMERA") {
-            await askCameraPermission();
-        } else {
-            await askMediaLibraryPermission();
+        if(Platform.OS !== "web") {
+            const permissionGranted = type === "CAMERA"
+                                      ? await askCameraPermission()
+                                      : await askMediaLibraryPermission();
+            if(!permissionGranted) return;
         }
 
         const images = await pickImage(
@@ -124,7 +158,9 @@ function InputImagePicker({
             if(setValue) setValue(newImage);
         }
 
-        if(newImage === selectedImage) return;
+        if(newImage?.uri === selectedImage?.uri) return;
+
+        const previousSelectedImage = selectedImage;
 
         if(history.length + 1 > limitOfImages + defaultImages.length) {
             setHistory(prevHistory => {
@@ -133,21 +169,19 @@ function InputImagePicker({
             });
         }
 
-        setSelectedImage(prevSelectedImage => {
-            setHistory(prevHistory => {
-                if(prevSelectedImage?.uri === newImage?.uri) return prevHistory;
+        setSelectedImage(newImage);
+        setHistory(prevHistory => {
+            const filteredHistory = prevHistory.filter(img => img.uri !== newImage?.uri);
+            const shouldStoreOld = previousSelectedImage && !defaultImages.includes(previousSelectedImage);
 
-                const filteredHistory = prevHistory.filter(img => img.uri !== newImage?.uri);
-                const shouldStoreOld = prevSelectedImage && !defaultImages.includes(prevSelectedImage);
+            if(shouldStoreOld) return [...filteredHistory, previousSelectedImage];
 
-                if(shouldStoreOld) return [...filteredHistory, prevSelectedImage];
-
-                return filteredHistory;
-            });
-
-            return newImage;
+            return filteredHistory;
         });
     };
+
+    const isRemoteAttachment = (image?: ImageType | null) => Platform.OS === "web" && !!image &&
+        image.uri === image.fileName && !/^(blob:|data:|https?:|file:)/i.test(image.uri);
 
     const renderHistoryItem = useCallback((
         item: ImageType,
@@ -155,7 +189,10 @@ function InputImagePicker({
         size: number,
         coordinate: SharedValue<number>
     ) => {
-        const itemCarousel: CarouselItemType = { id: item.uri, image: { uri: item.uri, attachment: false } };
+        const itemCarousel: CarouselItemType = {
+            id: item.uri,
+            image: { uri: item.uri, attachment: isRemoteAttachment(item) }
+        };
 
         return (
             <CarouselItem
@@ -187,7 +224,7 @@ function InputImagePicker({
                 }
             />
         );
-    }, [removeImageFromHistory, selectImage]);
+    }, [isRemoteAttachment, removeImageFromHistory, selectImage]);
 
     const keyExtractor = useCallback((item: ImageType) => item.uri, []);
 
@@ -201,32 +238,30 @@ function InputImagePicker({
             {
                 !multipleSelection &&
                <>
-                  <Image
-                     path={ selectedImage?.uri }
-                     attachment={ false }
-                     alt={ alt }
-                     imageStyle={ [
-                         styles.chosenImage,
-                         !selectedImage && { position: "relative" },
-                         imageStyle
-                     ] }
-                  >
-                      {
-                          !!selectedImage &&
-                         <View style={ styles.chosenImageActionContainer }>
-                            <Button.Icon
-                               icon={ ICON_NAMES.close }
-                               iconSize={ FONT_SIZES.p1 }
-                               iconColor={ COLORS.redLight }
-                               width={ FONT_SIZES.p1 * 1.2 }
-                               height={ FONT_SIZES.p1 * 1.2 }
-                               backgroundColor={ hexToRgba(COLORS.black, 0.75) }
-                               onPress={ () => selectImage(null) }
-                               style={ { alignSelf: "flex-end", borderColor: COLORS.redLight, borderWidth: 2 } }
-                            />
-                         </View>
-                      }
-                  </Image>
+                  <View style={ [styles.chosenImageContainer, imageStyle] }>
+                     <Image
+                        path={ selectedImage?.uri }
+                        attachment={ isRemoteAttachment(selectedImage) }
+                        alt={ alt }
+                        imageStyle={ [styles.chosenImage, imageStyle] }
+                     >
+                         {
+                             !!selectedImage &&
+                            <View style={ styles.chosenImageActionContainer }>
+                               <Button.Icon
+                                  icon={ ICON_NAMES.close }
+                                  iconSize={ FONT_SIZES.p1 }
+                                  iconColor={ COLORS.redLight }
+                                  width={ FONT_SIZES.p1 * 1.2 }
+                                  height={ FONT_SIZES.p1 * 1.2 }
+                                  backgroundColor={ hexToRgba(COLORS.black, 0.75) }
+                                  onPress={ () => selectImage(null) }
+                                  style={ { alignSelf: "flex-end", borderColor: COLORS.redLight, borderWidth: 2 } }
+                               />
+                            </View>
+                         }
+                     </Image>
+                  </View>
                   <InputTitle title={ t("form.image_picker.selectable_images") }/>
                </>
             }
@@ -236,10 +271,11 @@ function InputImagePicker({
                         icon={ ICON_NAMES.upload }
                         onPress={ () => getImages("GALLERY") }
                     />
-                    <Button.Icon
-                        icon={ ICON_NAMES.cameraPlus }
-                        onPress={ () => getImages("CAMERA") }
-                    />
+                    { cameraAvailable &&
+                       <Button.Icon
+                          icon={ ICON_NAMES.cameraPlus }
+                          onPress={ () => getImages("CAMERA") }
+                       /> }
                 </View>
                 <View style={ styles.imagesContainer } onLayout={ handleLayout }>
                     <Carousel
@@ -275,9 +311,14 @@ const styles = StyleSheet.create({
         gap: SEPARATOR_SIZES.lightSmall
     },
     chosenImage: {
-        alignSelf: "flex-start",
         resizeMode: "stretch",
         borderRadius: 35
+    },
+    chosenImageContainer: {
+        position: "relative",
+        width: "100%",
+        alignSelf: "stretch",
+        flexShrink: 0
     },
     chosenImageActionContainer: {
         flex: 1,

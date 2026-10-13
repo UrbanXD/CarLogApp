@@ -167,6 +167,9 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
         const amount = formResult.expense.amount * (formResult.expense.isPricePerUnit
                                                     ? formResult.quantity * fuelUnit.conversionFactor
                                                     : 1);
+        const odometerValue = typeof formResult.odometerValue === "number" && Number.isFinite(formResult.odometerValue)
+                              ? formResult.odometerValue
+                              : null;
 
         const expense: ExpenseTableRow = {
             id: formResult.expense.id,
@@ -183,19 +186,19 @@ export class FuelLogMapper extends AbstractMapper<FuelLogTableRow, FuelLog> {
             id: formResult.id,
             car_id: formResult.carId,
             expense_id: formResult.expense.id,
-            odometer_log_id: !!formResult?.odometerValue ? formResult.odometerLogId : null,
+            odometer_log_id: odometerValue !== null ? formResult.odometerLogId : null,
             fuel_unit_id: formResult.fuelUnitId,
             quantity: numberToFractionDigit(formResult.quantity * (fuelUnit?.conversionFactor ?? 1)),
             is_price_per_unit: Number(formResult.expense.isPricePerUnit) // because of sqllite
         };
 
         let odometerLog: OdometerLogTableRow | null = null;
-        if(!!formResult?.odometerValue) {
+        if(odometerValue !== null) {
             odometerLog = {
                 id: formResult.odometerLogId,
                 car_id: formResult.carId,
                 type_id: OdometerLogTypeEnum.FUEL,
-                value: Math.round(formResult.odometerValue * odometerUnit.conversionFactor)
+                value: Math.round(odometerValue * odometerUnit.conversionFactor)
             };
         }
 

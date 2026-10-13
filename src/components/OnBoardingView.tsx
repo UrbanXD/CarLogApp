@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ListRenderItemInfo, Platform, useWindowDimensions, View } from "react-native";
+import { ListRenderItemInfo, Platform, ScrollView, useWindowDimensions, View } from "react-native";
 import { DEFAULT_SEPARATOR } from "../constants";
 import { RenderComponent } from "../types";
 import { useBottomSheetInternal, useBottomSheetScrollableCreator } from "@gorhom/bottom-sheet";
@@ -9,11 +9,15 @@ import { FlashList, ListRenderItemInfo as FlashListRenderItemInfo } from "@shopi
 type OnBoardingViewProps = {
     steps: Array<RenderComponent>
     currentStep?: number
+    renderCurrentStepOnly?: boolean
 }
+
+const CurrentStep: React.FC<{ render: RenderComponent }> = ({ render }) => <>{ render() }</>;
 
 export function OnBoardingView({
     steps,
-    currentStep = 0
+    currentStep = 0,
+    renderCurrentStepOnly = false
 }: OnBoardingViewProps) {
     const isBottomSheet = !!useBottomSheetInternal(true);
     const BottomSheetFlashListScrollable = isBottomSheet
@@ -122,6 +126,28 @@ export function OnBoardingView({
             style={ [containerStyle, Platform.OS === "web" && { width, minWidth: 0, maxWidth: "100%" }] }
         />
     );
+
+    if(Platform.OS === "web" && renderCurrentStepOnly) {
+        return (
+            <ScrollView
+                style={ {
+                    flex: 1,
+                    width: "100%",
+                    minWidth: 0,
+                    minHeight: 0,
+                    maxWidth: "100%"
+                } }
+                contentContainerStyle={ {
+                    flexGrow: 1,
+                    width: "100%",
+                    minWidth: 0
+                } }
+                showsVerticalScrollIndicator={ false }
+            >
+                { steps[currentStep] && <CurrentStep key={ currentStep } render={ steps[currentStep] }/> }
+            </ScrollView>
+        );
+    }
 
     if(Platform.OS !== "web") return list;
 

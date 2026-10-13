@@ -14,7 +14,7 @@ import { InvalidFormToast } from "../../../../../../ui/alert/presets/toast";
 type EditFuelLogFormProps = {
     fuelLog: FuelLog
     /** Which field will be edited, if its undefined that means full form view will appear */
-    field: FuelLogFormFieldsEnum
+    field?: FuelLogFormFieldsEnum
     onFormStateChange?: (formState: FormState<FuelLogFormFields>) => void
 }
 
@@ -28,8 +28,8 @@ export function EditFuelLogForm({
     const { dismissBottomSheet } = useBottomSheet();
 
     const form = useForm<FuelLogFormFields, any, FuelLogFormFields>(useEditFuelLogFormProps(fuelLog));
-    const { fields } = useFuelLogFormFields({ form, isEdit: true });
-    const editFields: FormFields = fields[field];
+    const { fields, fullForm } = useFuelLogFormFields({ form, isEdit: true });
+    const editFields: FormFields = field === undefined ? fullForm : fields[field] ?? fullForm;
 
     const submitHandler: SubmitHandlerArgs<FuelLogFormFields> = {
         onValid: async (formResult) => {

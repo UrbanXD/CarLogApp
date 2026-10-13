@@ -72,6 +72,10 @@ export class SupabaseStorageAdapter implements StorageAdapter {
         const { filename } = options ?? {};
         if(!filename) return;
 
+        await this.deleteRemoteFile(filename);
+    }
+
+    async deleteRemoteFile(filename: string): Promise<void> {
         if(!BaseConfig.SUPABASE_ATTACHMENT_BUCKET) {
             throw new Error("Supabase bucket not configured in AppConfig.ts");
         }

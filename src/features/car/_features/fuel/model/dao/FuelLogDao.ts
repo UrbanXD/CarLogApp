@@ -10,6 +10,7 @@ import { Kysely, SelectQueryBuilder, sql } from "kysely";
 import { ExpenseTypeDao } from "../../../../../expense/model/dao/ExpenseTypeDao.ts";
 import { FuelUnitDao } from "./FuelUnitDao.ts";
 import { FUEL_LOG_TABLE } from "../../../../../../database/connector/powersync/tables/fuelLog.ts";
+import { RIDE_EXPENSE_TABLE } from "../../../../../../database/connector/powersync/tables/rideExpense.ts";
 import { EXPENSE_TABLE } from "../../../../../../database/connector/powersync/tables/expense.ts";
 import { OdometerLogDao, SelectOdometerTableRow } from "../../../odometer/model/dao/OdometerLogDao.ts";
 import { FuelLogFormFields } from "../../schemas/form/fuelLogForm.ts";
@@ -457,6 +458,11 @@ export class FuelLogDao extends Dao<FuelLogTableRow, FuelLog, FuelLogMapper, Sel
 
     async deleteLog(fuelLog: FuelLog): Promise<string | number> {
         return await this.db.transaction().execute(async trx => {
+            await trx
+            .deleteFrom(RIDE_EXPENSE_TABLE)
+            .where("expense_id", "=", fuelLog.expense.id)
+            .execute();
+
             const result = await trx
             .deleteFrom(FUEL_LOG_TABLE)
             .where("id", "=", fuelLog.id)

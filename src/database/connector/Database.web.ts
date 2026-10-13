@@ -5,6 +5,7 @@ import { SupabaseConnector } from "./SupabaseConnector.ts";
 import { Kysely, wrapPowerSyncWithKysely } from "@powersync/kysely-driver";
 import { ParseJSONResultsPlugin } from "kysely";
 import { SupabaseStorageAdapter } from "./storage/SupabaseStorageAdapter.ts";
+import { WebPhotoAttachmentQueue } from "./powersync/WebPhotoAttachmentQueue.ts";
 
 import { UserDao } from "../../features/user/model/dao/UserDao.ts";
 import { CarDao } from "../../features/car/model/dao/CarDao.ts";
@@ -113,8 +114,9 @@ export class Database {
             const db = wrapPowerSyncWithKysely<DatabaseType>(powersync, { plugins: [new ParseJSONResultsPlugin()] });
             const supabaseConnector = new SupabaseConnector(supabaseClient);
             const storage = supabaseConnector.storage;
+            const attachmentQueue = new WebPhotoAttachmentQueue(storage);
 
-            return new Database(powersync, db, supabaseConnector, storage, syncNeed);
+            return new Database(powersync, db, supabaseConnector, storage, syncNeed, attachmentQueue);
         } catch(error) {
             console.error("Error at Database.create():", error);
             throw error;
@@ -479,6 +481,7 @@ export class Database {
                 rideExpenseMapper,
                 ridePlaceMapper,
                 ridePassengerMapper,
+                this.fuelLogDao.mapper,
                 this.odometerLogDao,
                 this.odometerUnitDao,
                 this.carDao

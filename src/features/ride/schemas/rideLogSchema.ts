@@ -5,12 +5,14 @@ import { zNote } from "../../../types/zodTypes.ts";
 import { ridePassengerSchema } from "../_features/passenger/schemas/ridePassengerSchema.ts";
 import { ridePlaceSchema } from "../_features/place/schemas/ridePlaceSchema.ts";
 import { rideExpenseSchema } from "../_features/rideExpense/schemas/rideExpenseSchema.ts";
+import { fuelLogSchema } from "../../car/_features/fuel/schemas/fuelLogSchema.ts";
 
 export const rideLogSchema = z
 .object({
     id: z.string().uuid(),
     car: carSimpleSchema,
     rideExpenses: z.array(rideExpenseSchema),
+    fuelLogs: z.array(fuelLogSchema),
     ridePassengers: z.array(ridePassengerSchema),
     ridePlaces: z.array(ridePlaceSchema),
     startOdometer: odometerSchema,

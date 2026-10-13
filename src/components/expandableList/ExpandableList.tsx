@@ -94,7 +94,7 @@ export function ExpandableList({
                 ItemSeparatorComponent={ renderSeparatorComponent }
                 ListEmptyComponent={ renderEmptyComponent }
                 showsVerticalScrollIndicator={ showWebScrollbar }
-                style={ [styles.itemsContainer, showWebScrollbar && WEB_SCROLLBAR_STYLE] }
+                style={ StyleSheet.flatten([styles.itemsContainer, showWebScrollbar && WEB_SCROLLBAR_STYLE]) }
                 renderScrollComponent={ BottomSheetFlashListScrollable }
             />
             {

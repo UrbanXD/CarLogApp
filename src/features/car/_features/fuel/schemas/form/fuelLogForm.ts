@@ -17,7 +17,7 @@ import {
 import dayjs from "dayjs";
 import { DefaultValues, UseFormProps } from "react-hook-form";
 
-const fuelLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
+export const fuelLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
 .pick({ carId: true, date: true, note: true })
 .extend({
     expense: inputAmountSchema()
@@ -58,7 +58,32 @@ const fuelLogForm = (odometerLogDao: OdometerLogDao) => expenseForm
 
 export type FuelLogFormFields = z.infer<ReturnType<typeof fuelLogForm>>;
 
-export function useCreateFuelLogFormProps(car: Car | null): UseFormProps<FuelLogFormFields, any, FuelLogFormFields> {
+export function fuelLogToFormFields(fuelLog: FuelLog): FuelLogFormFields {
+    const odometerValue = fuelLog.odometer?.value;
+
+    return {
+        id: fuelLog.id,
+        expense: {
+            id: fuelLog.expense.id,
+            currencyId: fuelLog.expense.amount.currency.id,
+            amount: fuelLog.isPricePerUnit ? fuelLog.pricePerUnit : fuelLog.expense.amount.amount,
+            isPricePerUnit: fuelLog.isPricePerUnit,
+            exchangeRate: fuelLog.expense.amount.exchangeRate
+        },
+        quantity: fuelLog.quantity,
+        odometerLogId: fuelLog.odometer?.id ?? getUUID(),
+        carId: fuelLog.car.id,
+        fuelUnitId: fuelLog.fuelUnit.id,
+        odometerValue: typeof odometerValue === "number" && Number.isFinite(odometerValue) ? odometerValue : null,
+        note: fuelLog.expense.note,
+        date: dayjs(fuelLog.expense.date).isValid() ? fuelLog.expense.date : new Date().toISOString()
+    };
+}
+
+export function useCreateFuelLogFormProps(
+    car: Car | null,
+    defaultDate?: string
+): UseFormProps<FuelLogFormFields, any, FuelLogFormFields> {
     const { odometerLogDao } = useDatabase();
 
     const defaultValues: DefaultValues<FuelLogFormFields> = {
@@ -76,7 +101,7 @@ export function useCreateFuelLogFormProps(car: Car | null): UseFormProps<FuelLog
         fuelUnitId: car?.fuelTank.unit.id,
         odometerValue: undefined,
         note: null,
-        date: new Date().toISOString()
+        date: defaultDate ?? new Date().toISOString()
     };
 
     return { defaultValues, resolver: zodResolver(fuelLogForm(odometerLogDao)) };
@@ -85,23 +110,7 @@ export function useCreateFuelLogFormProps(car: Car | null): UseFormProps<FuelLog
 export function useEditFuelLogFormProps(fuelLog: FuelLog): UseFormProps<FuelLogFormFields, any, FuelLogFormFields> {
     const { odometerLogDao } = useDatabase();
 
-    const defaultValues: DefaultValues<FuelLogFormFields> = {
-        id: fuelLog.id,
-        expense: {
-            id: fuelLog.expense.id,
-            currencyId: fuelLog.expense.amount.currency.id,
-            amount: fuelLog.isPricePerUnit ? fuelLog.pricePerUnit : fuelLog.expense.amount.amount,
-            isPricePerUnit: fuelLog.isPricePerUnit,
-            exchangeRate: fuelLog.expense.amount.exchangeRate
-        },
-        quantity: fuelLog.quantity,
-        odometerLogId: fuelLog.odometer?.id ?? getUUID(),
-        carId: fuelLog.car.id,
-        fuelUnitId: fuelLog.fuelUnit.id,
-        odometerValue: fuelLog.odometer?.value ?? undefined,
-        note: fuelLog.expense.note,
-        date: dayjs(fuelLog.expense.date).isValid() ? fuelLog.expense.date : new Date().toISOString()
-    };
+    const defaultValues: DefaultValues<FuelLogFormFields> = fuelLogToFormFields(fuelLog);
 
     return { defaultValues, resolver: zodResolver(fuelLogForm(odometerLogDao)) };
 }

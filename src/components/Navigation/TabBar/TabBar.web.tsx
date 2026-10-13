@@ -24,7 +24,7 @@ function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
     const isCompact = width <= 760;
     const dockWidth = isCompact ? width : Math.min(760, width - 40);
     const dockBottom = isCompact ? insets.bottom : 16;
-    const styles = useStyles(dockWidth, dockBottom, isCompact, insets.bottom);
+    const styles = createStyles(width, dockWidth, dockBottom, isCompact, insets.bottom);
 
     return (
         <>
@@ -80,10 +80,16 @@ function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
     );
 }
 
-const useStyles = (width: number, bottom: number, compact: boolean, insetBottom: number) => StyleSheet.create({
+const createStyles = (
+    windowWidth: number,
+    width: number,
+    bottom: number,
+    compact: boolean,
+    insetBottom: number
+) => StyleSheet.create({
     container: {
         position: "absolute",
-        left: (useWindowDimensions().width - width) / 2,
+        left: (windowWidth - width) / 2,
         bottom,
         zIndex: 1,
         flexDirection: "row",

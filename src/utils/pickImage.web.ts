@@ -1,5 +1,5 @@
 import * as ImagePicker from "expo-image-picker";
-import { getFileExtension, getMediaType } from "../database/utils/getFileExtension.ts";
+import { getMediaType } from "../database/utils/getFileExtension.ts";
 import { getUUID } from "../database/utils/uuid.ts";
 import { Image } from "../types/zodTypes.ts";
 
@@ -23,8 +23,11 @@ export async function pickImage(
         if(pickerResult.canceled) return null;
 
         return pickerResult.assets.map(asset => {
-            const fileExtension = getFileExtension(asset.uri);
-            const fileName = asset.fileName ?? `${ getUUID() }.${ fileExtension }`;
+            const fileExtension = asset.fileName?.match(/\.([a-z0-9]+)$/i)?.[1]
+                ?? asset.mimeType?.split("/")[1]?.split("+")[0]
+                ?? "jpg";
+            const normalizedFileExtension = fileExtension.toLowerCase() === "jpeg" ? "jpg" : fileExtension;
+            const fileName = `${ getUUID() }.${ normalizedFileExtension }`;
 
             return {
                 uri: asset.uri,

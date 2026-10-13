@@ -5,6 +5,7 @@ import {
     GestureResponderEvent,
     Keyboard,
     LayoutChangeEvent,
+    Platform,
     Pressable,
     StyleSheet,
     Text,
@@ -36,7 +37,9 @@ import { KeyboardController } from "react-native-keyboard-controller";
 import { formTheme } from "../../../ui/form/constants/theme.ts";
 import { BottomSheetTextInput, useBottomSheetInternal } from "@gorhom/bottom-sheet";
 
-const AnimatedTextInput = Animated.createAnimatedComponent(BottomSheetTextInput);
+const AnimatedBottomSheetTextInput = Animated.createAnimatedComponent(BottomSheetTextInput);
+const AnimatedWebTextInput = Animated.createAnimatedComponent(TextInput);
+const AnimatedTextInput = Platform.OS === "web" ? AnimatedWebTextInput : AnimatedBottomSheetTextInput;
 
 interface SliderProps {
     value?: number;
@@ -88,6 +91,7 @@ const Slider: React.FC<SliderProps> = ({
     const bottomSheetInternal = useBottomSheetInternal(true);
 
     const tooltipInputRef = useAnimatedRef<TextInput>();
+    const trackRef = useRef<View>(null);
 
     const {
         borderRadius = 25,
@@ -123,20 +127,31 @@ const Slider: React.FC<SliderProps> = ({
     const onChange = inputFieldContext?.field?.onChange;
     const error = inputFieldContext?.fieldState?.error;
 
+    const initialValue = Math.min(maxValue, Math.max(minValue, Number.isFinite(value) ? value : minValue));
     const trackWidth = useSharedValue(0);
     const thumbOffset = useSharedValue(0);
     const percent = useSharedValue(0);
-    const inputValue = useSharedValue(value ? value.toString() : minValue.toString());
+    const inputValue = useSharedValue(initialValue.toString());
     const bounds = useSharedValue({ min: minValue, max: maxValue });
 
     const [trackLayoutReady, setTrackLayoutReady] = useState(false);
     const isInternalChange = useRef(false);
 
-    const [currentValue, setCurrentValue] = useState<number>(NaN);
+    const [currentValue, setCurrentValue] = useState<number>(initialValue);
+    const [tooltipInputText, setTooltipInputText] = useState(initialValue.toString());
+    const [displayPercent, setDisplayPercent] = useState(0);
+
+    const updateCurrentValue = useCallback((nextValue: number, text = nextValue.toString()) => {
+        if(!Number.isFinite(nextValue)) return;
+
+        const clampedValue = Math.min(maxValue, Math.max(minValue, nextValue));
+        setCurrentValue(clampedValue);
+        setTooltipInputText(text);
+    }, [maxValue, minValue]);
 
     // External -> Internal
     useEffect(() => {
-        const rawValue = inputFieldContext?.field?.value;
+        const rawValue = inputFieldContext?.field?.value ?? value;
 
         if(isInternalChange.current) {
             isInternalChange.current = false;
@@ -147,15 +162,13 @@ const Slider: React.FC<SliderProps> = ({
         if(!isNaN(numericValue)) {
             const clampedValue = Math.min(maxValue, Math.max(minValue, numericValue));
 
-            if(clampedValue !== currentValue) {
-                setCurrentValue(clampedValue);
-            }
+            updateCurrentValue(clampedValue, clampedValue.toString());
         }
-    }, [inputFieldContext?.field?.value, value, maxValue, minValue]);
+    }, [inputFieldContext?.field?.value, value, maxValue, minValue, updateCurrentValue]);
 
     // Internal -> External
     useEffect(() => {
-        if(!trackLayoutReady || isNaN(currentValue)) return;
+        if(!trackLayoutReady || !Number.isFinite(currentValue)) return;
 
         const range = bounds.value.max - bounds.value.min;
         const safeRange = range <= 0 ? 1 : range;
@@ -171,6 +184,28 @@ const Slider: React.FC<SliderProps> = ({
             if(onChange) onChange(currentValue);
         }
     }, [currentValue, trackLayoutReady]);
+
+    useAnimatedReaction(
+        () => Math.round(percent.value * 100) / 100,
+        (nextPercent, previousPercent) => {
+            if(nextPercent !== previousPercent) scheduleOnRN(setDisplayPercent, nextPercent);
+        }
+    );
+
+    useEffect(() => {
+        if(Platform.OS !== "web" || !tooltipAsInputField || !showsTooltip) return;
+
+        const input = tooltipInputRef.current as unknown as HTMLInputElement | null;
+        if(!input) return;
+
+        const onDoubleClick = () => {
+            input.focus();
+            input.select();
+        };
+
+        input.addEventListener("dblclick", onDoubleClick);
+        return () => input.removeEventListener("dblclick", onDoubleClick);
+    }, [showsTooltip, tooltipAsInputField]);
 
     useEffect(() => {
         const subscription = Keyboard.addListener("keyboardDidHide", () => {
@@ -212,28 +247,45 @@ const Slider: React.FC<SliderProps> = ({
 
     const setInputValue = () => {
         "worklet";
-        inputValue.value = Math.floor(bounds.value.min + ((bounds.value.max - bounds.value.min) * (percent.value / 100)))
-        .toString();
+        const range = bounds.value.max - bounds.value.min;
+        const nextValue = range > 0
+                          ? bounds.value.min + range * (percent.value / 100)
+                          : bounds.value.min;
+        inputValue.value = Math.floor(nextValue).toString();
     };
 
     const calculatePercentByValue = () => {
         "worklet";
+        const range = bounds.value.max - bounds.value.min;
+        const numericValue = Number(inputValue.value);
+        if(range <= 0 || isNaN(range) || isNaN(numericValue)) {
+            percent.value = 0;
+            return;
+        }
+
         percent.value = Math.max(
             0,
-            Math.min(100, (Number(inputValue.value) - bounds.value.min) * 100 / (bounds.value.max - bounds.value.min))
+            Math.min(100, (numericValue - bounds.value.min) * 100 / range)
         );
     };
 
     const calculatePercentByOffset = () => {
         "worklet";
+        const availableWidth = trackWidth.value - (showsHandle ? handleWidth : 0);
+        if(availableWidth <= 0 || isNaN(availableWidth)) {
+            percent.value = 0;
+            return;
+        }
+
         percent.value = Math.max(
             0,
-            Math.min(100, (thumbOffset.value / (trackWidth.value - (showsHandle ? handleWidth : 0))) * 100)
+            Math.min(100, (thumbOffset.value / availableWidth) * 100)
         );
     };
 
     const calculateThumbOffsetByPercent = () => {
-        thumbOffset.value = percent.value * (trackWidth.value - (showsHandle ? handleWidth : 0)) / 100;
+        const availableWidth = Math.max(0, trackWidth.value - (showsHandle ? handleWidth : 0));
+        thumbOffset.value = Math.max(0, Math.min(100, percent.value)) * availableWidth / 100;
     };
 
     const calculateOffsetByPercent = () => {
@@ -247,8 +299,9 @@ const Slider: React.FC<SliderProps> = ({
 
     const calculateOffsetByTapPosition = (locationX: number) => {
         "worklet";
+        const availableWidth = Math.max(0, trackWidth.value - (showsHandle ? handleWidth : 0));
         thumbOffset.value = Math.min(
-            trackWidth.value - (showsHandle ? handleWidth : 0),
+            availableWidth,
             Math.max(0, locationX - (showsHandle ? handleWidth / 2 : 0))
         );
 
@@ -257,15 +310,13 @@ const Slider: React.FC<SliderProps> = ({
         setInputValue();
 
         const value = Number(inputValue.value);
-        if(!isNaN(value)) scheduleOnRN(setCurrentValue, value);
+        if(!isNaN(value)) scheduleOnRN(updateCurrentValue, value, value.toString());
     };
 
     const calculateOffsetByPanning = (changeX: number) => {
         "worklet";
-        thumbOffset.value = Math.min(
-            trackWidth.value - (showsHandle ? handleHeight : 0),
-            Math.max(0, thumbOffset.value + changeX)
-        );
+        const availableWidth = Math.max(0, trackWidth.value - (showsHandle ? handleWidth : 0));
+        thumbOffset.value = Math.min(availableWidth, Math.max(0, thumbOffset.value + changeX));
     };
 
     useAnimatedReaction(
@@ -283,8 +334,35 @@ const Slider: React.FC<SliderProps> = ({
     );
 
     const onTrackPress = (event: GestureResponderEvent) => {
-        scheduleOnUI(calculateOffsetByTapPosition, event.nativeEvent.locationX);
+        if(disabled || !tapToSeek) return;
+
+        const nativeEvent = event.nativeEvent as typeof event.nativeEvent & {
+            clientX?: number;
+            pageX?: number;
+            offsetX?: number;
+        };
+        let locationX = nativeEvent.locationX;
+
+        if(Platform.OS === "web") {
+            const trackElement = trackRef.current as unknown as HTMLElement | null;
+            const rect = trackElement?.getBoundingClientRect?.();
+
+            if(rect && typeof nativeEvent.clientX === "number") {
+                locationX = nativeEvent.clientX - rect.left;
+            } else if(rect && typeof nativeEvent.pageX === "number") {
+                locationX = nativeEvent.pageX - rect.left - window.scrollX;
+            } else if(typeof nativeEvent.offsetX === "number") {
+                locationX = nativeEvent.offsetX;
+            }
+        }
+
+        if(typeof locationX !== "number" || !Number.isFinite(locationX)) return;
+        scheduleOnUI(calculateOffsetByTapPosition, locationX);
     };
+
+    const webTrackClickProps = Platform.OS === "web" && tapToSeek && !disabled
+                               ? { onClick: onTrackPress as any }
+                               : {};
 
     const panOnStart = () => {
         scheduleOnRN(KeyboardController.dismiss);
@@ -298,8 +376,8 @@ const Slider: React.FC<SliderProps> = ({
     };
 
     const panOnEnd = () => {
-        const value = Number(inputValue.value);
-        if(!isNaN(value)) scheduleOnRN(setCurrentValue, value);
+        const nextValue = Number(inputValue.value);
+        if(!isNaN(nextValue)) scheduleOnRN(updateCurrentValue, nextValue, nextValue.toString());
     };
 
     const barPan = useMemo(
@@ -308,7 +386,7 @@ const Slider: React.FC<SliderProps> = ({
         .onStart(panOnStart)
         .onChange(panOnChange)
         .onEnd(panOnEnd),
-        [showsHandle]
+        [showsHandle, disabled]
     );
 
     const handlePan = useMemo(
@@ -317,7 +395,7 @@ const Slider: React.FC<SliderProps> = ({
         .onStart(panOnStart)
         .onChange(panOnChange)
         .onEnd(panOnEnd),
-        [showsHandle]
+        [showsHandle, disabled]
     );
 
     const tooltipPan = useMemo(
@@ -326,7 +404,7 @@ const Slider: React.FC<SliderProps> = ({
         .onStart(panOnStart)
         .onChange(panOnChange)
         .onEnd(panOnEnd)
-        , []);
+        , [showsTooltip, disabled]);
 
     const tooltipDoubleTap = useMemo(
         () => Gesture.Tap()
@@ -336,7 +414,7 @@ const Slider: React.FC<SliderProps> = ({
         .onStart(() => {
             dispatchCommand(tooltipInputRef, "focus");
         })
-        , []);
+        , [showsTooltip, disabled, tooltipAsInputField]);
 
     const tooltipGesture = Gesture.Exclusive(tooltipPan, tooltipDoubleTap);
 
@@ -359,23 +437,22 @@ const Slider: React.FC<SliderProps> = ({
 
     const onTooltipTextChange = (value: string) => {
         const numericText = value.replace(/[^0-9.,]/g, "").replace(",", ".");
+        setTooltipInputText(numericText);
+        inputValue.value = numericText;
 
-        let number = numericText.length === 0 ? minValue : Number(numericText);
+        if(numericText.length === 0 || numericText === ".") return;
+
+        const number = Number(numericText);
+        if(!Number.isFinite(number)) return;
 
         const clamped = Math.min(maxValue, Math.max(number, minValue));
-        inputValue.value = clamped.toString() + " "; // empty string add to prevent not updating text
-        scheduleOnRN(setTimeout, () => {
-            let clampedText = clamped.toString();
-            if(maxValue !== clamped && numericText.endsWith(".")) clampedText += ".";
+        const clampedText = clamped === number ? numericText : clamped.toString();
+        inputValue.value = clampedText;
+        setTooltipInputText(clampedText);
 
-            inputValue.value = clampedText;
-        }, 100);
-
-        if(!isNaN(number)) {
-            scheduleOnUI(calculatePercentByValue);
-            scheduleOnUI(calculateThumbOffsetByPercent);
-            scheduleOnRN(setCurrentValue, clamped);
-        }
+        scheduleOnUI(calculatePercentByValue);
+        scheduleOnUI(calculateThumbOffsetByPercent);
+        scheduleOnRN(updateCurrentValue, clamped, clampedText);
     };
 
     const sliderBarStyle = useAnimatedStyle(() => {
@@ -455,10 +532,11 @@ const Slider: React.FC<SliderProps> = ({
         if(innerTooltip) translateY = 0;
 
         let minLeft = innerTooltip ? minBarWidth : 0;
+        const maxLeft = Math.max(minLeft, trackWidth.value - tooltipLayout.width);
 
         return {
-            minWidth: tooltipLayout.width,
-            left: Math.min(Math.max(minLeft, left), trackWidth.value - tooltipLayout.width),
+            minWidth: Math.min(tooltipLayout.width, trackWidth.value),
+            left: Math.max(minLeft, Math.min(left, maxLeft)),
             transform: [{ translateY }],
             borderTopRightRadius,
             borderBottomRightRadius,
@@ -524,15 +602,17 @@ const Slider: React.FC<SliderProps> = ({
         innerTooltip
     }), [trackColor, showsHandle, tooltipLayout, handleHeight]);
 
+    const webTooltipInputStyle = Platform.OS === "web"
+                                 ? {
+                                     width: `${ Math.max(2, tooltipInputText.length + 0.5) }ch`,
+                                     minWidth: 0,
+                                     maxWidth: "100%",
+                                     flexShrink: 0
+                                 } as any
+                                 : undefined;
+
     const animatedTooltipProps = useAnimatedProps(() => {
-        let text = inputValue.value;
-
-        return { text, defaultValue: text };
-    });
-
-    const animatedPercentTextProps = useAnimatedProps(() => {
-        let text = `${ percent.value.toFixed(2) }%`;
-
+        const text = inputValue.value;
         return { text, defaultValue: text };
     });
 
@@ -553,16 +633,17 @@ const Slider: React.FC<SliderProps> = ({
                           }
                          <View
                             onLayout={ onTooltipTextLayout }
-                            pointerEvents="none"
+                            pointerEvents={ Platform.OS === "web" && tooltipAsInputField ? "auto" : "none" }
                             style={ { flexDirection: "row", alignItems: "center" } }
                          >
                             <AnimatedTextInput
                                ref={ tooltipInputRef as any }
-                               defaultValue={ currentValue.toString() }
                                editable={ tooltipAsInputField }
-                               animatedProps={ animatedTooltipProps }
+                               { ...(Platform.OS === "web"
+                                     ? { value: tooltipInputText }
+                                     : { defaultValue: tooltipInputText, animatedProps: animatedTooltipProps }) }
                                keyboardType="numeric"
-                               style={ styles.tooltipText }
+                               style={ [styles.tooltipText, webTooltipInputStyle] }
                                onChangeText={ onTooltipTextChange }
                                onBlur={ onBlur }
                                onFocus={ onFocus }
@@ -573,6 +654,7 @@ const Slider: React.FC<SliderProps> = ({
                    </GestureDetector>
                 }
                 <Pressable
+                    ref={ trackRef }
                     style={ [styles.track, error && styles.trackError] }
                     onLayout={ onTrackLayout }
                     onPress={ onTrackPress }
@@ -587,13 +669,13 @@ const Slider: React.FC<SliderProps> = ({
                        </>
                     }
                     <GestureDetector gesture={ barPan }>
-                        <Animated.View style={ [styles.bar, sliderBarStyle] }/>
+                        <Animated.View { ...webTrackClickProps } style={ [styles.bar, sliderBarStyle] }/>
                     </GestureDetector>
                     {
                         showsHandle &&
                        <GestureDetector gesture={ handlePan }>
                           <TouchableWithoutFeedback>
-                             <Animated.View style={ [styles.handle, sliderHandleStyle] }>
+                             <Animated.View { ...webTrackClickProps } style={ [styles.handle, sliderHandleStyle] }>
                                 <View style={ styles.innerHandle }/>
                              </Animated.View>
                           </TouchableWithoutFeedback>
@@ -606,20 +688,21 @@ const Slider: React.FC<SliderProps> = ({
                <View style={ styles.boundingValuesContainer }>
                    {
                        showsBoundingValues &&
-                      <Text style={ styles.boundingValueText }>{ minValue } { unit }</Text>
+                      <View style={ styles.boundingValueContainer }>
+                         <Text numberOfLines={ 1 } style={ styles.boundingValueText }>{ minValue }</Text>
+                          { unit && <Text numberOfLines={ 1 } style={ styles.boundingValueText }>{ unit }</Text> }
+                      </View>
                    }
                    {
                        showsPercent &&
-                      <AnimatedTextInput
-                         defaultValue={ "0%" }
-                         editable={ false }
-                         animatedProps={ animatedPercentTextProps }
-                         style={ [styles.boundingValuesContainer, { padding: 0 }] }
-                      />
+                      <Text style={ styles.boundingPercentText }>{ displayPercent.toFixed(2) }%</Text>
                    }
                    {
                        showsBoundingValues &&
-                      <Text style={ styles.boundingValueText }>{ maxValue } { unit }</Text>
+                      <View style={ [styles.boundingValueContainer, styles.maxBoundaryValueContainer] }>
+                         <Text numberOfLines={ 1 } style={ styles.boundingValueText }>{ maxValue }</Text>
+                          { unit && <Text numberOfLines={ 1 } style={ styles.boundingValueText }>{ unit }</Text> }
+                      </View>
                    }
                </View>
             }
@@ -664,10 +747,29 @@ const useStyles = ({
     boundingValuesContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
+        alignItems: "center",
         gap: SEPARATOR_SIZES.lightSmall,
         width: "100%"
     },
+    boundingValueContainer: {
+        flexDirection: "row",
+        alignItems: "baseline",
+        flexShrink: 0,
+        gap: SEPARATOR_SIZES.lightSmall / 2
+    },
+    maxBoundaryValueContainer: {
+        justifyContent: "flex-end"
+    },
     boundingValueText: {
+        fontFamily: "Gilroy-Medium",
+        fontSize: FONT_SIZES.p4,
+        color: boundingValuesTextColor,
+        textAlign: "center",
+        flexShrink: 0
+    },
+    boundingPercentText: {
+        flex: 1,
+        minWidth: 0,
         fontFamily: "Gilroy-Medium",
         fontSize: FONT_SIZES.p4,
         color: boundingValuesTextColor,

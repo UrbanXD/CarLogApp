@@ -31,7 +31,7 @@ export function FuelInput<FormFieldValues extends FieldValues>({
     const formCarId = useWatch({ control, name: carIdFieldName });
     const fuelValue = useWatch({ control, name: fieldName });
 
-    const { car } = useCar({ carId: formCarId, options: { queryOnce: true } });
+    const { car, isLoading: isCarLoading } = useCar({ carId: formCarId, options: { queryOnce: true } });
     const capacity = useMemo(() => car?.fuelTank.capacity ?? 0, [car?.fuelTank.capacity]);
 
     useEffect(() => {
@@ -74,60 +74,65 @@ export function FuelInput<FormFieldValues extends FieldValues>({
             fieldInfoText={ subtitle }
             containerStyle={ { gap: SEPARATOR_SIZES.lightSmall } }
         >
-            <View style={ styles.actionContainer }>
-                <View style={ styles.stepperButtons }>
-                    {
-                        stepperButtons.map((step, index) => (
-                            <React.Fragment key={ index }>
-                                <Pressable
-                                    onPress={ () => modifyFuelValue(step) }
-                                    style={ styles.button }
-                                >
-                                    <Text style={ styles.buttonText }>
-                                        { step > 0 ? `+${ step }` : step }
-                                    </Text>
-                                </Pressable>
-                                {
-                                    Math.floor(stepperButtons.length / 2) === index + 1 && car &&
-                                   <Text style={ styles.buttonText }>
-                                       { car.fuelTank.unit.short }
-                                   </Text>
-                                }
-                            </React.Fragment>
-                        ))
-                    }
-                </View>
-                <Pressable
-                    onPress={ fuelingToFull }
-                    style={ [styles.button, styles.fullTankButton] }
-                >
-                    <Text style={ [styles.buttonText, styles.fullTankText] }>
-                        { t("fuel.full_tank") }
-                    </Text>
-                </Pressable>
-            </View>
-            <Input.Slider
-                minValue={ 0 }
-                maxValue={ capacity }
-                unit={ car?.fuelTank.unit.short }
-                tooltipAsInputField={ true }
-                style={ {
-                    showsHandle: false,
-                    showsTag: true,
-                    showsPercent: true,
-                    innerTooltip: true,
-                    borderRadius: 0,
-                    trackBorderWidth: 0,
-                    barColor: [
-                        { color: "#FF3B30", percent: 0 },
-                        { color: "#FFCC00", percent: 45 },
-                        { color: "#02c227", percent: 75 },
-                        { color: "#02a121", percent: 100 }
-                    ],
-                    tooltipColor: COLORS.gray5,
-                    trackHeight: formTheme.containerHeight
-                } }
-            />
+            {
+                !isCarLoading && car && capacity > 0 &&
+               <>
+                  <View style={ styles.actionContainer }>
+                     <View style={ styles.stepperButtons }>
+                         {
+                             stepperButtons.map((step, index) => (
+                                 <React.Fragment key={ index }>
+                                     <Pressable
+                                         onPress={ () => modifyFuelValue(step) }
+                                         style={ styles.button }
+                                     >
+                                         <Text style={ styles.buttonText }>
+                                             { step > 0 ? `+${ step }` : step }
+                                         </Text>
+                                     </Pressable>
+                                     {
+                                         Math.floor(stepperButtons.length / 2) === index + 1 &&
+                                        <Text style={ styles.buttonText }>
+                                            { car.fuelTank.unit.short }
+                                        </Text>
+                                     }
+                                 </React.Fragment>
+                             ))
+                         }
+                     </View>
+                     <Pressable
+                        onPress={ fuelingToFull }
+                        style={ [styles.button, styles.fullTankButton] }
+                     >
+                        <Text style={ [styles.buttonText, styles.fullTankText] }>
+                            { t("fuel.full_tank") }
+                        </Text>
+                     </Pressable>
+                  </View>
+                  <Input.Slider
+                     minValue={ 0 }
+                     maxValue={ capacity }
+                     unit={ car.fuelTank.unit.short }
+                     tooltipAsInputField={ true }
+                     style={ {
+                         showsHandle: false,
+                         showsTag: true,
+                         showsPercent: true,
+                         innerTooltip: true,
+                         borderRadius: 0,
+                         trackBorderWidth: 0,
+                         barColor: [
+                             { color: "#FF3B30", percent: 0 },
+                             { color: "#FFCC00", percent: 45 },
+                             { color: "#02c227", percent: 75 },
+                             { color: "#02a121", percent: 100 }
+                         ],
+                         tooltipColor: COLORS.gray5,
+                         trackHeight: formTheme.containerHeight
+                     } }
+                  />
+               </>
+            }
         </Input.Field>
     );
 }
